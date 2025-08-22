@@ -27,6 +27,8 @@ marking the columns to be used in downstream analyses.
 including column key \var{col_key}, column name \var{col_name}, detected
 column type \var{col_class} and expected column type
 \var{expected_col_class}.
+\item\strong{non_unique_uniprot} Character vector of \var{OlinkID} mapped
+to more than one \var{UniProt} ID.
 }
 }
 \description{

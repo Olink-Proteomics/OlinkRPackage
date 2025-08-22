@@ -53,6 +53,8 @@
 #'   including column key \var{col_key}, column name \var{col_name}, detected
 #'   column type \var{col_class} and expected column type
 #'   \var{expected_col_class}.
+#'   \item\strong{non_unique_uniprot} Character vector of \var{OlinkID} mapped
+#'   to more than one \var{UniProt} ID.
 #' }
 #'
 #' @export
@@ -150,6 +152,12 @@ check_npx <- function(df,
 
   # assay QC
   check_npx_out_lst$assay_qc <- check_npx_qcwarn_assays(
+    df = df,
+    col_names = check_npx_out_lst$col_names
+  )
+
+  # non-unique uniprot id
+  check_npx_out_lst$non_unique_uniprot <- check_npx_nonunique_uniprot(
     df = df,
     col_names = check_npx_out_lst$col_names
   )
@@ -589,9 +597,12 @@ check_npx_olinkid <- function(df,
 
   # warning if there is any invalid Olink ID
   if (length(invalid_oid) > 0L) {
-    cli::cli_warn(c(
-      "Unrecognized OlinkID{?s} detected: {.val {invalid_oid}}"
-    ))
+    cli::cli_warn(
+      c(
+        "Unrecognized OlinkID{?s} detected: {.val {invalid_oid}}",
+        "i" = "Consider running {.fn clean_npx} next!"
+      )
+    )
   }
 
   # return ----
@@ -658,10 +669,13 @@ check_npx_all_na_assays <- function(df, col_names) {
 
   # Issue warning if any assays with only NAs are found
   if (length(all_nas) > 0L) {
-    cli::cli_warn(c(
-      "{.val {all_nas}} ha{?s/ve} {.val {col_names$quant}} = NA for all
-      samples."
-    ))
+    cli::cli_warn(
+      c(
+        "{.val {all_nas}} ha{?s/ve} {.val {col_names$quant}} = NA for all
+        samples.",
+        "i" = "Consider running {.fn clean_npx} next!"
+      )
+    )
   }
 
   return(all_nas)
@@ -706,9 +720,12 @@ check_npx_duplicate_sample_ids <- function(df, col_names) {
 
   # Warn if duplicates are found
   if (length(duplicates) > 0L) {
-    cli::cli_warn(c(
-      "Duplicate SampleID{?s} detected: {.val {duplicates}}"
-    ))
+    cli::cli_warn(
+      c(
+        "Duplicate SampleID{?s} detected: {.val {duplicates}}",
+        "i" = "Consider running {.fn clean_npx} next!"
+      )
+    )
   }
 
   return(duplicates)
@@ -775,10 +792,13 @@ check_npx_all_na_sample <- function(df, col_names) {
 
   # Issue warning if any assays with only NAs are found
   if (length(all_na_sample) > 0L) {
-    cli::cli_warn(c(
-      "{.val {all_na_sample}} ha{?s/ve} {.val {col_names$quant}} = NA for all
-      assays."
-    ))
+    cli::cli_warn(
+      c(
+        "{.val {all_na_sample}} ha{?s/ve} {.val {col_names$quant}} = NA for all
+        assays.",
+        "i" = "Consider running {.fn clean_npx} next!"
+      )
+    )
   }
 
   return(all_na_sample)
@@ -964,9 +984,12 @@ check_npx_qcwarn_assays <- function(df, col_names) {
 
     if (length(qc_warn_assays) > 0L) {
       cli::cli_inform(
-        c("{.val {length(qc_warn_assays)}} assay{?s} exhibited assay QC warnings
-        in column {.arg {unname(col_names$assay_warn)}} of the dataset:
-          {.val {qc_warn_assays}}.")
+        c(
+          "{.val {length(qc_warn_assays)}} assay{?s} exhibited assay QC warnings
+          in column {.arg {unname(col_names$assay_warn)}} of the dataset:
+          {.val {qc_warn_assays}}.",
+          "i" = "Consider running {.fn clean_npx} next!"
+        )
       )
     }
 
@@ -977,4 +1000,62 @@ check_npx_qcwarn_assays <- function(df, col_names) {
   }
 
   return(qc_warn_assays)
+}
+
+#' Help function checking for assays mapping to multiple UniProt identifiers.
+#'
+#' @author
+#'  Kathleen Nevola
+#'  Kang Dong
+#'  Klev Diamanti
+#'
+#' @description
+#' Occasionally, updates in panel versions include updates in \var{UniProt}
+#' identifiers (e.g. change in formatting). This function identifies cases where
+#' an assay identifier \var{OlinkID} maps to multiple \var{UniProt} identifiers.
+#'
+#' @inheritParams check_npx
+#' @inheritParams check_npx_olinkid
+#'
+#' @return A character vector of assay identifiers \var{OlinkID} that map to
+#' more than one \var{UniProt} identifiers.
+#'
+check_npx_nonunique_uniprot <- function(df, col_names) {
+
+  # Group by OlinkID and count distinct UniProt entries, and identify OlinkIDs
+  # linked to multiple UniProt IDs
+  oid_uniprot_dups <- df |>
+    dplyr::distinct( # Ensure uniqueness of OlinkID-UniProt pairs
+      .data[[col_names$olink_id]],
+      .data[[col_names$uniprot]]
+    ) |>
+    dplyr::group_by(
+      .data[[col_names$olink_id]]
+    ) |>
+    dplyr::summarise(
+      freq = dplyr::n(),
+      .groups = "drop"
+    ) |>
+    dplyr::filter(
+      .data[["freq"]] > 1L
+    ) |>
+    dplyr::collect() |>
+    dplyr::pull(
+      .data[[col_names$olink_id]]
+    )
+
+  # Emit a warning if any duplicates are found
+  if (length(oid_uniprot_dups) > 0L) {
+    cli::cli_warn(
+      c(
+        "Detected multiple UniProt identifiers for assay{?s}:
+        {.val {oid_uniprot_dups}}.",
+        "i" = "Consider running {.fn clean_npx} next!"
+      )
+    )
+  } else {
+    oid_uniprot_dups <- character(0L)
+  }
+
+  return(oid_uniprot_dups)
 }

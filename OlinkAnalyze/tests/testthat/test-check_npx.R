@@ -25,7 +25,7 @@ test_that(
   {
     df <- dplyr::tibble(
       SampleID = LETTERS[1L:4L],
-      OlinkID = rep("OID12345", 4L),
+      OlinkID = paste0("OID1234", seq(1L:4L)),
       UniProt = LETTERS[1L:4L],
       Assay = LETTERS[1L:4L],
       Panel = LETTERS[1L:4L],
@@ -55,7 +55,8 @@ test_that(
         "col_key" = character(0L),
         "expected_col_class" = character(0L)
       ),
-      assay_qc = character(0L)
+      assay_qc = character(0L),
+      non_unique_uniprot = character(0L)
     )
 
     expect_equal(
@@ -73,7 +74,7 @@ test_that(
       SampleID = LETTERS[1L:4L],
       SampleType = LETTERS[1L:4L],
       AssayType = LETTERS[1L:4L],
-      OlinkID = rep("OID12345", 4L),
+      OlinkID = c(paste0("OID1234", seq(1L:3L)), "OID12345"),
       UniProt = LETTERS[1L:4L],
       Assay = LETTERS[1L:4L],
       Panel = LETTERS[1L:4L],
@@ -115,7 +116,8 @@ test_that(
         "col_key" = character(0L),
         "expected_col_class" = character(0L)
       ),
-      assay_qc = c("OID12345")
+      assay_qc = c("OID12345"),
+      non_unique_uniprot = character(0L)
     )
 
     expect_message(
@@ -135,7 +137,7 @@ test_that(
     df <- dplyr::tibble(
       SampleID = c("A", "A", "C", "D"),
       OlinkID = rep("OID123456", 4L),
-      UniProt = LETTERS[1L:4L],
+      UniProt = rep(LETTERS[1L], 4L),
       Assay = LETTERS[1L:4L],
       Panel = LETTERS[1L:4L],
       Panel_Lot_Nr = LETTERS[1L:4L],
@@ -164,7 +166,8 @@ test_that(
         "col_key" = c("quant"),
         "expected_col_class" = c("numeric")
       ),
-      assay_qc = character(0L)
+      assay_qc = character(0L),
+      non_unique_uniprot = character(0L)
     )
 
     expect_warning(
@@ -180,6 +183,75 @@ test_that(
         regexp = "Duplicate SampleID detected"
       ),
       regexp = "\"NPX\": Expected \"numeric\". Detected \"character\"."
+    )
+  }
+)
+
+test_that(
+  "check_npx - warnings - OlinkIDs mapped with >1 Uniprots",
+  {
+    df <- dplyr::tibble(
+      SampleID = rep(x = "Sample1", times = 3L),
+      OlinkID = c("OID00001", "OID00002", "OID00002"),
+      UniProt = c("Uniprot_1", "Uniprot_2", "Uniprot_3"),
+      SampleType = rep(x = "SAMPLE", times = 3L),
+      AssayType = rep(x = "assay", times = 3L),
+      SampleQC = rep(x = "PASS", times = 3L),
+      AssayQC = rep(x = "PASS", times = 3L),
+      NPX = rnorm(n = 3L),
+      PlateID = rep(x = "plate1", times = 3L),
+      Assay = rep(x = "assay_a", times = 3L),
+      Panel = rep(x = "panel_a", times = 3L),
+      PanelVersion = rep(x = "panel_version_a", times = 3L),
+      LOD = rnorm(n = 3L),
+      ExtNPX = rnorm(n = 3L),
+      Count = rnorm(n = 3L),
+      Normalization = rep(x = "Intensity", times = 3L)
+    )
+
+    expected_result <- list(
+      col_names = list(
+        sample_id = "SampleID",
+        sample_type = "SampleType",
+        assay_type = "AssayType",
+        olink_id = "OlinkID",
+        uniprot = "UniProt",
+        assay = "Assay",
+        panel = "Panel",
+        plate_id = "PlateID",
+        panel_version = "PanelVersion",
+        lod = "LOD",
+        quant = "NPX",
+        ext_npx = "ExtNPX",
+        count = "Count",
+        qc_warning = "SampleQC",
+        assay_warn = "AssayQC",
+        normalization = "Normalization"
+      ),
+      oid_invalid = character(0L),
+      assay_na = character(0L),
+      sample_id_dups = c("Sample1"),
+      sample_id_na = character(0L),
+      col_class = dplyr::tibble(
+        "col_name" = character(0L),
+        "col_class" = character(0L),
+        "col_key" = character(0L),
+        "expected_col_class" = character(0L)
+      ),
+      assay_qc = character(0L),
+      non_unique_uniprot = c("OID00002")
+
+    )
+
+    expect_warning(
+      object = expect_warning(
+        object = expect_equal(
+          object = check_npx(df = df),
+          expected = expected_result
+        ),
+        regexp = "Duplicate SampleID detected: \"Sample1\""
+      ),
+      regexp = "Detected multiple UniProt identifiers for assay: \"OID00002\"."
     )
   }
 )
@@ -1214,6 +1286,132 @@ test_that(
         expected = c("OID12345", "OID12346", "OID12347", "OID12348")
       ),
       regexp = "\"OID12345\", \"OID12346\", \"OID12347\", and \"OID12348\"."
+    )
+  }
+)
+
+# Test check_npx_nonunique_uniprot ----
+
+test_that(
+  "check_npx_nonunique_uniprot - works - no OlinkID mapped with >1 Uniprot IDs",
+  {
+    df <- dplyr::tibble(
+      SampleID = c("Sample1", "Sample1", "Sample1"),
+      OlinkID = c("OID00001", "OID00002", "OID00003"),
+      UniProt = c("Uniprot_1", "Uniprot_2", "Uniprot_3")
+    )
+
+    col_names <- list(
+      sample_id = "SampleID",
+      olink_id = "OlinkID",
+      uniprot = "UniProt"
+    )
+
+    # test tibble ----
+
+    expect_equal(
+      object = check_npx_nonunique_uniprot(df = df,
+                                           col_names = col_names),
+      expected = character(0L)
+    )
+
+    # test arrow tibble ----
+
+    arrow_df <- arrow::as_arrow_table(x = df)
+
+    expect_equal(
+      object = check_npx_nonunique_uniprot(df = arrow_df,
+                                           col_names = col_names),
+      expected = character(0L)
+    )
+
+  }
+)
+
+test_that(
+  "check_npx_nonunique_uniprot - works - 1 OlinkID mapped with >1 Uniprot IDs",
+  {
+    df <- dplyr::tibble(
+      SampleID = c("Sample1", "Sample1", "Sample1"),
+      OlinkID = c("OID00001", "OID00002", "OID00002"),
+      UniProt = c("Uniprot_1", "Uniprot_2", "Uniprot_3")
+    )
+
+    col_names <- list(
+      sample_id = "SampleID",
+      olink_id = "OlinkID",
+      uniprot = "UniProt"
+    )
+
+    # test tibble ----
+
+    expect_warning(
+      object = expect_equal(
+        object = check_npx_nonunique_uniprot(df = df,
+                                             col_names = col_names),
+        expected = "OID00002"
+      ),
+      regexp = "Detected multiple UniProt identifiers for assay: \"OID00002\"."
+    )
+
+    # test arrow tibble ----
+
+    arrow_df <- arrow::as_arrow_table(x = df)
+
+    expect_warning(
+      object = expect_equal(
+        object = check_npx_nonunique_uniprot(df = arrow_df,
+                                             col_names = col_names),
+        expected = "OID00002"
+      ),
+      regexp = "Detected multiple UniProt identifiers for assay: \"OID00002\"."
+    )
+  }
+)
+
+test_that(
+  "check_npx_nonunique_uniprot - works - 3 OlinkID mapped with >1 Uniprot IDs",
+  {
+    df <- dplyr::tibble(
+      SampleID = rep("Sample1", times = 11L),
+      OlinkID = c("OID00001", "OID00002", "OID00002",
+                  "OID00003", "OID00003", "OID00003",
+                  "OID00004", "OID00004", "OID00004", "OID00004", "OID00004"),
+      UniProt = c("UP_1", "UP_2", "UP_3",
+                  "UP_4", "UP_5", "UP_6",
+                  "UP_7", "UP_7", "UP_8", "UP_8", "UP_9")
+    )
+
+    col_names <- list(
+      sample_id = "SampleID",
+      olink_id = "OlinkID",
+      uniprot = "UniProt"
+    )
+
+    # test tibble ----
+
+    expect_warning(
+      object = expect_equal(
+        object = check_npx_nonunique_uniprot(df = df,
+                                             col_names = col_names),
+        expected = c("OID00002", "OID00003", "OID00004")
+      ),
+      regexp = paste("Detected multiple UniProt identifiers for assays:",
+                     "\"OID00002\", \"OID00003\", and \"OID00004\".")
+    )
+
+    # test arrow tibble ----
+
+    arrow_df <- arrow::as_arrow_table(x = df)
+
+    expect_warning(
+      object = expect_equal(
+        object = check_npx_nonunique_uniprot(df = arrow_df,
+                                             col_names = col_names),
+        expected = c("OID00002", "OID00003", "OID00004")
+      ),
+      regexp = paste("Detected multiple UniProt identifiers for assays:",
+                     "\"OID00002\", \"OID00003\", and \"OID00004\".")
     )
   }
 )
