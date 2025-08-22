@@ -52,7 +52,7 @@ jobs:
           extra-packages: any::rcmdcheck, any::pillar
           
       - name: Install arrow from apache r-universe for windows
-        if: matrix.oss == 'windows-latest'
+        if: matrix.os == 'windows-latest'
         run: |
           Sys.unsetenv("RSPM")
           Sys.unsetenv("RENV_CONFIG_REPOS_OVERRIDE")
