@@ -3,6 +3,8 @@
 #' @author
 #'   Klev Diamanti
 #'
+#' @keywords internal
+#'
 #' @return A scalar character vector with the class type of outputs from
 #' read_npx* functions.
 #'
@@ -19,6 +21,8 @@ get_df_output_print <- function() {
 #'
 #' @author
 #'   Klev Diamanti
+#'
+#' @keywords internal
 #'
 #' @return A scalar character vector with one sentence describing the acceptable
 #' extensions of each file type.
@@ -43,6 +47,8 @@ get_file_ext_summary <- function() {
 #' @author
 #'   Klev Diamanti
 #'
+#' @keywords internal
+#'
 #' @return A character vector with the acceptable file formats.
 #'
 get_file_formats <- function() {
@@ -61,6 +67,8 @@ get_file_formats <- function() {
 #' @param name_sub Substring of file format. One of
 #' `r ansi_collapse_quot(c(get_file_formats(), "NULL"))`. If `NULL` all
 #' file extensions are returned.
+#'
+#' @keywords internal
 #'
 #' @return Character vector with accepted file extensions.
 #'
