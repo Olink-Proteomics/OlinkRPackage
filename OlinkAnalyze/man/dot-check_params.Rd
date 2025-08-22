@@ -36,3 +36,4 @@ Common parameters for check functions.
 \author{
 Klev Diamanti
 }
+\keyword{internal}

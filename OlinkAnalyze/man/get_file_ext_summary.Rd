@@ -16,3 +16,4 @@ Describes acceptable file extension for each file type.
 \author{
 Klev Diamanti
 }
+\keyword{internal}

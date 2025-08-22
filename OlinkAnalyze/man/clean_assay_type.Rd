@@ -30,3 +30,4 @@ function uses column mapping provided by \code{check_log}.
 Kang Dong
 Klev Diamanti
 }
+\keyword{internal}

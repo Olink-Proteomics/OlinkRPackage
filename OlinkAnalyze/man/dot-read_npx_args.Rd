@@ -62,3 +62,4 @@ Common parameters for read_npx-related functions.
 \author{
 Klev Diamanti
 }
+\keyword{internal}

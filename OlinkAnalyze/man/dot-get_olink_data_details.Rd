@@ -29,3 +29,4 @@ Common parameters for getter functions in this file.
 \author{
 Klev Diamanti
 }
+\keyword{internal}

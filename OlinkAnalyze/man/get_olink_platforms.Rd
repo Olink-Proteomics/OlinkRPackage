@@ -29,3 +29,4 @@ Get names of selected Olink platforms.
 \author{
 Klev Diamanti
 }
+\keyword{internal}

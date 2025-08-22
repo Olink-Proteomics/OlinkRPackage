@@ -36,3 +36,4 @@ Help function checking that \var{olink_platform} is expected.
 \author{
 Klev Diamanti
 }
+\keyword{internal}

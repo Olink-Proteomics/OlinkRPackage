@@ -19,3 +19,4 @@ Common parameters for downstream anaysis functions.
 \author{
 Klev Diamanti
 }
+\keyword{internal}

@@ -28,3 +28,4 @@ class using information from \code{check_log$col_class}.
 Kang Dong
 Klev Diamanti
 }
+\keyword{internal}

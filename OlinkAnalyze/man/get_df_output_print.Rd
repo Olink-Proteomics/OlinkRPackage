@@ -16,3 +16,4 @@ Prints class type output from read_npx* functions.
 \author{
 Klev Diamanti
 }
+\keyword{internal}

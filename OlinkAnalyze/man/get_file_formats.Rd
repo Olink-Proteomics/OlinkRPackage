@@ -15,3 +15,4 @@ Get all acceptable file formats.
 \author{
 Klev Diamanti
 }
+\keyword{internal}

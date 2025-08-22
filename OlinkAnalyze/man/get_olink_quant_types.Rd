@@ -33,3 +33,4 @@ Get names of selected Olink quantification types.
 \author{
 Klev Diamanti
 }
+\keyword{internal}
