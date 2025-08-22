@@ -203,6 +203,8 @@ check_npx <- function(df,
 #'
 #' @inheritParams check_npx
 #'
+#' @keywords internal
+#'
 #' @return List of column names from the input data frame marking the columns to
 #' be used in downstream analyses.
 #'
@@ -466,6 +468,8 @@ check_npx_col_names <- function(df,
 #'
 #' @inheritParams check_npx
 #'
+#' @keywords internal
+#'
 #' @return \var{column_name_dict} updated based on \var{preferred_names}.
 #'
 check_npx_update_col_names <- function(preferred_names) {
@@ -570,6 +574,8 @@ check_npx_update_col_names <- function(preferred_names) {
 #' @param col_names A list of matched column names. This is the output of the
 #' \var{check_npx_col_names} function.
 #'
+#' @keywords internal
+#'
 #' @return A character vector with invalid \var{OlinkID}.
 #'
 check_npx_olinkid <- function(df,
@@ -629,6 +635,8 @@ check_npx_olinkid <- function(df,
 #'
 #' @inheritParams check_npx
 #' @inheritParams check_npx_olinkid
+#'
+#' @keywords internal
 #'
 #' @return A character vector containing \var{OlinkID} of assays with quantified
 #' values \emph{NA} for all samples, otherwise returns \emph{character(0)}.
@@ -692,6 +700,8 @@ check_npx_all_na_assays <- function(df, col_names) {
 #' @inheritParams check_npx
 #' @inheritParams check_npx_olinkid
 #'
+#' @keywords internal
+#'
 #' @return A character vector of duplicate \var{SampleID} found in the data.
 #'
 check_npx_duplicate_sample_ids <- function(df, col_names) {
@@ -751,6 +761,8 @@ check_npx_duplicate_sample_ids <- function(df, col_names) {
 #'
 #' @inheritParams check_npx
 #' @inheritParams check_npx_olinkid
+#'
+#' @keywords internal
 #'
 #' @return A character vector containing \var{SampleID} of samples with
 #' quantified values \emph{NA} for all assays, otherwise returns
@@ -817,6 +829,8 @@ check_npx_all_na_sample <- function(df, col_names) {
 #'
 #' @inheritParams check_npx
 #' @inheritParams check_npx_olinkid
+#'
+#' @keywords internal
 #'
 #' @returns A data frame with the columns \var{col_name}, \var{col_key},
 #' \var{col_class} and \var{expected_col_class} marking columns with the
@@ -952,6 +966,8 @@ check_npx_col_class <- function(df, col_names) {
 #' @inheritParams check_npx
 #' @inheritParams check_npx_olinkid
 #'
+#' @keywords internal
+#'
 #' @returns A character vector containing \var{OlinkID} of assays with at least
 #' one QC warning, otherwise a \emph{character(0)}.
 #'
@@ -1016,6 +1032,8 @@ check_npx_qcwarn_assays <- function(df, col_names) {
 #'
 #' @inheritParams check_npx
 #' @inheritParams check_npx_olinkid
+#'
+#' @keywords internal
 #'
 #' @return A character vector of assay identifiers \var{OlinkID} that map to
 #' more than one \var{UniProt} identifiers.

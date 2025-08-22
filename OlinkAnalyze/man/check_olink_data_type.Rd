@@ -36,3 +36,4 @@ Help function checking that \var{data_type} is expected.
 \author{
 Klev Diamanti
 }
+\keyword{internal}

@@ -58,3 +58,4 @@ Help function utilizing functions from \code{\link{read_npx_format}} and
 \author{
 Klev Diamanti
 }
+\keyword{internal}

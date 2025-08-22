@@ -18,3 +18,4 @@ Utility function removing columns with all values NA from a dataset.
 \author{
 Klev Diamanti
 }
+\keyword{internal}

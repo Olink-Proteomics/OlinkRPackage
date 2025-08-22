@@ -33,3 +33,4 @@ Get names of selected broader Olink platforms.
 \author{
 Klev Diamanti
 }
+\keyword{internal}

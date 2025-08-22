@@ -34,3 +34,4 @@ Help function ensuring \code{\link{read_npx_legacy}} works
 \author{
 Klev Diamanti
 }
+\keyword{internal}

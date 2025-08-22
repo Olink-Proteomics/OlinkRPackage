@@ -3,6 +3,8 @@
 #' @author
 #'   Klev Diamanti
 #'
+#' @keywords internal
+#'
 #' @return A character vector with names of all Olink platforms.
 #'
 get_all_olink_platforms <- function() {
@@ -20,6 +22,8 @@ get_all_olink_platforms <- function() {
 #' Get names of selected Olink platforms.
 #'
 #' @inherit .get_olink_data_details params author
+#'
+#' @keywords internal
 #'
 #' @return A character vector with names of Olink platforms filtered by
 #' \var{broad_platform}, \var{data_type}, and \var{quant_type}.
@@ -79,6 +83,8 @@ get_olink_platforms <- function(broad_platform = NULL,
 #' @param x Name of Olink platform. One of
 #' `r ansi_collapse_quot(get_olink_platforms())`.
 #'
+#' @keywords internal
+#'
 #' @return
 #' `NULL` if platform is expected, otherwise an error.
 #'
@@ -136,6 +142,8 @@ check_olink_platform <- function(x,
 #' @author
 #'   Klev Diamanti
 #'
+#' @keywords internal
+#'
 #' @return A character vector with names of all Olink broader platforms.
 #'
 get_all_olink_broader_platforms <- function() { # nolint object_length_linter
@@ -153,6 +161,8 @@ get_all_olink_broader_platforms <- function() { # nolint object_length_linter
 #' Get names of selected broader Olink platforms.
 #'
 #' @inherit .get_olink_data_details params author
+#'
+#' @keywords internal
 #'
 #' @return A character vector with names of Olink broader platforms filtered by
 #' \var{platform_name}, \var{data_type}, and \var{quant_type}.
@@ -212,6 +222,8 @@ get_olink_broader_platforms <- function(platform_name = NULL,
 #' @param x Name of the broader Olink platform. One of
 #' `r ansi_collapse_quot(get_olink_broader_platforms())`.
 #'
+#' @keywords internal
+#'
 #' @return
 #' `NULL` if broader Olink platform is expected, otherwise an error.
 #'
@@ -269,6 +281,8 @@ check_olink_broader_platform <- function(x,
 #' @author
 #'   Klev Diamanti
 #'
+#' @keywords internal
+#'
 #' @return A character vector with names of all Olink quantification methods
 #' (data types).
 #'
@@ -293,6 +307,8 @@ get_all_olink_data_types <- function() {
 #'   Klev Diamanti
 #'
 #' @inherit .get_olink_data_details params author
+#'
+#' @keywords internal
 #'
 #' @return A character vector with names of Olink quantification methods (data
 #' types) filtered by \var{broad_platform}, \var{platform_name}, and
@@ -353,6 +369,8 @@ get_olink_data_types <- function(broad_platform = NULL,
 #' @param x The name of the Olink data type. One of
 #' `r ansi_collapse_quot(get_olink_data_types())`.
 #'
+#' @keywords internal
+#'
 #' @return
 #' `NULL` if quantification method (data type) is expected, otherwise an error.
 #'
@@ -410,6 +428,8 @@ check_olink_data_type <- function(x,
 #' @author
 #'   Klev Diamanti
 #'
+#' @keywords internal
+#'
 #' @return A character vector with names of all Olink quantification types.
 #'
 get_all_olink_quant_types <- function() {
@@ -430,6 +450,8 @@ get_all_olink_quant_types <- function() {
 #' Get names of selected Olink quantification types.
 #'
 #' @inherit .get_olink_data_details params author
+#'
+#' @keywords internal
 #'
 #' @return A character vector with names of Olink quantification types filtered
 #' by \var{broad_platform}, \var{platform_name}, and \var{data_type}.
@@ -488,6 +510,8 @@ get_olink_quant_types <- function(broad_platform = NULL,
 #' @inherit .get_olink_data_details params author
 #' @param x The name of the Olink quantification type. One of
 #' `r ansi_collapse_quot(get_olink_quant_types())`.
+#'
+#' @keywords internal
 #'
 #' @return
 #' `NULL` if quantification type is expected, otherwise an error.
@@ -556,6 +580,8 @@ check_olink_quant_type <- function(x,
 #' @param quant_type Name of the \var{quant_type} to filter for. If `NULL` all
 #' quantification types are considered, otherwise one of
 #' `r ansi_collapse_quot(get_olink_quant_types())` is expected.
+#'
+#' @keywords internal
 #'
 .get_olink_data_details <- function(broad_platform,
                                     platform_name,

@@ -29,3 +29,4 @@ Additional checks of the top matrix of Olink dataset in wide format.
 \author{
 Klev Diamanti
 }
+\keyword{internal}

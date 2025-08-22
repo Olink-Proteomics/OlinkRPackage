@@ -36,3 +36,4 @@ Help function checking that \var{broad_platform} is expected.
 \author{
 Klev Diamanti
 }
+\keyword{internal}

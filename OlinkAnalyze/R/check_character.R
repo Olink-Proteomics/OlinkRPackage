@@ -2,6 +2,8 @@
 #'
 #' @inherit .check_params params author return seealso
 #'
+#' @keywords internal
+#'
 check_is_character <- function(x,
                                error = FALSE) {
 
@@ -40,6 +42,8 @@ check_is_character <- function(x,
 #' Help function checking if a variable is a scalar character.
 #'
 #' @inherit .check_params params author return seealso
+#'
+#' @keywords internal
 #'
 check_is_scalar_character <- function(x,
                                       error = FALSE) {

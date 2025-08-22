@@ -2,6 +2,8 @@
 #'
 #' @inherit .check_params params author return seealso
 #'
+#' @keywords internal
+#'
 check_is_list <- function(x,
                           error = FALSE) {
 

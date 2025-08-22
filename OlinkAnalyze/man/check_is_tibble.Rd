@@ -36,3 +36,4 @@ Help function checking if a variable is a tibble dataset.
 \author{
 Klev Diamanti
 }
+\keyword{internal}

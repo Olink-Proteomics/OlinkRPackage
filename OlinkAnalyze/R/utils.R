@@ -5,6 +5,8 @@
 #'
 #' @param df An Olink dataset.
 #'
+#' @keywords internal
+#'
 #' @return The input Olink dataset without all-NA columns.
 #'
 remove_all_na_cols <- function(df) {
@@ -40,6 +42,8 @@ remove_all_na_cols <- function(df) {
 #' @param x Character vector.
 #' @param sep One of "or" and "and".
 #'
+#' @keywords internal
+#'
 #' @return Scalar character vector collapsed by "and" or "or".
 #'
 ansi_collapse_quot <- function(x,
@@ -62,6 +66,8 @@ ansi_collapse_quot <- function(x,
 #' @param x Variable to check.
 #' @param error Scalar boolean to return an error instead of a `FALSE`
 #' (`default = FALSE`).
+#'
+#' @keywords internal
 #'
 #' @return Boolean, `TRUE` or `FALSE`, if the variable is of the correct class;
 #' If output is `FALSE` and \var{error} = `TRUE`, an error is thrown.
@@ -113,6 +119,8 @@ ansi_collapse_quot <- function(x,
 #' \strong{Important: should be used only to wide format files from Target 96 or
 #' Target 48 with NPX Software version earlier than 1.8!} (default `FALSE`).
 #'
+#' @keywords internal
+#'
 #' @return Dataset,
 #' `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")`, with Olink
 #' data in long format.
@@ -136,6 +144,8 @@ ansi_collapse_quot <- function(x,
 #' from \code{\link{read_npx}}.
 #' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
 #' [`check_npx()`] will be run internally using `df`.
+#'
+#' @keywords internal
 #'
 .downstream_fun_args <- function(df,
                                  check_log) {}

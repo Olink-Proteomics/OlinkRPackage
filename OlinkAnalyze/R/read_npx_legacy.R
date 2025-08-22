@@ -25,6 +25,8 @@
 #' \var{olink_wide_spec}.
 #' }
 #'
+#' @keywords internal
+#'
 read_npx_legacy_help <- function(file,
                                  out_df,
                                  olink_platform = NULL,
@@ -194,6 +196,8 @@ read_npx_legacy_help <- function(file,
 #' \var{olink_wide_bottom_matrix}.
 #'
 #' @return `NULL` unless unsupported file is detected.
+#'
+#' @keywords internal
 #'
 read_npx_legacy_check <- function(file,
                                   df_top,
@@ -390,6 +394,8 @@ read_npx_legacy_check <- function(file,
 #'
 #' @inherit read_npx_wide params return
 #' @inherit read_npx params
+#'
+#' @keywords internal
 #'
 #' @seealso
 #'   \code{\link{read_npx_format_read}}

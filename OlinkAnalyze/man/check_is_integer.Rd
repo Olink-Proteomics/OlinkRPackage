@@ -36,3 +36,4 @@ Help function checking if a variable is a vector of integers.
 \author{
 Klev Diamanti
 }
+\keyword{internal}

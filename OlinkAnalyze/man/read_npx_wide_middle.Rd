@@ -23,9 +23,7 @@ each chunk of columns \var{df_top} was split on in function.
 }
 \value{
 A list of data frames (df_oid, df_pid, df_qc_warn and df_int_ctrl) in
-long format from the middle matrix of an Olink wide file.
-
-A list of data frames from middle matrix in long format:
+long format from the middle matrix of an Olink wide file:
 \itemize{
 \item Data frame containing measurements of Olink assays \var{df_mid_oid}
 \item Data frame containing plate identifiers \var{df_mid_pid}
@@ -50,3 +48,4 @@ middle matrix \var{df_mid} into corresponding chunks of columns.
 \author{
 Klev Diamanti
 }
+\keyword{internal}

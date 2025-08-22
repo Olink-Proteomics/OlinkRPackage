@@ -66,6 +66,8 @@
 #' @returns
 #' Nothing or an error message if any column is missing.
 #'
+#' @keywords internal
+#'
 check_columns <- function(df,
                           col_list) {
 

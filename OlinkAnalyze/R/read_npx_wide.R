@@ -14,6 +14,8 @@
 #' One of `NULL` (default) for auto-detection,
 #' `r ansi_collapse_quot(get_olink_platforms(broad_platform = "qPCR"), "or")`.
 #'
+#' @keywords internal
+#'
 #' @seealso
 #'   \code{\link{read_npx_format}}
 #'   \code{\link{read_npx_wide_split_row}}
@@ -211,6 +213,8 @@ read_npx_wide <- function(df,
 #'   \item \strong{Bottom matrix} as \var{df_bottom}
 #' }
 #'
+#' @keywords internal
+#'
 #' @seealso
 #'   \code{\link{read_npx_wide}}
 #'   \code{\link{read_npx_wide_npxs_version}}
@@ -372,6 +376,8 @@ read_npx_wide_split_row <- function(df,
 #'
 #' @return The version of the NPX Signature software.
 #'
+#' @keywords internal
+#'
 #' @seealso
 #'   \code{\link{read_npx_wide}}
 #'   \code{\link{read_npx_wide_split_row}}
@@ -414,6 +420,8 @@ read_npx_wide_npxs_version <- function(df) {
 #' @inheritParams read_npx_wide_top
 #'
 #' @return NULL unless an inconsistency is spotted.
+#'
+#' @keywords internal
 #'
 #' @seealso
 #'   \code{\link{read_npx_wide_top}}
@@ -711,6 +719,8 @@ read_npx_wide_check_top <- function(df,
 #'   \var{df_top_dev_int_ctrl}
 #' }
 #'
+#' @keywords internal
+#'
 #' @seealso
 #'   \code{\link{read_npx_wide}}
 #'   \code{\link{read_npx_wide_split_row}}
@@ -935,9 +945,7 @@ read_npx_wide_top <- function(df,
 #' \code{\link{read_npx_wide_top}}.
 #'
 #' @return A list of data frames (df_oid, df_pid, df_qc_warn and df_int_ctrl) in
-#' long format from the middle matrix of an Olink wide file.
-#'
-#' A list of data frames from middle matrix in long format:
+#' long format from the middle matrix of an Olink wide file:
 #' \itemize{
 #'   \item Data frame containing measurements of Olink assays \var{df_mid_oid}
 #'   \item Data frame containing plate identifiers \var{df_mid_pid}
@@ -947,6 +955,8 @@ read_npx_wide_top <- function(df,
 #'   \item Data frame containing measurements of deviations from internal
 #'   control assays \var{df_mid_dev_int_ctrl}
 #' }
+#'
+#' @keywords internal
 #'
 #' @seealso
 #'   \code{\link{read_npx_wide}}
@@ -1153,6 +1163,8 @@ read_npx_wide_middle <- function(df,
 #'
 #' @return Same tibble as input with additional column \var{Panel_Version}.
 #'
+#' @keywords internal
+#'
 read_npx_wide_panel_version <- function(df) {
 
   # check columns ----
@@ -1220,6 +1232,8 @@ read_npx_wide_panel_version <- function(df) {
 #' function \code{\link{read_npx_wide_middle}}.
 #'
 #' @return Tibble in long format combining the top and middle matrices.
+#'
+#' @keywords internal
 #'
 #' @seealso
 #'   \code{\link{read_npx_wide_top}}
@@ -1372,6 +1386,8 @@ red_npx_wide_top_mid_long <- function(df_top_list,
 #' @inheritParams read_npx_wide_bottom
 #'
 #' @return Tibble with the bottom matrix specifications for the Olink wide file.
+#'
+#' @keywords internal
 #'
 #' @seealso
 #'   \code{\link{read_npx_wide_bottom}}
@@ -1532,6 +1548,8 @@ read_npx_wide_bottom_version <- function(df,
 #' from the combination of top and middle data frames.
 #'
 #' @return A tibble with the bottom matrix of an Olink wide file in long format.
+#'
+#' @keywords internal
 #'
 #' @seealso
 #'   \code{\link{read_npx_wide}}

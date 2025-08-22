@@ -21,6 +21,8 @@
 #' `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")`, with Olink
 #' data in long or wide format.
 #'
+#' @keywords internal
+#'
 #' @seealso
 #'   \code{\link{read_npx}}
 #'   \code{\link{read_npx_parquet}}
@@ -200,6 +202,8 @@ read_npx_csv <- read_npx_delim
 #' @return Dataset, `r ansi_collapse_quot(x = "tibble")`, with Olink data in
 #' long format.
 #'
+#' @keywords internal
+#'
 #' @seealso
 #'   \code{\link{read_npx_delim_wide}}
 #'   \code{\link{read_npx_delim}}
@@ -243,6 +247,8 @@ read_npx_delim_long <- function(file,
 #'
 #' @return Dataset, `r ansi_collapse_quot(x = "tibble")`, with Olink data in
 #' wide format.
+#'
+#' @keywords internal
 #'
 #' @seealso
 #'   \code{\link{read_npx_delim_long}}
@@ -317,6 +323,8 @@ read_npx_delim_wide <- function(file,
 #'
 #' @return The file delimiter
 #' `r ansi_collapse_quot(x = accepted_field_sep, sep = "or")`.
+#'
+#' @keywords internal
 #'
 #' @seealso
 #'   \code{\link{read_npx_delim}}

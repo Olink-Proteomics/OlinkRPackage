@@ -41,6 +41,8 @@
 #' dataset. Used only when \code{\link{read_npx_format}} is called from
 #' \code{\link{read_npx_legacy}}.
 #'
+#' @keywords internal
+#'
 #' @seealso
 #'   \code{\link{read_npx}}
 #'   \code{\link{read_npx_format_read}}
@@ -231,6 +233,8 @@ read_npx_format <- function(file,
 #' \var{olink_platform} and \var{data_type}.
 #' }
 #'
+#' @keywords internal
+#'
 #' @seealso
 #'   \code{\link{read_npx_format}}
 #'   \code{\link{read_npx_format_get_format}}
@@ -371,6 +375,8 @@ read_npx_format_read <- function(file,
 #' detection of the quantification method. Used in function
 #' \code{\link{read_npx_format_get_quant}}.
 #' }
+#'
+#' @keywords internal
 #'
 #' @seealso
 #'   \code{\link{read_npx_format}}
@@ -573,6 +579,8 @@ read_npx_format_get_format <- function(df_top_n,
 #' @return The name of the Olink platform. One of
 #' `r ansi_collapse_quot(get_olink_platforms(broad_platform = "qPCR"), "or")`.
 #'
+#' @keywords internal
+#'
 #' @seealso
 #'   \code{\link{read_npx_format}}
 #'   \code{\link{read_npx_format_read}}
@@ -751,6 +759,8 @@ read_npx_format_get_platform <- function(df_top_n,
 #'
 #' @return The name of the data type. One of
 #' `r ansi_collapse_quot(get_olink_data_types(broad_platform = "qPCR"), "or")`.
+#'
+#' @keywords internal
 #'
 #' @seealso
 #'   \code{\link{read_npx_format}}

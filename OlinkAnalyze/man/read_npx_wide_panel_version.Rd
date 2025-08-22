@@ -15,3 +15,4 @@ Same tibble as input with additional column \var{Panel_Version}.
 \description{
 Help function to extract Panel_Version from Panel column.
 }
+\keyword{internal}

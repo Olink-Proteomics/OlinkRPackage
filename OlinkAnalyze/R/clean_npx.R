@@ -283,6 +283,8 @@ clean_npx <- function(df,
 #'
 #' @inherit clean_npx params return author
 #'
+#' @keywords internal
+#'
 clean_assay_na <- function(df,
                            check_log,
                            remove_assay_na = TRUE,
@@ -345,6 +347,8 @@ clean_assay_na <- function(df,
 #' invalid or malformed assay identifiers.
 #'
 #' @inherit clean_npx params return author
+#'
+#' @keywords internal
 #'
 clean_invalid_oid <- function(df,
                               check_log,
@@ -409,6 +413,8 @@ clean_invalid_oid <- function(df,
 #'
 #' @inherit clean_npx params return author
 #'
+#' @keywords internal
+#'
 clean_duplicate_sample_id <- function(df,
                                       check_log,
                                       remove_dup_sample_id = TRUE,
@@ -471,6 +477,8 @@ clean_duplicate_sample_id <- function(df,
 #' the original data unchanged.
 #'
 #' @inherit clean_npx params return author
+#'
+#' @keywords internal
 #'
 clean_sample_type <- function(df,
                               check_log,
@@ -603,6 +611,8 @@ clean_sample_type <- function(df,
 #'
 #' @inherit clean_npx params return author
 #'
+#' @keywords internal
+#'
 clean_assay_type <- function(df,
                              check_log,
                              remove_control_assay = TRUE,
@@ -732,6 +742,8 @@ clean_assay_type <- function(df,
 #'
 #' @inherit clean_npx params return author
 #'
+#' @keywords internal
+#'
 clean_qc_warning <- function(df,
                              check_log,
                              remove_qc_warning = TRUE,
@@ -819,6 +831,8 @@ clean_qc_warning <- function(df,
 #' `check_log` to remove assays flagged as `WARN` in the dataset.
 #'
 #' @inherit clean_npx params return author
+#'
+#' @keywords internal
 #'
 clean_assay_warning <- function(df,
                                 check_log,
@@ -923,6 +937,8 @@ clean_assay_warning <- function(df,
 #'
 #' @inherit clean_npx params return author
 #'
+#' @keywords internal
+#'
 #' @examples
 #' \dontrun{
 #' # use npx_data1 to check that clean_control_sample_id() works
@@ -1017,6 +1033,8 @@ clean_control_sample_id <- function(df,
 #'
 #' @inherit clean_npx params return author
 #'
+#' @keywords internal
+#'
 clean_col_class <- function(df,
                             check_log,
                             convert_df_cols = TRUE,
@@ -1100,6 +1118,8 @@ clean_col_class <- function(df,
 #' replaces the original UniProt column with the unified mapping.
 #'
 #' @inherit clean_npx params return author
+#'
+#' @keywords internal
 #'
 clean_nonunique_uniprot <- function(df,
                                     check_log,
