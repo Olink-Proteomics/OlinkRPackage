@@ -2,6 +2,8 @@
 #'
 #' @inherit .check_params params author return seealso
 #'
+#' @keywords internal
+#'
 check_is_boolean <- function(x,
                              error = FALSE) {
 
@@ -36,6 +38,8 @@ check_is_boolean <- function(x,
 #' Help function checking if a variable is a scalar boolean.
 #'
 #' @inherit .check_params params author return seealso
+#'
+#' @keywords internal
 #'
 check_is_scalar_boolean <- function(x,
                                     error = FALSE) {

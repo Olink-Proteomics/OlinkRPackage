@@ -2,6 +2,8 @@
 #'
 #' @inherit .check_params params author return seealso
 #'
+#' @keywords internal
+#'
 check_is_arrow_object <- function(x,
                                   error = FALSE) {
 
@@ -42,6 +44,8 @@ check_is_arrow_object <- function(x,
 #'
 #' @inherit .check_params params author return seealso
 #'
+#' @keywords internal
+#'
 check_is_tibble <- function(x,
                             error = FALSE) {
 
@@ -81,6 +85,8 @@ check_is_tibble <- function(x,
 #' Help function checking if a variable is a tibble or an ArrowObject dataset.
 #'
 #' @inherit .check_params params author return seealso
+#'
+#' @keywords internal
 #'
 check_is_dataset <- function(x,
                              error = FALSE) {

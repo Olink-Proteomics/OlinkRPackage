@@ -9,6 +9,8 @@
 #' @return `TRUE` if the file exists, and `FALSE` if not; error if the file does
 #' not exist and `error = TRUE`.
 #'
+#' @keywords internal
+#'
 check_file_exists <- function(file,
                               error = FALSE) {
 
@@ -59,6 +61,8 @@ check_file_exists <- function(file,
 #'
 #' @return The type of the file extension based on the global variable
 #' \var{accepted_npx_file_ext}.
+#'
+#' @keywords internal
 #'
 check_file_extension <- function(file) {
 
