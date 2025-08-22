@@ -23,3 +23,4 @@ Help function checking data for assay QC warnings.
 \author{
 Klev Diamanti
 }
+\keyword{internal}

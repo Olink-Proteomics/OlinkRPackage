@@ -36,3 +36,4 @@ Help function checking if a variable is a scalar character.
 \author{
 Klev Diamanti
 }
+\keyword{internal}

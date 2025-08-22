@@ -36,3 +36,4 @@ Help function checking if a variable is a vector of numerics.
 \author{
 Klev Diamanti
 }
+\keyword{internal}

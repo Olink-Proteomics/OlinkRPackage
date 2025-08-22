@@ -27,3 +27,4 @@ the columns \var{col_class} and \var{col_class_check} of
 \author{
 Klev Diamanti
 }
+\keyword{internal}

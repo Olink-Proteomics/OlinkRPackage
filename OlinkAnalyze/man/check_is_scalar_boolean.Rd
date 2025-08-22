@@ -36,3 +36,4 @@ Help function checking if a variable is a scalar boolean.
 \author{
 Klev Diamanti
 }
+\keyword{internal}

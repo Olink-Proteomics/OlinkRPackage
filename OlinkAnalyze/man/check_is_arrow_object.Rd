@@ -36,3 +36,4 @@ Help function checking if a variable is an R6 ArrowObject.
 \author{
 Klev Diamanti
 }
+\keyword{internal}

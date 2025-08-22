@@ -22,3 +22,4 @@ This function checks if there are duplicate sample identifiers for any assay.
 \author{
 Masoumeh Sheikhi
 }
+\keyword{internal}

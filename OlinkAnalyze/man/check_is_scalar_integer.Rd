@@ -36,3 +36,4 @@ Help function checking if a variable is a scalar integer.
 \author{
 Klev Diamanti
 }
+\keyword{internal}
