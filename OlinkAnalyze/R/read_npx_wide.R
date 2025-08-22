@@ -945,11 +945,7 @@ read_npx_wide_top <- function(df,
 #' \code{\link{read_npx_wide_top}}.
 #'
 #' @return A list of data frames (df_oid, df_pid, df_qc_warn and df_int_ctrl) in
-#' long format from the middle matrix of an Olink wide file.
-#'
-#' @keywords internal
-#'
-#' A list of data frames from middle matrix in long format:
+#' long format from the middle matrix of an Olink wide file:
 #' \itemize{
 #'   \item Data frame containing measurements of Olink assays \var{df_mid_oid}
 #'   \item Data frame containing plate identifiers \var{df_mid_pid}
@@ -959,6 +955,8 @@ read_npx_wide_top <- function(df,
 #'   \item Data frame containing measurements of deviations from internal
 #'   control assays \var{df_mid_dev_int_ctrl}
 #' }
+#'
+#' @keywords internal
 #'
 #' @seealso
 #'   \code{\link{read_npx_wide}}
