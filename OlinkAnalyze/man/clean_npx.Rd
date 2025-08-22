@@ -7,7 +7,6 @@
 clean_npx(
   df,
   check_log = NULL,
-  preferred_names = NULL,
   remove_assay_na = TRUE,
   remove_invalid_oid = TRUE,
   remove_dup_sample_id = TRUE,
@@ -17,6 +16,7 @@ clean_npx(
   remove_assay_warning = TRUE,
   control_sample_ids = NULL,
   convert_df_cols = TRUE,
+  convert_nonunique_uniprot = TRUE,
   out_df = "tibble",
   verbose = FALSE
 )
@@ -26,12 +26,7 @@ clean_npx(
 from \code{\link{read_npx}}.}
 
 \item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df} and \code{preferred_names}.}
-
-\item{preferred_names}{Optional to be provided only if \code{check_log} is \code{NULL}.
-A named character vector where names are internal column names and values are
-column names to be selected from the input data frame. Read the
-\emph{description} from \code{\link[=check_npx]{check_npx()}} for further information.}
+\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
 
 \item{remove_assay_na}{Logical. If \code{FALSE}, skips filtering assays with all
 quantified values \code{NA}. Defaults to \code{TRUE}.}
@@ -66,14 +61,14 @@ samples. Default \code{NULL}, to mark no samples to be removed.}
 Defaults to \code{TRUE}, were columns required for downstream analysis are
 converted to the expected format.}
 
-\item{out_df}{The class of the output data set. One of
-"tibble" and "arrow". (default = \code{"tibble"})}
+\item{convert_nonunique_uniprot}{Logical. If \code{FALSE}, retains non-unique
+OlinkID - UniProt mapping. Defaults to \code{TRUE}.}
+
+\item{out_df}{The class of the output dataset. One of
+"tibble" or "arrow". Defaults to
+"tibble".}
 
 \item{verbose}{Logical. If \code{FALSE} (default), silences step-wise messages.}
-}
-\value{
-Clean data set, tibble, ArrowObject, with Olink data in long
-format.
 }
 \description{
 This function applies a series of cleaning steps to a data set exported by
@@ -113,6 +108,8 @@ downstream analysis.
 \code{WARN}.
 \item \strong{Correct column data type}: ensure that certain columns have the
 expected data type (class). These columns are identified in \code{\link[=check_npx]{check_npx()}}.
+\item \strong{Resolve multiple UniProt mappings per assay}: ensure that each assay
+identifier (e.g., \code{OlinkID}) maps uniquely to a single UniProt ID.
 }
 
 \strong{Important:}
