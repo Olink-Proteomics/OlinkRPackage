@@ -7,7 +7,7 @@
    {
       "os": "windows-latest",
       "r": "release",
-      "runOn": "always"
+      "runOn": "pull_request"
    },
    {
       "os": "ubuntu-22.04",
@@ -22,6 +22,6 @@
    {
       "os": "ubuntu-24.04",
       "r": "release",
-      "runOn": "pull_request"
+      "runOn": "always"
    }
 ]
