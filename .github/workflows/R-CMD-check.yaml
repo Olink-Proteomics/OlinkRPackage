@@ -52,11 +52,13 @@ jobs:
           extra-packages: any::rcmdcheck, any::pillar
           
       - name: Install arrow from apache r-universe for windows
-        if: matrix.os == 'windows-latest'
+        if: runner.os == 'windows-latest'
         run: |
-          install.packages('arrow', repos = c('https://apache.r-universe.dev', 'https://cloud.r-project.org'))
+          Sys.unsetenv("RSPM")
+          Sys.unsetenv("RENV_CONFIG_REPOS_OVERRIDE")
+          install.packages("arrow", repos = c("https://apache.r-universe.dev", "https://cloud.r-project.org"))
         shell: Rscript {0}
-          
+      
       - uses: r-lib/actions/check-r-package@v2
         with:
           working-directory: OlinkAnalyze
