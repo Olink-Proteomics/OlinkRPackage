@@ -51,6 +51,12 @@ jobs:
           working-directory: OlinkAnalyze
           extra-packages: any::rcmdcheck, any::pillar, any::tzdb
           
+      - name: Install tzdb explicitly for windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          install.packages('tzdb', repos = 'https://cloud.r-project.org')
+        shell: Rscript {0}
+          
       - uses: r-lib/actions/check-r-package@v2
         with:
           working-directory: OlinkAnalyze
