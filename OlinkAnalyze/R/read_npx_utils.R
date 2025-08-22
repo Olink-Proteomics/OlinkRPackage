@@ -9,6 +9,8 @@
 #' @return Error if \var{out_df} is not one of
 #' `r ansi_collapse_quot(x = read_npx_df_output, sep = "and")`.
 #'
+#' @keywords internal
+#'
 check_out_df_arg <- function(out_df) {
 
   # check that out_df is a string
@@ -40,6 +42,8 @@ check_out_df_arg <- function(out_df) {
 #' @inheritParams .downstream_fun_args
 #'
 #' @return The dataset in the requested class.
+#'
+#' @keywords internal
 #'
 convert_read_npx_output <- function(df,
                                     out_df) {
@@ -85,6 +89,8 @@ convert_read_npx_output <- function(df,
 #' @inheritParams .downstream_fun_args
 #'
 #' @return Error is file contains problematic column names. `NULL` otherwise.
+#'
+#' @keywords internal
 #'
 read_npx_format_colnames <- function(df,
                                      file) {

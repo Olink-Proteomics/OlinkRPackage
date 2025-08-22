@@ -11,6 +11,8 @@
 #' Expecting file extension
 #' `r ansi_collapse_quot(get_file_ext(name_sub = "parquet"))`.
 #'
+#' @keywords internal
+#'
 #' @seealso
 #'   \code{\link{read_npx}}
 #'   \code{\link{read_npx_zip}}

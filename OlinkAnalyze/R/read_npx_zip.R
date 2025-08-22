@@ -33,6 +33,8 @@
 #' format. Expected file extensions
 #' `r ansi_collapse_quot(get_file_ext(name_sub = "compressed"))`.
 #'
+#' @keywords internal
+#'
 #' @seealso
 #'   \code{\link{read_npx}}
 #'   \code{\link{read_npx_parquet}}
@@ -196,6 +198,8 @@ read_npx_zip <- function(file,
 #'
 #' @return The file name of the checksum file, or NA if file is absent.
 #'
+#' @keywords internal
+#'
 #' @seealso
 #'   \code{\link{read_npx_zip}}
 #'   \code{\link{get_npx_file}}
@@ -251,6 +255,8 @@ get_checksum_file <- function(files) {
 #' considered as Olink data file. Mainly used to avoid nested compressed files.
 #'
 #' @return The file name of the Olink data file.
+#'
+#' @keywords internal
 #'
 #' @seealso
 #'   \code{\link{read_npx_zip}}
@@ -345,6 +351,8 @@ get_npx_file <- function(files,
 #'
 #' @return `NULL` or an error if the files could not be opened or if checksum
 #' did not match.
+#'
+#' @keywords internal
 #'
 check_checksum <- function(checksum_file,
                            npx_file) {
