@@ -64,3 +64,16 @@ olink_assay_types <- list(
   "ext" = c("ext_ctrl"),
   "amp" = c("amp_ctrl")
 )
+
+## check_npx output list names ----
+
+check_npx_lst_names <- c(
+  "col_names",
+  "oid_invalid",
+  "assay_na",
+  "sample_id_dups",
+  "sample_id_na",
+  "col_class",
+  "assay_qc",
+  "non_unique_uniprot"
+)
