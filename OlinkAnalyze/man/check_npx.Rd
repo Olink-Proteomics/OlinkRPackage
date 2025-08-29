@@ -23,10 +23,14 @@ marking the columns to be used in downstream analyses.
 \item \strong{assay_na} Character vector of assays with all samples having
 \emph{NA} values.
 \item \strong{sample_id_dups} Character vector of duplicate \var{SampleID}.
+\item \strong{sample_id_na} Character vector containing \var{SampleID} of
+samples with quantified values \emph{NA} for all assays.
 \item \strong{col_class} Data frame with columns of incorrect type
 including column key \var{col_key}, column name \var{col_name}, detected
 column type \var{col_class} and expected column type
 \var{expected_col_class}.
+\item \strong{assay_qc} Character vector containing \var{OlinkID} of assays
+with at least one assay warning.
 \item\strong{non_unique_uniprot} Character vector of \var{OlinkID} mapped
 to more than one \var{UniProt} ID.
 }
