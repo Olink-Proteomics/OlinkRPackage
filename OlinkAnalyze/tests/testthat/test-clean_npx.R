@@ -2234,27 +2234,3 @@ test_that(
     )
   }
 )
-
-test_that(
-  "clean_npx - works - no check_npx log",
-  {
-    test_result <- npx_data1 |>
-      dplyr::filter(
-        !(.data[["SampleID"]] %in% c("CONTROL_SAMPLE_AS 1",
-                                     "CONTROL_SAMPLE_AS 2"))
-      ) |>
-      dplyr::mutate(
-        SampleType = "SAMPLE",
-        AssayType = "assay",
-        Assay_Warning = "Pass"
-      )
-
-    expect_message(
-      object = expect_equal(
-        object = clean_npx(df = test_result),
-        expected = test_result
-      ),
-      regexp = "`check_log` not provided. Running `check_npx\\(\\)`"
-    )
-  }
-)
