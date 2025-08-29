@@ -1,10 +1,10 @@
 ## Release Summary
 
-This release contains new features to version 3.5.1 including support for new data types and minor bug fixes.
+This release adds bug fixes to Olink Analyze 4.3
 
 ## R CMD check results
 
-There were no ERRORs, WARNINGs, or NOTEs. 
+There were no ERRORs, WARNINGs, or NOTEs.
 
 ## revdepcheck results
 
