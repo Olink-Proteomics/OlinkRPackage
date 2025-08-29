@@ -23,6 +23,11 @@ samples. Default \code{NULL}, to mark no samples to be removed.}
 
 \item{verbose}{Logical. If \code{FALSE} (default), silences step-wise messages.}
 }
+\value{
+Dataset,
+"tibble" or "ArrowObject", with Olink
+data in long format.
+}
 \description{
 This function removes rows from NPX data where the sample identifiers, as
 defined in \code{check_log}, match samples provided in

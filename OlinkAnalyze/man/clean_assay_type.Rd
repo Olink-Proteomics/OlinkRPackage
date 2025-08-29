@@ -21,6 +21,11 @@ types to remove.}
 
 \item{verbose}{Logical. If \code{FALSE} (default), silences step-wise messages.}
 }
+\value{
+Dataset,
+"tibble" or "ArrowObject", with Olink
+data in long format.
+}
 \description{
 This function filters out internal control assays (\code{ext_ctrl}, \code{inc_ctrl},
 \code{amp_ctrl}) from the dataset, unless user specified to retain them. The

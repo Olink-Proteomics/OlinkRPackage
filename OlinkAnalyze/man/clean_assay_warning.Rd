@@ -23,6 +23,11 @@ from \code{\link{read_npx}}.}
 
 \item{verbose}{Logical. If \code{FALSE} (default), silences step-wise messages.}
 }
+\value{
+Dataset,
+"tibble" or "ArrowObject", with Olink
+data in long format.
+}
 \description{
 The function is used to remove assay-level QC warnings from the dataset
 before analysis. It uses the column marking assay QC warnings identified by
