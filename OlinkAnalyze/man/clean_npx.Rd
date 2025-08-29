@@ -70,6 +70,11 @@ OlinkID - UniProt mapping. Defaults to \code{TRUE}.}
 
 \item{verbose}{Logical. If \code{FALSE} (default), silences step-wise messages.}
 }
+\value{
+Dataset,
+"tibble" or "ArrowObject", with Olink
+data in long format.
+}
 \description{
 This function applies a series of cleaning steps to a data set exported by
 Olink Software and imported in R by \code{\link[=read_npx]{read_npx()}}. Some of the steps of this

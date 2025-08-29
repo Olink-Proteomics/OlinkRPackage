@@ -18,6 +18,11 @@ from \code{\link{read_npx}}.}
 
 \item{verbose}{Logical. If \code{FALSE} (default), silences step-wise messages.}
 }
+\value{
+Dataset,
+"tibble" or "ArrowObject", with Olink
+data in long format.
+}
 \description{
 This function uses the column marking QC warnings identified by
 \code{check_log} to remove samples flagged \code{FAIL} in the dataset.

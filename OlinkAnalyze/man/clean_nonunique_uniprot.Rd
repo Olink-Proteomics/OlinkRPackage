@@ -23,6 +23,11 @@ OlinkID - UniProt mapping. Defaults to \code{TRUE}.}
 
 \item{verbose}{Logical. If \code{FALSE} (default), silences step-wise messages.}
 }
+\value{
+Dataset,
+"tibble" or "ArrowObject", with Olink
+data in long format.
+}
 \description{
 This function checks the non-unique "OlinkID - UniProt" mappings, as defined
 in \code{check_log}. It selects the first instance of UniProt ID per OlinkID and

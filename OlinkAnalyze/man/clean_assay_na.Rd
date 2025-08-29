@@ -18,6 +18,11 @@ quantified values \code{NA}. Defaults to \code{TRUE}.}
 
 \item{verbose}{Logical. If \code{FALSE} (default), silences step-wise messages.}
 }
+\value{
+Dataset,
+"tibble" or "ArrowObject", with Olink
+data in long format.
+}
 \description{
 This function filters out rows from a \code{tibble} or \code{arrow} object where the
 assay identifier (one of

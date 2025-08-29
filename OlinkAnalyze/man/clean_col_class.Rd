@@ -19,6 +19,11 @@ converted to the expected format.}
 
 \item{verbose}{Logical. If \code{FALSE} (default), silences step-wise messages.}
 }
+\value{
+Dataset,
+"tibble" or "ArrowObject", with Olink
+data in long format.
+}
 \description{
 This function checks for mismatches between actual and expected column
 classes in the input data frame and coerces those columns to the expected

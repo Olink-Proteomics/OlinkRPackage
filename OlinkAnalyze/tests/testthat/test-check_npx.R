@@ -60,6 +60,11 @@ test_that(
     )
 
     expect_equal(
+      object = names(expected_result) |> sort(),
+      expected = check_npx_lst_names |> sort()
+    )
+
+    expect_equal(
       object = check_npx(df = df,
                          preferred_names = NULL),
       expected = expected_result
@@ -120,6 +125,11 @@ test_that(
       non_unique_uniprot = character(0L)
     )
 
+    expect_equal(
+      object = names(expected_result) |> sort(),
+      expected = check_npx_lst_names |> sort()
+    )
+
     expect_message(
       object = expect_equal(
         object = check_npx(df = df,
@@ -168,6 +178,11 @@ test_that(
       ),
       assay_qc = character(0L),
       non_unique_uniprot = character(0L)
+    )
+
+    expect_equal(
+      object = names(expected_result) |> sort(),
+      expected = check_npx_lst_names |> sort()
     )
 
     expect_warning(
@@ -243,6 +258,11 @@ test_that(
 
     )
 
+    expect_equal(
+      object = names(expected_result) |> sort(),
+      expected = check_npx_lst_names |> sort()
+    )
+
     expect_warning(
       object = expect_warning(
         object = expect_equal(
@@ -253,6 +273,193 @@ test_that(
       ),
       regexp = "Detected multiple UniProt identifiers for assay: \"OID00002\"."
     )
+  }
+)
+
+# Test run_check_npx ----
+
+test_that(
+  "run_check_npx - works - no check_log",
+  {
+    test_npx_data1 <- npx_data1 |>
+      dplyr::filter(
+        !(.data[["SampleID"]]
+          %in% c("CONTROL_SAMPLE_AS 1", "CONTROL_SAMPLE_AS 2"))
+      )
+
+    expect_message(
+      object = run_check_npx(df = test_npx_data1),
+      regexp = "`check_log` not provided. Running `check_npx\\(\\)`"
+    )
+  }
+)
+
+test_that(
+  "run_check_npx - works - check_log is all correct",
+  {
+    test_check_log <- check_npx(df = npx_data1) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_equal(
+      object = run_check_npx(df = npx_data1,
+                             check_log = test_check_log),
+      expected = test_check_log
+    )
+  }
+)
+
+test_that(
+  "run_check_npx - error - check_log has no names",
+  {
+    test_check_log <- check_npx(df = npx_data1) |>
+      suppressWarnings() |>
+      suppressMessages()
+    names(test_check_log) <- NULL
+
+    expect_error(
+      object = run_check_npx(df = npx_data1,
+                             check_log = test_check_log),
+      regexp = "`check_log` is a list with no names!"
+    )
+  }
+)
+
+test_that(
+  "run_check_npx - error - check_log misses some names",
+  {
+    test_check_log <- check_npx(df = npx_data1) |>
+      suppressWarnings() |>
+      suppressMessages()
+    test_check_log <- test_check_log[utils::head(x = check_npx_lst_names,
+                                                 n = 4L)]
+
+    expect_error(
+      object = run_check_npx(df = npx_data1,
+                             check_log = test_check_log),
+      regexp = paste("Elements \"sample_id_na\", \"col_class\", \"assay_qc\",",
+                     "and \"non_unique_uniprot\" are missing from `check_log`!")
+    )
+  }
+)
+
+test_that(
+  "run_check_npx - warning - check_log has additional unexpected names",
+  {
+    test_check_log <- check_npx(df = npx_data1) |>
+      suppressWarnings() |>
+      suppressMessages()
+    test_check_log <- append(
+      x = test_check_log,
+      values = list("i_am_a_new_element" = c(1L, 2L, 3L))
+    )
+
+    expect_warning(
+      object = run_check_npx(df = npx_data1,
+                             check_log = test_check_log),
+      regexp = paste("Additional element \"i_am_a_new_element\" detected in",
+                     "`check_log`!")
+    )
+  }
+)
+
+test_that(
+  "run_check_npx - error - check_log misses required keys for column names",
+  {
+    test_check_log <- check_npx(df = npx_data1) |>
+      suppressWarnings() |>
+      suppressMessages()
+    test_check_log$col_names <- test_check_log$col_names[utils::head(x = names(test_check_log$col_names), n = 4L)] # nolint indentation_linter
+
+    expect_error(
+      object = run_check_npx(df = npx_data1,
+                             check_log = test_check_log),
+      regexp = "There are no column names associated with the following keys:"
+    )
+  }
+)
+
+test_that(
+  "run_check_npx - warning - check_log has additional keys for column names",
+  {
+    test_check_log <- check_npx(df = npx_data1) |>
+      suppressWarnings() |>
+      suppressMessages()
+    test_check_log$col_names <- append(
+      x = test_check_log$col_names,
+      values = list("i_am_a_new_element" = "Site")
+    )
+
+    expect_warning(
+      object = run_check_npx(df = npx_data1,
+                             check_log = test_check_log),
+      regexp = "Unexpected key \"i_am_a_new_element\" corresponding to column"
+    )
+  }
+)
+
+test_that(
+  "run_check_npx - error - check_log contains column names not in df",
+  {
+    test_check_log <- check_npx(df = npx_data1) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    # check_log contains non-character values v1 ----
+
+    test_check_log_v1 <- test_check_log
+    test_check_log_v1$col_names$sample_id <- FALSE
+
+    expect_error(
+      object = run_check_npx(df = npx_data1,
+                             check_log = test_check_log_v1),
+      regexp = paste("Column name \"FALSE\" from `check_log` is missing from",
+                     "the dataset `df`!")
+    )
+
+    # check_log contains non-character values v2 ----
+
+    test_check_log_v2 <- test_check_log
+    test_check_log_v2$col_names$sample_id <- FALSE
+    test_check_log_v2$col_names$olink_id <- 1L
+    test_check_log_v2$col_names$uniprot <- 1.1
+    test_check_log_v2$col_names$plate_id <- TRUE
+
+    expect_error(
+      object = run_check_npx(df = npx_data1,
+                             check_log = test_check_log_v2),
+      regexp = paste("Column names \"FALSE\", \"1\", \"1.1\", and \"TRUE\"",
+                     "from `check_log` are missing from the dataset `df`!")
+    )
+
+    # check_log contains values not in df v1 ----
+
+    test_check_log_v3 <- test_check_log
+    test_check_log_v3$col_names$sample_id <- "SampleID2"
+
+    expect_error(
+      object = run_check_npx(df = npx_data1,
+                             check_log = test_check_log_v3),
+      regexp = paste("Column name \"SampleID2\" from `check_log` is missing",
+                     "from the dataset `df`!")
+    )
+
+    # check_log contains values not in df v2 ----
+
+    test_check_log_v4 <- test_check_log
+    test_check_log_v4$col_names$sample_id <- "SampleID2"
+    test_check_log_v4$col_names$i_am_a_new_element <- "Site2"
+
+    expect_error(
+      object = expect_warning(
+        object = run_check_npx(df = npx_data1,
+                               check_log = test_check_log_v4),
+        regexp = "Unexpected key \"i_am_a_new_element\" corresponding to column"
+      ),
+      regexp = paste("Column names \"SampleID2\" and \"Site2\" from",
+                     "`check_log` are missing from the dataset `df`!")
+    )
+
   }
 )
 

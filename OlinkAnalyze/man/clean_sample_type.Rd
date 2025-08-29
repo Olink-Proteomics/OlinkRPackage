@@ -20,6 +20,11 @@ indicating the sample types to remove.}
 
 \item{verbose}{Logical. If \code{FALSE} (default), silences step-wise messages.}
 }
+\value{
+Dataset,
+"tibble" or "ArrowObject", with Olink
+data in long format.
+}
 \description{
 This function filters out rows from a dataset where the sample type column
 matches known control sample types: \code{"SAMPLE_CONTROL"}, \code{"PLATE_CONTROL"} or
