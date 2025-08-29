@@ -172,6 +172,171 @@ check_npx <- function(df,
 
 }
 
+#' Check and run [`check_npx()`] if not provided.
+#'
+#' @details
+#' This function acts as a wrapper for [`check_npx()`]. It will check if the
+#' input `check_log` provided by the user is valid. If not, it will throw
+#' relevant errors or warnings. Alternatively, if `check_log` was not provided
+#' by the user, it will run [`check_npx()`] to provide `check_log` to enable
+#' downstream functions to run.#'
+#'
+#' @inherit .downstream_fun_args params author
+#' @inherit check_npx return
+#'
+#' @keywords internal
+#'
+run_check_npx <- function(df,
+                          check_log = NULL) {
+  # generate check_log if not provided ----
+  if (is.null(check_log)) {
+    cli::cli_inform(
+      c(
+        "{.arg check_log} not provided. Running {.fn check_npx}.",
+        "i" = "It is recommended that the user runs {.fn check_npx} to get a
+        full picture of the results from the data validity check!"
+      )
+    )
+
+    check_log <- check_npx(df = df)
+    return(check_log)
+  }
+
+  # checks if check_log was provided ----
+
+  check_is_list(x = check_log, error = TRUE)
+
+  ## check that check_log has all expected output names ----
+
+  # check that check_log has names
+  if (is.null(names(check_log))) {
+    cli::cli_abort(
+      c(
+        "x" = "{.arg check_log} is a list with no names!",
+        "i" = "Ensure that {.arg check_log} is the output of {.fn check_npx}
+        for dataset {.arg df}!"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+  }
+
+  # check that all expected elements in check_log are in place
+  check_log_missing <- setdiff(
+    x = check_npx_lst_names,
+    y = names(check_log)
+  )
+  if (length(check_log_missing) > 0L) {
+    cli::cli_abort(
+      c(
+        "x" = "Element{?s} {.val {check_log_missing}} are missing from
+        {.arg check_log}!",
+        "i" = "Ensure that {.arg check_log} is the output of {.fn check_npx}
+        for dataset {.arg df}!"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+  }
+
+  # check if check_log contains additional elements
+  check_log_additional <- setdiff(
+    x = names(check_log),
+    y = check_npx_lst_names
+  )
+  if (length(check_log_additional) > 0L) {
+    cli::cli_warn(
+      c(
+        "Additional element{?s} {.val {check_log_additional}} detected in
+        {.arg check_log}!",
+        "i" = "Ensure that {.arg check_log} is the output of {.fn check_npx}
+        for dataset {.arg df}!"
+      )
+    )
+  }
+
+  ## check that df column names are in place ----
+
+  # missing required column keys
+  check_log_cnames_missing <- setdiff(
+    x = column_name_dict |> # required column names
+      dplyr::filter(
+        .data[["col_miss"]] == FALSE
+      ) |>
+      dplyr::pull(
+        .data[["col_key"]]
+      ),
+    y = names(check_log$col_names)
+  )
+  if (length(check_log_cnames_missing) > 0L) {
+    df_req_cols_miss <- column_name_dict |>
+      dplyr::filter(
+        .data[["col_miss"]] == FALSE
+        & .data[["col_key"]] %in% .env[["check_log_cnames_missing"]]
+      )
+
+    miss_cols <- paste0(
+      "* \"", df_req_cols_miss$col_key, "\": One of ",
+      sapply(df_req_cols_miss$col_names,
+             ansi_collapse_quot,
+             sep = "or"), "."
+    )
+
+    cli::cli_abort(
+      c(
+        "x" = "{cli::qty(df_req_cols_miss$col_key)} There {?is/are} no column
+        name{?s} associated with the following key{?s}:",
+        miss_cols,
+        "i" = "Ensure that {.arg check_log} is the output of {.fn check_npx}
+        for dataset {.arg df}!"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+  }
+
+  # additional unexpected column names
+  check_log_cnames_additional <- setdiff(
+    x = names(check_log$col_names),
+    y = column_name_dict |> # all column names
+      dplyr::pull(
+        .data[["col_key"]]
+      )
+  )
+  if (length(check_log_cnames_additional) > 0L) {
+    cli::cli_warn(
+      c(
+        "Unexpected key{?s} {.val {check_log_cnames_additional}} corresponding
+        to column names detected in {.arg check_log$col_names}!",
+        "i" = "Ensure that {.arg check_log} is the output of {.fn check_npx}
+        for dataset {.arg df}!"
+      )
+    )
+  }
+
+  # check that actual column names are in place - sort of security check that
+  # check_log corresponds to the current df
+  check_log_cols_miss <- setdiff(
+    x = unlist(x = check_log$col_names,
+               recursive = TRUE,
+               use.names = FALSE),
+    y = names(df)
+  )
+  if (length(check_log_cols_miss) > 0L) {
+    cli::cli_abort(
+      c(
+        "x" = "Column name{?s} {.val {check_log_cols_miss}} from
+        {.arg check_log} {?is/are} missing from the dataset {.arg df}!",
+        "i" = "Ensure that {.arg check_log} is the output of {.fn check_npx}
+        for dataset {.arg df}!"),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+  }
+
+  return(check_log)
+}
+
 #' Check, update and define column names used in downstream analyses
 #'
 #' @description
