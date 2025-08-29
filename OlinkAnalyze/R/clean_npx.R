@@ -55,8 +55,8 @@
 #'   Kang Dong
 #'   Klev Diamanti
 #'
-#' @inherit .downstream_fun_args params return
-#' @inherit .read_npx_args params
+#' @inherit .downstream_fun_args params
+#' @inherit .read_npx_args params return
 #' @param remove_assay_na Logical. If `FALSE`, skips filtering assays with all
 #' quantified values `NA`. Defaults to `TRUE`.
 #' @param remove_invalid_oid Logical. If `FALSE`, skips filtering assays with
@@ -126,29 +126,9 @@ clean_npx <- function(df,
   # Validate input dataset
   check_is_dataset(x = df, error = TRUE)
   check_is_scalar_boolean(x = verbose, error = TRUE)
+  check_log <- run_check_npx(df = df, check_log = check_log)
 
   if (verbose) cli::cli_h2("Starting {.fn clean_npx} pipeline.")
-
-  # Validate or generate check_log from check_npx()
-  if (is.null(check_log)) {
-
-    cli::cli_inform(
-      c(
-        "{.arg check_log} not provided. Running {.fn check_npx}.",
-        "i" = "It is recommended that the user runs {.fn check_npx} to get a
-        full picture of the results from the data validity check!"
-      )
-    )
-
-    check_log <- check_npx(
-      df = df
-    ) |>
-      suppressWarnings() |>
-      suppressMessages()
-
-  }
-
-  check_is_list(x = check_log, error = TRUE)
 
   # Clean invalid Olink IDs
   if (verbose) cli::cli_h3("Removing assays with invalid identifiers.")
