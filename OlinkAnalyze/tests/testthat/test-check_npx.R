@@ -60,6 +60,11 @@ test_that(
     )
 
     expect_equal(
+      object = names(expected_result) |> sort(),
+      expected = check_npx_lst_names |> sort()
+    )
+
+    expect_equal(
       object = check_npx(df = df,
                          preferred_names = NULL),
       expected = expected_result
@@ -120,6 +125,11 @@ test_that(
       non_unique_uniprot = character(0L)
     )
 
+    expect_equal(
+      object = names(expected_result) |> sort(),
+      expected = check_npx_lst_names |> sort()
+    )
+
     expect_message(
       object = expect_equal(
         object = check_npx(df = df,
@@ -168,6 +178,11 @@ test_that(
       ),
       assay_qc = character(0L),
       non_unique_uniprot = character(0L)
+    )
+
+    expect_equal(
+      object = names(expected_result) |> sort(),
+      expected = check_npx_lst_names |> sort()
     )
 
     expect_warning(
@@ -241,6 +256,11 @@ test_that(
       assay_qc = character(0L),
       non_unique_uniprot = c("OID00002")
 
+    )
+
+    expect_equal(
+      object = names(expected_result) |> sort(),
+      expected = check_npx_lst_names |> sort()
     )
 
     expect_warning(
