@@ -6853,8 +6853,7 @@ test_that(
 
     expect_equal(
       object = bridge_norm_noformat |>
-        dplyr::select(.data[["OlinkID"]]) |>
-        dplyr::distinct() |>
+        dplyr::distinct(.data[["OlinkID"]]) |>
         dplyr::filter(.data[["OlinkID"]] %in%
                         lst_check_bridge$non_overlapping_oid) |>
         nrow(),
