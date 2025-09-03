@@ -7197,7 +7197,7 @@ test_that(
               "16 Negative Controls or Plate Controls removed"
           ),
           regexp =
-            "85 not bridgeable or non-overlapping assays are included"
+            "85 non-overlapping assays are included in the bridged dataset"
         ),
         regexp = "Output includes two sets of bridging samples"
       ),
