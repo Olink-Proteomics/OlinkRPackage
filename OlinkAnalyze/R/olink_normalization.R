@@ -319,13 +319,13 @@ olink_normalization <- function(df1,
     } else if (lst_check$norm_mode == olink_norm_modes$norm_cross_product) {
       # HT-3K normalization ----
 
-      cli::cli_inform(c("i" =
-                          paste0("Output includes two sets of bridging
-                                 samples.") ,
-                        "*" =
-                          paste0("Retaining only bridging samples from the
-                                 reference dataset is recommended for
-                                 downstream analysis.")))
+      cli::cli_inform(
+        c(
+          "i" = "Output includes two sets of bridging samples.",
+          "We recommend retaining only bridge samples from the reference dataset
+          for downstream analysis."
+        )
+      )
 
       df_norm <- norm_internal_cross_product(
         ref_df = lst_check$ref_df,
