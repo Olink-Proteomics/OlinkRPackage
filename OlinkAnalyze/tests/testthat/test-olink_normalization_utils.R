@@ -6966,7 +6966,7 @@ test_that(
           "16 Negative Controls or Plate Controls removed from bridged dataset"
       ),
       regexp =
-        "2 not bridgeable or non-overlapping assays are included"
+        "2 non-overlapping assays are included in the bridged dataset"
     )
 
     # Format with no non-overlapping assays
