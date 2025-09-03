@@ -7399,8 +7399,7 @@ test_that(
       object = df_3k_reveal_noformat |>
         dplyr::filter(.data[["SampleType"]] %in%
                         c("NEGATIVE_CONTROL", "PLATE_CONTROL")) |>
-        dplyr::select(.data[["SampleID"]], .data[["SampleType"]]) |>
-        dplyr::distinct() |>
+        dplyr::distinct(.data[["SampleID"]], .data[["SampleType"]]) |>
         nrow(),
       expected = 16L
     )
