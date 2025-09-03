@@ -6843,7 +6843,7 @@ test_that(
 
     expect_equal(
       object = bridge_norm_format |>
-        dplyr::select(.data[["SampleID"]]) |>
+        dplyr::select(dplyr::all_of(c("SampleID"))) |>
         dplyr::filter(.data[["SampleID"]] %in% c("NEG_CTRL", "PLATE_CTRL")) |>
         nrow(),
       expected = 0L
