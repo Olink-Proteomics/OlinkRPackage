@@ -7258,7 +7258,7 @@ test_that(
           "16 Negative Controls or Plate Controls removed from bridged dataset"
       ),
       regexp =
-        "85 not bridgeable or non-overlapping assays are included"
+        "85 non-overlapping assays are included in the bridged dataset"
     )
 
     ## check that function works both ways
