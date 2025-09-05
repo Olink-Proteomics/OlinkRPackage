@@ -40,23 +40,53 @@ Calculate LOD using Negative Controls or Fixed LOD
 }
 \examples{
 \dontrun{
-   \donttest{
-  try({ # This will fail if the files do not exist.
+  \donttest{
+  try(
+    {
+      # This will fail if the files do not exist.
 
-  # Import NPX data
-    npx_data <- read_NPX("path/to/npx_file")
+      # Import NPX data
+      npx_data <- read_npx(filename = "path/to/npx_file")
 
-  # Estimate LOD from negative controls
-    npx_data_lod_NC <- olink_lod(data = npx_data,  lod_method = "NCLOD")
+      # Check NPX data
+      check_log <- check_npx(df = npx_data)
 
-  # Estimate LOD from fixed LOD
-  ## Locate the fixed LOD file
-    lod_file_path <- "path/to/lod_file"
+      # Clean NPX data
+      npx_data_clean <- clean_npx(
+        df = npx_data,
+        check_log = check_log
+      )
 
-    npx_data_lod_Fixed <- olink_lod(data = npx_data,
-                                    lod_file_path = lod_file_path,
-                                    lod_method = "FixedLOD")
-     })
+      # Re-check NPX data
+      check_log_clean <- check_npx(df = npx_data_clean)
+
+      # Estimate LOD from negative controls
+      npx_data_lod_nc <- olink_lod(
+        data = npx_data_clean,
+        check_log = check_log_clean,
+        lod_method = "NCLOD"
+      )
+
+      # Estimate LOD from fixed LOD
+      ## Locate the fixed LOD file
+      lod_file_path <- "path/to/lod_file"
+
+      npx_data_lod_Fixed <- olink_lod(
+        data = npx_data,
+        check_log = check_log_clean,
+        lod_file_path = lod_file_path,
+        lod_method = "FixedLOD"
+      )
+
+      # Estimate LOD from both negative controls and fixed LOD
+      npx_data_lod_both <- olink_lod(
+        data = npx_data,
+        check_log = check_log_clean,
+        lod_file_path = lod_file_path,
+        lod_method = "Both"
+      )
+    }
+  )
   }
 }
 
