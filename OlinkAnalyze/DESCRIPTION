@@ -80,6 +80,9 @@ Imports:
     stringr,
     tidyr
 Suggests: 
+    broom,
+    car,
+    emmeans,
     readxl,
     testthat (>= 3.0.0),
     withr,
