@@ -99,63 +99,65 @@ mean(numerical variable) versus mean NPX at mean(numerical variable) +
 }
 \examples{
 \donttest{
-# data
-npx_df <- npx_data1 |>
-  dplyr::filter(
-    !grepl(
-      pattern = "control|ctrl",
-      x = .data[["SampleID"]],
-      ignore.case = TRUE
-     )
+if (rlang::is_installed(pkg = c("broom", "car", "emmeans"))) {
+  # data
+  npx_df <- npx_data1 |>
+    dplyr::filter(
+      !grepl(
+        pattern = "control|ctrl",
+        x = .data[["SampleID"]],
+        ignore.case = TRUE
+       )
+    )
+
+  # check data
+  npx_df_check_log <- check_npx(
+    df = npx_df
   )
 
-# check data
-npx_df_check_log <- check_npx(
-  df = npx_df
-)
+  # Two-way ANOVA, one main effect (Site) covariate.
+  # Results in model NPX~Treatment*Time+Site.
+  anova_results <- OlinkAnalyze::olink_anova(
+    df = npx_df,
+    check_log = npx_df_check_log,
+    variable = c("Treatment:Time"),
+    covariates = "Site"
+  )
 
-# Two-way ANOVA, one main effect (Site) covariate.
-# Results in model NPX~Treatment*Time+Site.
-anova_results <- OlinkAnalyze::olink_anova(
-  df = npx_df,
-  check_log = npx_df_check_log,
-  variable = c("Treatment:Time"),
-  covariates = "Site"
-)
+  # Posthoc test for the model NPX~Treatment*Time+Site,
+  # on the interaction effect Treatment:Time with covariate Site.
 
-# Posthoc test for the model NPX~Treatment*Time+Site,
-# on the interaction effect Treatment:Time with covariate Site.
+  # Filtering out significant and relevant results.
+  significant_assays <- anova_results |>
+    dplyr::filter(
+      .data[["Threshold"]] == "Significant"
+      & .data[["term"]] == "Treatment:Time"
+    ) |>
+    dplyr::select(
+      dplyr::all_of("OlinkID")
+    ) |>
+    dplyr::distinct() |>
+    dplyr::pull()
 
-# Filtering out significant and relevant results.
-significant_assays <- anova_results |>
-  dplyr::filter(
-    .data[["Threshold"]] == "Significant"
-    & .data[["term"]] == "Treatment:Time"
-  ) |>
-  dplyr::select(
-    dplyr::all_of("OlinkID")
-  ) |>
-  dplyr::distinct() |>
-  dplyr::pull()
+  # Posthoc, all pairwise comparisons
+  anova_posthoc_results <- OlinkAnalyze::olink_anova_posthoc(
+    df = npx_df,
+    check_log = npx_df_check_log,
+    variable = c("Treatment:Time"),
+    covariates = "Site",
+    olinkid_list = significant_assays,
+    effect = "Treatment:Time"
+  )
 
-# Posthoc, all pairwise comparisons
-anova_posthoc_results <- OlinkAnalyze::olink_anova_posthoc(
-  df = npx_df,
-  check_log = npx_df_check_log,
-  variable = c("Treatment:Time"),
-  covariates = "Site",
-  olinkid_list = significant_assays,
-  effect = "Treatment:Time"
-)
-
-# Posthoc, treated vs untreated at each timepoint, adjusted for Site effect
-anova_posthoc_results <- OlinkAnalyze::olink_anova_posthoc(
-  df = npx_df,
-  check_log = npx_df_check_log,
-  model_formula = "NPX~Treatment*Time+Site",
-  olinkid_list = significant_assays,
-  effect_formula = "pairwise~Treatment|Time"
-)
+  # Posthoc, treated vs untreated at each timepoint, adjusted for Site effect
+  anova_posthoc_results <- OlinkAnalyze::olink_anova_posthoc(
+    df = npx_df,
+    check_log = npx_df_check_log,
+    model_formula = "NPX~Treatment*Time+Site",
+    olinkid_list = significant_assays,
+    effect_formula = "pairwise~Treatment|Time"
+  )
+}
 }
 
 }

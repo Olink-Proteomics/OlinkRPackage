@@ -102,46 +102,48 @@ p-value adjustment.
 }
 \examples{
 \donttest{
-#data
-npx_df <- npx_data1 |>
-  dplyr::filter(
-    !grepl(
-      pattern = "control|ctrl",
-      x = .data[["SampleID"]],
-      ignore.case = TRUE
+if (rlang::is_installed(pkg = c("broom", "car"))) {
+  #data
+  npx_df <- npx_data1 |>
+    dplyr::filter(
+      !grepl(
+        pattern = "control|ctrl",
+        x = .data[["SampleID"]],
+        ignore.case = TRUE
+      )
     )
+
+  # check data
+  npx_df_check_log <- check_npx(
+    df = npx_df
   )
 
-# check data
-npx_df_check_log <- check_npx(
-  df = npx_df
-)
+  # One-way ANOVA, no covariates.
+  # Results in a model NPX~Time
+  anova_results <- OlinkAnalyze::olink_anova(
+    df = npx_df,
+    check_log = npx_df_check_log,
+    variable = "Time"
+  )
 
-# One-way ANOVA, no covariates.
-# Results in a model NPX~Time
-anova_results <- OlinkAnalyze::olink_anova(
-  df = npx_df,
-  check_log = npx_df_check_log,
-  variable = "Time"
-)
+  # Two-way ANOVA, one main effect covariate.
+  # Results in model NPX~Treatment*Time+Site.
+  anova_results <- OlinkAnalyze::olink_anova(
+    df = npx_df,
+    check_log = npx_df_check_log,
+    variable = c("Treatment:Time"),
+    covariates = "Site"
+  )
 
-# Two-way ANOVA, one main effect covariate.
-# Results in model NPX~Treatment*Time+Site.
-anova_results <- OlinkAnalyze::olink_anova(
-  df = npx_df,
-  check_log = npx_df_check_log,
-  variable = c("Treatment:Time"),
-  covariates = "Site"
-)
-
-# One-way ANOVA, interaction effect covariate.
-# Results in model NPX~Treatment+Site:Time+Site+Time.
-anova_results <- OlinkAnalyze::olink_anova(
-  df = npx_df,
-  check_log = npx_df_check_log,
-  variable = "Treatment",
-  covariates = "Site:Time"
-)
+  # One-way ANOVA, interaction effect covariate.
+  # Results in model NPX~Treatment+Site:Time+Site+Time.
+  anova_results <- OlinkAnalyze::olink_anova(
+    df = npx_df,
+    check_log = npx_df_check_log,
+    variable = "Treatment",
+    covariates = "Site:Time"
+  )
+}
 }
 
 }
