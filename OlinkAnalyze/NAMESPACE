@@ -2,6 +2,8 @@
 
 export(check_npx)
 export(clean_npx)
+export(olink_anova)
+export(olink_anova_posthoc)
 export(olink_lod)
 export(read_NPX)
 export(read_npx)
