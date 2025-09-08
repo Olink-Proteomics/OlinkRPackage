@@ -376,6 +376,13 @@ ggplot2::ggsave(
   units = "in",
   dpi = "screen"
 )
+ggplot2::ggsave(
+  filename = "man/figures/PCA_btw_product_before.pdf",
+  width = 6L,
+  height = 2.5,
+  units = "in",
+  dpi = "screen"
+)
 
 rm(pca_e3072, pca_eht)
 

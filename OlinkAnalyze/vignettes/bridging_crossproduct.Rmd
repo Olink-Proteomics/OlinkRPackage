@@ -1,21 +1,49 @@
 ---
 title: "Bridging across NGS-based Olink^®^ products"
-output: 
-  rmarkdown::html_vignette:
-    toc: true
-    toc_depth: 3
-    fig_caption: TRUE
-    includes:
-      in_header: ../man/figures/logo.html
+author: "Olink Data Science"
+date: "`r format(Sys.Date(), '%Y-%m-%d')`"
+output:
+  pdf_document:
+    toc: false # replaced by \tableofcontents
+    # toc_depth: 3
+    # number_sections: true
+    fig_caption: true
+    latex_engine: xelatex
+header-includes:
+  - \usepackage{graphicx}
+  - \usepackage{float}
+  - \usepackage{fontspec} 
+  - \setmainfont{Swedish Gothic}  
+  - \usepackage{setspace}
+  - \onehalfspacing    # for 1.5x line spacing, options \singlespacing, ...
+  - \usepackage{fancyhdr}
+  - \pagestyle{fancy}
+  - \fancyhead{}
+  - \fancyhead[L]{\includegraphics[width=20pt]{../man/figures/small_logo.png}}
+  - \fancyhead[C]{\textbf{Bridging across NGS-based Olink\textsuperscript{®} products}}
+  - \fancyhead[R]{\thepage}
+  - \setlength{\headheight}{23.74pt}
+  - \addtolength{\topmargin}{-11.7pt}
+  - \renewcommand{\headrulewidth}{0.4pt}
+  - \fancyfoot{}  # clears footer
 vignette: >
-  %\VignetteIndexEntry{Bridging across NGS-based Olink products}
-  %\VignetteEncoding{UTF-8}
+  %\VignetteIndexEntry{Bridging across NGS-based Olink^®^ products}
   %\VignetteEngine{knitr::rmarkdown}
-date: 'Compiled: `r format(Sys.Date(), "%B %d, %Y")`'
-editor_options: 
-  markdown: 
-    wrap: 72
+  %\VignetteEncoding{UTF-8}
 ---
+
+<!-- adding logo after title, author and date, and before toc -->
+
+\thispagestyle{empty}
+\begin{center}
+\vspace*{2cm}
+\includegraphics[width=2cm]{../man/figures/Olink\-Symbol_Black.png}
+\end{center}
+\newpage
+\pagestyle{fancy}
+\setcounter{tocdepth}{2}
+\tableofcontents
+\clearpage
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -42,21 +70,21 @@ library(kableExtra)
 
 ## Introduction
 
-Individual Olink^®^ NPX^TM^ projects are generally normalized using
+Individual Olink\textsuperscript{®} NPX\textsuperscript{TM} projects are generally normalized using
 either plate control normalization or intensity normalization methods.
 Since NPX is a relative measurement, in the case when a study is
 separated into multiple projects, an additional normalization step is
 needed to allow the data to be comparable across projects. The following tutorial is
 designed to give you an overview of the Olink bridging procedure for
-combining data sets from Olink^®^ Explore 3072, Olink^®^ Explore HT,
-and Olink^®^ Reveal products.
+combining data sets from Olink\textsuperscript{®} Explore 3072, Olink\textsuperscript{®} Explore HT,
+and Olink\textsuperscript{®} Reveal products.
 
 ### Important Terminology
 
 -   **Bridging samples** – Overlapping samples run on two or more projects
     that are used as references to enable normalization. These
     samples are selected as described in the [Introduction to Bridging
-    tutorial](bridging_introduction.html)
+    tutorial]()
     to ensure samples are of high quality and span the range of the
     data. In the case of data containing LOD, samples are also filtered
     for high detectability. Bridging samples are selected from the project
@@ -79,7 +107,7 @@ and Olink^®^ Reveal products.
 
 -   **Reference data** – The project data which is being normalized to
     is known as the reference data. In the case of between-product
-    bridging, the reference project is the Explore HT NPX data or Reveal NPX data. The
+    bridging, the reference project is the Explore HT NPX data or the Reveal NPX data. The
     reference data set is not altered during bridging and the other data
     set is adjusted to the reference data set using the bridging samples.
 
@@ -91,7 +119,7 @@ technical variation. One such method of normalizing two projects is referred to 
 normalization, bridge normalization, or just simply bridging. For more
 information on within-product bridging, see the [Introduction to
 Bridging
-tutorial](bridging_introduction.html).
+tutorial]().
 Bridging makes certain assumptions on the distributions of
 the assays, namely that we are measuring the same true biological range
 no matter the setting. If an assay displays different distributions
@@ -124,7 +152,7 @@ noise in both products.
 
 ### Considerations for between-product bridging
 
-Product bridging allows the NPX values of an Olink Explore 3072 project
+between-product bridging allows the NPX values of an Olink Explore 3072 project
 to be normalized and made comparable to the NPX values of an Olink
 Explore HT project or an Olink Reveal project. This process is one-directional, and normalizing
 Olink Explore HT NPX values or Olink Reveal NPX values to Olink Explore 3072 is not supported. Normalization between Olink Explore HT and Olink Reveal in either direction are also not supported.
@@ -147,7 +175,7 @@ among data sets and, as such, are analyzed in both data sets. Olink NPX
 data sets without shared samples cannot be combined using the
 bridging approach described below. More information on bridge sample
 selection can be found in the [selecting bridging samples
-section](bridging_introduction.html#selecting-bridging-samples)
+section]()
 of the Introduction to Bridging tutorial.
 
 ## Bridge Sample Selection
@@ -155,10 +183,10 @@ of the Introduction to Bridging tutorial.
 Prior to running a study with Explore HT or Olink Reveal, bridging samples must be selected
 from the study run with Explore 3072 and be run on the subsequent study. These samples can
 be selected using the `olink_bridgeselector()` function in Olink Analyze
-as detailed in [the Introduction to bridging
-tutorial](bridging_introduction.html#selecting-bridging-samples). The recommended number of bridge samples for within- and between- product bridging is summarized in the table below. When selecting bridge samples, the aim is to select samples that represent the dynamic range of the assay expression in the product. As such, quality control of the sample and, if available, proportion of data above LOD in the sample are considered when determining if a sample is chosen as a bridging sample. When LOD data is not available in the data export from Olink NPX software, LOD can optionally be calculated from fixed LOD or negative controls as
+as detailed in [the Introduction to Bridging
+tutorial](). The recommended number of bridge samples for within- and between- product bridging is summarized in the table below. When selecting bridge samples, the aim is to select samples that represent the dynamic range of the assay expression in the product. As such, quality control of the sample and, if available, proportion of data above LOD in the sample are considered when determining if a sample is chosen as a bridging sample. When LOD data is not available in the data export from Olink NPX software, LOD can optionally be calculated from fixed LOD or negative controls as
 detailed in the [Calculating LOD from Olink Explore data
-tutorial](LOD.html).
+tutorial]().
 
 ```{r brnrtab, eval=TRUE, message=FALSE, echo = FALSE}
 data.frame(Platform = c("Target 96",
@@ -180,9 +208,10 @@ data.frame(Platform = c("Target 96",
                                "40-64",
                                "32-48")) |>
   kbl(booktabs = TRUE,
+      linesep = "",
       digits = 2,
       caption = "Recommended number of bridging samples for Olink platforms") |>
-  kable_styling(bootstrap_options = "striped",
+  kable_styling(#bootstrap_options = "striped",
                 full_width = FALSE,
                 position = "center",
                 latex_options = "HOLD_position")
@@ -200,7 +229,7 @@ data and Reveal data which have at least 32 to 48 bridging samples. For
 studies containing multiple projects of Explore 3072 data, the Explore
 3072 data sets should be bridged using within-product bridging as
 detailed in the [Introduction to bridging
-tutorial](bridging_introduction.html) or otherwise normalized together
+tutorial]() or otherwise normalized together
 prior to performing between-product bridging.
 
 The assays from Explore 3072 are matched to the corresponding assays in
@@ -256,7 +285,7 @@ data_reference_product <- read_NPX("~/NPX_Reveal_location.parquet")
 
 First, confirm that there are overlapping sample IDs within the study. Note that external controls should not be included in the list of
 bridging samples, as detailed in the [Bridge Sample Selection] section
-of this tutorial. External control samples often share the same naming
+of the Introduction to Bridging tutorial. External control samples often share the same naming
 convention across data sets but may represent different samples due to
 reagent batch differences. Appending the project name to the end of the
 control samples can ensure unique Sample IDs. For the example below Explore HT data is used as the reference project, however the sample process can performed using Reveal as the reference data.
@@ -282,6 +311,7 @@ overlapping_samples <- unique(intersect(data_explore3072_samples,
 try(
   readRDS(normalizePath("../man/figures/overlapping_samples_table.rds")) |> 
     kableExtra::kbl(booktabs = TRUE,
+                    linesep = "",
                     digits = 2,
                     caption = "Overlapping bridging samples") |>
     kableExtra::kable_styling(bootstrap_options = "striped",
@@ -303,7 +333,7 @@ f3 <- paste0("PCA plot prior to bridging for Explore 3072 data",
 ```
 
 
-```{r eval = FALSE}
+```{r eval = FALSE, fig.cap=f3, fig.height= 8, fig.width= 6, out.width="\\linewidth"}
 #### Extract bridging samples
 
 data_explore3072_before_br <- data_explore3072 |>
@@ -330,8 +360,8 @@ pca_EHT <- OlinkAnalyze::olink_pca_plot(df = data_reference_product_before_br,
                                         quiet = TRUE)
 ```
 
-```{r echo=FALSE, fig.cap=f3, fig.height= 8, fig.width= 6}
-knitr::include_graphics(normalizePath("../man/figures/PCA_btw_product_before.png"),
+```{r echo=FALSE, eval=TRUE, fig.cap=f3, fig.height= 8, fig.width= 6}
+knitr::include_graphics(normalizePath("../man/figures/PCA_btw_product_before.pdf"),
                         error = FALSE)
 
 ```
@@ -460,7 +490,7 @@ compared between the two products:
 
 An overview of these criteria is visualized below.
 
-```{r echo=FALSE, fig.cap=fcap, out.width="50%"}
+```{r echo=FALSE, fig.cap=fcap, out.width="\\linewidth"}
 knitr::include_graphics(normalizePath("../man/figures/assay_bridgeability.jpg"), 
                         error = FALSE)
 fcap <- paste("Criteria to determine the bridging recommendation for an assay.",
@@ -498,10 +528,10 @@ npx_br_data_bridgeable_plt <- olink_bridgeability_plot(
 npx_br_data_bridgeable_plt[[1]]
 ```
 
-```{r message=FALSE, echo = FALSE, out.width = "675px", fig.cap = fcap}
+```{r message=FALSE, echo = FALSE, out.width = "\\linewidth", fig.cap = fcap}
 knitr::include_graphics(normalizePath("../man/figures/bridgeable_plt_MedianCenter.png"), error = FALSE)
 
-fcap <- "Visualization of an assay's bridgeability criteria as generated by the olink_bridgeability_plot function."
+fcap <- "Visualization of an assay's bridgeability criteria as generated by the olink\\_bridgeability\\_plot function."
 ```
 \
 \
@@ -510,12 +540,12 @@ Prior to assessment, outlier bridging samples are excluded. A sample is
 considered an outlier if the NPX value is more than 3 times the
 interquartile range above or below the median on either product.
 
-After assessment, an assay is considered bridgeable if it meets the
+After assessment, an assay is considered bridgeable if it meets any of the
 first three criteria. The fourth criteria determines which normalization
-method is recommended for bridging. If all four criteria are met then
+method is recommended for bridging. If the fourth criteria is met then
 the recommended method is normalization using the median of paired
-differences. If only the first three criteria are met then quantile
-smoothing is recommended. If any of the first three criteria are not met
+differences. If any of the first three criteria are met then quantile
+smoothing is recommended. If all of the first three criteria are not met
 then bridging is not recommended for that assay. Note that bridgeable
 assays will differ between projects based on the expression of bridge
 samples in the studies.
@@ -594,17 +624,19 @@ the `df1_project_nr` and `df2_project_nr` arguments. The resulting
 data set will contain the newly bridged Explore 3072 data set. The
 reference product data will be concatenated to the Explore 3072 data.
 As the reference data is not altered during normalization, the
-normalized NPX values in the Explore HT or Reveal data will be the same as the
+normalized NPX values in the Explore HT or the Reveal data will be the same as the
 values in the NPX column which contains the non-normalized data.
 
 ```{r echo=FALSE}
 try( 
   readRDS(normalizePath("../man/figures/bridging_results.rds")) |> 
     kableExtra::kbl(booktabs = TRUE,
-        digits = 1,
-        caption = "Table 4. First 5 rows of combined datasets after bridging with between-product formatting argument set to FALSE.") |>
-    kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 10, 
-                  position = "center", latex_options = "HOLD_position") |> 
+                    linesep = "",
+                    digits = 1,
+                    caption = "First 5 rows of combined datasets after bridging with between-product formatting argument set to FALSE.") |>
+    kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE,
+                              font_size = 10, position = "center",
+                              latex_options = c("HOLD_position","scale_down")) |> 
     kableExtra::scroll_box(width = "100%")
 )
 ```
@@ -622,10 +654,11 @@ try(
                                    OlinkID_E3072)) |>
     dplyr::select(-c("OlinkID_E3072", "MedianCenteredNPX", "QSNormalizedNPX")) |> 
     kableExtra::kbl(booktabs = TRUE,
+                    linesep = "",
         digits = 1,
-        caption = "Table 5. First 5 rows of combined datasets after bridging with between-product formatting argument set to TRUE.") |>
+        caption = "First 5 rows of combined datasets after bridging with between-product formatting argument set to TRUE.") |>
     kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 10, 
-                  position = "center", latex_options = "HOLD_position") |> 
+                  position = "center", latex_options = c("HOLD_position","scale_down")) |> 
     kableExtra::scroll_box(width = "100%")
 )
 ```
