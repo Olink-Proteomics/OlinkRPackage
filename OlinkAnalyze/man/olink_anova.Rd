@@ -104,7 +104,7 @@ p-value adjustment.
 \donttest{
 if (rlang::is_installed(pkg = c("broom", "car"))) {
   #data
-  npx_df <- npx_data1 |>
+  npx_df <- OlinkAnalyze::npx_data1 |>
     dplyr::filter(
       !grepl(
         pattern = "control|ctrl",
@@ -114,7 +114,7 @@ if (rlang::is_installed(pkg = c("broom", "car"))) {
     )
 
   # check data
-  npx_df_check_log <- check_npx(
+  npx_df_check_log <- OlinkAnalyze::check_npx(
     df = npx_df
   )
 

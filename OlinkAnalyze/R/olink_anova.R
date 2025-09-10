@@ -82,7 +82,7 @@
 #' \donttest{
 #' if (rlang::is_installed(pkg = c("broom", "car"))) {
 #'   #data
-#'   npx_df <- npx_data1 |>
+#'   npx_df <- OlinkAnalyze::npx_data1 |>
 #'     dplyr::filter(
 #'       !grepl(
 #'         pattern = "control|ctrl",
@@ -92,7 +92,7 @@
 #'     )
 #'
 #'   # check data
-#'   npx_df_check_log <- check_npx(
+#'   npx_df_check_log <- OlinkAnalyze::check_npx(
 #'     df = npx_df
 #'   )
 #'
@@ -583,7 +583,7 @@ olink_anova <- function(df,
 #' \donttest{
 #' if (rlang::is_installed(pkg = c("broom", "car", "emmeans"))) {
 #'   # data
-#'   npx_df <- npx_data1 |>
+#'   npx_df <- OlinkAnalyze::npx_data1 |>
 #'     dplyr::filter(
 #'       !grepl(
 #'         pattern = "control|ctrl",
@@ -593,7 +593,7 @@ olink_anova <- function(df,
 #'     )
 #'
 #'   # check data
-#'   npx_df_check_log <- check_npx(
+#'   npx_df_check_log <- OlinkAnalyze::check_npx(
 #'     df = npx_df
 #'   )
 #'
