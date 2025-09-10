@@ -59,7 +59,7 @@ arranged by ascending p-values.
 \examples{
 \donttest{
 if (rlang::is_installed(pkg = c("broom"))) {
-  npx_df <- npx_data1 |>
+  npx_df <- OlinkAnalyze::npx_data1 |>
     dplyr::filter(
     !grepl(
       pattern = "control",
@@ -67,7 +67,7 @@ if (rlang::is_installed(pkg = c("broom"))) {
       ignore.case = TRUE
     )
   )
-  check_log <- check_npx(df = npx_df)
+  check_log <- OlinkAnalyze::check_npx(df = npx_df)
 
   ttest_results <- OlinkAnalyze::olink_ttest(
     df = npx_df,
