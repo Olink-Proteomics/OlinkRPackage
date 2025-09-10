@@ -177,7 +177,6 @@ olink_ttest <- function(df,
       .data[["n_levels"]] > 1L
     ) |>
     nrow()
-
   if (n_samples_w_more_than_1_level > 0L) {
     stop(paste0("There are ", n_samples_w_more_than_1_level,
                 " samples that do not have a unique level for your variable.",
@@ -200,12 +199,11 @@ olink_ttest <- function(df,
       .groups = "drop"
     ) |>
     dplyr::filter(
-      (.data[["n"]] - .data[["n_na"]]) <= 1L
+      .data[["n"]] == .data[["n_na"]]
     ) |>
     dplyr::pull(
       .data[["OlinkID"]]
     )
-
   if (length(nas_in_level) > 0L) {
     warning(paste0("The assays ", paste(nas_in_level, collapse = ", "),
                    " have too few datapoints in one level of the factor.",
@@ -235,12 +233,10 @@ olink_ttest <- function(df,
       df <- dplyr::as_tibble(x = df)
     }
 
-    #check that each "pair_id' has only 2 samples
+    # check that each "pair_id' has only 2 samples
     ct_pairs <- df |>
       dplyr::filter(
-        !(.data[["OlinkID"]] %in% check_log$assay_na)
-        & !(.data[["OlinkID"]] %in% .env[["nas_in_level"]])
-        & !is.na(.data[[variable]])
+        !is.na(.data[[variable]])
       ) |>
       dplyr::group_by(
         .data[["OlinkID"]], .data[[pair_id]]
@@ -324,6 +320,7 @@ olink_ttest <- function(df,
           stats::t.test,
           fml,
           data = .x,
+          paired = FALSE,
           !!!dot_lst
         )
         broom::tidy(x = t_res)
