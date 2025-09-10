@@ -2,6 +2,7 @@
 utils::globalVariables(
   c(
     ".env",
-    ".data"
+    ".data",
+    ":="
   )
 )
