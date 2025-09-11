@@ -544,3 +544,75 @@ testthat::test_that(
     )
   }
 )
+
+testthat::test_that(
+  "reference manifest matches",
+  {
+    # legacy version
+    env_legacy_v <- new.env()
+    file_legacy_v <- test_path("data", "refResults.RData")
+    skip_if_not(file.exists(file_legacy_v))
+    load(file = file_legacy_v, envir = env_legacy_v)
+
+    testthat::expect_equal(
+      object = manifest,
+      expected = env_legacy_v$ref_results$manifest
+    )
+  }
+)
+
+testthat::test_that(
+  "reference npx_data1 matches",
+  {
+    # legacy version
+    env_legacy_v <- new.env()
+    file_legacy_v <- test_path("data", "refResults.RData")
+    skip_if_not(file.exists(file_legacy_v))
+    load(file = file_legacy_v, envir = env_legacy_v)
+
+    testthat::expect_equal(
+      object = npx_data1 |>
+        dplyr::select(
+          dplyr::any_of(names(env_legacy_v$ref_results$npx_data1))
+        ) |>
+        dplyr::arrange(
+          .data[["SampleID"]], .data[["OlinkID"]]
+        ),
+      expected = env_legacy_v$ref_results$npx_data1 |>
+        dplyr::select(
+          -dplyr::all_of("Index")
+        ) |>
+        dplyr::arrange(
+          .data[["SampleID"]], .data[["OlinkID"]]
+        )
+    )
+  }
+)
+
+testthat::test_that(
+  "reference npx_data2 matches",
+  {
+    # legacy version
+    env_legacy_v <- new.env()
+    file_legacy_v <- test_path("data", "refResults.RData")
+    skip_if_not(file.exists(file_legacy_v))
+    load(file = file_legacy_v, envir = env_legacy_v)
+
+    testthat::expect_equal(
+      object = npx_data2 |>
+        dplyr::select(
+          dplyr::any_of(names(env_legacy_v$ref_results$npx_data2))
+        ) |>
+        dplyr::arrange(
+          .data[["SampleID"]], .data[["OlinkID"]]
+        ),
+      expected = env_legacy_v$ref_results$npx_data2 |>
+        dplyr::select(
+          -dplyr::all_of("Index")
+        ) |>
+        dplyr::arrange(
+          .data[["SampleID"]], .data[["OlinkID"]]
+        )
+    )
+  }
+)
