@@ -107,8 +107,7 @@ npx_data2 <- npx_data2 |>
       dplyr::all_of(
         c("NPX", "LOD", "MissingFreq")
       ),
-      ~ as.numeric(.x) |>
-        signif(digits = 5L)
+      ~ as.numeric(.x)
     )
   ) |>
   # remove columns missing from the reference npx_data2
