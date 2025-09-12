@@ -30,8 +30,7 @@ test_that(
 
     expect_equal(
       object = t_test_res,
-      expected = reference_results$t_test,
-      tolerance = 1e-4
+      expected = reference_results$t_test
     )
   }
 )
@@ -70,8 +69,7 @@ test_that(
 
     expect_equal(
       object = paired_t_test_res,
-      expected = reference_results$t_test_paired,
-      tolerance = 1e-4
+      expected = reference_results$t_test_paired
     )
   }
 )

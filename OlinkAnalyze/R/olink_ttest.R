@@ -320,7 +320,6 @@ olink_ttest <- function(df,
           stats::t.test,
           fml,
           data = .x,
-          paired = FALSE,
           !!!dot_lst
         )
         broom::tidy(x = t_res)

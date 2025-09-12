@@ -152,8 +152,7 @@ test_that(
 
     expect_equal(
       object = anova_res_site,
-      expected = reference_results$anova_site,
-      tolerance = 1e-4 # we allow some minor deviation from the original tests
+      expected = reference_results$anova_site
     )
   }
 )
@@ -196,8 +195,7 @@ test_that(
 
     expect_equal(
       object = anova_res_time,
-      expected = reference_results$anova_time,
-      tolerance = 1e-4 # we allow some minor deviation from the original tests
+      expected = reference_results$anova_time
     )
   }
 )
@@ -242,8 +240,7 @@ test_that(
 
     expect_equal(
       object = anova_res_site_time,
-      expected = reference_results$anova_site_time,
-      tolerance = 1e-4 # we allow some minor deviation from the original tests
+      expected = reference_results$anova_site_time
     )
   }
 )
@@ -434,8 +431,7 @@ test_that(
 
     expect_equal(
       object = anova_posthoc_res_site,
-      expected = reference_results$anova_site_posthoc,
-      tolerance = 1e-4 # we allow some minor deviation from the original tests
+      expected = reference_results$anova_site_posthoc
     )
   }
 )
@@ -513,8 +509,7 @@ test_that(
 
     expect_equal(
       object = anova_posthoc_res_time,
-      expected = reference_results$anova_time_posthoc,
-      tolerance = 1e-4 # we allow some minor deviation from the original tests
+      expected = reference_results$anova_time_posthoc
     )
   }
 )
