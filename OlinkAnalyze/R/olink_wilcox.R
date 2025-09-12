@@ -227,7 +227,7 @@ olink_wilcox <- function(df,
       stop(paste0("Column ", pair_id, " not found."))
     }
 
-    if (!tibble::is_tibble(x = df)) {
+    if (!check_is_tibble(x = df, error = FALSE)) {
       message("Converting data frame to tibble.")
       df <- dplyr::as_tibble(x = df)
     }
