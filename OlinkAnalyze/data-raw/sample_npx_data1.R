@@ -126,12 +126,80 @@ npx_data1 <- npx_data1 |>
     relationship = "many-to-one"
   )
 
+## df to order npx_data1 ----
+
+# the table below is exported from:
+# npx_data1 |> dplyr::distinct(SampleID, Index, PlateID)
+# using the original npx_data1
+npx_data1_order <- dplyr::tibble(
+  SampleID = c("A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8",
+               "CONTROL_SAMPLE_AS 1", "A9", "A10", "A11", "A12", "A13", "A14",
+               "A15", "A16", "A17", "A18", "CONTROL_SAMPLE_AS 2", "A19", "A20",
+               "A21", "A22", "A23", "A24", "A25", "A26", "A27", "A28", "A29",
+               "A30", "A31", "A32", "A33", "A34", "A35", "A36", "A37", "A38",
+               "A39", "A40", "A41", "A42", "A43", "A44", "A45", "A46", "A47",
+               "A48", "A49", "A50", "A51", "A52", "A53", "A54", "A55", "A56",
+               "A57", "A58", "A59", "A60", "A61", "A62", "A63", "A64", "A65",
+               "A66", "A67", "A68", "A69", "A70", "A71", "A72", "A73", "A74",
+               "A75", "A76", "A77", "B1", "B2", "B3", "B4", "B5", "B6", "B7",
+               "B8", "B9", "B10", "CONTROL_SAMPLE_AS 1", "B11", "B12", "B13",
+               "B14", "B15", "B16", "B17", "B18", "B19", "B20",
+               "CONTROL_SAMPLE_AS 2", "B21", "B22", "B23", "B24", "B25", "B26",
+               "B27", "B28", "B29", "B30", "B31", "B32", "B33", "B34", "B35",
+               "B36", "B37", "B38", "B39", "B40", "B41", "B42", "B43", "B44",
+               "B45", "B46", "B47", "B48", "B49", "B50", "B51", "B52", "B53",
+               "B54", "B55", "B56", "B57", "B58", "B59", "B60", "B61", "B62",
+               "B63", "B64", "B65", "B66", "B67", "B68", "B69", "B70", "B71",
+               "B72", "B73", "B74", "B75", "B76", "B77", "B78", "B79", "A1",
+               "A2", "A3", "A4", "A5", "A6", "A7", "A8", "CONTROL_SAMPLE_AS 1",
+               "A9", "A10", "A11", "A12", "A13", "A14", "A15", "A16", "A17",
+               "A18", "CONTROL_SAMPLE_AS 2", "A19", "A20", "A21", "A22", "A23",
+               "A24", "A25", "A26", "A27", "A28", "A29", "A30", "A31", "A32",
+               "A33", "A34", "A35", "A36", "A37", "A38", "A39", "A40", "A41",
+               "A42", "A43", "A44", "A45", "A46", "A47", "A48", "A49", "A50",
+               "A51", "A52", "A53", "A54", "A55", "A56", "A57", "A58", "A59",
+               "A60", "A61", "A62", "A63", "A64", "A65", "A66", "A67", "A68",
+               "A69", "A70", "A71", "A72", "A73", "A74", "A75", "A76", "A77",
+               "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9", "B10",
+               "CONTROL_SAMPLE_AS 1", "B11", "B12", "B13", "B14", "B15", "B16",
+               "B17", "B18", "B19", "B20", "CONTROL_SAMPLE_AS 2", "B21", "B22",
+               "B23", "B24", "B25", "B26", "B27", "B28", "B29", "B30", "B31",
+               "B32", "B33", "B34", "B35", "B36", "B37", "B38", "B39", "B40",
+               "B41", "B42", "B43", "B44", "B45", "B46", "B47", "B48", "B49",
+               "B50", "B51", "B52", "B53", "B54", "B55", "B56", "B57", "B58",
+               "B59", "B60", "B61", "B62", "B63", "B64", "B65", "B66", "B67",
+               "B68", "B69", "B70", "B71", "B72", "B73", "B74", "B75", "B76",
+               "B77", "B78", "B79"),
+  PlateID = c(
+    rep(x = "Example_Data_13_INFI.csv", times = 79L),
+    rep(x = "Example_Data_14_INFI.csv", times = 81L),
+    rep(x = "Example_Data_1_CAM.csv", times = 79L),
+    rep(x = "Example_Data_2_CAM.csv", times = 81L)
+  ),
+  Index = rep(x = 1L:160L, times = 2L)
+)
+
+npx_data1 <- npx_data1 |>
+  dplyr::left_join(
+    npx_data1_order,
+    by = c("SampleID", "PlateID"),
+    relationship = "many-to-one"
+  )
+rm(npx_data1_order)
+
 ## order dataset ----
 
 npx_data1 <- npx_data1 |>
   # order df to match reference npx_data1
   dplyr::arrange(
-    .data[["OlinkID"]], .data[["PlateID"]], .data[["SampleID"]]
+    .data[["Panel"]], .data[["OlinkID"]], .data[["Index"]]
+  ) |>
+  dplyr::select(
+    dplyr::all_of(
+      c("SampleID", "Index", "OlinkID", "UniProt", "Assay", "MissingFreq",
+        "Panel_Version", "PlateID", "QC_Warning", "LOD", "NPX", "Subject",
+        "Treatment", "Site", "Time", "Project", "Panel")
+    )
   )
 
 # clean up
@@ -148,50 +216,24 @@ ref_npx_data1_file <- system.file("data-raw",
 
 ref_npx_data1 <- readRDS(ref_npx_data1_file)
 
-## check columns ----
-
-stopifnot(
-  all(colnames(npx_data1) %in% colnames(ref_npx_data1))
-)
-
-stopifnot(
-  ncol(npx_data1) == 16L
-)
-
-stopifnot(
-  ncol(ref_npx_data1) == 17L
-)
-
-## modify reference npx_data1 ----
-
-ref_npx_data1 <- ref_npx_data1 |>
-  # selecting only columns that are present in npx_data1. this should result in
-  # removing only column "Index" from ref_npx_data1 and ordering its columns
-  # similarly to npx_data1
-  dplyr::select(
-    dplyr::all_of(
-      colnames(npx_data1)
-    )
-  ) |>
-  # order df to match npx_data1
-  dplyr::arrange(
-    .data[["OlinkID"]], .data[["PlateID"]], .data[["SampleID"]]
-  )
-
 # clean up
 rm(ref_npx_data1_file)
 
 # check identical ----
 
 # at this stage npx_data1 should be identical to the reference dataset
-# ref_npx_data1. We simply allow some rounding error on the 4th decimal digit.
+# ref_npx_data1.
 
 stopifnot(
   npx_data1_eq <- all.equal(target = ref_npx_data1,
                             current = npx_data1,
-                            tolerance = 1e-4,
                             check.attributes = TRUE,
                             check.names = TRUE)
+)
+
+testthat::expect_equal(
+  object = npx_data1,
+  expected = ref_npx_data1
 )
 
 #### IMPORTANT
