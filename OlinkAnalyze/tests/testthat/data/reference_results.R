@@ -888,7 +888,7 @@ i_want_to_override <- FALSE
 if (i_want_to_override == TRUE) {
   saveRDS(
     reference_results,
-    file = "tests/data/reference_results/reference_results.rds",
+    file = "tests/testthat/data/reference_results.rds",
     version = 2L,
     compress = "gzip"
   )
