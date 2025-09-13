@@ -571,20 +571,8 @@ testthat::test_that(
     load(file = file_legacy_v, envir = env_legacy_v)
 
     testthat::expect_equal(
-      object = npx_data1 |>
-        dplyr::select(
-          dplyr::any_of(names(env_legacy_v$ref_results$npx_data1))
-        ) |>
-        dplyr::arrange(
-          .data[["SampleID"]], .data[["OlinkID"]]
-        ),
-      expected = env_legacy_v$ref_results$npx_data1 |>
-        dplyr::select(
-          -dplyr::all_of("Index")
-        ) |>
-        dplyr::arrange(
-          .data[["SampleID"]], .data[["OlinkID"]]
-        )
+      object = npx_data1,
+      expected = env_legacy_v$ref_results$npx_data1
     )
   }
 )
@@ -599,20 +587,8 @@ testthat::test_that(
     load(file = file_legacy_v, envir = env_legacy_v)
 
     testthat::expect_equal(
-      object = npx_data2 |>
-        dplyr::select(
-          dplyr::any_of(names(env_legacy_v$ref_results$npx_data2))
-        ) |>
-        dplyr::arrange(
-          .data[["SampleID"]], .data[["OlinkID"]]
-        ),
-      expected = env_legacy_v$ref_results$npx_data2 |>
-        dplyr::select(
-          -dplyr::all_of("Index")
-        ) |>
-        dplyr::arrange(
-          .data[["SampleID"]], .data[["OlinkID"]]
-        )
+      object = npx_data2,
+      expected = env_legacy_v$ref_results$npx_data2
     )
   }
 )
