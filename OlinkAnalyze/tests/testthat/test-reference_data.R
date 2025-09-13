@@ -550,13 +550,13 @@ testthat::test_that(
   {
     # legacy version
     env_legacy_v <- new.env()
-    file_legacy_v <- test_path("data", "refResults.RData")
+    file_legacy_v <- test_path("..", "..", "data-raw", "ref_manifest.rds")
     skip_if_not(file.exists(file_legacy_v))
-    load(file = file_legacy_v, envir = env_legacy_v)
+    env_legacy_v$manifest <- readRDS(file = file_legacy_v)
 
-    testthat::expect_equal(
+    testthat::expect_identical(
       object = manifest,
-      expected = env_legacy_v$ref_results$manifest
+      expected = env_legacy_v$manifest
     )
   }
 )
@@ -566,13 +566,13 @@ testthat::test_that(
   {
     # legacy version
     env_legacy_v <- new.env()
-    file_legacy_v <- test_path("data", "refResults.RData")
+    file_legacy_v <- test_path("..", "..", "data-raw", "ref_npx_data1.rds")
     skip_if_not(file.exists(file_legacy_v))
-    load(file = file_legacy_v, envir = env_legacy_v)
+    env_legacy_v$npx_data1 <- readRDS(file = file_legacy_v)
 
-    testthat::expect_equal(
+    testthat::expect_identical(
       object = npx_data1,
-      expected = env_legacy_v$ref_results$npx_data1
+      expected = env_legacy_v$npx_data1
     )
   }
 )
@@ -582,13 +582,13 @@ testthat::test_that(
   {
     # legacy version
     env_legacy_v <- new.env()
-    file_legacy_v <- test_path("data", "refResults.RData")
+    file_legacy_v <- test_path("..", "..", "data-raw", "ref_npx_data2.rds")
     skip_if_not(file.exists(file_legacy_v))
-    load(file = file_legacy_v, envir = env_legacy_v)
+    env_legacy_v$npx_data2 <- readRDS(file = file_legacy_v)
 
-    testthat::expect_equal(
+    testthat::expect_identical(
       object = npx_data2,
-      expected = env_legacy_v$ref_results$npx_data2
+      expected = env_legacy_v$npx_data2
     )
   }
 )
