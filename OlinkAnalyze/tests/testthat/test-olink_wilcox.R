@@ -30,8 +30,7 @@ test_that(
 
     expect_equal(
       object = wilcox_test_res,
-      expected = reference_results$wilcox_test,
-      tolerance = 1e-4
+      expected = reference_results$wilcox_test
     )
   }
 )
@@ -70,8 +69,7 @@ test_that(
 
     expect_equal(
       object = paired_wilcox_test_res,
-      expected = reference_results$wilcox_test_paired,
-      tolerance = 1e-2
+      expected = reference_results$wilcox_test_paired
     )
   }
 )
