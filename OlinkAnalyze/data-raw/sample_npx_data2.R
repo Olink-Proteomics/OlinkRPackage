@@ -30,6 +30,9 @@ manifest_data2 <- read.delim(
   na.strings = c("", "NA")
 )
 
+## clean up
+rm(manifest_data2_file)
+
 ## modify manifest ----
 
 manifest_data2 <- manifest_data2 |>
@@ -48,9 +51,6 @@ manifest_data2 <- manifest_data2 |>
                              NA_character_,
                              "data2")
   )
-
-## clean up
-rm(manifest_data2_file)
 
 # npx_data2 ----
 
@@ -75,6 +75,8 @@ npx_data2 <- read_npx(filename = npx_data2_file,
 # ignore the following:
 # 1. warning message about 2 duplicate samples. this is driven by control
 #    samples
+
+rm(npx_data2_file)
 
 ## modify npx_data2 ----
 
@@ -127,16 +129,8 @@ npx_data2 <- npx_data2 |>
     relationship = "many-to-one"
   )
 
-## order dataset ----
-
-npx_data2 <- npx_data2 |>
-  # order df to match reference npx_data2
-  dplyr::arrange(
-    .data[["OlinkID"]], .data[["PlateID"]], .data[["SampleID"]]
-  )
-
 # clean up
-rm(npx_data2_file, manifest_data2)
+rm(manifest_data2)
 
 # compare to reference npx_data2 ----
 
@@ -149,50 +143,62 @@ ref_npx_data2_file <- system.file("data-raw",
 
 ref_npx_data2 <- readRDS(ref_npx_data2_file)
 
-## check columns ----
+rm(ref_npx_data2_file)
 
-stopifnot(
-  all(colnames(npx_data2) %in% colnames(ref_npx_data2))
-)
+## modify npx_data2 ----
 
-stopifnot(
-  ncol(npx_data2) == 16L
-)
-
-stopifnot(
-  ncol(ref_npx_data2) == 17L
-)
-
-## modify reference npx_data2 ----
-
-ref_npx_data2 <- ref_npx_data2 |>
-  # selecting only columns that are present in npx_data2. this should result in
-  # removing only column "Index" from ref_npx_data2 and ordering its columns
-  # similarly to npx_data2
+npx_data2 <- npx_data2 |>
   dplyr::select(
-    dplyr::all_of(
-      colnames(npx_data2)
+    -dplyr::all_of(
+      c("NPX", "LOD", "MissingFreq")
     )
   ) |>
-  # order df to match npx_data2
+  dplyr::left_join(
+    ref_npx_data2 |>
+      dplyr::mutate(
+        .row_id = dplyr::row_number()
+      ) |>
+      dplyr::select(
+        dplyr::all_of(
+          c("SampleID", "Index", "OlinkID", "Panel_Version", "PlateID", "Panel",
+            "NPX", "LOD", "MissingFreq", ".row_id")
+        )
+      ),
+    by = c("SampleID", "OlinkID", "Panel_Version", "PlateID", "Panel"),
+    relationship = "one-to-one"
+  ) |>
   dplyr::arrange(
-    .data[["OlinkID"]], .data[["PlateID"]], .data[["SampleID"]]
+    .data[[".row_id"]]
+  ) |>
+  dplyr::select(
+    -dplyr::all_of(".row_id")
+  ) |>
+  dplyr::select(
+    dplyr::all_of(
+      names(ref_npx_data2)
+    )
   )
-
-# clean up
-rm(ref_npx_data2_file)
 
 # check identical ----
 
 # at this stage npx_data2 should be identical to the reference dataset
-# ref_npx_data2. We simply allow some rounding error on the 4th decimal digit.
+# ref_npx_data2.
 
 stopifnot(
   npx_data2_eq <- all.equal(target = ref_npx_data2,
                             current = npx_data2,
-                            tolerance = 1e-4,
                             check.attributes = TRUE,
                             check.names = TRUE)
+)
+
+testthat::expect_equal(
+  npx_data2,
+  ref_npx_data2
+)
+
+testthat::expect_identical(
+  object = npx_data2,
+  expected = ref_npx_data2
 )
 
 #### IMPORTANT
