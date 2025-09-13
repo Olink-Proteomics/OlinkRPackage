@@ -148,6 +148,11 @@ rm(ref_npx_data2_file)
 ## modify npx_data2 ----
 
 npx_data2 <- npx_data2 |>
+  dplyr::select(
+    -dplyr::all_of(
+      c("NPX", "LOD", "MissingFreq")
+    )
+  ) |>
   dplyr::left_join(
     ref_npx_data2 |>
       dplyr::mutate(
@@ -155,8 +160,8 @@ npx_data2 <- npx_data2 |>
       ) |>
       dplyr::select(
         dplyr::all_of(
-          c("SampleID", "Index", "OlinkID", "Panel_Version", "PlateID",
-            "Panel", ".row_id")
+          c("SampleID", "Index", "OlinkID", "Panel_Version", "PlateID", "Panel",
+            "NPX", "LOD", "MissingFreq", ".row_id")
         )
       ),
     by = c("SampleID", "OlinkID", "Panel_Version", "PlateID", "Panel"),
@@ -189,6 +194,11 @@ stopifnot(
 testthat::expect_equal(
   npx_data2,
   ref_npx_data2
+)
+
+testthat::expect_identical(
+  object = npx_data2,
+  expected = ref_npx_data2
 )
 
 #### IMPORTANT

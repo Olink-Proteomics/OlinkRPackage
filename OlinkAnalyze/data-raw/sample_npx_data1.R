@@ -145,8 +145,15 @@ rm(ref_npx_data1_file)
 ## modify npx_data1 ----
 
 # force npx_data1 to match order of rows from ref_npx_data1
+# also use NPX, LOD and MissingFreq from reference dataset so that tests produce
+# reference results
 
 npx_data1 <- npx_data1 |>
+  dplyr::select(
+    -dplyr::all_of(
+      c("NPX", "LOD", "MissingFreq")
+    )
+  ) |>
   dplyr::left_join(
     ref_npx_data1 |>
       dplyr::mutate(
@@ -154,8 +161,8 @@ npx_data1 <- npx_data1 |>
       ) |>
       dplyr::select(
         dplyr::all_of(
-          c("SampleID", "Index", "OlinkID", "Panel_Version", "PlateID",
-            "Panel", ".row_id")
+          c("SampleID", "Index", "OlinkID", "Panel_Version", "PlateID", "Panel",
+            "NPX", "LOD", "MissingFreq", ".row_id")
         )
       ),
     by = c("SampleID", "OlinkID", "Panel_Version", "PlateID", "Panel"),
@@ -186,6 +193,11 @@ stopifnot(
 )
 
 testthat::expect_equal(
+  object = npx_data1,
+  expected = ref_npx_data1
+)
+
+testthat::expect_identical(
   object = npx_data1,
   expected = ref_npx_data1
 )
