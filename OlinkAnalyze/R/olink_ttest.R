@@ -85,6 +85,12 @@ olink_ttest <- function(df,
                         check_log = NULL,
                         ...) {
 
+  # Check if all required libraries for this function are installed
+  rlang::check_installed(
+    pkg = c("broom"),
+    call = rlang::caller_env()
+  )
+
   if (missing(df) || missing(variable)) {
     stop("The df and variable arguments need to be specified.")
   }

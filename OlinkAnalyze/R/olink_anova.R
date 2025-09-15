@@ -133,6 +133,12 @@ olink_anova <- function(df,
                         return.covariates = FALSE, # nolint object_name_linter
                         verbose = TRUE) {
 
+  # Check if all required libraries for this function are installed
+  rlang::check_installed(
+    pkg = c("broom", "car"),
+    call = rlang::caller_env()
+  )
+
   if (!missing(model_formula)) {
     if ("formula" %in% class(model_formula)) {
       model_formula <- deparse(model_formula) # Convert to string if is formula
@@ -654,6 +660,12 @@ olink_anova_posthoc <- function(df,
                                 mean_return = FALSE,
                                 post_hoc_padjust_method = "tukey",
                                 verbose = TRUE) {
+
+  # Check if all required libraries for this function are installed
+  rlang::check_installed(
+    pkg = c("broom", "car", "emmeans"),
+    call = rlang::caller_env()
+  )
 
   if (!missing(model_formula)) {
     if ("formula" %in% class(model_formula)) {
