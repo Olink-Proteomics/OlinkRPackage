@@ -77,7 +77,7 @@
 #'       check_log = check_log
 #'     )
 #' }
-#'}
+#' }
 #'
 olink_ttest <- function(df,
                         variable,
