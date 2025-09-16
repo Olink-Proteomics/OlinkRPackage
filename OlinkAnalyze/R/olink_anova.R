@@ -587,7 +587,7 @@ olink_anova <- function(df,
 #'
 #' @examples
 #' \donttest{
-#' if (rlang::is_installed(pkg = c("broom", "car", "emmeans"))) {
+#' if (rlang::is_installed(pkg = c("car", "emmeans"))) {
 #'   # data
 #'   npx_df <- OlinkAnalyze::npx_data1 |>
 #'     dplyr::filter(
@@ -663,7 +663,7 @@ olink_anova_posthoc <- function(df,
 
   # Check if all required libraries for this function are installed
   rlang::check_installed(
-    pkg = c("broom", "car", "emmeans"),
+    pkg = c("car", "emmeans"),
     call = rlang::caller_env()
   )
 
