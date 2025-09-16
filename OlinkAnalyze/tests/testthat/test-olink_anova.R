@@ -366,7 +366,6 @@ test_that(
     reference_results <- get_example_data(filename = "reference_results.rds")
 
     skip_if_not_installed(pkg = "car")
-    skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")
 
     # this has been tested earlier
@@ -444,7 +443,6 @@ test_that(
     reference_results <- get_example_data(filename = "reference_results.rds")
 
     skip_if_not_installed(pkg = "car")
-    skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")
 
     # this has been tested earlier
@@ -518,7 +516,6 @@ test_that(
   "olink_anova_posthoc - works - no check_log",
   {
     skip_if_not_installed(pkg = "car")
-    skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")
 
     expect_warning(
@@ -592,7 +589,6 @@ test_that(
   "olink_anova_posthoc - error - 'df', 'variable' or 'effect' not provided",
   {
     skip_if_not_installed(pkg = "car")
-    skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")
 
     expect_error(
@@ -616,7 +612,6 @@ test_that(
   "olink_anova_posthoc - error - control assays in dataset",
   {
     skip_if_not_installed(pkg = "car")
-    skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")
 
     expect_error(
@@ -647,7 +642,6 @@ test_that(
   "olink_anova_posthoc - works - when edge cases are cleaned up",
   {
     skip_if_not_installed(pkg = "car")
-    skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")
 
     expect_no_error(
