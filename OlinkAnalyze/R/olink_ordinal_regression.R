@@ -79,19 +79,19 @@
 #'
 #'   # Two-way Ordinal Regression with CLM.
 #'   # Results in model NPX~Treatment+Time+Treatment:Time.
-#'   ordinalRegression_results <- OlinkAnalyze::olink_ordinalRegression(
+#'   ordinalRegression_results <- OlinkAnalyze::olink_ordinal_regression(
 #'     df = npx_df,
 #'     variable = "Treatment:Time"
 #'   )
 #' }
 #' }
 #'
-olink_ordinalRegression <- function(df, # nolint object_name_linter
-                                    variable,
-                                    covariates = NULL,
-                                    return.covariates = FALSE, # nolint object_name_linter
-                                    check_log = NULL,
-                                    verbose = TRUE) {
+olink_ordinal_regression <- function(df,
+                                     variable,
+                                     covariates = NULL,
+                                     return.covariates = FALSE, # nolint object_name_linter
+                                     check_log = NULL,
+                                     verbose = TRUE) {
   # Check if all required libraries for this function are installed
   rlang::check_installed(
     pkg = c("ordinal", "broom"),
@@ -384,6 +384,10 @@ olink_ordinalRegression <- function(df, # nolint object_name_linter
   return(ord_regr_results)
 }
 
+#' @rdname olink_ordinal_regression
+#' @export
+olink_ordinalRegression <- olink_ordinal_regression  # nolint object_name_linter
+
 #' Function which performs an posthoc test per protein.
 #'
 #' @description
@@ -459,7 +463,7 @@ olink_ordinalRegression <- function(df, # nolint object_name_linter
 #'
 #'   # Two-way Ordinal Regression with CLM.
 #'   # Results in model NPX~Treatment+Time+Treatment:Time.
-#'   ordinalRegression_results <- OlinkAnalyze::olink_ordinalRegression(
+#'   ordinalRegression_results <- OlinkAnalyze::olink_ordinal_regression(
 #'     df = npx_df,
 #'     variable = "Treatment:Time"
 #'   )
@@ -475,7 +479,7 @@ olink_ordinalRegression <- function(df, # nolint object_name_linter
 #'     unique()
 #'
 #'   # Posthoc test
-#'   ordRegr_results_posthoc <- OlinkAnalyze::olink_ordinalRegression_posthoc(
+#'   ordRegr_results_posthoc <- OlinkAnalyze::olink_ordinal_regression_posthoc(
 #'     df = npx_df,
 #'     variable = c("Treatment:Time"),
 #'     olinkid_list = significant_assays,
@@ -485,16 +489,16 @@ olink_ordinalRegression <- function(df, # nolint object_name_linter
 #' }
 #' }
 #'
-olink_ordinalRegression_posthoc <- function(df, # nolint object_name_linter object_length_linter
-                                            olinkid_list = NULL,
-                                            variable,
-                                            covariates = NULL,
-                                            effect,
-                                            effect_formula,
-                                            mean_return = FALSE,
-                                            post_hoc_padjust_method = "tukey",
-                                            check_log = NULL,
-                                            verbose = TRUE) {
+olink_ordinal_regression_posthoc <- function(df, # nolint object_length_linter
+                                             olinkid_list = NULL,
+                                             variable,
+                                             covariates = NULL,
+                                             effect,
+                                             effect_formula,
+                                             mean_return = FALSE,
+                                             post_hoc_padjust_method = "tukey",
+                                             check_log = NULL,
+                                             verbose = TRUE) {
 
   # Check if all required libraries for this function are installed
   rlang::check_installed(
@@ -732,3 +736,7 @@ olink_ordinalRegression_posthoc <- function(df, # nolint object_name_linter obje
 
   return(ord_regr_posthoc_result)
 }
+
+#' @rdname olink_ordinal_regression_posthoc
+#' @export
+olink_ordinalRegression_posthoc <- olink_ordinal_regression_posthoc  # nolint object_name_linter

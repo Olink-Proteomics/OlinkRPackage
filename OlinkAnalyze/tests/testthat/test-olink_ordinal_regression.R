@@ -112,10 +112,10 @@ dt_edge_case_ctrl_assay_check <- check_npx(df = dt_edge_case_ctrl_assay) |>
   suppressMessages() |>
   suppressWarnings()
 
-# Test olink_ordinalRegression ----
+# Test olink_ordinal_regression ----
 
 test_that(
-  "olink_ordinalRegression - works - site",
+  "olink_ordinal_regression - works - site",
   {
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "ordinal")
@@ -124,7 +124,7 @@ test_that(
       object = expect_no_error(
         object = expect_message(
           object = expect_message(
-            object = ord_regs_res_site <- olink_ordinalRegression(
+            object = ord_regs_res_site <- olink_ordinal_regression(
               df = npx_data1_mod,
               variable = "Site",
               check_log = npx_data1_mod_check_log
@@ -186,7 +186,7 @@ test_that(
 )
 
 test_that(
-  "olink_ordinalRegression - works - time",
+  "olink_ordinal_regression - works - time",
   {
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "ordinal")
@@ -195,7 +195,7 @@ test_that(
       object = expect_no_error(
         object = expect_message(
           object = expect_message(
-            object = ord_regs_res_time <- olink_ordinalRegression(
+            object = ord_regs_res_time <- olink_ordinal_regression(
               df = npx_data1_mod,
               variable = "Time",
               check_log = npx_data1_mod_check_log
@@ -254,7 +254,7 @@ test_that(
 )
 
 test_that(
-  "olink_ordinalRegression - works - treatment*time",
+  "olink_ordinal_regression - works - treatment*time",
   {
     # Load reference results
     # tests are skipped if files are absent
@@ -267,7 +267,7 @@ test_that(
       object = expect_no_error(
         object = expect_message(
           object = expect_message(
-            object = ord_regs_res_treat_time <- olink_ordinalRegression(
+            object = ord_regs_res_treat_time <- olink_ordinal_regression(
               df = npx_data1_mod,
               variable = "Treatment:Time",
               check_log = npx_data1_mod_check_log
@@ -300,7 +300,7 @@ test_that(
 )
 
 test_that(
-  "olink_ordinalRegression - works - no check_log",
+  "olink_ordinal_regression - works - no check_log",
   {
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "ordinal")
@@ -310,7 +310,7 @@ test_that(
         object = expect_message(
           object = expect_message(
             object = expect_message(
-              object = olink_ordinalRegression(
+              object = olink_ordinal_regression(
                 df = dt_edge_case_no_ctrl,
                 variable = "treatment2"
               ),
@@ -337,30 +337,30 @@ test_that(
 )
 
 test_that(
-  "olink_ordinalRegression - error - 'df' and/or 'variable' not provided",
+  "olink_ordinal_regression - error - 'df' and/or 'variable' not provided",
   {
     skip_if_not_installed(pkg = "ordinal")
     skip_if_not_installed(pkg = "broom")
 
     expect_error(
-      object = olink_ordinalRegression(),
+      object = olink_ordinal_regression(),
       regexp = "The df and variable arguments need to be specified."
     )
 
     expect_error(
-      object = olink_ordinalRegression(df = npx_data1_mod),
+      object = olink_ordinal_regression(df = npx_data1_mod),
       regexp = "The df and variable arguments need to be specified."
     )
 
     expect_error(
-      object = olink_ordinalRegression(variable = "Site"),
+      object = olink_ordinal_regression(variable = "Site"),
       regexp = "The df and variable arguments need to be specified."
     )
   }
 )
 
 test_that(
-  "olink_ordinalRegression - works - when edge cases are cleaned up",
+  "olink_ordinal_regression - works - when edge cases are cleaned up",
   {
     skip_if_not_installed(pkg = "ordinal")
     skip_if_not_installed(pkg = "broom")
@@ -369,7 +369,7 @@ test_that(
       object = expect_no_warning(
         object = expect_message(
           object = expect_message(
-            object = olink_ordinalRegression(
+            object = olink_ordinal_regression(
               df = dt_edge_case_ctrl_assay,
               variable = "treatment1",
               check_log = dt_edge_case_ctrl_assay_check
@@ -386,16 +386,16 @@ test_that(
   }
 )
 
-# Test olink_ordinalRegression ----
+# Test olink_ordinal_regression_posthoc ----
 
 test_that(
-  "olink_ordinalRegression - works - site",
+  "olink_ordinal_regression_posthoc - works - site",
   {
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "ordinal")
     skip_if_not_installed(pkg = "emmeans")
 
-    ord_regs_res_site <- olink_ordinalRegression(
+    ord_regs_res_site <- olink_ordinal_regression(
       df = npx_data1_mod,
       variable = "Site",
       check_log = npx_data1_mod_check_log
@@ -416,7 +416,7 @@ test_that(
         object = expect_message(
           object = expect_message(
             object = ord_regs_posthoc_res_site <-
-              olink_ordinalRegression_posthoc(
+              olink_ordinal_regression_posthoc(
                 df = npx_data1_mod,
                 check_log = npx_data1_mod_check_log,
                 variable = "Site",
@@ -498,7 +498,7 @@ test_that(
 )
 
 test_that(
-  "olink_ordinalRegression - works - treatment*time",
+  "olink_ordinal_regression_posthoc - works - treatment*time",
   {
     # Load reference results
     # tests are skipped if files are absent
@@ -508,7 +508,7 @@ test_that(
     skip_if_not_installed(pkg = "emmeans")
     skip_if_not_installed(pkg = "ordinal")
 
-    ord_regs_res_treat_time <- olink_ordinalRegression(
+    ord_regs_res_treat_time <- olink_ordinal_regression(
       df = npx_data1_mod,
       variable = "Treatment:Time",
       check_log = npx_data1_mod_check_log
@@ -530,7 +530,7 @@ test_that(
           object = expect_message(
             object = expect_message(
               object = ord_reg_ph_res_treat_time <-
-                olink_ordinalRegression_posthoc(
+                olink_ordinal_regression_posthoc(
                   df = npx_data1_mod,
                   check_log = npx_data1_mod_check_log,
                   variable = "Treatment:Time",
@@ -572,7 +572,7 @@ test_that(
 )
 
 test_that(
-  "olink_ordinalRegression - works - no check_log",
+  "olink_ordinal_regression_posthoc - works - no check_log",
   {
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "ordinal")
@@ -583,7 +583,7 @@ test_that(
         object = expect_message(
           object = expect_message(
             object = expect_message(
-              object = ord_regs_res_treat <- olink_ordinalRegression(
+              object = ord_regs_res_treat <- olink_ordinal_regression(
                 df = dt_edge_case_no_ctrl,
                 variable = "treatment2"
               ),
@@ -620,7 +620,7 @@ test_that(
         object = expect_message(
           object = expect_message(
             object = expect_message(
-              object = olink_ordinalRegression_posthoc(
+              object = olink_ordinal_regression_posthoc(
                 df = dt_edge_case_no_ctrl,
                 variable = "treatment2",
                 olinkid_list = ord_regs_res_treat_oid,
@@ -649,29 +649,29 @@ test_that(
 )
 
 test_that(
-  "olink_ordinalRegression_posthoc - error - required input not provided",
+  "olink_ordinal_regression_posthoc - error - required input not provided",
   {
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "ordinal")
     skip_if_not_installed(pkg = "emmeans")
 
     expect_error(
-      object = olink_ordinalRegression_posthoc(),
+      object = olink_ordinal_regression_posthoc(),
       regexp = "The df, variable and effect arguments need to be specified."
     )
 
     expect_error(
-      object = olink_ordinalRegression_posthoc(df = npx_data1_mod),
+      object = olink_ordinal_regression_posthoc(df = npx_data1_mod),
       regexp = "The df, variable and effect arguments need to be specified."
     )
 
     expect_error(
-      object = olink_ordinalRegression_posthoc(variable = "Site"),
+      object = olink_ordinal_regression_posthoc(variable = "Site"),
       regexp = "The df, variable and effect arguments need to be specified."
     )
 
     expect_error(
-      object = olink_ordinalRegression_posthoc(
+      object = olink_ordinal_regression_posthoc(
         df = npx_data1_mod,
         variable = "Site"
       ),
@@ -681,7 +681,7 @@ test_that(
 )
 
 test_that(
-  "olink_anova_posthoc - works - when edge cases are cleaned up",
+  "olink_ordinal_regression_posthoc - works - when edge cases are cleaned up",
   {
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "ordinal")
@@ -691,7 +691,7 @@ test_that(
       object = expect_no_warning(
         object = expect_message(
           object = expect_message(
-            object = olink_ordinalRegression_posthoc(
+            object = olink_ordinal_regression_posthoc(
               df = dt_edge_case_ctrl_assay,
               variable = "treatment2",
               check_log = dt_edge_case_ctrl_assay_check,
