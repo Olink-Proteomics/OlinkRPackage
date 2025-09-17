@@ -83,6 +83,7 @@ Suggests:
     broom,
     car,
     emmeans,
+    ordinal,
     readxl,
     testthat (>= 3.0.0),
     withr,
