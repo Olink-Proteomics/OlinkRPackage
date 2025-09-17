@@ -366,6 +366,7 @@ test_that(
     reference_results <- get_example_data(filename = "reference_results.rds")
 
     skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")
 
     # this has been tested earlier
@@ -443,6 +444,7 @@ test_that(
     reference_results <- get_example_data(filename = "reference_results.rds")
 
     skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")
 
     # this has been tested earlier
@@ -513,9 +515,117 @@ test_that(
 )
 
 test_that(
+  "olink_anova_posthoc - works - site*time",
+  {
+    skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
+    skip_if_not_installed(pkg = "emmeans")
+
+    # this has been tested earlier
+    anova_res_site_time <- olink_anova(
+      df = npx_data1_mod,
+      variable = c("Site", "Time"),
+      check_log = npx_data1_mod_check_log
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    anova_res_site_time_oid <- anova_res_site_time |>
+      dplyr::filter(
+        .data[["Threshold"]] == "Significant"
+      ) |>
+      dplyr::pull(
+        .data[["OlinkID"]]
+      )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = olink_anova_posthoc_msg <- testthat::capture_messages(
+          {
+            anova_posthoc_res_site_time <- olink_anova_posthoc(
+              df = npx_data1_mod,
+              check_log = npx_data1_mod_check_log,
+              variable = c("Site", "Time"),
+              olinkid_list = anova_res_site_time_oid,
+              effect = "Time"
+            )
+          }
+        )
+      )
+    )
+
+    # check messages
+    expect_true(
+      object = grepl(
+        pattern = paste("Variables and covariates converted from character to",
+                        "factors: Site, Time"),
+        x = olink_anova_posthoc_msg[1L],
+        fixed = TRUE
+      )
+    )
+    expect_true(
+      object = grepl(
+        pattern = paste("Means estimated for each assay from ANOVA model:",
+                        "NPX~Site*Time"),
+        x = olink_anova_posthoc_msg[2L],
+        fixed = TRUE
+      )
+    )
+    expect_equal(
+      object = grepl(
+        pattern = paste("NOTE: Results may be misleading due to involvement",
+                        "in interactions"),
+        x = olink_anova_posthoc_msg[3L:7L],
+        fixed = TRUE
+      ) |>
+        sum(),
+      expected = 5L
+    )
+
+    # check that results match
+    expect_identical(
+      object = dim(anova_posthoc_res_site_time),
+      expected = c(15L, 11L)
+    )
+
+    expect_equal(
+      object = anova_posthoc_res_site_time |>
+        dplyr::filter(
+          .data[["Threshold"]] == "Significant"
+        ) |>
+        dplyr::select(
+          dplyr::all_of(
+            c("OlinkID", "term", "contrast", "estimate",
+              "conf.low", "conf.high", "Adjusted_pval")
+          )
+        ) |>
+        dplyr::mutate(
+          dplyr::across(
+            dplyr::all_of(
+              c("OlinkID", "term", "contrast")
+            ),
+            ~ as.character(.x)
+          )
+        ),
+      expected = dplyr::tibble(
+        OlinkID = c("OID01276", "OID00525"),
+        term = rep(x = "Time", times = 2L),
+        contrast = rep(x = "Baseline - Week.6", times = 2L),
+        estimate = c(-2.311703, -1.060433),
+        conf.low = c(-4.346567, -2.053885),
+        conf.high = c(-0.2768394, -0.0669805),
+        Adjusted_pval = c(0.02164654, 0.03340609)
+      ),
+      tolerance = 1e-6
+    )
+  }
+)
+
+test_that(
   "olink_anova_posthoc - works - no check_log",
   {
     skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")
 
     expect_warning(
@@ -589,6 +699,7 @@ test_that(
   "olink_anova_posthoc - error - 'df', 'variable' or 'effect' not provided",
   {
     skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")
 
     expect_error(
@@ -612,6 +723,7 @@ test_that(
   "olink_anova_posthoc - error - control assays in dataset",
   {
     skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")
 
     expect_error(
@@ -642,6 +754,7 @@ test_that(
   "olink_anova_posthoc - works - when edge cases are cleaned up",
   {
     skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")
 
     expect_no_error(
