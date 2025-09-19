@@ -383,7 +383,9 @@ norm_internal_rename_cols <- function(ref_cols,
   # according to the ones from reference.
   df_nonref_cols_rename <- lapply(names(ref_cols), function(c_to_u) {
     if (c_to_u %in% cols_to_update) {
-      if (length(ref_cols[[c_to_u]]) != length(not_ref_cols[[c_to_u]])) {
+      if (length(ref_cols[[c_to_u]]) != length(not_ref_cols[[c_to_u]])
+          && all(c(length(ref_cols[[c_to_u]]),
+                   length(not_ref_cols[[c_to_u]])) != 0L)) {
         cli::cli_abort(  # nolint return_linter
           c(
             "x" = "Cannot rename {cli::qty(not_ref_cols[[c_to_u]])}
