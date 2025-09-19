@@ -7,14 +7,12 @@ load(file = test_path('data','npx_data_format221010.RData'))
 
 #Run olink_wilcox
 wilcox.test_results <- olink_wilcox(npx_data1, 'Treatment') %>% 
-  mutate(p.value = round(p.value, 3)) %>%
-  arrange(p.value, Assay)
+  arrange(estimate, Assay)
 
 wilcox.test_results_paired <- npx_data1 %>% #Paired Mann-Whitney U Test
   filter(Time %in% c("Baseline","Week.6")) %>%
   olink_wilcox(variable = "Time", pair_id = "Subject") %>% 
-  mutate(p.value = round(p.value, 3)) %>%
-  arrange(p.value, Assay)
+  arrange(estimate, Assay)
 
 test_that("Wilcox-test function works", {
   expect_equal(wilcox.test_results, ref_results$wilcox.test_results,tolerance = 1e-10)  # compare results to ref
