@@ -44,24 +44,6 @@ boxplot_time_site <- npx_data1 %>%
                     head(10) %>%
                     pull(OlinkID)})
 
-
-test_that("olink_boxplot works", {
-  if (requireNamespace("vdiffr", quietly = TRUE) ){
-    vdiffr::expect_doppelganger('boxplot site 2prots', boxplot_site_2prots)
-    vdiffr::expect_doppelganger('boxplot site 10prots', boxplot_site_10prots[[2]])
-    vdiffr::expect_doppelganger('boxplot time', boxplot_time)
-    vdiffr::expect_doppelganger('boxplot time with coloroption', boxplot_time_coloroption)
-    vdiffr::expect_doppelganger('boxplot time and site', boxplot_time_site)
-  }
-  expect_warning(npx_data_format221010 %>%
-                   olink_boxplot(variable = "treatment2",
-                                 olinkid_list = c(npx_Check$all_nas[1:5],"OID30538")))
-
-  boxplot_npxcheck <- suppressWarnings(olink_boxplot(npx_data_format221010, variable = "treatment2",
-                                   olinkid_list = c(npx_Check$all_nas[1:5],"OID30538")))
-  expect_length(unique(boxplot_npxcheck[[1]]$data$Name_OID), 1)
-})
-
 test_that("olink_boxplot works", {
   expect_warning(npx_data_format221010 %>%
                    olink_boxplot(variable = "treatment2",
@@ -72,7 +54,7 @@ test_that("olink_boxplot works", {
   expect_length(unique(boxplot_npxcheck[[1]]$data$Name_OID), 1)
 })
 
-test_that("olink_boxplot works", {
+test_that("olink_boxplot works - vdiffr", {
   skip_on_ci()
   skip_on_cran()
   if (requireNamespace("vdiffr", quietly = TRUE) ){
