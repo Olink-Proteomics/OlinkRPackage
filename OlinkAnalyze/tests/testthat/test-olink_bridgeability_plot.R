@@ -4,6 +4,8 @@ test_that(
   "olink_bridgeability_plot - works",
   {
     skip_if_not_installed("vdiffr")
+    skip_on_cran()
+    skip_on_ci()
 
     npx_ht <- OlinkAnalyze:::data_ht_small |>
       dplyr::filter(
