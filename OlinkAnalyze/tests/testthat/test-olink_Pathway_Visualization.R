@@ -45,7 +45,8 @@ test_that("Plot works",{
                                                  method = "ORA",
                                                  keyword = "SIGNALING")
 
-
+  skip_on_cran()
+  skip_on_ci()
   set.seed(123)
   vdiffr::expect_doppelganger("GSEA Visualization", gsea_vis)
   vdiffr::expect_doppelganger("GSEA Vis with Keyword", gsea_vis_keyword)

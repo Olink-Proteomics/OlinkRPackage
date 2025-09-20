@@ -41,7 +41,6 @@ if(as.numeric(R.Version()$major) < 4){
 }
 
 test_that("olink_plate_randomizer works", {
-
   expect_equal(droplevels(randomized_result1), droplevels(ref_results$randomized_result1))
   expect_equal(droplevels(randomized_result2), droplevels(ref_results$randomized_result2))
   expect_equal(droplevels(randomized_result3), droplevels(ref_results$randomized_result3))

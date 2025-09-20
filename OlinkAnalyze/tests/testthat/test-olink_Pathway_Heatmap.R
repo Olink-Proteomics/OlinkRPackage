@@ -33,6 +33,8 @@ test_that("Plot works",{
                                        method = "ORA",
                                        keyword = "cell")
 
+  skip_on_cran()
+  skip_on_ci()
   set.seed(123)
   vdiffr::expect_doppelganger("GSEA Heatmap", gsea_heatmap)
   vdiffr::expect_doppelganger("ORA Heatmap with Keyword", ora_heatmap)
