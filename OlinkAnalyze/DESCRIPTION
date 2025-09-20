@@ -93,7 +93,6 @@ Imports:
 Suggests: 
     arrow,
     clusterProfiler,
-    extrafont,
     FSA,
     ggplotify,
     kableExtra,
@@ -107,6 +106,7 @@ Suggests:
     pheatmap,
     rmarkdown,
     scales,
+    showtext,
     systemfonts,
     testthat (>= 3.0.0),
     umap,
