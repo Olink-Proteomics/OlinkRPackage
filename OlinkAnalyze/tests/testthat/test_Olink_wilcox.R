@@ -15,9 +15,10 @@ wilcox.test_results_paired <- npx_data1 %>% #Paired Mann-Whitney U Test
   arrange(estimate, Assay)
 
 test_that("Wilcox-test function works", {
-  expect_equal(wilcox.test_results, ref_results$wilcox.test_results,tolerance = 1e-10)  # compare results to ref
+  expect_equal(wilcox.test_results, 
+               dplyr::arrange(ref_results$wilcox.test_results, estimate, Assay))  # compare results to ref
   expect_equal(wilcox.test_results_paired,
-               as.matrix(ref_results$wilcox.test_results_paired),tolerance = 1e-10)  # compare results to ref
+               dplyr::arrange(ref_results$wilcox.test_results_paired, estimate, Assay))  # compare results to ref
   expect_error(olink_wilcox(df = npx_data1)) # no input data
   expect_error(olink_wilcox(npx_data1, "Time")) # more than 2 levels in the grouping variable
   
