@@ -106,14 +106,16 @@ fonts_system <- function() {
 }
 
 get_font_path <- function(family) {
-  if (is.function(systemfonts::match_fonts)) {
+  ns <- asNamespace("systemfonts")
+
+  if ("match_fonts" %in% getNamespaceExports("systemfonts")) {
     # systemfonts >= 1.1.0
-    fonts <- systemfonts::match_fonts(family)
-  } else if (is.function(systemfonts::match_font)) {
+    fonts <- ns$match_fonts(family)
+  } else if ("match_font" %in% getNamespaceExports("systemfonts")) {
     # systemfonts <= 1.0.5
-    fonts <- systemfonts::match_font(family)
+    fonts <- ns$match_font(family)
   } else {
-    stop("Neither match_fonts() nor match_font() found in systemfonts package.")
+    stop("No match_font(s) function found in systemfonts namespace")
   }
 
   fonts$path
