@@ -105,6 +105,20 @@ fonts_system <- function() {
   return(font_names)
 }
 
+get_font_path <- function(family) {
+  if (is.function(systemfonts::match_fonts)) {
+    # systemfonts >= 1.1.0
+    fonts <- systemfonts::match_fonts(family)
+  } else if (is.function(systemfonts::match_font)) {
+    # systemfonts <= 1.0.5
+    fonts <- systemfonts::match_font(family)
+  } else {
+    stop("Neither match_fonts() nor match_font() found in systemfonts package.")
+  }
+
+  fonts$path
+}
+
 # register font if present in OS and not registered
 register_font <- function(family) {
   if (!requireNamespace("sysfonts", quietly = TRUE)) {
@@ -116,9 +130,7 @@ register_font <- function(family) {
   # If already known to sysfonts, skip
   if (!(family %in% sysfonts::font_families())) {
     # Let sysfonts/font_add ask fontconfig for the actual file
-    path <- ifelse(as.numeric(R.version$minor) >= 4.3,
-                   systemfonts::match_fonts(family)$path,
-                   systemfonts::match_font(family)$path)
+    path <- get_font_path(family = family)
     if (!is.na(path)) {
       sysfonts::font_add(family = family, regular = path)
     }
