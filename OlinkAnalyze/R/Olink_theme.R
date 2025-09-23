@@ -20,7 +20,7 @@
 #'   set_plot_theme(font = "")
 #'
 #'
-set_plot_theme <- function(font = "Arial Thin") {
+set_plot_theme <- function(font = "Arial") {
 
   usefont <- ""
 
