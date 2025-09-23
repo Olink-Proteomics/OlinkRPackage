@@ -50,7 +50,8 @@ outliers <- lapply(pca_plot_byPanel_outliers, function(x){x$data}) %>%
 
 test_that("olink_pca_plot works", {
   skip_on_cran()
-  skip_if(!("Arial" %in% OlinkAnalyze:::fonts_system()))
+  skip_on_os("windows")
+  skip_on_os("mac")
   skip_if_not_installed("vdiffr")
 
   # Two Warnings thrown: for dropped assays and dropped samples
@@ -89,7 +90,8 @@ test_that("olink_pca_plot works", {
 
 test_that("PCA plot internal", {
   skip_on_cran()
-  skip_if(!("Arial" %in% OlinkAnalyze:::fonts_system()))
+  skip_on_os("windows")
+  skip_on_os("mac")
   skip_if_not_installed("vdiffr")
 
   pca_p2 <- npx_data1 %>%
@@ -209,7 +211,8 @@ test_that("PCA calculation - output values", {
 
 test_that("PCA basic plotting", {
   skip_on_cran()
-  skip_if(!("Arial" %in% OlinkAnalyze:::fonts_system()))
+  skip_on_os("windows")
+  skip_on_os("mac")
   skip_if_not_installed("vdiffr")
 
   pca_input <- npx_data1 %>%
@@ -229,7 +232,8 @@ test_that("PCA basic plotting", {
 
 test_that("minimal PCA plot", {
   skip_on_cran()
-  skip_if(!("Arial" %in% OlinkAnalyze:::fonts_system()))
+  skip_on_os("windows")
+  skip_on_os("mac")
   skip_if_not_installed("vdiffr")
 
   pca_plot <- npx_data1 %>%
