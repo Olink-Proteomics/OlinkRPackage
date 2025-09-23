@@ -2,7 +2,7 @@
 #'
 #' This function sets a coherent plot theme for functions.
 #'
-#' @param font Font family to use for text elements.
+#' @param font Font family to use for text elements. Default: "Arial".
 #'
 #' @return No return value, used as theme for ggplots
 #' @export
