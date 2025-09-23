@@ -39,6 +39,9 @@ set_plot_theme <- function(font = "Arial") {
         # you may register it manually (via font_add or similar).
         usefont <- font
 
+        # register font if needed
+        register_font(family = font)
+
         # Turn on showtext automatic rendering
         showtext::showtext_auto()
       }
@@ -93,4 +96,22 @@ fonts_system <- function() {
 
   # Remove duplicates and sort for consistency
   return(font_names)
+}
+
+# register font if present in OS and not registered
+register_font <- function(family) {
+  if (!requireNamespace("sysfonts", quietly = TRUE)) {
+    stop("Package 'sysfonts' is required for register_font(). Please install package \"sysfonts\" before continuing.
+
+         install.packages(\"sysfonts\")")
+  }
+
+  # If already known to sysfonts, skip
+  if (!(family %in% sysfonts::font_families())) {
+    # Let sysfonts/font_add ask fontconfig for the actual file
+    path <- systemfonts::match_fonts(family)$path
+    if (!is.na(path)) {
+      sysfonts::font_add(family = family, regular = path)
+    }
+  }
 }
