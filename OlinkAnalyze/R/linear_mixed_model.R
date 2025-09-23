@@ -310,7 +310,7 @@ olink_lmer <- function(df,
     }
 
   }, warning = function(w) {
-    if (grepl(x = w, pattern = "ANOVA output (were|was) not recognized") |
+    if (grepl(x = w, pattern = "NumDF\\s+and\\s+DenDF.*ANOVA\\s+output.*not\\s+recognized\\s+or\\s+transformed") |
         grepl(x = w, pattern = glob2rx("*contains implicit NA, consider using*"))){
       invokeRestart("muffleWarning")
     }
