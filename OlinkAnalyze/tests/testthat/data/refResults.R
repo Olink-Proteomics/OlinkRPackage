@@ -12,8 +12,7 @@ wilcox.test_results <- olink_wilcox(npx_data1, 'Treatment')
 #paired Mann-Whitney U Test
 wilcox.test_results_paired <- npx_data1 %>%
   filter(Time %in% c("Baseline","Week.6")) %>%
-  olink_wilcox(variable = "Time", pair_id = "Subject") %>% 
-  arrange(estimate, Assay)
+  olink_wilcox(variable = "Time", pair_id = "Subject")
 
 #### Kruskal and Friedman test ####
 # One-way Kruskal-Wallis Test
