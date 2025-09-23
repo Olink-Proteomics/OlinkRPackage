@@ -73,7 +73,9 @@ set_plot_theme <- function(font = "Arial Thin") {
 # Replacement for extrafont::fonts()
 fonts_system <- function() {
   if (!requireNamespace("systemfonts", quietly = TRUE)) {
-    stop("Package 'systemfonts' is required for fonts_system(). Please install it.")
+    stop("Package 'systemfonts' is required for fonts_system().  Please install package \"systemfonts\" before continuing.
+ 
+install.packages(\"systemfonts\")")
   }
 
   fonts_df <- systemfonts::system_fonts()
