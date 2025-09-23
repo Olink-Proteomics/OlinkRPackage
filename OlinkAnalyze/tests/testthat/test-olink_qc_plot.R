@@ -19,7 +19,8 @@ test_that("olink_qc_plot works", {
 
 test_that("olink_qc_plot works - vdiffr", {
   skip_on_cran()
-  skip_on_ci()
+  skip_if(!("Arial" %in% OlinkAnalyze:::fonts_system()))
+
   if (requireNamespace("vdiffr", quietly = TRUE) ){
     vdiffr::expect_doppelganger('QC plot', qc_plot)
     vdiffr::expect_doppelganger('QC plot with coloroption', qc_plot2)

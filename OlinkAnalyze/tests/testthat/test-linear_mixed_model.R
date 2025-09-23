@@ -88,8 +88,9 @@ lmer_plot_excludedids<- suppressWarnings(olink_lmer_plot(df = npx_data_format221
                x_axis_variable = "treatment1", number_of_proteins_per_plot = 5))
 
 test_that("olink_lmer_plot works", {
+  skip_if(!("Arial" %in% OlinkAnalyze:::fonts_system()))
   skip_on_cran()
-  skip_on_ci()
+
   if (requireNamespace("vdiffr", quietly = TRUE) ){
     vdiffr::expect_doppelganger('lmer plot', lmer_plot)
     vdiffr::expect_doppelganger('lmer plot more prots than space', lmer_plot_moreProts[[2]])

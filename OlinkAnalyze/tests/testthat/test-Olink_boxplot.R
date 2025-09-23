@@ -55,8 +55,9 @@ test_that("olink_boxplot works", {
 })
 
 test_that("olink_boxplot works - vdiffr", {
-  skip_on_ci()
   skip_on_cran()
+  skip_if(!("Arial" %in% OlinkAnalyze:::fonts_system()))
+
   if (requireNamespace("vdiffr", quietly = TRUE) ){
     vdiffr::expect_doppelganger('boxplot site 2prots', boxplot_site_2prots)
     vdiffr::expect_doppelganger('boxplot site 10prots', boxplot_site_10prots[[2]])
