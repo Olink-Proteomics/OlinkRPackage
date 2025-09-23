@@ -107,6 +107,22 @@ fonts_system <- function() {
   return(font_names)
 }
 
+get_font_path <- function(family) {
+  ns <- asNamespace("systemfonts")
+
+  if ("match_fonts" %in% getNamespaceExports("systemfonts")) {
+    # systemfonts >= 1.1.0
+    fonts <- ns$match_fonts(family)
+  } else if ("match_font" %in% getNamespaceExports("systemfonts")) {
+    # systemfonts <= 1.0.5
+    fonts <- ns$match_font(family)
+  } else {
+    stop("No match_font(s) function found in systemfonts namespace")
+  }
+
+  fonts$path
+}
+
 # register font if present in OS and not registered
 register_font <- function(family, in_test = FALSE) {
   if (!requireNamespace("sysfonts", quietly = TRUE)) {
@@ -121,7 +137,7 @@ register_font <- function(family, in_test = FALSE) {
       sysfonts::font_add_google(name = stringr::str_to_title(family), family = family)
     } else {
       # Let sysfonts/font_add ask fontconfig for the actual file
-      path <- systemfonts::match_fonts(family)$path
+      path <- get_font_path(family = family)
       if (!is.na(path)) {
         sysfonts::font_add(family = family, regular = path)
       }
