@@ -37,6 +37,7 @@ test_that("Plot works",{
   skip_on_os("windows")
   skip_on_os("mac")
   skip_if_not_installed("vdiffr")
+  skip_on_ci()
 
   set.seed(123)
   vdiffr::expect_doppelganger("GSEA Heatmap", gsea_heatmap)

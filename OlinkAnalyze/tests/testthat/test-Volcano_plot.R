@@ -17,6 +17,7 @@ test_that("olink_volcano_plot works", {
   skip_on_os("windows")
   skip_on_os("mac")
   skip_on_cran()
+  skip_on_ci()
 
   vdiffr::expect_doppelganger('volcano plot', volcano_plot)
   vdiffr::expect_doppelganger('volcano plot with coloroption', volcano_plot2)

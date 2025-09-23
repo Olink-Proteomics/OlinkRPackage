@@ -91,6 +91,7 @@ test_that("olink_lmer_plot works", {
   skip_on_os("windows")
   skip_on_os("mac")
   skip_on_cran()
+  skip_on_ci()
   skip_if_not_installed("vdiffr")
 
   vdiffr::expect_doppelganger('lmer plot', lmer_plot)

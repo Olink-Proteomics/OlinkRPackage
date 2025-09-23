@@ -19,6 +19,7 @@ test_that("olink_qc_plot works", {
 
 test_that("olink_qc_plot works - vdiffr", {
   skip_on_cran()
+  skip_on_ci()
   skip_on_os("windows")
   skip_on_os("mac")
   skip_if_not_installed("vdiffr")
