@@ -8,8 +8,7 @@ t.test_results_paired <- npx_data1 %>%
   olink_ttest(variable = "Time", pair_id = "Subject")
 
 #### Mann-Whitney U Test ####
-wilcox.test_results <- olink_wilcox(npx_data1, 'Treatment') %>% 
-  arrange(estimate, Assay)
+wilcox.test_results <- olink_wilcox(npx_data1, 'Treatment')
 #paired Mann-Whitney U Test
 wilcox.test_results_paired <- npx_data1 %>%
   filter(Time %in% c("Baseline","Week.6")) %>%
