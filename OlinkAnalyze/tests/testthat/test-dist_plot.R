@@ -22,9 +22,8 @@ test_that("olink_dist_plot works", {
 test_that("olink_dist_plot works - vdiffr", {
   skip_if(!("Arial" %in% OlinkAnalyze:::fonts_system()))
   skip_on_cran()
+  skip_if_not_installed("vdiffr")
 
-  if (requireNamespace("vdiffr", quietly = TRUE) ){
-    vdiffr::expect_doppelganger('Distribution plot', distribution_plot)
-    vdiffr::expect_doppelganger('Distribution plot col by treatment', distribution_plot_treatColor)
-  }
+  vdiffr::expect_doppelganger('Distribution plot', distribution_plot)
+  vdiffr::expect_doppelganger('Distribution plot col by treatment', distribution_plot_treatColor)
 })

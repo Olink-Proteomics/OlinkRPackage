@@ -47,6 +47,8 @@ test_that("Plot works",{
 
   skip_on_cran()
   skip_on_ci()
+  skip_if_not_installed("vdiffr")
+
   set.seed(123)
   vdiffr::expect_doppelganger("GSEA Visualization", gsea_vis)
   vdiffr::expect_doppelganger("GSEA Vis with Keyword", gsea_vis_keyword)

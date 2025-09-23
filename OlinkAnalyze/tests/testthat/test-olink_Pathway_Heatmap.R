@@ -35,6 +35,8 @@ test_that("Plot works",{
 
   skip_on_cran()
   skip_on_ci()
+  skip_if_not_installed("vdiffr")
+
   set.seed(123)
   vdiffr::expect_doppelganger("GSEA Heatmap", gsea_heatmap)
   vdiffr::expect_doppelganger("ORA Heatmap with Keyword", ora_heatmap)

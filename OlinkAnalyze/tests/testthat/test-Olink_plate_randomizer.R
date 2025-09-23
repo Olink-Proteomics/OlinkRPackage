@@ -59,11 +59,10 @@ test_that("olink_plate_randomizer works", {
 
 test_that("olink_plate_randomizer works - vdiffr", {
   skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
+  skip_if_not_installed("vdiffr")
   skip_if(!("Arial" %in% OlinkAnalyze:::fonts_system()))
   skip_on_cran()
 
-  if (requireNamespace("vdiffr", quietly = TRUE) ){
-    vdiffr::expect_doppelganger("Randomized_Data",olink_displayPlateLayout(randomized_result5, num_ctrl = 10,
-                                                                           rand_ctrl = TRUE, fill.color = "Visit"))
-  }
+  vdiffr::expect_doppelganger("Randomized_Data",olink_displayPlateLayout(randomized_result5, num_ctrl = 10,
+                                                                         rand_ctrl = TRUE, fill.color = "Visit"))
 })
