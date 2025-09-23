@@ -116,7 +116,9 @@ register_font <- function(family) {
   # If already known to sysfonts, skip
   if (!(family %in% sysfonts::font_families())) {
     # Let sysfonts/font_add ask fontconfig for the actual file
-    path <- systemfonts::match_fonts(family)$path
+    path <- ifelse(as.numeric(R.version$minor) >= 4.3,
+                   systemfonts::match_fonts(family)$path,
+                   systemfonts::match_font(family)$path)
     if (!is.na(path)) {
       sysfonts::font_add(family = family, regular = path)
     }
