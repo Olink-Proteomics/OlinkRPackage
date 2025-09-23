@@ -22,12 +22,6 @@
 #'
 set_plot_theme <- function(font = "Arial") {
 
-  if (!requireNamespace("showtext", quietly = TRUE)) {
-    stop("Package 'showtext' is required for fonts_system(). Please install package \"showtext\" before continuing.
-
-         install.packages(\"showtext\")")
-  }
-
   usefont <- ""
 
   if (getOption("OlinkAnalyze.allow.font.load", default = TRUE)) {
