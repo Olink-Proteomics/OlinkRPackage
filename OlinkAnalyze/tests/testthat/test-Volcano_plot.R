@@ -14,7 +14,8 @@ volcano_plot2 <- olink_volcano_plot(ref_results$t.test_results,
 
 test_that("olink_volcano_plot works", {
   skip_if_not_installed("vdiffr")
-  skip_if(!("Arial" %in% OlinkAnalyze:::fonts_system()))
+  skip_on_os("windows")
+  skip_on_os("mac")
   skip_on_cran()
 
   vdiffr::expect_doppelganger('volcano plot', volcano_plot)
