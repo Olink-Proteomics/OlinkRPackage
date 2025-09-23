@@ -5,7 +5,8 @@ test_that(
   {
     skip_if_not_installed("vdiffr")
     skip_on_cran()
-    skip_if(!("Arial" %in% OlinkAnalyze:::fonts_system()))
+    skip_on_os("windows")
+    skip_on_os("mac")
 
     npx_ht <- OlinkAnalyze:::data_ht_small |>
       dplyr::filter(
