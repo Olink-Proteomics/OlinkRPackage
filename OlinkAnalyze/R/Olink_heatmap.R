@@ -321,7 +321,7 @@ olink_heatmap_plot <- function(df,
 
 # set_plot_theme_pheatmap() is a non-exported function
 # It emulates some of the styling that OlinkAnalyze::set_plot_theme() would otherwise provide for a ggplot
-set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font1="Arial Thin", font2="Arial") {
+set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font1="Arial Regular", font2="Arial") {
   xnames <- x$layout$name
 
   # Prepare fonts
@@ -374,7 +374,7 @@ set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font1="Arial Thi
     x$grobs[[row_tree_i]] <- grid::editGrob(x$grobs[[row_tree_i]], gp=grid::gpar(col=col, lwd=0.4))
   }
 
-  # Main title (use Arial Thin if exists, otherwise Arial)
+  # Main title (use Arial Regular if exists, otherwise Arial)
   main_i <- which(x$layout$name == "main")
   if (length(main_i) > 0L) {
     if (set_font1) {
@@ -388,7 +388,7 @@ set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font1="Arial Thi
     }
   }
 
-  # Row / column names (use Arial Thin if exists, otherwise Arial)
+  # Row / column names (use Arial Regular if exists, otherwise Arial)
   col_names_i <- which(x$layout$name == "col_names")
   row_names_i <- which(x$layout$name == "row_names")
   if (length(col_names_i) > 0L) {
@@ -414,7 +414,7 @@ set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font1="Arial Thi
     }
   }
 
-  # Row annotation (use Arial Thin if exists, otherwise Arial)
+  # Row annotation (use Arial Regular if exists, otherwise Arial)
   row_annotation_names_i <- which(x$layout$name == "row_annotation_names")
   if (length(row_annotation_names_i) > 0L) {
     if (set_font1) {
@@ -428,7 +428,7 @@ set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font1="Arial Thi
     }
   }
 
-  # Columns annotation (use Arial Thin if exists, otherwise Arial)
+  # Columns annotation (use Arial Regular if exists, otherwise Arial)
   col_annotation_names_i <- which(x$layout$name == "col_annotation_names")
   if (length(col_annotation_names_i) > 0L) {
     if (set_font1) {
@@ -453,7 +453,7 @@ set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font1="Arial Thi
     }
   }
 
-  # Standard legend (use Arial Thin if exists, otherwise Arial)
+  # Standard legend (use Arial Regular if exists, otherwise Arial)
   legend_i <- which(x$layout$name == "legend")
   if (length(legend_i) > 0L) {
     if (set_font1) {
