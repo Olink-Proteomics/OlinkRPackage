@@ -31,7 +31,7 @@ set_plot_theme <- function(font = "Arial") {
         # If the font is already available in systemfonts, or showtext, add it
         # One approach: try to see if the font is installed in system; if not,
         # you may register it manually (via font_add or similar).
-        usefont <- "Arimo Regular"
+        usefont <- ""
 
         # register font if needed
         register_font(family = usefont)
