@@ -26,7 +26,20 @@ set_plot_theme <- function(font = "Arial") {
 
   if (getOption("OlinkAnalyze.allow.font.load", default = TRUE)) {
     if (requireNamespace("showtext", quietly = TRUE)) {
-      if (font %in% fonts_system()) {
+      # if in testing mode, use a common font across operating systems
+      if (is_testing()) {
+        # If the font is already available in systemfonts, or showtext, add it
+        # One approach: try to see if the font is installed in system; if not,
+        # you may register it manually (via font_add or similar).
+        usefont <- "Arimo Regular"
+
+        # register font if needed
+        register_font(family = usefont)
+
+        # Turn on showtext automatic rendering
+        showtext::showtext_auto()
+
+      } else if (font %in% fonts_system()) {
 
         # If the font is already available in systemfonts, or showtext, add it
         # One approach: try to see if the font is installed in system; if not,
@@ -42,10 +55,7 @@ set_plot_theme <- function(font = "Arial") {
     }
   }
 
-  # if in testing mode, use a common font across operating systems
-  if (is_testing()) {
-    usefont <- "sans"
-  }
+  print(paste("Use this font:", usefont))
 
   olink_theme <- ggplot2::theme_bw() +
     ggplot2::theme(
