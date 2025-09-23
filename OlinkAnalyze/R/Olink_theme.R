@@ -48,7 +48,7 @@ set_plot_theme <- function(font = "Arial") {
     }
   }
 
-  # if in testing mode with vdiffr, use a common font across operating systems
+  # if in testing mode, use a common font across operating systems
   if (is_testing()) {
     usefont <- "sans"
   }
