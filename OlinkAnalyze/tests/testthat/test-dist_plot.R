@@ -20,8 +20,6 @@ test_that("olink_dist_plot works", {
 })
 
 test_that("olink_dist_plot works - vdiffr", {
-  # skip_on_os("windows")
-  skip_on_os("mac")
   skip_on_cran()
   skip_if_not_installed("vdiffr")
 
