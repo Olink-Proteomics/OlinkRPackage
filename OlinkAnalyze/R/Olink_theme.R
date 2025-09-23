@@ -48,6 +48,11 @@ set_plot_theme <- function(font = "Arial") {
     }
   }
 
+  # if in testing mode with vdiffr, use a common font across operating systems
+  if (vdiffr::in_test()) {
+    font <- "sans"
+  }
+
   olink_theme <- ggplot2::theme_bw() +
     ggplot2::theme(
       panel.grid.major = ggplot2::element_blank(),
