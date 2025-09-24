@@ -47,7 +47,7 @@ set_plot_theme <- function(font = "Arial") {
         usefont <- font
 
         # register font if needed
-        register_font(family = font, in_test = FALSE)
+        register_font(family = usefont, in_test = FALSE)
 
         # Turn on showtext automatic rendering
         showtext::showtext_auto()
