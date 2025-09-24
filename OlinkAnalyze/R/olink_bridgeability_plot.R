@@ -430,31 +430,31 @@ bridgeability_ks_plt <- function(data) {
 }
 
 bridgeability_combine_plots <-  function(iqr, r2, counts, ks, title) {
-    out_plot <- ggpubr::ggarrange(
+  out_plot <- ggpubr::ggarrange(
+    ggpubr::ggarrange(
+      r2,
       ggpubr::ggarrange(
-        r2,
-        ggpubr::ggarrange(
-          iqr, counts,
-          ncol = 2L,
-          widths = c(1L, 1L),
-          common.legend = TRUE
-        ),
-        ncol = 2L
+        iqr, counts,
+        ncol = 2L,
+        widths = c(1L, 1L),
+        common.legend = TRUE
       ),
-      ks,
-      nrow = 2L,
-      heights = c(1L, 1L)
-    )
+      ncol = 2L
+    ),
+    ks,
+    nrow = 2L,
+    heights = c(1L, 1L)
+  )
 
-    out_plot <- ggpubr::annotate_figure(
-      p = out_plot,
-      top = ggpubr::text_grob(
-        label = title,
-        size = 14L,
-        just = "centre",
-        face = "plain"
-      )
+  out_plot <- ggpubr::annotate_figure(
+    p = out_plot,
+    top = ggpubr::text_grob(
+      label = title,
+      size = 14L,
+      just = "centre",
+      face = "plain"
     )
+  )
 
-    return(out_plot)
-  }
+  return(out_plot)
+}

@@ -135,7 +135,7 @@ test_that(
 
     # oid = "OID40770" ----
 
-    data_norm_clean_oidOID40770 <- data_norm_clean |>
+    data_norm_clean_oid40770 <- data_norm_clean |>
       dplyr::filter(
         .data[["OlinkID"]] == "OID40770"
       )
@@ -144,7 +144,7 @@ test_that(
 
     vdiffr::expect_doppelganger(
       title = "bridgeable-plot_iqr_OID40770",
-      fig = bridgeability_iqr_range_plt(data = data_norm_clean_oidOID40770),
+      fig = bridgeability_iqr_range_plt(data = data_norm_clean_oid40770),
       cran = FALSE
     )
 
@@ -152,7 +152,7 @@ test_that(
 
     vdiffr::expect_doppelganger(
       title = "bridgeable-plot_r2_OID40770",
-      fig = bridgeability_r2_plt(data = data_norm_clean_oidOID40770),
+      fig = bridgeability_r2_plt(data = data_norm_clean_oid40770),
       cran = FALSE
     )
 
@@ -161,7 +161,7 @@ test_that(
     vdiffr::expect_doppelganger(
       title = "bridgeable-plot_counts_OID40770",
       fig = bridgeability_counts_plt(
-        data = data_norm_clean_oidOID40770,
+        data = data_norm_clean_oid40770,
         median_counts_threshold = 150L
       ),
       cran = FALSE
@@ -171,13 +171,13 @@ test_that(
 
     vdiffr::expect_doppelganger(
       title = "bridgeable-plot_ks_OID40770",
-      fig = bridgeability_ks_plt(data = data_norm_clean_oidOID40770),
+      fig = bridgeability_ks_plt(data = data_norm_clean_oid40770),
       cran = FALSE
     )
 
     # oid = "OID40835" ----
 
-    data_norm_clean_oidOID40835 <- data_norm_clean |>
+    data_norm_clean_oid40835 <- data_norm_clean |>
       dplyr::filter(
         .data[["OlinkID"]] == "OID40835"
       )
@@ -186,7 +186,7 @@ test_that(
 
     vdiffr::expect_doppelganger(
       title = "bridgeable-plot_iqr_OID40835",
-      fig = bridgeability_iqr_range_plt(data = data_norm_clean_oidOID40835),
+      fig = bridgeability_iqr_range_plt(data = data_norm_clean_oid40835),
       cran = FALSE
     )
 
@@ -194,7 +194,7 @@ test_that(
 
     vdiffr::expect_doppelganger(
       title = "bridgeable-plot_r2_OID40835",
-      fig = bridgeability_r2_plt(data = data_norm_clean_oidOID40835),
+      fig = bridgeability_r2_plt(data = data_norm_clean_oid40835),
       cran = FALSE
     )
 
@@ -203,7 +203,7 @@ test_that(
     vdiffr::expect_doppelganger(
       title = "bridgeable-plot_counts_OID40835",
       fig = bridgeability_counts_plt(
-        data = data_norm_clean_oidOID40835,
+        data = data_norm_clean_oid40835,
         median_counts_threshold = 150L
       ),
       cran = FALSE
@@ -213,7 +213,7 @@ test_that(
 
     vdiffr::expect_doppelganger(
       title = "bridgeable-plot_ks_OID40835",
-      fig = bridgeability_ks_plt(data = data_norm_clean_oidOID40835),
+      fig = bridgeability_ks_plt(data = data_norm_clean_oid40835),
       cran = FALSE
     )
   }
