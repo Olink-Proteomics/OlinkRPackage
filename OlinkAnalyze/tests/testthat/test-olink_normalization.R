@@ -673,6 +673,105 @@ test_that(
 )
 
 test_that(
+  "norm_internal_rename_cols - works - no error when AssayQC is missing",
+  {
+    skip_if_not_installed("arrow")
+
+    # AssayQC in reference only ----
+
+    lst_cnames_v1 <- olink_norm_input_check_df_cols(
+      lst_df = list(
+        "p1" = npx_data1 |>
+          dplyr::rename(
+            "SampleQC" = "QC_Warning"
+          ) |>
+          dplyr::mutate(
+            Normalization = "Intensity",
+            AssayQC = "Pass"
+          ) |>
+          arrow::as_arrow_table(),
+        "p2" = npx_data2 |>
+          dplyr::rename(
+            "Panel_Lot_Nr" = "Panel_Version"
+          ) |>
+          dplyr::mutate(
+            Normalization = "Intensity"
+          ) |>
+          arrow::as_arrow_table()
+      )
+    )
+
+    update_cnames_v1 <- norm_internal_rename_cols(
+      ref_cols = lst_cnames_v1$p1,
+      not_ref_cols = lst_cnames_v1$p2,
+      not_ref_df = npx_data2 |>
+        dplyr::rename(
+          "Panel_Lot_Nr" = "Panel_Version"
+        ) |>
+        dplyr::mutate(
+          Normalization = "Intensity"
+        ) |>
+        arrow::as_arrow_table()
+    ) |>
+      names()
+
+    # ensure that
+    expect_identical(
+      object = update_cnames_v1,
+      expected = c(names(npx_data2), c("Normalization")) |>
+        stringr::str_replace("QC_Warning", "SampleQC")
+    )
+
+    # AssayQC in non-reference only ----
+
+    lst_cnames_v2 <- olink_norm_input_check_df_cols(
+      lst_df = list(
+        "p1" = npx_data1 |>
+          dplyr::rename(
+            "SampleQC" = "QC_Warning"
+          ) |>
+          dplyr::mutate(
+            Normalization = "Intensity",
+            AssayQC = "Pass"
+          ) |>
+          arrow::as_arrow_table(),
+        "p2" = npx_data2 |>
+          dplyr::rename(
+            "Panel_Lot_Nr" = "Panel_Version"
+          ) |>
+          dplyr::mutate(
+            Normalization = "Intensity"
+          ) |>
+          arrow::as_arrow_table()
+      )
+    )
+
+    update_cnames_v2 <- norm_internal_rename_cols(
+      ref_cols = lst_cnames_v2$p2,
+      not_ref_cols = lst_cnames_v2$p1,
+      not_ref_df = npx_data1 |>
+        dplyr::rename(
+          "SampleQC" = "QC_Warning"
+        ) |>
+        dplyr::mutate(
+          Normalization = "Intensity",
+          AssayQC = "Pass"
+        ) |>
+        arrow::as_arrow_table()
+    ) |>
+      names()
+
+    # ensure that
+    expect_identical(
+      object = update_cnames_v2,
+      expected = c(names(npx_data2), c("Normalization", "AssayQC")) |>
+        stringr::str_replace("Panel_Version", "Panel_Lot_Nr")
+    )
+
+  }
+)
+
+test_that(
   "olink_norm_rename_cols_to_ref - error",
   {
     skip_if_not_installed("arrow")
