@@ -1,13 +1,14 @@
 's
-Benjamini
 AGPL
 anova
 Anova
+Arial
 ArrowDataset
 ArrowObject
 ArrowTable
 bargraph
 Bargraph
+Benjamini
 BgRatio
 BioConductor
 Bo
@@ -178,6 +179,7 @@ SubjectColumn
 SubjectID
 sumsq
 tbl
+testthat
 theming
 Theming
 Thermo
