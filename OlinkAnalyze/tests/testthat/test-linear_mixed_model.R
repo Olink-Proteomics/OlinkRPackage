@@ -88,10 +88,7 @@ lmer_plot_excludedids<- suppressWarnings(olink_lmer_plot(df = npx_data_format221
                x_axis_variable = "treatment1", number_of_proteins_per_plot = 5))
 
 test_that("olink_lmer_plot works", {
-  skip_on_os("windows")
-  skip_on_os("mac")
   skip_on_cran()
-  skip_on_ci()
   skip_if_not_installed("vdiffr")
 
   vdiffr::expect_doppelganger('lmer plot', lmer_plot)

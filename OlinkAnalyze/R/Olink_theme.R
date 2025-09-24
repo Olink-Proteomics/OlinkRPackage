@@ -31,10 +31,10 @@ set_plot_theme <- function(font = "Arial") {
         # If the font is already available in systemfonts, or showtext, add it
         # One approach: try to see if the font is installed in system; if not,
         # you may register it manually (via font_add or similar).
-        usefont <- "Arimo Regular"
+        usefont <- "roboto"
 
         # register font if needed
-        register_font(family = usefont)
+        register_font(family = usefont, in_test = TRUE)
 
         # Turn on showtext automatic rendering
         showtext::showtext_auto()
@@ -47,7 +47,7 @@ set_plot_theme <- function(font = "Arial") {
         usefont <- font
 
         # register font if needed
-        register_font(family = usefont)
+        register_font(family = usefont, in_test = FALSE)
 
         # Turn on showtext automatic rendering
         showtext::showtext_auto()
@@ -122,7 +122,7 @@ get_font_path <- function(family) {
 }
 
 # register font if present in OS and not registered
-register_font <- function(family) {
+register_font <- function(family, in_test = FALSE) {
   if (!requireNamespace("sysfonts", quietly = TRUE)) {
     stop("Package 'sysfonts' is required for register_font(). Please install package \"sysfonts\" before continuing.
 
@@ -131,10 +131,14 @@ register_font <- function(family) {
 
   # If already known to sysfonts, skip
   if (!(family %in% sysfonts::font_families())) {
-    # Let sysfonts/font_add ask fontconfig for the actual file
-    path <- get_font_path(family = family)
-    if (!is.na(path)) {
-      sysfonts::font_add(family = family, regular = path)
+    if (in_test == TRUE) {
+      sysfonts::font_add_google(name = stringr::str_to_title(family), family = family)
+    } else {
+      # Let sysfonts/font_add ask fontconfig for the actual file
+      path <- get_font_path(family = family)
+      if (!is.na(path)) {
+        sysfonts::font_add(family = family, regular = path)
+      }
     }
   }
 }
