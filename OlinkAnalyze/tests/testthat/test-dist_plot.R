@@ -14,12 +14,15 @@ distribution_plot_treatColor <- npx_data1 %>%
   olink_dist_plot(color_g = 'Treatment')
 
 test_that("olink_dist_plot works", {
-  if (requireNamespace("vdiffr", quietly = TRUE) ){
-    vdiffr::expect_doppelganger('Distribution plot', distribution_plot)
-    vdiffr::expect_doppelganger('Distribution plot col by treatment', distribution_plot_treatColor)
-  }
-
   expect_warning(olink_dist_plot(npx_data_format221010)) # data with all NPX=NA for some assays
   expect_warning(olink_dist_plot(npx_data_format221121)) # data with all NPX=NA for some assays
   expect_warning(olink_dist_plot(npx_data_extended_format221121)) # data with all NPX=NA for some assays
+})
+
+test_that("olink_dist_plot works - vdiffr", {
+  skip_on_cran()
+  skip_if_not_installed("vdiffr")
+
+  vdiffr::expect_doppelganger('Distribution plot', distribution_plot)
+  vdiffr::expect_doppelganger('Distribution plot col by treatment', distribution_plot_treatColor)
 })
