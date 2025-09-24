@@ -69,7 +69,7 @@ olink_bridgeability_plot <- function(data,
   }
 
   # set seed
-  set.seed(seed = 1)
+  set.seed(seed = 1L)
 
   # check OlinkID ----
 
