@@ -27,7 +27,7 @@ set_plot_theme <- function(font = "Arial") {
   if (getOption("OlinkAnalyze.allow.font.load", default = TRUE)) {
     if (requireNamespace("showtext", quietly = TRUE)) {
       # if in testing mode, use a common font across operating systems
-      if (testhat::is_testing()) {
+      if (testthat::is_testing()) {
         # If the font is already available in systemfonts, or showtext, add it
         # One approach: try to see if the font is installed in system; if not,
         # you may register it manually (via font_add or similar).
