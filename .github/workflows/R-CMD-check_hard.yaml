@@ -73,7 +73,7 @@ jobs:
             )
           } else {
             cli::cli_inform(
-              c("Identified no warning and no skipped tests!")
+              c("Identified failing tests!")
             )
           }
         shell: Rscript {0}
