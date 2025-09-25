@@ -73,7 +73,7 @@ jobs:
             )
           } else {
             cli::cli_inform(
-              c("Identified failing tests!")
+              c("No failing tests identified!")
             )
           }
         shell: Rscript {0}
