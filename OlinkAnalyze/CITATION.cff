@@ -2,7 +2,7 @@
 # CITATION file created with {cffr} R package, v0.4.1
 # See also: https://docs.ropensci.org/cffr/
 # -----------------------------------------------------------
-
+ 
 cff-version: 1.2.0
 message: 'To cite package "Olink Analyze" in publications use:'
 type: software
@@ -462,6 +462,17 @@ references:
     given-names: Guangchuang
     email: guangchuangyu@gmail.com
     orcid: https://orcid.org/0000-0002-6485-8781
+  year: '2023'
+- type: software
+  title: extrafont
+  abstract: 'extrafont: Tools for Using Fonts'
+  notes: Suggests
+  url: https://github.com/wch/extrafont
+  repository: https://CRAN.R-project.org/package=extrafont
+  authors:
+  - family-names: Chang
+    given-names: Winston
+    email: winston@stdout.org
   year: '2023'
 - type: software
   title: FSA

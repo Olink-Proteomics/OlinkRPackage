@@ -321,39 +321,30 @@ olink_heatmap_plot <- function(df,
 
 # set_plot_theme_pheatmap() is a non-exported function
 # It emulates some of the styling that OlinkAnalyze::set_plot_theme() would otherwise provide for a ggplot
-set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font1="Arial Regular", font2="Arial") {
+set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font1="Swedish Gothic Thin", font2="Swedish Gothic") {
   xnames <- x$layout$name
 
   # Prepare fonts
   set_font1 <- FALSE
   set_font2 <- FALSE
   if (getOption("OlinkAnalyze.allow.font.load", default = TRUE)) {
-    if (requireNamespace("showtext", quietly = TRUE) &&
-        requireNamespace("systemfonts", quietly = TRUE)) {
-      if (font1 %in% fonts_system() && font2 %in% fonts_system()){
-        # If the font is already available in systemfonts, or showtext, add it
-        # One approach: try to see if the font is installed in system; if not,
-        # you may register it manually (via font_add or similar).
+    if (requireNamespace("extrafont", quietly = TRUE)) {
+      if (font1 %in% extrafont::fonts()){
+        if (.Platform$OS.type == "windows"){
+          extrafont::loadfonts(quiet = TRUE, device = "win")
+        }
+        extrafont::loadfonts(quiet = TRUE, device = "pdf")
         set_font1 <- TRUE
-        set_font2 <- TRUE
-        # Turn on showtext automatic rendering
-        showtext::showtext_auto()
-      } else if (font1 %in% fonts_system()) {
-        # If the font is already available in systemfonts, or showtext, add it
-        # One approach: try to see if the font is installed in system; if not,
-        # you may register it manually (via font_add or similar).
-        set_font1 <- TRUE
-        # Turn on showtext automatic rendering
-        showtext::showtext_auto()
-      } else if (font2 %in% fonts_system()) {
-        # If the font is already available in systemfonts, or showtext, add it
-        # One approach: try to see if the font is installed in system; if not,
-        # you may register it manually (via font_add or similar).
-        set_font2 <- TRUE
-        # Turn on showtext automatic rendering
-        showtext::showtext_auto()
       }
-    } else if (requireNamespace("systemfonts", quietly = TRUE)) {
+      if (font2 %in% extrafont::fonts()){
+        if (.Platform$OS.type == "windows"){
+          extrafont::loadfonts(quiet = TRUE, device = "win")
+        }
+        extrafont::loadfonts(quiet = TRUE, device = "pdf")
+        set_font2 <- TRUE
+      }
+    }
+    else if (requireNamespace("systemfonts", quietly = TRUE)) {
       # NOTE: This is a special for OI, where the above fails but the fonts should already have been registered
       if (font1 %in% unique(systemfonts::registry_fonts()$family)) {
         set_font1 <- TRUE
@@ -374,7 +365,7 @@ set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font1="Arial Reg
     x$grobs[[row_tree_i]] <- grid::editGrob(x$grobs[[row_tree_i]], gp=grid::gpar(col=col, lwd=0.4))
   }
 
-  # Main title (use Arial Regular if exists, otherwise Arial)
+  # Main title (use Swedish Goth Thin if exists, otherwise Swedish Gothic)
   main_i <- which(x$layout$name == "main")
   if (length(main_i) > 0L) {
     if (set_font1) {
@@ -388,7 +379,7 @@ set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font1="Arial Reg
     }
   }
 
-  # Row / column names (use Arial Regular if exists, otherwise Arial)
+  # Row / column names (use Swedish Goth Thin if exists, otherwise Swedish Gothic)
   col_names_i <- which(x$layout$name == "col_names")
   row_names_i <- which(x$layout$name == "row_names")
   if (length(col_names_i) > 0L) {
@@ -414,7 +405,7 @@ set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font1="Arial Reg
     }
   }
 
-  # Row annotation (use Arial Regular if exists, otherwise Arial)
+  # Row annotation (use Swedish Goth Thin if exists, otherwise Swedish Gothic)
   row_annotation_names_i <- which(x$layout$name == "row_annotation_names")
   if (length(row_annotation_names_i) > 0L) {
     if (set_font1) {
@@ -428,7 +419,7 @@ set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font1="Arial Reg
     }
   }
 
-  # Columns annotation (use Arial Regular if exists, otherwise Arial)
+  # Columns annotation (use Swedish Goth Thin if exists, otherwise Swedish Gothic)
   col_annotation_names_i <- which(x$layout$name == "col_annotation_names")
   if (length(col_annotation_names_i) > 0L) {
     if (set_font1) {
@@ -442,7 +433,7 @@ set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font1="Arial Reg
     }
   }
 
-  # Annotation legend (must use Arial - otherwise result is poor)
+  # Annotation legend (must use Swedish Gothic - otherwise result is poor)
   annotation_legend_i <- which(x$layout$name == "annotation_legend")
   if (length(annotation_legend_i) > 0L) {
     if (set_font2) {
@@ -453,7 +444,7 @@ set_plot_theme_pheatmap <- function(x, fontsize, col="#737373", font1="Arial Reg
     }
   }
 
-  # Standard legend (use Arial Regular if exists, otherwise Arial)
+  # Standard legend (use Swedish Goth Thin if exists, otherwise Swedish Gothic)
   legend_i <- which(x$layout$name == "legend")
   if (length(legend_i) > 0L) {
     if (set_font1) {

@@ -4,10 +4,10 @@
 \alias{set_plot_theme}
 \title{Function to set plot theme}
 \usage{
-set_plot_theme(font = "Arial")
+set_plot_theme(font = "Swedish Gothic Thin")
 }
 \arguments{
-\item{font}{Font family to use for text elements. Default: "Arial".}
+\item{font}{Font family to use for text elements. Depends on extrafont package.}
 }
 \value{
 No return value, used as theme for ggplots

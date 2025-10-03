@@ -41,6 +41,7 @@ if(as.numeric(R.Version()$major) < 4){
 }
 
 test_that("olink_plate_randomizer works", {
+
   expect_equal(droplevels(randomized_result1), droplevels(ref_results$randomized_result1))
   expect_equal(droplevels(randomized_result2), droplevels(ref_results$randomized_result2))
   expect_equal(droplevels(randomized_result3), droplevels(ref_results$randomized_result3))
@@ -55,13 +56,8 @@ test_that("olink_plate_randomizer works", {
                  unique() %>%
                  dplyr::pull(), 10)
   skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
-})
-
-test_that("olink_plate_randomizer works - vdiffr", {
-  skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
-  skip_if_not_installed("vdiffr")
-  skip_on_cran()
-
+  if (requireNamespace("vdiffr", quietly = TRUE) ){
   vdiffr::expect_doppelganger("Randomized_Data",olink_displayPlateLayout(randomized_result5, num_ctrl = 10,
-                                                                         rand_ctrl = TRUE, fill.color = "Visit"))
+                                                                        rand_ctrl = TRUE, fill.color = "Visit"))
+  }
 })

@@ -441,7 +441,7 @@ criteria:
 For assays that are bridgeable, the shape of the NPX distribution is
 compared between the two products:
 
--   **Assessing similarity of NPX distribution across products:** If any of the
+-   **Assessing similarity of NPX distribution across products:** If the
     three criteria outlined above are met then the assay is considered
     bridgeable. Otherwise, bridging is not recommended for that assay.
     If an assay is bridgeable, the similarity of the NPX distribution is
@@ -510,9 +510,13 @@ Prior to assessment, outlier bridging samples are excluded. A sample is
 considered an outlier if the NPX value is more than 3 times the
 interquartile range above or below the median on either product.
 
-After assessment, an assay is considered bridgeable if it meets any of the
+After assessment, an assay is considered bridgeable if it meets the
 first three criteria. The fourth criteria determines which normalization
-method is recommended for bridging. Note that bridgeable
+method is recommended for bridging. If all four criteria are met then
+the recommended method is normalization using the median of paired
+differences. If only the first three criteria are met then quantile
+smoothing is recommended. If any of the first three criteria are not met
+then bridging is not recommended for that assay. Note that bridgeable
 assays will differ between projects based on the expression of bridge
 samples in the studies.
 
