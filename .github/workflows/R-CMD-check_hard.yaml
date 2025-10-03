@@ -12,7 +12,6 @@
 #
 # From https://github.com/r-lib/actions/blob/5e080d8d4241b4e7ed3834b113a6fa643d3f1351/examples/check-no-suggests.yaml#L8
 on: [push, pull_request]
-
 name: R-CMD-check-hard
 
 jobs:
@@ -54,6 +53,30 @@ jobs:
             any::kableExtra
           needs: check
           working-directory: OlinkAnalyze
+        
+      - name: Run tests and check all snapshots
+        run: |
+          reporter <- testthat::SummaryReporter$new()
+          testthat::test_local(path = "OlinkAnalyze", reporter = reporter)
+          reporter$end_reporter()
+
+          n_warn <- length(reporter$warnings$as_list())
+          n_skip <- length(reporter$skips$as_list())
+          n_fails <- length(reporter$failures$as_list())
+
+          if (n_fails > 0L) {
+            cli::cli_abort(
+              c(
+                "x" = "Identified {.val {n_fails}} test{?s} that failed!",
+                "i" = "Expected 0!"
+              )
+            )
+          } else {
+            cli::cli_inform(
+              c("No failing tests identified!")
+            )
+          }
+        shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2
         with:

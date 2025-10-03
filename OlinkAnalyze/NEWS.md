@@ -1,3 +1,10 @@
+# Olink Analyze 4.3.2
+## Bug Fixes
+* Tests for `olink_wilcox()` are now arranged by Assay name to handle ties (#616, @boxizhang)
+* The `extrafont` package has been removed as a dependency as it is archived on CRAN (#619, @klevdiamanti)
+* Regex in `olink_lmer()` has been improved to better capture the warning message (#618, @klevdiamanti)
+* Handling for when `AssayQC` is not present in both data sets for normalization (#620, @klevdiamanti)
+
 # Olink Analyze 4.3.1
 ## Bug Fixes
 * `olink_lod()` call to `checkNPX()` now correctly uses data instead of df, allowing the function to run without error (#579, @klevdiamanti)

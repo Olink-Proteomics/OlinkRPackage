@@ -55,6 +55,30 @@ jobs:
         run: |
           install.packages("msigdbdf", repos = c("https://igordot.r-universe.dev"))
         shell: Rscript {0}
+        
+      - name: Run tests and check all snapshots
+        run: |
+          reporter <- testthat::SummaryReporter$new()
+          testthat::test_local(path = "OlinkAnalyze", reporter = reporter)
+          reporter$end_reporter()
+
+          n_warn <- length(reporter$warnings$as_list())
+          n_skip <- length(reporter$skips$as_list())
+          n_fails <- length(reporter$failures$as_list())
+
+          if (n_fails > 0L) {
+            cli::cli_abort(
+              c(
+                "x" = "Identified {.val {n_fails}} test{?s} that failed!",
+                "i" = "Expected 0!"
+              )
+            )
+          } else {
+            cli::cli_inform(
+              c("No failing tests identified!")
+            )
+          }
+        shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2
         with:
