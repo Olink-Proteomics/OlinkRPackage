@@ -19,13 +19,14 @@ header-includes:
   - \usepackage{fancyhdr}
   - \pagestyle{fancy}
   - \fancyhead{}
-  - \fancyhead[L]{\includegraphics[width=20pt]{../man/figures/small_logo.png}}
-  - \fancyhead[C]{\textbf{Bridging across NGS-based Olink\textsuperscript{®} products}}
-  - \fancyhead[R]{\thepage}
+  - \fancyhead[R]{\includegraphics[width=20pt]{../man/figures/small_logo.png}}
+  - \fancyhead[L]{\textbf{Bridging across NGS-based Olink\textsuperscript{®} products}}
+  # - \fancyhead[R]{\thepage}
   - \setlength{\headheight}{23.74pt}
   - \addtolength{\topmargin}{-11.7pt}
   - \renewcommand{\headrulewidth}{0.4pt}
-  - \fancyfoot{}  # clears footer
+  # - \fancyfoot{}  # clears footer
+  # - \usepackage{pdflscape}
 vignette: >
   %\VignetteIndexEntry{Bridging across NGS-based Olink^®^ products}
   %\VignetteEngine{knitr::rmarkdown}
@@ -154,7 +155,7 @@ noise in both products.
 
 ### Considerations for between-product bridging
 
-between-product bridging allows the NPX values of an Olink Explore 3072 project
+Between-product bridging allows the NPX values of an Olink Explore 3072 project
 to be normalized and made comparable to the NPX values of an Olink
 Explore HT project or an Olink Reveal project. This process is one-directional, and normalizing
 Olink Explore HT NPX values or Olink Reveal NPX values to Olink Explore 3072 is not supported. Normalization between Olink Explore HT and Olink Reveal in either direction are also not supported.
@@ -326,7 +327,7 @@ try(
 )
 ```
 
-
+\clearpage
 PCA plots for each dataset can be used to assess if any bridge samples are outliers in the dataset.
 
 ```{r include=FALSE}
@@ -365,7 +366,7 @@ pca_EHT <- OlinkAnalyze::olink_pca_plot(df = data_reference_product_before_br,
                                         quiet = TRUE)
 ```
 
-```{r echo=FALSE, eval=TRUE, fig.cap=f3, out.width="90%"}
+```{r echo=FALSE, eval=TRUE, fig.cap=f3, out.width="100%"}
 knitr::include_graphics(normalizePath("../man/figures/PCA_btw_product_before.pdf"),
                         error = FALSE)
 
@@ -404,7 +405,7 @@ npx_3072 <- data_explore3072 |>
   dplyr::mutate(Project = "data2")
 
 # perform between-product bridging without formatting for downstream analysis
-npx_br_data <- olink_normalization(df1 = npx_ref_product, 
+npx_br_data <- olink_normalization(df1 = npx_ht, 
                                    df2 = npx_3072,
                                    overlapping_samples_df1 =
                                      overlapping_samples,
@@ -414,7 +415,7 @@ npx_br_data <- olink_normalization(df1 = npx_ref_product,
                                    format = FALSE)
 
 # perform between-product bridging with formatting for downstream analysis
-npx_br_data <- olink_normalization(df1 = npx_ref_product, 
+npx_br_data <- olink_normalization(df1 = npx_ht, 
                                    df2 = npx_3072,
                                    overlapping_samples_df1 =
                                      overlapping_samples,
@@ -491,7 +492,9 @@ compared between the two products:
     the data, and quantile smoothing is recommended. If the distance is
     less than the cutoff, then normalization using the median of paired
     differences is recommended. By default this cutoff difference is set
-    to 0.2.\\
+    to 0.2.
+
+\clearpage
 
 An overview of these criteria is visualized below.
 
@@ -633,13 +636,25 @@ normalized NPX values in the Explore HT or the Reveal data will be the same as t
 values in the NPX column which contains the non-normalized data.
 
 
-\begin{center}
-\rotatebox{90}{
-\begin{minipage}{\textheight}
+
 
 ```{r echo=FALSE}
 try( 
   readRDS(normalizePath("../man/figures/bridging_results.rds")) |> 
+    dplyr::select( # wide table, select fewer columns
+      SampleID,
+      OlinkID,
+      Assay,
+      Panel,
+      NPX,
+      PCNormalizedNPX,
+      Count,
+      Normalization,
+      Project,
+      OlinkID_E3072,
+      MedianCenteredNPX,
+      QSNormalizedNPX,
+      BridgingRecommendation) |> 
     kableExtra::kbl(booktabs = TRUE,
                     linesep = "",
                     digits = 1,
@@ -649,9 +664,10 @@ try(
                               font_size = 20, position = "center",
                               latex_options = c("HOLD_position","scale_down")) |> 
     kableExtra::scroll_box(width = "100%") |> 
-    kableExtra::column_spec(column = 1:21,width_max = "5em")
+    kableExtra::column_spec(column = 1:13,width_max = "5em") # change column = 1:13 if needed
 )
 ```
+
 
 ```{r echo=FALSE}
 try( 
@@ -664,7 +680,18 @@ try(
     dplyr::mutate(OlinkID = ifelse(!(BridgingRecommendation == "NotBridgeable"),
                                    paste(OlinkID, OlinkID_E3072, sep = "_"),
                                    OlinkID_E3072)) |>
-    dplyr::select(-c("OlinkID_E3072", "MedianCenteredNPX", "QSNormalizedNPX")) |>
+    dplyr::select(-c("OlinkID_E3072", "MedianCenteredNPX", "QSNormalizedNPX")) |> 
+    dplyr::select(  # wide table, select fewer columns
+      SampleID,
+      OlinkID,
+      Assay,
+      Panel,
+      NPX,
+      PCNormalizedNPX,
+      Count,
+      Normalization,
+      Project,
+      BridgingRecommendation) |> 
     kableExtra::kbl(booktabs = TRUE,
                     linesep = "",
         digits = 1,
@@ -672,60 +699,9 @@ try(
     kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 20, 
                   position = "center", latex_options = c("HOLD_position","scale_down")) |> 
     kableExtra::scroll_box(width = "100%") |> 
-    kableExtra::column_spec(column = 1:19,width_max = "5em")
+    kableExtra::column_spec(column = 1:10,width_max = "5em")
 )
 ```
-
-\clearpage
-
-\end{minipage}
-}
-\end{center}
-
-
-\clearpage
-
-
-```{r echo=FALSE}
-try( 
-  readRDS(normalizePath("../man/figures/bridging_results.rds")) |> 
-    kableExtra::kbl(booktabs = TRUE,
-                    linesep = "",
-                    digits = 1,
-                    caption = "First 5 rows of combined datasets after bridging with between-product formatting argument set to FALSE.") |>
-    kableExtra::kable_styling(bootstrap_options = "striped", 
-                              full_width = FALSE,
-                              font_size = 20, position = "center",
-                              latex_options = c("HOLD_position","scale_down")) |> 
-    kableExtra::scroll_box(width = "100%") |> 
-    kableExtra::column_spec(column = 1:21,width_max = "5em")
-)
-```
-
-```{r echo=FALSE}
-try( 
-  readRDS(normalizePath("../man/figures/bridging_results.rds")) |> 
-    dplyr::mutate(NPX = case_when(
-    BridgingRecommendation == "MedianCentering" ~ MedianCenteredNPX,
-    BridgingRecommendation == "QuantileSmoothing" ~ QSNormalizedNPX,
-    .default = NPX)) |>
-    dplyr::mutate(SampleID = paste(SampleID, Project, sep = "_")) |>
-    dplyr::mutate(OlinkID = ifelse(!(BridgingRecommendation == "NotBridgeable"),
-                                   paste(OlinkID, OlinkID_E3072, sep = "_"),
-                                   OlinkID_E3072)) |>
-    dplyr::select(-c("OlinkID_E3072", "MedianCenteredNPX", "QSNormalizedNPX")) |>
-    kableExtra::kbl(booktabs = TRUE,
-                    linesep = "",
-        digits = 1,
-        caption = "First 5 rows of combined datasets after bridging with between-product formatting argument set to TRUE.") |>
-    kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 20, 
-                  position = "center", latex_options = c("HOLD_position","scale_down")) |> 
-    kableExtra::scroll_box(width = "100%") |> 
-    kableExtra::column_spec(column = 1:19,width_max = "5em")
-)
-```
-
-
 
 
 
@@ -846,7 +822,6 @@ df$metadata$Product <- "Explore3072"
 arrow::write_parquet(x = df, sink = "path_to_output.parquet")
 ```
 
-\clearpage
 ## FAQs
 
 ### Overlapping Assays within products
