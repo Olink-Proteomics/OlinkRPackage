@@ -147,6 +147,13 @@ test_that("data completeness check", {
 
 })
 
+test_that("duplicate sample ids check", {
+  expect_message(
+    OlinkAnalyze::npx_data1 %>%
+      npxCheck(),
+    regexp = "Duplicate SampleID")
+})
+
 
 # Sample ID with # --------------------------------------------------------
 
