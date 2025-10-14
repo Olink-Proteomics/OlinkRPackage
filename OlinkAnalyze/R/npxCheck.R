@@ -47,15 +47,9 @@ npxCheck <- function(df) {
 
   # Check for duplicates in SampleID ----
   duplicate_ids <- df |>
-    dplyr::select(SampleID,
-                  OlinkID, UniProt) |>
     dplyr::filter(!is.na(UniProt)) |>
-    dplyr::select(-UniProt) |>
+    dplyr::select(SampleID, OlinkID) |>
     duplicated()
-  # duplicate_ids <- df |>
-  #   dplyr::select(SampleID,
-  #                 OlinkID) |>
-  #   duplicated()
 
   # Check if any duplicates are found
   duplicate_samples <- character(0)

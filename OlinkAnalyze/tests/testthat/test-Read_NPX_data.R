@@ -152,6 +152,22 @@ test_that("duplicate sample ids check", {
     OlinkAnalyze::npx_data1 %>%
       npxCheck(),
     regexp = "Duplicate SampleID")
+
+  expect_message(
+    OlinkAnalyze::npx_data1 %>%
+      dplyr::mutate(OlinkID = dplyr::if_else(SampleID %in% c("A1","A2") &
+                                               UniProt == "O00533", NA, OlinkID)) %>%
+      npxCheck(),
+    regexp = "CONTROL_SAMPLE_AS 1 | CONTROL_SAMPLE_AS 2")
+
+  expect_no_message(
+    OlinkAnalyze::npx_data1 |>
+      dplyr::filter(!str_detect(string = SampleID, pattern = "CONTROL_SAMPLE")) |>
+      dplyr::mutate(OlinkID = dplyr::if_else(SampleID %in% c("A1","A2") &
+                                               UniProt == "O00533", NA, OlinkID)) |>
+      npxCheck(),
+    message = "")
+
 })
 
 
