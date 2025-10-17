@@ -237,3 +237,39 @@ test_that(
 
   }
 )
+
+# Dar ID triggers error ---
+
+test_that("DarIDs trigger re-export message", {
+  expect_message(
+    check_darid(npx_data1 |> 
+                  dplyr::mutate(DataAnalysisRefID = "D10007") |> 
+                  dplyr::mutate(PanelDataArchiveVersion = "1.2")),
+    regexp = "Outdated .* combination"
+  )
+  
+  expect_message(
+    check_darid(npx_data1 |> 
+                  dplyr::mutate(DataAnalysisRefID = "D10007") |> 
+                  dplyr::mutate(PanelDataArchiveVersion = "1.2")),
+    regexp = "Re-export data using"
+  )
+  
+  expect_message(
+    check_darid(npx_data1 |> 
+                  mutate(DataAnalysisRefID = "D10007") |> 
+                  mutate(PanelDataArchiveVersion = "1.2")),
+    regexp = "Failure to re-export"
+  )
+  
+  expect_no_message(
+    check_darid(npx_data1)
+  )
+  
+  expect_message(
+    check_darid(npx_data1 |> 
+                  mutate(DataAnalysisRefID = "D10007") |> 
+                  mutate(ExploreVersion = "1.2")),
+    regexp = "NPX Map"
+  )
+})

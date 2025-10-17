@@ -367,40 +367,7 @@ read_NPX_explore <- function(filename) {
   }
   
   # PC Lot factor checks
-  if (all(c("PanelDataArchiveVersion", "DataAnalysisRefID") %in% names(out)) &&
-      any(stringr::str_detect(DataAnalysisRefID, 
-                              "D.*0007 || D.*0008 || D.*0010 || D.*0014")) &&
-      any(sapply(PanelDataArchiveVersion, function(x){
-        compareVersion("1.5", x) 
-      }) == 1)){
-        cli::cli_alert_info(
-          paste0("Outdated Data Analysis Reference ID and ",
-          "Panel Archive Version combination detected."))
-        cli::cli_alert(
-          paste0("Re-export data using Panel Archive Version 1.5.0+ and", 
-          "use the newest version of the Fixed LOD file ",
-           "when calculating LOD (Version 6+).")) 
-        cli::cli_alert_warning(
-          paste0("Failure to re-export may result in ",
-                 "incorrect PC normalization across lots and Fixed LOD ",
-                 "calculations."))
-  }
-  
-  if(all(c("ExploreVersion", "DataAnalysisRefID") %in% names(out)) &&
-     any(stringr::str_detect(DataAnalysisRefID, 
-                             "D.*0007 || D.*0008 || D.*0010 || D.*0014"))){
-    cli::cli_alert_info(
-      paste0("Outdated Data Analysis Reference ID and ",
-             "Software Version combination detected."))
-    cli::cli_alert(
-      paste0("Re-export data using Panel Archive Version 1.5.0+ in NPX Map and", 
-             " use the newest version of the Fixed LOD file ",
-             "when calculating LOD (Version 6+).")) 
-    cli::cli_alert_warning(
-      paste0("Failure to re-export may result in ",
-             "incorrect PC normalization across lots and Fixed LOD ",
-             "calculations."))
-  }    
+  check_darid(out)
   
       
 
@@ -859,4 +826,52 @@ check_data_completeness <- function(df){
             print_and_capture(NA_panel_sample))
   }
 
+}
+
+
+
+
+#' Title
+#'
+#' @param df 
+#'
+#' @return
+#'
+#' @examples
+check_darid <- function(df){
+  if (all(c("PanelDataArchiveVersion", "DataAnalysisRefID") %in% names(df)) &&
+      any(stringr::str_detect(df[["DataAnalysisRefID"]], 
+                              "D.*0007 || D.*0008 || D.*0010 || D.*0014")) &&
+      any(sapply(df[["PanelDataArchiveVersion"]], function(x){
+        compareVersion("1.5", x) 
+      }) == 1)){
+    cli::cli_alert_info(
+      paste0("Outdated Data Analysis Reference ID and ",
+             "Panel Archive Version combination detected."))
+    cli::cli_alert(
+      paste0("Re-export data using Panel Archive Version 1.5.0+ and", 
+             "use the newest version of the Fixed LOD file ",
+             "when calculating LOD (Version 6+).")) 
+    cli::cli_alert_warning(
+      paste0("Failure to re-export may result in ",
+             "incorrect PC normalization across lots and Fixed LOD ",
+             "calculations."))
+  }
+  
+  if(all(c("ExploreVersion", "DataAnalysisRefID") %in% names(df)) &&
+     any(stringr::str_detect(df[["DataAnalysisRefID"]], 
+                             "D.*0007 || D.*0008 || D.*0010 || D.*0014"))){
+    cli::cli_alert_info(
+      paste0("Outdated Data Analysis Reference ID and ",
+             "Software Version combination detected."))
+    cli::cli_alert(
+      paste0("Re-export data using Panel Archive Version 1.5.0+ in NPX Map and", 
+             " use the newest version of the Fixed LOD file ",
+             "when calculating LOD (Version 6+).")) 
+    cli::cli_alert_warning(
+      paste0("Failure to re-export may result in ",
+             "incorrect PC normalization across lots and Fixed LOD ",
+             "calculations."))
+    return()
+  }
 }
