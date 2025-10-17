@@ -98,16 +98,7 @@ olink_lod_internal <- function(data, lod_file_path = NULL, lod_method = "NCLOD")
 
     lod_file <- read.table(file = lod_file_path, sep = ";", header = TRUE)
     
-    if("DataAnalysisRefID" %in% names(data) &&
-      any(stringr::str_detect(data$DataAnalysisRefID,
-                              "D.*0007 || D.*0008 || D.*0010 || D.*0014"))&&
-      !("Version" %in% names(lod_file))&&
-      any(sapply(data$PanelDataArchiveVersion, function(x){
-        compareVersion("1.5", x) 
-      }) != 1)){
-      cli::cli_alert_info("Outdated version of Fixed LOD file detected.")
-      cli::cli_alert("Please download the newest version from Olink.com.")
-    }
+    check_lod_darid(lod_file, data)
     
     lod_data <- olink_fixed_lod(data_analysis_ref_id = data$DataAnalysisRefID,
                                 lod_file = lod_file)
@@ -313,4 +304,17 @@ int_norm_count <- function(data, lod_data){
 
   return(data)
 
+}
+
+check_lod_darid <- function(lod_file, data){
+  if("DataAnalysisRefID" %in% names(data) &&
+     any(stringr::str_detect(data[["DataAnalysisRefID"]],
+                             "D.*0007 || D.*0008 || D.*0010 || D.*0014"))&&
+     !("Version" %in% names(lod_file))&&
+     any(sapply(data[["PanelDataArchiveVersion"]], function(x){
+       compareVersion("1.5", x) 
+     }) != 1)){
+    cli::cli_alert_info("Outdated version of Fixed LOD file detected.")
+    cli::cli_alert("Please download the newest version from Olink.com.")
+  }
 }
