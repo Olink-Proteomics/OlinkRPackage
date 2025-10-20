@@ -831,13 +831,14 @@ check_data_completeness <- function(df){
 
 
 
-#' Title
-#'
-#' @param df 
+#' Check DarIDs 
+#' DarIDs D.07, 08, 10, and 14 need to be exported with 
+#' Panel Data Archive Version 1.5 or later
+#' @param df NPX data
 #'
 #' @return
 #'
-#' @examples
+#' @keywords internal
 check_darid <- function(df){
   if (all(c("PanelDataArchiveVersion", "DataAnalysisRefID") %in% names(df)) &&
       any(stringr::str_detect(df[["DataAnalysisRefID"]], 
