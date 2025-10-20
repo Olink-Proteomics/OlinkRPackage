@@ -2,13 +2,18 @@
 % Please edit documentation in R/Read_NPX_data.R
 \name{check_darid}
 \alias{check_darid}
-\title{Title}
+\title{Check DarIDs
+DarIDs D.07, 08, 10, and 14 need to be exported with
+Panel Data Archive Version 1.5 or later}
 \usage{
 check_darid(df)
 }
 \arguments{
-\item{df}{}
+\item{df}{NPX data}
 }
 \description{
-Title
+Check DarIDs
+DarIDs D.07, 08, 10, and 14 need to be exported with
+Panel Data Archive Version 1.5 or later
 }
+\keyword{internal}
