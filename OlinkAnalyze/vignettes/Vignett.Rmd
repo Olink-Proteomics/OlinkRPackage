@@ -1,18 +1,49 @@
 ---
-title: "Olink® Analyze Vignette"
-author: "Olink DS team"
-date: "`r Sys.Date()`"
-output: 
-  html_vignette:
-    toc: true
-    toc_depth: 2
-    includes:
-      in_header: ../man/figures/logo.html
+title: "Olink^®^ Analyze Vignette"
+author: "Olink Data Science"
+date: "`r format(Sys.Date(), '%Y-%m-%d')`"
+output:
+  pdf_document:
+    toc: false # replaced by \tableofcontents
+    # toc_depth: 3
+    # number_sections: true
+    fig_caption: true
+    latex_engine: xelatex
+header-includes:
+  - \usepackage{graphicx}
+  - \usepackage{float}
+  - \usepackage{fontspec} 
+  - \setmainfont{Swedish Gothic}  
+  - \usepackage{setspace}
+  - \onehalfspacing    # for 1.5x line spacing, options \singlespacing, ...
+  - \usepackage{fancyhdr}
+  - \pagestyle{fancy}
+  - \fancyhead{}
+  - \fancyhead[L]{\includegraphics[width=20pt]{../man/figures/small_logo.png}}
+  - \fancyhead[C]{\textbf{Olink® Analyze Vignette}}
+  - \fancyhead[R]{\thepage}
+  - \setlength{\headheight}{23.74pt}
+  - \addtolength{\topmargin}{-11.7pt}
+  - \renewcommand{\headrulewidth}{0.4pt}
+  - \fancyfoot{}  # clears footer
 vignette: >
   %\VignetteIndexEntry{Olink® Analyze Vignette}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+<!-- adding logo after title, author and date, and before toc -->
+
+\thispagestyle{empty}
+\begin{center}
+\vspace*{2cm}
+\includegraphics[width=2cm]{../man/figures/Olink\-Symbol_Black.png}
+\end{center}
+\newpage
+\pagestyle{fancy}
+\setcounter{tocdepth}{2}
+\tableofcontents
+\clearpage
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
@@ -35,7 +66,7 @@ You can install Olink® Analyze from CRAN.
 install.packages("OlinkAnalyze")
 ```
 
-# List of functions
+### List of functions
 
 **Preprocessing**
 
@@ -125,7 +156,7 @@ The read_NPX function imports an NPX file into a tidy format to work with in R. 
 -   filename: Path to the NPX output file.
 
 ```{r message=FALSE, eval=FALSE}
-data <- read_NPX("~/NPX_file_location.xlsx")
+data <- read_NPX("~/path/to/NPX_file.parquet")
 ```
 
 ### Function output
@@ -159,7 +190,7 @@ data <-  list.files(path = "path/to/dir/with/NPX/files",
       # Optionally add additional columns to add file identifiers
       dplyr::mutate(File = x) 
       }  |>
-         # optional to return a single data frame of all files instead of a list of data frames
+         # optionally return one data frame instead of a list of data frames
          dplyr::bind_rows() 
 
 # Read in multiple NPX files in .parquet format
@@ -181,13 +212,13 @@ data <-  list.files(path = "path/to/dir/with/NPX/files",
 
 The olink_plate_randomizer function randomly assigns samples to a plate well with the option to keep the same individuals on the same plate. Olink® does not recommend to force balance based on other clinical variables.
 
-For more information on plate randomization, consult the [Plate Randomization Vignette](plate_randomizer.html).
+For more information on plate randomization, consult the [Plate Randomization Vignette]().
 
 ## Select bridge samples (olink_bridgeselector)
 
 The bridge selection function selects a number of bridge samples based on the input data. Bridge samples are used to normalize two dataframes/projects that have been ran at different time points, hence, a batch effect is expected. It selects samples that have good detectability (if applicable), pass quality control, and cover a wide range of data points.
 
-For more information on bridge sample selection, consult the [Introduction to bridging Olink® NPX datasets tutorial](bridging_introduction.html).
+For more information on bridge sample selection, consult the [Introduction to bridging Olink® NPX datasets tutorial]().
 
 ## Normalizing NPX data (olink_normalization)
 
@@ -195,16 +226,16 @@ The Olink® normalization function normalizes NPX values between two different d
 
 The function handles four different types of normalization:
 
--   **Bridging normalization**: One of the dataframes is adjusted to another using overlapping samples (bridge samples). The overlapping samples should have the same IDs between dataframes. Adjustment is made using the median of the paired differences between the bridge samples. For more information on bridging, consult the [Introduction to bridging Olink® NPX datasets tutorial](bridging_introduction.html).
+-   **Bridging normalization**: One of the dataframes is adjusted to another using overlapping samples (bridge samples). The overlapping samples should have the same IDs between dataframes. Adjustment is made using the median of the paired differences between the bridge samples. For more information on bridging, consult the [Introduction to bridging Olink® NPX datasets tutorial]().
 -   **Subset normalization**: A subset of samples is used to normalize two dataframes, one of which is used as a reference_project. Adjustment is made using the differences of medians between the sample subsets from the two dataframes. Subset normalization is useful if no bridge samples were included and one can assume that the distribution of the two datasets is very similar.
 -   **Reference median normalization**: Works only on one dataframe. This is effectively subset normalization, but using difference of medians to pre-recorded median values. df1, overlapping_samples_df1 and reference_medians need to be specified.
--   **Cross-product bridging**: Similar to bridging normalization but bridging across products, for example bridging Explore 3072 data to Explore HT data. Overlapping samples are run on both products and used to determine which assays are bridgeable and what method should be used to bridge each assay. For more information on the between-product bridging methodology, consult the [Bridging across NGS-based Olink^®^ products Tutorial](bridging_crossproduct.html).
+-   **Cross-product bridging**: Similar to bridging normalization but bridging across products, for example bridging Explore 3072 data to Explore HT data. Overlapping samples are run on both products and used to determine which assays are bridgeable and what method should be used to bridge each assay. For more information on the between-product bridging methodology, consult the [Bridging across NGS-based Olink^®^ products Tutorial]().
 
 ## Integrating Explore NPX LOD (olink_lod)
 
 The olink_lod function adds LOD information to an Explore HT or Explore 3072 NPX dataframe. This function can incorporate LOD based on either an Explore dataset's negative controls or using predetermined fixed LOD values, which can be downloaded from the Document Download Center at [olink.com](https://olink.com/knowledge/documents), or using both methods. The default LOD calculation method is based off of the negative controls. If an NPX file is intensity normalized, both intensity normalized and PC normalized LODs are provided.
 
-For more information on calculating LOD, consult the [Calculating LOD from Olink® Explore data tutorial](LOD.html).
+For more information on calculating LOD, consult the [Calculating LOD from Olink® Explore data tutorial]().
 
 # Statistical analysis
 
@@ -363,14 +394,15 @@ anova_results_oneway <- olink_anova(df = npx_data1_no_controls,
                                     variable = 'Site')
 
 # extracting the significant proteins
-anova_results_oneway_significant <- anova_results_oneway %>%
-  dplyr::filter(Threshold == 'Significant') %>%
+anova_results_oneway_significant <- anova_results_oneway |>
+  dplyr::filter(Threshold == 'Significant') |>
   dplyr::pull(OlinkID)
 
-anova_posthoc_oneway_results <- olink_anova_posthoc(df = npx_data1_no_controls,
-                                                    olinkid_list = anova_results_oneway_significant,
-                                                    variable = 'Site',
-                                                    effect = 'Site')
+anova_posthoc_oneway_results <- 
+  olink_anova_posthoc(df = npx_data1_no_controls,
+                      olinkid_list = anova_results_oneway_significant,
+                      variable = 'Site',
+                      effect = 'Site')
 ```
 
 ### Function output
@@ -416,15 +448,20 @@ Adjusted p-values are calculated using the Benjamini & Hochberg (1995) method (�
 -   verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 
 ```{r message=FALSE, eval=FALSE}
-if (requireNamespace("lme4", quietly = TRUE) & requireNamespace("lmerTest", quietly = TRUE)){
-# Linear mixed model with one variable.
-  lmer_results_oneway <- olink_lmer(df = npx_data1, 
-                                    variable = 'Site',
-                                    random = 'Subject')
-# Linear mixed model with two variables.
-  lmer_results_twoway <- olink_lmer(df = npx_data1, 
-                                    variable = c('Site', 'Treatment'),
-                                    random = 'Subject')
+if (requireNamespace("lme4", quietly = TRUE) &
+    requireNamespace("lmerTest", quietly = TRUE)) {
+  # Linear mixed model with one variable.
+  lmer_results_oneway <- olink_lmer(
+    df = npx_data1,
+    variable = "Site",
+    random = "Subject"
+  )
+  # Linear mixed model with two variables.
+  lmer_results_twoway <- olink_lmer(
+    df = npx_data1,
+    variable = c("Site", "Treatment"),
+    random = "Subject"
+  )
 }
 ```
 
@@ -463,21 +500,26 @@ The olink_lmer_posthoc function is similar to olink_lmer but performs a post-hoc
 -   verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 
 ```{r message=FALSE, eval=FALSE}
-if (requireNamespace("lme4", quietly = TRUE) & requireNamespace("lmerTest", quietly = TRUE)){
+if (requireNamespace("lme4", quietly = TRUE) &
+    requireNamespace("lmerTest", quietly = TRUE)) {
   # Linear mixed model with two variables.
-  lmer_results_twoway <- olink_lmer(df = npx_data1, 
-                                    variable = c('Site', 'Treatment'),
-                                    random = 'Subject')
+  lmer_results_twoway <- olink_lmer(
+    df = npx_data1,
+    variable = c("Site", "Treatment"),
+    random = "Subject"
+  )
   # extracting the significant proteins
-  lmer_results_twoway_significant <- lmer_results_twoway %>%
-    dplyr::filter(Threshold == 'Significant', term == 'Treatment') %>%
+  lmer_results_twoway_significant <- lmer_results_twoway |>
+    dplyr::filter(Threshold == "Significant", term == "Treatment") |>
     dplyr::pull(OlinkID)
   # performing post-hoc analysis
-  lmer_posthoc_twoway_results <- olink_lmer_posthoc(df = npx_data1,
-                                                    olinkid_list = lmer_results_twoway_significant,
-                                                    variable = c('Site', 'Treatment'),
-                                                    random = 'Subject',
-                                                    effect = 'Treatment') 
+  lmer_posthoc_twoway_results <- olink_lmer_posthoc(
+    df = npx_data1,
+    olinkid_list = lmer_results_twoway_significant,
+    variable = c("Site", "Treatment"),
+    random = "Subject",
+    effect = "Treatment"
+  )
 }
 ```
 
@@ -532,7 +574,8 @@ ttest_results <- olink_ttest(
   alternative = "two.sided")
 
 try({ # This expression might fail if dependencies are not installed
-gsea_results <- olink_pathway_enrichment(data = npx_data1, test_results = ttest_results)
+gsea_results <- olink_pathway_enrichment(data = npx_data1, 
+                                         test_results = ttest_results)
 ora_results <- olink_pathway_enrichment(
   data = npx_data1,
   test_results = ttest_results, method = "ORA")
@@ -573,9 +616,9 @@ Columns for GSEA:
 
 Generates PCA projection of all samples from NPX data along two principal components (default PC2 vs PC1) colored by the variable specified by color_g (default QC_Warning) and including the percentage of explained variance. By default, the values are scaled and centered in the PCA and proteins with missing NPX values removed from the corresponding assay(s). Unique sample names are required. Imputation by median value is done for assays with missingness \<10% and for multi-plate projects, and for missingness \<5% for single plate projects.
 
-More information about `olink_pca()` can be found in the [Outlier Exclusion Vignette](OutlierExclusion.html).
+More information about `olink_pca()` can be found in the [Outlier Exclusion Vignette]().
 
-## Uniform Manifold Approximation and Projection for Dimension Reduction (UMAP) (olink_umap_plot)
+## Uniform Manifold Approximation and Projection (UMAP) plot (olink_umap_plot)
 
 Computes a manifold approximation and projection and plots the two specified components. Unique sample names are required and imputation by the median is done for assays with missingness \<10% for multi-plate projects and \<5% for single plate projects.
 
@@ -600,30 +643,30 @@ NOTE: UMAP is a non-linear data transformation that might not accurately preserv
 -   verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 -   quiet: Logical. Default: False. If TRUE, the resulting plot is not printed.
 
-```{r message=FALSE, eval = FALSE}
+
+```{r message=FALSE, eval = TRUE}
 if (requireNamespace("umap", quietly = TRUE) ){
-npx_data1 %>% 
-  dplyr::filter(!stringr::str_detect(SampleID, 'CONTROL_SAMPLE')) %>% 
-  olink_umap_plot(df = .,
-                 color_g = "QC_Warning", byPanel = TRUE)  
+npx_data1 |> 
+  dplyr::filter(!stringr::str_detect(SampleID, 'CONTROL_SAMPLE')) |> 
+  olink_umap_plot(color_g = "QC_Warning", byPanel = TRUE)  
   }
 ```
 
-```{r message=FALSE, echo = FALSE}
+```{r message=FALSE, eval=FALSE, echo = FALSE, out.width = "\\linewidth"}
 knitr::include_graphics(normalizePath("../man/figures/olink_umap_plot.png"),
                         error = FALSE)
 ```
 
-```{r message=FALSE, eval =FALSE}
-npx_data1 %>% 
-  dplyr::filter(!stringr::str_detect(SampleID, 'CONTROL_SAMPLE')) %>% 
-  olink_umap_plot(df = .,
-                 color_g = "QC_Warning", byPanel = TRUE)  
+```{r message=FALSE, eval =FALSE, echo=FALSE}
+npx_data1 |> 
+  dplyr::filter(!stringr::str_detect(SampleID, 'CONTROL_SAMPLE')) |> 
+  olink_umap_plot(color_g = "QC_Warning", byPanel = TRUE)  
 ```
 
 ### Function output
 
 A list of objects of class *ggplot* (silently returned). Plots are also printed unless option `quiet = TRUE` is set.
+
 
 # Visualization
 
@@ -641,7 +684,7 @@ The olink_boxplot function is used to generate boxplots of NPX values stratified
 -   verbose: Logical. Default: False. Flag indicating if plots shall be printed additionally to assigned to a list variable.
 -   number_of_proteins_per_plot: Number of boxplots to include in the facets plot. Default 6.
 
-```{r message=FALSE, eval = FALSE}
+```{r message=FALSE, eval = TRUE}
 # Remove control samples and assays
 npx_data1_no_controls <- npx_data1 |>
   dplyr::filter(!stringr::str_detect(SampleID,
@@ -660,19 +703,19 @@ plot <- npx_data1_no_controls |>
 plot[[1]]
 ```
 
-```{r message=FALSE, echo = FALSE}
+```{r message=FALSE,eval=FALSE, echo = FALSE, out.width = "\\linewidth"}
 knitr::include_graphics(normalizePath("../man/figures/olink_boxplot.png"),
                         error = FALSE)
 ```
 
-```{r message=FALSE, eval = FALSE}
-anova_posthoc_results<-npx_data1_no_controls %>% 
+```{r message=FALSE}
+anova_posthoc_results<-npx_data1_no_controls |> 
   olink_anova_posthoc(olinkid_list = c("OID00488", "OID01276"),
                       variable = 'Site',
                       effect = 'Site')
 
-plot2 <- npx_data1_no_controls %>%
-  na.omit() %>% # removing missing values which exists for Site
+plot2 <- npx_data1_no_controls |>
+  na.omit() |> # removing missing values which exists for Site
   olink_boxplot(variable = "Site", 
                 olinkid_list = c("OID00488", "OID01276"),
                 number_of_proteins_per_plot  = 2,
@@ -682,7 +725,7 @@ plot2[[1]]
 
 ```
 
-```{r message=FALSE, echo = FALSE}
+```{r message=FALSE, eval = FALSE, echo = FALSE, out.width = "\\linewidth"}
 knitr::include_graphics(normalizePath("../man/figures/olink_boxplot_anova_posthoc.png"),
                         error = FALSE)
 ```
@@ -691,13 +734,13 @@ knitr::include_graphics(normalizePath("../man/figures/olink_boxplot_anova_postho
 
 A list of objects of class *ggplot*.
 
-**Note:** Please note that plots will not appear in the *plots* panel of *Rstudio* if not assigned to a variable and printing it (see sample code above).
+**Note:** Plots will not appear in the *plots* panel of *Rstudio* unless they are assigned to a variable and explicitly printed (see sample code above).
 
 ## Boxplots for QC (olink_dist_plot)
 
 The olink_dist_plot function generates boxplots of NPX values for each sample, faceted by Olink panel. This is used as an initial QC step to identify potential outliers.
 
-More information about `olink_dist_plot()` can be found in the [Outlier Exclusion Vignette](OutlierExclusion.html).
+More information about `olink_dist_plot()` can be found in the [Outlier Exclusion Vignette]().
 
 ## Point-range plot for LMER (olink_lmer_plot)
 
@@ -715,19 +758,22 @@ The function olink_lmer_plot generates a point-range plot for a given list of pr
 -   number_of_proteins_per_plot: Number plots to include in the list of point-range plots. Defaults to 6 plots per figure.
 -   verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 
-```{r message=FALSE, eval = FALSE}
-if (requireNamespace("lme4", quietly = TRUE) & requireNamespace("lmerTest", quietly = TRUE)){
-  plot <- olink_lmer_plot(df = npx_data1, 
-                          olinkid_list = c("OID01216", "OID01217"), 
-                          variable = c('Site', 'Treatment'), 
-                          x_axis_variable =  'Site',
-                          col_variable = 'Treatment',
-                          random = 'Subject')
+```{r message=FALSE, fig.width = 8,out.width = "\\linewidth"}
+if (requireNamespace("lme4", quietly = TRUE) &
+    requireNamespace("lmerTest", quietly = TRUE)) {
+  plot <- olink_lmer_plot(
+    df = npx_data1,
+    olinkid_list = c("OID01216", "OID01217"),
+    variable = c("Site", "Treatment"),
+    x_axis_variable = "Site",
+    col_variable = "Treatment",
+    random = "Subject"
+  )
   plot[[1]]
 }
 ```
 
-```{r message=FALSE, fig.width = 8, echo = FALSE}
+```{r message=FALSE, eval = FALSE, fig.width = 8, echo = FALSE, out.width = "\\linewidth"}
 knitr::include_graphics(normalizePath("../man/figures/olink_lmer_plot.png"),
                         error = FALSE)
 ```
@@ -750,7 +796,7 @@ The olink_pathway_heatmap function generates a heatmap of proteins related to pa
 -   keyword: (optional) keyword to filter enrichment results on, if not specified, displays top terms
 -   number_of_terms: number of terms to display, default is 20
 
-```{r  message=FALSE, eval = FALSE}
+```{r  message=FALSE, fig.height=4,fig.width=8, out.width="\\linewidth"}
 # GSEA Heatmap from t-test results
 try({ # This expression might fail if dependencies are not installed
 olink_pathway_heatmap(enrich_results = gsea_results, 
@@ -758,11 +804,11 @@ olink_pathway_heatmap(enrich_results = gsea_results,
 })
 ```
 
-```{r message=FALSE, echo = FALSE}
+```{r message=FALSE, eval = FALSE, echo = FALSE, out.width = "\\linewidth"}
 knitr::include_graphics(normalizePath("../man/figures/olink_pathway_heatmap_gsea.png"), error = FALSE)
 ```
 
-```{r message = FALSE, fig.height=4, fig.width=8, eval = FALSE}
+```{r message = FALSE, fig.height=4, fig.width=8, out.width = "\\linewidth"}
 # ORA Heatmap from t-test results with cell keyword
 try({ # This expression might fail if dependencies are not installed
 olink_pathway_heatmap(enrich_results = ora_results, 
@@ -771,7 +817,7 @@ olink_pathway_heatmap(enrich_results = ora_results,
 })
 ```
 
-```{r message=FALSE, echo = FALSE}
+```{r message=FALSE, eval = FALSE, echo = FALSE, out.width = "\\linewidth"}
 knitr::include_graphics(normalizePath("../man/figures/olink_pathway_heatmap_ora.png"), error = FALSE)
 ```
 
@@ -798,7 +844,7 @@ A bar graph as a **ggplot** object.
 
 The olink_qc_plot function generates a plot faceted by Panel, plotting IQR vs. median for all samples. This is a good first check to find out if any samples have a tendency to be classified as outliers. Horizontal dashed lines indicate +/-3 standard deviations from the mean IQR. Vertical dashed lines indicate +/-3 standard deviations from the mean sample median.
 
-More information about `olink_qc_plot()` can be found in the [Outlier Exclusion Vignette](OutlierExclusion.html).
+More information about `olink_qc_plot()` can be found in the [Outlier Exclusion Vignette]().
 
 ## Heatmap (olink_heatmap_plot)
 
@@ -820,19 +866,19 @@ The grouping variable(s) are annotated and colored in the left side of the heatm
 -   fontsize. Default: 10. Fontsize for all text.
 -   na_col. Default: Black. Color of the cells with NA.
 
-```{r message=FALSE,  eval = FALSE}
-first10 <- npx_data1 %>%
-  dplyr::pull(OlinkID) %>% 
-  unique() %>% 
+```{r message=FALSE, fig.width=8, fig.height=6, out.width="\\linewidth"}
+first10 <- npx_data1 |>
+  dplyr::pull(OlinkID) |> 
+  unique() |> 
   head(10)
 
-first15samples <- npx_data1$SampleID %>% 
-  unique() %>% 
+first15samples <- npx_data1$SampleID |> 
+  unique() |> 
   head(15)
 
-npx_data_small <- npx_data1 %>% 
-  dplyr::filter(!str_detect(SampleID, 'CONT')) %>% 
-  dplyr::filter(OlinkID %in% first10) %>% 
+npx_data_small <- npx_data1 |> 
+  dplyr::filter(!str_detect(SampleID, 'CONT')) |> 
+  dplyr::filter(OlinkID %in% first10) |> 
   dplyr::filter(SampleID %in% first15samples)
 
 try({ #This statement might fail if dependencies are not installed
@@ -840,7 +886,7 @@ try({ #This statement might fail if dependencies are not installed
   })
 ```
 
-```{r message=FALSE, fig.height=4, echo = FALSE}
+```{r message=FALSE, eval=FALSE, fig.height=4, echo = FALSE, out.width = "\\linewidth"}
 knitr::include_graphics(normalizePath("../man/figures/olink_heatmap_plot.png"), error = FALSE)
 ```
 
@@ -858,13 +904,13 @@ The olink_volcano_plot function generates a volcano plot using results from the 
 -   x_lab: Optional. Character value to use as the x-axis label.
 -   olinkid_list: Optional. Character vector of proteins (OlinkID) to label in the plot. If not provided, by default the function will label all significant proteins.
 
-```{r message=FALSE, eval = FALSE}
+```{r message=FALSE, eval = TRUE, out.width="\\linewidth"}
 # perform t-test
 ttest_results <- olink_ttest(df = npx_data1,
                              variable = 'Treatment')
 # select names of proteins to show
-top_10_name <- ttest_results %>%
-  dplyr::slice_head(n = 10) %>%
+top_10_name <- ttest_results |>
+  dplyr::slice_head(n = 10) |>
   dplyr::pull(OlinkID)
 # volcano plot
 olink_volcano_plot(p.val_tbl = ttest_results,
@@ -872,7 +918,7 @@ olink_volcano_plot(p.val_tbl = ttest_results,
                    olinkid_list = top_10_name)
 ```
 
-```{r message=FALSE, echo = FALSE}
+```{r message=FALSE, eval=FALSE, echo = FALSE, out.width = "\\linewidth"}
 knitr::include_graphics(normalizePath("../man/figures/olink_volcano_plot.png"), error = FALSE)
 ```
 
@@ -884,16 +930,16 @@ An object of class *ggplot*.
 
 This function sets a coherent plot theme for plots by adding it to a ggplot object. It is mainly used for aesthetic reasons.
 
-```{r message=FALSE, eval = FALSE}
-npx_data1 %>% 
+```{r message=FALSE}
+npx_data1 |> 
   dplyr::filter(!is.na(Treatment)) |>
-  dplyr::filter(OlinkID == 'OID01216') %>% 
+  dplyr::filter(OlinkID == 'OID01216') |> 
   ggplot(aes(x = Treatment, y = NPX, fill = Treatment)) +
   geom_boxplot() +
   set_plot_theme()
 ```
 
-```{r message=FALSE, echo = FALSE}
+```{r message=FALSE, eval = FALSE, echo = FALSE, out.width = "\\linewidth"}
 knitr::include_graphics(normalizePath("../man/figures/set_plot_theme_boxplot.png"), error = FALSE)
 ```
 
@@ -901,17 +947,17 @@ knitr::include_graphics(normalizePath("../man/figures/set_plot_theme_boxplot.png
 
 These functions sets a coherent coloring theme for the plots by adding it to a ggplot object. It is mainly used for aesthetic reasons.
 
-```{r message=FALSE, eval = FALSE}
-npx_data1 %>% 
+```{r message=FALSE}
+npx_data1 |> 
   dplyr::filter(!is.na(Treatment)) |>
-  dplyr::filter(OlinkID == 'OID01216') %>% 
+  dplyr::filter(OlinkID == 'OID01216') |> 
   ggplot(aes(x = Treatment, y = NPX, fill = Treatment)) +
   geom_boxplot() +
   set_plot_theme() +
   olink_fill_discrete()
 ```
 
-```{r message=FALSE, echo = FALSE}
+```{r message=FALSE, eval = FALSE, echo = FALSE, out.width = "\\linewidth"}
 knitr::include_graphics(normalizePath("../man/figures/olink_fill_discrete_boxplot.png"), error = FALSE)
 ```
 
@@ -962,13 +1008,14 @@ npx_br_data_bridgeable_plt <- olink_bridgeability_plot(
 npx_br_data_bridgeable_plt[[1]]
 ```
 
-```{r message=FALSE, echo = FALSE, out.width = "600px"}
+```{r message=FALSE, echo = FALSE, out.width = "\\linewidth"}
 knitr::include_graphics(normalizePath("../man/figures/bridgeable_plt_MedianCenter.png"), error = FALSE)
 ```
 
 ### Function output
 
 A list of objects of class *ggplot*.
+\clearpage
 
 ## Contact Us
 
