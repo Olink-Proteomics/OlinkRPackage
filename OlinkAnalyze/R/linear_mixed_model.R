@@ -310,7 +310,7 @@ olink_lmer <- function(df,
     }
 
   }, warning = function(w) {
-    if (grepl(x = w, pattern = glob2rx("*not recognized or transformed*")) |
+    if (grepl(x = w, pattern = "not\\s+recognized\\s+or\\s+transformed") |
         grepl(x = w, pattern = glob2rx("*contains implicit NA, consider using*"))){
       invokeRestart("muffleWarning")
     }

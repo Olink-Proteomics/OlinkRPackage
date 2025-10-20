@@ -477,7 +477,7 @@ criteria:
 For assays that are bridgeable, the shape of the NPX distribution is
 compared between the two products:
 
--   **Assessing similarity of NPX distribution across products:** If the
+-   **Assessing similarity of NPX distribution across products:** If any of the
     three criteria outlined above are met then the assay is considered
     bridgeable. Otherwise, bridging is not recommended for that assay.
     If an assay is bridgeable, the similarity of the NPX distribution is

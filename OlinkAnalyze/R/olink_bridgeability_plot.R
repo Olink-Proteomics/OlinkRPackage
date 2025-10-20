@@ -69,7 +69,7 @@ olink_bridgeability_plot <- function(data,
   }
 
   # set seed
-  set.seed(seed = 1)
+  set.seed(seed = 1L)
 
   # check OlinkID ----
 
@@ -94,10 +94,7 @@ olink_bridgeability_plot <- function(data,
 
   # clean up data to bridgeable assays only
 
-  data <- data |>
-    dplyr::filter(
-      .data[["Count"]] > .env[["min_count"]]
-    )
+  bridgeability_prep_data(data = data, min_count = min_count)
 
   # Adjusting the platform and add color green for bridgeable assays
   if (length(unique(data$Project)) != 2L) {
@@ -107,263 +104,6 @@ olink_bridgeability_plot <- function(data,
         "i" = "Expected 2!"
       )
     )
-  }
-
-  # Help plotting function ----
-
-  iqr_range_plt <- function(data) {
-
-    iqr_range_plt <- ggplot2::ggplot(
-      data = data,
-      mapping = ggplot2::aes(
-        x = .data[["oid_assay"]],
-        y = .data[["NPX"]],
-        fill = .data[["Project"]]
-      )
-    ) +
-      ggplot2::geom_violin(
-        alpha = 0.4,
-        position = ggplot2::position_nudge(x = 0),
-        width = 0.4
-      ) +
-      ggplot2::geom_boxplot(
-        width = .1,
-        outlier.shape = NA,
-        alpha = 0.4
-      ) +
-      ggplot2::labs(
-        x = "Assay",
-        y = "NPX Distribution",
-        fill = "Platform: "
-      ) +
-      ggplot2::guides(
-        fill = ggplot2::guide_legend(
-          nrow = 1L,
-          byrow = TRUE
-        )
-      ) +
-      OlinkAnalyze::set_plot_theme() +
-      OlinkAnalyze::olink_fill_discrete() +
-      OlinkAnalyze::olink_color_discrete() +
-      ggplot2::theme(
-        axis.text.x = ggplot2::element_blank()
-      )
-
-    return(iqr_range_plt)
-  }
-
-  r2_plt <- function(data) {
-
-    projects <- unique(data$Project)
-
-    data <- data |>
-      dplyr::select(
-        dplyr::all_of(
-          c("SampleID", "oid_assay", "NPX", "Project")
-        )
-      ) |>
-      tidyr::pivot_wider(
-        names_from = dplyr::all_of("Project"),
-        values_from = dplyr::all_of("NPX")
-      ) |>
-      tidyr::drop_na()
-
-    r2_lm <- stats::cor(
-      x = dplyr::pull(data, .data[[projects[1L]]]),
-      y = dplyr::pull(data, .data[[projects[2L]]]),
-      use = "everything",
-      method = "pearson"
-    ) |>
-      (\(.) . ^ 2L)() |>
-      signif(2L)
-
-    caps <- ifelse(r2_lm < 0.2,
-                   "Possibly bridging background to background",
-                   "")
-
-    r2_plt <- ggplot2::ggplot(
-      data = data,
-      mapping = ggplot2::aes(
-        x = .data[[projects[1L]]],
-        y = .data[[projects[2L]]]
-      )
-    ) +
-      ggplot2::geom_point(
-        color = "blue",
-        alpha = 0.4
-      ) +
-      ggplot2::geom_smooth(
-        method = "lm",
-        formula = "y ~ x",
-        color = "black"
-      ) +
-      ggpubr::stat_cor(
-        method = "pearson",
-        ggplot2::aes(
-          label = ggplot2::after_stat(x = .data[["rr.label"]])
-        ),
-        geom = "label"
-      ) +
-      OlinkAnalyze::set_plot_theme() +
-      OlinkAnalyze::olink_color_discrete() +
-      ggplot2::labs(
-        caption = caps
-      )
-
-    return(r2_plt)
-  }
-
-  counts_plt <- function(data,
-                         median_counts_threshold) {
-
-    counts_plt <- data |>
-      dplyr::group_by(
-        .data[["OlinkID"]], .data[["Project"]]
-      ) |>
-      dplyr::mutate(
-        median_count = median(x = .data[["Count"]], na.rm = TRUE)
-      ) |>
-      dplyr::ungroup() |>
-      dplyr::distinct(
-        .data[["oid_assay"]], .data[["Project"]], .data[["median_count"]]
-      ) |>
-      ggplot2::ggplot(
-        mapping = ggplot2::aes(
-          x = .data[["oid_assay"]],
-          fill = .data[["Project"]],
-          y = .data[["median_count"]],
-          label = .data[["median_count"]]
-        )
-      ) +
-      ggplot2::geom_col(
-        width = 0.5,
-        position = "dodge"
-      ) +
-      ggplot2::geom_text(
-        position = ggplot2::position_dodge(0.5),
-        vjust = 0.5
-      ) +
-      ggplot2::geom_hline(
-        yintercept = median_counts_threshold,
-        color = "black",
-        linetype = "dashed",
-        linewidth = 0.7
-      ) +
-      ggplot2::labs(
-        x = "Assay",
-        y = "Median Count",
-        fill = "Platform:"
-      ) +
-      OlinkAnalyze::set_plot_theme() +
-      OlinkAnalyze::olink_fill_discrete() +
-      ggplot2::theme(
-        axis.text.x = ggplot2::element_blank()
-      )
-
-    return(counts_plt)
-  }
-
-  ks_plt <- function(data) {
-
-    projects <- unique(data$Project)
-
-    data_wide <- data |>
-      dplyr::select(
-        dplyr::all_of(
-          c("SampleID", "oid_assay", "NPX", "Project")
-        )
-      ) |>
-      tidyr::pivot_wider(
-        names_from = dplyr::all_of("Project"),
-        values_from = dplyr::all_of("NPX")
-      ) |>
-      tidyr::drop_na()
-
-    # Calculate empirical cumulative distribution function (ECDF) per platform
-    ecdf_p1 <- dplyr::pull(data_wide, .data[[projects[1L]]]) |> stats::ecdf()
-    ecdf_p2 <- dplyr::pull(data_wide, .data[[projects[2L]]]) |> stats::ecdf()
-
-    # Find min/max statistics to draw line between points of greatest distance
-    min_max <- seq(
-      from = dplyr::select(data_wide, dplyr::all_of(projects)) |> min(),
-      to = dplyr::select(data_wide, dplyr::all_of(projects)) |> max(),
-      length.out = nrow(data_wide)
-    )
-    x0 <- min_max[which(abs(ecdf_p1(min_max) - ecdf_p2(min_max)) ==
-                          max(abs(ecdf_p1(min_max) - ecdf_p2(min_max))))]
-    y0 <- ecdf_p1(x0)
-    y1 <- ecdf_p2(x0)
-
-    ks_result <- stats::ks.test(
-      x = dplyr::pull(data_wide, .data[[projects[1L]]]),
-      y = dplyr::pull(data_wide, .data[[projects[2L]]]),
-      alternative = "two.sided",
-      exact = NULL,
-      simulate.p.value = FALSE,
-      B = 2000L
-    ) |>
-      (\(.) signif(x = .$statistic, digits = 2L))() |>
-      (\(.) paste("D =", .))()
-
-    # Main KS plot construction
-    ks_plt <- ggplot2::ggplot(
-      data = data,
-      mapping = ggplot2::aes(
-        x = .data[["NPX"]],
-        group = .data[["Project"]],
-        color = .data[["Project"]]
-      )
-    ) +
-      ggplot2::stat_ecdf(
-        linewidth = 1L
-      ) +
-      ggplot2::geom_segment(
-        mapping = ggplot2::aes(
-          x = x0[1L],
-          y = y0[1L],
-          xend = x0[1L],
-          yend = y1[1L]
-        ),
-        linetype = "dashed",
-        color = "black"
-      ) +
-      ggplot2::geom_point(
-        mapping = ggplot2::aes(
-          x = x0[1L],
-          y = y0[1L]
-        ),
-        color = "black",
-        size = 2L
-      ) +
-      ggplot2::geom_point(
-        mapping = ggplot2::aes(
-          x = x0[1L],
-          y = y1[1L]
-        ),
-        color = "black",
-        size = 2L
-      ) +
-      ggplot2::annotate(
-        geom = "text",
-        x = Inf,
-        y = 0.1,
-        hjust = 1,
-        cex = 4,
-        label = ks_result
-      ) +
-      ggplot2::labs(
-        x = "NPX",
-        y = "ECDF",
-        color = "Platform:"
-      ) +
-      OlinkAnalyze::set_plot_theme() +
-      OlinkAnalyze::olink_color_discrete() +
-      ggplot2::theme(
-        legend.position = "top",
-        legend.title = ggplot2::element_blank()
-      )
-
-    return(ks_plt)
   }
 
   # Bridgeable plot ----
@@ -393,45 +133,28 @@ olink_bridgeability_plot <- function(data,
       }
 
       # iqr plot
-      iqr <- iqr_range_plt(data = data_tmp)
+      iqr_p <- bridgeability_iqr_range_plt(data = data_tmp)
       # r2 plot
-      r2 <- r2_plt(data = data_tmp)
+      r2_p <- bridgeability_r2_plt(data = data_tmp)
       # counts plot
-      counts <- counts_plt(data = data_tmp,
-                           median_counts_threshold = median_counts_threshold)
+      counts_p <- bridgeability_counts_plt(
+        data = data_tmp,
+        median_counts_threshold = median_counts_threshold
+      )
       # ks plot
-      ks <- ks_plt(data = data_tmp)
+      ks_p <- bridgeability_ks_plt(data = data_tmp)
 
       # copmbine plots
-      out_plot <- ggpubr::ggarrange(
-        ggpubr::ggarrange(
-          r2,
-          ggpubr::ggarrange(
-            iqr, counts,
-            ncol = 2L,
-            widths = c(1L, 1L),
-            common.legend = TRUE
-          ),
-          ncol = 2L
-        ),
-        ks,
-        nrow = 2L,
-        heights = c(1L, 1L)
-      )
 
-      out_plot_title <- ifelse(
-        bridge_suggest %in% c("MedianCentering", "QuantileSmoothing"),
-        paste0(unique(data_tmp$oid_assay), " (bridgeable)"),
-        paste0(unique(data_tmp$oid_assay), " (non bridgeable)")
-      )
-
-      out_plot <- ggpubr::annotate_figure(
-        p = out_plot,
-        top = ggpubr::text_grob(
-          label = out_plot_title,
-          size = 14L,
-          just = "centre",
-          face = "plain"
+      out_plot <- bridgeability_combine_plots(
+        iqr = iqr_p,
+        r2 = r2_p,
+        counts = counts_p,
+        ks = ks_p,
+        title = ifelse(
+          bridge_suggest %in% c("MedianCentering", "QuantileSmoothing"),
+          paste0(unique(data_tmp$oid_assay), " (bridgeable)"),
+          paste0(unique(data_tmp$oid_assay), " (non bridgeable)")
         )
       )
 
@@ -441,4 +164,297 @@ olink_bridgeability_plot <- function(data,
   names(out_plts) <- olink_id
 
   return(out_plts)
+}
+
+bridgeability_prep_data <- function(data, min_count = 10L) {
+  data <- data |>
+    dplyr::filter(
+      .data[["Count"]] > .env[["min_count"]]
+    )
+  return(data)
+}
+
+bridgeability_iqr_range_plt <- function(data) {
+
+  iqr_range_plt <- ggplot2::ggplot(
+    data = data,
+    mapping = ggplot2::aes(
+      x = .data[["oid_assay"]],
+      y = .data[["NPX"]],
+      fill = .data[["Project"]]
+    )
+  ) +
+    ggplot2::geom_violin(
+      alpha = 0.4,
+      position = ggplot2::position_nudge(x = 0),
+      width = 0.4
+    ) +
+    ggplot2::geom_boxplot(
+      width = .1,
+      outlier.shape = NA,
+      alpha = 0.4
+    ) +
+    ggplot2::labs(
+      x = "Assay",
+      y = "NPX Distribution",
+      fill = "Platform: "
+    ) +
+    ggplot2::guides(
+      fill = ggplot2::guide_legend(
+        nrow = 1L,
+        byrow = TRUE
+      )
+    ) +
+    OlinkAnalyze::set_plot_theme() +
+    OlinkAnalyze::olink_fill_discrete() +
+    OlinkAnalyze::olink_color_discrete() +
+    ggplot2::theme(
+      axis.text.x = ggplot2::element_blank()
+    )
+
+  return(iqr_range_plt)
+}
+
+bridgeability_r2_plt <- function(data) {
+
+  projects <- unique(data$Project)
+
+  data <- data |>
+    dplyr::select(
+      dplyr::all_of(
+        c("SampleID", "oid_assay", "NPX", "Project")
+      )
+    ) |>
+    tidyr::pivot_wider(
+      names_from = dplyr::all_of("Project"),
+      values_from = dplyr::all_of("NPX")
+    ) |>
+    tidyr::drop_na()
+
+  r2_lm <- stats::cor(
+    x = dplyr::pull(data, .data[[projects[1L]]]),
+    y = dplyr::pull(data, .data[[projects[2L]]]),
+    use = "everything",
+    method = "pearson"
+  ) |>
+    (\(.) . ^ 2L)() |>
+    signif(2L)
+
+  caps <- ifelse(r2_lm < 0.2,
+                 "Possibly bridging background to background",
+                 "")
+
+  r2_plt <- ggplot2::ggplot(
+    data = data,
+    mapping = ggplot2::aes(
+      x = .data[[projects[1L]]],
+      y = .data[[projects[2L]]]
+    )
+  ) +
+    ggplot2::geom_point(
+      color = "blue",
+      alpha = 0.4
+    ) +
+    ggplot2::geom_smooth(
+      method = "lm",
+      formula = "y ~ x",
+      color = "black"
+    ) +
+    ggpubr::stat_cor(
+      method = "pearson",
+      ggplot2::aes(
+        label = ggplot2::after_stat(x = .data[["rr.label"]])
+      ),
+      geom = "label"
+    ) +
+    OlinkAnalyze::set_plot_theme() +
+    OlinkAnalyze::olink_color_discrete() +
+    ggplot2::labs(
+      caption = caps
+    )
+
+  return(r2_plt)
+}
+
+bridgeability_counts_plt <- function(data,
+                                     median_counts_threshold) {
+
+  counts_plt <- data |>
+    dplyr::group_by(
+      .data[["OlinkID"]], .data[["Project"]]
+    ) |>
+    dplyr::mutate(
+      median_count = median(x = .data[["Count"]], na.rm = TRUE)
+    ) |>
+    dplyr::ungroup() |>
+    dplyr::distinct(
+      .data[["oid_assay"]], .data[["Project"]], .data[["median_count"]]
+    ) |>
+    ggplot2::ggplot(
+      mapping = ggplot2::aes(
+        x = .data[["oid_assay"]],
+        fill = .data[["Project"]],
+        y = .data[["median_count"]],
+        label = .data[["median_count"]]
+      )
+    ) +
+    ggplot2::geom_col(
+      width = 0.5,
+      position = "dodge"
+    ) +
+    ggplot2::geom_text(
+      position = ggplot2::position_dodge(0.5),
+      vjust = 0.5
+    ) +
+    ggplot2::geom_hline(
+      yintercept = median_counts_threshold,
+      color = "black",
+      linetype = "dashed",
+      linewidth = 0.7
+    ) +
+    ggplot2::labs(
+      x = "Assay",
+      y = "Median Count",
+      fill = "Platform:"
+    ) +
+    OlinkAnalyze::set_plot_theme() +
+    OlinkAnalyze::olink_fill_discrete() +
+    ggplot2::theme(
+      axis.text.x = ggplot2::element_blank()
+    )
+
+  return(counts_plt)
+}
+
+bridgeability_ks_plt <- function(data) {
+
+  projects <- unique(data$Project)
+
+  data_wide <- data |>
+    dplyr::select(
+      dplyr::all_of(
+        c("SampleID", "oid_assay", "NPX", "Project")
+      )
+    ) |>
+    tidyr::pivot_wider(
+      names_from = dplyr::all_of("Project"),
+      values_from = dplyr::all_of("NPX")
+    ) |>
+    tidyr::drop_na()
+
+  # Calculate empirical cumulative distribution function (ECDF) per platform
+  ecdf_p1 <- dplyr::pull(data_wide, .data[[projects[1L]]]) |> stats::ecdf()
+  ecdf_p2 <- dplyr::pull(data_wide, .data[[projects[2L]]]) |> stats::ecdf()
+
+  # Find min/max statistics to draw line between points of greatest distance
+  min_max <- seq(
+    from = dplyr::select(data_wide, dplyr::all_of(projects)) |> min(),
+    to = dplyr::select(data_wide, dplyr::all_of(projects)) |> max(),
+    length.out = nrow(data_wide)
+  )
+  x0 <- min_max[which(abs(ecdf_p1(min_max) - ecdf_p2(min_max)) ==
+                        max(abs(ecdf_p1(min_max) - ecdf_p2(min_max))))]
+  y0 <- ecdf_p1(x0)
+  y1 <- ecdf_p2(x0)
+
+  ks_result <- stats::ks.test(
+    x = dplyr::pull(data_wide, .data[[projects[1L]]]),
+    y = dplyr::pull(data_wide, .data[[projects[2L]]]),
+    alternative = "two.sided",
+    exact = NULL,
+    simulate.p.value = FALSE,
+    B = 2000L
+  ) |>
+    (\(.) signif(x = .$statistic, digits = 2L))() |>
+    (\(.) paste("D =", .))()
+
+  # Main KS plot construction
+  ks_plt <- ggplot2::ggplot(
+    data = data,
+    mapping = ggplot2::aes(
+      x = .data[["NPX"]],
+      group = .data[["Project"]],
+      color = .data[["Project"]]
+    )
+  ) +
+    ggplot2::stat_ecdf(
+      linewidth = 1L
+    ) +
+    ggplot2::geom_segment(
+      mapping = ggplot2::aes(
+        x = x0[1L],
+        y = y0[1L],
+        xend = x0[1L],
+        yend = y1[1L]
+      ),
+      linetype = "dashed",
+      color = "black"
+    ) +
+    ggplot2::geom_point(
+      mapping = ggplot2::aes(
+        x = x0[1L],
+        y = y0[1L]
+      ),
+      color = "black",
+      size = 2L
+    ) +
+    ggplot2::geom_point(
+      mapping = ggplot2::aes(
+        x = x0[1L],
+        y = y1[1L]
+      ),
+      color = "black",
+      size = 2L
+    ) +
+    ggplot2::annotate(
+      geom = "text",
+      x = Inf,
+      y = 0.1,
+      hjust = 1,
+      cex = 4,
+      label = ks_result
+    ) +
+    ggplot2::labs(
+      x = "NPX",
+      y = "ECDF",
+      color = "Platform:"
+    ) +
+    OlinkAnalyze::set_plot_theme() +
+    OlinkAnalyze::olink_color_discrete() +
+    ggplot2::theme(
+      legend.position = "top",
+      legend.title = ggplot2::element_blank()
+    )
+
+  return(ks_plt)
+}
+
+bridgeability_combine_plots <-  function(iqr, r2, counts, ks, title) {
+  out_plot <- ggpubr::ggarrange(
+    ggpubr::ggarrange(
+      r2,
+      ggpubr::ggarrange(
+        iqr, counts,
+        ncol = 2L,
+        widths = c(1L, 1L),
+        common.legend = TRUE
+      ),
+      ncol = 2L
+    ),
+    ks,
+    nrow = 2L,
+    heights = c(1L, 1L)
+  )
+
+  out_plot <- ggpubr::annotate_figure(
+    p = out_plot,
+    top = ggpubr::text_grob(
+      label = title,
+      size = 14L,
+      just = "centre",
+      face = "plain"
+    )
+  )
+
+  return(out_plot)
 }

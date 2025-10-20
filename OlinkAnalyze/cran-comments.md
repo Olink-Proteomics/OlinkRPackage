@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release adds bug fixes to Olink Analyze 4.3
+This release fixes the issue that led to failing tests on R dev on CRAN. Additional bug fixes have been added to version 4.3.1
 
 ## R CMD check results
 

@@ -45,6 +45,8 @@ test_that("Plot works",{
                                                  method = "ORA",
                                                  keyword = "SIGNALING")
 
+  skip_on_cran()
+  skip_if_not_installed("vdiffr")
 
   set.seed(123)
   vdiffr::expect_doppelganger("GSEA Visualization", gsea_vis)
