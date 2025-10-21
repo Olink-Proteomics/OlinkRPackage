@@ -658,7 +658,7 @@ try(
     kableExtra::kbl(booktabs = TRUE,
                     linesep = "",
                     digits = 1,
-                    caption = "First 5 rows of combined datasets after bridging with between-product formatting argument set to FALSE.") |>
+                    caption = "Preview of combined datasets after bridging with between-product formatting argument set to FALSE: first 5 rows and selected columns.") |>
     kableExtra::kable_styling(bootstrap_options = "striped", 
                               full_width = FALSE,
                               font_size = 20, position = "center",
@@ -695,7 +695,7 @@ try(
     kableExtra::kbl(booktabs = TRUE,
                     linesep = "",
         digits = 1,
-        caption = "First 5 rows of combined datasets after bridging with between-product formatting argument set to TRUE.") |>
+        caption = "Preview of combined datasets after bridging with between-product formatting argument set to TRUE: first 5 rows and selected columns.") |>
     kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 20, 
                   position = "center", latex_options = c("HOLD_position","scale_down")) |> 
     kableExtra::scroll_box(width = "100%") |> 
