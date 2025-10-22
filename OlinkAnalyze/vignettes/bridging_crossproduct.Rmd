@@ -28,7 +28,7 @@ header-includes:
   # - \fancyfoot{}  # clears footer
   # - \usepackage{pdflscape}
 vignette: >
-  %\VignetteIndexEntry{Bridging across NGS-based Olink^®^ products}
+  %\VignetteIndexEntry{Bridging across NGS-based Olink® products}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
