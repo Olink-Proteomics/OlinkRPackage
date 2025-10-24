@@ -253,7 +253,6 @@ olink_norm_input_check <- function(df1,
   )
   lst_df <- lst_df_overlap_assay$lst_df
   reference_medians <- lst_df_overlap_assay$reference_medians
-  non_overlapping_oid <- lst_df_overlap_assay$non_overlapping_oid
 
   # Check normalization approach ----
 
@@ -285,17 +284,11 @@ olink_norm_input_check <- function(df1,
     not_ref_cols = NULL,
     not_ref_product = NULL,
     reference_medians = NULL,
-    norm_mode = NULL,
-    non_overlapping_oid = NULL
+    norm_mode = NULL
   )
 
   # set normalization mode
   lst_out$norm_mode <- norm_mode
-
-  # save any non-overlapping OlinkIDs
-  if (!is.null(non_overlapping_oid)) {
-    lst_out$non_overlapping_oid <- non_overlapping_oid
-  }
 
   if (norm_mode %in% olink_norm_modes$ref_median) {
     # reference median normalization
@@ -1877,7 +1870,7 @@ olink_norm_input_clean_assays <- function(lst_df,
 #' `r cli::ansi_collapse(x = OlinkAnalyze:::olink_norm_modes, sep2 = " or ", last = " or ")`. # nolint line_length_linter
 #'
 #' @return A named list containing \var{lst_df} and \var{reference_medians}
-#' with assays shared across all datasets.
+#' will assays shared across all datasets.
 #'
 olink_norm_input_assay_overlap <- function(lst_df,
                                            reference_medians,
@@ -1936,10 +1929,7 @@ olink_norm_input_assay_overlap <- function(lst_df,
     dplyr::filter(
       .data[["L"]] != 0L
     )
-  # Keep dataset of origin for nonoverlapping assays
-  oid_removed <- oid_combos_miss |>
-    dplyr::select(X, Z) |>
-    tibble::deframe()
+  oid_removed <- oid_combos_miss$Z |> unlist() |> unique()
 
   # remove non-shared assays and throw a warning message about it
   if (nrow(oid_combos_miss) > 0L) {
@@ -1948,27 +1938,23 @@ olink_norm_input_assay_overlap <- function(lst_df,
     lst_out$lst_df <- lapply(names(lst_df), function(l_name) {
       lst_df[[l_name]] |> # nolint return_linter
         dplyr::filter(
-          !(.data[[lst_cols[[l_name]]$olink_id]] %in% unlist(oid_removed))
+          !(.data[[lst_cols[[l_name]]$olink_id]] %in% oid_removed)
         )
     })
     names(lst_out$lst_df) <- names(lst_df)
-
-    # save any non-overlapping OlinkIDs
-    lst_out$non_overlapping_oid <- oid_removed
-
 
     # remove from reference_medians too, if available
     if (!is.null(reference_medians)) {
       lst_out$reference_medians <- reference_medians |>
         dplyr::filter(
-          !(.data[["OlinkID"]] %in% unlist(oid_removed))
+          !(.data[["OlinkID"]] %in% oid_removed)
         )
     }
     if (norm_mode == olink_norm_modes$norm_cross_product) {
       cli::cli_warn(
         c(
-          "{length(unique(unlist(oid_removed)))} assay{?s} are not shared across products.",
-          "i" = "{length(unlist(oid_removed))} assay{?s} will be removed from
+          "{length(oid_removed)} assay{?s} are not shared across products.",
+          "i" = "{length(oid_removed)} assay{?s} will be removed from
         normalization."
         ),
         wrap = FALSE
@@ -1977,9 +1963,9 @@ olink_norm_input_assay_overlap <- function(lst_df,
     } else {    # warning message
       cli::cli_warn(
         c(
-          "Assay{?s} {.val {unique(unlist(oid_removed))}} not shared across input dataset(s):",
+          "Assay{?s} {.val {oid_removed}} not shared across input dataset(s):",
           dplyr::pull(oid_combos_miss, .data[["M"]]),
-          "i" = "{cli::qty(unique(unlist(oid_removed)))} Assay{?s} will be removed from
+          "i" = "{cli::qty(oid_removed)} Assay{?s} will be removed from
         normalization."
         ),
         wrap = FALSE
@@ -1990,11 +1976,9 @@ olink_norm_input_assay_overlap <- function(lst_df,
   } else {
 
     # if all assays shared, return original datasets
-    # If empty, set non_overlapping_oid to NULL for checks
     lst_out <- list(
       lst_df = lst_df,
-      reference_medians = reference_medians,
-      non_overlapping_oid = NULL
+      reference_medians = reference_medians
     )
 
   }
@@ -2164,418 +2148,4 @@ mapping_file_id <- function(ref_product) {
     ref_map_3k <- reveal_e3072_mapping
   }
   return(ref_map_3k)
-}
-
-#' Format the output of olink_normalization for seamless use with
-#' downstream analysis functions.
-#'
-#' @author
-#'   Danai G. Topouza
-#'   Klev Diamanti
-#'
-#' @description
-#' For within-product bridging:
-#' * Adds non-overlapping assays between projects to the bridged file without
-#' adjustment.
-#' * Removes external controls, except sample controls.
-#'
-#' For cross-product bridging:
-#' * Adds non-overlapping assays between projects and not bridgeable assays to
-#' the bridged file without adjustment.
-#' * Removes external controls, except sample controls.
-#' * Replaces the NPX values of the non-reference project by the Median Centered
-#' or QS Normalized NPX, according to the Bridging Recommendation.
-#' * Edits the BridgingRecommendation column to indicate whether an assay is
-#' NotBridgeable, NotOverlapping, MedianCentering, or QuantileSmoothing bridged.
-#' * Replaces OlinkID by the concatenation of each product's OlinkIDs to
-#' record the OlinkIDs from both projects for bridgeable assays.
-#' * Assays that are NotBridgeable or NotOverlapping retain their original
-#' non-reference OlinkIDs and NPX values.
-#' * Removes  MedianCenteredNPX, QSNormalizedNPX, OlinkID_E3072 columns.
-#'
-#' @param df_norm A "tibble" of Olink data in long format resulting from the
-#' olink_normalization_product function.
-#' @param df1 First dataset to be used for normalization, pre-normalization.
-#' Must match df1 used in olink_normalization product bridging.
-#' @param df2 Second dataset to be used for normalization, pre-normalization.
-#' Must match df2 used in olink_normalization product bridging.
-#' @param df1_project_nr Project name of first dataset. Must match name used in
-#' olink_normalization product bridging.
-#' @param df2_project_nr Project name of second dataset. Must match name used in
-#' olink_normalization product bridging.
-#' @param lst_check Normalization input list checks generated by
-#' olink_norm_input_check()
-#'
-#' @return A "tibble" of Olink data in long format containing both input
-#' datasets with the bridged NPX quantifications, with the above
-#' modifications.
-#'
-#' @examples
-#' \donttest{
-#' # bridge samples
-#' bridge_samples <- intersect(
-#'   x = unique(OlinkAnalyze:::data_ht_small$SampleID),
-#'   y = unique(OlinkAnalyze:::data_3k_small$SampleID)
-#' ) |>
-#'   (\(x) x[!grepl("CONTROL", x)])()
-#'
-#' # run olink_normalization
-#' df_norm <- olink_normalization(
-#'   df1 = OlinkAnalyze:::data_ht_small,
-#'   df2 = OlinkAnalyze:::data_3k_small,
-#'   overlapping_samples_df1 = bridge_samples,
-#'   df1_project_nr = "Explore HT",
-#'   df2_project_nr = "Explore 3072",
-#'   reference_project = "Explore HT"
-#' )
-#'
-#' # generate lst_check
-#' lst_check <- OlinkAnalyze:::olink_norm_input_check(
-#'   df1 = OlinkAnalyze:::data_3k_small,
-#'   df2 = OlinkAnalyze:::data_ht_small,
-#'   overlapping_samples_df1 = bridge_samples,
-#'   overlapping_samples_df2 = NULL,
-#'   df1_project_nr = "P1",
-#'   df2_project_nr = "P2",
-#'   reference_project = "P2",
-#'   reference_medians = NULL
-#' )
-#'
-#' # format output
-#' OlinkAnalyze:::olink_normalization_format(
-#'   df_norm = df_norm,
-#'   lst_check = lst_check,
-#'   df1 = OlinkAnalyze:::data_ht_small,
-#'   df2 = OlinkAnalyze:::data_3k_small,
-#'   df1_project_nr = "Explore HT",
-#'   df2_project_nr = "Explore 3072"
-#' )
-#' }
-#'
-olink_normalization_format <- function(df_norm = df_norm,
-                                       lst_check = lst_check,
-                                       df1 = df1,
-                                       df1_project_nr = df1_project_nr,
-                                       df2 = df2,
-                                       df2_project_nr = df2_project_nr) {
-
-  # Check bridging type
-  if (lst_check$norm_mode == olink_norm_modes$bridge) {
-    # Bridge normalization ----
-
-
-    # Extract data from non-overlapping assays ----
-    if (length(unlist(lst_check$non_overlapping_oid)) > 0) {
-      no_overlap_assays <- olink_norm_format_get_nonoverlapping(lst_check = lst_check,
-                                                                df1 = df1,
-                                                                df1_project_nr = df1_project_nr,
-                                                                df2 = df2,
-                                                                df2_project_nr = df2_project_nr)
-
-      # combine data ---
-      df_norm <- df_norm |>
-        dplyr::bind_rows(
-          no_overlap_assays
-        )
-    }
-
-    # Remove controls and sort by project
-    df_full <- df_norm |>
-      olink_norm_format_rm_ext_ctrl() |>
-      dplyr::arrange(
-        .data[["Project"]], .data[["SampleID"]]
-      )
-
-
-  } else if (lst_check$norm_mode == olink_norm_modes$norm_cross_product) {
-    # Cross-product bridge normalization ----
-
-    # Extract data for assays = "NotBridgeable" ----
-
-    df_not_bridgeable <- df_norm |>
-      dplyr::filter(
-        # keep only assays that are not bridgeable
-        .data[["BridgingRecommendation"]] == "NotBridgeable"
-      ) |>
-      dplyr::mutate(
-        OlinkID = dplyr::if_else(
-          .data[["Project"]] == lst_check$ref_name,
-          .data[["OlinkID"]],
-          .data[["OlinkID_E3072"]]
-        )
-      )
-
-    not_bridgeable_assays <- df_not_bridgeable |>
-      dplyr::distinct(OlinkID)
-
-    cli::cli_inform(c("i" = paste0(nrow(not_bridgeable_assays), " not bridgeable
-    assays are included in the bridged dataset without adjustment.")
-    ))
-
-    # Extract data from non-overlapping assays ----
-
-    no_overlap_assays <- olink_norm_format_get_nonoverlapping(lst_check = lst_check,
-                                                              df1 = df1,
-                                                              df1_project_nr = df1_project_nr,
-                                                              df2 = df2,
-                                                              df2_project_nr = df2_project_nr)
-
-    # Keep the data following BridgingRecommendation for bridgeable assays ----
-
-    df_bridgeable <- df_norm |>
-      dplyr::filter(
-        # keep only assays that are bridgeable
-        .data[["BridgingRecommendation"]] != "NotBridgeable"
-      ) |> # Remove controls
-      dplyr::mutate(
-        OlinkID = paste0(.data[["OlinkID"]], "_", .data[["OlinkID_E3072"]]),
-        NPX = dplyr::case_when(
-          .data[["BridgingRecommendation"]] == "MedianCentering" ~
-            .data[["MedianCenteredNPX"]],
-          .data[["BridgingRecommendation"]] == "QuantileSmoothing" ~
-            .data[["QSNormalizedNPX"]],
-          .default = .data[["NPX"]]
-        )
-      )
-
-    # combine data and sort ----
-
-    df_full <- df_bridgeable |>
-      dplyr::bind_rows(
-        df_not_bridgeable
-      ) |>
-      dplyr::bind_rows(
-        no_overlap_assays
-      ) |>
-      dplyr::select( # Remove extra columns
-        -dplyr::any_of(
-          c("MedianCenteredNPX", "QSNormalizedNPX", "OlinkID_E3072",
-            "OlinkID_Reveal")
-        )
-      ) |>
-      olink_norm_format_rm_ext_ctrl() |> # rm nc and pc
-      dplyr::arrange(
-        .data[["Project"]], .data[["SampleID"]]
-      )
-
-  } else if (lst_check$norm_mode == olink_norm_modes$subset) {
-    # Subset normalization ----
-    # Extract data from non-overlapping assays ----
-    if (!is.null(lst_check$non_overlapping_oid)) {
-      no_overlap_assays <- olink_norm_format_get_nonoverlapping(lst_check = lst_check,
-                                                                df1 = df1,
-                                                                df1_project_nr = df1_project_nr,
-                                                                df2 = df2,
-                                                                df2_project_nr = df2_project_nr)
-
-      # combine data ---
-      df_norm <- df_norm |>
-        dplyr::bind_rows(
-          no_overlap_assays
-        )
-    }
-
-    # Remove NCs and PCs and sort by project
-    df_full <- df_norm |>
-      olink_norm_format_rm_ext_ctrl() |>
-      dplyr::arrange(
-        .data[["Project"]], .data[["SampleID"]]
-      )
-
-
-  } else if (lst_check$norm_mode == olink_norm_modes$ref_median) {
-    # Reference median normalization ----
-
-    # Extract data from non-overlapping assays ----
-    # add non overlapping assays but NOT FROM THE REF MEDIAN, only from the bridged dataset
-    if (!is.null(lst_check$non_overlapping_oid)) {
-      no_overlap_assays <- olink_norm_format_get_nonoverlapping(lst_check = lst_check,
-                                                                df1 = df1,
-                                                                df1_project_nr = df1_project_nr,
-                                                                df2 = df2,
-                                                                df2_project_nr = df2_project_nr)
-
-      # combine data ---
-      df_norm <- df_norm |>
-        dplyr::bind_rows(
-          no_overlap_assays
-        )
-    }
-    # Remove NCs and PCs and sort by project
-    df_full <- df_norm |>
-      olink_norm_format_rm_ext_ctrl() |>
-      dplyr::arrange(
-        .data[["Project"]], .data[["SampleID"]]
-      )
-  }
-
-  return(df_full)
-}
-
-#' Remove negative controls and plate controls from dataset. For use in
-#' olink_normalization_format function. Generates a message stating which
-#' control samples were removed.
-#'
-#' @author
-#'   Danai Topouxa
-#'
-#' @param df NPX dataset to be processed.
-#'
-#' @return A "tibble" of Olink data in long format containing the input dataset
-#' with negative controls and plate controls removed.
-#'
-olink_norm_format_rm_ext_ctrl <- function(df = df) {
-
-  # Set variable to capture Negative Controls and Plate Controls
-  control.neg.plt.regex <- "Negative|NEGATIVE|NEG|Neg|PLATE|IPC|Plate|plate|Plate Control|plate control|plate_control|Plate_Control" # nolint object_usage_linter
-
-  nc_pc_sampleids <- df |>
-    dplyr::select(all_of("SampleID")) |>
-    dplyr::distinct() |>
-    dplyr::filter(
-      stringr::str_detect(.data[["SampleID"]], control.neg.plt.regex)
-    ) |>
-    dplyr::pull(.data[["SampleID"]])
-
-  if (length(nc_pc_sampleids) == 0) {
-    cli::cli_inform(c("i" = paste0("No Negative Controls or Plate Controls
-                               found in bridged dataset.")))
-  } else {
-    df <- df |>
-      dplyr::filter(
-        !(.data[["SampleID"]] %in% nc_pc_sampleids) # rm nc, pc
-      )
-
-    cli::cli_inform(c("i" = paste0(length(nc_pc_sampleids),
-                                   " Negative Controls or Plate Controls
-                               removed from bridged dataset: ",
-                                   paste0(nc_pc_sampleids, collapse = ", "
-                                   ))))
-  }
-
-  return(df)
-}
-
-#' Retrieve non-overlapping assays between two NPX datasets. For use in
-#' olink_normalization_format function. Generates a message stating how many
-#' assays were not overlapping. Appends additional columns depending on the
-#' normalization type to match normalized data output. For cross-product
-#' normalization, splits any concatenated OlinkIDs.
-#'
-#' @author
-#'   Danai Topouxa
-#'
-#' @param df1 First dataset to be used for normalization, pre-normalization.
-#' Must match df1 used in olink_normalization product bridging.
-#' @param df2 Second dataset to be used for normalization, pre-normalization.
-#' Must match df2 used in olink_normalization product bridging.
-#' @param df1_project_nr Project name of first dataset. Must match name used in
-#' olink_normalization product bridging.
-#' @param df2_project_nr Project name of second dataset. Must match name used in
-#' olink_normalization product bridging.
-#' @param lst_check Normalization input list checks generated by
-#' olink_norm_input_check()
-#'
-#' @return A combined "tibble" of Olink data in long format containing only the
-#' non-overlapping assays from each input dataset.
-#'
-olink_norm_format_get_nonoverlapping <- function(lst_check = lst_check,
-                                                 df1 = df1,
-                                                 df1_project_nr = df1_project_nr,
-                                                 df2 = df2,
-                                                 df2_project_nr = df2_project_nr){
-
-  cli::cli_inform(c("i" = paste0(length(unlist(lst_check$non_overlapping_oid)),
-                                 " non-overlapping assays are included in
-                        the bridged dataset. Assays found in only
-                        one project will have decreased statistical
-                        power due to the lower number of samples."
-  )))
-
-  if (lst_check$norm_mode == olink_norm_modes$norm_cross_product) {
-    # Cross-product bridge normalization ----
-
-    # Split any combined product OlinkIDs in lst_check to catch all assays
-    df1_split <- lst_check$non_overlapping_oid[[df1_project_nr]] |>
-      stringr::str_subset("_") |>
-      strsplit("_") |>
-      unlist()
-
-    df2_split <- lst_check$non_overlapping_oid[[df2_project_nr]] |>
-      stringr::str_subset("_") |>
-      strsplit("_") |>
-      unlist()
-
-    lst_check$non_overlapping_oid[[df1_project_nr]] <- c(unlist(lst_check$non_overlapping_oid[[df1_project_nr]]),
-                                                         df1_split)
-
-    lst_check$non_overlapping_oid[[df2_project_nr]] <- c(unlist(lst_check$non_overlapping_oid[[df2_project_nr]]),
-                                                         df2_split)
-
-  }
-
-  df1_no_overlap <- df1 |>
-    dplyr::filter(
-      # keep non-overlapping assays
-      (.data[["OlinkID"]] %in% lst_check$non_overlapping_oid[[df1_project_nr]])
-    ) |>
-    # add Project
-    dplyr::mutate(
-      Project = df1_project_nr
-    )
-
-  df2_no_overlap <- df2 |>
-    dplyr::filter(
-      # keep non-overlapping assays
-      (.data[["OlinkID"]] %in% lst_check$non_overlapping_oid[[df2_project_nr]])
-    ) |>
-    # add Project
-    dplyr::mutate(
-      Project = df2_project_nr
-    )
-
-
-  # combine data ---
-  df_non_overlapping <- df1_no_overlap |>
-    dplyr::bind_rows(
-      df2_no_overlap
-    )
-
-  if (lst_check$norm_mode %in% c(olink_norm_modes$bridge, olink_norm_modes$subset)) {
-
-    # Combine non-overlapping assays from df1 and df2
-    # Set non-overlapping adjustment factor to 0
-    df_non_overlapping <- df1_no_overlap |>
-      dplyr::bind_rows(
-        df2_no_overlap
-      ) |>
-      dplyr::mutate(
-        Adj_factor = 0
-      )
-
-  } else if (lst_check$norm_mode == olink_norm_modes$norm_cross_product) {
-
-    # Combine non-overlapping assays from df1 and df2
-    # Set bridging recommendation for nonoverlapping assays
-    df_non_overlapping <- df1_no_overlap |>
-      dplyr::bind_rows(
-        df2_no_overlap
-      ) |>
-      dplyr::mutate(
-        BridgingRecommendation = "NotOverlapping"
-      )
-
-  } else if (lst_check$norm_mode == olink_norm_modes$ref_median) {
-
-    # Keep only non-overlapping assays from df1, not from ref median data
-    # Set non-overlapping adjustment factor to 0
-    df_non_overlapping <- df1_no_overlap |>
-      dplyr::mutate(
-        Adj_factor = 0
-      )
-
-  }
-
-  return(df_non_overlapping)
-
 }
