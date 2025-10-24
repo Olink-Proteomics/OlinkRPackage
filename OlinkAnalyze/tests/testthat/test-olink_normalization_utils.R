@@ -6734,7 +6734,7 @@ test_that(
         ),
         regexp = "Output includes two sets of bridging samples"
       ),
-      regexp = "No Negative Controls or Plate Controls found in bridged dataset"
+      regexp = "No Negative Controls or Plate Controls found in normalized dataset"
     )
 
     # Add non-overlaping assays and one PC and one NC to remove
@@ -6790,9 +6790,9 @@ test_that(
               regexp = "Bridge normalization will be performed!"
             ),
             regexp =
-              "2 Negative Controls or Plate Controls removed from bridged"
+              "2 Negative Controls or Plate Controls removed from normalized"
           ),
-          regexp = "4 non-overlapping assays are included in the bridged"
+          regexp = "4 non-overlapping assays are included "
         ),
         regexp = "Assays \"OID01216\", \"OID99999\", \"OID00000\", and \"OID05124\" not shared"
       ),
@@ -6827,10 +6827,10 @@ test_that(
           df2_project_nr = "df2_norm",
           lst_check = lst_check_bridge
         ),
-        regexp = "4 non-overlapping assays are included in the bridged dataset."
+        regexp = "4 non-overlapping assays are included"
       ),
       regexp =
-        "2 Negative Controls or Plate Controls removed from bridged dataset"
+        "2 Negative Controls or Plate Controls removed from normalized dataset"
     )
 
     ## check that function works both ways
@@ -6842,8 +6842,7 @@ test_that(
     ## Check that control samples removed
     expect_equal(
       object = bridge_norm_format |>
-        dplyr::select(SampleID) |>
-        dplyr::distinct() |>
+        dplyr::distinct(SampleID) |>
         nrow(),
       expected = 312L
     )
@@ -6974,7 +6973,7 @@ test_that(
             lst_check = lst_check_3k_ht
           ),
           regexp =
-            "16 Negative Controls or Plate Controls removed from bridged dataset"
+            "16 Negative Controls or Plate Controls removed from normalized"
         ),
         regexp =
           "2 not bridgeable assays are included"
@@ -7218,7 +7217,7 @@ test_that(
                 "16 Negative Controls or Plate Controls removed"
             ),
             regexp =
-              "85 non-overlapping assays are included in the bridged dataset"
+              "85 non-overlapping assays are included in the normalized"
           ),
           regexp = "Output includes two sets of bridging samples"
         ),
@@ -7279,10 +7278,10 @@ test_that(
             lst_check = lst_check_3k_reveal
           ),
           regexp =
-            "16 Negative Controls or Plate Controls removed from bridged dataset"
+            "16 Negative Controls or Plate Controls removed from normalized"
         ),
         regexp =
-          "85 non-overlapping assays are included in the bridged dataset"
+          "85 non-overlapping assays are included in the normalized"
       ),
       regexp = "26 not bridgeable assays are included"
     )
@@ -7465,4 +7464,310 @@ test_that(
   }
 )
 
-# TODO add tests for subset and ref median norm
+test_that(
+  "olink_normalization_format - subset normalization",
+  {
+    skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
+
+    ref_norm_res <- get_example_data("ref_results_norm.rds")
+
+    # Format with no non-overlapping assays
+    expect_message(
+      expect_message(
+        object = subset_norm <- olink_normalization(
+          df1 = ref_norm_res$lst_df$df1_norm,
+          df2 = ref_norm_res$lst_df$df2_norm,
+          overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
+          overlapping_samples_df2 = ref_norm_res$lst_sample$df2_subset,
+          df1_project_nr = "df1_norm",
+          df2_project_nr = "df2_norm",
+          reference_project = "df1_norm",
+          format = T
+        ) |>
+          dplyr::filter(
+            .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+          ),
+        regexp = "Subset normalization will be performed!"
+      ),
+      regexp = "No Negative Controls or Plate Controls found in normalized"
+    )
+
+    # Add non-overlaping assays and one PC and one NC to remove
+    df1_nonoverlapping <- ref_norm_res$lst_df$df1_norm |>
+      dplyr::mutate(OlinkID = ifelse(.data[["OlinkID"]] == "OID01216",
+                                     "OID00000",
+                                     .data[["OlinkID"]])) |>
+      dplyr::mutate(SampleID = ifelse(.data[["SampleID"]] == "A58",
+                                      "NEG_CTRL",
+                                      .data[["SampleID"]]))
+
+    df2_nonoverlapping <- ref_norm_res$lst_df$df2_norm |>
+      dplyr::mutate(OlinkID = ifelse(.data[["OlinkID"]] == "OID05124",
+                                     "OID99999",
+                                     .data[["OlinkID"]])) |>
+      dplyr::mutate(SampleID = ifelse(.data[["SampleID"]] == "C1",
+                                      "PLATE_CTRL",
+                                      .data[["SampleID"]]))
+
+    expect_warning(
+      expect_message(
+        lst_check_subset <- olink_norm_input_check(
+          df1 = df1_nonoverlapping,
+          df2 = df2_nonoverlapping,
+          overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
+          overlapping_samples_df2 = ref_norm_res$lst_sample$df2_subset,
+          df1_project_nr = "df1_norm",
+          df2_project_nr = "df2_norm",
+          reference_project = "df1_norm",
+          reference_medians = NULL
+        ),
+        regexp = "Subset normalization will be performed!"
+      ),
+      regexp = "Assays \"OID01216\", \"OID99999\", \"OID00000\", and \"OID05124\" not shared"
+    )
+
+    # formatted data
+
+    expect_warning(
+      expect_message(
+        expect_message(
+          expect_message(
+            object = subset_norm_format <- olink_normalization(
+              df1 = df1_nonoverlapping,
+              df2 = df2_nonoverlapping,
+              overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
+              overlapping_samples_df2 = ref_norm_res$lst_sample$df2_subset,
+              df1_project_nr = "df1_norm",
+              df2_project_nr = "df2_norm",
+              reference_project = "df1_norm",
+              format = TRUE
+            ),
+            regexp = "Subset normalization will be performed!"
+          ),
+          regexp =
+            "2 Negative Controls or Plate Controls removed from normalized"
+        ),
+        regexp = "4 non-overlapping assays are included in the normalized"
+      ),
+      regexp = "Assays \"OID01216\", \"OID99999\", \"OID00000\", and \"OID05124\" not shared"
+    )
+
+    expect_warning(expect_message(
+      object = subset_norm_noformat <- olink_normalization(
+        df1 = df1_nonoverlapping,
+        df2 = df2_nonoverlapping,
+        overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
+        overlapping_samples_df2 = ref_norm_res$lst_sample$df2_subset,
+        df1_project_nr = "df1_norm",
+        df2_project_nr = "df2_norm",
+        reference_project = "df1_norm",
+        format = FALSE
+      ),
+      regexp = "Subset normalization will be performed!"
+    ),
+    regexp = "Assays \"OID01216\", \"OID99999\", \"OID00000\", and \"OID05124\" not shared"
+    )
+
+    expect_message(
+      expect_message(
+        object = subset_norm_format_fun <- olink_normalization_format(
+          df_norm = subset_norm_noformat,
+          df1 = df1_nonoverlapping,
+          df1_project_nr = "df1_norm",
+          df2 = df2_nonoverlapping,
+          df2_project_nr = "df2_norm",
+          lst_check = lst_check_subset
+        ),
+        regexp = "4 non-overlapping assays are included in the normalized"
+      ),
+      regexp =
+        "2 Negative Controls or Plate Controls removed from normalized"
+    )
+
+    ## check that function works both ways
+    expect_equal(
+      object = dim(subset_norm_format),
+      expected = dim(subset_norm_format_fun)
+    )
+
+    ## Check that control samples removed
+    expect_equal(
+      object = subset_norm_format |>
+        dplyr::distinct(SampleID) |>
+        nrow(),
+      expected = 312L
+    )
+
+    expect_equal(
+      object = subset_norm_format |>
+        dplyr::select(dplyr::all_of(c("SampleID"))) |>
+        dplyr::filter(.data[["SampleID"]] %in% c("NEG_CTRL", "PLATE_CTRL")) |>
+        nrow(),
+      expected = 0L
+    )
+
+    ## Check that non overlapping assays included in formatted data
+
+    expect_equal(
+      object = subset_norm_noformat |>
+        dplyr::distinct(.data[["OlinkID"]]) |>
+        dplyr::filter(.data[["OlinkID"]] %in%
+                        unlist(lst_check_subset$non_overlapping_oid)) |>
+        nrow(),
+      expected = 0L
+    )
+
+    expect_equal(
+      object = subset_norm_format |>
+        dplyr::distinct(.data[["OlinkID"]]) |>
+        dplyr::filter(.data[["OlinkID"]] %in%
+                        unlist(lst_check_subset$non_overlapping_oid)) |>
+        nrow(),
+      expected = 4L
+    )
+
+  }
+)
+
+test_that(
+  "olink_normalization_format - reference median normalization",
+  {
+    skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
+
+    ref_norm_res <- get_example_data("ref_results_norm.rds")
+
+    # Format with no non-overlapping assays
+    expect_message(
+      expect_message(
+        object = ref_med_norm <- olink_normalization(
+          df1 = ref_norm_res$lst_df$df1_norm,
+          overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
+          df1_project_nr = "df1_norm",
+          reference_medians = ref_norm_res$lst_df$ref_med,
+          format = T
+        ),
+        regexp = "Reference median normalization will be performed!"
+      ),
+      regexp =
+        "No Negative Controls or Plate Controls found in normalized dataset"
+    )
+
+    # Add non-overlaping assays and one NC to remove
+    df1_nonoverlapping <- ref_norm_res$lst_df$df1_norm |>
+      dplyr::mutate(OlinkID = ifelse(.data[["OlinkID"]] == "OID01216",
+                                     "OID00000",
+                                     .data[["OlinkID"]])) |>
+      dplyr::mutate(SampleID = ifelse(.data[["SampleID"]] == "A58",
+                                      "NEG_CTRL",
+                                      .data[["SampleID"]]))
+
+
+    expect_warning(
+      expect_message(
+        lst_check_ref_med <- olink_norm_input_check(
+          df1 = df1_nonoverlapping,
+          df2 = NULL,
+          overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
+          overlapping_samples_df2 = NULL,
+          df1_project_nr = "df1_norm",
+          reference_medians = ref_norm_res$lst_df$ref_med
+        ),
+        regexp = "Reference median normalization will be performed!"
+      ),
+      regexp = "Assays \"OID01216\" and \"OID00000\" not shared"
+    )
+
+    # formatted data
+
+    expect_warning(
+      expect_message(
+        expect_message(
+          expect_message(
+            object = ref_med_norm_format <- olink_normalization(
+              df1 = df1_nonoverlapping,
+              overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
+              df1_project_nr = "df1_norm",
+              reference_medians = ref_norm_res$lst_df$ref_med,
+              format = TRUE
+            ),
+            regexp = "Reference median normalization will be performed!"
+          ),
+          regexp =
+            "1 Negative Control or Plate Control removed from normalized"
+        ),
+        regexp = "1 non-overlapping assay found in the dataset"
+      ),
+      regexp = "Assays \"OID01216\" and \"OID00000\" not shared"
+    )
+
+    expect_warning(expect_message(
+      object = ref_med_norm_noformat <- olink_normalization(
+        df1 = df1_nonoverlapping,
+        overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
+        df1_project_nr = "df1_norm",
+        reference_medians = ref_norm_res$lst_df$ref_med,
+        format = FALSE
+      ),
+      regexp = "Reference median normalization will be performed!"
+    ),
+    regexp = "Assays \"OID01216\" and \"OID00000\" not shared"
+    )
+
+    expect_message(
+      expect_message(
+        object = ref_med_norm_format_fun <- olink_normalization_format(
+          df_norm = ref_med_norm_noformat,
+          df1 = df1_nonoverlapping,
+          df1_project_nr = "df1_norm",
+          lst_check = lst_check_ref_med
+        ),
+        regexp = "1 non-overlapping assay found in the dataset"
+      ),
+      regexp =
+        "1 Negative Control or Plate Control removed from normalized dataset"
+    )
+
+    ## check that function works both ways
+    expect_equal(
+      object = dim(ref_med_norm_format),
+      expected = dim(ref_med_norm_format_fun)
+    )
+
+    ## Check that control samples removed
+    expect_equal(
+      object = ref_med_norm_format |>
+        dplyr::distinct(SampleID) |>
+        nrow(),
+      expected = 157L
+    )
+
+    expect_equal(
+      object = ref_med_norm_format |>
+        dplyr::select(dplyr::all_of(c("SampleID"))) |>
+        dplyr::filter(.data[["SampleID"]] %in% c("NEG_CTRL", "PLATE_CTRL")) |>
+        nrow(),
+      expected = 0L
+    )
+
+    ## Check that non overlapping assays included in formatted data
+
+    expect_equal(
+      object = ref_med_norm_noformat |>
+        dplyr::distinct(.data[["OlinkID"]]) |>
+        dplyr::filter(.data[["OlinkID"]] %in%
+                        unlist(lst_check_ref_med$non_overlapping_oid)) |>
+        nrow(),
+      expected = 0L
+    )
+
+    expect_equal(
+      object = ref_med_norm_format |>
+        dplyr::distinct(.data[["OlinkID"]]) |>
+        dplyr::filter(.data[["OlinkID"]] %in%
+                        unlist(lst_check_ref_med$non_overlapping_oid)) |>
+        nrow(),
+      expected = 1L
+    )
+
+  }
+)

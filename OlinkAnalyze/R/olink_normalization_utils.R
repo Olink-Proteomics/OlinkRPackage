@@ -2256,8 +2256,8 @@ olink_normalization_format <- function(df_norm = df_norm,
                                        lst_check = lst_check,
                                        df1 = df1,
                                        df1_project_nr = df1_project_nr,
-                                       df2 = df2,
-                                       df2_project_nr = df2_project_nr) {
+                                       df2 = NULL,
+                                       df2_project_nr = NULL) {
 
   # Check bridging type
   if (lst_check$norm_mode == olink_norm_modes$bridge) {
@@ -2387,7 +2387,6 @@ olink_normalization_format <- function(df_norm = df_norm,
     # Reference median normalization ----
 
     # Extract data from non-overlapping assays ----
-    # add non overlapping assays but NOT FROM THE REF MEDIAN, only from the bridged dataset
     if (!is.null(lst_check$non_overlapping_oid)) {
       no_overlap_assays <- olink_norm_format_get_nonoverlapping(lst_check = lst_check,
                                                                 df1 = df1,
@@ -2439,18 +2438,18 @@ olink_norm_format_rm_ext_ctrl <- function(df = df) {
 
   if (length(nc_pc_sampleids) == 0) {
     cli::cli_inform(c("i" = paste0("No Negative Controls or Plate Controls
-                               found in bridged dataset.")))
+                               found in normalized dataset.")))
   } else {
     df <- df |>
       dplyr::filter(
         !(.data[["SampleID"]] %in% nc_pc_sampleids) # rm nc, pc
       )
 
-    cli::cli_inform(c("i" = paste0(length(nc_pc_sampleids),
-                                   " Negative Controls or Plate Controls
-                               removed from bridged dataset: ",
+    cli::cli_inform(c("i" = "{length(nc_pc_sampleids)} Negative
+                              Control{?s} or Plate Control{?s}
+                               removed from normalized dataset: ",
                                    paste0(nc_pc_sampleids, collapse = ", "
-                                   ))))
+                                   )))
   }
 
   return(df)
@@ -2484,88 +2483,38 @@ olink_norm_format_get_nonoverlapping <- function(lst_check = lst_check,
                                                  df1_project_nr = df1_project_nr,
                                                  df2 = df2,
                                                  df2_project_nr = df2_project_nr){
+  # Get non-overlapping assays in df1
 
-  cli::cli_inform(c("i" = paste0(length(unlist(lst_check$non_overlapping_oid)),
-                                 " non-overlapping assays are included in
-                        the bridged dataset. Assays found in only
-                        one project will have decreased statistical
-                        power due to the lower number of samples."
-  )))
+  ## Split any combined product OlinkIDs from cross-product normalization
+  ## at the underscore to catch all assays
+  df1_split <- lst_check$non_overlapping_oid[[df1_project_nr]] |>
+    stringr::str_subset("_") |>
+    strsplit("_") |>
+    unlist()
 
-  if (lst_check$norm_mode == olink_norm_modes$norm_cross_product) {
-    # Cross-product bridge normalization ----
+  ## Append split IDs to existing list
+  df1_assays <-
+    c(unlist(lst_check$non_overlapping_oid[[df1_project_nr]]),
+      df1_split)
 
-    # Split any combined product OlinkIDs in lst_check to catch all assays
-    df1_split <- lst_check$non_overlapping_oid[[df1_project_nr]] |>
-      stringr::str_subset("_") |>
-      strsplit("_") |>
-      unlist()
-
-    df2_split <- lst_check$non_overlapping_oid[[df2_project_nr]] |>
-      stringr::str_subset("_") |>
-      strsplit("_") |>
-      unlist()
-
-    lst_check$non_overlapping_oid[[df1_project_nr]] <- c(unlist(lst_check$non_overlapping_oid[[df1_project_nr]]),
-                                                         df1_split)
-
-    lst_check$non_overlapping_oid[[df2_project_nr]] <- c(unlist(lst_check$non_overlapping_oid[[df2_project_nr]]),
-                                                         df2_split)
-
-  }
-
+  ## Get non-overlapping assays
   df1_no_overlap <- df1 |>
     dplyr::filter(
       # keep non-overlapping assays
-      (.data[["OlinkID"]] %in% lst_check$non_overlapping_oid[[df1_project_nr]])
+      (.data[["OlinkID"]] %in% df1_assays)
     ) |>
     # add Project
     dplyr::mutate(
       Project = df1_project_nr
     )
 
-  df2_no_overlap <- df2 |>
-    dplyr::filter(
-      # keep non-overlapping assays
-      (.data[["OlinkID"]] %in% lst_check$non_overlapping_oid[[df2_project_nr]])
-    ) |>
-    # add Project
-    dplyr::mutate(
-      Project = df2_project_nr
-    )
-
-
-  # combine data ---
-  df_non_overlapping <- df1_no_overlap |>
-    dplyr::bind_rows(
-      df2_no_overlap
-    )
-
-  if (lst_check$norm_mode %in% c(olink_norm_modes$bridge, olink_norm_modes$subset)) {
-
-    # Combine non-overlapping assays from df1 and df2
-    # Set non-overlapping adjustment factor to 0
-    df_non_overlapping <- df1_no_overlap |>
-      dplyr::bind_rows(
-        df2_no_overlap
-      ) |>
-      dplyr::mutate(
-        Adj_factor = 0
-      )
-
-  } else if (lst_check$norm_mode == olink_norm_modes$norm_cross_product) {
-
-    # Combine non-overlapping assays from df1 and df2
-    # Set bridging recommendation for nonoverlapping assays
-    df_non_overlapping <- df1_no_overlap |>
-      dplyr::bind_rows(
-        df2_no_overlap
-      ) |>
-      dplyr::mutate(
-        BridgingRecommendation = "NotOverlapping"
-      )
-
-  } else if (lst_check$norm_mode == olink_norm_modes$ref_median) {
+  # Processing for reference median normalization
+  if (lst_check$norm_mode == olink_norm_modes$ref_median) {
+    cli::cli_inform(c("i" =
+    "{length(unlist(lst_check$non_overlapping_oid[[df1_project_nr]]))}
+    non-overlapping assay{?s} found in the dataset but not in the reference
+    medians {?is/are} included in the normalized dataset without adjustment."
+    ))
 
     # Keep only non-overlapping assays from df1, not from ref median data
     # Set non-overlapping adjustment factor to 0
@@ -2573,9 +2522,71 @@ olink_norm_format_get_nonoverlapping <- function(lst_check = lst_check,
       dplyr::mutate(
         Adj_factor = 0
       )
+  } else  { # Continue for all other normalization types
+
+    # Get non-overlapping assays for df2 - does not apply to ref median norm
+
+    ## Split any combined product OlinkIDs from cross-product normalization
+    ## at the underscore to catch all assays
+    df2_split <- lst_check$non_overlapping_oid[[df2_project_nr]] |>
+      stringr::str_subset("_") |>
+      strsplit("_") |>
+      unlist()
+
+    ## Append split IDs to existing list
+    df2_assays <-
+      c(unlist(lst_check$non_overlapping_oid[[df2_project_nr]]),
+        df2_split)
+
+    ## Get non-overlapping assays
+    df2_no_overlap <- df2 |>
+      dplyr::filter(
+        # keep non-overlapping assays
+        (.data[["OlinkID"]] %in% df2_assays)
+      ) |>
+      # add Project
+      dplyr::mutate(
+        Project = df2_project_nr
+      )
+
+    cli::cli_inform(c("i" =
+      "{length(unlist(lst_check$non_overlapping_oid))} non-overlapping
+      assay{?s} {?is/are} included in the normalized dataset without
+      adjustment. Assays found in only one project will have decreased
+      statistical power due to the lower number of samples."
+    ))
+
+    # Processing for within-product bridging and subset normalization
+    if (lst_check$norm_mode %in%
+        c(olink_norm_modes$bridge, olink_norm_modes$subset)) {
+
+      # Combine non-overlapping assays from df1 and df2
+      # Set non-overlapping adjustment factor to 0
+      df_non_overlapping <- df1_no_overlap |>
+        dplyr::bind_rows(
+          df2_no_overlap
+        ) |>
+        dplyr::mutate(
+          Adj_factor = 0
+        )
+
+    }
+    # Processing for cross-product bridging
+    else if (lst_check$norm_mode == olink_norm_modes$norm_cross_product) {
+
+      # Combine non-overlapping assays from df1 and df2
+      # Set bridging recommendation for non-overlapping assays
+      df_non_overlapping <- df1_no_overlap |>
+        dplyr::bind_rows(
+          df2_no_overlap
+        ) |>
+        dplyr::mutate(
+          BridgingRecommendation = "NotOverlapping"
+        )
+
+    }
 
   }
 
   return(df_non_overlapping)
-
 }
