@@ -10,8 +10,8 @@ olink_normalization_format(
   lst_check = lst_check,
   df1 = df1,
   df1_project_nr = df1_project_nr,
-  df2 = df2,
-  df2_project_nr = df2_project_nr
+  df2 = NULL,
+  df2_project_nr = NULL
 )
 }
 \arguments{
