@@ -27,7 +27,7 @@ bridge, subset, ref_median or norm_cross_product. # nolint line_length_linter}
 }
 \value{
 A named list containing \var{lst_df} and \var{reference_medians}
-with assays shared across all datasets.
+will assays shared across all datasets.
 }
 \description{
 Check \var{datasets} and \var{reference_medians} for Olink identifiers not
