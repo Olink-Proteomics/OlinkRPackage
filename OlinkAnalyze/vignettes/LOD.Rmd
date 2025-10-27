@@ -258,6 +258,15 @@ PC normalized negative control LOD.
 The intensity normalization LOD adjustment is applied to both the
 negative control and fixed LOD methods.
 
+## Considerations of Integrating LOD in Cross-Product Bridging
+
+For cross-product bridging, only the reference project’s negative controls (NCs) should be used to calculate the NC LOD. The reference project remains unaltered during bridging, so the LOD derived from its NCs will stay consistent regardless of when it is calculated or added. For the non-reference project, LOD will be modified by the same adjustment factor that is used on the NPX value
+
+For cross-product bridging, only the reference project’s negative controls (NCs) should be used to calculate the NC LOD. The reference project remains unaltered during bridging, so both the NC-derived LOD (NCLOD) and any fixed LOD attached to the reference project will remain unchanged regardless of when they are calculated or added.
+For the non-reference project, the LOD values are adjusted by the same factor applied to the NPX values. If using a fixed LOD, it is recommended to add it after bridging. If applying NCLOD to the entire bridged dataset, the unaltered reference project NCs should be used.
+
+For cross-product bridging, the reference project remains unaltered during bridging normalization, so both NC LOD calculated based NCs in reference project and fixed LOD attached to the reference project will remain unchanged regardless of when they are calculated or added. For the non-reference project, 
+
 ## Export Olink Explore Data with LOD
 
 Olink Explore data with LOD data can be exported using
