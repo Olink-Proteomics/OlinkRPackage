@@ -1131,9 +1131,9 @@ olink_norm_input_cross_product <- function(lst_df,
       && all(prod_uniq %in% c("3k", "HT", "Reveal", "other"))) {
     norm_mode <- olink_norm_modes$bridge
   } else if (identical(x = prod_uniq, y = c("3k", "HT"))
-             | identical(x = prod_uniq, y = c("3k", "Reveal"))
-             | identical(x = prod_uniq, y = c("Reveal", "HT"))
-             | identical(x = prod_uniq, y = c("HT", "Reveal"))) {
+             || identical(x = prod_uniq, y = c("3k", "Reveal"))
+             || identical(x = prod_uniq, y = c("Reveal", "HT"))
+             || identical(x = prod_uniq, y = c("HT", "Reveal"))) {
     norm_mode <- olink_norm_modes$norm_cross_product
   } else {
     cli::cli_abort(
@@ -1173,7 +1173,7 @@ olink_norm_input_cross_product <- function(lst_df,
 
     # update Olink assay identifiers if cross product normalization ----
 
-    if (prod_uniq %in% c("3k", "HT")){
+    if (unique(prod_uniq == c("3k", "HT"))){
       # add combined OlinkID to HT dataset
       l_ref_name <- names(product_ids)[ref_ids == "ref"]
       ref_product <- product_ids[ref_ids == "ref"] |> unname()
@@ -1237,8 +1237,8 @@ olink_norm_input_cross_product <- function(lst_df,
         )
     }
 
-    if (prod_uniq %in% c("Reveal", "HT") ||
-        prod_uniq %in% c("HT", "Reveal")){
+    else if (unique(prod_uniq == c("Reveal", "HT")) ||
+        unique(prod_uniq == c("HT", "Reveal"))){
       # add combined OlinkID to HT dataset
       l_ref_name <- names(product_ids)[ref_ids == "ref"]
       ref_product <- product_ids[ref_ids == "ref"] |> unname()
