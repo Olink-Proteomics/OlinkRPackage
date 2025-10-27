@@ -1,3 +1,6 @@
+# set seed
+set.seed(123)
+
 skip_on_cran()
 skip_if_not_installed("clusterProfiler")
 skip_if_not_installed("msigdbr", minimum_version = "9.0.0")
@@ -25,8 +28,7 @@ anova_posthoc_results <- olink_anova_posthoc(
   suppressMessages() |>
   suppressWarnings()
 
-# set seed
-set.seed(123)
+
 
 test_that("Input data equal for different LOD names", {
   duplicate_assay_data <- npx_data1 |>
