@@ -57,3 +57,11 @@ reveal_e3072_mapping <- readRDS(file = reveal_e3072_mapping_rds) |>
   ) |>
   dplyr::as_tibble()
 rm(reveal_e3072_mapping_rds)
+
+# Reveal HT mapping
+reveal_HT_mapping_rda <- system.file("extdata",
+                                        "OlinkID_Reveal_HT_mapping.Rda",
+                                        package = "OlinkAnalyze",
+                                        mustWork = TRUE)
+reveal_eht_mapping <- load(reveal_HT_mapping_rda)
+remove(reveal_HT_mapping_rda)
