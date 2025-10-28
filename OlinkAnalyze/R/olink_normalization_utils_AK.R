@@ -1181,7 +1181,7 @@ olink_norm_input_cross_product <- function(lst_df,
                                  ref_product)
 
       map_3k_ref_oid_col <- paste0("OlinkID_", ref_product)
-      ref_map_3k <- mapping_file_id(ref_product = ref_product)
+      ref_map_3k <- mapping_file_id(prod_uniq = prod_uniq)
       ref_df_to_map_3k_keys <- stats::setNames(object = map_3k_ref_oid_col,
                                                nm = l_ref_oid_rename)
 
@@ -1246,7 +1246,7 @@ olink_norm_input_cross_product <- function(lst_df,
                                  ref_product)
 
       map_ref_oid_col <- paste0("OlinkID_", ref_product)
-      ref_map <- mapping_file_id(ref_product = ref_product)
+      ref_map <- mapping_file_id(prod_uniq = prod_uniq)
       ref_df_to_map_keys <- stats::setNames(object = map_ref_oid_col,
                                                nm = l_ref_oid_rename)
 
@@ -2211,12 +2211,14 @@ olink_norm_reference_id <- function(lst_product,
 #' @return dataframe of mapping file to use for OlinkID mapping
 #' (eHT_e3072_mapping or reveal_e3072_mapping)
 #'
-mapping_file_id <- function(ref_product) {
+mapping_file_id <- function(prod_uniq) {
   # Ref mapping file
-  if (ref_product == "HT") {
-    ref_map_3k <- eHT_e3072_mapping
-  } else if (ref_product == "Reveal") {
-    ref_map_3k <- reveal_e3072_mapping
+  if (identical(x = prod_uniq, y = c("3k", "HT"))) {
+    ref_map <- eHT_e3072_mapping
+  } else if (identical(x = prod_uniq, y = c("3k", "Reveal"))) {
+    ref_map <- reveal_e3072_mapping
+  } else if (identical(x = prod_uniq, y = c("HT", "Reveal"))) {
+    ref_map <- reveal_eht_mapping
   }
-  return(ref_map_3k)
+  return(ref_map)
 }

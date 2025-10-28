@@ -5,9 +5,9 @@
 \alias{mapping_file_id}
 \title{Identifying which mapping file to use}
 \usage{
-mapping_file_id(ref_product)
+mapping_file_id(prod_uniq)
 
-mapping_file_id(ref_product)
+mapping_file_id(prod_uniq)
 }
 \arguments{
 \item{ref_product}{one of "HT" or "Reveal" depending on reference product}
