@@ -59,9 +59,9 @@ reveal_e3072_mapping <- readRDS(file = reveal_e3072_mapping_rds) |>
 rm(reveal_e3072_mapping_rds)
 
 # Reveal HT mapping
-reveal_HT_mapping_rda <- system.file("extdata",
-                                        "OlinkID_Reveal_HT_mapping.Rda",
+reveal_ht_mapping_rds <- system.file("extdata",
+                                        "OlinkID_Reveal_HT_mapping.rds",
                                         package = "OlinkAnalyze",
                                         mustWork = TRUE)
-load(reveal_HT_mapping_rda)
-remove(reveal_HT_mapping_rda)
+reveal_eht_mapping <- readRDS(file = reveal_ht_mapping_rds)
+remove(reveal_ht_mapping_rds)
