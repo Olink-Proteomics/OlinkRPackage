@@ -1274,8 +1274,9 @@ olink_norm_input_cross_product <- function(lst_df,
       # add combined OlinkID to non-reference dataset
       l_name <- names(product_ids)[!ref_ids == "ref"]
       l_oid_rename <- paste0(lst_cols[[l_name]]$olink_id, "_not_ref")
+      not_ref_product <- product_ids[ref_ids == "not_ref"] |> unname()
 
-      map_nonref_oid_col <- "OlinkID_Ref"
+      map_nonref_oid_col <- paste0("OlinkID_", not_ref_product)
       nonref_df_to_map_keys <- stats::setNames(object = map_nonref_oid_col,
                                                   nm = l_oid_rename)
 
