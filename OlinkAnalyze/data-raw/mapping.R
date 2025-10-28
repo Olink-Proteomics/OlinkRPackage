@@ -63,5 +63,5 @@ reveal_HT_mapping_rda <- system.file("extdata",
                                         "OlinkID_Reveal_HT_mapping.Rda",
                                         package = "OlinkAnalyze",
                                         mustWork = TRUE)
-reveal_eht_mapping <- load(reveal_HT_mapping_rda)
+load(reveal_HT_mapping_rda)
 remove(reveal_HT_mapping_rda)
