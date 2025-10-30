@@ -1173,7 +1173,10 @@ olink_norm_input_cross_product <- function(lst_df,
 
     # update Olink assay identifiers if cross product normalization ----
 
-    if (identical(prod_uniq, c("3k", "HT"))) {
+    if (identical(prod_uniq, c("3k", "HT"))
+        || identical(x = prod_uniq, y = c("3k", "Reveal"))
+        || identical(x = prod_uniq, y = c("Reveal", "HT"))
+        || identical(x = prod_uniq, y = c("HT", "Reveal"))) {
       # add combined OlinkID to HT dataset
       l_ref_name <- names(product_ids)[ref_ids == "ref"]
       ref_product <- product_ids[ref_ids == "ref"] |> unname()
