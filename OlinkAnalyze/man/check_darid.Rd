@@ -11,6 +11,9 @@ check_darid(df)
 \arguments{
 \item{df}{NPX data}
 }
+\value{
+warning messages
+}
 \description{
 Check DarIDs
 DarIDs D.07, 08, 10, and 14 need to be exported with

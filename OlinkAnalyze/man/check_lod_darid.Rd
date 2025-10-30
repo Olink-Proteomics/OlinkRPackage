@@ -8,9 +8,12 @@ Check for old Fixed LOD when using D.07, 08, 10, and 14}
 check_lod_darid(lod_file, data)
 }
 \arguments{
-\item{lod_file}{}
+\item{lod_file}{df with fixed LOD data}
 
-\item{data}{}
+\item{data}{df with NPX data}
+}
+\value{
+warning messages
 }
 \description{
 Check fixed LOD file version vs DarID

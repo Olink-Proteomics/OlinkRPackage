@@ -15,13 +15,9 @@ df <- npx_data1 |>
                                  OlinkID)) |>
   dplyr::mutate(DataAnalysisRefID = "D10010") |>
   dplyr::mutate(PanelDataArchiveVersion = "1.5")
-test_that("LOD DARID message works", {
-  expect_message(check_lod_darid(lod_file, df),
-                 regexp = "Outdated version")
 
-  expect_message(check_lod_darid(lod_file, df),
-                 regexp = "Olink.com")
 
+test_that("No message", {
   expect_no_message(check_lod_darid(lod_file |>
                                       mutate(Version = "9.0.0"),
                                     df))
@@ -29,4 +25,15 @@ test_that("LOD DARID message works", {
   expect_no_message(check_lod_darid(lod_file,
                                     df |>
                                       mutate(PanelDataArchiveVersion = "1.0")))
+
+})
+
+test_that("LOD DARID message is triggered", {
+  messages <- capture_messages(
+    check_lod_darid(lod_file, df)
+  )
+
+  expect_true(any(grepl("Outdated version .* detected", messages)))
+  expect_true(any(grepl(".* newest version from Olink.com", messages)))
+
 })

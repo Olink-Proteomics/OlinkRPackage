@@ -97,9 +97,9 @@ olink_lod_internal <- function(data, lod_file_path = NULL, lod_method = "NCLOD")
   if (lod_method == lod_methods$fix_lod) {
 
     lod_file <- read.table(file = lod_file_path, sep = ";", header = TRUE)
-    
+
     check_lod_darid(lod_file, data)
-    
+
     lod_data <- olink_fixed_lod(data_analysis_ref_id = data$DataAnalysisRefID,
                                 lod_file = lod_file)
 
@@ -308,10 +308,10 @@ int_norm_count <- function(data, lod_data){
 
 #' Check fixed LOD file version vs DarID
 #' Check for old Fixed LOD when using D.07, 08, 10, and 14
-#' @param lod_file 
-#' @param data 
+#' @param lod_file df with fixed LOD data
+#' @param data df with NPX data
 #'
-#' @return
+#' @return warning messages
 #'
 #' @keywords internal
 check_lod_darid <- function(lod_file, data){
@@ -320,10 +320,9 @@ check_lod_darid <- function(lod_file, data){
                              "D.*0007 || D.*0008 || D.*0010 || D.*0014"))&&
      !("Version" %in% names(lod_file))&&
      any(sapply(data[["PanelDataArchiveVersion"]], function(x){
-       utils::compareVersion("1.5", x) 
+       utils::compareVersion("1.5", x)
      }) != 1)){
     cli::cli_alert_info("Outdated version of Fixed LOD file detected.")
     cli::cli_alert("Please download the newest version from Olink.com.")
   }
-  return()
 }
