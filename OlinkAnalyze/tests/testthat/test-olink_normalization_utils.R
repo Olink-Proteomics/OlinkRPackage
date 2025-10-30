@@ -3522,73 +3522,74 @@ test_that(
 
     # Reveal-HT ----
 
-    # expect_no_condition(
-    #   object = lst_cross_prod_out_ht <- olink_norm_input_cross_product(
-    #     lst_df = list(
-    #       "p1" = data_reveal,
-    #       "p2" = data_ht
-    #     ),
-    #     lst_cols = list(
-    #       "p1" = list(panel = "Panel",
-    #                   olink_id = "OlinkID",
-    #                   count = "Count"),
-    #       "p2" = list(panel = "Panel",
-    #                   olink_id = "OlinkID",
-    #                   count = "Count")
-    #     ),
-    #     reference_project = "p2",
-    #     product_ids = c("p1" = "Reveal", "p2" = "HT"),
-    #     ref_ids = c("p1" = "not_ref", "p2" = "ref")
-    #   )
-    # )
+    expect_no_condition(
+      object = lst_cross_prod_out_ht <- olink_norm_input_cross_product(
+        lst_df = list(
+          "p1" = data_ht,
+          "p2" = data_reveal
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel",
+                      olink_id = "OlinkID",
+                      count = "Count"),
+          "p2" = list(panel = "Panel",
+                      olink_id = "OlinkID",
+                      count = "Count")
+        ),
+        reference_project = "p2",
+        product_ids = c("p1" = "HT", "p2" = "Reveal"),
+        ref_ids = c("p1" = "not_ref", "p2" = "ref")
+      )
+    )
 
-    # expect_identical(
-    #   object = lst_cross_prod_out_ht,
-    #   expected = list(
-    #     norm_mode = olink_norm_modes$norm_cross_product,
-    #     lst_df = list(
-    #       "p1" = data_reveal |>
-    #         dplyr::rename(
-    #           "OlinkID_not_ref" = "OlinkID"
-    #         ) |>
-    #         dplyr::left_join(
-    #           reveal_eht_mapping |>
-    #             dplyr::select(
-    #               dplyr::all_of(
-    #                 c("OlinkID_not_ref", "OlinkID")
-    #               )
-    #             ),
-    #           by = "OlinkID_not_ref",
-    #           relationship = "many-to-one"
-    #         ) |>
-    #         dplyr::mutate(
-    #           OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
-    #                                    .data[["OlinkID_Reveal"]],
-    #                                    .data[["OlinkID"]])
-    #         ),
-    #       "p2" = data_ht |>
-    #         dplyr::rename(
-    #           "OlinkID_HT" = "OlinkID"
-    #         ) |>
-    #         dplyr::left_join(
-    #           reveal_eht_mapping |>
-    #             dplyr::select(
-    #               dplyr::all_of(
-    #                 c("OlinkID_HT", "OlinkID")
-    #               )
-    #             ),
-    #           by = "OlinkID_HT",
-    #           relationship = "many-to-many"
-    #         ) |>
-    #         dplyr::mutate(
-    #           OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
-    #                                    .data[["OlinkID_HT"]],
-    #                                    .data[["OlinkID"]])
-    #         )
-    #     )
-    #   )
-    # )
+    expect_identical(
+      object = lst_cross_prod_out_ht,
+      expected = list(
+        norm_mode = olink_norm_modes$norm_cross_product,
+        lst_df = list(
+          "p1" = data_ht |>
+            dplyr::rename(
+              "OlinkID_not_ref" = "OlinkID"
+            ) |>
+            dplyr::left_join(
+              reveal_eht_mapping |>
+                dplyr::rename("OlinkID_not_ref" = "OlinkID_HT") |>
+                dplyr::select(
+                  dplyr::all_of(
+                    c("OlinkID_not_ref", "OlinkID")
+                  )
+                ),
+              by = "OlinkID_not_ref",
+              relationship = "many-to-many"
+            ) |>
+            dplyr::mutate(
+              OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
+                                       .data[["OlinkID_not_ref"]],
+                                       .data[["OlinkID"]])
+            ),
+          "p2" = data_reveal |>
+            dplyr::rename(
+              "OlinkID_Reveal" = "OlinkID"
+            ) |>
+            dplyr::left_join(
+              reveal_eht_mapping |>
+                dplyr::select(
+                  dplyr::all_of(
+                    c("OlinkID_Reveal", "OlinkID")
+                  )
+                ),
+              by = "OlinkID_Reveal",
+              relationship = "many-to-one"
+            ) |>
+            dplyr::mutate(
+              OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
+                                       .data[["OlinkID_Reveal"]],
+                                       .data[["OlinkID"]])
+            )
 
+        )
+      )
+    )
   }
 )
 
