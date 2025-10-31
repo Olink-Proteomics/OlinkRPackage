@@ -901,6 +901,7 @@ test_that(
       )
     )
 
+    
     ## check that function works both ways
     expect_equal(
       object = dim(df_3k_reveal_format),

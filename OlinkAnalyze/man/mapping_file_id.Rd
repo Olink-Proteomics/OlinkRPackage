@@ -11,7 +11,7 @@ mapping_file_id(prod_uniq)
 }
 \value{
 dataframe of mapping file to use for OlinkID mapping
-(eHT_e3072_mapping or reveal_e3072_mapping)
+(eHT_e3072_mapping, reveal_eht_mapping or reveal_e3072_mapping)
 }
 \description{
 Identifying which mapping file to use

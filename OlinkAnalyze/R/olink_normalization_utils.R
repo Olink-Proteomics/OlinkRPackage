@@ -2212,8 +2212,8 @@ olink_norm_reference_id <- function(lst_product,
 #' @param prod_uniq Name of products (not_ref, ref)
 #'
 #' @return dataframe of mapping file to use for OlinkID mapping
-#' (eHT_e3072_mapping or reveal_e3072_mapping)
-#' 
+#' (eHT_e3072_mapping, reveal_eht_mapping or reveal_e3072_mapping)
+#'
 #' @keywords internal
 #'
 mapping_file_id <- function(prod_uniq) {
