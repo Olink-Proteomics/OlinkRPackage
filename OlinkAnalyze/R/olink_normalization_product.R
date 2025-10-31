@@ -744,8 +744,7 @@ olink_normalization_qs <- function(lst_df,
 #' @param reference_project Project name of reference project. Must match name
 #' used in olink_normalization product bridging and be one of df1_project_nr or
 #' df2_project_nr.
-#' @param ref_product Name of reference product. Must be one of "HT" or
-#' "Reveal".
+#' @param prod_uniq Name of products (not_ref, ref)
 #'
 #' @return A "tibble" of Olink data in long format containing both input
 #' datasets with the bridged NPX quantifications, with the above
@@ -788,7 +787,7 @@ olink_normalization_product_format <- function(df_norm, # nolint object_length_l
                                                df2,
                                                df2_project_nr,
                                                reference_project,
-                                               ref_product) {
+                                               prod_uniq) {
 
   # Extract data for assays = "NotBridgeable" ----
 
@@ -814,7 +813,7 @@ olink_normalization_product_format <- function(df_norm, # nolint object_length_l
   # We also keep OlinkIDs of assays from both products that are being normalized
   # as one vector, to identify assays that were excluded from the cross-product
   # normalization.
-  oid_ref_notref <- mapping_file_id(ref_product = ref_product) |> # nolint object_usage_linter
+  oid_ref_notref <- mapping_file_id(prod_uniq = prod_uniq) |> # nolint object_usage_linter
     dplyr::select(
       dplyr::starts_with("OlinkID_")
     ) |>

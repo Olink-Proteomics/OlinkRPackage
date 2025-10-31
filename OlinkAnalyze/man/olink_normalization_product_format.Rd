@@ -12,7 +12,7 @@ olink_normalization_product_format(
   df2,
   df2_project_nr,
   reference_project,
-  ref_product
+  prod_uniq
 )
 }
 \arguments{
@@ -35,8 +35,7 @@ olink_normalization product bridging.}
 used in olink_normalization product bridging and be one of df1_project_nr or
 df2_project_nr.}
 
-\item{ref_product}{Name of reference product. Must be one of "HT" or
-"Reveal".}
+\item{prod_uniq}{Name of products (not_ref, ref)}
 }
 \value{
 A "tibble" of Olink data in long format containing both input

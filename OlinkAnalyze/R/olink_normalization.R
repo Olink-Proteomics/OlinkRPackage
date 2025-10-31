@@ -320,7 +320,7 @@ olink_normalization <- function(df1,
           df2 = df2,
           df2_project_nr = df2_project_nr,
           reference_project = reference_project,
-          ref_product = lst_check$ref_product
+          prod_uniq = c(lst_check$not_ref_product, lst_check$ref_product)
         )
       }
 

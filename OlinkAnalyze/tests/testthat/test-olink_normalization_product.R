@@ -713,7 +713,7 @@ test_that(
         df2 = data_3k,
         df2_project_nr = "P1",
         reference_project = "P2",
-        ref_product = "HT"
+        prod_uniq = c("3k", "HT")
       )
     )
 
@@ -897,7 +897,7 @@ test_that(
         df2 = data_3k,
         df2_project_nr = "P1",
         reference_project = "P2",
-        ref_product = "Reveal"
+        prod_uniq = c("3k", "Reveal")
       )
     )
 
