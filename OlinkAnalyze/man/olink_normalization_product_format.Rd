@@ -82,7 +82,7 @@ OlinkAnalyze:::olink_normalization_product_format(
   df1_project_nr = "Explore HT",
   df2_project_nr = "Explore 3072",
   reference_project = "Explore HT",
-  ref_product = "HT"
+  prod_uniq = c("3k", "HT")
 )
 }
 

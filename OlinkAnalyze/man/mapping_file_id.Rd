@@ -7,7 +7,7 @@
 mapping_file_id(prod_uniq)
 }
 \arguments{
-\item{ref_product}{one of "HT" or "Reveal" depending on reference product}
+\item{prod_uniq}{Name of products (not_ref, ref)}
 }
 \value{
 dataframe of mapping file to use for OlinkID mapping
@@ -16,3 +16,4 @@ dataframe of mapping file to use for OlinkID mapping
 \description{
 Identifying which mapping file to use
 }
+\keyword{internal}
