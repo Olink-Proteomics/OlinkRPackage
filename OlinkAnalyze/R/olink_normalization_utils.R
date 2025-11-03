@@ -1136,7 +1136,6 @@ olink_norm_input_cross_product <- function(lst_df,
     # 3k to HT or Reveal where HT or Reveal is reference
     # HT and Reveal bidirectionally
     norm_mode <- olink_norm_modes$norm_cross_product
-    
   } else {
     cli::cli_abort(
       c("x" = "Unexpected datasets to be bridge normalized!",
@@ -1177,19 +1176,19 @@ olink_norm_input_cross_product <- function(lst_df,
     ref_product <- product_ids[ref_ids == "ref"] |> unname()
     l_ref_oid_rename <- paste0(lst_cols[[l_ref_name]]$olink_id, "_",
                                ref_product)
-    
+
     map_ref_oid_col <- paste0("OlinkID_", ref_product)
     ref_map <- mapping_file_id(prod_uniq = prod_uniq)
     ref_df_to_map_keys <- stats::setNames(object = map_ref_oid_col,
                                           nm = l_ref_oid_rename)
-    
+  
     lst_df[[l_ref_name]] <- lst_df[[l_ref_name]] |>
       dplyr::rename(
         !!l_ref_oid_rename := lst_cols[[l_ref_name]]$olink_id
       ) |>
       dplyr::left_join(
         ref_map |>
-        dplyr::select(
+          dplyr::select(
           dplyr::all_of(
             c(map_ref_oid_col, "OlinkID")
           )
@@ -1203,29 +1202,29 @@ olink_norm_input_cross_product <- function(lst_df,
                                  .data[[map_ref_oid_col]],
                                  .data[["OlinkID"]])
       )
-    
+  
     # add combined OlinkID to non-reference dataset
     l_name <- names(product_ids)[!ref_ids == "ref"]
     not_ref_product <- product_ids[ref_ids == "not_ref"] |> unname()
-    
+  
     # Change name for 3k
     not_ref_product <- ifelse(not_ref_product == "3k", "E3072", not_ref_product)
     not_ref_oid_rename <- ifelse(not_ref_product == "E3072",
                                  "_E3072",
                                  "_not_ref")
     l_oid_rename <- paste0(lst_cols[[l_name]]$olink_id, not_ref_oid_rename)
-    
+  
     map_nonref_oid_col <- paste0("OlinkID_", not_ref_product)
     nonref_df_to_map_keys <- stats::setNames(object = map_nonref_oid_col,
                                              nm = l_oid_rename)
-    
+  
     lst_df[[l_name]] <- lst_df[[l_name]] |>
       dplyr::rename(
         !!l_oid_rename := lst_cols[[l_name]]$olink_id
       ) |>
       dplyr::left_join(
         ref_map |>
-        dplyr::select(
+          dplyr::select(
           dplyr::all_of(
             c(map_nonref_oid_col, "OlinkID")
           )
