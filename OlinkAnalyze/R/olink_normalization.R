@@ -306,7 +306,7 @@ olink_normalization <- function(df1,
         ref_samples = lst_check$ref_samples,
         ref_name = lst_check$ref_name,
         ref_cols = lst_check$ref_cols,
-        prod_uniq = c(lst_check$not_ref_prod, lst_check$ref_product),
+        prod_uniq = c(lst_check$not_ref_product, lst_check$ref_product),
         not_ref_df = lst_check$not_ref_df,
         not_ref_name = lst_check$not_ref_name,
         not_ref_cols = lst_check$not_ref_cols
