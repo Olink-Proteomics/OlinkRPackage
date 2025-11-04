@@ -641,7 +641,7 @@ values in the NPX column which contains the non-normalized data.
 ```{r echo=FALSE}
 try( 
   readRDS(normalizePath("../man/figures/bridging_results.rds")) |> 
-    dplyr::select( # wide table, select fewer columns
+    dplyr::select( # select fewer columns for better readability
       SampleID,
       OlinkID,
       Assay,
@@ -681,7 +681,7 @@ try(
                                    paste(OlinkID, OlinkID_E3072, sep = "_"),
                                    OlinkID_E3072)) |>
     dplyr::select(-c("OlinkID_E3072", "MedianCenteredNPX", "QSNormalizedNPX")) |> 
-    dplyr::select(  # wide table, select fewer columns
+    dplyr::select(  # select fewer columns for readability 
       SampleID,
       OlinkID,
       Assay,
@@ -707,10 +707,14 @@ try(
 
 ## Evaluating the quality of bridging
 
-PCA is used to assess the quality of bridging by determining if the
-sample controls (SCs) and bridging samples appear closer after bridging.
-Two PCAs can be generated, one containing the SCs and one containing the
-bridging samples. Prior to bridging there will be a noticeable
+PCA plots are used to assess the quality of bridging by determining if the
+<!-- sample controls (SCs) and  -->
+bridging samples appear closer after bridging.
+
+<!-- Two PCAs can be generated, one containing the SCs and one containing the -->
+<!-- bridging samples.  -->
+
+Prior to bridging there will be a noticeable
 separation between products which should decrease after bridging.
 
 ```{r include=FALSE}
@@ -721,7 +725,7 @@ f11 <- "Combined PCA of bridging samples from both platforms after normalization
 ```
 
 
-```{r pca_pre_sc, echo=TRUE, eval = FALSE}
+```{r pca_pre_sc, echo=FALSE, eval = FALSE}
 ## Before Bridging
 npx_br_data |> 
   dplyr::filter(SampleType == "SAMPLE_CONTROL") |> 
@@ -730,7 +734,7 @@ npx_br_data |>
   OlinkAnalyze::olink_pca_plot(color_g = "Project")
 ```
 
-```{r pca_pre_sc_fig, echo=FALSE, fig.cap=f8, message=FALSE, fig.pos="H"}
+```{r pca_pre_sc_fig, echo=FALSE, fig.cap=f8, message=FALSE, fig.pos="H", eval=FALSE}
 ## Before Bridging
 knitr::include_graphics(normalizePath("../man/figures/SCs_pre_bridging.pdf"), 
                         error = FALSE)
@@ -769,7 +773,7 @@ npx_after_br_reco <- npx_br_data |>
 
 ```
 
-``` {r pca_post_SC, eval=FALSE, echo = TRUE}
+``` {r pca_post_SC, eval=FALSE, echo = FALSE}
 
 ### Generate unique SampleIDs
 npx_after_br_final <- npx_after_br_reco |>
@@ -782,7 +786,7 @@ npx_after_br_final |>
   
 ```
 
-```{r echo=FALSE, fig.cap=f10, fig.pos="H"}
+```{r echo=FALSE, fig.cap=f10, fig.pos="H", eval=FALSE}
 knitr::include_graphics(normalizePath("../man/figures/SCs_post_bridging.pdf"),
                         error = FALSE)
 ```

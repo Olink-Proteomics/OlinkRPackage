@@ -71,13 +71,9 @@ HT projects, while intensity normalization is generally used for
 multi-plate projects. Additionally, the intensity normalization method
 assumes that all samples within a project are fully randomized.
 
-In the case where all samples within a project are not fully randomized,
-or when a study is separated into separate batches, an additional
-normalization step is needed to allow the data to be comparable, since
-NPX is a relative measurement. The joint analysis of two or more Olink®
-NPX datasets often requires an additional batch correction step to
-remove technical variations, which is referred to as overlapping sample
-reference normalization, bridge normalization, or just simply bridging.
+Since NPX is a measure of relative quantification, normalization is needed to align NPX values across plates, runs, and batches. Some normalization methods, such as plate control normalization and intensity normalization, can be performed within the Olink NPX software, while other methods, such as subset normalization and bridge normalization, rely on external data to perform normalization and are instead performed using Olink Analyze after data is exported from Olink NPX software.
+ 
+The ideal normalization method for a study will depend on several factors including sample availability, randomization, and similarities to control samples. For example, in Olink Explore, plate control normalization uses the median of the plate controls for adjustment and performs best in assays that are well detected in the plate controls. It does not require external samples or randomization but may not perform as well for samples that are unsimilar to the plate control samples, such as alternative matrices or samples from certain diseases. Intensity normalization, which uses the median of the samples on the plate (excluding the control strip) for adjustment, performs well for any sample type so long as the samples are randomized. If randomization is not optimized, but samples are available, overlapping samples can be used for normalization, known as  overlapping sample reference normalization, bridge normalization, or just bridging.
 
 Bridging is also needed if Olink® NPX datasets are:
 

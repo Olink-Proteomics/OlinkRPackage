@@ -276,9 +276,18 @@ table1 |>
                 FixedPCNormalizedLOD = PCNormalizedLOD) |> 
   dplyr::mutate(NCLOD = FixedLOD - 2.34,
                 NCPCNormalizedLOD = FixedPCNormalizedLOD - 2.34) |> 
-  dplyr::select(SampleID, SampleType, OlinkID, UniProt, Assay, Count, NPX, Normalization, PCNormalizedNPX, FixedLOD, FixedPCNormalizedLOD, NCLOD, NCPCNormalizedLOD) |> 
-  knitr::kable(caption = "Example results using both LOD calculation methods") |> 
-  kableExtra::kable_styling(font_size = 10)
+  dplyr::select(SampleID, SampleType, OlinkID, UniProt, Assay, 
+                Count, NPX, Normalization, PCNormalizedNPX, FixedLOD, 
+                FixedPCNormalizedLOD, NCLOD, NCPCNormalizedLOD) |> 
+  kableExtra::kbl(booktabs = TRUE,
+      linesep = "",
+      digits = 2,
+      caption = "Example results using both LOD calculation methods") |> 
+  kableExtra::kable_styling(font_size = 11, full_width = TRUE,
+                  position = "center", latex_options = c("HOLD_position","scale_down")) |> 
+    kableExtra::column_spec(column = 1:13,width_max = "10em") 
+
+
 ```
 
 ## Adjusting LOD for Intensity Normalized Data
