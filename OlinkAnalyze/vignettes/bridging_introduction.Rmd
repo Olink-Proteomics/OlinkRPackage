@@ -1,20 +1,53 @@
 ---
-title: "Introduction to bridging Olink® NPX datasets"
-output: 
-  html_vignette:
-    toc: true
-    toc_depth: 3
-    includes:
-      in_header: ../man/figures/logo.html
+title: "Introduction to bridging Olink^®^ NPX datasets"
+author: "Olink Data Science"
+date: "`r format(Sys.Date(), '%Y-%m-%d')`"
+output:
+  pdf_document:
+    toc: false # replaced by \tableofcontents
+    # toc_depth: 3
+    # number_sections: true
+    fig_caption: true
+    latex_engine: xelatex
+header-includes:
+  - \usepackage{graphicx}
+  - \usepackage{float}
+  - \usepackage{fontspec} 
+  - \setmainfont{Swedish Gothic}  
+  - \usepackage{setspace}
+  - \onehalfspacing    # for 1.5x line spacing, options \singlespacing, ...
+  - \usepackage{fancyhdr}
+  - \pagestyle{fancy}
+  - \fancyhead{}
+  - \fancyhead[R]{\includegraphics[width=20pt]{../man/figures/small_logo.png}}
+  - \fancyhead[L]{\textbf{Introduction to bridging Olink\textsuperscript{®} NPX datasets}}
+  # - \fancyhead[R]{\thepage}
+  - \setlength{\headheight}{23.74pt}
+  - \addtolength{\topmargin}{-11.7pt}
+  - \renewcommand{\headrulewidth}{0.4pt}
+  # - \fancyfoot{}  # clears footer
+  # - \usepackage{pdflscape}
 vignette: >
   %\VignetteIndexEntry{Introduction to bridging Olink® NPX datasets}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
-date: 'Compiled: `r format(Sys.Date(), "%B %d, %Y")`'
 editor_options: 
   markdown: 
     wrap: 72
 ---
+<!-- adding logo after title, author and date, and before toc -->
+
+\thispagestyle{empty}
+\begin{center}
+\vspace*{2cm}
+\includegraphics[width=2cm]{../man/figures/Olink\-Symbol_Black.png}
+\end{center}
+\renewcommand{\arraystretch}{1.5}
+\newpage
+\pagestyle{fancy}
+\setcounter{tocdepth}{2}
+\tableofcontents
+\clearpage
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -35,16 +68,12 @@ Individual Olink® NPX datasets are normalized using either plate control
 normalization or intensity normalization methods. Plate control
 normalization is generally used for single plate projects or for Explore
 HT projects, while intensity normalization is generally used for
-multi-plate projects. Additionally, intensity normalization method
+multi-plate projects. Additionally, the intensity normalization method
 assumes that all samples within a project are fully randomized.
 
-In the case where all samples within a project are not fully randomized,
-or when a study is separated into separate batches, an additional
-normalization step is needed to allow the data to be comparable, since
-NPX is a relative measurement. The joint analysis of two or more Olink®
-NPX datasets often requires an additional batch correction step to
-remove technical variations, which is referred to as overlapping sample
-reference normalization, bridge normalization, or just simply bridging.
+Since NPX is a measure of relative quantification, normalization is needed to align NPX values across plates, runs, and batches. Some normalization methods, such as plate control normalization and intensity normalization, can be performed within the Olink NPX software, while other methods, such as subset normalization and bridge normalization, rely on external data to perform normalization and are instead performed using Olink Analyze after data is exported from Olink NPX software.
+ 
+The ideal normalization method for a study will depend on several factors including sample availability, randomization, and similarities to control samples. For example, in Olink Explore, plate control normalization uses the median of the plate controls for adjustment and performs best in assays that are well detected in the plate controls. It does not require external samples or randomization but may not perform as well for samples that are unsimilar to the plate control samples, such as alternative matrices or samples from certain diseases. Intensity normalization, which uses the median of the samples on the plate (excluding the control strip) for adjustment, performs well for any sample type so long as the samples are randomized. If randomization is not optimized, but samples are available, overlapping samples can be used for normalization, known as  overlapping sample reference normalization, bridge normalization, or just bridging.
 
 Bridging is also needed if Olink® NPX datasets are:
 
@@ -87,10 +116,11 @@ data.frame(Platform = c("Target 96",
                                "16-32",
                                "16-24",
                                "40-64",
-                               "32-48")) %>%
+                               "32-48")) |>
   kbl(booktabs = TRUE,
+      linesep = "",
       digits = 2,
-      caption = "Table 1. Recommended number of bridging samples for Olink platforms") %>%
+      caption = "Recommended number of bridging samples for Olink platforms") |>
   kable_styling(bootstrap_options = "striped",
                 full_width = FALSE,
                 position = "center",
@@ -98,9 +128,11 @@ data.frame(Platform = c("Target 96",
 
 ```
 
-The following tutorial is designed to give you an overview of the kinds
-of data combining methods that are possible using the Olink® bridging
-procedure. Before starting bridging, it is important to check if the
+The following tutorial is designed to give an overview of the kinds
+of data combining methods that are possible using the Olink® within-product bridging
+procedure. For bridging across the NGS-based products see the [Bridging across NGS-based Olink^®^ products](). 
+
+Before starting bridging, it is important to check if the
 same sample IDs were assigned to the bridging samples.
 
 ## Selecting bridging samples
@@ -110,7 +142,7 @@ from the reference study and be added to the second study. These samples
 can be selected using the `olink_bridgeselector()` function in Olink
 Analyze. The bridge selection function will select a number of bridge
 samples based on the reference data. This function selects samples which
-passes QC and have high detectability. In the case of where
+pass QC and have high detectability. In the case of where
 detectability cannot be calculated from the test data set (ex: Explore
 HT data), the function will only select samples which pass QC. External
 controls are not selected as bridge samples as they are not necessarily
@@ -124,7 +156,7 @@ To select samples across the range of the data, the samples are ordered
 by mean NPX value and selected across this range. When running the
 selector, Olink recommends starting at sampleMissingFreq = 0.10 which
 represents a maximum of 10% data below LOD per sample. If there are not
-enough samples output, increase to 20%. For alternative matrices and
+enough samples in the output, increase to 20%. For alternative matrices and
 specific disease types, it may be needed to increase the
 sampleMissingFreq to higher levels.
 
@@ -134,21 +166,20 @@ bridge samples are displayed in Table 2.
 
 ```{r bridge_sample_selection_example, echo=T, eval=T}
 
-bridge_Samples<- npx_data1 %>% 
+bridge_Samples<- npx_data1 |> 
   # Excluding control samples. Naming convention may differ.
-  dplyr::filter((stringr::str_detect(SampleID, "CONTROL", negate = TRUE))) %>%
-  olink_bridgeselector(sampleMissingFreq = 0.1,
-                     n = 16)
+  dplyr::filter((stringr::str_detect(SampleID, "CONTROL", negate = TRUE))) |>
+  olink_bridgeselector(sampleMissingFreq = 0.1, n = 16)
 ```
 
 ```{r bridge_sample_selection, echo=FALSE}
-npx_data1 %>% 
-  filter((stringr::str_detect(SampleID, "CONTROL", negate = TRUE))) %>%
+npx_data1 |> 
+  filter((stringr::str_detect(SampleID, "CONTROL", negate = TRUE))) |>
   olink_bridgeselector(sampleMissingFreq = 0.1,
-                     n = 16) %>%
-  kableExtra::kbl(booktabs = TRUE,
+                     n = 16) |>
+  kableExtra::kbl(booktabs = TRUE, linesep = "",
       digits = 2,
-      caption = "Table 2. Selected Bridging Samples") %>%
+      caption = "Selected Bridging Samples") |>
   kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE,
                 position = "center", latex_options = "HOLD_position")
   
@@ -161,36 +192,35 @@ bridge samples are evenly dispersed among the other samples, as shown in
 Figure 1.
 
 ```{r captions, echo=FALSE}
-f1<- "Figure 1. PCA plot of bridging samples and other samples in npx_data1. Control samples are excluded from the PCA plot."
+f1<- "PCA plot of bridging samples and other samples in npx\\_data1. Control samples are excluded from the PCA plot."
 
-f2 <- "Figure 2. Density plot of NPX distribution in both datasets before bridging."
+f2 <- "Density plot of NPX distribution in both datasets before bridging."
 
-f3 <- "Figure 3. PCA plot of both datasets before bridging."
+f3 <- "PCA plot of both datasets before bridging."
 
-f4 <- "Figure 4. Density plot of NPX distribution in both datasets after bridging."
+f4 <- "Density plot of NPX distribution in both datasets after bridging."
 
-f5 <- "Figure 5. Histogram of adjustment factors in normalized data from Project \"data2\"."
+f5 <- "Histogram of adjustment factors in normalized data from Project \"data2\"."
 
-f6 <- "Figure 6. Violin plot of CHL1 in both datasets prior to bridging. Bridge samples are indicated by black points."
+f6 <- "Violin plot of CHL1 in both datasets prior to bridging. Bridge samples are indicated by black points."
 
-f7 <- "Figure 7. Density plot of inter-project CV before and after bridging."
+f7 <- "Density plot of inter-project CV before and after bridging."
 
-f8 <- "Figure 8. PCA plot of both datasets after bridging."
+f8 <- "PCA plot of both datasets after bridging."
 ```
 
 ```{r bridge_sample_selection_example_pca, echo=T, eval=T, fig.cap= f1}
-npx_data1 %>% 
-  filter(!str_detect(SampleID, 'CONT')) %>%
-  mutate(Bridge = ifelse(SampleID %in% bridge_Samples$SampleID, "Bridge", "Sample")) %>% 
+npx_data1 |> 
+  filter(!str_detect(SampleID, 'CONT')) |>
+  mutate(Bridge = ifelse(SampleID %in% bridge_Samples$SampleID, "Bridge", "Sample")) |> 
   olink_pca_plot(color_g = "Bridge")
 
 ```
 
 ## Setup bridging datasets
 
-Bridging datasets are standard Olink® NPX tables. They can be loaded
-using `read_NPX()` function with default Olink Software NPX file as
-input.
+The `read_NPX()` function can be used to import an
+NPX file as generated by Olink^®^ NPX Software.
 
 ```{r message=FALSE, eval=FALSE, echo = TRUE}
 data1 <- read_NPX("~/NPX_file1_location.xlsx")
@@ -198,8 +228,8 @@ data2 <- read_NPX("~/NPX_file2_location.xlsx")
 ```
 
 To demonstrate how bridging works, we will use the example datasets
-(`npx_data1` and `npx_data2`) from **Olink Analyze** package. This
-workflow also uses functions from the dplyr, stringr, and ggplot2
+(`npx_data1` and `npx_data2`) from the **Olink Analyze** package. This
+workflow also uses functions from the **dplyr**, **stringr**, and **ggplot2**
 packages.
 
 ## Check bridging datasets
@@ -215,17 +245,19 @@ unlikely to cover the dynamic range of assays expressed in the study
 samples.
 
 ```{r, eval= FALSE}
-data.frame(SampleID = intersect(npx_data1$SampleID, npx_data2$SampleID)) %>%
+data.frame(SampleID = intersect(npx_data1$SampleID, npx_data2$SampleID)) |>
   dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_SAMPLE"))
 ```
 
 ```{r, echo=FALSE}
 
-data.frame(SampleID = intersect(npx_data1$SampleID, npx_data2$SampleID)) %>%
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_SAMPLE")) %>% #Remove control samples
+data.frame(SampleID = intersect(npx_data1$SampleID, npx_data2$SampleID)) |>
+  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_SAMPLE")) |> #Remove control samples
+  pull() |> 
+  matrix(ncol = 4) |> 
   kableExtra::kbl(booktabs = TRUE,
       digits = 2,
-      caption = "Table 3. Overlapping Bridge Samples") %>%
+      caption = "Overlapping Bridge Samples") |>
   kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE,
                 position = "center", latex_options = "HOLD_position")
 ```
@@ -240,17 +272,17 @@ and red areas on the edge of the distribution.
 
 ```{r check, message=FALSE, fig.cap= f2}
 # Load datasets
-npx_1 <- npx_data1 %>%
+npx_1 <- npx_data1 |>
   mutate(Project = "data1")
-npx_2 <- npx_data2 %>%
+npx_2 <- npx_data2 |>
   mutate(Project = "data2")
 
 npx_df <- bind_rows(npx_1, npx_2)
 
 
 # Plot NPX density before bridging normalization
-npx_df %>%
-  mutate(Panel = gsub("Olink ", "", Panel)) %>%
+npx_df |>
+  mutate(Panel = gsub("Olink ", "", Panel)) |>
   ggplot(aes(x = NPX, fill = Project)) +
   geom_density(alpha = 0.4) +
   facet_grid(~Panel) +
@@ -279,21 +311,21 @@ along PC1, indicating batch differences between the two datasets.
 ```{r pca1, message=FALSE, fig.cap=f3}
 #### Extract bridging samples
 
-overlapping_samples <-  data.frame(SampleID = intersect(npx_1$SampleID, npx_2$SampleID)) %>%  
-  filter(!str_detect(SampleID, "CONTROL_SAMPLE")) %>% #Remove control samples
+overlapping_samples <-  data.frame(SampleID = intersect(npx_1$SampleID, npx_2$SampleID)) |>  
+  filter(!str_detect(SampleID, "CONTROL_SAMPLE")) |> #Remove control samples
   pull(SampleID)
 
-npx_before_br <- npx_data1 %>%
-  dplyr::filter(!str_detect(SampleID, "CONTROL_SAMPLE")) %>% #Remove control samples
+npx_before_br <- npx_data1 |>
+  dplyr::filter(!str_detect(SampleID, "CONTROL_SAMPLE")) |> #Remove control samples
   dplyr::mutate(Type = if_else(SampleID %in% overlapping_samples,
                         paste0("data1 Bridge"),
-                        paste0("data1 Sample"))) %>%
+                        paste0("data1 Sample"))) |>
   rbind({
-    npx_data2 %>%
-      filter(!str_detect(SampleID, "CONTROL_SAMPLE")) %>% #Remove control samples %>% 
+    npx_data2 |>
+      filter(!str_detect(SampleID, "CONTROL_SAMPLE")) |> #Remove control samples |> 
       mutate(Type = if_else(SampleID %in% overlapping_samples,
                             paste0("data2 Bridge"),
-                            paste0("data2 Sample"))) %>%
+                            paste0("data2 Sample"))) |>
       mutate(SampleID = if_else(SampleID %in% overlapping_samples,
                                 paste0(SampleID, "_new"),
                                 SampleID))
@@ -307,7 +339,7 @@ OlinkAnalyze::olink_pca_plot(df          = npx_before_br,
 
 ## Perform bridging between two data sets
 
-We can use `olink_normalization_bridge()` function to bridge two
+The `olink_normalization_bridge()` function can be used to bridge two
 datasets. The bridging procedure is to first calculate **the median of
 the paired NPX differences** per assay between the bridging samples as
 adjustment factor then use these adjustment factors to adjust NPX values
@@ -316,12 +348,12 @@ reference dataset (`df1`) and its NPX values remain unaltered. The other
 dataset is considered the new dataset (`df2`) and is adjusted to the
 reference dataset based on the adjustment factors.
 
-The output from `olink_normalization_bridge()` function is a NPX table
+The output from the `olink_normalization_bridge()` function is a NPX table
 with adjusted NPX value in the column `NPX`, as shown in Table 4.
-`olink_normalization_bridge()` is a wrapper for and supersedes
-`olink_normalization()` .
+The `olink_normalization_bridge()` function is a wrapper for and supersedes the
+`olink_normalization()` function.
 
-`olink_normalization_bridge()` creates a new column `Project` to
+The `olink_normalization_bridge()` function creates a new column `Project` to
 distinguish between reference dataset from the other dataset. It is up
 to the user to define which dataset is the reference dataset and specify
 the names of the bridge samples. The resulting dataset will contain the
@@ -330,13 +362,13 @@ with adjustment factors of 0, and the newly bridged dataset.
 
 ```{r bridging, message=FALSE}
 # Find shared samples
-npx_1 <- npx_data1 %>%
+npx_1 <- npx_data1 |>
   mutate(Project = "data1") 
-npx_2 <- npx_data2 %>%
+npx_2 <- npx_data2 |>
   mutate(Project = "data2")
 
-overlap_samples <-data.frame(SampleID = intersect(npx_1$SampleID, npx_2$SampleID)) %>%
-  filter(!str_detect(SampleID, "CONTROL_SAMPLE")) %>% #Remove control samples
+overlap_samples <-data.frame(SampleID = intersect(npx_1$SampleID, npx_2$SampleID)) |>
+  filter(!str_detect(SampleID, "CONTROL_SAMPLE")) |> #Remove control samples
   pull(SampleID)
 
 overlap_samples_list <- list("DF1" = overlap_samples,
@@ -354,13 +386,14 @@ npx_br_data <- olink_normalization_bridge(project_1_df = npx_1,
 ```
 
 ```{r norm_data_table , echo = FALSE}
-npx_br_data %>% 
-  head(10) %>% 
+npx_br_data |> 
+  select(OlinkID, Assay, PlateID,	QC_Warning,	LOD, NPX, Project,	Panel, Adj_factor,	SampleID, Adj_factor) |> 
+  head(10) |> 
   kableExtra::kbl(booktabs = TRUE,
       digits = 1,
-      caption = "Table 4. First 10 rows of combined datasets after bridging.") %>%
-  kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 10, 
-                position = "center", latex_options = "HOLD_position") %>% 
+      caption = "Preview of combined datasets after bridging: first 10 rows and selected columns.") |>
+  kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 20, 
+                  position = "center", latex_options = c("HOLD_position","scale_down")) |> 
   kableExtra::scroll_box(width = "100%")
 ```
 
@@ -389,8 +422,8 @@ outside of the distribution.
 ```{r densitybr, message=FALSE, fig.cap= f4}
 # Plot NPX density after bridging normalization
 
-npx_br_data %>%
-  mutate(Panel = gsub("Olink ", "", Panel)) %>%
+npx_br_data |>
+  mutate(Panel = gsub("Olink ", "", Panel)) |>
   ggplot2::ggplot(ggplot2::aes(x = NPX, fill = Project)) +
   ggplot2::geom_density(alpha = 0.4) +
   ggplot2::facet_grid(~Panel) +
@@ -405,7 +438,7 @@ npx_br_data %>%
 
 ```
 
-Then, summarize number of assays that have adjustment factors in certain
+Then, summarize the number of assays that have adjustment factors in certain
 ranges. High adjustment factors can result from variations between
 projects, such as panel versions or technical modifications. The cutoff
 of a deviating adjustment factor is subjective and depends on a variety
@@ -426,10 +459,10 @@ the bridging samples than the similarity between the datasets, as
 indicated by the overlaid black dots in Figure 6.
 
 ```{r dist_adj_fct, message=FALSE, echo = FALSE, fig.cap = f5}
-npx_br_data %>% 
-  dplyr::filter(Project == "data2") %>%  # Only looking at Project 2 since project 1 is unadjusted
-  dplyr::select(OlinkID, Adj_factor) %>% 
-  dplyr::distinct() %>% 
+npx_br_data |> 
+  dplyr::filter(Project == "data2") |>  # Only looking at Project 2 since project 1 is unadjusted
+  dplyr::select(OlinkID, Adj_factor) |> 
+  dplyr::distinct() |> 
   ggplot2::ggplot(ggplot2::aes(x = Adj_factor)) +
     ggplot2::geom_histogram() +
   set_plot_theme()
@@ -441,22 +474,22 @@ demonstration purposes.
 
 ```{r voilin plot, fig.cap = f6}
 # Bridge sample data
-bridge_samples <- npx_1 %>%
-  rbind(npx_2) %>%
-  filter(SampleID %in% overlapping_samples) %>%
-  filter(Assay == "CHL1") %>%
+bridge_samples <- npx_1 |>
+  rbind(npx_2) |>
+  filter(SampleID %in% overlapping_samples) |>
+  filter(Assay == "CHL1") |>
   mutate(Assay_OID = paste(Assay, OlinkID, sep = "\n"))
 
 # Generate violin plot for CHL1
-npx_data1 %>%
-  mutate(Project = "data1") %>%
+npx_data1 |>
+  mutate(Project = "data1") |>
   bind_rows({
-    npx_data2 %>%
+    npx_data2 |>
       mutate(Project = "data2")
-  }) %>%
-  filter(Assay == "CHL1") %>%
-  filter(!str_detect(SampleID, "CONTROL*.")) %>%
-  mutate(Assay_OID = paste(Assay, OlinkID, sep = "\n")) %>% 
+  }) |>
+  filter(Assay == "CHL1") |>
+  filter(!str_detect(SampleID, "CONTROL*.")) |>
+  mutate(Assay_OID = paste(Assay, OlinkID, sep = "\n")) |> 
   ggplot2::ggplot(aes(Project, NPX)) +
   ggplot2::geom_violin(aes(fill = Project)) +
   geom_point(data = bridge_samples, position = position_jitter(0.1)) +
@@ -466,13 +499,13 @@ npx_data1 %>%
 ```
 
 Another way to determine if bridging decreased variability between
-projects is to calculate the CV of the control samples across both
+projects is to calculate the Coefficient of Variation (CV) of the control samples across both
 projects before and after bridging, as shown in Figure 7. The CV after
 normalization is expected to be smaller than the CV prior to
 normalization, as shown in Figure 7.
 
 Note that the CV calculation formula differs for Olink Target 96 and
-Olink Explore products. More information of CV calculation can be found
+Olink Explore products. More information on the CV calculation can be found
 in the [Olink FAQ](https://olink.com/knowledge/faq)
 
 ```{r CV_calculation, fig.cap= f7}
@@ -487,28 +520,28 @@ t96_cv <- function(NPX, na.rm = T) {
 
 tech <- "Target"
 
-cv_before <- npx_1 %>% 
-  rbind(npx_2) %>% 
-  filter(str_detect(SampleID,"CONTROL*.")) %>%
-  filter(NPX > LOD) %>%
-  group_by(OlinkID) %>%
-  mutate(CV = ifelse(tech=='Explore',explore_cv(NPX), t96_cv(NPX))) %>%
-  ungroup() %>%
+cv_before <- npx_1 |> 
+  rbind(npx_2) |> 
+  filter(str_detect(SampleID,"CONTROL*.")) |>
+  filter(NPX > LOD) |>
+  group_by(OlinkID) |>
+  mutate(CV = ifelse(tech=='Explore',explore_cv(NPX), t96_cv(NPX))) |>
+  ungroup() |>
   distinct(OlinkID,CV)
 
 
-cv_after <- npx_br_data %>%
-  filter(str_detect(SampleID, "CONTROL")) %>%
-  filter(NPX > LOD) %>%
-  group_by(OlinkID) %>%
-  mutate(CV = ifelse(tech=='Explore',explore_cv(NPX), t96_cv(NPX))) %>%
-  ungroup() %>%
+cv_after <- npx_br_data |>
+  filter(str_detect(SampleID, "CONTROL")) |>
+  filter(NPX > LOD) |>
+  group_by(OlinkID) |>
+  mutate(CV = ifelse(tech=='Explore',explore_cv(NPX), t96_cv(NPX))) |>
+  ungroup() |>
   distinct(OlinkID,CV)
 
-cv_before %>%
-  mutate(Analysis = "Before") %>%
-  rbind((cv_after %>%
-           mutate(Analysis = "After"))) %>%
+cv_before |>
+  mutate(Analysis = "Before") |>
+  rbind((cv_after |>
+           mutate(Analysis = "After"))) |>
   ggplot2::ggplot(ggplot2::aes(x = CV, fill = Analysis)) +
   ggplot2::geom_density(alpha = 0.7) +
   set_plot_theme() +
@@ -518,8 +551,7 @@ cv_before %>%
 
 ```
 
-Finally, use PCA plot to check whether bridging normalization has effect
-in correcting batch effects (Figure 8). In the example below, it is
+Finally, use a PCA plot to check whether bridging normalization has corrected the batch effect (Figure 8). In the example below, it is
 clear that before bridging samples from data 1 and 2 are divided into
 separate clusters due to the batch effects (Figure 3), but after
 bridging they are shown as one cluster in the PCA plot (Figure 8).
@@ -531,10 +563,10 @@ between two data sets.
 
 ### Generate unique SampleIDs
 
-npx_after_br <- npx_br_data %>%
+npx_after_br <- npx_br_data |>
   dplyr::mutate(Type = ifelse(SampleID %in% overlapping_samples, 
                               paste(Project, "Bridge"),
-                              paste(Project, "Sample"))) %>%
+                              paste(Project, "Sample"))) |>
   dplyr:::mutate(SampleID = paste0(Project, PlateID, SampleID))
 
 ### PCA plot
@@ -552,13 +584,14 @@ columns will need to be removed. To export the new project,
 `dplyr::filter` can be used to filter by Project.
 
 ```{r, eval = FALSE}
-new_normalized_data <- npx_br_data %>% 
-  dplyr::filter(Project == "data2") %>% 
-  dplyr::select(-Project, -Adj_factor) %>% 
+new_normalized_data <- npx_br_data |> 
+  dplyr::filter(Project == "data2") |> 
+  dplyr::select(-Project, -Adj_factor) |> 
   write.table(, file = "New_Normalized_NPX_data.csv", sep = ";")
 
 ```
 
+\clearpage
 ## Contact Us
 
 We are always happy to help. Email us with any questions:

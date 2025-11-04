@@ -1,22 +1,54 @@
 ---
 title: "Outlier Exclusion Vignette"
-author: "Olink DS team"
-date: "`r Sys.Date()`"
-output: 
-  html_vignette:
-    toc: true
-    toc_depth: 3
-    includes:
-      in_header: ../man/figures/logo.html
+author: "Olink Data Science"
+date: "`r format(Sys.Date(), '%Y-%m-%d')`"
+output:
+  pdf_document:
+    toc: false # replaced by \tableofcontents
+    # toc_depth: 3
+    # number_sections: true
+    fig_caption: true
+    latex_engine: xelatex
+header-includes:
+  - \usepackage{graphicx}
+  - \usepackage{float}
+  - \usepackage{fontspec} 
+  - \setmainfont{Swedish Gothic}  
+  - \usepackage{setspace}
+  - \onehalfspacing    # for 1.5x line spacing, options \singlespacing, ...
+  - \usepackage{fancyhdr}
+  - \pagestyle{fancy}
+  - \fancyhead{}
+  - \fancyhead[R]{\includegraphics[width=20pt]{../man/figures/small_logo.png}}
+  - \fancyhead[L]{\textbf{Outlier Exclusion Vignette}}
+  # - \fancyhead[R]{\thepage}
+  - \setlength{\headheight}{23.74pt}
+  - \addtolength{\topmargin}{-11.7pt}
+  - \renewcommand{\headrulewidth}{0.4pt}
+  # - \fancyfoot{}  # clears footer
+  # - \usepackage{pdflscape}
 vignette: >
   %\VignetteIndexEntry{Outlier Exclusion Vignette}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+<!-- adding logo after title, author and date, and before toc -->
+
+\thispagestyle{empty}
+\begin{center}
+\vspace*{2cm}
+\includegraphics[width=2cm]{../man/figures/Olink\-Symbol_Black.png}
+\end{center}
+\renewcommand{\arraystretch}{1.5}
+\newpage
+\pagestyle{fancy}
+\setcounter{tocdepth}{2}
+\tableofcontents
+\clearpage
 
 ## Introduction
 
-This vignette describes how to use Olink® Analyze to evaluate a dataset for the presence of outliers. When performing statistical analyze it is important to establish the presence of any outlier samples in the data prior to statistical analysis. There are many reasons why a sample might be an outlier, it could be due to a data entry or measurement error (i.e. labeling a control sample as a disease sample), sampling problems or unusual conditions (i.e. contamination), or natural variation. In many parametric statistics tests the mean of each group is used to determine differences between groups. Since the mean is highly sensitive to outliers, it is important to examine datasets for outliers prior to analysis as these outliers could have a large influence on the statistical results.
+This vignette describes how to use Olink® Analyze to evaluate a dataset for the presence of outliers. When performing statistical analyze it is important to determine if there are any outlier samples in the data prior to statistical analysis. There are many reasons why a sample might be an outlier; it could be due to a data entry or measurement error (for example, labeling a control sample as a disease sample), sampling problems or unusual conditions (for example, contamination), or natural variation. In many parametric statistics tests the mean of each group is used to determine differences between groups. Since the mean is highly sensitive to outliers, it is important to examine datasets for outliers prior to analysis as these outliers could have a large influence on the statistical results.
 
 In Olink Analyze, there are three visualization functions that can be used to identify potential outlier samples. In this vignette, you will learn how to use `olink_pca_plot()`, `olink_dist_plot()` , and `olink_qc_plot()` to identify and remove outliers from a dataset.
 
@@ -82,12 +114,41 @@ Regardless of what the PCA is being used for, PCA plots are great tools to get a
 ```{r Outlier_example_code, eval = FALSE}
 p1<- outlier_data |> olink_pca_plot(label_samples = T, quiet = T)
 p2<- group_data |> olink_pca_plot(color_g = "Site", quiet = T)
-ggpubr::ggarrange(p1[[1]], p2[[1]], nrow = 2, labels = "AUTO")
+ggpubr::ggarrange(p1[[1]], p2[[1]], nrow = 1, labels = "AUTO")
 ```
 
-```{r Outlier_Example, echo=FALSE, fig.cap=fcap}
-knitr::include_graphics(normalizePath("../man/figures/PCA_Outlier_Fig1.png"),error = FALSE)
-fcap <- "**Figure 1** **A.** PCA can be used to identify individual outlier samples as shown by samples A25 and A52. **B.** PCA can be used to identify difference in groups as seen by Site_D samples. This is not suggesting Site_D is an outlier, but rather that there may be a global difference between sites."
+```{r Outlier_Example, echo=FALSE, fig.cap=fcap, out.width="\\linewidth"}
+# knitr::include_graphics(normalizePath("../man/figures/PCA_Outlier_Fig1.png"),error = FALSE)
+p1 <-
+  {
+    outlier_data |> olink_pca_plot(label_samples = T, quiet = T)
+  }[[1]] +
+  ggplot2::theme(
+    legend.text = ggplot2::element_text(size = 7),
+    legend.title = ggplot2::element_text(size = 9),
+    legend.key.size = ggplot2::unit(0.1, "cm"),
+    legend.key.height = ggplot2::unit(0.1, "cm"),
+    legend.key.width = ggplot2::unit(0.1, "cm"),
+    legend.key.spacing = ggplot2::unit(0.1, "cm")
+  )
+
+p2 <-
+  {
+    group_data |>
+      olink_pca_plot(color_g = "Site", quiet = T)
+  }[[1]] +
+  ggplot2::theme(
+    legend.text = ggplot2::element_text(size = 7),
+    legend.title = ggplot2::element_text(size = 9),
+    legend.key.size = ggplot2::unit(0.1, "cm"),
+    legend.key.height = ggplot2::unit(0.1, "cm"),
+    legend.key.width = ggplot2::unit(0.1, "cm"),
+    legend.key.spacing = ggplot2::unit(0.1, "cm"),
+    legend.key.justification = "left"
+  )
+
+ggpubr::ggarrange(p1, p2, nrow = 1, labels = "AUTO", legend = "bottom", widths = c(1,1.1)) 
+fcap <- "\\textbf{A.} PCA can be used to identify individual outlier samples as shown by samples A25 and A52. \\textbf{B.} PCA can be used to identify difference in groups as seen by Site\\_D samples. This is not suggesting Site D is an outlier, but rather that there may be a global difference between sites."
 ```
 
 ### How to use PCA plot to identify an outlier
@@ -106,7 +167,8 @@ PCA plots can be generated using `olink_pca_plot()` and specifying the color for
 
 ```{r PCA_treatment, eval=FALSE}
 OlinkAnalyze::npx_data1 |> 
-  dplyr::filter(stringr::str_detect(SampleID, "CONTROL", negate = T)) |> # Filter duplicate SampleIDs
+  dplyr::filter(
+    stringr::str_detect(SampleID, "CONTROL", negate = T)) |> # Remove control samples
   olink_pca_plot(color_g = "Treatment")
 ```
 
@@ -118,30 +180,41 @@ When multiple panels are run, there is a chance a sample may be an outlier on on
 
 ```{r PCA_Panel, eval=FALSE}
 OlinkAnalyze::npx_data2 |> 
-  dplyr::filter(stringr::str_detect(SampleID, "CONTROL", negate = T)) |> # Filter out control SampleIDs
-  olink_pca_plot(byPanel = TRUE) # Specify by panel
+  dplyr::filter(                            
+    stringr::str_detect(SampleID, "CONTROL", negate = T)) |> # Remove control samples
+  olink_pca_plot(byPanel = TRUE)                             # Specify by panel
 ```
 
 ```{r PCA_Panel_fig, echo=FALSE}
-knitr::include_graphics(normalizePath("../man/figures/PCA_Panel.png"), error = FALSE)
+# knitr::include_graphics(normalizePath("../man/figures/PCA_Panel.png"), error = FALSE)
+OlinkAnalyze::npx_data2 |> 
+  dplyr::filter(                            
+    stringr::str_detect(SampleID, "CONTROL", negate = T)) |> # Remove control samples
+  olink_pca_plot(byPanel = TRUE)                          # Specify by panel
 ```
 
 The PCA plots will be saved in a list of ggplot objects and each can be viewed individually using `[[n]]` syntax as shown below.
 
 ```{r PCA_object, eval = FALSE}
-pca_plots<-OlinkAnalyze::npx_data2|> # Save the PCA plot to a variable
-  dplyr::filter(stringr::str_detect(SampleID, "CONTROL", negate = T)) |> # Filter duplicate SampleIDs
-  olink_pca_plot(byPanel = TRUE, quiet = TRUE) # By panel
-# quiet argument suppresses export
+pca_plots <- OlinkAnalyze::npx_data2 |>         # Save the PCA plot to a variable
+  dplyr::filter(                                # Remove control samples
+    stringr::str_detect(SampleID, "CONTROL", negate = T)
+  ) |> 
+  olink_pca_plot(byPanel = TRUE, quiet = TRUE)  # By panel
 
-pca_plots[[1]] #Cardiometabolic PCA
-pca_plots[[2]] #Inflammation PCA
+
+pca_plots[[1]] # Cardiometabolic PCA
+pca_plots[[2]] # Inflammation PCA
 ```
 
 The plots above show an example where there are not any clear outliers in the PCA. For the purposes of this vignette, we have also generated data where 2 samples appear as outliers.
 
 ```{r Outlier_PCA, echo = FALSE}
-knitr::include_graphics(normalizePath("../man/figures/Outlier_PCA.png"), error = FALSE)
+# knitr::include_graphics(normalizePath("../man/figures/Outlier_PCA.png"), error = FALSE)
+outlier_data |> 
+  dplyr::filter(
+    stringr::str_detect(SampleID, "CONTROL", negate = T)) |> # Remove control samples
+  olink_pca_plot(label_samples = FALSE, byPanel = TRUE ) 
 ```
 
 However from this plot, we can not identify which two samples are outliers. In the next section we will go over how to label outliers in the plot.
@@ -152,32 +225,44 @@ There are two ways to label the samples in the PCA plot. The first way is to use
 
 ```{r, eval = FALSE}
 outlier_data |> 
-  dplyr::filter(stringr::str_detect(SampleID, "CONTROL", negate = T)) |> # Filter duplicate SampleIDs
+  dplyr::filter(
+    stringr::str_detect(SampleID, "CONTROL", negate = T)) |> # Remove control samples
   olink_pca_plot(label_samples = TRUE) 
 ```
 
 ```{r Label_samples, echo = FALSE}
-knitr::include_graphics(normalizePath("../man/figures/label_samples_pca.png"), error = FALSE)
+outlier_data |> 
+  dplyr::filter(
+    stringr::str_detect(SampleID, "CONTROL", negate = T)) |> # Remove control samples
+  olink_pca_plot(label_samples = TRUE) 
+# knitr::include_graphics(normalizePath("../man/figures/label_samples_pca.png"), error = FALSE)
 ```
 
 Here we can see that samples A25 and A52 appear as outliers. This method can be useful when there is clear separation in samples. However it can be difficult to identify additional trends when all samples are labeled. In this case the samples must also be visually identified as opposed to programmatically extracted from the plot. For a cleaner plot with only the outliers labeled, we can use `outlierDefX`, `outlierDefY`, `outlierLines`, and `label_outliers`. These arguments will plot lines at a number of standard deviations from the mean of the plotted PC and label the samples outside of these lines. The values of `outlierDefX` and `outlierDefY` will need to be generated by the users and may require some manual adjustment to determine the correct number to highlight the outliers.
 
 ```{r, eval = FALSE}
 outlier_data |> 
-  dplyr::filter(stringr::str_detect(SampleID, "CONTROL", negate = T)) |> # Filter duplicate SampleIDs
+  dplyr::filter(
+    stringr::str_detect(SampleID, "CONTROL", negate = T)) |> # Remove control samples
   olink_pca_plot(outlierDefX = 3, outlierDefY = 3, 
                  outlierLines = TRUE, label_outliers = TRUE) 
 ```
 
 ```{r outlier_line_pca, echo = FALSE}
-knitr::include_graphics(normalizePath("../man/figures/outlier_line_pca.png"), error = FALSE)
+# knitr::include_graphics(normalizePath("../man/figures/outlier_line_pca.png"), error = FALSE)
+outlier_data |> 
+  dplyr::filter(
+    stringr::str_detect(SampleID, "CONTROL", negate = T)) |> # Remove control samples
+  olink_pca_plot(outlierDefX = 3, outlierDefY = 3, 
+                 outlierLines = TRUE, label_outliers = TRUE) 
 ```
 
 To remove the lines and just keep the outliers labelled, `outlierLines` can be set to False.
 
 ```{r, eval = FALSE}
 outlier_data |> 
-  dplyr::filter(stringr::str_detect(SampleID, "CONTROL", negate = T)) |> # Filter duplicate SampleIDs
+  dplyr::filter(
+    stringr::str_detect(SampleID, "CONTROL", negate = T)) |> # Remove control samples
   olink_pca_plot(outlierDefX = 3, outlierDefY = 3, 
                  outlierLines = FALSE, label_outliers = TRUE) 
 ```
@@ -186,7 +271,8 @@ Once the correct outliers have been highlighted in the graph, we can then progra
 
 ```{r}
 outliers_pca_labeled <- outlier_data |> 
-  dplyr::filter(stringr::str_detect(SampleID, "CONTROL", negate = T)) |> # Filter duplicate SampleIDs
+  dplyr::filter(
+    stringr::str_detect(SampleID, "CONTROL", negate = T)) |> # Remove control samples
   olink_pca_plot(outlierDefX = 3, outlierDefY = 3, outlierLines = FALSE, 
                  label_outliers = TRUE, quiet = TRUE) 
 
@@ -215,29 +301,42 @@ If we look at a subset of the outlier data from the PCA example, we can see that
 
 ```{r, eval = FALSE}
 outlier_data |> 
-  dplyr::filter(SampleID %in% c("A25", "A52", "A1", "A2", "A3", "A5", "A15", "A16", "A18", "A19", "A20"))|> 
+  dplyr::filter(SampleID %in% c("A25", "A52", "A1", "A2", "A3", "A5", 
+                                "A15", "A16", "A18", "A19", "A20"))|> 
   olink_dist_plot()
 ```
 
-```{r, echo=FALSE}
-knitr::include_graphics(normalizePath("../man/figures/dist_boxplot.png"), error = FALSE)
+```{r, echo=FALSE, out.width="\\linewidth"}
+# knitr::include_graphics(normalizePath("../man/figures/dist_boxplot.png"), error = FALSE)
+outlier_data |> 
+  dplyr::filter(SampleID %in% c("A25", "A52", "A1", "A2", "A3", "A5", 
+                                "A15", "A16", "A18", "A19", "A20"))|> 
+  olink_dist_plot() + 
+  ggplot2::theme(legend.position = "bottom", 
+                 axis.text.x = ggplot2::element_text(size = 7))
+  
 ```
 
 NPX distribution plots can also be useful in identifying group trends, such as a difference in site D as shown in the figure below. The color of the bars can be altered using the `color_g` argument.
 
 ```{r, eval=FALSE}
 group_data |> 
-  dplyr::filter(Site %in% c("Site_A", "Site_D")) |> # Only visualizing 2 sites to see all samples
+  dplyr::filter(Site %in% c("Site_A", "Site_D")) |> # Visualizing 2 sites to see all samples
   olink_dist_plot(color_g = "Site")
 ```
 
 ```{r, echo=FALSE}
-knitr::include_graphics(normalizePath("../man/figures/site_boxplot.png"), error = FALSE)
+# knitr::include_graphics(normalizePath("../man/figures/site_boxplot.png"), error = FALSE)
+group_data |> 
+  dplyr::filter(Site %in% c("Site_A", "Site_D")) |> # Visualizing 2 sites to see all samples
+  olink_dist_plot(color_g = "Site") + 
+  ggplot2::theme(legend.position = "bottom", 
+                 axis.text.x = ggplot2::element_text(size = 5, angle = 90))
 ```
 
 In this case, the shift in NPX distribution could be biologically meaningful or could indicate a sample or technical issue. There are several biological cases where the total protein concentration in a sample may be larger in one group than another. However, in some cases the difference in protein concentration can also lead to skewed results, in which case it may be helpful to normalize the data for the changes in protein concentration by performing a median adjustment as shown below.
 
-```{r, eval=FALSE}
+```{r, eval=TRUE}
 # Calculate SampleID Median NPX
 median_NPX<-group_data |> 
   dplyr::group_by(SampleID) |> 
@@ -249,12 +348,14 @@ adjusted_data <- group_data |>
   dplyr::mutate(NPX = NPX - Median_NPX) 
 
 adjusted_data|> 
-  dplyr::filter(Site %in% c("Site_A", "Site_D")) |> # Only visualizing 2 sites to see all samples
-  olink_dist_plot(color_g = "Site")
+  dplyr::filter(Site %in% c("Site_A", "Site_D")) |> # Visualizing 2 sites to see all samples
+  olink_dist_plot(color_g = "Site") + 
+  ggplot2::theme(legend.position = "bottom", 
+                 axis.text.x = ggplot2::element_text(size = 5, angle = 90))
 ```
 
-```{r echo=FALSE}
-knitr::include_graphics(normalizePath("../man/figures/sample_med_boxplot.png"), error = FALSE)
+```{r echo=FALSE, eval=FALSE}
+# knitr::include_graphics(normalizePath("../man/figures/sample_med_boxplot.png"), error = FALSE)
 ```
 
 
@@ -274,13 +375,13 @@ Often there are too many samples to identify outliers using `olink_dist_plot()`.
 
 Using the outlier data from the previous plots, we can see that sample A52 has a lower sample median and sample A25 has a higher sample median in both panels. Sample A48 has the highest IQR of all samples in the Inflammation panel. However, we can see many other samples approaching the line threshold line (default of 3 standard deviation from the mean IQR or sample median), suggesting that this sample may not be a true outlier.
 
-```{r, eval = FALSE}
+```{r, eval = TRUE}
 outlier_data |> 
   olink_qc_plot()
 ```
 
-```{r echo=FALSE}
-knitr::include_graphics(normalizePath("../man/figures/qc_plot.png"), error = FALSE)
+```{r echo=FALSE, eval=FALSE}
+# knitr::include_graphics(normalizePath("../man/figures/qc_plot.png"), error = FALSE)
 ```
 
 
@@ -288,13 +389,13 @@ With a standard deviation of 3 and assuming a normal distribution of samples, it
 
 Similar to what was shown in the NPX distribution plot example, the QC plot can also be used to see changes in specific groups. In the example below, the samples are colored by site and Site D appears to have samples with higher sample median. 
 
-```{r eval=FALSE}
+```{r eval=TRUE}
 group_data |> 
   olink_qc_plot(color_g = "Site")
 ```
 
-```{r echo=FALSE}
-knitr::include_graphics(normalizePath("../man/figures/qc_site_plot.png"), error = FALSE)
+```{r echo=FALSE, eval=FALSE}
+# knitr::include_graphics(normalizePath("../man/figures/qc_site_plot.png"), error = FALSE)
 ```
 
 ### Labeling outliers 
@@ -302,14 +403,14 @@ knitr::include_graphics(normalizePath("../man/figures/qc_site_plot.png"), error 
 
 To change the threshold and outliers that are labeled, we can use `median_outlierDef`, `IQR_outlierDef`, `outlierLines`, and `label_outliers`. These arguments will plot lines at a number of standard deviations from the mean of the sample median or IQR and label the samples outside of these lines. The values of `median_outlierDef` and `IQR_outlierDef` default to 3 and may require some manual adjustment to determine the correct number to highlight the outliers.
 
-```{r eval=FALSE}
+```{r eval=TRUE}
 outlier_data |> 
   olink_qc_plot(median_outlierDef = 2, IQR_outlierDef = 4, 
                  outlierLines = TRUE, label_outliers = TRUE) 
 ```
 
-```{r echo=FALSE}
-knitr::include_graphics(normalizePath("../man/figures/qc_label_plot.png"), error = FALSE)
+```{r echo=FALSE, eval=FALSE}
+ # knitr::include_graphics(normalizePath("../man/figures/qc_label_plot.png"), error = FALSE)
 ```
 
 To remove the lines and just keep the outliers labelled `outlierLines` can be set to False.
@@ -343,7 +444,7 @@ After reviewing these plots, a list of potential outliers may be generated. Whet
 In the case of a biological issue, it may be useful to keep the potential outlier within the study as the sample has biological meaning, however additional normalization may be needed. For example, in a diabetes study, patients with severe diabetes may have higher protein in their urine as compared to control subject. In this case it could be useful to normalize based on total protein concentration or median NPX to set all values within the context of the study. 
 Another example is in the case of multiple batches, one batch may appear to cluster differently from another batch. In this case additional normalization such as bridging is needed to bridge the studies to the same scale.
 
-
+\clearpage
 ## Contact Us
 
 We are always happy to help. Email us with any questions:

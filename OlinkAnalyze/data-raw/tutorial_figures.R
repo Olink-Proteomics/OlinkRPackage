@@ -290,8 +290,8 @@ ggplot2::ggsave(
 # 3k to HT bridging Figures -----------------------------------------------
 
 # Read data
-data_explore3072 <- readRDS(file = "tests/data/example_3k_data.rds")
-data_exploreht <- readRDS(file = "tests/data/example_HT_data.rds")
+data_explore3072 <- readRDS(file = "tests/testthat/data/example_3k_data.rds")
+data_exploreht <- readRDS(file = "tests/testthat/data/example_HT_data.rds")
 
 data_explore3072_samples <- data_explore3072 |>
   dplyr::filter(
@@ -355,16 +355,17 @@ pca_e3072 <- OlinkAnalyze::olink_pca_plot(
   df = data_explore3072_before_br,
   color_g = "Type",
   quiet = TRUE
-)
+)[[1L]] + set_plot_theme(font = "")
 
 pca_eht <- OlinkAnalyze::olink_pca_plot(
   df = data_exploreht_before_br,
   color_g = "Type",
   quiet = TRUE
-)
+)[[1L]] + set_plot_theme(font = "")
 
 ggpubr::ggarrange(
-  pca_e3072[[1L]], pca_eht[[1L]],
+  pca_e3072, pca_eht,
+  common.legend = FALSE,
   nrow = 1L,
   legend = "bottom"
 )
@@ -373,6 +374,13 @@ ggplot2::ggsave(
   filename = "man/figures/PCA_btw_product_before.png",
   width = 6L,
   height = 2.5,
+  units = "in",
+  dpi = "screen"
+)
+ggplot2::ggsave(
+  filename = "man/figures/PCA_btw_product_before.pdf",
+  width = 10L,
+  height = 4,
   units = "in",
   dpi = "screen"
 )
@@ -413,7 +421,7 @@ npx_br_data |>
 
 # SC pre bridging-------------------------------------------------------
 
-npx_br_data |>
+{npx_br_data |>
   dplyr::filter(
     .data[["SampleType"]] == "SAMPLE_CONTROL"
   ) |>
@@ -422,8 +430,9 @@ npx_br_data |>
     SampleID = paste0(.data[["Project"]], .data[["SampleID"]])
   ) |>
   OlinkAnalyze::olink_pca_plot(
-    color_g = "Project"
-  )
+    color_g = "Project",
+    quiet = FALSE
+  )}[[1]] + set_plot_theme(font = "")
 
 ggplot2::ggsave(
   filename = "man/figures/SCs_pre_bridging.png",
@@ -432,10 +441,17 @@ ggplot2::ggsave(
   units = "in",
   dpi = "screen"
 )
+ggplot2::ggsave(
+  filename = "man/figures/SCs_pre_bridging.pdf",
+  width = 5L,
+  height = 2L,
+  units = "in",
+  dpi = "screen"
+)
 
 # Bridge sample pre bridging ----------------------------------------------
 
-npx_br_data |>
+{npx_br_data |>
   dplyr::filter(
     .data[["SampleType"]] == "SAMPLE"
     & .data[["SampleID"]] %in% .env[["overlapping_samples"]]
@@ -446,11 +462,18 @@ npx_br_data |>
   ) |>
   OlinkAnalyze::olink_pca_plot(
     color_g = "Project"
-  )
+  )}[[1]] + set_plot_theme(font = "")
 
 ggplot2::ggsave(
   filename = "man/figures/bridges_pre_bridging.png",
   width = 3L,
+  height = 2L,
+  units = "in",
+  dpi = "screen"
+)
+ggplot2::ggsave(
+  filename = "man/figures/bridges_pre_bridging.pdf",
+  width = 5L,
   height = 2L,
   units = "in",
   dpi = "screen"
@@ -487,13 +510,13 @@ npx_after_br_final <- npx_after_br_reco |>
 
 # PCA plot of the data from SCs ------------------------------
 
-npx_after_br_final |>
+{npx_after_br_final |>
   dplyr::filter(
     .data[["SampleType"]] == "SAMPLE_CONTROL"
   ) |>
   OlinkAnalyze::olink_pca_plot(
     color_g = "Project"
-  )
+  )}[[1]] + set_plot_theme(font = "")
 
 ggplot2::ggsave(
   filename = "man/figures/SCs_post_bridging.png",
@@ -502,10 +525,17 @@ ggplot2::ggsave(
   units = "in",
   dpi = "screen"
 )
+ggplot2::ggsave(
+  filename = "man/figures/SCs_post_bridging.pdf",
+  width = 5L,
+  height = 2L,
+  units = "in",
+  dpi = "screen"
+)
 
 # PCA plot of the data from bridging samples ------------------
 
-npx_after_br_reco |>
+{npx_after_br_reco |>
   dplyr::filter(
     .data[["SampleType"]] == "SAMPLE"
     & .data[["SampleID"]] %in% .env[["overlapping_samples"]]
@@ -515,12 +545,61 @@ npx_after_br_reco |>
   ) |>
   OlinkAnalyze::olink_pca_plot(
     color_g = "Project"
-  )
+  )}[[1]] + set_plot_theme(font = "")
 
 ggplot2::ggsave(
   filename = "man/figures/bridges_post_bridging.png",
   width = 3L,
   height = 2L,
+  units = "in",
+  dpi = "screen"
+)
+ggplot2::ggsave(
+  filename = "man/figures/bridges_post_bridging.pdf",
+  width = 5L,
+  height = 2L,
+  units = "in",
+  dpi = "screen"
+)
+
+## bridgeability_plot -----
+npx_ht <- OlinkAnalyze:::data_ht_small |>
+  dplyr::filter(
+    .data[["SampleType"]] == "SAMPLE"
+  )
+
+npx_3072 <- OlinkAnalyze:::data_3k_small |>
+  dplyr::filter(
+    .data[["SampleType"]] == "SAMPLE"
+  )
+
+overlapping_samples <- intersect(
+  x = npx_ht$SampleID,
+  y = npx_3072$SampleID
+)
+
+data_norm <- OlinkAnalyze::olink_normalization(
+  df1 = npx_ht,
+  df2 = npx_3072,
+  overlapping_samples_df1 = overlapping_samples,
+  df1_project_nr = "Explore HT",
+  df2_project_nr = "Explore 3072",
+  reference_project = "Explore HT"
+)
+
+data_norm_bridge_p <- OlinkAnalyze::olink_bridgeability_plot(
+  data = data_norm,
+  olink_id =  "OID40770",
+  median_counts_threshold = 150L,
+  min_count = 10L
+)
+
+data_norm_bridge_p <- data_norm_bridge_p[["OID40770"]] + set_plot_theme(font = "")
+data_norm_bridge_p
+ggplot2::ggsave(
+  filename = "man/figures/bridgeable_plt_MedianCenter.pdf",
+  width = 6L,
+  height = 6L,
   units = "in",
   dpi = "screen"
 )
