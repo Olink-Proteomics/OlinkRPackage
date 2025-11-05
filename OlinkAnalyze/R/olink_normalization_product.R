@@ -768,7 +768,7 @@ olink_normalization_qs <- function(lst_df,
 #' )
 #'
 #'# generate lst_check
-#'lst_check_3k_ht <- olink_norm_input_check(
+#'lst_check_3k_ht <- OlinkAnalyze:::olink_norm_input_check(
 #'  df1 = OlinkAnalyze:::data_ht_small,
 #'  df2 = OlinkAnalyze:::data_3k_small,
 #'  overlapping_samples_df1 = bridge_samples,
