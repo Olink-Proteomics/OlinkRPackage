@@ -42,7 +42,8 @@ subset normalization.}
 Required for reference median normalization.}
 
 \item{format}{Boolean that controls whether the normalized dataset will be
-formatted for input to downstream analysis.}
+formatted for input to downstream analysis. Only applicable for cross-product
+bridge normalization.}
 }
 \value{
 Tibble or ArrowObject with the normalized dataset.
