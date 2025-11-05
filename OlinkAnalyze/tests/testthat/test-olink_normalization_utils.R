@@ -3549,22 +3549,21 @@ test_that(
         lst_df = list(
           "p1" = data_ht |>
             dplyr::rename(
-              "OlinkID_not_ref" = "OlinkID"
+              "OlinkID_HT" = "OlinkID"
             ) |>
             dplyr::left_join(
               reveal_eht_mapping |>
-                dplyr::rename("OlinkID_not_ref" = "OlinkID_HT") |>
                 dplyr::select(
                   dplyr::all_of(
-                    c("OlinkID_not_ref", "OlinkID")
+                    c("OlinkID_HT", "OlinkID")
                   )
                 ),
-              by = "OlinkID_not_ref",
+              by = "OlinkID_HT",
               relationship = "many-to-many"
             ) |>
             dplyr::mutate(
               OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
-                                       .data[["OlinkID_not_ref"]],
+                                       .data[["OlinkID_HT"]],
                                        .data[["OlinkID"]])
             ),
           "p2" = data_reveal |>

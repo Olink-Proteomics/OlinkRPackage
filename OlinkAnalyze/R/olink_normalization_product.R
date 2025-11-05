@@ -741,10 +741,8 @@ olink_normalization_qs <- function(lst_df,
 #' olink_normalization product bridging.
 #' @param df2_project_nr Project name of second dataset. Must match name used in
 #' olink_normalization product bridging.
-#' @param reference_project Project name of reference project. Must match name
-#' used in olink_normalization product bridging and be one of df1_project_nr or
-#' df2_project_nr.
 #' @param prod_uniq Name of products (not_ref, ref)
+#' @param lst_check = lst_check
 #'
 #' @return A "tibble" of Olink data in long format containing both input
 #' datasets with the bridged NPX quantifications, with the above
@@ -786,10 +784,15 @@ olink_normalization_product_format <- function(df_norm, # nolint object_length_l
                                                df1_project_nr,
                                                df2,
                                                df2_project_nr,
-                                               reference_project,
-                                               prod_uniq) {
+                                               prod_uniq,
+                                               lst_check) {
 
   # Extract data for assays = "NotBridgeable" ----
+  not_ref_product <- ifelse(lst_check$not_ref_product == "3k",
+                            "E3072",
+                            lst_check$not_ref_product)
+
+  olinkid_not_ref <- paste0("OlinkID_", not_ref_product)
 
   df_not_bridgeable <- df_norm |>
     dplyr::filter(
@@ -800,11 +803,11 @@ olink_normalization_product_format <- function(df_norm, # nolint object_length_l
     ) |>
     dplyr::mutate(
       OlinkID = dplyr::if_else(
-        .data[["Project"]] == .env[["reference_project"]],
+        .data[["Project"]] == lst_check$ref_name,
         .data[["OlinkID"]],
-        .data[["OlinkID_E3072"]]
+        .data[[olinkid_not_ref]])
       )
-    )
+
 
   # Extract data from non-overlapping assays ----
 
@@ -855,7 +858,7 @@ olink_normalization_product_format <- function(df_norm, # nolint object_length_l
       & .data[["BridgingRecommendation"]] != "NotBridgeable"
     ) |> # Remove controls
     dplyr::mutate(
-      OlinkID = paste0(.data[["OlinkID"]], "_", .data[["OlinkID_E3072"]]),
+      OlinkID = paste0(.data[["OlinkID"]], "_", .data[[olinkid_not_ref]]),
       NPX = dplyr::case_when(
         .data[["BridgingRecommendation"]] == "MedianCentering" ~
           .data[["MedianCenteredNPX"]],
@@ -882,7 +885,7 @@ olink_normalization_product_format <- function(df_norm, # nolint object_length_l
     ) |>
     dplyr::select( # Remove extra columns
       -dplyr::any_of(
-        c("MedianCenteredNPX", "QSNormalizedNPX", "OlinkID_E3072")
+        c("MedianCenteredNPX", "QSNormalizedNPX", olinkid_not_ref)
       )
     ) |>
     dplyr::arrange(

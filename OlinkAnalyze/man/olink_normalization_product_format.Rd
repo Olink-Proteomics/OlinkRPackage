@@ -11,8 +11,8 @@ olink_normalization_product_format(
   df1_project_nr,
   df2,
   df2_project_nr,
-  reference_project,
-  prod_uniq
+  prod_uniq,
+  lst_check
 )
 }
 \arguments{
@@ -31,11 +31,9 @@ Must match df2 used in olink_normalization product bridging.}
 \item{df2_project_nr}{Project name of second dataset. Must match name used in
 olink_normalization product bridging.}
 
-\item{reference_project}{Project name of reference project. Must match name
-used in olink_normalization product bridging and be one of df1_project_nr or
-df2_project_nr.}
-
 \item{prod_uniq}{Name of products (not_ref, ref)}
+
+\item{lst_check}{= lst_check}
 }
 \value{
 A "tibble" of Olink data in long format containing both input
