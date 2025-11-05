@@ -767,6 +767,18 @@ olink_normalization_qs <- function(lst_df,
 #'   reference_project = "Explore HT"
 #' )
 #'
+#'# generate lst_check
+#'lst_check_3k_ht <- olink_norm_input_check(
+#'  df1 = OlinkAnalyze:::data_ht_small,
+#'  df2 = OlinkAnalyze:::data_3k_small,
+#'  overlapping_samples_df1 = bridge_samples,
+#'  overlapping_samples_df2 = NULL,
+#'  df1_project_nr = "Explore HT",
+#'  df2_project_nr = "Explore 3072",
+#'  reference_project = "Explore HT",
+#'  reference_medians = NULL
+#'  )
+#'
 #' # format output
 #' OlinkAnalyze:::olink_normalization_product_format(
 #'   df_norm = df_norm,
@@ -774,7 +786,7 @@ olink_normalization_qs <- function(lst_df,
 #'   df2 = OlinkAnalyze:::data_3k_small,
 #'   df1_project_nr = "Explore HT",
 #'   df2_project_nr = "Explore 3072",
-#'   reference_project = "Explore HT",
+#'   lst_check = lst_check_3k_ht,
 #'   prod_uniq = c("3k", "HT")
 #' )
 #' }
