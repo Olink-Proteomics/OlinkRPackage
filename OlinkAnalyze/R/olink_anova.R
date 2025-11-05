@@ -38,11 +38,11 @@
 #'
 #' @param df NPX data frame in long format with at least protein name (Assay),
 #' OlinkID, UniProt, Panel and a factor with at least 3 levels.
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
 #' @param variable Single character value or character array. Variable(s) to
 #' test. If length > 1, the included variable names will be used in crossed
 #' analyses. Also takes ':' or '*' notation.
+#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
+#' [`check_npx()`] will be run internally using `df`.
 #' @param outcome Character. The dependent variable. Default: NPX.
 #' @param covariates Single character value or character array. Default: NULL.
 #' Covariates to include. Takes ':' or '*' notation. Crossed analysis will not
@@ -228,7 +228,7 @@ olink_anova <- function(df,
 
   anova_result <- withCallingHandlers(
     {
-      #Filtering on valid OlinkID
+      # Filtering on valid OlinkID
       df <- df |>
         dplyr::filter(
           stringr::str_detect(
@@ -237,7 +237,7 @@ olink_anova <- function(df,
           )
         )
 
-      #Allow for :/* notation in covariates
+      # Allow for :/* notation in covariates
       variable <- gsub(pattern = "\\*", replacement = ":", x = variable)
       if (!is.null(covariates)) {
         covariates <- gsub(pattern = "\\*", replacement = ":", x = covariates)
@@ -263,11 +263,12 @@ olink_anova <- function(df,
       # Variables to check
       variable_testers <- intersect(x = c(variable, covariates), y = names(df))
 
-      # Remove rows where variables or covariate is NA (cant include in analysis
-      # anyway)
+      # Remove rows where variables or covariate is NA (can't include in
+      # analysis anyway)
       removed.sampleids <- NULL # nolint object_name_linter
       for (i in variable_testers) {
-        removed.sampleids <- c(removed.sampleids, df$SampleID[is.na(df[[i]])]) |> # nolint object_name_linter
+        removed.sampleids <- c(removed.sampleids,
+                               df$SampleID[is.na(df[[i]])]) |> # nolint object_name_linter
           unique()
         df <- df[!is.na(df[[i]]), ]
       }
@@ -275,7 +276,7 @@ olink_anova <- function(df,
       # Check data format
       check_log <- run_check_npx(df = df, check_log = check_log)
 
-      ##Convert character vars to factor
+      # Convert character vars to factor
       converted.vars <- NULL # nolint object_name_linter
       num.vars <- NULL # nolint object_name_linter
       for (i in variable_testers) {
