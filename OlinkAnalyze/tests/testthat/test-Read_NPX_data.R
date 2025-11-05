@@ -260,3 +260,38 @@ test_that(
 
   }
 )
+
+# Dar ID triggers error ---
+test_that("no message",{
+  expect_no_message(
+    check_darid(npx_data1)
+  )
+})
+
+
+test_that("DarIDs trigger re-export message", {
+  messages <- capture_messages(
+    check_darid(
+      npx_data1 |>
+        dplyr::mutate(DataAnalysisRefID = "D10007") |>
+        dplyr::mutate(PanelDataArchiveVersion = "1.2")
+    )
+  )
+
+  expect_true(any(grepl("Outdated .* Panel Archive .* combination", messages)))
+  expect_true(any(grepl("Re-export data using Panel Archive", messages)))
+  expect_true(any(grepl("Failure to re-export", messages)))
+})
+
+test_that("DarIDs & ExploreVersion trigger re-export message", {
+  messages <- capture_messages(
+    check_darid(npx_data1 |>
+                  mutate(DataAnalysisRefID = "D10007") |>
+                  mutate(ExploreVersion = "1.2"))
+  )
+
+  expect_true(any(grepl("Outdated .* Software Version combination", messages)))
+  expect_true(any(grepl("Re-export data using .* NPX Map", messages)))
+  expect_true(any(grepl("Failure to re-export", messages)))
+
+})

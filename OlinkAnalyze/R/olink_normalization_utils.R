@@ -253,7 +253,6 @@ olink_norm_input_check <- function(df1,
   )
   lst_df <- lst_df_overlap_assay$lst_df
   reference_medians <- lst_df_overlap_assay$reference_medians
-  non_overlapping_oid <- lst_df_overlap_assay$non_overlapping_oid
 
   # Check normalization approach ----
 
@@ -285,17 +284,11 @@ olink_norm_input_check <- function(df1,
     not_ref_cols = NULL,
     not_ref_product = NULL,
     reference_medians = NULL,
-    norm_mode = NULL,
-    non_overlapping_oid = NULL
+    norm_mode = NULL
   )
 
   # set normalization mode
   lst_out$norm_mode <- norm_mode
-
-  # save any non-overlapping OlinkIDs
-  if (!is.null(non_overlapping_oid)) {
-    lst_out$non_overlapping_oid <- non_overlapping_oid
-  }
 
   if (norm_mode %in% olink_norm_modes$ref_median) {
     # reference median normalization
@@ -1877,7 +1870,7 @@ olink_norm_input_clean_assays <- function(lst_df,
 #' `r cli::ansi_collapse(x = OlinkAnalyze:::olink_norm_modes, sep2 = " or ", last = " or ")`. # nolint line_length_linter
 #'
 #' @return A named list containing \var{lst_df} and \var{reference_medians}
-#' with assays shared across all datasets.
+#' will assays shared across all datasets.
 #'
 olink_norm_input_assay_overlap <- function(lst_df,
                                            reference_medians,
@@ -1936,10 +1929,7 @@ olink_norm_input_assay_overlap <- function(lst_df,
     dplyr::filter(
       .data[["L"]] != 0L
     )
-  # Keep dataset of origin for nonoverlapping assays
-  oid_removed <- oid_combos_miss |>
-    dplyr::select(X, Z) |>
-    tibble::deframe()
+  oid_removed <- oid_combos_miss$Z |> unlist() |> unique()
 
   # remove non-shared assays and throw a warning message about it
   if (nrow(oid_combos_miss) > 0L) {
@@ -1948,27 +1938,23 @@ olink_norm_input_assay_overlap <- function(lst_df,
     lst_out$lst_df <- lapply(names(lst_df), function(l_name) {
       lst_df[[l_name]] |> # nolint return_linter
         dplyr::filter(
-          !(.data[[lst_cols[[l_name]]$olink_id]] %in% unlist(oid_removed))
+          !(.data[[lst_cols[[l_name]]$olink_id]] %in% oid_removed)
         )
     })
     names(lst_out$lst_df) <- names(lst_df)
-
-    # save any non-overlapping OlinkIDs
-    lst_out$non_overlapping_oid <- oid_removed
-
 
     # remove from reference_medians too, if available
     if (!is.null(reference_medians)) {
       lst_out$reference_medians <- reference_medians |>
         dplyr::filter(
-          !(.data[["OlinkID"]] %in% unlist(oid_removed))
+          !(.data[["OlinkID"]] %in% oid_removed)
         )
     }
     if (norm_mode == olink_norm_modes$norm_cross_product) {
       cli::cli_warn(
         c(
-          "{length(unique(unlist(oid_removed)))} assay{?s} are not shared across products.",
-          "i" = "{length(unlist(oid_removed))} assay{?s} will be removed from
+          "{length(oid_removed)} assay{?s} are not shared across products.",
+          "i" = "{length(oid_removed)} assay{?s} will be removed from
         normalization."
         ),
         wrap = FALSE
@@ -1977,9 +1963,9 @@ olink_norm_input_assay_overlap <- function(lst_df,
     } else {    # warning message
       cli::cli_warn(
         c(
-          "Assay{?s} {.val {unique(unlist(oid_removed))}} not shared across input dataset(s):",
+          "Assay{?s} {.val {oid_removed}} not shared across input dataset(s):",
           dplyr::pull(oid_combos_miss, .data[["M"]]),
-          "i" = "{cli::qty(unique(unlist(oid_removed)))} Assay{?s} will be removed from
+          "i" = "{cli::qty(oid_removed)} Assay{?s} will be removed from
         normalization."
         ),
         wrap = FALSE
@@ -1990,11 +1976,9 @@ olink_norm_input_assay_overlap <- function(lst_df,
   } else {
 
     # if all assays shared, return original datasets
-    # If empty, set non_overlapping_oid to NULL for checks
     lst_out <- list(
       lst_df = lst_df,
-      reference_medians = reference_medians,
-      non_overlapping_oid = NULL
+      reference_medians = reference_medians
     )
 
   }

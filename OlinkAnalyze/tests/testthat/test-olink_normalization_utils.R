@@ -69,8 +69,7 @@ test_that(
                             sample_type = character(0L)),
         not_ref_product = "other",
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$bridge,
-        non_overlapping_oid = NULL
+        norm_mode = olink_norm_modes$bridge
       )
     )
 
@@ -146,94 +145,7 @@ test_that(
                             sample_type = character(0L)),
         not_ref_product = "other",
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$bridge,
-        non_overlapping_oid = NULL
-      )
-    )
-
-    # with non-overlapping OlinkIDs ----
-
-    bridge_samples <- intersect(x = npx_data1$SampleID,
-                                y = npx_data2$SampleID) |>
-      (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x)])()
-
-    expect_message(
-      expect_warning(
-        object = lst_check_out <- olink_norm_input_check(
-          df1 = npx_data1 |>
-            dplyr::mutate(
-              Normalization = "Intensity"
-            ) |>
-            dplyr::mutate(OlinkID = ifelse(.data[["OlinkID"]] == "OID01216",
-                                           "OID00000",
-                                           .data[["OlinkID"]])),
-          df2 = npx_data2 |>
-            dplyr::mutate(
-              Normalization = "Intensity"
-            ),
-          overlapping_samples_df1 = bridge_samples,
-          overlapping_samples_df2 = NULL,
-          df1_project_nr = "20200001",
-          df2_project_nr = "20200002",
-          reference_project = "20200002",
-          reference_medians = NULL
-        ),
-        regexp = "*not shared across input dataset(s)*"
-      ),
-      regexp = "Bridge normalization will be performed!"
-    )
-
-    expect_identical(
-      object = lst_check_out,
-      expected = list(
-        ref_df = npx_data2 |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ) |>
-          dplyr::filter(!(.data[["OlinkID"]] == "OID01216")), # rm changed assay
-        ref_samples = bridge_samples,
-        ref_name = "20200002",
-        ref_cols = list(sample_id = "SampleID",
-                        olink_id = "OlinkID",
-                        uniprot = "UniProt",
-                        assay = "Assay",
-                        panel = "Panel",
-                        panel_version = "Panel_Version",
-                        plate_id = "PlateID",
-                        qc_warn = "QC_Warning",
-                        assay_warn = character(0L),
-                        quant = "NPX",
-                        lod = "LOD",
-                        normalization = "Normalization",
-                        count = character(0L),
-                        sample_type = character(0L)),
-        ref_product = "other",
-        not_ref_df = npx_data1 |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ) |>
-          dplyr::filter(!(.data[["OlinkID"]] == "OID01216")), # rm changed assay
-        not_ref_samples = NULL,
-        not_ref_name = "20200001",
-        not_ref_cols = list(sample_id = "SampleID",
-                            olink_id = "OlinkID",
-                            uniprot = "UniProt",
-                            assay = "Assay",
-                            panel = "Panel",
-                            panel_version = "Panel_Version",
-                            plate_id = "PlateID",
-                            qc_warn = "QC_Warning",
-                            assay_warn = character(0L),
-                            quant = "NPX",
-                            lod = "LOD",
-                            normalization = "Normalization",
-                            count = character(0L),
-                            sample_type = character(0L)),
-        not_ref_product = "other",
-        reference_medians = NULL,
-        norm_mode = olink_norm_modes$bridge,
-        non_overlapping_oid = list("20200002" = "OID01216",
-                                   "20200001" = "OID00000")
+        norm_mode = olink_norm_modes$bridge
       )
     )
 
@@ -319,8 +231,7 @@ test_that(
                             sample_type = character(0L)),
         not_ref_product = "other",
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$bridge,
-        non_overlapping_oid = NULL
+        norm_mode = olink_norm_modes$bridge
       )
     )
 
@@ -403,8 +314,7 @@ test_that(
                             sample_type = character(0L)),
         not_ref_product = "other",
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$bridge,
-        non_overlapping_oid = NULL
+        norm_mode = olink_norm_modes$bridge
       )
     )
   }
@@ -529,9 +439,7 @@ test_that(
                             sample_type = "SampleType"),
         not_ref_product = "3k",
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$norm_cross_product,
-        non_overlapping_oid = list("HT" = "OID54321",
-                                   "3K" = "OID12345")
+        norm_mode = olink_norm_modes$norm_cross_product
       )
     )
 
@@ -645,26 +553,7 @@ test_that(
                             sample_type = "SampleType"),
         not_ref_product = "3k",
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$norm_cross_product,
-        non_overlapping_oid =
-          list("3K" = c("OID31162", "OID30796", "OID20054", "OID20055", "OID30420",
-            "OID20059", "OID20791", "OID20051", "OID31159", "OID20057",
-            "OID31160", "OID31163", "OID31158", "OID20790", "OID20058",
-            "OID20053", "OID30146", "OID30130", "OID31277", "OID30080",
-            "OID20435", "OID30471", "OID21188", "OID30877", "OID30067",
-            "OID21243", "OID30956", "OID21244", "OID30955", "OID20062",
-            "OID30488", "OID31275", "OID20437", "OID20806", "OID30881",
-            "OID20492", "OID31351", "OID30161", "OID31173", "OID21162",
-            "OID20810", "OID31348", "OID30949", "OID31260", "OID31339",
-            "OID21202", "OID21255", "OID31190", "OID30871", "OID30861",
-            "OID20803", "OID30166", "OID30121", "OID30792", "OID20432",
-            "OID30828", "OID20446", "OID21246", "OID30124", "OID30118",
-            "OID30065", "OID31230", "OID30062", "OID30079", "OID20811",
-            "OID20865", "OID30850", "OID30980", "OID30165", "OID30466",
-            "OID21267", "OID30896", "OID30844", "OID31218", "OID31202",
-            "OID30873", "OID30051", "OID21217", "OID30856", "OID20074",
-            "OID50330_OID20473", "OID20848", "OID21237", "OID12345"),
-            "reveal" = "OID54321")
+        norm_mode = olink_norm_modes$norm_cross_product
       )
     )
   }
@@ -735,8 +624,7 @@ test_that(
                             sample_type = character(0L)),
         not_ref_product = NULL,
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$subset,
-        non_overlapping_oid = NULL
+        norm_mode = olink_norm_modes$subset
       )
     )
 
@@ -808,8 +696,7 @@ test_that(
                             sample_type = character(0L)),
         not_ref_product = NULL,
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$subset,
-        non_overlapping_oid = NULL
+        norm_mode = olink_norm_modes$subset
       )
     )
   }
@@ -885,8 +772,7 @@ test_that(
                             sample_type = character(0L)),
         not_ref_product = NULL,
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$subset,
-        non_overlapping_oid = NULL
+        norm_mode = olink_norm_modes$subset
       )
     )
 
@@ -958,8 +844,7 @@ test_that(
                             sample_type = character(0L)),
         not_ref_product = NULL,
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$subset,
-        non_overlapping_oid = NULL
+        norm_mode = olink_norm_modes$subset
       )
     )
   }
@@ -1033,8 +918,7 @@ test_that(
         not_ref_cols = NULL,
         not_ref_product = NULL,
         reference_medians = ref_median_df,
-        norm_mode = olink_norm_modes$ref_median,
-        non_overlapping_oid = NULL
+        norm_mode = olink_norm_modes$ref_median
       )
     )
 
@@ -1091,8 +975,7 @@ test_that(
         not_ref_cols = NULL,
         not_ref_product = NULL,
         reference_medians = ref_median_df,
-        norm_mode = olink_norm_modes$ref_median,
-        non_overlapping_oid = NULL
+        norm_mode = olink_norm_modes$ref_median
       )
     )
   }
