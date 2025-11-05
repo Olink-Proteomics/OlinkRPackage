@@ -647,23 +647,28 @@ test_that(
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product,
         non_overlapping_oid =
-          list("3K" = c("OID31162", "OID30796", "OID20054", "OID20055", "OID30420",
-                        "OID20059", "OID20791", "OID20051", "OID31159", "OID20057",
-                        "OID31160", "OID31163", "OID31158", "OID20790", "OID20058",
-                        "OID20053", "OID30146", "OID30130", "OID31277", "OID30080",
-                        "OID20435", "OID30471", "OID21188", "OID30877", "OID30067",
-                        "OID21243", "OID30956", "OID21244", "OID30955", "OID20062",
-                        "OID30488", "OID31275", "OID20437", "OID20806", "OID30881",
-                        "OID20492", "OID31351", "OID30161", "OID31173", "OID21162",
-                        "OID20810", "OID31348", "OID30949", "OID31260", "OID31339",
-                        "OID21202", "OID21255", "OID31190", "OID30871", "OID30861",
-                        "OID20803", "OID30166", "OID30121", "OID30792", "OID20432",
-                        "OID30828", "OID20446", "OID21246", "OID30124", "OID30118",
-                        "OID30065", "OID31230", "OID30062", "OID30079", "OID20811",
-                        "OID20865", "OID30850", "OID30980", "OID30165", "OID30466",
-                        "OID21267", "OID30896", "OID30844", "OID31218", "OID31202",
-                        "OID30873", "OID30051", "OID21217", "OID30856", "OID20074",
-                        "OID50330_OID20473", "OID20848", "OID21237", "OID12345"),
+          list("3K" = c("OID31162", "OID30796", "OID20054", "OID20055",
+                        "OID30420", "OID20059", "OID20791", "OID20051",
+                        "OID31159", "OID20057", "OID31160", "OID31163",
+                        "OID31158", "OID20790", "OID20058", "OID20053",
+                        "OID30146", "OID30130", "OID31277", "OID30080",
+                        "OID20435", "OID30471", "OID21188", "OID30877",
+                        "OID30067", "OID21243", "OID30956", "OID21244",
+                        "OID30955", "OID20062", "OID30488", "OID31275",
+                        "OID20437", "OID20806", "OID30881", "OID20492",
+                        "OID31351", "OID30161", "OID31173", "OID21162",
+                        "OID20810", "OID31348", "OID30949", "OID31260",
+                        "OID31339", "OID21202", "OID21255", "OID31190",
+                        "OID30871", "OID30861", "OID20803", "OID30166",
+                        "OID30121", "OID30792", "OID20432", "OID30828",
+                        "OID20446", "OID21246", "OID30124", "OID30118",
+                        "OID30065", "OID31230", "OID30062", "OID30079",
+                        "OID20811", "OID20865", "OID30850", "OID30980",
+                        "OID30165", "OID30466", "OID21267", "OID30896",
+                        "OID30844", "OID31218", "OID31202", "OID30873",
+                        "OID30051", "OID21217", "OID30856", "OID20074",
+                        "OID50330_OID20473", "OID20848", "OID21237",
+                        "OID12345"),
                "reveal" = "OID54321")
       )
     )
@@ -6734,7 +6739,7 @@ test_that(
         ),
         regexp = "Output includes two sets of bridging samples"
       ),
-      regexp = "No Negative Controls or Plate Controls found in normalized dataset"
+      regexp = "No Negative Controls or Plate Controls found in normalized"
     )
 
     # Add non-overlaping assays and one PC and one NC to remove
@@ -6768,7 +6773,7 @@ test_that(
         ),
         regexp = "Bridge normalization will be performed!"
       ),
-      regexp = "Assays \"OID01216\", \"OID99999\", \"OID00000\", and \"OID05124\" not shared"
+      regexp = "\"OID01216\", \"OID99999\", \"OID00000\", and \"OID05124\""
     )
 
     # formatted data
@@ -6794,7 +6799,7 @@ test_that(
           ),
           regexp = "4 non-overlapping assays are included "
         ),
-        regexp = "Assays \"OID01216\", \"OID99999\", \"OID00000\", and \"OID05124\" not shared"
+        regexp = "\"OID01216\", \"OID99999\", \"OID00000\", and \"OID05124\""
       ),
       regexp = "Output includes two sets of bridging samples"
     )
@@ -6812,7 +6817,7 @@ test_that(
         ),
         regexp = "Bridge normalization will be performed!"
       ),
-      regexp = "Assays \"OID01216\", \"OID99999\", \"OID00000\", and \"OID05124\" not shared"
+      regexp = "\"OID01216\", \"OID99999\", \"OID00000\", and \"OID05124\""
       ),
       regexp = "Output includes two sets of bridging samples"
     )
@@ -7482,7 +7487,7 @@ test_that(
           df1_project_nr = "df1_norm",
           df2_project_nr = "df2_norm",
           reference_project = "df1_norm",
-          format = T
+          format = TRUE
         ) |>
           dplyr::filter(
             .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -7523,7 +7528,7 @@ test_that(
         ),
         regexp = "Subset normalization will be performed!"
       ),
-      regexp = "Assays \"OID01216\", \"OID99999\", \"OID00000\", and \"OID05124\" not shared"
+      regexp = "\"OID01216\", \"OID99999\", \"OID00000\", and \"OID05124\""
     )
 
     # formatted data
@@ -7549,7 +7554,7 @@ test_that(
         ),
         regexp = "4 non-overlapping assays are included in the normalized"
       ),
-      regexp = "Assays \"OID01216\", \"OID99999\", \"OID00000\", and \"OID05124\" not shared"
+      regexp = "\"OID01216\", \"OID99999\", \"OID00000\", and \"OID05124\""
     )
 
     expect_warning(expect_message(
@@ -7565,7 +7570,7 @@ test_that(
       ),
       regexp = "Subset normalization will be performed!"
     ),
-    regexp = "Assays \"OID01216\", \"OID99999\", \"OID00000\", and \"OID05124\" not shared"
+    regexp = "\"OID01216\", \"OID99999\", \"OID00000\", and \"OID05124\""
     )
 
     expect_message(
@@ -7644,7 +7649,7 @@ test_that(
           overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
           df1_project_nr = "df1_norm",
           reference_medians = ref_norm_res$lst_df$ref_med,
-          format = T
+          format = TRUE
         ),
         regexp = "Reference median normalization will be performed!"
       ),
