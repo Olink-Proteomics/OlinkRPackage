@@ -20,23 +20,26 @@ test_that(
 
     ### bridge normalization - no norm column ----
 
-    expect_warning(
-      object = expect_message(
-        object = bridge_no_norm <- olink_normalization(
-          df1 = ref_norm_res$lst_df$df1_no_norm,
-          df2 = ref_norm_res$lst_df$df2_no_norm,
-          overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
-          df1_project_nr = "df1_no_norm",
-          df2_project_nr = "df2_no_norm",
-          reference_project = "df1_no_norm"
-        ) |>
-          dplyr::filter(
-            .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
-          ),
-        regexp = "Bridge normalization will be performed!"
+    expect_message(
+      object = expect_warning(
+        object = expect_message(
+          object = bridge_no_norm <- olink_normalization(
+            df1 = ref_norm_res$lst_df$df1_no_norm,
+            df2 = ref_norm_res$lst_df$df2_no_norm,
+            overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
+            df1_project_nr = "df1_no_norm",
+            df2_project_nr = "df2_no_norm",
+            reference_project = "df1_no_norm"
+          ) |>
+            dplyr::filter(
+              .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+            ),
+          regexp = "Bridge normalization will be performed!"
+        ),
+        regexp = paste("Datasets \"df1_no_norm\" and \"df2_no_norm\" do not",
+                       "contain a column named \"Normalization\"")
       ),
-      regexp = paste("Datasets \"df1_no_norm\" and \"df2_no_norm\" do not",
-                     "contain a column named \"Normalization\"")
+      regexp = "Output includes two sets of bridging samples"
     )
 
     expect_equal(
@@ -48,18 +51,21 @@ test_that(
     ### bridge normalization - with norm column ----
 
     expect_message(
-      object = bridge_norm <- olink_normalization(
-        df1 = ref_norm_res$lst_df$df1_norm,
-        df2 = ref_norm_res$lst_df$df2_norm,
-        overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
-        df1_project_nr = "df1_norm",
-        df2_project_nr = "df2_norm",
-        reference_project = "df1_norm"
-      ) |>
-        dplyr::filter(
-          .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
-        ),
-      regexp = "Bridge normalization will be performed!"
+      object = expect_message(
+        object = bridge_norm <- olink_normalization(
+          df1 = ref_norm_res$lst_df$df1_norm,
+          df2 = ref_norm_res$lst_df$df2_norm,
+          overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
+          df1_project_nr = "df1_norm",
+          df2_project_nr = "df2_norm",
+          reference_project = "df1_norm"
+        ) |>
+          dplyr::filter(
+            .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+          ),
+        regexp = "Bridge normalization will be performed!"
+      ),
+      regexp = "Output includes two sets of bridging samples"
     )
 
     expect_equal(
@@ -71,18 +77,21 @@ test_that(
     ### bridge normalization - no lod column ----
 
     expect_message(
-      object = bridge_no_lod <- olink_normalization(
-        df1 = ref_norm_res$lst_df$df1_no_lod,
-        df2 = ref_norm_res$lst_df$df2_no_lod,
-        overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
-        df1_project_nr = "df1_no_lod",
-        df2_project_nr = "df2_no_lod",
-        reference_project = "df1_no_lod"
-      ) |>
-        dplyr::filter(
-          .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
-        ),
-      regexp = "Bridge normalization will be performed!"
+      object = expect_message(
+        object = bridge_no_lod <- olink_normalization(
+          df1 = ref_norm_res$lst_df$df1_no_lod,
+          df2 = ref_norm_res$lst_df$df2_no_lod,
+          overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
+          df1_project_nr = "df1_no_lod",
+          df2_project_nr = "df2_no_lod",
+          reference_project = "df1_no_lod"
+        ) |>
+          dplyr::filter(
+            .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+          ),
+        regexp = "Bridge normalization will be performed!"
+      ),
+      regexp = "Output includes two sets of bridging samples"
     )
 
     expect_equal(
@@ -95,20 +104,24 @@ test_that(
 
     expect_message(
       object = expect_message(
-        object = bridge_multiple_lod <- olink_normalization(
-          df1 = ref_norm_res$lst_df$df1_multiple_lod,
-          df2 = ref_norm_res$lst_df$df2_multiple_lod,
-          overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
-          df1_project_nr = "df1_multiple_lod",
-          df2_project_nr = "df2_multiple_lod",
-          reference_project = "df1_multiple_lod"
-        ) |>
-          dplyr::filter(
-            .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
-          ),
-        regexp = "Bridge normalization will be performed!"
+        object = expect_message(
+          object = bridge_multiple_lod <- olink_normalization(
+            df1 = ref_norm_res$lst_df$df1_multiple_lod,
+            df2 = ref_norm_res$lst_df$df2_multiple_lod,
+            overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
+            df1_project_nr = "df1_multiple_lod",
+            df2_project_nr = "df2_multiple_lod",
+            reference_project = "df1_multiple_lod"
+          ) |>
+            dplyr::filter(
+              .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+            ),
+          regexp = "Bridge normalization will be performed!"
+        ),
+        regexp = paste("Datasets \"df1_multiple_lod\" and \"df2_multiple_lod\"",
+                       "contain")
       ),
-      regexp = "Datasets \"df1_multiple_lod\" and \"df2_multiple_lod\" contain"
+      regexp = "Output includes two sets of bridging samples"
     )
 
     expect_equal(
@@ -454,22 +467,25 @@ test_that(
     data_ht <- get_example_data(filename = "example_HT_data.rds")
 
     expect_message(
-      expect_warning(
-        object = ht_3k_norm <- olink_normalization(
-          df1 = data_ht,
-          df2 = data_3k,
-          overlapping_samples_df1 = intersect(
-            x = unique(data_ht$SampleID),
-            y = unique(data_3k$SampleID)
-          ) |>
-            (\(.) .[!grepl("CONTROL", .)])(),
-          df1_project_nr = "df_ht",
-          df2_project_nr = "df_3k",
-          reference_project = "df_ht"
+      object = expect_message(
+        expect_warning(
+          object = ht_3k_norm <- olink_normalization(
+            df1 = data_ht,
+            df2 = data_3k,
+            overlapping_samples_df1 = intersect(
+              x = unique(data_ht$SampleID),
+              y = unique(data_3k$SampleID)
+            ) |>
+              (\(.) .[!grepl("CONTROL", .)])(),
+            df1_project_nr = "df_ht",
+            df2_project_nr = "df_3k",
+            reference_project = "df_ht"
+          ),
+          regexp = "2 assays are not shared across products."
         ),
-        regexp = "2 assays are not shared across products."
+        regexp = "Cross-product normalization will be performed!"
       ),
-      regexp = "Cross-product normalization will be performed!"
+      regexp = "Output includes two sets of bridging samples"
     )
 
     expect_identical(
@@ -499,28 +515,31 @@ test_that(
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
 
-    expect_warning(
+    expect_message(
       object = expect_warning(
-        object = expect_message(
-          object = rev_3k_norm <- olink_normalization(
-            df1 = data_reveal,
-            df2 = data_3k,
-            overlapping_samples_df1 = intersect(
-              x = unique(data_reveal$SampleID),
-              y = unique(data_3k$SampleID)
-            ) |>
-              (\(x) x[!grepl("CONTROL", x)])() |>
-              sort() |>
-              head(32L),
-            df1_project_nr = "Reveal",
-            df2_project_nr = "3k",
-            reference_project = "Reveal"
+        object = expect_warning(
+          object = expect_message(
+            object = rev_3k_norm <- olink_normalization(
+              df1 = data_reveal,
+              df2 = data_3k,
+              overlapping_samples_df1 = intersect(
+                x = unique(data_reveal$SampleID),
+                y = unique(data_3k$SampleID)
+              ) |>
+                (\(x) x[!grepl("CONTROL", x)])() |>
+                sort() |>
+                head(32L),
+              df1_project_nr = "Reveal",
+              df2_project_nr = "3k",
+              reference_project = "Reveal"
+            ),
+            regexp = "Cross-product normalization will be performed!"
           ),
-          regexp = "Cross-product normalization will be performed!"
+          regexp = "85 assays are not shared across products"
         ),
-        regexp = "85 assays are not shared across products"
+        regexp = "There are 20 assays with fewer than 32 bridge samples for QS"
       ),
-      regexp = "There are 20 assays with fewer than 32 bridge samples for QS"
+      regexp = "Output includes two sets of bridging samples"
     )
 
     expect_identical(
@@ -864,7 +883,7 @@ test_that(
 # Cross-product specific tests ----
 
 test_that(
-  "Cross product normalization works - correlation assays present",
+  "Cross product normalization - works - correlation assays present",
   {
     skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
@@ -881,48 +900,60 @@ test_that(
       sort() |>
       head(50L)
 
-    #correlation assay IDs
+    # correlation assay IDs
     oid_ht <- "OID43204"
-    oid_3k <- eHT_e3072_mapping$OlinkID_E3072[eHT_e3072_mapping$OlinkID_HT == oid_ht] # nolint line_length_linter
+    oid_3k <- eHT_e3072_mapping |>
+      dplyr::filter(
+        .data[["OlinkID_HT"]] == oid_ht
+      ) |>
+      dplyr::pull(
+        .data[["OlinkID_E3072"]]
+      )
 
     # HT correlation is present
     expect_message(
-      object = expect_contains(
-        object = olink_normalization(
-          df1 = data_ht |>
-            dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
-          df2 = data_3k |>
-            dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
-          overlapping_samples_df1 = bridge_samples,
-          df1_project_nr = "proj_ht",
-          df2_project_nr = "proj_3k",
-          reference_project = "proj_ht"
-        ) |>
-          dplyr::distinct(OlinkID) |>
-          dplyr::pull(),
-        expected = oid_ht
+      object = expect_message(
+        object = expect_contains(
+          object = olink_normalization(
+            df1 = data_ht |>
+              dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
+            df2 = data_3k |>
+              dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
+            overlapping_samples_df1 = bridge_samples,
+            df1_project_nr = "proj_ht",
+            df2_project_nr = "proj_3k",
+            reference_project = "proj_ht"
+          ) |>
+            dplyr::distinct(OlinkID) |>
+            dplyr::pull(),
+          expected = oid_ht
+        ),
+        regexp = "Cross-product normalization will be performed!"
       ),
-      regexp = "Cross-product normalization will be performed!"
+      regexp = "Output includes two sets of bridging samples"
     )
 
     # All 3k correlations are present
     expect_message(
-      object = expect_contains(
-        object = olink_normalization(
-          df1 = data_ht |>
-            dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
-          df2 = data_3k |>
-            dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
-          overlapping_samples_df1 = bridge_samples,
-          df1_project_nr = "proj_ht",
-          df2_project_nr = "proj_3k",
-          reference_project = "proj_ht"
-        ) |>
-          dplyr::distinct(OlinkID_E3072) |>
-          dplyr::pull(),
-        expected = oid_3k
+      object = expect_message(
+        object = expect_contains(
+          object = olink_normalization(
+            df1 = data_ht |>
+              dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
+            df2 = data_3k |>
+              dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
+            overlapping_samples_df1 = bridge_samples,
+            df1_project_nr = "proj_ht",
+            df2_project_nr = "proj_3k",
+            reference_project = "proj_ht"
+          ) |>
+            dplyr::distinct(OlinkID_E3072) |>
+            dplyr::pull(),
+          expected = oid_3k
+        ),
+        regexp = "Cross-product normalization will be performed!"
       ),
-      regexp = "Cross-product normalization will be performed!"
+      regexp = "Output includes two sets of bridging samples"
     )
   }
 )
@@ -997,23 +1028,26 @@ test_that(
       dplyr::rename(QC_Warning = SampleQC) |>
       dplyr::rename(Assay_Warning = AssayQC)
 
-    expect_warning(
-      object = expect_message(
-        object = ht_3k_norm <- olink_normalization(
-          df1 = data_ht,
-          df2 = data_3k_old,
-          overlapping_samples_df1 = intersect(
-            x = unique(data_ht$SampleID),
-            y = unique(data_3k_old$SampleID)
-          ) |>
-            (\(.) .[!grepl("CONTROL", .)])(),
-          df1_project_nr = "df_ht",
-          df2_project_nr = "df_3k",
-          reference_project = "df_ht"
+    expect_message(
+      object = expect_warning(
+        object = expect_message(
+          object = ht_3k_norm <- olink_normalization(
+            df1 = data_ht,
+            df2 = data_3k_old,
+            overlapping_samples_df1 = intersect(
+              x = unique(data_ht$SampleID),
+              y = unique(data_3k_old$SampleID)
+            ) |>
+              (\(.) .[!grepl("CONTROL", .)])(),
+            df1_project_nr = "df_ht",
+            df2_project_nr = "df_3k",
+            reference_project = "df_ht"
+          ),
+          regexp = "Cross-product normalization will be performed!"
         ),
-        regexp = "Cross-product normalization will be performed!"
+        regexp = "2 assays are not shared across products."
       ),
-      regexp = "2 assays are not shared across products."
+      regexp = "Output includes two sets of bridging samples"
     )
 
     expect_identical(
