@@ -672,6 +672,23 @@ test_that(
     ) |>
       (\(x) x[!grepl("CONTROL", x)])()
 
+    expect_warning(
+      object = expect_message(
+        lst_check_3k_ht <- olink_norm_input_check(
+          df1 = data_3k,
+          df2 = data_ht,
+          overlapping_samples_df1 = bridge_samples_3k_ht,
+          overlapping_samples_df2 = NULL,
+          df1_project_nr = "P1",
+          df2_project_nr = "P2",
+          reference_project = "P2",
+          reference_medians = NULL
+        ),
+        regexp = "Cross-product normalization will be performed!"
+      ),
+      regexp = "2 assays are not shared across products."
+    )
+
     # formatted data
     expect_message(
       object = expect_warning(
@@ -712,7 +729,7 @@ test_that(
         df1_project_nr = "P2",
         df2 = data_3k,
         df2_project_nr = "P1",
-        reference_project = "P2",
+        lst_check = lst_check_3k_ht,
         prod_uniq = c("3k", "HT")
       )
     )
@@ -840,8 +857,6 @@ test_that(
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
 
-    # 3k-HT ----
-
     bridge_samples_3k_reveal <- intersect(
       x = unique(data_3k$SampleID),
       y = unique(data_reveal$SampleID)
@@ -849,6 +864,23 @@ test_that(
       (\(x) x[!grepl("CONTROL", x)])() |>
       sort() |>
       head(35L)
+
+    object = expect_warning(
+      object = expect_message(
+        lst_check_3k_reveal <- olink_norm_input_check(
+          df1 = data_3k,
+          df2 = data_reveal,
+          overlapping_samples_df1 = bridge_samples_3k_reveal,
+          overlapping_samples_df2 = NULL,
+          df1_project_nr = "P1",
+          df2_project_nr = "P2",
+          reference_project = "P2",
+          reference_medians = NULL
+        ),
+        regexp = "Cross-product normalization will be performed!"
+      ),
+      regexp = "85 assays are not shared across products."
+    )
 
     # formatted data
     expect_warning(
@@ -896,7 +928,7 @@ test_that(
         df1_project_nr = "P2",
         df2 = data_3k,
         df2_project_nr = "P1",
-        reference_project = "P2",
+        lst_check = lst_check_3k_reveal,
         prod_uniq = c("3k", "Reveal")
       )
     )

@@ -1196,7 +1196,7 @@ olink_norm_input_cross_product <- function(lst_df,
         by = ref_df_to_map_keys,
         relationship = "many-to-many"
       ) |>
-      # Matched OlinkID not found in mapping file, set OlinkID_ref to OlinkID
+      # If matched OlinkID not found in mapping file, set OlinkID to OlinkID_ref
       dplyr::mutate(
         OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
                                  .data[[map_ref_oid_col]],
@@ -1209,9 +1209,11 @@ olink_norm_input_cross_product <- function(lst_df,
 
     # Change name for 3k
     not_ref_product <- ifelse(not_ref_product == "3k", "E3072", not_ref_product)
+
     not_ref_oid_rename <- ifelse(not_ref_product == "E3072",
                                  "_E3072",
                                  paste0("_", not_ref_product))
+
     l_oid_rename <- paste0(lst_cols[[l_name]]$olink_id, not_ref_oid_rename)
 
     map_nonref_oid_col <- paste0("OlinkID_", not_ref_product)
@@ -1233,7 +1235,7 @@ olink_norm_input_cross_product <- function(lst_df,
         relationship = "many-to-one"
       ) |>
       # If matched OlinkID is not found in mapping file
-      # set OlinkID_ref to OlinkID
+      # set OlinkID to OlinkID_not_ref
       dplyr::mutate(
         OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
                                  .data[[l_oid_rename]],
