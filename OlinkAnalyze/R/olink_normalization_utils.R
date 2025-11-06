@@ -275,11 +275,13 @@ olink_norm_input_check <- function(df1,
 
   lst_out <- list(
     ref_df = NULL,
+    ref_original_df = NULL,
     ref_samples = NULL,
     ref_name = NULL,
     ref_cols = NULL,
     ref_product = NULL,
     not_ref_df = NULL,
+    not_ref_original_df = NULL,
     not_ref_samples = NULL,
     not_ref_name = NULL,
     not_ref_cols = NULL,
@@ -302,6 +304,7 @@ olink_norm_input_check <- function(df1,
     lst_out$ref_name <- df1_project_nr
     lst_out$ref_samples <- overlapping_samples_df1
     lst_out$ref_df <- lst_df[[lst_out$ref_name]]
+    lst_out$ref_original_df <- df1
     lst_out$ref_cols <- lst_cols[[lst_out$ref_name]]
     lst_out$reference_medians <- reference_medians
   } else if (norm_mode %in% c(olink_norm_modes$subset,
@@ -309,10 +312,14 @@ olink_norm_input_check <- function(df1,
                               olink_norm_modes$norm_cross_product)) {
     # bridge or subset normalization
     if (reference_project == df1_project_nr) {
+      lst_out$ref_original_df <- df1
       lst_out$ref_name <- df1_project_nr
+      lst_out$not_ref_original_df <- df2
       lst_out$not_ref_name <- df2_project_nr
     } else {
+      lst_out$ref_original_df <- df2
       lst_out$ref_name <- df2_project_nr
+      lst_out$not_ref_original_df <- df1
       lst_out$not_ref_name <- df1_project_nr
     }
     lst_out$ref_df <- lst_df[[lst_out$ref_name]]
