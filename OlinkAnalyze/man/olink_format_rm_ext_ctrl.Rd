@@ -24,5 +24,6 @@ olink_normalization_format function. Generates a message stating which
 control samples were removed.
 }
 \author{
-Danai Topouza
+Danai G. Topouza
+Klev Diamanti
 }
