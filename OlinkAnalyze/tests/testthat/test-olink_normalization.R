@@ -916,9 +916,13 @@ test_that(
         object = expect_contains(
           object = olink_normalization(
             df1 = data_ht |>
-              dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
+              dplyr::filter(
+                !(.data[["OlinkID"]] %in% c("OID12345", "OID54321"))
+              ),
             df2 = data_3k |>
-              dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
+              dplyr::filter(
+                !(.data[["OlinkID"]] %in% c("OID12345", "OID54321"))
+              ),
             overlapping_samples_df1 = bridge_samples,
             df1_project_nr = "proj_ht",
             df2_project_nr = "proj_3k",
@@ -939,9 +943,13 @@ test_that(
         object = expect_contains(
           object = olink_normalization(
             df1 = data_ht |>
-              dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
+              dplyr::filter(
+                !(.data[["OlinkID"]] %in% c("OID12345", "OID54321"))
+              ),
             df2 = data_3k |>
-              dplyr::filter(!(OlinkID %in% c("OID12345", "OID54321"))),
+              dplyr::filter(
+                !(.data[["OlinkID"]] %in% c("OID12345", "OID54321"))
+              ),
             overlapping_samples_df1 = bridge_samples,
             df1_project_nr = "proj_ht",
             df2_project_nr = "proj_3k",
@@ -1024,9 +1032,11 @@ test_that(
     data_ht <- get_example_data(filename = "example_HT_data.rds")
 
     data_3k_old <- data_3k |>
-      dplyr::rename(Sample_Type = SampleType) |>
-      dplyr::rename(QC_Warning = SampleQC) |>
-      dplyr::rename(Assay_Warning = AssayQC)
+      dplyr::rename(
+        "Sample_Type" = "SampleType",
+        "QC_Warning" = "SampleQC",
+        "Assay_Warning" = "AssayQC"
+      )
 
     expect_message(
       object = expect_warning(
