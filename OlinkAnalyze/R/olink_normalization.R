@@ -341,27 +341,25 @@ olink_normalization <- function(df1,
     )
   }
 
-  # format output dataset ----
-
-  if (format == TRUE) {
-
-    df_norm <- olink_normalization_format(
-      lst_check = lst_check,
-      df_norm = df_norm,
-      df1 = df1,
-      df1_project_nr = df1_project_nr,
-      df2 = df2,
-      df2_project_nr = df2_project_nr
-    )
-
-  }
-
   # Recalculate MaxLOD ----
 
   df_norm <- norm_internal_update_maxlod(
     df = df_norm,
     cols = lst_check$ref_cols
   )
+
+  # format output dataset ----
+
+  if (format == TRUE) {
+
+    df_norm <- olink_normalization_format(
+      df_norm = df_norm,
+      ref_df = lst_check$ref_original_df,
+      not_ref_df = lst_check$not_ref_original_df,
+      lst_check = lst_check
+    )
+
+  }
 
   return(df_norm)
 }
