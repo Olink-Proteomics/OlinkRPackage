@@ -556,6 +556,230 @@ test_that(
         norm_mode = olink_norm_modes$norm_cross_product
       )
     )
+    
+    # Reveal-HT normalization ----
+    
+    bridge_samples <- intersect(x = data_reveal$SampleID,
+                                y = data_ht$SampleID) |>
+      (\(x) x[!grepl(pattern = "CONTROL", x = x)])() |>
+      sort() |>
+      head(32L)
+    
+    expect_message(
+      expect_warning(
+        object = lst_check_out <- olink_norm_input_check(
+          df1 = data_reveal,
+          df2 = data_ht,
+          overlapping_samples_df1 = bridge_samples,
+          overlapping_samples_df2 = NULL,
+          df1_project_nr = "Reveal",
+          df2_project_nr = "HT",
+          reference_project = "HT",
+          reference_medians = NULL
+        ),
+        regexp = "80 assays are not shared across products."
+      ),
+      regexp = "Cross-product normalization will be performed!"
+    )
+    
+    expect_identical(
+      object = lst_check_out,
+      expected = list(
+        ref_df = data_ht |>
+          dplyr::rename(
+            "OlinkID_HT" = "OlinkID"
+          ) |>
+          dplyr::left_join(
+            reveal_eht_mapping |>
+              dplyr::select(
+                dplyr::all_of(
+                  c("OlinkID_HT", "OlinkID")
+                )
+              ),
+            by = "OlinkID_HT",
+            relationship = "many-to-many"
+          ) |>
+          dplyr::mutate(
+            OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
+                                     .data[["OlinkID_HT"]],
+                                     .data[["OlinkID"]])
+          ) |>
+          dplyr::filter(
+            .data[["OlinkID_HT"]] != .data[["OlinkID"]]
+          ),
+        ref_samples = bridge_samples,
+        ref_name = "HT",
+        ref_cols = list(sample_id = "SampleID",
+                        olink_id = "OlinkID",
+                        uniprot = "UniProt",
+                        assay = "Assay",
+                        panel = "Panel",
+                        panel_version = "DataAnalysisRefID",
+                        plate_id = "PlateID",
+                        qc_warn = "SampleQC",
+                        assay_warn = "AssayQC",
+                        quant = "NPX",
+                        lod = character(0),
+                        normalization = "Normalization",
+                        count = "Count",
+                        sample_type = "SampleType"),
+        ref_product = "HT",
+        not_ref_df = data_reveal |>
+          dplyr::rename(
+            "OlinkID_Reveal" = "OlinkID"
+          ) |>
+          dplyr::left_join(
+            reveal_eht_mapping |>
+              dplyr::select(
+                dplyr::all_of(
+                  c("OlinkID_Reveal", "OlinkID")
+                )
+              ),
+            by = "OlinkID_Reveal",
+            relationship = "many-to-one"
+          ) |>
+          dplyr::mutate(
+            OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
+                                     .data[["OlinkID_Reveal"]],
+                                     .data[["OlinkID"]])
+          ) |>
+          dplyr::filter(
+            .data[["OlinkID_Reveal"]] != .data[["OlinkID"]]
+          ),
+        not_ref_samples = NULL,
+        not_ref_name = "Reveal",
+        not_ref_cols = list(sample_id = "SampleID",
+                            olink_id = "OlinkID",
+                            uniprot = "UniProt",
+                            assay = "Assay",
+                            panel = "Panel",
+                            panel_version = "DataAnalysisRefID",
+                            plate_id = "PlateID",
+                            qc_warn = "SampleQC",
+                            assay_warn = "AssayQC",
+                            quant = "NPX",
+                            lod = character(0),
+                            normalization = "Normalization",
+                            count = "Count",
+                            sample_type = "SampleType"),
+        not_ref_product = "Reveal",
+        reference_medians = NULL,
+        norm_mode = olink_norm_modes$norm_cross_product
+      )
+    )
+    
+    
+    # HT-Reveal normalization ----
+    
+    bridge_samples <- intersect(x = data_reveal$SampleID,
+                                y = data_ht$SampleID) |>
+      (\(x) x[!grepl(pattern = "CONTROL", x = x)])() |>
+      sort() |>
+      head(32L)
+    
+    expect_message(
+      expect_warning(
+        object = lst_check_out <- olink_norm_input_check(
+          df1 = data_reveal,
+          df2 = data_ht,
+          overlapping_samples_df1 = bridge_samples,
+          overlapping_samples_df2 = NULL,
+          df1_project_nr = "Reveal",
+          df2_project_nr = "HT",
+          reference_project = "Reveal",
+          reference_medians = NULL
+        ),
+        regexp = "80 assays are not shared across products."
+      ),
+      regexp = "Cross-product normalization will be performed!"
+    )
+    
+    expect_identical(
+      object = lst_check_out,
+      expected = list(
+        ref_df = data_reveal |>
+          dplyr::rename(
+            "OlinkID_Reveal" = "OlinkID"
+          ) |>
+          dplyr::left_join(
+            reveal_eht_mapping |>
+              dplyr::select(
+                dplyr::all_of(
+                  c("OlinkID_Reveal", "OlinkID")
+                )
+              ),
+            by = "OlinkID_Reveal",
+            relationship = "many-to-many"
+          ) |>
+          dplyr::mutate(
+            OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
+                                     .data[["OlinkID_Reveal"]],
+                                     .data[["OlinkID"]])
+          ) |>
+          dplyr::filter(
+            .data[["OlinkID_Reveal"]] != .data[["OlinkID"]]
+          ),
+        ref_samples = bridge_samples,
+        ref_name = "Reveal",
+        ref_cols = list(sample_id = "SampleID",
+                        olink_id = "OlinkID",
+                        uniprot = "UniProt",
+                        assay = "Assay",
+                        panel = "Panel",
+                        panel_version = "DataAnalysisRefID",
+                        plate_id = "PlateID",
+                        qc_warn = "SampleQC",
+                        assay_warn = "AssayQC",
+                        quant = "NPX",
+                        lod = character(0),
+                        normalization = "Normalization",
+                        count = "Count",
+                        sample_type = "SampleType"),
+        ref_product = "Reveal",
+        not_ref_df = data_ht |>
+          dplyr::rename(
+            "OlinkID_HT" = "OlinkID"
+          ) |>
+          dplyr::left_join(
+            reveal_eht_mapping |>
+              dplyr::select(
+                dplyr::all_of(
+                  c("OlinkID_HT", "OlinkID")
+                )
+              ),
+            by = "OlinkID_HT",
+            relationship = "many-to-one"
+          ) |>
+          dplyr::mutate(
+            OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
+                                     .data[["OlinkID_HT"]],
+                                     .data[["OlinkID"]])
+          ) |>
+          dplyr::filter(
+            .data[["OlinkID_HT"]] != .data[["OlinkID"]]
+          ),
+        not_ref_samples = NULL,
+        not_ref_name = "HT",
+        not_ref_cols = list(sample_id = "SampleID",
+                            olink_id = "OlinkID",
+                            uniprot = "UniProt",
+                            assay = "Assay",
+                            panel = "Panel",
+                            panel_version = "DataAnalysisRefID",
+                            plate_id = "PlateID",
+                            qc_warn = "SampleQC",
+                            assay_warn = "AssayQC",
+                            quant = "NPX",
+                            lod = character(0),
+                            normalization = "Normalization",
+                            count = "Count",
+                            sample_type = "SampleType"),
+        not_ref_product = "HT",
+        reference_medians = NULL,
+        norm_mode = olink_norm_modes$norm_cross_product
+      )
+    )
+    
   }
 )
 
@@ -3549,22 +3773,21 @@ test_that(
         lst_df = list(
           "p1" = data_ht |>
             dplyr::rename(
-              "OlinkID_not_ref" = "OlinkID"
+              "OlinkID_HT" = "OlinkID"
             ) |>
             dplyr::left_join(
               reveal_eht_mapping |>
-                dplyr::rename("OlinkID_not_ref" = "OlinkID_HT") |>
                 dplyr::select(
                   dplyr::all_of(
-                    c("OlinkID_not_ref", "OlinkID")
+                    c("OlinkID_HT", "OlinkID")
                   )
                 ),
-              by = "OlinkID_not_ref",
+              by = "OlinkID_HT",
               relationship = "many-to-many"
             ) |>
             dplyr::mutate(
               OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
-                                       .data[["OlinkID_not_ref"]],
+                                       .data[["OlinkID_HT"]],
                                        .data[["OlinkID"]])
             ),
           "p2" = data_reveal |>
@@ -3587,6 +3810,75 @@ test_that(
                                        .data[["OlinkID"]])
             )
 
+        )
+      )
+    )
+    
+   # HT-Reveal ----
+      
+      expect_no_condition(
+        object = lst_cross_prod_out_ht <- olink_norm_input_cross_product(
+          lst_df = list(
+            "p1" = data_ht,
+            "p2" = data_reveal
+          ),
+          lst_cols = list(
+            "p1" = list(panel = "Panel",
+                        olink_id = "OlinkID",
+                        count = "Count"),
+            "p2" = list(panel = "Panel",
+                        olink_id = "OlinkID",
+                        count = "Count")
+          ),
+          reference_project = "p2",
+          product_ids = c("p1" = "HT", "p2" = "Reveal"),
+          ref_ids = c("p1" = "ref", "p2" = "not_ref")
+        )
+      )
+    
+    expect_identical(
+      object = lst_cross_prod_out_ht,
+      expected = list(
+        norm_mode = olink_norm_modes$norm_cross_product,
+        lst_df = list(
+          "p1" = data_ht |>
+            dplyr::rename(
+              "OlinkID_HT" = "OlinkID"
+            ) |>
+            dplyr::left_join(
+              reveal_eht_mapping |>
+                dplyr::select(
+                  dplyr::all_of(
+                    c("OlinkID_HT", "OlinkID")
+                  )
+                ),
+              by = "OlinkID_HT",
+              relationship = "many-to-many"
+            ) |>
+            dplyr::mutate(
+              OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
+                                       .data[["OlinkID_HT"]],
+                                       .data[["OlinkID"]])
+            ),
+          "p2" = data_reveal |>
+            dplyr::rename(
+              "OlinkID_Reveal" = "OlinkID"
+            ) |>
+            dplyr::left_join(
+              reveal_eht_mapping |>
+                dplyr::select(
+                  dplyr::all_of(
+                    c("OlinkID_Reveal", "OlinkID")
+                  )
+                ),
+              by = "OlinkID_Reveal",
+              relationship = "many-to-one"
+            ) |>
+            dplyr::mutate(
+              OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
+                                       .data[["OlinkID_Reveal"]],
+                                       .data[["OlinkID"]]))
+          
         )
       )
     )
@@ -6536,6 +6828,23 @@ test_that(
       ),
       expected = c("p1" = "HT", "p2" = "Reveal")
     )
+    
+    
+    # Reveal-HT ----
+    
+    expect_identical(
+      object = olink_norm_product_id(
+        lst_df = list(
+          "p1" = data_reveal,
+          "p2" = data_ht
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel"),
+          "p2" = list(panel = "Panel")
+        )
+      ),
+      expected = c("p1" = "Reveal", "p2" = "HT")
+    )
 
     # HT-HT ----
 
@@ -6614,10 +6923,30 @@ test_that(
 
     expect_identical(
       object = olink_norm_reference_id(
-        lst_product = c("p1" = "3", "p2" = "HT"),
+        lst_product = c("p1" = "3k", "p2" = "HT"),
         reference_project = "p2"
       ),
       expected = c("p1" = "not_ref", "p2" = "ref")
+    )
+    
+    # reveal-ht ----
+    
+    expect_identical(
+      object = olink_norm_reference_id(
+        lst_product = c("p1" = "Reveal", "p2" = "HT"),
+        reference_project = "p2"
+      ),
+      expected = c("p1" = "not_ref", "p2" = "ref")
+    )
+    
+    # ht-reveal ----
+    
+    expect_identical(
+      object = olink_norm_reference_id(
+        lst_product = c("p1" = "Reveal", "p2" = "HT"),
+        reference_project = "p1"
+      ),
+      expected = c("p1" = "ref", "p2" = "not_ref")
     )
 
   }
@@ -6643,6 +6972,12 @@ test_that(
     # returns Reveal-HT mapping file
     expect_identical(
       object = mapping_file_id(prod_uniq = c("HT", "Reveal")),
+      expected = reveal_eht_mapping
+    )
+    
+    # returns Reveal-HT mapping file
+    expect_identical(
+      object = mapping_file_id(prod_uniq = c("Reveal", "HT")),
       expected = reveal_eht_mapping
     )
   }
