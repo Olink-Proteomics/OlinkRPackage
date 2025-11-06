@@ -330,7 +330,11 @@ test_that(
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
-    data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
+    data_reveal <- get_example_data(filename = "example_Reveal_data.rds") |>
+      # Set unique OlinkID for TEST_Reveal assay
+      dplyr::mutate(OlinkID = ifelse(.data[["Assay"]] == "TEST_Reveal",
+                                     "OID56789",
+                                     OlinkID))
 
     # 3k-HT normalization ----
 
@@ -532,8 +536,9 @@ test_that(
                                      .data[["OlinkID"]])
           ) |>
           dplyr::filter(
-            .data[["OlinkID_E3072"]] != .data[["OlinkID"]]
-            & .data[["OlinkID_E3072"]] != "OID20473"
+            .data[["OlinkID_E3072"]] != .data[["OlinkID"]] &
+              # Rm assay found in mapping file but not in Reveal dataset
+              .data[["OlinkID_E3072"]] != "OID20473"
           ),
         not_ref_samples = NULL,
         not_ref_name = "3K",
@@ -556,15 +561,15 @@ test_that(
         norm_mode = olink_norm_modes$norm_cross_product
       )
     )
-    
+
     # Reveal-HT normalization ----
-    
+
     bridge_samples <- intersect(x = data_reveal$SampleID,
                                 y = data_ht$SampleID) |>
       (\(x) x[!grepl(pattern = "CONTROL", x = x)])() |>
       sort() |>
       head(32L)
-    
+
     expect_message(
       expect_warning(
         object = lst_check_out <- olink_norm_input_check(
@@ -577,11 +582,11 @@ test_that(
           reference_project = "HT",
           reference_medians = NULL
         ),
-        regexp = "80 assays are not shared across products."
+        regexp = "82 assays are not shared across products."
       ),
       regexp = "Cross-product normalization will be performed!"
     )
-    
+
     expect_identical(
       object = lst_check_out,
       expected = list(
@@ -605,7 +610,9 @@ test_that(
                                      .data[["OlinkID"]])
           ) |>
           dplyr::filter(
-            .data[["OlinkID_HT"]] != .data[["OlinkID"]]
+            .data[["OlinkID_HT"]] != .data[["OlinkID"]] &
+              # Rm assays found in mapping file but not in Reveal dataset
+              !(.data[["OlinkID_HT"]] %in% c("OID42114", "OID43204"))
           ),
         ref_samples = bridge_samples,
         ref_name = "HT",
@@ -667,16 +674,16 @@ test_that(
         norm_mode = olink_norm_modes$norm_cross_product
       )
     )
-    
-    
+
+
     # HT-Reveal normalization ----
-    
+
     bridge_samples <- intersect(x = data_reveal$SampleID,
                                 y = data_ht$SampleID) |>
       (\(x) x[!grepl(pattern = "CONTROL", x = x)])() |>
       sort() |>
       head(32L)
-    
+
     expect_message(
       expect_warning(
         object = lst_check_out <- olink_norm_input_check(
@@ -689,11 +696,11 @@ test_that(
           reference_project = "Reveal",
           reference_medians = NULL
         ),
-        regexp = "80 assays are not shared across products."
+        regexp = "82 assays are not shared across products."
       ),
       regexp = "Cross-product normalization will be performed!"
     )
-    
+
     expect_identical(
       object = lst_check_out,
       expected = list(
@@ -756,7 +763,9 @@ test_that(
                                      .data[["OlinkID"]])
           ) |>
           dplyr::filter(
-            .data[["OlinkID_HT"]] != .data[["OlinkID"]]
+            .data[["OlinkID_HT"]] != .data[["OlinkID"]] &
+              # Rm assays found in mapping file but not in Reveal dataset
+              !(.data[["OlinkID_HT"]] %in% c("OID42114", "OID43204"))
           ),
         not_ref_samples = NULL,
         not_ref_name = "HT",
@@ -779,7 +788,7 @@ test_that(
         norm_mode = olink_norm_modes$norm_cross_product
       )
     )
-    
+
   }
 )
 
@@ -3813,9 +3822,9 @@ test_that(
         )
       )
     )
-    
+
    # HT-Reveal ----
-      
+
       expect_no_condition(
         object = lst_cross_prod_out_ht <- olink_norm_input_cross_product(
           lst_df = list(
@@ -3835,7 +3844,7 @@ test_that(
           ref_ids = c("p1" = "ref", "p2" = "not_ref")
         )
       )
-    
+
     expect_identical(
       object = lst_cross_prod_out_ht,
       expected = list(
@@ -3878,7 +3887,7 @@ test_that(
               OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
                                        .data[["OlinkID_Reveal"]],
                                        .data[["OlinkID"]]))
-          
+
         )
       )
     )
@@ -6828,10 +6837,10 @@ test_that(
       ),
       expected = c("p1" = "HT", "p2" = "Reveal")
     )
-    
-    
+
+
     # Reveal-HT ----
-    
+
     expect_identical(
       object = olink_norm_product_id(
         lst_df = list(
@@ -6928,9 +6937,9 @@ test_that(
       ),
       expected = c("p1" = "not_ref", "p2" = "ref")
     )
-    
+
     # reveal-ht ----
-    
+
     expect_identical(
       object = olink_norm_reference_id(
         lst_product = c("p1" = "Reveal", "p2" = "HT"),
@@ -6938,9 +6947,9 @@ test_that(
       ),
       expected = c("p1" = "not_ref", "p2" = "ref")
     )
-    
+
     # ht-reveal ----
-    
+
     expect_identical(
       object = olink_norm_reference_id(
         lst_product = c("p1" = "Reveal", "p2" = "HT"),
@@ -6974,7 +6983,7 @@ test_that(
       object = mapping_file_id(prod_uniq = c("HT", "Reveal")),
       expected = reveal_eht_mapping
     )
-    
+
     # returns Reveal-HT mapping file
     expect_identical(
       object = mapping_file_id(prod_uniq = c("Reveal", "HT")),
