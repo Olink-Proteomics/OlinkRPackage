@@ -7776,3 +7776,342 @@ test_that(
 
   }
 )
+
+# Test olink_format_rm_ext_ctrl ----
+
+test_that(
+  "olink_format_rm_ext_ctrl - works - no external controls",
+  {
+    skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
+
+    ref_norm_res <- get_example_data("ref_results_norm.rds")
+
+    ### bridge normalization - no norm column ----
+
+    bridge_nonorm_noctrl_check <- olink_norm_input_check(
+      df1 = ref_norm_res$lst_df$df1_no_norm,
+      df2 = ref_norm_res$lst_df$df2_no_norm,
+      overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
+      overlapping_samples_df2 = NULL,
+      df1_project_nr = "df1_no_norm",
+      df2_project_nr = "df2_no_norm",
+      reference_project = "df1_no_norm",
+      reference_medians = NULL
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    expect_message(
+      object = olink_format_rm_ext_ctrl(
+        df = ref_norm_res$lst_norm$bridge_norm$no_norm,
+        lst_check = bridge_nonorm_noctrl_check
+      ),
+      regexp = "No Negative Controls or Plate Controls found in dataset"
+    )
+
+    ### bridge normalization - with norm column ----
+
+    bridge_norm_noctrl_check <- olink_norm_input_check(
+      df1 = ref_norm_res$lst_df$df1_norm,
+      df2 = ref_norm_res$lst_df$df2_norm,
+      overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
+      overlapping_samples_df2 = NULL,
+      df1_project_nr = "df1_norm",
+      df2_project_nr = "df2_norm",
+      reference_project = "df1_norm",
+      reference_medians = NULL
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    expect_message(
+      object = olink_format_rm_ext_ctrl(
+        df = ref_norm_res$lst_norm$bridge_norm$norm,
+        lst_check = bridge_norm_noctrl_check
+      ),
+      regexp = "No Negative Controls or Plate Controls found in dataset"
+    )
+
+    ### bridge normalization - no lod column ----
+
+    bridge_nolod_noctrl_check <- olink_norm_input_check(
+      df1 = ref_norm_res$lst_df$df1_no_lod,
+      df2 = ref_norm_res$lst_df$df2_no_lod,
+      overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
+      overlapping_samples_df2 = NULL,
+      df1_project_nr = "df1_nolod",
+      df2_project_nr = "df2_nolod",
+      reference_project = "df1_nolod",
+      reference_medians = NULL
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    expect_message(
+      object = olink_format_rm_ext_ctrl(
+        df = ref_norm_res$lst_norm$bridge_norm$no_lod,
+        lst_check = bridge_nolod_noctrl_check
+      ),
+      regexp = "No Negative Controls or Plate Controls found in dataset"
+    )
+
+    ### bridge normalization - multiple lod columns ----
+
+    bridge_multilod_noctrl_check <- olink_norm_input_check(
+      df1 = ref_norm_res$lst_df$df1_multiple_lod,
+      df2 = ref_norm_res$lst_df$df2_multiple_lod,
+      overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
+      overlapping_samples_df2 = NULL,
+      df1_project_nr = "df1_multiple_lod",
+      df2_project_nr = "df2_multiple_lod",
+      reference_project = "df1_multiple_lod",
+      reference_medians = NULL
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    expect_message(
+      object = olink_format_rm_ext_ctrl(
+        df = ref_norm_res$lst_norm$bridge_norm$multiple_lod,
+        lst_check = bridge_multilod_noctrl_check
+      ),
+      regexp = "No Negative Controls or Plate Controls found in dataset"
+    )
+  }
+)
+
+test_that(
+  "olink_format_rm_ext_ctrl - works - external controls - no sample_type",
+  {
+    skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
+
+    ref_norm_res <- get_example_data("ref_results_norm.rds")
+
+    bridge_norm_noctrl_check <- olink_norm_input_check(
+      df1 = ref_norm_res$lst_df$df1_norm,
+      df2 = ref_norm_res$lst_df$df2_norm,
+      overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
+      overlapping_samples_df2 = NULL,
+      df1_project_nr = "df1_norm",
+      df2_project_nr = "df2_norm",
+      reference_project = "df1_norm",
+      reference_medians = NULL
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # NC samples ----
+
+    # Add NCs to remove
+    bridge_norm_wctrl_nc <- ref_norm_res$lst_norm$bridge_norm$no_norm |>
+      dplyr::mutate(
+        SampleID = dplyr::case_match(
+          .data[["SampleID"]],
+          "A6" ~ "NEG_CTRL",
+          "A38" ~ "NEGATIVE_CONTROL",
+          "A43" ~ "Neg_Ctrl",
+          "D1" ~ "NEG_CTRL_2",
+          "D52" ~ "NEGATIVE_CONTROL_2",
+          "D75" ~ "Neg_Ctrl_2",
+          .default = .data[["SampleID"]]
+        )
+      )
+
+    expect_message(
+      object = expect_message(
+        object = olink_format_rm_ext_ctrl(
+          df = bridge_norm_wctrl_nc,
+          lst_check = bridge_norm_noctrl_check
+        ),
+        regexp = paste("6 Negative Controls were removed from dataset:",
+                       "\"NEG_CTRL\", \"NEGATIVE_CONTROL\", \"Neg_Ctrl\",",
+                       "\"NEG_CTRL_2\", \"NEGATIVE_CONTROL_2\", and",
+                       "\"Neg_Ctrl_2\"")
+      ),
+      regexp = "Please verify that no other samples were removed unintentional"
+    )
+
+    # PC samples ----
+
+    # Add PCs to remove
+    bridge_norm_wctrl_pc <- ref_norm_res$lst_norm$bridge_norm$no_norm |>
+      dplyr::mutate(
+        SampleID = dplyr::case_match(
+          .data[["SampleID"]],
+          "A6" ~ "PLATE",
+          "A38" ~ "IPC",
+          "A43" ~ "Plate",
+          "D1" ~ "plate",
+          "D52" ~ "plate_control",
+          "D75" ~ "Plate_Control",
+          .default = .data[["SampleID"]]
+        )
+      )
+
+    expect_message(
+      object = expect_message(
+        object = olink_format_rm_ext_ctrl(
+          df = bridge_norm_wctrl_pc,
+          lst_check = bridge_norm_noctrl_check
+        ),
+        regexp = paste("6 Plate Controls were removed from dataset: \"PLATE\",",
+                       "\"IPC\", \"Plate\", \"plate\", \"plate_control\", and",
+                       "\"Plate_Control\"")
+      ),
+      regexp = "Please verify that no other samples were removed unintentional"
+    )
+
+    # NC and PC samples ----
+
+    bridge_norm_wctrl_ncpc <- ref_norm_res$lst_norm$bridge_norm$no_norm |>
+      dplyr::mutate(
+        SampleID = dplyr::case_match(
+          .data[["SampleID"]],
+          "A6" ~ "NEG_CTRL",
+          "A38" ~ "IPC",
+          "A43" ~ "Neg_Ctrl",
+          "D1" ~ "plate",
+          "D52" ~ "NEGATIVE_CONTROL_2",
+          "D75" ~ "Plate_Control",
+          .default = .data[["SampleID"]]
+        )
+      )
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = olink_format_rm_ext_ctrl(
+            df = bridge_norm_wctrl_ncpc,
+            lst_check = bridge_norm_noctrl_check
+          ),
+          regexp = paste("3 Negative Controls were removed from dataset:",
+                         "\"NEG_CTRL\", \"Neg_Ctrl\", and",
+                         "\"NEGATIVE_CONTROL_2\"")
+        ),
+        regexp = paste("3 Plate Controls were removed from dataset: \"IPC\",",
+                       "\"plate\", and \"Plate_Control\"")
+      ),
+      regexp = "Please verify that no other samples were removed unintentional"
+    )
+  }
+)
+
+test_that(
+  "olink_format_rm_ext_ctrl - works - external controls - with sample_type",
+  {
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
+
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
+
+    bridge_samples_3k_ht <- intersect(
+      x = unique(data_3k$SampleID),
+      y = unique(data_ht$SampleID)
+    ) |>
+      (\(x) x[!grepl("CONTROL", x)])()
+
+    # both datasets have SampleType ----
+
+    bridge_norm_noctrl_check_v1 <- olink_norm_input_check(
+      df1 = data_ht,
+      df2 = data_3k,
+      overlapping_samples_df1 = bridge_samples_3k_ht,
+      overlapping_samples_df2 = NULL,
+      df1_project_nr = "df1_norm",
+      df2_project_nr = "df2_norm",
+      reference_project = "df1_norm",
+      reference_medians = NULL
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df_3k_ht_format_v1 <- data_3k |>
+      dplyr::bind_rows(data_ht)
+
+    expect_message(
+      object = expect_message(
+        object = olink_format_rm_ext_ctrl(
+          df = df_3k_ht_format_v1,
+          lst_check = bridge_norm_noctrl_check_v1
+        ),
+        regexp = paste("6 Negative Controls were removed from dataset:")
+      ),
+      regexp = paste("10 Plate Controls were removed from dataset:")
+    )
+
+    # one dataset has SampleType and the other has Sample_Type ----
+
+    bridge_norm_noctrl_check_v2 <- olink_norm_input_check(
+      df1 = data_ht,
+      df2 = data_3k |>
+        dplyr::rename(
+          "Sample_Type" = "SampleType"
+        ),
+      overlapping_samples_df1 = bridge_samples_3k_ht,
+      overlapping_samples_df2 = NULL,
+      df1_project_nr = "df1_norm",
+      df2_project_nr = "df2_norm",
+      reference_project = "df1_norm",
+      reference_medians = NULL
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df_3k_ht_format_v2 <- data_3k |>
+      dplyr::rename(
+        "Sample_Type" = "SampleType"
+      ) |>
+      dplyr::bind_rows(data_ht)
+
+    expect_message(
+      object = expect_message(
+        object = olink_format_rm_ext_ctrl(
+          df = df_3k_ht_format_v2,
+          lst_check = bridge_norm_noctrl_check_v2
+        ),
+        regexp = paste("6 Negative Controls were removed from dataset:")
+      ),
+      regexp = paste("10 Plate Controls were removed from dataset:")
+    )
+
+    # one dataset has SampleType and the other has no sample type col ----
+
+    bridge_norm_noctrl_check_v3 <- olink_norm_input_check(
+      df1 = data_ht,
+      df2 = data_3k |>
+        dplyr::select(
+          -dplyr::all_of("SampleType")
+        ),
+      overlapping_samples_df1 = bridge_samples_3k_ht,
+      overlapping_samples_df2 = NULL,
+      df1_project_nr = "df1_norm",
+      df2_project_nr = "df2_norm",
+      reference_project = "df1_norm",
+      reference_medians = NULL
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df_3k_ht_format_v3 <- data_3k |>
+      dplyr::select(
+        -dplyr::all_of("SampleType")
+      ) |>
+      dplyr::bind_rows(data_ht)
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = olink_format_rm_ext_ctrl(
+            df = df_3k_ht_format_v3,
+            lst_check = bridge_norm_noctrl_check_v3
+          ),
+          regexp = paste("6 Negative Controls were removed from dataset:")
+        ),
+        regexp = paste("10 Plate Controls were removed from dataset:")
+      ),
+      regexp = "Please verify that no other samples were removed unintentional"
+    )
+  }
+)
+
