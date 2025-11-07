@@ -107,7 +107,11 @@ olink_normalization_format <- function(df_norm,
 
     oid_col_name <- lst_check$ref_cols$olink_id
     oid_rm_prefix <- paste(oid_col_name, "_")
-    not_ref_oid_col_name <- "OlinkID_E3072"
+    not_ref_oid_col_name <- c(names(reveal_e3072_mapping),
+                              names(eHT_e3072_mapping)) |>
+      unique() |>
+      (\(.) .[grepl("^OlinkID_", .)])() |>
+      (\(.) .[. %in% names(df_norm)])()
 
     quant_col_name <- lst_check$ref_cols$quant
 
