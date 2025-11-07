@@ -8187,3 +8187,631 @@ test_that(
   }
 )
 
+# Test olink_format_oid_no_overlap ----
+
+test_that(
+  "olink_format_oid_no_overlap - works - reference median normalization",
+  {
+    skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
+
+    ref_norm_res <- get_example_data("ref_results_norm.rds")
+
+    oid_only_in_ref <- c("OID01216", "OID01217")
+
+    # df1 contains assays not in reference medians
+    df1_ref_med <- ref_norm_res$lst_df$df1_norm
+
+    # remove the assays from the reference medians for testing
+    df_ref_med <- ref_norm_res$lst_df$ref_med |>
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% .env[["oid_only_in_ref"]])
+      )
+
+    # run input check for normalization
+    ref_med_check_lst <- olink_norm_input_check(
+      df1 = df1_ref_med,
+      df2 = NULL,
+      overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
+      overlapping_samples_df2 = NULL,
+      df1_project_nr = "df1_norm",
+      reference_medians = df_ref_med
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # check that function returns missing OlinkIDs with adjustment factor 0
+    expect_message(
+      object = df_ref_med_miss_oid <- olink_format_oid_no_overlap(
+        ref_df = df1_ref_med,
+        not_ref_df = NULL,
+        lst_check = ref_med_check_lst
+      ),
+      regexp = paste("2 non-overlapping assays found in the dataset but not in",
+                     "the reference medians. Assays are included in the",
+                     "normalized dataset without adjustment.")
+    )
+
+    expect_equal(
+      object = df_ref_med_miss_oid |>
+        dplyr::arrange(
+          .data[["SampleID"]], .data[["OlinkID"]]
+        ),
+      expected = df1_ref_med |>
+        dplyr::filter(
+          .data[["OlinkID"]] %in% .env[["oid_only_in_ref"]]
+        ) |>
+        dplyr::mutate(
+          Project = "df1_norm",
+          Adj_factor = 0
+        ) |>
+        dplyr::arrange(
+          .data[["SampleID"]], .data[["OlinkID"]]
+        )
+    )
+  }
+)
+
+test_that(
+  "olink_format_oid_no_overlap - works - bridge/subset normalization",
+  {
+    skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
+
+    ref_norm_res <- get_example_data("ref_results_norm.rds")
+
+    # assays present in reference dataset only ----
+
+    oid_only_in_ref_v1 <- c("OID01216", "OID01217")
+
+    # df1 contains assays not in df2
+    df1_subset_v1 <- ref_norm_res$lst_df$df1_norm
+
+    df2_subset_v1 <- ref_norm_res$lst_df$df2_norm |>
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% .env[["oid_only_in_ref_v1"]])
+      )
+
+    # run input check for normalization
+    subset_check_lst_v1 <- olink_norm_input_check(
+      df1 = df1_subset_v1,
+      df2 = df2_subset_v1,
+      overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
+      overlapping_samples_df2 = ref_norm_res$lst_sample$df2_subset,
+      df1_project_nr = "df1_norm",
+      df2_project_nr = "df2_norm",
+      reference_project = "df1_norm",
+      reference_medians = NULL
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # check that function returns missing OlinkIDs with adjustment factor 0
+    expect_message(
+      object = df_subset_miss_oid_v1 <- olink_format_oid_no_overlap(
+        ref_df = df1_subset_v1,
+        not_ref_df = df2_subset_v1,
+        lst_check = subset_check_lst_v1
+      ),
+      regexp = paste("2 non-overlapping assays are included in the normalized",
+                     "dataset without adjustment. Assays found in only one",
+                     "project will have decreased statistical power due to the",
+                     "lower number of samples.")
+    )
+
+    expect_equal(
+      object = df_subset_miss_oid_v1 |>
+        dplyr::arrange(
+          .data[["SampleID"]], .data[["OlinkID"]]
+        ),
+      expected = df1_subset_v1 |>
+        dplyr::filter(
+          .data[["OlinkID"]] %in% .env[["oid_only_in_ref_v1"]]
+        ) |>
+        dplyr::mutate(
+          Project = "df1_norm",
+          Adj_factor = 0
+        ) |>
+        dplyr::arrange(
+          .data[["SampleID"]], .data[["OlinkID"]]
+        )
+    )
+
+    # assays present in the non-reference dataset only ----
+
+    oid_only_in_ref_v2 <- c("OID00561", "OID00562", "OID01213", "OID05124")
+
+    df1_subset_v2 <- ref_norm_res$lst_df$df1_norm |>
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% .env[["oid_only_in_ref_v2"]])
+      )
+
+    df2_subset_v2 <- ref_norm_res$lst_df$df2_norm
+
+    # run input check for normalization
+    subset_check_lst_v2 <- olink_norm_input_check(
+      df1 = df1_subset_v2,
+      df2 = df2_subset_v2,
+      overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
+      overlapping_samples_df2 = ref_norm_res$lst_sample$df2_subset,
+      df1_project_nr = "df1_norm",
+      df2_project_nr = "df2_norm",
+      reference_project = "df1_norm",
+      reference_medians = NULL
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # check that function returns missing OlinkIDs with adjustment factor 0
+    expect_message(
+      object = df_subset_miss_oid_v2 <- olink_format_oid_no_overlap(
+        ref_df = df1_subset_v2,
+        not_ref_df = df2_subset_v2,
+        lst_check = subset_check_lst_v2
+      ),
+      regexp = paste("4 non-overlapping assays are included in the normalized",
+                     "dataset without adjustment. Assays found in only one",
+                     "project will have decreased statistical power due to the",
+                     "lower number of samples.")
+    )
+
+    expect_equal(
+      object = df_subset_miss_oid_v2 |>
+        dplyr::arrange(
+          .data[["SampleID"]], .data[["OlinkID"]]
+        ),
+      expected = df2_subset_v2 |>
+        dplyr::filter(
+          .data[["OlinkID"]] %in% .env[["oid_only_in_ref_v2"]]
+        ) |>
+        dplyr::mutate(
+          Project = "df2_norm",
+          Adj_factor = 0
+        ) |>
+        dplyr::arrange(
+          .data[["SampleID"]], .data[["OlinkID"]]
+        )
+    )
+
+    # different assays present in either dataset ----
+
+    # run input check for normalization
+    subset_check_lst_v3 <- olink_norm_input_check(
+      df1 = df1_subset_v2,
+      df2 = df2_subset_v1,
+      overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
+      overlapping_samples_df2 = ref_norm_res$lst_sample$df2_subset,
+      df1_project_nr = "df1_norm",
+      df2_project_nr = "df2_norm",
+      reference_project = "df1_norm",
+      reference_medians = NULL
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # check that function returns missing OlinkIDs with adjustment factor 0
+    expect_message(
+      object = df_subset_miss_oid_v3 <- olink_format_oid_no_overlap(
+        ref_df = df1_subset_v2,
+        not_ref_df = df2_subset_v1,
+        lst_check = subset_check_lst_v3
+      ),
+      regexp = paste("6 non-overlapping assays are included in the normalized",
+                     "dataset without adjustment. Assays found in only one",
+                     "project will have decreased statistical power due to the",
+                     "lower number of samples.")
+    )
+
+    expect_equal(
+      object = df_subset_miss_oid_v3 |>
+        dplyr::arrange(
+          .data[["SampleID"]], .data[["OlinkID"]]
+        ),
+      expected = df1_subset_v1 |>
+        dplyr::filter(
+          .data[["OlinkID"]] %in% .env[["oid_only_in_ref_v1"]]
+        ) |>
+        dplyr::mutate(
+          Project = "df1_norm"
+        ) |>
+        dplyr::bind_rows(
+          df2_subset_v2 |>
+            dplyr::filter(
+              .data[["OlinkID"]] %in% .env[["oid_only_in_ref_v2"]]
+            ) |>
+            dplyr::mutate(
+              Project = "df2_norm"
+            )
+        ) |>
+        dplyr::mutate(
+          Adj_factor = 0
+        ) |>
+        dplyr::arrange(
+          .data[["SampleID"]], .data[["OlinkID"]]
+        )
+    )
+  }
+)
+
+test_that(
+  "olink_format_oid_no_overlap - works - cross-product normalization",
+  {
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
+
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
+
+    # help fun ----
+
+    get_non_shares_oid <- function(df1, df_suffix_p1, df2, df_suffix_p2) {
+
+      oid_p1 <- paste("OlinkID", df_suffix_p1, sep = "_")
+      oid_p2 <- paste("OlinkID", df_suffix_p2, sep = "_")
+
+      non_overlap_oid <- eHT_e3072_mapping |>
+        dplyr::select(
+          dplyr::all_of(
+            c(oid_p1, oid_p2)
+          )
+        ) |>
+        dplyr::filter(
+          .data[[oid_p1]] %in% df1$OlinkID
+          | .data[[oid_p2]] %in% df2$OlinkID
+        ) |>
+        dplyr::mutate(
+          in_p1 = .data[[oid_p1]] %in% df1$OlinkID,
+          in_p2 = .data[[oid_p2]] %in% df2$OlinkID
+        ) |>
+        dplyr::filter(
+          .data[["in_p1"]] == TRUE
+          & .data[["in_p2"]] == FALSE
+        ) |>
+        dplyr::pull(
+          .data[[oid_p1]]
+        )
+      return(non_overlap_oid)
+    }
+
+    # cross-product normalization - vanilla ----
+
+    data_3k_v1 <- data_3k
+    data_ht_v1 <- data_ht
+
+    # not using get_non_shares_oid here because the originally non-overlapping
+    # assays are synthetic, and not present in eHT_e3072_mapping.
+    oid_only_in_ref_v1 <- setdiff(data_ht_v1$OlinkID,
+                                  eHT_e3072_mapping$OlinkID_HT)
+    oid_only_in_notref_v1 <- setdiff(data_3k_v1$OlinkID,
+                                     eHT_e3072_mapping$OlinkID_E3072)
+
+    bridge_samples_cross_product_v1 <- intersect(
+      x = unique(data_3k_v1$SampleID),
+      y = unique(data_ht_v1$SampleID)
+    ) |>
+      (\(x) x[!grepl("CONTROL", x)])()
+
+    lst_check_cross_product_v1 <- olink_norm_input_check(
+      df1 = data_ht_v1,
+      df2 = data_3k_v1,
+      overlapping_samples_df1 = bridge_samples_cross_product_v1,
+      overlapping_samples_df2 = NULL,
+      df1_project_nr = "HT",
+      df2_project_nr = "3K",
+      reference_project = "HT",
+      reference_medians = NULL
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # check that function returns missing OlinkIDs with BridgingRecommendation
+    expect_message(
+      object = df_cross_product_miss_oid_v1 <- olink_format_oid_no_overlap(
+        ref_df = data_ht_v1,
+        not_ref_df = data_3k_v1,
+        lst_check = lst_check_cross_product_v1
+      ),
+      regexp = paste("2 non-overlapping assays are included in the normalized",
+                     "dataset without adjustment. Assays found in only one",
+                     "project will have decreased statistical power due to the",
+                     "lower number of samples.")
+    )
+
+    expect_equal(
+      object = df_cross_product_miss_oid_v1 |>
+        dplyr::arrange(
+          .data[["SampleID"]], .data[["OlinkID"]]
+        ),
+      expected = data_ht_v1 |>
+        dplyr::filter(
+          .data[["OlinkID"]] %in% .env[["oid_only_in_ref_v1"]]
+        ) |>
+        dplyr::mutate(
+          Project = "HT"
+        ) |>
+        dplyr::bind_rows(
+          data_3k_v1 |>
+            dplyr::filter(
+              .data[["OlinkID"]] %in% .env[["oid_only_in_notref_v1"]]
+            ) |>
+            dplyr::mutate(
+              Project = "3K"
+            )
+        ) |>
+        dplyr::mutate(
+          BridgingRecommendation = "NotOverlapping"
+        ) |>
+        dplyr::arrange(
+          .data[["SampleID"]], .data[["OlinkID"]]
+        )
+    )
+
+    # cross-product normalization - remove additional assays from both ----
+
+    drop_assays <- eHT_e3072_mapping |>
+      dplyr::filter(
+        .data[["OlinkID_HT"]] %in% data_ht$OlinkID
+        & .data[["OlinkID_E3072"]] %in% data_3k$OlinkID
+      ) |>
+      dplyr::arrange(.data[["Assay"]]) |>
+      dplyr::select(dplyr::all_of(c("OlinkID_HT", "OlinkID_E3072")))
+
+    drop_ht_assays <- drop_assays$OlinkID_HT[1L:4L]
+    drop_3k_assays <- drop_assays$OlinkID_E3072[5L:7L]
+
+    data_3k_v2 <- data_3k |>
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% .env[["drop_3k_assays"]])
+        & !(.data[["OlinkID"]] %in% .env[["oid_only_in_notref_v1"]])
+      )
+    data_ht_v2 <- data_ht |>
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% .env[["drop_ht_assays"]])
+        & !(.data[["OlinkID"]] %in% .env[["oid_only_in_ref_v1"]])
+      )
+
+    oid_only_in_ref_v2 <- get_non_shares_oid(
+      df1 = data_ht_v2,
+      df_suffix_p1 = "HT",
+      df2 = data_3k_v2,
+      df_suffix_p2 = "E3072"
+    )
+    oid_only_in_notref_v2 <- get_non_shares_oid(
+      df1 = data_3k_v2,
+      df_suffix_p1 = "E3072",
+      df2 = data_ht_v2,
+      df_suffix_p2 = "HT"
+    )
+
+    bridge_samples_cross_product_v2 <- intersect(
+      x = unique(data_3k_v2$SampleID),
+      y = unique(data_ht_v2$SampleID)
+    ) |>
+      (\(x) x[!grepl("CONTROL", x)])()
+
+    lst_check_cross_product_v2 <- olink_norm_input_check(
+      df1 = data_ht_v2,
+      df2 = data_3k_v2,
+      overlapping_samples_df1 = bridge_samples_cross_product_v2,
+      overlapping_samples_df2 = NULL,
+      df1_project_nr = "HT",
+      df2_project_nr = "3K",
+      reference_project = "HT",
+      reference_medians = NULL
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # check that function returns missing OlinkIDs with BridgingRecommendation
+    expect_message(
+      object = df_cross_product_miss_oid_v2 <- olink_format_oid_no_overlap(
+        ref_df = data_ht_v2,
+        not_ref_df = data_3k_v2,
+        lst_check = lst_check_cross_product_v2
+      ),
+      regexp = paste("7 non-overlapping assays are included in the normalized",
+                     "dataset without adjustment. Assays found in only one",
+                     "project will have decreased statistical power due to the",
+                     "lower number of samples.")
+    )
+
+    expect_equal(
+      object = df_cross_product_miss_oid_v2 |>
+        dplyr::arrange(
+          .data[["SampleID"]], .data[["OlinkID"]]
+        ),
+      expected = data_ht_v2 |>
+        dplyr::filter(
+          .data[["OlinkID"]] %in% .env[["oid_only_in_ref_v2"]]
+        ) |>
+        dplyr::mutate(
+          Project = "HT"
+        ) |>
+        dplyr::bind_rows(
+          data_3k_v2 |>
+            dplyr::filter(
+              .data[["OlinkID"]] %in% .env[["oid_only_in_notref_v2"]]
+            ) |>
+            dplyr::mutate(
+              Project = "3K"
+            )
+        ) |>
+        dplyr::mutate(
+          BridgingRecommendation = "NotOverlapping"
+        ) |>
+        dplyr::arrange(
+          .data[["SampleID"]], .data[["OlinkID"]]
+        )
+    )
+
+    # cross-product normalization - remove assays from reference ----
+
+    data_3k_v3 <- data_3k |>
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% .env[["oid_only_in_notref_v1"]])
+      )
+    data_ht_v3 <- data_ht |>
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% .env[["drop_ht_assays"]])
+        & !(.data[["OlinkID"]] %in% .env[["oid_only_in_ref_v1"]])
+      )
+
+    oid_only_in_ref_v3 <- get_non_shares_oid(
+      df1 = data_ht_v3,
+      df_suffix_p1 = "HT",
+      df2 = data_3k_v3,
+      df_suffix_p2 = "E3072"
+    )
+    oid_only_in_notref_v3 <- get_non_shares_oid(
+      df1 = data_3k_v3,
+      df_suffix_p1 = "E3072",
+      df2 = data_ht_v3,
+      df_suffix_p2 = "HT"
+    )
+
+    bridge_samples_cross_product_v3 <- intersect(
+      x = unique(data_3k_v3$SampleID),
+      y = unique(data_ht_v3$SampleID)
+    ) |>
+      (\(x) x[!grepl("CONTROL", x)])()
+
+    lst_check_cross_product_v3 <- olink_norm_input_check(
+      df1 = data_ht_v3,
+      df2 = data_3k_v3,
+      overlapping_samples_df1 = bridge_samples_cross_product_v3,
+      overlapping_samples_df2 = NULL,
+      df1_project_nr = "HT",
+      df2_project_nr = "3K",
+      reference_project = "HT",
+      reference_medians = NULL
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # check that function returns missing OlinkIDs with BridgingRecommendation
+    expect_message(
+      object = df_cross_product_miss_oid_v3 <- olink_format_oid_no_overlap(
+        ref_df = data_ht_v3,
+        not_ref_df = data_3k_v3,
+        lst_check = lst_check_cross_product_v3
+      ),
+      regexp = paste("4 non-overlapping assays are included in the normalized",
+                     "dataset without adjustment. Assays found in only one",
+                     "project will have decreased statistical power due to the",
+                     "lower number of samples.")
+    )
+
+    expect_equal(
+      object = df_cross_product_miss_oid_v3 |>
+        dplyr::arrange(
+          .data[["SampleID"]], .data[["OlinkID"]]
+        ),
+      expected = data_ht_v3 |>
+        dplyr::filter(
+          .data[["OlinkID"]] %in% .env[["oid_only_in_ref_v3"]]
+        ) |>
+        dplyr::mutate(
+          Project = "HT"
+        ) |>
+        dplyr::bind_rows(
+          data_3k_v3 |>
+            dplyr::filter(
+              .data[["OlinkID"]] %in% .env[["oid_only_in_notref_v3"]]
+            ) |>
+            dplyr::mutate(
+              Project = "3K"
+            )
+        ) |>
+        dplyr::mutate(
+          BridgingRecommendation = "NotOverlapping"
+        ) |>
+        dplyr::arrange(
+          .data[["SampleID"]], .data[["OlinkID"]]
+        )
+    )
+
+    # cross-product normalization - remove assays from non reference ----
+
+    data_3k_v4 <- data_3k |>
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% .env[["drop_3k_assays"]])
+        & !(.data[["OlinkID"]] %in% .env[["oid_only_in_notref_v1"]])
+      )
+    data_ht_v4 <- data_ht |>
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% .env[["oid_only_in_ref_v1"]])
+      )
+
+    oid_only_in_ref_v4 <- get_non_shares_oid(
+      df1 = data_ht_v4,
+      df_suffix_p1 = "HT",
+      df2 = data_3k_v4,
+      df_suffix_p2 = "E3072"
+    )
+    oid_only_in_notref_v4 <- get_non_shares_oid(
+      df1 = data_3k_v4,
+      df_suffix_p1 = "E3072",
+      df2 = data_ht_v4,
+      df_suffix_p2 = "HT"
+    )
+
+    bridge_samples_cross_product_v4 <- intersect(
+      x = unique(data_3k_v4$SampleID),
+      y = unique(data_ht_v4$SampleID)
+    ) |>
+      (\(x) x[!grepl("CONTROL", x)])()
+
+    lst_check_cross_product_v4 <- olink_norm_input_check(
+      df1 = data_ht_v4,
+      df2 = data_3k_v4,
+      overlapping_samples_df1 = bridge_samples_cross_product_v4,
+      overlapping_samples_df2 = NULL,
+      df1_project_nr = "HT",
+      df2_project_nr = "3K",
+      reference_project = "HT",
+      reference_medians = NULL
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # check that function returns missing OlinkIDs with BridgingRecommendation
+    expect_message(
+      object = df_cross_product_miss_oid_v4 <- olink_format_oid_no_overlap(
+        ref_df = data_ht_v4,
+        not_ref_df = data_3k_v4,
+        lst_check = lst_check_cross_product_v4
+      ),
+      regexp = paste("3 non-overlapping assays are included in the normalized",
+                     "dataset without adjustment. Assays found in only one",
+                     "project will have decreased statistical power due to the",
+                     "lower number of samples.")
+    )
+
+    expect_equal(
+      object = df_cross_product_miss_oid_v4 |>
+        dplyr::arrange(
+          .data[["SampleID"]], .data[["OlinkID"]]
+        ),
+      expected = data_ht_v4 |>
+        dplyr::filter(
+          .data[["OlinkID"]] %in% .env[["oid_only_in_ref_v4"]]
+        ) |>
+        dplyr::mutate(
+          Project = "HT"
+        ) |>
+        dplyr::bind_rows(
+          data_3k_v4 |>
+            dplyr::filter(
+              .data[["OlinkID"]] %in% .env[["oid_only_in_notref_v4"]]
+            ) |>
+            dplyr::mutate(
+              Project = "3K"
+            )
+        ) |>
+        dplyr::mutate(
+          BridgingRecommendation = "NotOverlapping"
+        ) |>
+        dplyr::arrange(
+          .data[["SampleID"]], .data[["OlinkID"]]
+        )
+    )
+  }
+)
