@@ -2281,7 +2281,7 @@ olink_normalization_format <- function(df_norm,
 
     # Remove controls and sort by project
     df_full <- df_norm |>
-      olink_format_rm_ext_ctrl() |>
+      olink_format_rm_ext_ctrl(lst_check = lst_check) |>
       dplyr::arrange(
         .data[["Project"]], .data[["SampleID"]]
       )
@@ -2353,7 +2353,7 @@ olink_normalization_format <- function(df_norm,
             "OlinkID_Reveal")
         )
       ) |>
-      olink_format_rm_ext_ctrl() |> # rm nc and pc
+      olink_format_rm_ext_ctrl(lst_check = lst_check) |> # rm nc and pc
       dplyr::arrange(
         .data[["Project"]], .data[["SampleID"]]
       )
@@ -2377,7 +2377,7 @@ olink_normalization_format <- function(df_norm,
 
     # Remove NCs and PCs and sort by project
     df_full <- df_norm |>
-      olink_format_rm_ext_ctrl() |>
+      olink_format_rm_ext_ctrl(lst_check = lst_check) |>
       dplyr::arrange(
         .data[["Project"]], .data[["SampleID"]]
       )
@@ -2402,7 +2402,7 @@ olink_normalization_format <- function(df_norm,
     }
     # Remove NCs and PCs and sort by project
     df_full <- df_norm |>
-      olink_format_rm_ext_ctrl() |>
+      olink_format_rm_ext_ctrl(lst_check = lst_check) |>
       dplyr::arrange(
         .data[["Project"]], .data[["SampleID"]]
       )
@@ -2515,14 +2515,14 @@ olink_format_rm_ext_ctrl <- function(df,
 
     if (length(nc_sid) > 0L) {
       cli::cli_inform(
-        c("i" = "{.val {length(nc_sid)}} Negative Control{?s} were removed from
-          dataset: {.val {nc_sid}}")
+        c("i" = "{.val {length(nc_sid)}} Negative Control{?s} {?was/were}
+        removed from dataset: {.val {nc_sid}}")
       )
     }
     if (length(pc_sid) > 0L) {
       cli::cli_inform(
-        c("i" = "{.val {length(pc_sid)}} Plate Control{?s} were removed from
-          dataset: {.val {pc_sid}}")
+        c("i" = "{.val {length(pc_sid)}} Plate Control{?s} {?was/were} removed
+        from dataset: {.val {pc_sid}}")
       )
     }
     if (ext_ctrl_regexp == TRUE) {
