@@ -844,7 +844,7 @@ check_darid <- function(df){
       any(stringr::str_detect(df[["DataAnalysisRefID"]],
                               "D.*0007 || D.*0008 || D.*0010 || D.*0014")) &&
       any(sapply(df[["PanelDataArchiveVersion"]], function(x){
-        compareVersion("1.5", x)
+        utils::compareVersion("1.5", x)
       }) == 1)){
     cli::cli_alert_info(
       paste0("Outdated Data Analysis Reference ID and ",
