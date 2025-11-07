@@ -6792,7 +6792,7 @@ test_that(
 # relevant messages are shown.
 
 test_that(
-  "olink_normalization_format - within-product bridge normalization",
+  "olink_normalization_format - works - within-product bridge norm",
   {
     skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
 
@@ -6823,8 +6823,6 @@ test_that(
     expect_message(
       object = olink_normalization_format(
         df_norm = df_norm_bridge_v1,
-        ref_df = df1_bridge_v1,
-        not_ref_df = df2_bridge_v1,
         lst_check = check_lst_bridge_v1
       ),
       regexp = "No Negative Controls or Plate Controls found in dataset"
@@ -6865,8 +6863,6 @@ test_that(
       object = expect_message(
         object = olink_normalization_format(
           df_norm = df_norm_bridge_v2,
-          ref_df = df1_bridge_v2,
-          not_ref_df = df2_bridge_v2,
           lst_check = check_lst_bridge_v2
         ),
         regexp = paste("4 non-overlapping assays are included in the",
@@ -6928,8 +6924,6 @@ test_that(
         object = expect_message(
           object = olink_normalization_format(
             df_norm = df_norm_bridge_v3,
-            ref_df = df1_bridge_v3,
-            not_ref_df = df2_bridge_v3,
             lst_check = check_lst_bridge_v3
           ),
           regexp = "1 Negative Control was removed from dataset: \"NEG_CTRL\""
@@ -7002,8 +6996,6 @@ test_that(
           object = expect_message(
             object = olink_normalization_format(
               df_norm = df_norm_bridge_v4,
-              ref_df = df1_bridge_v4,
-              not_ref_df = df2_bridge_v4,
               lst_check = check_lst_bridge_v4
             ),
             regexp = paste("4 non-overlapping assays are included in the",
@@ -7019,7 +7011,7 @@ test_that(
 )
 
 test_that(
-  "olink_normalization_format - within-product subset normalization",
+  "olink_normalization_format - works - within-product subset norm",
   {
     skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
 
@@ -7050,8 +7042,6 @@ test_that(
     expect_message(
       object = olink_normalization_format(
         df_norm = df_norm_subset_v1,
-        ref_df = df1_subset_v1,
-        not_ref_df = df2_subset_v1,
         lst_check = check_lst_subset_v1
       ),
       regexp = "No Negative Controls or Plate Controls found in dataset"
@@ -7092,8 +7082,6 @@ test_that(
       object = expect_message(
         object = olink_normalization_format(
           df_norm = df_norm_subset_v2,
-          ref_df = df1_subset_v2,
-          not_ref_df = df2_subset_v2,
           lst_check = check_lst_subset_v2
         ),
         regexp = paste("4 non-overlapping assays are included in the",
@@ -7155,8 +7143,6 @@ test_that(
         object = expect_message(
           object = olink_normalization_format(
             df_norm = df_norm_subset_v3,
-            ref_df = df1_subset_v3,
-            not_ref_df = df2_subset_v3,
             lst_check = check_lst_subset_v3
           ),
           regexp = "1 Negative Control was removed from dataset: \"NEG_CTRL\""
@@ -7229,8 +7215,6 @@ test_that(
           object = expect_message(
             object = olink_normalization_format(
               df_norm = df_norm_subset_v4,
-              ref_df = df1_subset_v4,
-              not_ref_df = df2_subset_v4,
               lst_check = check_lst_subset_v4
             ),
             regexp = paste("4 non-overlapping assays are included in the",
@@ -7246,7 +7230,7 @@ test_that(
 )
 
 test_that(
-  "olink_normalization_format - within-product reference median normalization",
+  "olink_normalization_format - works - within-product ref med norm",
   {
     skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
 
@@ -7277,8 +7261,6 @@ test_that(
     expect_message(
       object = olink_normalization_format(
         df_norm = df_norm_refmed_v1,
-        ref_df = df1_refmed_v1,
-        not_ref_df = refmed_v1,
         lst_check = check_lst_refmed_v1
       ),
       regexp = "No Negative Controls or Plate Controls found in dataset"
@@ -7319,8 +7301,6 @@ test_that(
       object = expect_message(
         object = olink_normalization_format(
           df_norm = df_norm_refmed_v2,
-          ref_df = df1_refmed_v2,
-          not_ref_df = refmed_v2,
           lst_check = check_lst_refmed_v2
         ),
         regexp = paste("2 non-overlapping assays found in the dataset but not",
@@ -7372,8 +7352,6 @@ test_that(
         object = expect_message(
           object = olink_normalization_format(
             df_norm = df_norm_refmed_v3,
-            ref_df = df1_refmed_v3,
-            not_ref_df = refmed_v3,
             lst_check = check_lst_refmed_v3
           ),
           regexp = "1 Negative Control was removed from dataset: \"NEG_CTRL\""
@@ -7436,8 +7414,6 @@ test_that(
           object = expect_message(
             object = olink_normalization_format(
               df_norm = df_norm_refmed_v4,
-              ref_df = df1_refmed_v4,
-              not_ref_df = refmed_v4,
               lst_check = check_lst_refmed_v4
             ),
             regexp = paste("2 non-overlapping assays found in the dataset but",
@@ -7453,7 +7429,7 @@ test_that(
 )
 
 test_that(
-  "olink_format_oid_no_overlap - works - cross-product normalization",
+  "olink_normalization_format - works - cross-product normalization",
   {
     skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
@@ -7542,8 +7518,6 @@ test_that(
           object = expect_message(
             object = olink_normalization_format(
               df_norm = data_ht_3k_norm_v1,
-              ref_df = data_ht_v1,
-              not_ref_df = data_3k_v1,
               lst_check = lst_check_cross_product_v1
             ),
             regexp = paste("2 not bridgeable assays are included in the",
@@ -7631,8 +7605,6 @@ test_that(
           object = expect_message(
             object = olink_normalization_format(
               df_norm = data_ht_3k_norm_v2,
-              ref_df = data_ht_v2,
-              not_ref_df = data_3k_v2,
               lst_check = lst_check_cross_product_v2
             ),
             regexp = paste("2 not bridgeable assays are included in the",
@@ -7708,8 +7680,6 @@ test_that(
           object = expect_message(
             object = olink_normalization_format(
               df_norm = data_ht_3k_norm_v3,
-              ref_df = data_ht_v3,
-              not_ref_df = data_3k_v3,
               lst_check = lst_check_cross_product_v3
             ),
             regexp = paste("2 not bridgeable assays are included in the",
@@ -7785,8 +7755,6 @@ test_that(
           object = expect_message(
             object = olink_normalization_format(
               df_norm = data_ht_3k_norm_v4,
-              ref_df = data_ht_v4,
-              not_ref_df = data_3k_v4,
               lst_check = lst_check_cross_product_v4
             ),
             regexp = paste("2 not bridgeable assays are included in the",
@@ -8175,8 +8143,6 @@ test_that(
     # check that function returns missing OlinkIDs with adjustment factor 0
     expect_message(
       object = df_ref_med_miss_oid <- olink_format_oid_no_overlap(
-        ref_df = df1_ref_med,
-        not_ref_df = NULL,
         lst_check = ref_med_check_lst
       ),
       regexp = paste("2 non-overlapping assays found in the dataset but not in",
@@ -8240,8 +8206,6 @@ test_that(
     # check that function returns missing OlinkIDs with adjustment factor 0
     expect_message(
       object = df_subset_miss_oid_v1 <- olink_format_oid_no_overlap(
-        ref_df = df1_subset_v1,
-        not_ref_df = df2_subset_v1,
         lst_check = subset_check_lst_v1
       ),
       regexp = paste("2 non-overlapping assays are included in the normalized",
@@ -8296,8 +8260,6 @@ test_that(
     # check that function returns missing OlinkIDs with adjustment factor 0
     expect_message(
       object = df_subset_miss_oid_v2 <- olink_format_oid_no_overlap(
-        ref_df = df1_subset_v2,
-        not_ref_df = df2_subset_v2,
         lst_check = subset_check_lst_v2
       ),
       regexp = paste("4 non-overlapping assays are included in the normalized",
@@ -8343,8 +8305,6 @@ test_that(
     # check that function returns missing OlinkIDs with adjustment factor 0
     expect_message(
       object = df_subset_miss_oid_v3 <- olink_format_oid_no_overlap(
-        ref_df = df1_subset_v2,
-        not_ref_df = df2_subset_v1,
         lst_check = subset_check_lst_v3
       ),
       regexp = paste("6 non-overlapping assays are included in the normalized",
@@ -8458,8 +8418,6 @@ test_that(
     # check that function returns missing OlinkIDs with BridgingRecommendation
     expect_message(
       object = df_cross_product_miss_oid_v1 <- olink_format_oid_no_overlap(
-        ref_df = data_ht_v1,
-        not_ref_df = data_3k_v1,
         lst_check = lst_check_cross_product_v1
       ),
       regexp = paste("2 non-overlapping assays are included in the normalized",
@@ -8556,8 +8514,6 @@ test_that(
     # check that function returns missing OlinkIDs with BridgingRecommendation
     expect_message(
       object = df_cross_product_miss_oid_v2 <- olink_format_oid_no_overlap(
-        ref_df = data_ht_v2,
-        not_ref_df = data_3k_v2,
         lst_check = lst_check_cross_product_v2
       ),
       regexp = paste("7 non-overlapping assays are included in the normalized",
@@ -8642,8 +8598,6 @@ test_that(
     # check that function returns missing OlinkIDs with BridgingRecommendation
     expect_message(
       object = df_cross_product_miss_oid_v3 <- olink_format_oid_no_overlap(
-        ref_df = data_ht_v3,
-        not_ref_df = data_3k_v3,
         lst_check = lst_check_cross_product_v3
       ),
       regexp = paste("4 non-overlapping assays are included in the normalized",
@@ -8728,8 +8682,6 @@ test_that(
     # check that function returns missing OlinkIDs with BridgingRecommendation
     expect_message(
       object = df_cross_product_miss_oid_v4 <- olink_format_oid_no_overlap(
-        ref_df = data_ht_v4,
-        not_ref_df = data_3k_v4,
         lst_check = lst_check_cross_product_v4
       ),
       regexp = paste("3 non-overlapping assays are included in the normalized",
