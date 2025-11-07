@@ -2548,6 +2548,7 @@ olink_format_rm_ext_ctrl <- function(df,
 #'
 #' @author
 #'   Danai Topouza
+#'   Klev Diamanti
 #'
 #' @param ref_df Reference dataset used for normalization, pre-normalization.
 #' @param not_ref_df Non-reference dataset used for normalization,

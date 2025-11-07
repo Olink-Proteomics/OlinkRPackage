@@ -27,4 +27,5 @@ normalization, splits any concatenated OlinkIDs.
 }
 \author{
 Danai Topouza
+Klev Diamanti
 }
