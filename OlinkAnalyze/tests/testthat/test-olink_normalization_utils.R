@@ -200,7 +200,7 @@ test_that(
           dplyr::mutate(
             Normalization = "Intensity"
           ) |>
-          dplyr::filter(!(.data[["OlinkID"]] == "OID01216")), # rm changed assay,
+          dplyr::filter(!(.data[["OlinkID"]] == "OID01216")), # rm changed assay
         ref_original_df = npx_data2 |>
           dplyr::mutate(
             Normalization = "Intensity"
@@ -7480,7 +7480,7 @@ test_that(
     oid_only_in_notref_v1 <- setdiff(data_3k_v1$OlinkID,
                                      eHT_e3072_mapping$OlinkID_E3072)
 
-    bridge_samples_cross_product_v1 <- intersect(
+    bridge_samples_crossproduct_v1 <- intersect(
       x = unique(data_3k_v1$SampleID),
       y = unique(data_ht_v1$SampleID)
     ) |>
@@ -7489,7 +7489,7 @@ test_that(
     lst_check_cross_product_v1 <- olink_norm_input_check(
       df1 = data_ht_v1,
       df2 = data_3k_v1,
-      overlapping_samples_df1 = bridge_samples_cross_product_v1,
+      overlapping_samples_df1 = bridge_samples_crossproduct_v1,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "HT",
       df2_project_nr = "3K",
@@ -7501,8 +7501,8 @@ test_that(
 
     data_ht_3k_norm_v1 <- olink_normalization(
       df1 = data_ht_v1,
-      df2 = data_3k_v1,,
-      overlapping_samples_df1 = bridge_samples_cross_product_v1,
+      df2 = data_3k_v1,
+      overlapping_samples_df1 = bridge_samples_crossproduct_v1,
       df1_project_nr = "HT",
       df2_project_nr = "3K",
       reference_project = "HT",
@@ -7568,7 +7568,7 @@ test_that(
       df_suffix_p2 = "HT"
     )
 
-    bridge_samples_cross_product_v2 <- intersect(
+    bridge_samples_crossproduct_v2 <- intersect(
       x = unique(data_3k_v2$SampleID),
       y = unique(data_ht_v2$SampleID)
     ) |>
@@ -7577,7 +7577,7 @@ test_that(
     lst_check_cross_product_v2 <- olink_norm_input_check(
       df1 = data_ht_v2,
       df2 = data_3k_v2,
-      overlapping_samples_df1 = bridge_samples_cross_product_v2,
+      overlapping_samples_df1 = bridge_samples_crossproduct_v2,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "HT",
       df2_project_nr = "3K",
@@ -7589,8 +7589,8 @@ test_that(
 
     data_ht_3k_norm_v2 <- olink_normalization(
       df1 = data_ht_v2,
-      df2 = data_3k_v2,,
-      overlapping_samples_df1 = bridge_samples_cross_product_v2,
+      df2 = data_3k_v2,
+      overlapping_samples_df1 = bridge_samples_crossproduct_v2,
       df1_project_nr = "HT",
       df2_project_nr = "3K",
       reference_project = "HT",
@@ -7643,7 +7643,7 @@ test_that(
       df_suffix_p2 = "HT"
     )
 
-    bridge_samples_cross_product_v3 <- intersect(
+    bridge_samples_crossproduct_v3 <- intersect(
       x = unique(data_3k_v3$SampleID),
       y = unique(data_ht_v3$SampleID)
     ) |>
@@ -7652,7 +7652,7 @@ test_that(
     lst_check_cross_product_v3 <- olink_norm_input_check(
       df1 = data_ht_v3,
       df2 = data_3k_v3,
-      overlapping_samples_df1 = bridge_samples_cross_product_v3,
+      overlapping_samples_df1 = bridge_samples_crossproduct_v3,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "HT",
       df2_project_nr = "3K",
@@ -7664,8 +7664,8 @@ test_that(
 
     data_ht_3k_norm_v3 <- olink_normalization(
       df1 = data_ht_v3,
-      df2 = data_3k_v3,,
-      overlapping_samples_df1 = bridge_samples_cross_product_v3,
+      df2 = data_3k_v3,
+      overlapping_samples_df1 = bridge_samples_crossproduct_v3,
       df1_project_nr = "HT",
       df2_project_nr = "3K",
       reference_project = "HT",
@@ -7718,7 +7718,7 @@ test_that(
       df_suffix_p2 = "HT"
     )
 
-    bridge_samples_cross_product_v4 <- intersect(
+    bridge_samples_crossproduct_v4 <- intersect(
       x = unique(data_3k_v4$SampleID),
       y = unique(data_ht_v4$SampleID)
     ) |>
@@ -7727,7 +7727,7 @@ test_that(
     lst_check_cross_product_v4 <- olink_norm_input_check(
       df1 = data_ht_v4,
       df2 = data_3k_v4,
-      overlapping_samples_df1 = bridge_samples_cross_product_v4,
+      overlapping_samples_df1 = bridge_samples_crossproduct_v4,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "HT",
       df2_project_nr = "3K",
@@ -7739,8 +7739,8 @@ test_that(
 
     data_ht_3k_norm_v4 <- olink_normalization(
       df1 = data_ht_v4,
-      df2 = data_3k_v4,,
-      overlapping_samples_df1 = bridge_samples_cross_product_v4,
+      df2 = data_3k_v4,
+      overlapping_samples_df1 = bridge_samples_crossproduct_v4,
       df1_project_nr = "HT",
       df2_project_nr = "3K",
       reference_project = "HT",
@@ -8396,7 +8396,7 @@ test_that(
     oid_only_in_notref_v1 <- setdiff(data_3k_v1$OlinkID,
                                      eHT_e3072_mapping$OlinkID_E3072)
 
-    bridge_samples_cross_product_v1 <- intersect(
+    bridge_samples_crossproduct_v1 <- intersect(
       x = unique(data_3k_v1$SampleID),
       y = unique(data_ht_v1$SampleID)
     ) |>
@@ -8405,7 +8405,7 @@ test_that(
     lst_check_cross_product_v1 <- olink_norm_input_check(
       df1 = data_ht_v1,
       df2 = data_3k_v1,
-      overlapping_samples_df1 = bridge_samples_cross_product_v1,
+      overlapping_samples_df1 = bridge_samples_crossproduct_v1,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "HT",
       df2_project_nr = "3K",
@@ -8492,7 +8492,7 @@ test_that(
       df_suffix_p2 = "HT"
     )
 
-    bridge_samples_cross_product_v2 <- intersect(
+    bridge_samples_crossproduct_v2 <- intersect(
       x = unique(data_3k_v2$SampleID),
       y = unique(data_ht_v2$SampleID)
     ) |>
@@ -8501,7 +8501,7 @@ test_that(
     lst_check_cross_product_v2 <- olink_norm_input_check(
       df1 = data_ht_v2,
       df2 = data_3k_v2,
-      overlapping_samples_df1 = bridge_samples_cross_product_v2,
+      overlapping_samples_df1 = bridge_samples_crossproduct_v2,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "HT",
       df2_project_nr = "3K",
@@ -8576,7 +8576,7 @@ test_that(
       df_suffix_p2 = "HT"
     )
 
-    bridge_samples_cross_product_v3 <- intersect(
+    bridge_samples_crossproduct_v3 <- intersect(
       x = unique(data_3k_v3$SampleID),
       y = unique(data_ht_v3$SampleID)
     ) |>
@@ -8585,7 +8585,7 @@ test_that(
     lst_check_cross_product_v3 <- olink_norm_input_check(
       df1 = data_ht_v3,
       df2 = data_3k_v3,
-      overlapping_samples_df1 = bridge_samples_cross_product_v3,
+      overlapping_samples_df1 = bridge_samples_crossproduct_v3,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "HT",
       df2_project_nr = "3K",
@@ -8660,7 +8660,7 @@ test_that(
       df_suffix_p2 = "HT"
     )
 
-    bridge_samples_cross_product_v4 <- intersect(
+    bridge_samples_crossproduct_v4 <- intersect(
       x = unique(data_3k_v4$SampleID),
       y = unique(data_ht_v4$SampleID)
     ) |>
@@ -8669,7 +8669,7 @@ test_that(
     lst_check_cross_product_v4 <- olink_norm_input_check(
       df1 = data_ht_v4,
       df2 = data_3k_v4,
-      overlapping_samples_df1 = bridge_samples_cross_product_v4,
+      overlapping_samples_df1 = bridge_samples_crossproduct_v4,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "HT",
       df2_project_nr = "3K",

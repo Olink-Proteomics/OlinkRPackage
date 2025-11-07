@@ -2255,7 +2255,7 @@ olink_normalization_format <- function(df_norm,
   # Extract data from non-overlapping assays ----
 
   if (!is.null(lst_check$non_overlapping_oid)
-      & length(unlist(lst_check$non_overlapping_oid)) > 0L) {
+      && length(unlist(lst_check$non_overlapping_oid)) > 0L) {
     no_overlap_oid <- olink_format_oid_no_overlap(
       lst_check = lst_check
     )
@@ -2392,9 +2392,9 @@ olink_format_rm_ext_ctrl <- function(df,
   if (length(lst_check$ref_cols$sample_type) > 0L
       && length(lst_check$not_ref_cols$sample_type) > 0L) {
 
-    exclude_ext_ctrl <- function(df,
-                                 lst_check,
-                                 ext_ctrl_type) {
+    exclude_ext_ctrl_sampletype <- function(df,
+                                            lst_check,
+                                            ext_ctrl_type) {
       ext_ctrl_sid <- df |>
         dplyr::filter(
           dplyr::if_any(
@@ -2412,12 +2412,12 @@ olink_format_rm_ext_ctrl <- function(df,
       return(ext_ctrl_sid)
     }
 
-    nc_sid <- exclude_ext_ctrl(df = df,
-                               lst_check = lst_check,
-                               ext_ctrl_type = "NEGATIVE_CONTROL")
-    pc_sid <- exclude_ext_ctrl(df = df,
-                               lst_check = lst_check,
-                               ext_ctrl_type = "PLATE_CONTROL")
+    nc_sid <- exclude_ext_ctrl_sampletype(df = df,
+                                          lst_check = lst_check,
+                                          ext_ctrl_type = "NEGATIVE_CONTROL")
+    pc_sid <- exclude_ext_ctrl_sampletype(df = df,
+                                          lst_check = lst_check,
+                                          ext_ctrl_type = "PLATE_CONTROL")
     ext_ctrl_regexp <- FALSE
 
   } else {
@@ -2430,9 +2430,9 @@ olink_format_rm_ext_ctrl <- function(df,
                  "plate control", "plate_control", "Plate_Control")
     pc_ctrl_regex <- paste(pc_ctrl, collapse = "|")
 
-    exclude_ext_ctrl <- function(df,
-                                 lst_check,
-                                 ext_ctrl_regex) {
+    exclude_ext_ctrl_sampleid <- function(df,
+                                          lst_check,
+                                          ext_ctrl_regex) {
       ext_ctrl_sid <- df |>
         dplyr::distinct(
           .data[[lst_check$ref_cols$sample_id]]
@@ -2449,12 +2449,12 @@ olink_format_rm_ext_ctrl <- function(df,
       return(ext_ctrl_sid)
     }
 
-    nc_sid <- exclude_ext_ctrl(df = df,
-                               lst_check = lst_check,
-                               ext_ctrl_regex = neg_ctrl_regex)
-    pc_sid <- exclude_ext_ctrl(df = df,
-                               lst_check = lst_check,
-                               ext_ctrl_regex = pc_ctrl_regex)
+    nc_sid <- exclude_ext_ctrl_sampleid(df = df,
+                                        lst_check = lst_check,
+                                        ext_ctrl_regex = neg_ctrl_regex)
+    pc_sid <- exclude_ext_ctrl_sampleid(df = df,
+                                        lst_check = lst_check,
+                                        ext_ctrl_regex = pc_ctrl_regex)
     ext_ctrl_regexp <- TRUE
   }
 
@@ -2565,7 +2565,7 @@ olink_format_oid_no_overlap <- function(lst_check) {
   # Processing for reference median normalization
   if (lst_check$norm_mode == olink_norm_modes$ref_median) {
 
-    num_non_overlap <- ref_df_no_overlap |>
+    num_non_overlap <- ref_df_no_overlap |> # nolint object_usage_linter
       dplyr::pull(
         .data[[lst_check$ref_cols$olink_id]]
       ) |>
