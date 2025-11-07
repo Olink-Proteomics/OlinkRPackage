@@ -2647,16 +2647,18 @@ olink_format_oid_no_overlap <- function(ref_df,
       statistical power due to the lower number of samples.")
     )
 
+    # Combine non-overlapping assays from df1 and df2
+    df_non_overlapping <- ref_df_no_overlap |>
+      dplyr::bind_rows(
+        not_ref_df_no_overlap
+      )
+
     # Processing for within-product bridging and subset normalization
     if (lst_check$norm_mode %in% c(olink_norm_modes$bridge,
                                    olink_norm_modes$subset)) {
 
-      # Combine non-overlapping assays from df1 and df2
       # Set non-overlapping adjustment factor to 0
-      df_non_overlapping <- ref_df_no_overlap |>
-        dplyr::bind_rows(
-          not_ref_df_no_overlap
-        ) |>
+      df_non_overlapping <- df_non_overlapping |>
         dplyr::mutate(
           Adj_factor = 0
         )
@@ -2664,16 +2666,11 @@ olink_format_oid_no_overlap <- function(ref_df,
     } else if (lst_check$norm_mode == olink_norm_modes$norm_cross_product) {
       # Processing for cross-product bridging
 
-      # Combine non-overlapping assays from df1 and df2
       # Set bridging recommendation for non-overlapping assays
-      df_non_overlapping <- ref_df_no_overlap |>
-        dplyr::bind_rows(
-          not_ref_df_no_overlap
-        ) |>
+      df_non_overlapping <- df_non_overlapping |>
         dplyr::mutate(
           BridgingRecommendation = "NotOverlapping"
         )
-
     }
 
   }
