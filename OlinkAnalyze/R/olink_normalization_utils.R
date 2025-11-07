@@ -2613,14 +2613,14 @@ olink_format_oid_no_overlap <- function(ref_df,
 
     num_non_overlap <- ref_df_no_overlap |>
       dplyr::pull(
-        .data[[bridge_nonorm_noctrl_check$ref_cols$olink_id]]
+        .data[[lst_check$ref_cols$olink_id]]
       ) |>
       unique()
 
     cli::cli_inform(
       c("i" = "{.val {length(num_non_overlap)}} non-overlapping assay{?s} found
-        in the dataset but not in the reference medians {?is/are} included in
-        the normalized dataset without adjustment.")
+        in the dataset but not in the reference medians. Assay{?s} {?is/are}
+        included in the normalized dataset without adjustment.")
     )
 
     # Keep only non-overlapping assays from ref_df, not from ref median data
