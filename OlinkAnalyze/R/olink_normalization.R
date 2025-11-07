@@ -354,8 +354,6 @@ olink_normalization <- function(df1,
 
     df_norm <- olink_normalization_format(
       df_norm = df_norm,
-      ref_df = lst_check$ref_original_df,
-      not_ref_df = lst_check$not_ref_original_df,
       lst_check = lst_check
     )
 
