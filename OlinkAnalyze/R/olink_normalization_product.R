@@ -442,10 +442,11 @@ olink_normalization_qs <- function(lst_df,
     num_samples <- 24L
   } else {
     cli::cli_abort(
-      c("i" = "Cross product bridging is only supported in the following cases:",
-      "*" = "Explore 3072 to Explore HT",
-      "*" = "Explore 3072 to Reveal",
-      "*" = "Explore HT and Reveal (in either direction)")
+      c("i" = "Cross product bridging is only supported in the
+      following cases:",
+        "*" = "Explore 3072 to Explore HT",
+        "*" = "Explore 3072 to Reveal",
+        "*" = "Explore HT and Reveal (in either direction)")
     )
   }
 
@@ -818,11 +819,10 @@ olink_normalization_product_format <- function(df_norm, # nolint object_length_l
       & .data[["BridgingRecommendation"]] == "NotBridgeable"
     ) |>
     dplyr::mutate(
-      OlinkID = dplyr::if_else(
-        .data[["Project"]] == lst_check$ref_name,
-        .data[["OlinkID"]],
-        .data[[olinkid_not_ref]])
-      )
+      OlinkID = dplyr::if_else(.data[["Project"]] == lst_check$ref_name,
+                               .data[["OlinkID"]],
+                               .data[[olinkid_not_ref]])
+    )
 
 
   # Extract data from non-overlapping assays ----

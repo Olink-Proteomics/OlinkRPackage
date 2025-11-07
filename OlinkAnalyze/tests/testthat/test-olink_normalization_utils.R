@@ -3823,27 +3823,27 @@ test_that(
       )
     )
 
-   # HT-Reveal ----
+    # HT-Reveal ----
 
-      expect_no_condition(
-        object = lst_cross_prod_out_ht <- olink_norm_input_cross_product(
-          lst_df = list(
-            "p1" = data_ht,
-            "p2" = data_reveal
-          ),
-          lst_cols = list(
-            "p1" = list(panel = "Panel",
-                        olink_id = "OlinkID",
-                        count = "Count"),
-            "p2" = list(panel = "Panel",
-                        olink_id = "OlinkID",
-                        count = "Count")
-          ),
-          reference_project = "p2",
-          product_ids = c("p1" = "HT", "p2" = "Reveal"),
-          ref_ids = c("p1" = "ref", "p2" = "not_ref")
-        )
+    expect_no_condition(
+      object = lst_cross_prod_out_ht <- olink_norm_input_cross_product(
+        lst_df = list(
+          "p1" = data_ht,
+          "p2" = data_reveal
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel",
+                      olink_id = "OlinkID",
+                      count = "Count"),
+          "p2" = list(panel = "Panel",
+                      olink_id = "OlinkID",
+                      count = "Count")
+        ),
+        reference_project = "p2",
+        product_ids = c("p1" = "HT", "p2" = "Reveal"),
+        ref_ids = c("p1" = "ref", "p2" = "not_ref")
       )
+    )
 
     expect_identical(
       object = lst_cross_prod_out_ht,
@@ -3883,10 +3883,9 @@ test_that(
               by = "OlinkID_Reveal",
               relationship = "many-to-one"
             ) |>
-            dplyr::mutate(
-              OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
-                                       .data[["OlinkID_Reveal"]],
-                                       .data[["OlinkID"]]))
+            dplyr::mutate(OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
+                                                   .data[["OlinkID_Reveal"]],
+                                                   .data[["OlinkID"]]))
 
         )
       )
