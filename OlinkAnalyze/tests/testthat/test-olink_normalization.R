@@ -29,7 +29,8 @@ test_that(
             overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
             df1_project_nr = "df1_no_norm",
             df2_project_nr = "df2_no_norm",
-            reference_project = "df1_no_norm"
+            reference_project = "df1_no_norm",
+            format = FALSE
           ) |>
             dplyr::filter(
               .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -58,7 +59,8 @@ test_that(
           overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
           df1_project_nr = "df1_norm",
           df2_project_nr = "df2_norm",
-          reference_project = "df1_norm"
+          reference_project = "df1_norm",
+          format = FALSE
         ) |>
           dplyr::filter(
             .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -84,7 +86,8 @@ test_that(
           overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
           df1_project_nr = "df1_no_lod",
           df2_project_nr = "df2_no_lod",
-          reference_project = "df1_no_lod"
+          reference_project = "df1_no_lod",
+          format = FALSE
         ) |>
           dplyr::filter(
             .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -111,7 +114,8 @@ test_that(
             overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
             df1_project_nr = "df1_multiple_lod",
             df2_project_nr = "df2_multiple_lod",
-            reference_project = "df1_multiple_lod"
+            reference_project = "df1_multiple_lod",
+            format = FALSE
           ) |>
             dplyr::filter(
               .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -150,7 +154,8 @@ test_that(
           overlapping_samples_df2 = ref_norm_res$lst_sample$df2_all,
           df1_project_nr = "df1_no_norm",
           df2_project_nr = "df2_no_norm",
-          reference_project = "df1_no_norm"
+          reference_project = "df1_no_norm",
+          format = FALSE
         ) |>
           dplyr::filter(
             .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -177,7 +182,8 @@ test_that(
         overlapping_samples_df2 = ref_norm_res$lst_sample$df2_all,
         df1_project_nr = "df1_norm",
         df2_project_nr = "df2_norm",
-        reference_project = "df1_norm"
+        reference_project = "df1_norm",
+        format = FALSE
       ) |>
         dplyr::filter(
           .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -201,7 +207,8 @@ test_that(
         overlapping_samples_df2 = ref_norm_res$lst_sample$df2_all,
         df1_project_nr = "df1_no_lod",
         df2_project_nr = "df2_no_lod",
-        reference_project = "df1_no_lod"
+        reference_project = "df1_no_lod",
+        format = FALSE
       ) |>
         dplyr::filter(
           .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -226,7 +233,8 @@ test_that(
           overlapping_samples_df2 = ref_norm_res$lst_sample$df2_all,
           df1_project_nr = "df1_multiple_lod",
           df2_project_nr = "df2_multiple_lod",
-          reference_project = "df1_multiple_lod"
+          reference_project = "df1_multiple_lod",
+          format = FALSE
         ) |>
           dplyr::filter(
             .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -262,7 +270,8 @@ test_that(
           overlapping_samples_df2 = ref_norm_res$lst_sample$df2_subset,
           df1_project_nr = "df1_no_norm",
           df2_project_nr = "df2_no_norm",
-          reference_project = "df1_no_norm"
+          reference_project = "df1_no_norm",
+          format = FALSE
         ) |>
           dplyr::filter(
             .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -289,7 +298,8 @@ test_that(
         overlapping_samples_df2 = ref_norm_res$lst_sample$df2_subset,
         df1_project_nr = "df1_norm",
         df2_project_nr = "df2_norm",
-        reference_project = "df1_norm"
+        reference_project = "df1_norm",
+        format = FALSE
       ) |>
         dplyr::filter(
           .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -313,7 +323,8 @@ test_that(
         overlapping_samples_df2 = ref_norm_res$lst_sample$df2_subset,
         df1_project_nr = "df1_no_lod",
         df2_project_nr = "df2_no_lod",
-        reference_project = "df1_no_lod"
+        reference_project = "df1_no_lod",
+        format = FALSE
       ) |>
         dplyr::filter(
           .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -338,7 +349,8 @@ test_that(
           overlapping_samples_df2 = ref_norm_res$lst_sample$df2_subset,
           df1_project_nr = "df1_multiple_lod",
           df2_project_nr = "df2_multiple_lod",
-          reference_project = "df1_multiple_lod"
+          reference_project = "df1_multiple_lod",
+          format = FALSE
         ) |>
           dplyr::filter(
             .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -371,7 +383,8 @@ test_that(
           df1 = ref_norm_res$lst_df$df1_no_norm,
           overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
           df1_project_nr = "df1_no_norm",
-          reference_medians = ref_norm_res$lst_df$ref_med
+          reference_medians = ref_norm_res$lst_df$ref_med,
+          format = FALSE
         ) |>
           dplyr::filter(
             .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -395,7 +408,8 @@ test_that(
         df1 = ref_norm_res$lst_df$df1_norm,
         overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
         df1_project_nr = "df1_norm",
-        reference_medians = ref_norm_res$lst_df$ref_med
+        reference_medians = ref_norm_res$lst_df$ref_med,
+        format = FALSE
       ) |>
         dplyr::filter(
           .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -416,7 +430,8 @@ test_that(
         df1 = ref_norm_res$lst_df$df1_no_lod,
         overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
         df1_project_nr = "df1_no_lod",
-        reference_medians = ref_norm_res$lst_df$ref_med
+        reference_medians = ref_norm_res$lst_df$ref_med,
+        format = FALSE
       ) |>
         dplyr::filter(
           .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -438,7 +453,8 @@ test_that(
           df1 = ref_norm_res$lst_df$df1_multiple_lod,
           overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
           df1_project_nr = "df1_multiple_lod",
-          reference_medians = ref_norm_res$lst_df$ref_med
+          reference_medians = ref_norm_res$lst_df$ref_med,
+          format = FALSE
         ) |>
           dplyr::filter(
             .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -479,7 +495,8 @@ test_that(
               (\(.) .[!grepl("CONTROL", .)])(),
             df1_project_nr = "df_ht",
             df2_project_nr = "df_3k",
-            reference_project = "df_ht"
+            reference_project = "df_ht",
+            format = FALSE
           ),
           regexp = "2 assays are not shared across products."
         ),
@@ -531,7 +548,8 @@ test_that(
                 head(32L),
               df1_project_nr = "Reveal",
               df2_project_nr = "3k",
-              reference_project = "Reveal"
+              reference_project = "Reveal",
+              format = FALSE
             ),
             regexp = "Cross-product normalization will be performed!"
           ),
