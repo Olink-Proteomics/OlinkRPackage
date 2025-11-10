@@ -33,12 +33,11 @@ test_that(
       suppressWarnings()
 
     # check that function returns formatted data
-    expect_message(
+    expect_no_condition(
       object = olink_normalization_format(
         df_norm = df_norm_bridge_v1,
         lst_check = check_lst_bridge_v1
-      ),
-      regexp = "No Negative Controls or Plate Controls found in dataset"
+      )
     )
 
     # assays not present in all datasets ----
@@ -73,15 +72,12 @@ test_that(
 
     # check that function returns formatted data
     expect_message(
-      object = expect_message(
-        object = olink_normalization_format(
-          df_norm = df_norm_bridge_v2,
-          lst_check = check_lst_bridge_v2
-        ),
-        regexp = paste("4 non-overlapping assays are included in the",
-                       "normalized dataset without adjustment")
+      object = olink_normalization_format(
+        df_norm = df_norm_bridge_v2,
+        lst_check = check_lst_bridge_v2
       ),
-      regexp = "No Negative Controls or Plate Controls found in dataset"
+      regexp = paste("4 non-overlapping assays are included in the",
+                     "normalized dataset without adjustment")
     )
 
     # external controls in datasets ----
@@ -252,12 +248,11 @@ test_that(
       suppressWarnings()
 
     # check that function returns formatted data
-    expect_message(
+    expect_no_condition(
       object = olink_normalization_format(
         df_norm = df_norm_subset_v1,
         lst_check = check_lst_subset_v1
-      ),
-      regexp = "No Negative Controls or Plate Controls found in dataset"
+      )
     )
 
     # assays not present in all datasets ----
@@ -292,15 +287,12 @@ test_that(
 
     # check that function returns formatted data
     expect_message(
-      object = expect_message(
-        object = olink_normalization_format(
-          df_norm = df_norm_subset_v2,
-          lst_check = check_lst_subset_v2
-        ),
-        regexp = paste("4 non-overlapping assays are included in the",
-                       "normalized dataset without adjustment")
+      object = olink_normalization_format(
+        df_norm = df_norm_subset_v2,
+        lst_check = check_lst_subset_v2
       ),
-      regexp = "No Negative Controls or Plate Controls found in dataset"
+      regexp = paste("4 non-overlapping assays are included in the",
+                     "normalized dataset without adjustment")
     )
 
     # external controls in datasets ----
@@ -471,12 +463,11 @@ test_that(
       suppressWarnings()
 
     # check that function returns formatted data
-    expect_message(
+    expect_no_condition(
       object = olink_normalization_format(
         df_norm = df_norm_refmed_v1,
         lst_check = check_lst_refmed_v1
-      ),
-      regexp = "No Negative Controls or Plate Controls found in dataset"
+      )
     )
 
     # assays not present in all datasets ----
@@ -511,15 +502,12 @@ test_that(
 
     # check that function returns formatted data
     expect_message(
-      object = expect_message(
-        object = olink_normalization_format(
-          df_norm = df_norm_refmed_v2,
-          lst_check = check_lst_refmed_v2
-        ),
-        regexp = paste("2 non-overlapping assays found in the dataset but not",
-                       "in the reference medians")
+      object = olink_normalization_format(
+        df_norm = df_norm_refmed_v2,
+        lst_check = check_lst_refmed_v2
       ),
-      regexp = "No Negative Controls or Plate Controls found in dataset"
+      regexp = paste("2 non-overlapping assays found in the dataset but not",
+                     "in the reference medians")
     )
 
     # external controls in datasets ----
@@ -1007,12 +995,11 @@ test_that(
       suppressMessages() |>
       suppressWarnings()
 
-    expect_message(
+    expect_no_condition(
       object = olink_format_rm_ext_ctrl(
         df = ref_norm_res$lst_norm$bridge_norm$no_norm,
         lst_check = bridge_nonorm_noctrl_check
-      ),
-      regexp = "No Negative Controls or Plate Controls found in dataset"
+      )
     )
 
     ### bridge normalization - with norm column ----
@@ -1030,12 +1017,11 @@ test_that(
       suppressMessages() |>
       suppressWarnings()
 
-    expect_message(
+    expect_no_condition(
       object = olink_format_rm_ext_ctrl(
         df = ref_norm_res$lst_norm$bridge_norm$norm,
         lst_check = bridge_norm_noctrl_check
-      ),
-      regexp = "No Negative Controls or Plate Controls found in dataset"
+      )
     )
 
     ### bridge normalization - no lod column ----
@@ -1053,12 +1039,11 @@ test_that(
       suppressMessages() |>
       suppressWarnings()
 
-    expect_message(
+    expect_no_condition(
       object = olink_format_rm_ext_ctrl(
         df = ref_norm_res$lst_norm$bridge_norm$no_lod,
         lst_check = bridge_nolod_noctrl_check
-      ),
-      regexp = "No Negative Controls or Plate Controls found in dataset"
+      )
     )
 
     ### bridge normalization - multiple lod columns ----
@@ -1076,12 +1061,11 @@ test_that(
       suppressMessages() |>
       suppressWarnings()
 
-    expect_message(
+    expect_no_condition(
       object = olink_format_rm_ext_ctrl(
         df = ref_norm_res$lst_norm$bridge_norm$multiple_lod,
         lst_check = bridge_multilod_noctrl_check
-      ),
-      regexp = "No Negative Controls or Plate Controls found in dataset"
+      )
     )
   }
 )
