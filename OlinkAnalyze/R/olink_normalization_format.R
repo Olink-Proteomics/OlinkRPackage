@@ -106,7 +106,7 @@ olink_normalization_format <- function(df_norm,
     # Extract data for assays = "NotBridgeable" ----
 
     oid_col_name <- lst_check$ref_cols$olink_id
-    oid_rm_prefix <- paste(oid_col_name, "_")
+    oid_rm_prefix <- paste0(oid_col_name, "_")
     not_ref_oid_col_name <- c(names(reveal_e3072_mapping),
                               names(eHT_e3072_mapping)) |>
       unique() |>
@@ -178,9 +178,8 @@ olink_normalization_format <- function(df_norm,
     df_combo <- df_combo |>
       dplyr::select( # Remove extra columns
         -dplyr::any_of(
-          c("MedianCenteredNPX", "QSNormalizedNPX")
-        ),
-        -dplyr::starts_with(oid_rm_prefix)
+          c("MedianCenteredNPX", "QSNormalizedNPX", not_ref_oid_col_name)
+        )
       )
   }
 
