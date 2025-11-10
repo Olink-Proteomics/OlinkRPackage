@@ -106,7 +106,6 @@ olink_normalization_format <- function(df_norm,
     # Extract data for assays = "NotBridgeable" ----
 
     oid_col_name <- lst_check$ref_cols$olink_id
-    oid_rm_prefix <- paste0(oid_col_name, "_")
     not_ref_oid_col_name <- c(names(reveal_e3072_mapping),
                               names(eHT_e3072_mapping)) |>
       unique() |>
@@ -284,11 +283,7 @@ olink_format_rm_ext_ctrl <- function(df,
     ext_ctrl_regexp <- TRUE
   }
 
-  if (length(c(nc_sid, pc_sid)) == 0L) {
-    cli::cli_inform(
-      c("i" = "No Negative Controls or Plate Controls found in dataset.")
-    )
-  } else {
+  if (length(c(nc_sid, pc_sid)) > 0L) {
     # remove NCs and PCs for the dataset
     df <- df |>
       dplyr::filter(
