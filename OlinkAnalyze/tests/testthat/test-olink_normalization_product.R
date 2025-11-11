@@ -781,13 +781,15 @@ test_that(
 
     # run the function
     expect_warning(
-      object = norm_qs_ht_na <- olink_normalization_qs(lst_df = lst_df,
-                                                       ref_cols = norm_input_check_ht$ref_cols,
-                                                       not_ref_cols = norm_input_check_ht$not_ref_cols,
-                                                       bridge_samples = head(x = bridge_samples, 40L),
-                                                       prod_uniq = c(norm_input_check_ht$not_ref_product,
-                                                         norm_input_check_ht$ref_product
-      )),
+      object = norm_qs_ht_na <-
+        olink_normalization_qs(lst_df = lst_df,
+                               ref_cols = norm_input_check_ht$ref_cols,
+                               not_ref_cols = norm_input_check_ht$not_ref_cols,
+                               bridge_samples = head(x = bridge_samples, 40L),
+                               prod_uniq = c(
+                                 norm_input_check_ht$not_ref_product,
+                                 norm_input_check_ht$ref_product
+                               )),
       regexp = "There are 33 assays with fewer than 40 bridge samples for QS"
     )
 
