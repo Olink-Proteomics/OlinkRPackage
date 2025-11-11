@@ -714,7 +714,9 @@ test_that(
         ref_cols = norm_input_check$ref_cols,
         not_ref_cols = norm_input_check$not_ref_cols,
         bridge_samples = head(x = bridge_samples, 40L),
-        ref_product = norm_input_check$ref_product
+        prod_uniq = c(
+          norm_input_check$not_ref_product,
+          norm_input_check$ref_product)
       ),
       regexp = "There are 31 assays with fewer than 40 bridge samples for QS"
     )
@@ -785,8 +787,10 @@ test_that(
         ref_cols = norm_input_check_ht$ref_cols,
         not_ref_cols = norm_input_check_ht$not_ref_cols,
         bridge_samples = head(x = bridge_samples, 40L),
-        ref_product = norm_input_check_ht$ref_product
-      ),
+        prod_uniq = c(
+          norm_input_check_ht$not_ref_product,
+          norm_input_check_ht$ref_product
+      )),
       regexp = "There are 33 assays with fewer than 40 bridge samples for QS"
     )
 
@@ -847,7 +851,10 @@ test_that(
         ref_cols = norm_input_check_3k$ref_cols,
         not_ref_cols = norm_input_check_3k$not_ref_cols,
         bridge_samples = head(x = bridge_samples, 40L),
-        ref_product = norm_input_check_3k$ref_product
+        prod_uniq = c(
+          norm_input_check_3k$not_ref_product,
+          norm_input_check_3k$ref_product
+        )
       ),
       regexp = "There are 31 assays with fewer than 40 bridge samples for QS"
     )
