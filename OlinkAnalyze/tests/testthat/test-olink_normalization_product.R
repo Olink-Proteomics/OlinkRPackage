@@ -1069,7 +1069,7 @@ test_that(
       sort() |>
       head(35L)
 
-    object = expect_warning(
+    expect_warning(
       object = expect_message(
         lst_check_3k_reveal <- olink_norm_input_check(
           df1 = data_3k,

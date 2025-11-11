@@ -818,9 +818,9 @@ olink_normalization_product_format <- function(df_norm, # nolint object_length_l
       OlinkID = dplyr::if_else(
         .data[["Project"]] == lst_check$ref_name,
         .data[["OlinkID"]],
-        .data[[olinkid_not_ref]])
+        .data[[olinkid_not_ref]]
       )
-
+    )
 
   # Extract data from non-overlapping assays ----
 
