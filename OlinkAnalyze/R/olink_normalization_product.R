@@ -467,7 +467,8 @@ olink_normalization_qs <- function(lst_df,
       dplyr::filter(
         .data[[count_ref_col]] > 10L
         & .data[["bridge_sample"]] == TRUE
-      )
+      )|>
+      tidyr::drop_na()
 
     # Minimal number of bridge samples required to for the function to work. If
     # not met, we just return NA.

@@ -590,6 +590,8 @@ test_that(
   }
 )
 
+
+
 test_that(
   "olink_normalization_qs - works - fewer than 40 bridge samples",
   {
@@ -660,6 +662,211 @@ test_that(
     )
   }
 )
+
+test_that(
+  "olink_normalization_qs - works - fewer than 40 bridge samples, some NA",
+  {
+
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
+
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
+
+    # 40 bridge samples for all assays ----
+
+    bridge_samples <- intersect(
+      x = unique(data_ht$SampleID),
+      y = unique(data_3k$SampleID)
+    ) |>
+      (\(x) x[!grepl("CONTROL", x)])() |>
+      sort()
+
+    # run the internal function that check input from olink_normalization
+    expect_warning(
+      object = expect_message(
+        object = norm_input_check <- olink_norm_input_check(
+          df1 = data_ht,
+          df2 = data_3k,
+          overlapping_samples_df1 = head(x = bridge_samples, 40L),
+          overlapping_samples_df2 = NULL,
+          df1_project_nr = "P1",
+          df2_project_nr = "P2",
+          reference_project = "P1",
+          reference_medians = NULL
+        ),
+        regexp = "Cross-product normalization will be performed!"
+      ),
+      regexp = "2 assays are not shared across products."
+    )
+
+    lst_df <- list(
+      norm_input_check$ref_df,
+      norm_input_check$not_ref_df
+    )
+    names(lst_df) <- c(norm_input_check$ref_name,
+                       norm_input_check$not_ref_name)
+
+    # run the function
+    expect_warning(
+      object = norm_qs_40_bridge <- olink_normalization_qs(
+        lst_df = lst_df,
+        ref_cols = norm_input_check$ref_cols,
+        not_ref_cols = norm_input_check$not_ref_cols,
+        bridge_samples = head(x = bridge_samples, 40L),
+        ref_product = norm_input_check$ref_product
+      ),
+      regexp = "There are 31 assays with fewer than 40 bridge samples for QS"
+    )
+
+    # select assays for which we introduce NAs
+    norm_qs_oid_na <- norm_qs_40_bridge |>
+      tidyr::drop_na() |>
+      dplyr::pull(
+        .data[["OlinkID"]]
+      ) |>
+      head(
+        n = 2L
+      )
+    norm_qs_oid_ht_na <- stringr::str_split(
+      string = norm_qs_oid_na,
+      pattern = "_"
+    ) |>
+      lapply(head, 1L) |>
+      unlist()
+    norm_qs_oid_3k_na <- stringr::str_split(
+      string = norm_qs_oid_na,
+      pattern = "_"
+    ) |>
+      lapply(tail, 1L) |>
+      unlist()
+
+    ## introduce NAs in HT bridge samples for some assays that are not NA ----
+
+    data_ht_v2 <- data_ht |>
+      dplyr::mutate(
+        NPX = dplyr::if_else(
+          .data[["SampleID"]] == bridge_samples[1L]
+          & .data[["OlinkID"]] %in% .env[["norm_qs_oid_ht_na"]],
+          NA_real_,
+          .data[["NPX"]]
+        )
+      )
+
+    # run the internal function that check input from olink_normalization
+    expect_warning(
+      object = expect_message(
+        object = norm_input_check_ht <- olink_norm_input_check(
+          df1 = data_ht_v2,
+          df2 = data_3k,
+          overlapping_samples_df1 = head(x = bridge_samples, 40L),
+          overlapping_samples_df2 = NULL,
+          df1_project_nr = "P1",
+          df2_project_nr = "P2",
+          reference_project = "P1",
+          reference_medians = NULL
+        ),
+        regexp = "Cross-product normalization will be performed!"
+      ),
+      regexp = "2 assays are not shared across products."
+    )
+
+    lst_df <- list(
+      norm_input_check_ht$ref_df,
+      norm_input_check_ht$not_ref_df
+    )
+    names(lst_df) <- c(norm_input_check_ht$ref_name,
+                       norm_input_check_ht$not_ref_name)
+
+    # run the function
+    expect_warning(
+      object = norm_qs_ht_na <- olink_normalization_qs(
+        lst_df = lst_df,
+        ref_cols = norm_input_check_ht$ref_cols,
+        not_ref_cols = norm_input_check_ht$not_ref_cols,
+        bridge_samples = head(x = bridge_samples, 40L),
+        ref_product = norm_input_check_ht$ref_product
+      ),
+      regexp = "There are 33 assays with fewer than 40 bridge samples for QS"
+    )
+
+    expect_true(
+      object = norm_qs_ht_na |>
+        dplyr::filter(
+          .data[["Project"]] == norm_input_check_ht$not_ref_name
+          & .data[["OlinkID"]] %in% .env[["norm_qs_oid_na"]]
+        ) |>
+        dplyr::pull(
+          .data[["QSNormalizedNPX"]]
+        ) |>
+        is.na() |>
+        all()
+    )
+
+    ## introduce NAs in 3k bridge samples for some assays that are not NA ----
+
+    data_3k_v2 <- data_3k |>
+      dplyr::mutate(
+        NPX = dplyr::if_else(
+          .data[["SampleID"]] %in% bridge_samples[1L:3L]
+          & .data[["OlinkID"]] %in% .env[["norm_qs_oid_3k_na"]],
+          NA_real_,
+          .data[["NPX"]]
+        )
+      )
+
+    # run the internal function that check input from olink_normalization
+    expect_warning(
+      object = expect_message(
+        object = norm_input_check_3k <- olink_norm_input_check(
+          df1 = data_ht,
+          df2 = data_3k_v2,
+          overlapping_samples_df1 = head(x = bridge_samples, 40L),
+          overlapping_samples_df2 = NULL,
+          df1_project_nr = "P1",
+          df2_project_nr = "P2",
+          reference_project = "P1",
+          reference_medians = NULL
+        ),
+        regexp = "Cross-product normalization will be performed!"
+      ),
+      regexp = "2 assays are not shared across products."
+    )
+
+    lst_df <- list(
+      norm_input_check_3k$ref_df,
+      norm_input_check_3k$not_ref_df
+    )
+    names(lst_df) <- c(norm_input_check_3k$ref_name,
+                       norm_input_check_3k$not_ref_name)
+
+    # run the function
+    expect_warning(
+      object = norm_qs_3k_na <- olink_normalization_qs(
+        lst_df = lst_df,
+        ref_cols = norm_input_check_3k$ref_cols,
+        not_ref_cols = norm_input_check_3k$not_ref_cols,
+        bridge_samples = head(x = bridge_samples, 40L),
+        ref_product = norm_input_check_3k$ref_product
+      ),
+      regexp = "There are 31 assays with fewer than 40 bridge samples for QS"
+    )
+
+    expect_true(
+      object = norm_qs_3k_na |>
+        dplyr::filter(
+          .data[["Project"]] == norm_input_check_3k$not_ref_name
+          & .data[["OlinkID"]] %in% .env[["norm_qs_oid_na"]]
+        ) |>
+        dplyr::pull(
+          .data[["QSNormalizedNPX"]]
+        ) |>
+        is.na() |>
+        all()
+    )
+  }
+)
+
 
 test_that(
   "olink_normalization_qs - works - HT/Reveal",
