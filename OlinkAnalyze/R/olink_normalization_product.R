@@ -467,7 +467,7 @@ olink_normalization_qs <- function(lst_df,
       dplyr::filter(
         .data[[count_ref_col]] > 10L
         & .data[["bridge_sample"]] == TRUE
-      )|>
+      ) |>
       tidyr::drop_na()
 
     # Minimal number of bridge samples required to for the function to work. If
@@ -820,11 +820,12 @@ olink_normalization_product_format <- function(df_norm, # nolint object_length_l
       & .data[["BridgingRecommendation"]] == "NotBridgeable"
     ) |>
     dplyr::mutate(
-      OlinkID = dplyr::if_else(.data[["Project"]] == lst_check$ref_name,
-                               .data[["OlinkID"]],
-                               .data[[olinkid_not_ref]])
+      OlinkID = dplyr::if_else(
+        .data[["Project"]] == lst_check$ref_name,
+        .data[["OlinkID"]],
+        .data[[olinkid_not_ref]]
+      )
     )
-
 
   # Extract data from non-overlapping assays ----
 
