@@ -20,7 +20,7 @@ datasets with the bridged NPX quantifications, with the above
 modifications.
 }
 \description{
-For within-product bridging:
+For within-product bridging and subset normalization:
 \itemize{
 \item Adds non-overlapping assays between projects to the bridged file without
 adjustment.
@@ -41,6 +41,13 @@ record the OlinkIDs from both projects for bridgeable assays.
 \item Assays that are NotBridgeable or NotOverlapping retain their original
 non-reference OlinkIDs and NPX values.
 \item Removes  MedianCenteredNPX, QSNormalizedNPX, OlinkID_E3072 columns.
+}
+
+#' For reference median normalization:
+\itemize{
+\item Adds non-overlapping assays from the dataset, but not from the reference
+medians,  to the bridged file without adjustment.
+\item Removes external controls, except sample controls.
 }
 }
 \examples{

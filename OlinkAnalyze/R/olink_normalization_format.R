@@ -6,7 +6,7 @@
 #'   Klev Diamanti
 #'
 #' @description
-#' For within-product bridging:
+#' For within-product bridging and subset normalization:
 #' * Adds non-overlapping assays between projects to the bridged file without
 #' adjustment.
 #' * Removes external controls, except sample controls.
@@ -24,6 +24,11 @@
 #' * Assays that are NotBridgeable or NotOverlapping retain their original
 #' non-reference OlinkIDs and NPX values.
 #' * Removes  MedianCenteredNPX, QSNormalizedNPX, OlinkID_E3072 columns.
+#'
+#' #' For reference median normalization:
+#' * Adds non-overlapping assays from the dataset, but not from the reference
+#' medians,  to the bridged file without adjustment.
+#' * Removes external controls, except sample controls.
 #'
 #' @param df_norm A "tibble" of Olink data in long format resulting from the
 #' `olink_normalization_product` function.

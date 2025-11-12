@@ -201,7 +201,7 @@ test_that(
 
     bridge_samples_v2 <- ref_norm_res$lst_sample$bridge_samples
 
-    # preapre expected result by modifying reference result
+    # prepare expected result by modifying reference result
     ref_bridge_norm_v2 <- ref_norm_res$lst_norm$bridge_norm$norm |>
       # remove non-overlapping assays
       dplyr::filter(
@@ -387,7 +387,7 @@ test_that(
 
     bridge_samples_v4 <- ref_norm_res$lst_sample$bridge_samples
 
-    # preapre expected result by modifying reference result
+    # prepare expected result by modifying reference result
     ref_bridge_norm_v4 <- ref_norm_res$lst_norm$bridge_norm$norm |>
       # remove non-overlapping assays
       dplyr::filter(
@@ -786,7 +786,7 @@ test_that(
     subset_samples_ref_v2 <- ref_norm_res$lst_sample$df1_subset
     subset_samples_not_ref_v2 <- ref_norm_res$lst_sample$df2_subset
 
-    # preapre expected result by modifying reference result
+    # prepare expected result by modifying reference result
     ref_subset_norm_v2 <- ref_norm_res$lst_norm$subset_norm$norm |>
       # remove non-overlapping assays
       dplyr::filter(
@@ -970,7 +970,7 @@ test_that(
     subset_samples_ref_v4 <- ref_norm_res$lst_sample$df1_subset
     subset_samples_not_ref_v4 <- ref_norm_res$lst_sample$df2_subset
 
-    # preapre expected result by modifying reference result
+    # prepare expected result by modifying reference result
     ref_subset_norm_v4 <- ref_norm_res$lst_norm$subset_norm$norm |>
       # remove non-overlapping assays
       dplyr::filter(
@@ -1234,7 +1234,7 @@ test_that(
 
     subset_samples_v2 <- ref_norm_res$lst_sample$df1_subset
 
-    # preapre expected result by modifying reference result
+    # prepare expected result by modifying reference result
     ref_refmed_norm_v2 <- ref_norm_res$lst_norm$ref_med_norm$norm |>
       # remove non-overlapping assays
       dplyr::filter(
@@ -1392,7 +1392,7 @@ test_that(
 
     subset_samples_v4 <- ref_norm_res$lst_sample$df1_subset
 
-    # preapre expected result by modifying reference result
+    # prepare expected result by modifying reference result
     ref_refmed_norm_v4 <- ref_norm_res$lst_norm$ref_med_norm$norm |>
       # remove non-overlapping assays
       dplyr::filter(
@@ -2074,7 +2074,8 @@ test_that(
             overlapping_samples_df1 = bridge_samples,
             df1_project_nr = "proj_ht",
             df2_project_nr = "proj_3k",
-            reference_project = "proj_ht"
+            reference_project = "proj_ht",
+            format = FALSE
           ) |>
             dplyr::distinct(OlinkID) |>
             dplyr::pull(),
@@ -2101,7 +2102,8 @@ test_that(
             overlapping_samples_df1 = bridge_samples,
             df1_project_nr = "proj_ht",
             df2_project_nr = "proj_3k",
-            reference_project = "proj_ht"
+            reference_project = "proj_ht",
+            format = FALSE
           ) |>
             dplyr::distinct(OlinkID_E3072) |>
             dplyr::pull(),
@@ -2133,7 +2135,8 @@ test_that(
         overlapping_samples_df1 = intersect(data_ht$SampleID, data_3k$SampleID),
         df1_project_nr = "proj_ht",
         df2_project_nr = "proj_3k",
-        reference_project = "proj_ht"
+        reference_project = "proj_ht",
+        format = FALSE
       ),
       regexp = "Column \"Count\" not found in datasets \"proj_ht\" and"
     )
@@ -2147,7 +2150,8 @@ test_that(
         overlapping_samples_df1 = intersect(data_ht$SampleID, data_3k$SampleID),
         df1_project_nr = "proj_ht",
         df2_project_nr = "proj_3k",
-        reference_project = "proj_ht"
+        reference_project = "proj_ht",
+        format = FALSE
       ),
       regexp = "Column \"Count\" not found in dataset \"proj_ht\"!"
     )
@@ -2161,7 +2165,8 @@ test_that(
         overlapping_samples_df1 = intersect(data_ht$SampleID, data_3k$SampleID),
         df1_project_nr = "proj_ht",
         df2_project_nr = "proj_3k",
-        reference_project = "proj_ht"
+        reference_project = "proj_ht",
+        format = FALSE
       ),
       regexp = "Column \"Count\" not found in dataset \"proj_3k\"!"
     )
@@ -2199,7 +2204,8 @@ test_that(
               (\(.) .[!grepl("CONTROL", .)])(),
             df1_project_nr = "df_ht",
             df2_project_nr = "df_3k",
-            reference_project = "df_ht"
+            reference_project = "df_ht",
+            format = FALSE
           ),
           regexp = "Cross-product normalization will be performed!"
         ),
