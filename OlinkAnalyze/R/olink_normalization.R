@@ -264,16 +264,6 @@ olink_normalization <- function(df1,
       reference_medians = lst_check$reference_medians
     )
 
-    if (format == TRUE) {
-      df_norm <- olink_normalization_format(
-        lst_check = lst_check, # nolint indentation_linter
-        df_norm = df_norm,
-        df1 = df1,
-        df1_project_nr = df1_project_nr,
-        df2 = df2,
-        df2_project_nr = df2_project_nr)
-    }
-
   } else {
     ## rename non-reference columns to reference columns ----
 
@@ -296,13 +286,6 @@ olink_normalization <- function(df1,
 
     if (lst_check$norm_mode == olink_norm_modes$bridge) {
       # bridge normalization ----
-      cli::cli_inform(
-        c(
-          "i" = "Output includes two sets of bridging samples.",
-          "We recommend retaining only bridge samples from the reference dataset
-          for downstream analysis."
-        )
-      )
 
       df_norm <- norm_internal_bridge(
         ref_df = lst_check$ref_df,
@@ -314,25 +297,8 @@ olink_normalization <- function(df1,
         not_ref_cols = lst_check$not_ref_cols
       )
 
-      if (format == TRUE) {
-        df_norm <- olink_normalization_format(
-          lst_check = lst_check, # nolint indentation_linter
-          df_norm = df_norm,
-          df1 = df1,
-          df1_project_nr = df1_project_nr,
-          df2 = df2,
-          df2_project_nr = df2_project_nr)
-      }
-
     } else if (lst_check$norm_mode == olink_norm_modes$norm_cross_product) {
-      # HT-3K normalization ----
-      cli::cli_inform(
-        c(
-          "i" = "Output includes two sets of bridging samples.",
-          "We recommend retaining only bridge samples from the reference dataset
-          for downstream analysis."
-        )
-      )
+      # cross-product normalization ----
 
       df_norm <- norm_internal_cross_product(
         ref_df = lst_check$ref_df,
@@ -344,16 +310,6 @@ olink_normalization <- function(df1,
         not_ref_name = lst_check$not_ref_name,
         not_ref_cols = lst_check$not_ref_cols
       )
-
-      if (format == TRUE) {
-        df_norm <- olink_normalization_format(
-          lst_check = lst_check, # nolint indentation_linter
-          df_norm = df_norm,
-          df1 = df1,
-          df1_project_nr = df1_project_nr,
-          df2 = df2,
-          df2_project_nr = df2_project_nr)
-      }
 
     } else if (lst_check$norm_mode == olink_norm_modes$subset) {
       # subset normalization ----
@@ -369,24 +325,39 @@ olink_normalization <- function(df1,
         not_ref_cols = lst_check$not_ref_cols
       )
 
-      if (format == TRUE) {
-        df_norm <- olink_normalization_format(
-          lst_check = lst_check, # nolint indentation_linter
-          df_norm = df_norm,
-          df1 = df1,
-          df1_project_nr = df1_project_nr,
-          df2 = df2,
-          df2_project_nr = df2_project_nr)
-      }
-
     }
   }
 
-  # Recalculate MaxLOD
+  # inform about duplicated SampleIDs ----
+
+  if (lst_check$norm_mode %in% c(olink_norm_modes$bridge,
+                                 olink_norm_modes$norm_cross_product)) {
+    cli::cli_inform(
+      c(
+        "i" = "Output includes two sets of bridging samples.",
+        "We recommend retaining only bridge samples from the reference dataset
+          for downstream analysis."
+      )
+    )
+  }
+
+  # Recalculate MaxLOD ----
+
   df_norm <- norm_internal_update_maxlod(
     df = df_norm,
     cols = lst_check$ref_cols
   )
+
+  # format output dataset ----
+
+  if (format == TRUE) {
+
+    df_norm <- olink_normalization_format(
+      df_norm = df_norm,
+      lst_check = lst_check
+    )
+
+  }
 
   return(df_norm)
 }
