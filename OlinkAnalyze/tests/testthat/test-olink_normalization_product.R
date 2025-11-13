@@ -933,7 +933,7 @@ test_that(
       )
     )
 
-    # < 24 samples included, no QS warning ----
+    # < 24 samples included, QS warning ----
     expect_warning(
       object = olink_normalization_qs(
         lst_df = lst_df,
