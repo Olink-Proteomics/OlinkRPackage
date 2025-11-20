@@ -47,6 +47,7 @@ test_that("Plot works",{
 
   skip_on_cran()
   skip_if_not_installed("vdiffr")
+  skip_unless_r(">= 4.5.2")
 
   set.seed(123)
   vdiffr::expect_doppelganger("GSEA Visualization", gsea_vis)
