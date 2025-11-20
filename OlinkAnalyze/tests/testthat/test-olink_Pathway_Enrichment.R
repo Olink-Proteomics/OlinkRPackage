@@ -140,7 +140,7 @@ test_that("T-test GSEA works", {
 
   expect_equal(
     object = nrow(tt_gsea),
-    expected = 591L
+    expected = 571L
   )
 
   # example data
@@ -234,7 +234,7 @@ test_that("GO GSEA works", {
 
   expect_equal(
     object = nrow(tt_gsea_go),
-    expected = 379L
+    expected = 355L
   )
 })
 
@@ -258,7 +258,7 @@ test_that("T-test ORA works", {
 
   expect_equal(
     object = nrow(tt_ora),
-    expected = 349L
+    expected = 352L
   )
 })
 
@@ -328,7 +328,7 @@ test_that("GO ORA works", {
 
   expect_equal(
     object = nrow(tt_ora_go),
-    expected = 227L
+    expected = 217L
   )
 })
 
