@@ -841,7 +841,7 @@ test_that(
         bridge_samples = head(x = bridge_samples, 40L),
         ref_product = norm_input_check_3k$ref_product
       ),
-      regexp = "There are 31 assays with fewer than 40 bridge samples for QS"
+      regexp = "There are 33 assays with fewer than 40 bridge samples for QS"
     )
 
     expect_true(

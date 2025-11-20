@@ -654,7 +654,7 @@ olink_normalization_qs <- function(lst_df,
     ) |>
     dplyr::ungroup() |>
     dplyr::filter(
-      .data[["na_npx"]] == 0L
+      .data[["na_npx"]] < .env[["num_notref_samples"]]
       & .data[["na_qs"]] == .env[["num_notref_samples"]]
     )
 
