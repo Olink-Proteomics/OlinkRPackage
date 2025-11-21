@@ -90,7 +90,7 @@ lmer_plot_excludedids<- suppressWarnings(olink_lmer_plot(df = npx_data_format221
 test_that("olink_lmer_plot works", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
-  skip_unless_r("< 4.5.2")
+  skip_unless_r_compat("< 4.5.2")
 
   vdiffr::expect_doppelganger('lmer plot', lmer_plot)
   vdiffr::expect_doppelganger('lmer plot more prots than space', lmer_plot_moreProts[[2]])

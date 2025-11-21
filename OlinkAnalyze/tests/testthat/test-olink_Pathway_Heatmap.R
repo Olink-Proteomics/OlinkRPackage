@@ -36,7 +36,7 @@ test_that("Plot works",{
 
   skip_on_cran()
   skip_if_not_installed("vdiffr")
-  skip_unless_r("< 4.5.2")
+  skip_unless_r_compat("< 4.5.2")
 
   set.seed(123)
   vdiffr::expect_doppelganger("GSEA Heatmap", gsea_heatmap)

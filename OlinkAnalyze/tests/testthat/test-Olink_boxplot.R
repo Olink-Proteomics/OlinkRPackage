@@ -57,7 +57,7 @@ test_that("olink_boxplot works", {
 test_that("olink_boxplot works - vdiffr", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
-  skip_unless_r("< 4.5.2")
+  skip_unless_r_compat("< 4.5.2")
 
   vdiffr::expect_doppelganger('boxplot site 2prots', boxplot_site_2prots)
   vdiffr::expect_doppelganger('boxplot site 10prots', boxplot_site_10prots[[2]])

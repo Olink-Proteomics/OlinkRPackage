@@ -90,7 +90,7 @@ test_that(
   "olink_bridgeability_plot - works - plots",
   {
     skip_if_not_installed("vdiffr")
-    skip_unless_r("< 4.5.2")
+    skip_unless_r_compat("< 4.5.2")
     skip_on_cran()
 
     npx_ht <- OlinkAnalyze:::data_ht_small |>

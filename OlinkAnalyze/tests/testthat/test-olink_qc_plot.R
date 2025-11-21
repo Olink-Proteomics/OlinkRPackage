@@ -20,7 +20,7 @@ test_that("olink_qc_plot works", {
 test_that("olink_qc_plot works - vdiffr", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
-  skip_unless_r("< 4.5.2")
+  skip_unless_r_compat("< 4.5.2")
 
   vdiffr::expect_doppelganger('QC plot', qc_plot)
   vdiffr::expect_doppelganger('QC plot with coloroption', qc_plot2)
