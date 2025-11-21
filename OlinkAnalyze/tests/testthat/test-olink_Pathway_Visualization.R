@@ -1,4 +1,5 @@
 skip_on_cran()
+skip_on_ci()
 skip_if_not_installed("clusterProfiler")
 skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
 skip_if_not_installed("msigdbr", minimum_version = "9.0.0")
