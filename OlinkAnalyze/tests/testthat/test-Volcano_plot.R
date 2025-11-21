@@ -14,9 +14,13 @@ volcano_plot2 <- olink_volcano_plot(ref_results$t.test_results,
 
 test_that("olink_volcano_plot works", {
   skip_if_not_installed("vdiffr")
-  skip_unless_r_compat("< 4.5.2")
   skip_on_cran()
 
-  vdiffr::expect_doppelganger('volcano plot', volcano_plot)
-  vdiffr::expect_doppelganger('volcano plot with coloroption', volcano_plot2)
+  volcano_plot_name <- "volcano plot"
+  check_snap_exist(test_dir_name = "Volcano_plot", snap_name = volcano_plot_name)
+  vdiffr::expect_doppelganger(volcano_plot_name, volcano_plot)
+
+  volcano_plot2_name <- "volcano plot with coloroption"
+  check_snap_exist(test_dir_name = "Volcano_plot", snap_name = volcano_plot2_name)
+  vdiffr::expect_doppelganger(volcano_plot2_name, volcano_plot2)
 })

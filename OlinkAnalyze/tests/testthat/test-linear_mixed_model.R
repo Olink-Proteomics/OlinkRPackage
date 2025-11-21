@@ -90,10 +90,14 @@ lmer_plot_excludedids<- suppressWarnings(olink_lmer_plot(df = npx_data_format221
 test_that("olink_lmer_plot works", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
-  skip_unless_r_compat("< 4.5.2")
 
-  vdiffr::expect_doppelganger('lmer plot', lmer_plot)
-  vdiffr::expect_doppelganger('lmer plot more prots than space', lmer_plot_moreProts[[2]])
+  lmer_plot_name <- "lmer plot"
+  check_snap_exist(test_dir_name = "linear_mixed_model", snap_name = lmer_plot_name)
+  vdiffr::expect_doppelganger(lmer_plot_name, lmer_plot)
+
+  lmer_plot_moreProts_name <- "lmer plot more prots than space"
+  check_snap_exist(test_dir_name = "linear_mixed_model", snap_name = lmer_plot_moreProts_name)
+  vdiffr::expect_doppelganger(lmer_plot_moreProts_name, lmer_plot_moreProts[[2]])
 
   expect_length(unique(lmer_plot_excludedids[[1]]$data$OlinkID), 1)
 })

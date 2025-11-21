@@ -1,5 +1,4 @@
 skip_on_cran()
-skip_on_ci()
 skip_if_not_installed("clusterProfiler")
 skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
 skip_if_not_installed("msigdbr", minimum_version = "9.0.0")
@@ -36,9 +35,14 @@ test_that("Plot works",{
 
   skip_on_cran()
   skip_if_not_installed("vdiffr")
-  skip_unless_r_compat("< 4.5.2")
 
   set.seed(123)
-  vdiffr::expect_doppelganger("GSEA Heatmap", gsea_heatmap)
-  vdiffr::expect_doppelganger("ORA Heatmap with Keyword", ora_heatmap)
+
+  gsea_heatmap_name <- "GSEA Heatmap"
+  check_snap_exist(test_dir_name = "olink_Pathway_Heatmap", snap_name = gsea_heatmap_name)
+  vdiffr::expect_doppelganger(gsea_heatmap_name, gsea_heatmap)
+
+  ora_heatmap_name <- "ORA Heatmap with Keyword"
+  check_snap_exist(test_dir_name = "olink_Pathway_Heatmap", snap_name = ora_heatmap_name)
+  vdiffr::expect_doppelganger(ora_heatmap_name, ora_heatmap)
 })
