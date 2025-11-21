@@ -41,13 +41,13 @@ skip_unless_r_compat <- function(range) {
 
     switch(
       op,
-      "<"  = cmp <  0L,
-      "<=" = cmp <= 0L,
-      ">"  = cmp >  0L,
-      ">=" = cmp >= 0L,
-      "==" = cmp == 0L,
-      "!=" = cmp != 0L,
-      TRUE
+      "<"  = cmp <  0L, # nolint return_linter
+      "<=" = cmp <= 0L, # nolint return_linter
+      ">"  = cmp >  0L, # nolint return_linter
+      ">=" = cmp >= 0L, # nolint return_linter
+      "==" = cmp == 0L, # nolint return_linter
+      "!=" = cmp != 0L, # nolint return_linter
+      TRUE # nolint return_linter
     )
   }
 
@@ -63,5 +63,5 @@ skip_unless_r_compat <- function(range) {
     testthat::skip(paste0("Requires R ", range, " (compat for older testthat)"))
   }
 
-  invisible(NULL)
+  invisible(NULL) # nolint return_linter
 }
