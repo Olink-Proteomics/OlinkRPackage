@@ -27,16 +27,10 @@ jobs:
           file: docker/Dockerfile_for_tests
           load: true
           build-args: R_VERSION=${{matrix.r_version}}
-          context: .
-      - 
-        name: Run testthat::test_local() in Docker (includes vdiffr snapshots)
+      -
+        name: Run rcmdcheck
         run: |
-          mkdir -p check
-          docker run --rm \
-            -v "$(pwd)/OlinkAnalyze":/OA \
-            -v "$(pwd)/check":/check \
-            oa:latest \
-            -q -e 'testthat::test_local(path = "/OA", reporter = testthat::SummaryReporter$new())'
+          echo "rcmdcheck::rcmdcheck(path = '/OA', check_dir = '/check', error_on = 'warning')" | docker run -i -v "$(pwd)/OlinkAnalyze":/OA -v "$(pwd)/check":/check oa:latest
       -
         name: Upload check results
         if: failure()
