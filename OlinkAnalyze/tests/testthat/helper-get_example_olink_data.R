@@ -27,4 +27,6 @@ check_snap_exist <- function(test_dir_name, snap_name) {
 
   snap_path <- test_path("_snaps", test_dir_name, snap_name_clean)
   skip_if_not(file.exists(snap_path))
+
+  return(invisible(NULL))
 }
