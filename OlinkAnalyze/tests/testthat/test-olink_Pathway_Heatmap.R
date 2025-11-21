@@ -1,5 +1,4 @@
 skip_on_cran()
-skip_on_ci()
 skip_if_not_installed("clusterProfiler")
 skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
 skip_if_not_installed("msigdbr", minimum_version = "9.0.0")
@@ -36,7 +35,7 @@ test_that("Plot works",{
 
   skip_on_cran()
   skip_if_not_installed("vdiffr")
-  skip_unless_r(">= 4.5.2")
+  skip_unless_r("< 4.5.2")
 
   set.seed(123)
   vdiffr::expect_doppelganger("GSEA Heatmap", gsea_heatmap)
