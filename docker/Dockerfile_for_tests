@@ -61,4 +61,10 @@ COPY OlinkAnalyze/DESCRIPTION /src/DESCRIPTION
 
 RUN R -e "devtools::install_dev_deps(pkg = '/src', dependencies = TRUE)"
 
+# Now override testthat to a specific version for ALL R versions
+RUN R -e "install.packages('remotes', repos = 'https://cloud.r-project.org'); \
+          remotes::install_version('testthat', version = '3.3.0', \
+                                   repos = 'https://cloud.r-project.org', \
+                                   upgrade = 'never')"
+
 ENTRYPOINT ["R", "--vanilla"]
