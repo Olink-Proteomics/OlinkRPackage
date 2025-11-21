@@ -1209,7 +1209,9 @@ olink_norm_input_cross_product <- function(lst_df,
 
     # Change name for 3k
     not_ref_product <- ifelse(not_ref_product == "3k", "E3072", not_ref_product)
+
     not_ref_oid_rename <- paste0("_", not_ref_product)
+
     l_oid_rename <- paste0(lst_cols[[l_name]]$olink_id, not_ref_oid_rename)
 
     map_nonref_oid_col <- paste0("OlinkID_", not_ref_product)
@@ -2155,7 +2157,7 @@ mapping_file_id <- function(prod_uniq) {
     ref_map <- eHT_e3072_mapping
   } else if (identical(x = prod_uniq, y = c("3k", "Reveal"))) {
     ref_map <- reveal_e3072_mapping
-  } else if (identical(x = prod_uniq, y = c("HT", "Reveal"))) {
+  } else if (all(prod_uniq %in% c("HT", "Reveal"))) {
     ref_map <- reveal_eht_mapping
   }
   return(ref_map)

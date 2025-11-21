@@ -306,7 +306,7 @@ olink_normalization <- function(df1,
         ref_samples = lst_check$ref_samples,
         ref_name = lst_check$ref_name,
         ref_cols = lst_check$ref_cols,
-        ref_product = lst_check$ref_product,
+        prod_uniq = c(lst_check$not_ref_product, lst_check$ref_product),
         not_ref_df = lst_check$not_ref_df,
         not_ref_name = lst_check$not_ref_name,
         not_ref_cols = lst_check$not_ref_cols
@@ -641,7 +641,7 @@ norm_internal_bridge <- function(ref_df,
 #' @param ref_name Project name of the reference dataset (required).
 #' @param ref_cols Named list of column names in the reference dataset
 #' (required).
-#' @param ref_product Name of reference product (required).
+#' @param prod_uniq Name of products (not_ref, ref)
 #' @param not_ref_df The non-reference dataset to be used in normalization
 #' (required).
 #' @param not_ref_name Project name of the non-reference dataset (required).
@@ -667,7 +667,7 @@ norm_internal_cross_product <- function(ref_df,
                                         ref_samples,
                                         ref_name,
                                         ref_cols,
-                                        ref_product,
+                                        prod_uniq,
                                         not_ref_df,
                                         not_ref_name,
                                         not_ref_cols) {
@@ -722,7 +722,7 @@ norm_internal_cross_product <- function(ref_df,
     ref_cols = ref_cols,
     not_ref_cols = not_ref_cols,
     bridge_samples = ref_samples,
-    ref_product = ref_product
+    prod_uniq = prod_uniq
   )
 
   # integrate normalization approaches ----
@@ -774,7 +774,7 @@ norm_internal_cross_product <- function(ref_df,
       )
     ) |>
     dplyr::rename(
-      !!ref_cols$olink_id := paste0("OlinkID_", ref_product)
+      !!ref_cols$olink_id := paste0("OlinkID_", prod_uniq[2])
     )
 
   # return ----

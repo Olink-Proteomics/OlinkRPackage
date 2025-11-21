@@ -247,7 +247,8 @@ test_that(
             ref_cols = norm_input_check$ref_cols,
             not_ref_cols = norm_input_check$not_ref_cols,
             bridge_samples = bridge_samples,
-            ref_product = norm_input_check$ref_product
+            prod_uniq = c(norm_input_check$not_ref_product,
+                          norm_input_check$ref_product)
           )
         )
       )
@@ -259,9 +260,10 @@ test_that(
           object = qs_norm_reveal <- olink_normalization_qs(
             lst_df = lst_df_reveal,
             ref_cols = norm_input_check_reveal$ref_cols,
-            not_ref_cols = norm_input_check$not_ref_cols,
+            not_ref_cols = norm_input_check_reveal$not_ref_cols,
             bridge_samples = bridge_samples_reveal,
-            ref_product = norm_input_check$ref_product
+            prod_uniq = c(norm_input_check_reveal$not_ref_product,
+                          norm_input_check_reveal$ref_product)
           )
         )
       )
@@ -273,9 +275,9 @@ test_that(
         ref_cols = norm_input_check$ref_cols,
         not_ref_cols = norm_input_check$not_ref_cols,
         bridge_samples = bridge_samples,
-        ref_product = "other"
+        prod_uniq = "other"
       ),
-      regexp = "Reference product must be HT or Reveal"
+      regexp = "Cross product bridging is only supported in the following cases"
     )
 
     # check if reference is reproduced ----
@@ -382,7 +384,8 @@ test_that(
             ref_cols = norm_input_check$ref_cols,
             not_ref_cols = norm_input_check$not_ref_cols,
             bridge_samples = bridge_samples,
-            ref_product = norm_input_check$ref_product
+            prod_uniq = c(norm_input_check$not_ref_product,
+                          norm_input_check$ref_product)
           )
         )
       )
@@ -510,7 +513,8 @@ test_that(
             ref_cols = norm_input_check$ref_cols,
             not_ref_cols = norm_input_check$not_ref_cols,
             bridge_samples = bridge_samples,
-            ref_product = norm_input_check$ref_product
+            prod_uniq = c(norm_input_check$not_ref_product,
+                          norm_input_check$ref_product)
           )
         )
       )
@@ -586,6 +590,8 @@ test_that(
   }
 )
 
+
+
 test_that(
   "olink_normalization_qs - works - fewer than 40 bridge samples",
   {
@@ -637,7 +643,8 @@ test_that(
         ref_cols = norm_input_check$ref_cols,
         not_ref_cols = norm_input_check$not_ref_cols,
         bridge_samples = head(x = bridge_samples, 38L),
-        ref_product = norm_input_check$ref_product
+        prod_uniq = c(norm_input_check$not_ref_product,
+                      norm_input_check$ref_product)
       ),
       regexp = "There are 104 assays with fewer than 40 bridge samples for QS"
     )
@@ -648,7 +655,8 @@ test_that(
         ref_cols = norm_input_check$ref_cols,
         not_ref_cols = norm_input_check$not_ref_cols,
         bridge_samples = head(x = bridge_samples, 40L),
-        ref_product = norm_input_check$ref_product
+        prod_uniq = c(norm_input_check$not_ref_product,
+                      norm_input_check$ref_product)
       ),
       regexp = "There are 31 assays with fewer than 40 bridge samples for QS"
     )
@@ -706,7 +714,8 @@ test_that(
         ref_cols = norm_input_check$ref_cols,
         not_ref_cols = norm_input_check$not_ref_cols,
         bridge_samples = head(x = bridge_samples, 40L),
-        ref_product = norm_input_check$ref_product
+        prod_uniq = c(norm_input_check$not_ref_product,
+                      norm_input_check$ref_product)
       ),
       regexp = "There are 31 assays with fewer than 40 bridge samples for QS"
     )
@@ -772,13 +781,15 @@ test_that(
 
     # run the function
     expect_warning(
-      object = norm_qs_ht_na <- olink_normalization_qs(
-        lst_df = lst_df,
-        ref_cols = norm_input_check_ht$ref_cols,
-        not_ref_cols = norm_input_check_ht$not_ref_cols,
-        bridge_samples = head(x = bridge_samples, 40L),
-        ref_product = norm_input_check_ht$ref_product
-      ),
+      object = norm_qs_ht_na <-
+        olink_normalization_qs(lst_df = lst_df,
+                               ref_cols = norm_input_check_ht$ref_cols,
+                               not_ref_cols = norm_input_check_ht$not_ref_cols,
+                               bridge_samples = head(x = bridge_samples, 40L),
+                               prod_uniq = c(
+                                 norm_input_check_ht$not_ref_product,
+                                 norm_input_check_ht$ref_product
+                               )),
       regexp = "There are 33 assays with fewer than 40 bridge samples for QS"
     )
 
@@ -839,7 +850,10 @@ test_that(
         ref_cols = norm_input_check_3k$ref_cols,
         not_ref_cols = norm_input_check_3k$not_ref_cols,
         bridge_samples = head(x = bridge_samples, 40L),
-        ref_product = norm_input_check_3k$ref_product
+        prod_uniq = c(
+          norm_input_check_3k$not_ref_product,
+          norm_input_check_3k$ref_product
+        )
       ),
       regexp = "There are 33 assays with fewer than 40 bridge samples for QS"
     )
@@ -855,6 +869,81 @@ test_that(
         ) |>
         is.na() |>
         all()
+    )
+  }
+)
+
+
+test_that(
+  "olink_normalization_qs - works - HT/Reveal",
+  {
+
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_Reveal_data.rds")))
+
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
+    data_reveal <- get_example_data(filename = "example_Reveal_data.rds") |>
+      # Set unique OlinkID for TEST_Reveal assay
+      dplyr::mutate(OlinkID = ifelse(.data[["Assay"]] == "TEST_Reveal",
+                                     "OID56789",
+                                     OlinkID))
+
+
+    bridge_samples <- intersect(
+      x = unique(data_ht$SampleID),
+      y = unique(data_reveal$SampleID)
+    ) |>
+      (\(x) x[!grepl("CONTROL", x)])() |>
+      sort()
+
+    # run the internal function that check input from olink_normalization
+    expect_warning(
+      object = expect_message(
+        object = norm_input_check <- olink_norm_input_check(
+          df1 = data_ht,
+          df2 = data_reveal,
+          overlapping_samples_df1 = bridge_samples,
+          overlapping_samples_df2 = NULL,
+          df1_project_nr = "P1",
+          df2_project_nr = "P2",
+          reference_project = "P1",
+          reference_medians = NULL
+        ),
+        regexp = "Cross-product normalization will be performed!"
+      ),
+      regexp = "82 assays are not shared across products."
+    )
+
+    lst_df <- list(
+      norm_input_check$ref_df,
+      norm_input_check$not_ref_df
+    )
+    names(lst_df) <- c(norm_input_check$ref_name,
+                       norm_input_check$not_ref_name)
+
+    # > 24 bridge samples included, no QS warning ----
+    expect_no_warning(
+      object = olink_normalization_qs(
+        lst_df = lst_df,
+        ref_cols = norm_input_check$ref_cols,
+        not_ref_cols = norm_input_check$not_ref_cols,
+        bridge_samples = bridge_samples,
+        prod_uniq = c(norm_input_check$not_ref_product,
+                      norm_input_check$ref_product)
+      )
+    )
+
+    # < 24 samples included, QS warning ----
+    expect_warning(
+      object = olink_normalization_qs(
+        lst_df = lst_df,
+        ref_cols = norm_input_check$ref_cols,
+        not_ref_cols = norm_input_check$not_ref_cols,
+        bridge_samples = head(x = bridge_samples, 18L),
+        prod_uniq = c(norm_input_check$not_ref_product,
+                      norm_input_check$ref_product)
+      ),
+      regexp = "There are 21 assays with fewer than 24 bridge samples for QS"
     )
   }
 )
