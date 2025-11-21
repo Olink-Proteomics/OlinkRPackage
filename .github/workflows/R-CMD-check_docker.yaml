@@ -36,7 +36,7 @@ jobs:
             -v "$(pwd)/OlinkAnalyze":/OA \
             -v "$(pwd)/check":/check \
             oa:latest \
-            R -q -e "testthat::test_local(path = '/OA', reporter = testthat::SummaryReporter$new())"
+            -q -e "testthat::test_local(path = '/OA', reporter = testthat::SummaryReporter$new())"
       -
         name: Upload check results
         if: failure()
