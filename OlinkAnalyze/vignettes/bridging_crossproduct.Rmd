@@ -548,7 +548,7 @@ The same principle applies when performing bridging between Explore HT and Olink
 The normalization using QS uses bridging samples to perform the following steps:
 
 
-1.  Each data point of the samples from Explore 3072 (or from Explore HT when Reveal is the reference, and vice versa) is mapped to the equivalent space in the reference product using an empirical cumulative distribution function. The empirical cumulative distribution function is a probability model that uses the observed NPX values of the bridging samples for an assay to create a step function that interpolates linearly between available data points.
+1.  Each data point of the samples from the non-reference project is mapped to the equivalent space in the reference product using an empirical cumulative distribution function. The empirical cumulative distribution function is a probability model that uses the observed NPX values of the bridging samples for an assay to create a step function that interpolates linearly between available data points.
 
 2.  The empirical distribution function is then used to map the data points from the source product to the reference product space using the specified quantiles. At this stage, all data points from the bridging samples have NPX values normalized to the reference product.
 
