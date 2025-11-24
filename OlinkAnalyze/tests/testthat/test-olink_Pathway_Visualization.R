@@ -1,4 +1,5 @@
 skip_on_cran()
+skip_on_ci()
 skip_if_not_installed("clusterProfiler")
 skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
 skip_if_not_installed("msigdbr", minimum_version = "9.0.0")
@@ -49,8 +50,20 @@ test_that("Plot works",{
   skip_if_not_installed("vdiffr")
 
   set.seed(123)
-  vdiffr::expect_doppelganger("GSEA Visualization", gsea_vis)
-  vdiffr::expect_doppelganger("GSEA Vis with Keyword", gsea_vis_keyword)
-  vdiffr::expect_doppelganger("ORA Vis with Terms", ora_vis_terms)
-  vdiffr::expect_doppelganger("ORA Vis with keyword", ora_vis_keyword)
+
+  gsea_vis_name <- "GSEA Visualization"
+  check_snap_exist(test_dir_name = "olink_Pathway_Visualization", snap_name = gsea_vis_name)
+  vdiffr::expect_doppelganger(gsea_vis_name, gsea_vis)
+
+  gsea_vis_keyword_name <- "GSEA Vis with Keyword"
+  check_snap_exist(test_dir_name = "olink_Pathway_Visualization", snap_name = gsea_vis_keyword_name)
+  vdiffr::expect_doppelganger(gsea_vis_keyword_name, gsea_vis_keyword)
+
+  ora_vis_terms_name <- "ORA Vis with Terms"
+  check_snap_exist(test_dir_name = "olink_Pathway_Visualization", snap_name = ora_vis_terms_name)
+  vdiffr::expect_doppelganger(ora_vis_terms_name, ora_vis_terms)
+
+  ora_vis_keyword_name <- "ORA Vis with keyword"
+  check_snap_exist(test_dir_name = "olink_Pathway_Visualization", snap_name = ora_vis_keyword_name)
+  vdiffr::expect_doppelganger(ora_vis_keyword_name, ora_vis_keyword)
 })
