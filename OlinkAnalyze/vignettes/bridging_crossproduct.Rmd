@@ -554,7 +554,7 @@ The normalization using QS uses bridging samples to perform the following steps:
 
 3.  To normalize the remaining data, a spline regression model is constructed using the sorted data from the source product (prior to mapping) and the mapped values, along with the anchor points of the spline. A spline regression model divides the dataset at the quantiles and uses these quantiles as anchor points or knots; the model then fits the values between each anchor point.
 
-4.  The spline regression model is used to predict all remaining data points from the source product (Explore 3072, Explore HT, or Reveal, depending on direction) into the space of the reference product. The model consists of piecewise linear regressions within the quantile intervals. The NPX value from the source product is used as the x-value in the appropriate interval to produce the predicted y-value corresponding to the NPX scale of the reference product.
+4.  The spline regression model is used to predict all remaining data points from the non-reference product (Explore 3072, Explore HT, or Reveal, depending on direction) into the space of the reference product. The model consists of piecewise linear regressions within the quantile intervals. The NPX value from the source product is used as the x-value in the appropriate interval to produce the predicted y-value corresponding to the NPX scale of the reference product.
 
 ### Function Output
 
