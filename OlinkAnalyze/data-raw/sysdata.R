@@ -38,6 +38,7 @@ rm(normalization_utilities_file)
 
 usethis::use_data(eHT_e3072_mapping,
                   reveal_e3072_mapping,
+                  reveal_eht_mapping,
                   data_ht_small,
                   data_3k_small,
                   olink_norm_mode_combos,

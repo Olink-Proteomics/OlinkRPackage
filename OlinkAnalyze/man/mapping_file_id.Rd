@@ -4,15 +4,16 @@
 \alias{mapping_file_id}
 \title{Identifying which mapping file to use}
 \usage{
-mapping_file_id(ref_product)
+mapping_file_id(prod_uniq)
 }
 \arguments{
-\item{ref_product}{one of "HT" or "Reveal" depending on reference product}
+\item{prod_uniq}{Name of products (not_ref, ref)}
 }
 \value{
 dataframe of mapping file to use for OlinkID mapping
-(eHT_e3072_mapping or reveal_e3072_mapping)
+(eHT_e3072_mapping, reveal_eht_mapping or reveal_e3072_mapping)
 }
 \description{
 Identifying which mapping file to use
 }
+\keyword{internal}
