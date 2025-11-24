@@ -206,7 +206,7 @@ For studies containing multiple projects of Explore 3072 data, the Explore
 3072 data sets should be bridged using within-product bridging as
 detailed in the [Introduction to bridging
 tutorial](bridging_introduction.html) or otherwise normalized together
-prior to performing between-product bridging. The same principle applies when performing bridging between Explore HT and Olink Reveal: if multiple HT studies or multiple Reveal studies are available, within products bridging is recommended to bridging all the HT studies or all the Reveal studies togehter first in advance of the between products bridging.
+prior to performing between-product bridging. The same principle applies when performing bridging between Explore HT and Olink Reveal: if multiple HT studies or multiple Reveal studies are available, within-product bridging is recommended to bridging all the HT studies or all the Reveal studies together first in advance of the between-product bridging.
 
 The assays from Explore 3072 are matched to their corresponding assays in Explore HT or Reveal and evaluated to determine whether each assay is bridgeable. For studies involving Explore HT and Olink Reveal, the assays between these two products are also matched and assessed for bridgeability in the same manner. All assays are then normalized using both quantile smoothing and normalization based on the median of paired differences. The output is an adjusted dataset that includes five additional columns, three of which relate specifically to bridging normalization:
 
