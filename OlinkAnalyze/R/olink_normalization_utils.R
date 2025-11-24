@@ -1179,8 +1179,6 @@ olink_norm_input_cross_product <- function(lst_df,
 
     map_ref_oid_col <- paste0("OlinkID_", ref_product)
     ref_map <- mapping_file_id(prod_uniq = prod_uniq)
-    ref_df_to_map_keys <- stats::setNames(object = map_ref_oid_col,
-                                          nm = l_ref_oid_rename)
 
     lst_df[[l_ref_name]] <- lst_df[[l_ref_name]] |>
       dplyr::rename(
@@ -1193,7 +1191,8 @@ olink_norm_input_cross_product <- function(lst_df,
               c(map_ref_oid_col, "OlinkID")
             )
           ),
-        by = ref_df_to_map_keys,
+        by = stats::setNames(object = map_ref_oid_col,
+                             nm = l_ref_oid_rename),
         relationship = "many-to-many"
       ) |>
       # If matched OlinkID not found in mapping file, set OlinkID to OlinkID_ref
@@ -1215,8 +1214,6 @@ olink_norm_input_cross_product <- function(lst_df,
     l_oid_rename <- paste0(lst_cols[[l_name]]$olink_id, not_ref_oid_rename)
 
     map_nonref_oid_col <- paste0("OlinkID_", not_ref_product)
-    nonref_df_to_map_keys <- stats::setNames(object = map_nonref_oid_col,
-                                             nm = l_oid_rename)
 
     lst_df[[l_name]] <- lst_df[[l_name]] |>
       dplyr::rename(
@@ -1229,7 +1226,8 @@ olink_norm_input_cross_product <- function(lst_df,
               c(map_nonref_oid_col, "OlinkID")
             )
           ),
-        by = nonref_df_to_map_keys,
+        by = stats::setNames(object = map_nonref_oid_col,
+                             nm = l_oid_rename),
         relationship = "many-to-one"
       ) |>
       # If matched OlinkID is not found in mapping file
