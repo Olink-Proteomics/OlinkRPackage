@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release fixes the issue that led to failing tests on R dev on CRAN. Additional bug fixes have been added to version 4.3.1
+This release adds additional functionality to 4.3.2 (cross product bridging Olink Explore HT and Olink Reveal) along with minor bug fixes.
 
 ## R CMD check results
 
