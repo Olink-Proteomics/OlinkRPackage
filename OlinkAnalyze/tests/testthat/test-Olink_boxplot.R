@@ -58,9 +58,23 @@ test_that("olink_boxplot works - vdiffr", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
 
-  vdiffr::expect_doppelganger('boxplot site 2prots', boxplot_site_2prots)
-  vdiffr::expect_doppelganger('boxplot site 10prots', boxplot_site_10prots[[2]])
-  vdiffr::expect_doppelganger('boxplot time', boxplot_time)
-  vdiffr::expect_doppelganger('boxplot time with coloroption', boxplot_time_coloroption)
-  vdiffr::expect_doppelganger('boxplot time and site', boxplot_time_site)
+  boxplot_site_2prots_name <- "boxplot site 2prots"
+  check_snap_exist(test_dir_name = "Olink_boxplot", snap_name = boxplot_site_2prots_name)
+  vdiffr::expect_doppelganger(boxplot_site_2prots_name, boxplot_site_2prots)
+
+  boxplot_site_10prots_name <- "boxplot site 10prots"
+  check_snap_exist(test_dir_name = "Olink_boxplot", snap_name = boxplot_site_10prots_name)
+  vdiffr::expect_doppelganger(boxplot_site_10prots_name, boxplot_site_10prots[[2]])
+
+  boxplot_time_name <- "boxplot time"
+  check_snap_exist(test_dir_name = "Olink_boxplot", snap_name = boxplot_time_name)
+  vdiffr::expect_doppelganger(boxplot_time_name, boxplot_time)
+
+  boxplot_time_coloroption_name <- "boxplot time with coloroption"
+  check_snap_exist(test_dir_name = "Olink_boxplot", snap_name = boxplot_time_coloroption_name)
+  vdiffr::expect_doppelganger(boxplot_time_coloroption_name, boxplot_time_coloroption)
+
+  boxplot_time_site_name <- "boxplot time and site"
+  check_snap_exist(test_dir_name = "Olink_boxplot", snap_name = boxplot_time_site_name)
+  vdiffr::expect_doppelganger(boxplot_time_site_name, boxplot_time_site)
 })
