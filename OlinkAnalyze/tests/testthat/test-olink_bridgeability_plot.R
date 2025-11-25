@@ -142,24 +142,33 @@ test_that(
 
     ## iqr plot ----
 
+    oid40770_iqr_name <- "bridgeable-plot_iqr_OID40770"
+    check_snap_exist(test_dir_name = "olink_bridgeability_plot",
+                     snap_name = oid40770_iqr_name)
     vdiffr::expect_doppelganger(
-      title = "bridgeable-plot_iqr_OID40770",
+      title = oid40770_iqr_name,
       fig = bridgeability_iqr_range_plt(data = data_norm_clean_oid40770),
       cran = FALSE
     )
 
     ## r2 plot ----
 
+    oid40770_r2_name <- "bridgeable-plot_r2_OID40770"
+    check_snap_exist(test_dir_name = "olink_bridgeability_plot",
+                     snap_name = oid40770_r2_name)
     vdiffr::expect_doppelganger(
-      title = "bridgeable-plot_r2_OID40770",
+      title = oid40770_r2_name,
       fig = bridgeability_r2_plt(data = data_norm_clean_oid40770),
       cran = FALSE
     )
 
     ## counts plot ----
 
+    oid40770_counts_name <- "bridgeable-plot_counts_OID40770"
+    check_snap_exist(test_dir_name = "olink_bridgeability_plot",
+                     snap_name = oid40770_counts_name)
     vdiffr::expect_doppelganger(
-      title = "bridgeable-plot_counts_OID40770",
+      title = oid40770_counts_name,
       fig = bridgeability_counts_plt(
         data = data_norm_clean_oid40770,
         median_counts_threshold = 150L
@@ -169,8 +178,11 @@ test_that(
 
     ## ks plot ----
 
+    id40770_ks_name <- "bridgeable-plot_ks_OID40770"
+    check_snap_exist(test_dir_name = "olink_bridgeability_plot",
+                     snap_name = id40770_ks_name)
     vdiffr::expect_doppelganger(
-      title = "bridgeable-plot_ks_OID40770",
+      title = id40770_ks_name,
       fig = bridgeability_ks_plt(data = data_norm_clean_oid40770),
       cran = FALSE
     )
@@ -184,24 +196,33 @@ test_that(
 
     ## iqr plot ----
 
+    oid40835_iqr_name <- "bridgeable-plot_iqr_OID40835"
+    check_snap_exist(test_dir_name = "olink_bridgeability_plot",
+                     snap_name = oid40835_iqr_name)
     vdiffr::expect_doppelganger(
-      title = "bridgeable-plot_iqr_OID40835",
+      title = oid40835_iqr_name,
       fig = bridgeability_iqr_range_plt(data = data_norm_clean_oid40835),
       cran = FALSE
     )
 
     ## r2 plot ----
 
+    oid40835_r2_name <- "bridgeable-plot_r2_OID40835"
+    check_snap_exist(test_dir_name = "olink_bridgeability_plot",
+                     snap_name = oid40835_r2_name)
     vdiffr::expect_doppelganger(
-      title = "bridgeable-plot_r2_OID40835",
+      title = oid40835_r2_name,
       fig = bridgeability_r2_plt(data = data_norm_clean_oid40835),
       cran = FALSE
     )
 
     ## counts plot ----
 
+    oid40835_counts_name <- "bridgeable-plot_counts_OID40835"
+    check_snap_exist(test_dir_name = "olink_bridgeability_plot",
+                     snap_name = oid40835_counts_name)
     vdiffr::expect_doppelganger(
-      title = "bridgeable-plot_counts_OID40835",
+      title = oid40835_counts_name,
       fig = bridgeability_counts_plt(
         data = data_norm_clean_oid40835,
         median_counts_threshold = 150L
@@ -211,8 +232,11 @@ test_that(
 
     ## ks plot ----
 
+    oid40835_ks_name <- "bridgeable-plot_ks_OID40835"
+    check_snap_exist(test_dir_name = "olink_bridgeability_plot",
+                     snap_name = oid40835_ks_name)
     vdiffr::expect_doppelganger(
-      title = "bridgeable-plot_ks_OID40835",
+      title = oid40835_ks_name,
       fig = bridgeability_ks_plt(data = data_norm_clean_oid40835),
       cran = FALSE
     )
