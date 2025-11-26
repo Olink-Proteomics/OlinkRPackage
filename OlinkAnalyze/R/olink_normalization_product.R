@@ -125,7 +125,7 @@ olink_normalization_bridgeable <- function(lst_df,
             ~ . == "SAMPLE"
           )
           # remove interal control assays
-          & .data[["AssayType"]] == "assay"
+          & .data[[ref_cols$assay_type]] == "assay"
           # remove datapoints with very few counts
           & .data[["Count"]] > .env[["min_datapoint_cnt"]]
         ) |>
@@ -556,7 +556,7 @@ olink_normalization_qs <- function(lst_df,
             ~ . == "SAMPLE"
           )
           # remove internal control assays
-          & .data[["AssayType"]] == "assay"
+          & .data[[ref_cols$assay_type]] == "assay"
         ) |>
         # keep only relevant columns (e.g. SampleID, OlinkID, NPX, Count)
         dplyr::select(
@@ -696,7 +696,7 @@ olink_normalization_qs <- function(lst_df,
       # only customer samples
       .data[["SampleType"]] == "SAMPLE"
       # remove internal control assays
-      & .data[["AssayType"]] == "assay"
+      & .data[[ref_cols$assay_type]] == "assay"
     ) |>
     dplyr::select(
       dplyr::all_of(
