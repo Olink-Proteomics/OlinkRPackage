@@ -75,12 +75,29 @@ test_that("olink_pca_plot works", {
     olink_pca_plot(npx_data_extended_format221121, quiet = TRUE),
     "have NPX = NA for all samples")
 
-  vdiffr::expect_doppelganger('PCA plot', pca_plot[[1]])
-  vdiffr::expect_doppelganger('PCA plot color by treatment', pca_plot_treatCol[[1]])
-  vdiffr::expect_doppelganger('PCA plot with loadings', pca_plot_treatCol_topLoadings[[1]])
-  vdiffr::expect_doppelganger('PCA plot drop_assays and drop_samples', pca_plot_drop[[1]])
-  vdiffr::expect_doppelganger('PCA plot panel 1', pca_plot_byPanel[[1]])
-  vdiffr::expect_doppelganger('PCA plot panel 2', pca_plot_byPanel[[2]])
+  pca_plot_name <- "PCA plot"
+  check_snap_exist(test_dir_name = "pca_plot", snap_name = pca_plot_name)
+  vdiffr::expect_doppelganger(pca_plot_name, pca_plot[[1]])
+
+  pca_plot_treatCol_name <- "PCA plot color by treatment"
+  check_snap_exist(test_dir_name = "pca_plot", snap_name = pca_plot_treatCol_name)
+  vdiffr::expect_doppelganger(pca_plot_treatCol_name, pca_plot_treatCol[[1]])
+
+  pca_plot_treatCol_topLoadings_name <- "PCA plot with loadings"
+  check_snap_exist(test_dir_name = "pca_plot", snap_name = pca_plot_treatCol_topLoadings_name)
+  vdiffr::expect_doppelganger(pca_plot_treatCol_topLoadings_name, pca_plot_treatCol_topLoadings[[1]])
+
+  pca_plot_drop_name <- "PCA plot drop_assays and drop_samples"
+  check_snap_exist(test_dir_name = "pca_plot", snap_name = pca_plot_drop_name)
+  vdiffr::expect_doppelganger(pca_plot_drop_name, pca_plot_drop[[1]])
+
+  pca_plot_byPanel_name1 <- "PCA plot panel 1"
+  check_snap_exist(test_dir_name = "pca_plot", snap_name = pca_plot_byPanel_name1)
+  vdiffr::expect_doppelganger(pca_plot_byPanel_name1, pca_plot_byPanel[[1]])
+
+  pca_plot_byPanel_name2 <- "PCA plot panel 2"
+  check_snap_exist(test_dir_name = "pca_plot", snap_name = pca_plot_byPanel_name2)
+  vdiffr::expect_doppelganger(pca_plot_byPanel_name2, pca_plot_byPanel[[2]])
 })
 
 
@@ -97,8 +114,9 @@ test_that("PCA plot internal", {
                             label_outliers = FALSE,
                             outlierLines = FALSE)
 
-
-  vdiffr::expect_doppelganger("PCA plot internal", pca_p2)
+  pca_p2_name <- "PCA plot internal"
+  check_snap_exist(test_dir_name = "pca_plot", snap_name = pca_p2_name)
+  vdiffr::expect_doppelganger(pca_p2_name, pca_p2)
 
 
   pca_p3 <- npx_data1 %>%
@@ -108,8 +126,9 @@ test_that("PCA plot internal", {
                             label_outliers = TRUE,
                             outlierLines = FALSE)
 
-
-  vdiffr::expect_doppelganger("PCA plot internal 2", pca_p3)
+  pca_p3_name <- "PCA plot internal 2"
+  check_snap_exist(test_dir_name = "pca_plot", snap_name = pca_p3_name)
+  vdiffr::expect_doppelganger(pca_p3_name, pca_p3)
 
 
   pca_p4 <- list(npx_data1 %>%
@@ -119,7 +138,9 @@ test_that("PCA plot internal", {
                             label_outliers = TRUE,
                             outlierLines = FALSE))
 
-  vdiffr::expect_doppelganger("PCA plot internal 3", pca_p4[[1]])
+  pca_p4_name <- "PCA plot internal 3"
+  check_snap_exist(test_dir_name = "pca_plot", snap_name = pca_p4_name)
+  vdiffr::expect_doppelganger(pca_p4_name, pca_p4[[1]])
 
 
   pca_p5 <- npx_data1 %>%
@@ -130,7 +151,9 @@ test_that("PCA plot internal", {
                             label_outliers = TRUE,
                             outlierLines = FALSE)
 
-  vdiffr::expect_doppelganger("PCA plot internal 4", pca_p5)
+  pca_p5_name <- "PCA plot internal 4"
+  check_snap_exist(test_dir_name = "pca_plot", snap_name = pca_p5_name)
+  vdiffr::expect_doppelganger(pca_p5_name, pca_p5)
 
 })
 
@@ -217,7 +240,10 @@ test_that("PCA basic plotting", {
 
   pca_p1 <- ggplot(pca$scores, aes(x = PCX, y = PCY)) +
     geom_point()
-  vdiffr::expect_doppelganger('PCA basic plotting', pca_p1)
+
+  pca_p1_name <- "PCA basic plotting"
+  check_snap_exist(test_dir_name = "pca_plot", snap_name = pca_p1_name)
+  vdiffr::expect_doppelganger(pca_p1_name, pca_p1)
 })
 
 
@@ -232,14 +258,16 @@ test_that("minimal PCA plot", {
     mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
     olink_pca_plot(quiet = TRUE,
                    label_outliers = FALSE)
-
-  vdiffr::expect_doppelganger("PCA plot - not label outliers", pca_plot[[1]])
+  pca_plot_name <- "PCA plot - not label outliers"
+  check_snap_exist(test_dir_name = "pca_plot", snap_name = pca_plot_name)
+  vdiffr::expect_doppelganger(pca_plot_name, pca_plot[[1]])
 
   pca_plot_outliers <- npx_data1 %>%
     mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
     olink_pca_plot(quiet = TRUE, label_outliers = TRUE)
-
-  vdiffr::expect_doppelganger("PCA plot - label outliers", pca_plot_outliers[[1]])
+  pca_plot_outliers_name <- "PCA plot - label outliers"
+  check_snap_exist(test_dir_name = "pca_plot", snap_name = pca_plot_outliers_name)
+  vdiffr::expect_doppelganger(pca_plot_outliers_name, pca_plot_outliers[[1]])
 
   #Removing Index dependence in PCA plot
   pca_rem_index <- npx_data1 %>%

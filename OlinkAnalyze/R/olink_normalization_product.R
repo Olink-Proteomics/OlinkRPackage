@@ -380,8 +380,7 @@ olink_normalization_bridgeable <- function(lst_df,
 #'  dataset. Exported from olink_norm_input_check. (required)
 #' @param bridge_samples Character vector of samples to be used for the
 #' quantile mapping. (required)
-#' @param ref_product Name of reference product. Must be one of "HT" or
-#' "Reveal".
+#' @param prod_uniq  Name of products (not_ref, ref)
 #'
 #' @return A "tibble" of Olink data in long format containing both input
 #' datasets with the quantile normalized quantifications.
@@ -425,7 +424,7 @@ olink_normalization_bridgeable <- function(lst_df,
 #'  ref_cols = ref_cols,
 #'  not_ref_cols = not_ref_cols,
 #'  bridge_samples = bridge_samples,
-#'  ref_product = "HT"
+#'  prod_uniq = c("3k","HT")
 #' )
 #' }
 #'
@@ -433,15 +432,21 @@ olink_normalization_qs <- function(lst_df,
                                    ref_cols,
                                    not_ref_cols,
                                    bridge_samples,
-                                   ref_product) {
+                                   prod_uniq) {
 
-  if (ref_product == "HT") {
+  if (identical(prod_uniq, c("3k", "HT"))) {
     num_samples <- 40L
-  } else if (ref_product == "Reveal") {
+  } else if (identical(prod_uniq, c("3k", "Reveal"))) {
     num_samples <- 32L
+  } else if (all(prod_uniq %in% c("HT", "Reveal"))) {
+    num_samples <- 24L
   } else {
     cli::cli_abort(
-      "Reference product must be HT or Reveal."
+      c("i" = "Cross product bridging is only supported in the
+      following cases:",
+        "*" = "Explore 3072 to Explore HT",
+        "*" = "Explore 3072 to Reveal",
+        "*" = "Explore HT and Reveal (in either direction)")
     )
   }
 
@@ -462,7 +467,8 @@ olink_normalization_qs <- function(lst_df,
       dplyr::filter(
         .data[[count_ref_col]] > 10L
         & .data[["bridge_sample"]] == TRUE
-      )
+      ) |>
+      tidyr::drop_na()
 
     # Minimal number of bridge samples required to for the function to work. If
     # not met, we just return NA.
@@ -653,7 +659,7 @@ olink_normalization_qs <- function(lst_df,
     ) |>
     dplyr::ungroup() |>
     dplyr::filter(
-      .data[["na_npx"]] == 0L
+      .data[["na_npx"]] < .env[["num_notref_samples"]]
       & .data[["na_qs"]] == .env[["num_notref_samples"]]
     )
 

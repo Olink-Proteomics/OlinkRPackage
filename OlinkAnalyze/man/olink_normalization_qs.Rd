@@ -9,7 +9,7 @@ olink_normalization_qs(
   ref_cols,
   not_ref_cols,
   bridge_samples,
-  ref_product
+  prod_uniq
 )
 }
 \arguments{
@@ -26,8 +26,7 @@ dataset. Exported from olink_norm_input_check. (required)}
 \item{bridge_samples}{Character vector of samples to be used for the
 quantile mapping. (required)}
 
-\item{ref_product}{Name of reference product. Must be one of "HT" or
-"Reveal".}
+\item{prod_uniq}{Name of products (not_ref, ref)}
 }
 \value{
 A "tibble" of Olink data in long format containing both input
@@ -105,7 +104,7 @@ qs_result <- OlinkAnalyze:::olink_normalization_qs(
  ref_cols = ref_cols,
  not_ref_cols = not_ref_cols,
  bridge_samples = bridge_samples,
- ref_product = "HT"
+ prod_uniq = c("3k","HT")
 )
 }
 

@@ -62,6 +62,8 @@ test_that("olink_plate_randomizer works - vdiffr", {
   skip_if_not_installed("vdiffr")
   skip_on_cran()
 
-  vdiffr::expect_doppelganger("Randomized_Data",olink_displayPlateLayout(randomized_result5, num_ctrl = 10,
+  plate_randomizer_name <- "Randomized_Data"
+  check_snap_exist(test_dir_name = "Olink_plate_randomizer", snap_name = plate_randomizer_name)
+  vdiffr::expect_doppelganger(plate_randomizer_name,olink_displayPlateLayout(randomized_result5, num_ctrl = 10,
                                                                          rand_ctrl = TRUE, fill.color = "Visit"))
 })

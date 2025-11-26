@@ -21,6 +21,11 @@ test_that("olink_qc_plot works - vdiffr", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
 
-  vdiffr::expect_doppelganger('QC plot', qc_plot)
-  vdiffr::expect_doppelganger('QC plot with coloroption', qc_plot2)
+  qc_plot_name <- "QC plot"
+  check_snap_exist(test_dir_name = "olink_qc_plot", snap_name = qc_plot_name)
+  vdiffr::expect_doppelganger(qc_plot_name, qc_plot)
+
+  qc_plot2_name <- "QC plot with coloroption"
+  check_snap_exist(test_dir_name = "olink_qc_plot", snap_name = qc_plot2_name)
+  vdiffr::expect_doppelganger(qc_plot2_name, qc_plot2)
 })
