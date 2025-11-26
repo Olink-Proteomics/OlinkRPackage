@@ -111,11 +111,8 @@ olink_normalization_format <- function(df_norm,
     # Extract data for assays = "NotBridgeable" ----
 
     oid_col_name <- lst_check$ref_cols$olink_id
-    not_ref_oid_col_name <- c(names(reveal_e3072_mapping),
-                              names(eHT_e3072_mapping)) |>
-      unique() |>
-      (\(.) .[grepl("^OlinkID_", .)])() |>
-      (\(.) .[. %in% names(df_norm)])()
+    not_ref_oid_col_name <- paste0(lst_check$ref_cols$olink_id,
+                                   "_", lst_check$not_ref_product)
 
     quant_col_name <- lst_check$ref_cols$quant
 
