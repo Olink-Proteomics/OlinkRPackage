@@ -566,7 +566,7 @@ test_that(
                             normalization = "Normalization",
                             count = "Count",
                             sample_type = "SampleType"),
-        not_ref_product = "3k",
+        not_ref_product = "E3072",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product,
         non_overlapping_oid = list("HT" = "OID54321",
@@ -700,34 +700,29 @@ test_that(
                             normalization = "Normalization",
                             count = "Count",
                             sample_type = "SampleType"),
-        not_ref_product = "3k",
+        not_ref_product = "E3072",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product,
-        non_overlapping_oid =
-          list("3K" = c("OID31162", "OID30796", "OID20054", "OID20055",
-                        "OID30420", "OID20059", "OID20791", "OID20051",
-                        "OID31159", "OID20057", "OID31160", "OID31163",
-                        "OID31158", "OID20790", "OID20058", "OID20053",
-                        "OID30146", "OID30130", "OID31277", "OID30080",
-                        "OID20435", "OID30471", "OID21188", "OID30877",
-                        "OID30067", "OID21243", "OID30956", "OID21244",
-                        "OID30955", "OID20062", "OID30488", "OID31275",
-                        "OID20437", "OID20806", "OID30881", "OID20492",
-                        "OID31351", "OID30161", "OID31173", "OID21162",
-                        "OID20810", "OID31348", "OID30949", "OID31260",
-                        "OID31339", "OID21202", "OID21255", "OID31190",
-                        "OID30871", "OID30861", "OID20803", "OID30166",
-                        "OID30121", "OID30792", "OID20432", "OID30828",
-                        "OID20446", "OID21246", "OID30124", "OID30118",
-                        "OID30065", "OID31230", "OID30062", "OID30079",
-                        "OID20811", "OID20865", "OID30850", "OID30980",
-                        "OID30165", "OID30466", "OID21267", "OID30896",
-                        "OID30844", "OID31218", "OID31202", "OID30873",
-                        "OID30051", "OID21217", "OID30856", "OID20074",
-                        "OID50330_OID20473", "OID20848", "OID21237",
-                        "OID12345"),
-               "Reveal" = c("OID56789")
-          )
+        non_overlapping_oid = list(
+          "3K" = c("OID31162", "OID30796", "OID20054", "OID20055", "OID30420",
+                   "OID20059", "OID20791", "OID20051", "OID31159", "OID20057",
+                   "OID31160", "OID31163", "OID31158", "OID20790", "OID20058",
+                   "OID20053", "OID30146", "OID30130", "OID31277", "OID30080",
+                   "OID20435", "OID30471", "OID21188", "OID30877", "OID30067",
+                   "OID21243", "OID30956", "OID21244", "OID30955", "OID20062",
+                   "OID30488", "OID31275", "OID20437", "OID20806", "OID30881",
+                   "OID20492", "OID31351", "OID30161", "OID31173", "OID21162",
+                   "OID20810", "OID31348", "OID30949", "OID31260", "OID31339",
+                   "OID21202", "OID21255", "OID31190", "OID30871", "OID30861",
+                   "OID20803", "OID30166", "OID30121", "OID30792", "OID20432",
+                   "OID30828", "OID20446", "OID21246", "OID30124", "OID30118",
+                   "OID30065", "OID31230", "OID30062", "OID30079", "OID20811",
+                   "OID20865", "OID30850", "OID30980", "OID30165", "OID30466",
+                   "OID21267", "OID30896", "OID30844", "OID31218", "OID31202",
+                   "OID30873", "OID30051", "OID21217", "OID30856", "OID20074",
+                   "OID50330_OID20473", "OID20848", "OID21237", "OID12345"),
+          "Reveal" = c("OID56789")
+        )
       )
     )
 
@@ -3753,7 +3748,7 @@ test_that(
           "3K_2" = list(panel = "Panel")
         ),
         reference_project = "3K_1",
-        product_ids = c("3K_1" = "3k", "3K_2" = "3k"),
+        product_ids = c("3K_1" = "E3072", "3K_2" = "E3072"),
         ref_ids = c("3K_1" = "ref", "3K_2" = "not_ref")
       )
     )
@@ -3888,7 +3883,7 @@ test_that(
                       count = "Count")
         ),
         reference_project = "p2",
-        product_ids = c("p1" = "3k", "p2" = "HT"),
+        product_ids = c("p1" = "E3072", "p2" = "HT"),
         ref_ids = c("p1" = "not_ref", "p2" = "ref")
       )
     )
@@ -3957,7 +3952,7 @@ test_that(
                       count = "Count")
         ),
         reference_project = "p2",
-        product_ids = c("p1" = "3k", "p2" = "Reveal"),
+        product_ids = c("p1" = "E3072", "p2" = "Reveal"),
         ref_ids = c("p1" = "not_ref", "p2" = "ref")
       )
     )
@@ -4246,7 +4241,7 @@ test_that(
           "HT" = list(panel = "Panel")
         ),
         reference_project = "3K",
-        product_ids = c("3K" = "3k", "HT" = "HT"),
+        product_ids = c("3K" = "E3072", "HT" = "HT"),
         ref_ids = c("3K" = "ref", "HT" = "not_ref")
       ),
       regexp = "Incorrect reference project!"
@@ -4263,7 +4258,7 @@ test_that(
           "reveal" = list(panel = "Panel")
         ),
         reference_project = "3K",
-        product_ids = c("3K" = "3k", "reveal" = "Reveal"),
+        product_ids = c("3K" = "E3072", "reveal" = "Reveal"),
         ref_ids = c("3K" = "ref", "reveal" = "not_ref")
       ),
       regexp = "Incorrect reference project!"
@@ -4301,7 +4296,7 @@ test_that(
                       count = "Count")
         ),
         reference_project = "p2",
-        product_ids = c("p1" = "3k", "p2" = "HT"),
+        product_ids = c("p1" = "E3072", "p2" = "HT"),
         ref_ids = c("p1" = "not_ref", "p2" = "ref")
       ),
       regexp = "Column \"Count\" not found in dataset \"p1\"!"
@@ -4324,7 +4319,7 @@ test_that(
                       olink_id = "OlinkID")
         ),
         reference_project = "p2",
-        product_ids = c("p1" = "3k", "p2" = "HT"),
+        product_ids = c("p1" = "E3072", "p2" = "HT"),
         ref_ids = c("p1" = "not_ref", "p2" = "ref")
       ),
       regexp = "Column \"Count\" not found in dataset \"p2\"!"
@@ -4347,7 +4342,7 @@ test_that(
                       olink_id = "OlinkID")
         ),
         reference_project = "p2",
-        product_ids = c("p1" = "3k", "p2" = "Reveal"),
+        product_ids = c("p1" = "E3072", "p2" = "Reveal"),
         ref_ids = c("p1" = "not_ref", "p2" = "ref")
       ),
       regexp = "Column \"Count\" not found in datasets \"p1\" and \"p2\"!"
@@ -6979,7 +6974,7 @@ test_that(
           "p2" = list(panel = "Panel")
         )
       ),
-      expected = c("p1" = "other", "p2" = "3k")
+      expected = c("p1" = "other", "p2" = "E3072")
     )
 
     # T96-HT ----
@@ -7027,7 +7022,7 @@ test_that(
           "p2" = list(panel = "Panel")
         )
       ),
-      expected = c("p1" = "3k", "p2" = "3k")
+      expected = c("p1" = "E3072", "p2" = "E3072")
     )
 
     # 3k-HT ----
@@ -7043,7 +7038,7 @@ test_that(
           "p2" = list(panel = "Panel")
         )
       ),
-      expected = c("p1" = "3k", "p2" = "HT")
+      expected = c("p1" = "E3072", "p2" = "HT")
     )
 
     # 3k-Reveal ----
@@ -7059,7 +7054,7 @@ test_that(
           "p2" = list(panel = "Panel")
         )
       ),
-      expected = c("p1" = "3k", "p2" = "Reveal")
+      expected = c("p1" = "E3072", "p2" = "Reveal")
     )
 
     # Reveal-Reveal ----
@@ -7224,13 +7219,13 @@ test_that(
   {
     # returns HT mapping file
     expect_identical(
-      object = mapping_file_id(prod_uniq = c("3k", "HT")),
+      object = mapping_file_id(prod_uniq = c("E3072", "HT")),
       expected = eHT_e3072_mapping
     )
 
     # returns Reveal mapping file
     expect_identical(
-      object = mapping_file_id(prod_uniq = c("3k", "Reveal")),
+      object = mapping_file_id(prod_uniq = c("E3072", "Reveal")),
       expected = reveal_e3072_mapping
     )
 
