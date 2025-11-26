@@ -48,7 +48,8 @@ test_that(
                         lod = "LOD",
                         normalization = character(0L),
                         count = character(0L),
-                        sample_type = character(0L)),
+                        sample_type = character(0L),
+                        assay_type = character(0L)),
         ref_product = "other",
         not_ref_df = npx_data2,
         not_ref_samples = NULL,
@@ -66,7 +67,8 @@ test_that(
                             lod = "LOD",
                             normalization = character(0L),
                             count = character(0L),
-                            sample_type = character(0L)),
+                            sample_type = character(0L),
+                            assay_type = character(0L)),
         not_ref_product = "other",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge
@@ -121,7 +123,8 @@ test_that(
                         lod = "LOD",
                         normalization = "Normalization",
                         count = character(0L),
-                        sample_type = character(0L)),
+                        sample_type = character(0L),
+                        assay_type = character(0L)),
         ref_product = "other",
         not_ref_df = npx_data1 |>
           dplyr::mutate(
@@ -142,7 +145,8 @@ test_that(
                             lod = "LOD",
                             normalization = "Normalization",
                             count = character(0L),
-                            sample_type = character(0L)),
+                            sample_type = character(0L),
+                            assay_type = character(0L)),
         not_ref_product = "other",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge
@@ -206,7 +210,8 @@ test_that(
                         lod = "LOD",
                         normalization = "Normalization",
                         count = character(0L),
-                        sample_type = character(0L)),
+                        sample_type = character(0L),
+                        assay_type = character(0L)),
         ref_product = "other",
         not_ref_df = npx_data1 |>
           dplyr::mutate(
@@ -228,7 +233,8 @@ test_that(
                             lod = "LOD",
                             normalization = "Normalization",
                             count = character(0L),
-                            sample_type = character(0L)),
+                            sample_type = character(0L),
+                            assay_type = character(0L)),
         not_ref_product = "other",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge
@@ -289,7 +295,8 @@ test_that(
                         lod = "LOD",
                         normalization = "Normalization",
                         count = character(0L),
-                        sample_type = character(0L)),
+                        sample_type = character(0L),
+                        assay_type = character(0L)),
         ref_product = "other",
         not_ref_df = npx_data1 |>
           dplyr::mutate(
@@ -311,7 +318,8 @@ test_that(
                             lod = "LOD",
                             normalization = "Normalization",
                             count = character(0L),
-                            sample_type = character(0L)),
+                            sample_type = character(0L),
+                            assay_type = character(0L)),
         not_ref_product = "other",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge
@@ -401,7 +409,8 @@ test_that(
                         lod = character(0),
                         normalization = "Normalization",
                         count = "Count",
-                        sample_type = "SampleType"),
+                        sample_type = "SampleType",
+                        assay_type = "AssayType"),
         ref_product = "HT",
         not_ref_df = data_3k |>
           dplyr::rename(
@@ -440,7 +449,8 @@ test_that(
                             lod = character(0),
                             normalization = "Normalization",
                             count = "Count",
-                            sample_type = "SampleType"),
+                            sample_type = "SampleType",
+                            assay_type = "AssayType"),
         not_ref_product = "3k",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product
@@ -514,7 +524,8 @@ test_that(
                         lod = character(0),
                         normalization = "Normalization",
                         count = "Count",
-                        sample_type = "SampleType"),
+                        sample_type = "SampleType",
+                        assay_type = "AssayType"),
         ref_product = "Reveal",
         not_ref_df = data_3k |>
           dplyr::rename(
@@ -555,7 +566,8 @@ test_that(
                             lod = character(0),
                             normalization = "Normalization",
                             count = "Count",
-                            sample_type = "SampleType"),
+                            sample_type = "SampleType",
+                            assay_type = "AssayType"),
         not_ref_product = "3k",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product
@@ -629,7 +641,8 @@ test_that(
                         lod = character(0),
                         normalization = "Normalization",
                         count = "Count",
-                        sample_type = "SampleType"),
+                        sample_type = "SampleType",
+                        assay_type = "AssayType"),
         ref_product = "HT",
         not_ref_df = data_reveal |>
           dplyr::rename(
@@ -668,7 +681,8 @@ test_that(
                             lod = character(0),
                             normalization = "Normalization",
                             count = "Count",
-                            sample_type = "SampleType"),
+                            sample_type = "SampleType",
+                            assay_type = "AssayType"),
         not_ref_product = "Reveal",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product
@@ -741,7 +755,8 @@ test_that(
                         lod = character(0),
                         normalization = "Normalization",
                         count = "Count",
-                        sample_type = "SampleType"),
+                        sample_type = "SampleType",
+                        assay_type = "AssayType"),
         ref_product = "Reveal",
         not_ref_df = data_ht |>
           dplyr::rename(
@@ -782,7 +797,8 @@ test_that(
                             lod = character(0),
                             normalization = "Normalization",
                             count = "Count",
-                            sample_type = "SampleType"),
+                            sample_type = "SampleType",
+                            assay_type = "AssayType"),
         not_ref_product = "HT",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product
@@ -836,7 +852,8 @@ test_that(
                         lod = "LOD",
                         normalization = character(0L),
                         count = character(0L),
-                        sample_type = character(0L)),
+                        sample_type = character(0L),
+                        assay_type = character(0L)),
         ref_product = NULL,
         not_ref_df = npx_data2,
         not_ref_samples = unique(npx_data2$SampleID),
@@ -854,7 +871,8 @@ test_that(
                             lod = "LOD",
                             normalization = character(0L),
                             count = character(0L),
-                            sample_type = character(0L)),
+                            sample_type = character(0L),
+                            assay_type = character(0L)),
         not_ref_product = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset
@@ -905,7 +923,8 @@ test_that(
                         lod = "LOD",
                         normalization = "Normalization",
                         count = character(0L),
-                        sample_type = character(0L)),
+                        sample_type = character(0L),
+                        assay_type = character(0L)),
         ref_product = NULL,
         not_ref_df = npx_data1 |>
           dplyr::mutate(
@@ -926,7 +945,8 @@ test_that(
                             lod = "LOD",
                             normalization = "Normalization",
                             count = character(0L),
-                            sample_type = character(0L)),
+                            sample_type = character(0L),
+                            assay_type = character(0L)),
         not_ref_product = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset
@@ -984,7 +1004,8 @@ test_that(
                         lod = "LOD",
                         normalization = character(0L),
                         count = character(0L),
-                        sample_type = character(0L)),
+                        sample_type = character(0L),
+                        assay_type = character(0L)),
         ref_product = NULL,
         not_ref_df = npx_data2,
         not_ref_samples = npx_df2_samples,
@@ -1002,7 +1023,8 @@ test_that(
                             lod = "LOD",
                             normalization = character(0L),
                             count = character(0L),
-                            sample_type = character(0L)),
+                            sample_type = character(0L),
+                            assay_type = character(0L)),
         not_ref_product = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset
@@ -1053,7 +1075,8 @@ test_that(
                         lod = "LOD",
                         normalization = "Normalization",
                         count = character(0L),
-                        sample_type = character(0L)),
+                        sample_type = character(0L),
+                        assay_type = character(0L)),
         ref_product = NULL,
         not_ref_df = npx_data1 |>
           dplyr::mutate(
@@ -1074,7 +1097,8 @@ test_that(
                             lod = "LOD",
                             normalization = "Normalization",
                             count = character(0L),
-                            sample_type = character(0L)),
+                            sample_type = character(0L),
+                            assay_type = character(0L)),
         not_ref_product = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset
@@ -1143,7 +1167,8 @@ test_that(
                         lod = "LOD",
                         normalization = character(0L),
                         count = character(0L),
-                        sample_type = character(0L)),
+                        sample_type = character(0L),
+                        assay_type = character(0L)),
         ref_product = NULL,
         not_ref_df = NULL,
         not_ref_samples = NULL,
@@ -1200,7 +1225,8 @@ test_that(
                         lod = "LOD",
                         normalization = "Normalization",
                         count = character(0L),
-                        sample_type = character(0L)),
+                        sample_type = character(0L),
+                        assay_type = character(0L)),
         ref_product = NULL,
         not_ref_df = NULL,
         not_ref_samples = NULL,
@@ -2124,7 +2150,8 @@ test_that(
           lod = "LOD",
           normalization = character(0L),
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          assay_type = character(0L)
         )
       )
     )
@@ -2164,7 +2191,8 @@ test_that(
           lod = "LOD",
           normalization = character(0L),
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          assay_type = character(0L)
         )
       )
     )
@@ -2206,7 +2234,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          assay_type = character(0L)
         )
       )
     )
@@ -2249,7 +2278,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          assay_type = character(0L)
         )
       )
     )
@@ -2296,7 +2326,8 @@ test_that(
           lod = "LOD",
           normalization = character(0L),
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          assay_type = character(0L)
         ),
         "p2" = list(
           sample_id = "SampleID",
@@ -2312,7 +2343,8 @@ test_that(
           lod = "LOD",
           normalization = character(0L),
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          assay_type = character(0L)
         )
       )
     )
@@ -2355,7 +2387,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          assay_type = character(0L)
         ),
         "p2" = list(
           sample_id = "SampleID",
@@ -2371,7 +2404,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          assay_type = character(0L)
         )
       )
     )
@@ -2410,7 +2444,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          assay_type = character(0L)
         ),
         "p2" = list(
           sample_id = "SampleID",
@@ -2426,7 +2461,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          assay_type = character(0L)
         )
       )
     )
@@ -2493,7 +2529,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          assay_type = character(0L)
         ),
         "p2" = list(
           sample_id = "SampleID",
@@ -2509,7 +2546,8 @@ test_that(
           lod = "LODNPX",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          assay_type = character(0L)
         )
       )
     )
@@ -2549,7 +2587,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          assay_type = character(0L)
         ),
         "p2" = list(
           sample_id = "SampleID",
@@ -2565,7 +2604,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          assay_type = character(0L)
         )
       )
     )
@@ -2646,7 +2686,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          assay_type = character(0L)
         ),
         "p2" = list(
           sample_id = "SampleID",
@@ -2662,7 +2703,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          assay_type = character(0L)
         ),
         "p3" = list(
           sample_id = "SampleID",
@@ -2678,7 +2720,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          assay_type = character(0L)
         ),
         "p4" = list(
           sample_id = "SampleID",
@@ -2694,7 +2737,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          assay_type = character(0L)
         )
       )
     )
@@ -2729,7 +2773,8 @@ test_that(
           lod = "LOD",
           normalization = character(0L),
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          assay_type = character(0L)
         ),
         "p2" = list(
           sample_id = "SampleID",
@@ -2745,7 +2790,8 @@ test_that(
           lod = "LOD",
           normalization = character(0L),
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          assay_type = character(0L)
         ),
         "p3" = list(
           sample_id = "SampleID",
@@ -2761,7 +2807,8 @@ test_that(
           lod = "LOD",
           normalization = character(0L),
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          assay_type = character(0L)
         ),
         "p4" = list(
           sample_id = "SampleID",
@@ -2777,7 +2824,8 @@ test_that(
           lod = "LOD",
           normalization = character(0L),
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          assay_type = character(0L)
         )
       )
     )
@@ -2891,7 +2939,8 @@ test_that(
           lod = "LOD",
           normalization = character(0L),
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          assay_type = character(0L)
         )
       )
     )
@@ -2930,7 +2979,8 @@ test_that(
           lod = "LOD",
           normalization = character(0L),
           count = "Count",
-          sample_type = character(0L)
+          sample_type = character(0L),
+          assay_type = character(0L)
         )
       )
     )
@@ -3228,7 +3278,6 @@ test_that(
   }
 )
 
-# Test olink_norm_input_check_quant
 # Test olink_norm_input_check_quant ----
 
 test_that(
