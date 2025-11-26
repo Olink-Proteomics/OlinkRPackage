@@ -693,7 +693,8 @@ olink_norm_input_check_df_cols <- function(lst_df) {
             "Max LOD", "Max_LOD", "MaxLOD"),
     normalization = "Normalization",
     count = "Count",
-    sample_type = c("SampleType", "Sample_Type")
+    sample_type = c("SampleType", "Sample_Type"),
+    assay_type = c("AssayType", "Assay_Type")
   )
 
   # intersect required column names with columns of df
@@ -780,7 +781,8 @@ olink_norm_input_check_df_cols <- function(lst_df) {
     # df in normalization
     lapply(function(sub_lst) {
       sub_lst[!(names(sub_lst) %in% c("lod", "normalization", # nolint return_linter
-                                      "assay_warn", "count", "sample_type"))] # nolint return_linter
+                                      "assay_warn", "count", "sample_type",
+                                      "assay_type"))] # nolint return_linter
     }) |>
     # remove all elements that have no missing value
     lapply(function(sub_lst) {
