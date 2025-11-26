@@ -184,7 +184,7 @@ olink_norm_input_check <- function(df1,
       )
       norm_mode <- norm_cross_product$norm_mode
       lst_df <- norm_cross_product$lst_df
-      # bridge or 3k-HT normalization normalization
+      # bridge or E3072-HT normalization normalization
       lst_ref_samples <- list(overlapping_samples_df1, overlapping_samples_df1)
     } else if (norm_mode == olink_norm_modes$subset) {
       # subset normalization
@@ -1132,22 +1132,22 @@ olink_norm_input_cross_product <- function(lst_df,
   # check and correct norm_mode if needed ----
 
   # check if each df comes from a different olink product:
-  # if all elements of the array contain the same product, it is simple
-  # bridge normalization. In case of 3k-3k bridging lst_product should contain
-  # only "3k" as element. For other olink products, all elements should be
+  # if all elements of the array contain the same product, it is simple a bridge
+  # normalization. In case of E3072-E3072 bridging lst_product should contain
+  # only "E3072" as element. For other olink products, all elements should be
   # NA_character.
   # If more than one products are in the vector, then it should be exclusively
-  # 3k and HT or 3k and Reveal.
-  # In any other case (e.g. 3k and NA_character) means that one df is 3k, but
-  # the other one probably T96, T48, which we do not normalize.
+  # E3072 and HT or E3072 and Reveal.
+  # In any other case (e.g. E3072 and NA_character) means that one df is E3072,
+  # but the other one probably T96, T48, which we do not normalize.
   prod_uniq <- product_ids |> unique() |> sort()
   if (length(prod_uniq) == 1L
-      && all(prod_uniq %in% c("3k", "HT", "Reveal", "other"))) {
+      && all(prod_uniq %in% c("E3072", "HT", "Reveal", "other"))) {
     norm_mode <- olink_norm_modes$bridge
-  } else if (identical(x = prod_uniq, y = c("3k", "HT"))
-             || identical(x = prod_uniq, y = c("3k", "Reveal"))
+  } else if (identical(x = prod_uniq, y = c("E3072", "HT"))
+             || identical(x = prod_uniq, y = c("E3072", "Reveal"))
              || all(prod_uniq %in% c("HT", "Reveal"))) {
-    # 3k to HT or Reveal where HT or Reveal is reference
+    # E3072 to HT or Reveal where HT or Reveal is reference
     # HT and Reveal bidirectionally
     norm_mode <- olink_norm_modes$norm_cross_product
   } else {
@@ -1220,9 +1220,7 @@ olink_norm_input_cross_product <- function(lst_df,
     l_name <- names(product_ids)[!ref_ids == "ref"]
     not_ref_product <- product_ids[ref_ids == "not_ref"] |> unname()
 
-    # Change name for 3k
-    not_ref_product <- ifelse(not_ref_product == "3k", "E3072", not_ref_product)
-
+    # Change name for E3072
     not_ref_oid_rename <- paste0("_", not_ref_product)
 
     l_oid_rename <- paste0(lst_cols[[l_name]]$olink_id, not_ref_oid_rename)
@@ -2125,7 +2123,7 @@ olink_norm_product_id <- function(lst_df,
       ) |>
       unique()
     if (all(u_panel %in% eHT_e3072_mapping$Panel_E3072)) {
-      return("3k")
+      return("E3072")
     } else if (all(u_panel == "Explore_HT")) {
       return("HT")
     } else if (all(u_panel == "Reveal")) {
@@ -2176,9 +2174,9 @@ olink_norm_reference_id <- function(lst_product,
 #'
 mapping_file_id <- function(prod_uniq) {
   # Ref mapping file
-  if (identical(x = prod_uniq, y = c("3k", "HT"))) {
+  if (identical(x = prod_uniq, y = c("E3072", "HT"))) {
     ref_map <- eHT_e3072_mapping
-  } else if (identical(x = prod_uniq, y = c("3k", "Reveal"))) {
+  } else if (identical(x = prod_uniq, y = c("E3072", "Reveal"))) {
     ref_map <- reveal_e3072_mapping
   } else if (all(prod_uniq %in% c("HT", "Reveal"))) {
     ref_map <- reveal_eht_mapping

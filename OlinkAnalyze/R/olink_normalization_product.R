@@ -424,7 +424,7 @@ olink_normalization_bridgeable <- function(lst_df,
 #'  ref_cols = ref_cols,
 #'  not_ref_cols = not_ref_cols,
 #'  bridge_samples = bridge_samples,
-#'  prod_uniq = c("3k","HT")
+#'  prod_uniq = c("E3072","HT")
 #' )
 #' }
 #'
@@ -434,9 +434,9 @@ olink_normalization_qs <- function(lst_df,
                                    bridge_samples,
                                    prod_uniq) {
 
-  if (identical(prod_uniq, c("3k", "HT"))) {
+  if (identical(prod_uniq, c("E3072", "HT"))) {
     num_samples <- 40L
-  } else if (identical(prod_uniq, c("3k", "Reveal"))) {
+  } else if (identical(prod_uniq, c("E3072", "Reveal"))) {
     num_samples <- 32L
   } else if (all(prod_uniq %in% c("HT", "Reveal"))) {
     num_samples <- 24L
