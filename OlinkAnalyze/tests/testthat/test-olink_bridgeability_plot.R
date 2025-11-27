@@ -21,21 +21,15 @@ test_that(
     )
 
     expect_message(
-      object = expect_message(
-        object = expect_message(
-          object = data_norm <- OlinkAnalyze::olink_normalization(
-            df1 = npx_ht,
-            df2 = npx_3072,
-            overlapping_samples_df1 = overlapping_samples,
-            df1_project_nr = "Explore HT",
-            df2_project_nr = "Explore 3072",
-            reference_project = "Explore HT"
-          ),
-          regexp = "Cross-product normalization will be performed!"
-        ),
-        regexp = "exhibited assay QC warning"
+      object = data_norm <- OlinkAnalyze::olink_normalization(
+        df1 = npx_ht,
+        df2 = npx_3072,
+        overlapping_samples_df1 = overlapping_samples,
+        df1_project_nr = "Explore HT",
+        df2_project_nr = "Explore 3072",
+        reference_project = "Explore HT"
       ),
-      regexp = "exhibited assay QC warning"
+      regexp = "Cross-product normalization will be performed!"
     )
 
     withCallingHandlers({
@@ -108,21 +102,15 @@ test_that(
     )
 
     expect_message(
-      object = expect_message(
-        object = expect_message(
-          object = data_norm <- OlinkAnalyze::olink_normalization(
-            df1 = npx_ht,
-            df2 = npx_3072,
-            overlapping_samples_df1 = overlapping_samples,
-            df1_project_nr = "Explore HT",
-            df2_project_nr = "Explore 3072",
-            reference_project = "Explore HT"
-          ),
-          regexp = "Cross-product normalization will be performed!"
-        ),
-        regexp = "exhibited assay QC warning"
+      object = data_norm <- OlinkAnalyze::olink_normalization(
+        df1 = npx_ht,
+        df2 = npx_3072,
+        overlapping_samples_df1 = overlapping_samples,
+        df1_project_nr = "Explore HT",
+        df2_project_nr = "Explore 3072",
+        reference_project = "Explore HT"
       ),
-      regexp = "exhibited assay QC warning"
+      regexp = "Cross-product normalization will be performed!"
     )
 
     data_norm_clean <- OlinkAnalyze:::bridgeability_prep_data(
@@ -262,21 +250,15 @@ test_that(
     )
 
     expect_message(
-      object = expect_message(
-        object = expect_message(
-          object = data_norm <- OlinkAnalyze::olink_normalization(
-            df1 = npx_ht,
-            df2 = npx_3072,
-            overlapping_samples_df1 = overlapping_samples,
-            df1_project_nr = "Explore HT",
-            df2_project_nr = "Explore 3072",
-            reference_project = "Explore HT"
-          ),
-          regexp = "Cross-product normalization will be performed!"
-        ),
-        regexp = "exhibited assay QC warning"
+      object = data_norm <- OlinkAnalyze::olink_normalization(
+        df1 = npx_ht,
+        df2 = npx_3072,
+        overlapping_samples_df1 = overlapping_samples,
+        df1_project_nr = "Explore HT",
+        df2_project_nr = "Explore 3072",
+        reference_project = "Explore HT"
       ),
-      regexp = "exhibited assay QC warning"
+      regexp = "Cross-product normalization will be performed!"
     )
 
     # add one project
@@ -331,21 +313,15 @@ test_that(
     )
 
     expect_message(
-      object = expect_message(
-        object = expect_message(
-          object = data_norm <- OlinkAnalyze::olink_normalization(
-            df1 = npx_ht,
-            df2 = npx_3072,
-            overlapping_samples_df1 = overlapping_samples,
-            df1_project_nr = "Explore HT",
-            df2_project_nr = "Explore 3072",
-            reference_project = "Explore HT"
-          ),
-          regexp = "Cross-product normalization will be performed!"
-        ),
-        regexp = "exhibited assay QC warning"
+      object = data_norm <- OlinkAnalyze::olink_normalization(
+        df1 = npx_ht,
+        df2 = npx_3072,
+        overlapping_samples_df1 = overlapping_samples,
+        df1_project_nr = "Explore HT",
+        df2_project_nr = "Explore 3072",
+        reference_project = "Explore HT"
       ),
-      regexp = "exhibited assay QC warning"
+      regexp = "Cross-product normalization will be performed!"
     )
 
     # too many bridging recommendations
