@@ -121,7 +121,7 @@ npxCheck <- function(df) {
     if (length(assays_with_warning) > 0L) {
       message(
         paste0(length(assays_with_warning), " assay(s) exhibited assay QC",
-               "warning. For more information see the ", assay_warning,
+               " warning. For more information see the ", assay_warning,
                " column.")
       )
     }
