@@ -118,11 +118,13 @@ npxCheck <- function(df) {
                           !!rlang::ensym(assay_warning))) |>
       dplyr::distinct(OlinkID) |>
       dplyr::pull()
-    message(
-      paste(length(assays_with_warning),
-            " assay(s) exhibited assay QC warning. For more information see the ",
-            assay_warning," column.", sep = "")
-    )
+    if (length(assays_with_warning) > 0L) {
+      message(
+        paste0(length(assays_with_warning), " assay(s) exhibited assay QC",
+               "warning. For more information see the ", assay_warning,
+               " column.")
+      )
+    }
   }
 
   return(
