@@ -11,8 +11,8 @@ olink_normalization_product_format(
   df1_project_nr,
   df2,
   df2_project_nr,
-  reference_project,
-  ref_product
+  prod_uniq,
+  lst_check
 )
 }
 \arguments{
@@ -31,12 +31,9 @@ Must match df2 used in olink_normalization product bridging.}
 \item{df2_project_nr}{Project name of second dataset. Must match name used in
 olink_normalization product bridging.}
 
-\item{reference_project}{Project name of reference project. Must match name
-used in olink_normalization product bridging and be one of df1_project_nr or
-df2_project_nr.}
+\item{prod_uniq}{Name of products (not_ref, ref)}
 
-\item{ref_product}{Name of reference product. Must be one of "HT" or
-"Reveal".}
+\item{lst_check}{= lst_check}
 }
 \value{
 A "tibble" of Olink data in long format containing both input
@@ -75,6 +72,18 @@ df_norm <- olink_normalization(
   reference_project = "Explore HT"
 )
 
+# generate lst_check
+lst_check_3k_ht <- OlinkAnalyze:::olink_norm_input_check(
+ df1 = OlinkAnalyze:::data_ht_small,
+ df2 = OlinkAnalyze:::data_3k_small,
+ overlapping_samples_df1 = bridge_samples,
+ overlapping_samples_df2 = NULL,
+ df1_project_nr = "Explore HT",
+ df2_project_nr = "Explore 3072",
+ reference_project = "Explore HT",
+ reference_medians = NULL
+ )
+
 # format output
 OlinkAnalyze:::olink_normalization_product_format(
   df_norm = df_norm,
@@ -82,8 +91,8 @@ OlinkAnalyze:::olink_normalization_product_format(
   df2 = OlinkAnalyze:::data_3k_small,
   df1_project_nr = "Explore HT",
   df2_project_nr = "Explore 3072",
-  reference_project = "Explore HT",
-  ref_product = "HT"
+  lst_check = lst_check_3k_ht,
+  prod_uniq = c("3k", "HT")
 )
 }
 

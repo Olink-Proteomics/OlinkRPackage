@@ -1131,16 +1131,19 @@ olink_norm_input_cross_product <- function(lst_df,
       && all(prod_uniq %in% c("3k", "HT", "Reveal", "other"))) {
     norm_mode <- olink_norm_modes$bridge
   } else if (identical(x = prod_uniq, y = c("3k", "HT"))
-             || identical(x = prod_uniq, y = c("3k", "Reveal"))) {
+             || identical(x = prod_uniq, y = c("3k", "Reveal"))
+             || all(prod_uniq %in% c("HT", "Reveal"))) {
+    # 3k to HT or Reveal where HT or Reveal is reference
+    # HT and Reveal bidirectionally
     norm_mode <- olink_norm_modes$norm_cross_product
   } else {
     cli::cli_abort(
       c("x" = "Unexpected datasets to be bridge normalized!",
         "i" = "Normalization is supported within the same Olink product or
-        between the following sets of products where the first product must be
-        the reference product:",
+        between the following sets of products:",
         "* {.val {\"Explore HT\"}} and {.val {\"Explore 3072\"}}",
-        "* {.val {\"Reveal\"}} and {.val {\"Explore 3072\"}}"),
+        "* {.val {\"Reveal\"}} and {.val {\"Explore 3072\"}}",
+        "* {.val {\"Explore HT\"}} and {.val {\"Reveal\"}}"),
       call = rlang::caller_env(),
       wrap = TRUE
     )
@@ -1168,69 +1171,73 @@ olink_norm_input_cross_product <- function(lst_df,
 
   if (norm_mode == olink_norm_modes$norm_cross_product) {
 
-    # update Olink assay identifiers if cross product normalization ----
-
-    # add combined OlinkID to HT dataset
+    # add combined OlinkID to reference dataset
     l_ref_name <- names(product_ids)[ref_ids == "ref"]
     ref_product <- product_ids[ref_ids == "ref"] |> unname()
     l_ref_oid_rename <- paste0(lst_cols[[l_ref_name]]$olink_id, "_",
                                ref_product)
 
-    map_3k_ref_oid_col <- paste0("OlinkID_", ref_product)
-    ref_map_3k <- mapping_file_id(ref_product = ref_product)
-    ref_df_to_map_3k_keys <- stats::setNames(object = map_3k_ref_oid_col,
-                                             nm = l_ref_oid_rename)
+    map_ref_oid_col <- paste0("OlinkID_", ref_product)
+    ref_map <- mapping_file_id(prod_uniq = prod_uniq)
 
     lst_df[[l_ref_name]] <- lst_df[[l_ref_name]] |>
       dplyr::rename(
         !!l_ref_oid_rename := lst_cols[[l_ref_name]]$olink_id
       ) |>
       dplyr::left_join(
-        ref_map_3k |>
+        ref_map |>
           dplyr::select(
             dplyr::all_of(
-              c(map_3k_ref_oid_col, "OlinkID")
+              c(map_ref_oid_col, "OlinkID")
             )
           ),
-        by = ref_df_to_map_3k_keys,
+        by = stats::setNames(object = map_ref_oid_col,
+                             nm = l_ref_oid_rename),
         relationship = "many-to-many"
       ) |>
-      # If matched OlinkID not found in mapping file, set OlinkID_ref to OlinkID
+      # If matched OlinkID not found in mapping file, set OlinkID to OlinkID_ref
       dplyr::mutate(
         OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
-                                 .data[[map_3k_ref_oid_col]],
+                                 .data[[map_ref_oid_col]],
                                  .data[["OlinkID"]])
       )
 
-    # add combined OlinkID to 3k dataset
-    l_3k_name <- names(product_ids)[product_ids == "3k"]
-    l_3k_oid_rename <- paste0(lst_cols[[l_3k_name]]$olink_id, "_E3072")
+    # add combined OlinkID to non-reference dataset
+    l_name <- names(product_ids)[!ref_ids == "ref"]
+    not_ref_product <- product_ids[ref_ids == "not_ref"] |> unname()
 
-    map_3k_nonref_oid_col <- "OlinkID_E3072"
-    nonref_df_to_map_3k_keys <- stats::setNames(object = map_3k_nonref_oid_col,
-                                                nm = l_3k_oid_rename)
+    # Change name for 3k
+    not_ref_product <- ifelse(not_ref_product == "3k", "E3072", not_ref_product)
 
-    lst_df[[l_3k_name]] <- lst_df[[l_3k_name]] |>
+    not_ref_oid_rename <- paste0("_", not_ref_product)
+
+    l_oid_rename <- paste0(lst_cols[[l_name]]$olink_id, not_ref_oid_rename)
+
+    map_nonref_oid_col <- paste0("OlinkID_", not_ref_product)
+
+    lst_df[[l_name]] <- lst_df[[l_name]] |>
       dplyr::rename(
-        !!l_3k_oid_rename := lst_cols[[l_3k_name]]$olink_id
+        !!l_oid_rename := lst_cols[[l_name]]$olink_id
       ) |>
       dplyr::left_join(
-        ref_map_3k |>
+        ref_map |>
           dplyr::select(
             dplyr::all_of(
-              c(map_3k_nonref_oid_col, "OlinkID")
+              c(map_nonref_oid_col, "OlinkID")
             )
           ),
-        by = nonref_df_to_map_3k_keys,
+        by = stats::setNames(object = map_nonref_oid_col,
+                             nm = l_oid_rename),
         relationship = "many-to-one"
       ) |>
       # If matched OlinkID is not found in mapping file
-      # set OlinkID_HT to OlinkID
+      # set OlinkID to OlinkID_not_ref
       dplyr::mutate(
         OlinkID = dplyr::if_else(is.na(.data[["OlinkID"]]),
-                                 .data[[l_3k_oid_rename]],
+                                 .data[[l_oid_rename]],
                                  .data[["OlinkID"]])
       )
+
 
     # check if both datasets contain the count column ----
 
@@ -2135,17 +2142,21 @@ olink_norm_reference_id <- function(lst_product,
 
 #' Identifying which mapping file to use
 #'
-#' @param ref_product one of "HT" or "Reveal" depending on reference product
+#' @param prod_uniq Name of products (not_ref, ref)
 #'
 #' @return dataframe of mapping file to use for OlinkID mapping
-#' (eHT_e3072_mapping or reveal_e3072_mapping)
+#' (eHT_e3072_mapping, reveal_eht_mapping or reveal_e3072_mapping)
 #'
-mapping_file_id <- function(ref_product) {
+#' @keywords internal
+#'
+mapping_file_id <- function(prod_uniq) {
   # Ref mapping file
-  if (ref_product == "HT") {
-    ref_map_3k <- eHT_e3072_mapping
-  } else if (ref_product == "Reveal") {
-    ref_map_3k <- reveal_e3072_mapping
+  if (identical(x = prod_uniq, y = c("3k", "HT"))) {
+    ref_map <- eHT_e3072_mapping
+  } else if (identical(x = prod_uniq, y = c("3k", "Reveal"))) {
+    ref_map <- reveal_e3072_mapping
+  } else if (all(prod_uniq %in% c("HT", "Reveal"))) {
+    ref_map <- reveal_eht_mapping
   }
-  return(ref_map_3k)
+  return(ref_map)
 }

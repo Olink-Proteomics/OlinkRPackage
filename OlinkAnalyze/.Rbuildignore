@@ -16,3 +16,4 @@
 ^data-raw$
 ^.RData
 ^tests/testthat/data/.*[.]rds
+^tests/testthat/.*/.*[.]svg

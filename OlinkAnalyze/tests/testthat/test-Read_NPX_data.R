@@ -147,6 +147,29 @@ test_that("data completeness check", {
 
 })
 
+test_that("duplicate sample ids check", {
+  expect_message(
+    OlinkAnalyze::npx_data1 %>%
+      npxCheck(),
+    regexp = "Duplicate SampleID")
+
+  expect_message(
+    OlinkAnalyze::npx_data1 %>%
+      dplyr::mutate(OlinkID = dplyr::if_else(SampleID %in% c("A1","A2") &
+                                               UniProt == "O00533", NA, OlinkID)) %>%
+      npxCheck(),
+    regexp = "CONTROL_SAMPLE_AS 1 | CONTROL_SAMPLE_AS 2")
+
+  expect_no_message(
+    OlinkAnalyze::npx_data1 |>
+      dplyr::filter(!str_detect(string = SampleID, pattern = "CONTROL_SAMPLE")) |>
+      dplyr::mutate(OlinkID = dplyr::if_else(SampleID %in% c("A1","A2") &
+                                               UniProt == "O00533", NA, OlinkID)) |>
+      npxCheck(),
+    message = "")
+
+})
+
 
 # Sample ID with # --------------------------------------------------------
 
@@ -237,3 +260,38 @@ test_that(
 
   }
 )
+
+# Dar ID triggers error ---
+test_that("no message",{
+  expect_no_message(
+    check_darid(npx_data1)
+  )
+})
+
+
+test_that("DarIDs trigger re-export message", {
+  messages <- capture_messages(
+    check_darid(
+      npx_data1 |>
+        dplyr::mutate(DataAnalysisRefID = "D10007") |>
+        dplyr::mutate(PanelDataArchiveVersion = "1.2")
+    )
+  )
+
+  expect_true(any(grepl("Outdated .* Panel Archive .* combination", messages)))
+  expect_true(any(grepl("Re-export data using Panel Archive", messages)))
+  expect_true(any(grepl("Failure to re-export", messages)))
+})
+
+test_that("DarIDs & ExploreVersion trigger re-export message", {
+  messages <- capture_messages(
+    check_darid(npx_data1 |>
+                  mutate(DataAnalysisRefID = "D10007") |>
+                  mutate(ExploreVersion = "1.2"))
+  )
+
+  expect_true(any(grepl("Outdated .* Software Version combination", messages)))
+  expect_true(any(grepl("Re-export data using .* NPX Map", messages)))
+  expect_true(any(grepl("Failure to re-export", messages)))
+
+})

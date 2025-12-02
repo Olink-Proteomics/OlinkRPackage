@@ -1,3 +1,14 @@
+# Olink Analyze 4.4.0
+## Minor Changes
+* Added support for bridging Olink Explore HT and Olink Reveal (#645, #636, #639, @boxizhang, @amrita-kar, @kathy-nevola, @dtopouza, @klev-diamanti)
+* Add warning message for specific DarID-SW export combinations that require re-export (#635, @kathy-nevola)
+* Added instructions for how to add LOD data to cross product bridging (#642, @KangD-dev)
+
+## Bug Fixes
+* Fix wording of bridgeable assays in cross-product bridging tutorial (#632, #630, @kathy-nevola)
+* Fixed warning message in case of duplicate samples so that samples with control assays did not count as duplicated samples (#634, @amrita-kar) 
+* QS Normalization will now exclude bridge samples with NA with warning, preventing error (#640, @klev-diamanti)
+
 # Olink Analyze 4.3.2
 ## Bug Fixes
 * Tests for `olink_wilcox()` are now arranged by Assay name to handle ties (#616, @boxizhang)
