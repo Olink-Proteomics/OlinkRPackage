@@ -105,7 +105,7 @@ olink_norm_input_check <- function(df1,
   npx_check <- npxCheck(df1)
   # Rename duplicate UniProts
   df1 <- uniprot_replace(df1, npx_check)
-  
+
   if (!is.null(df2)) {
     #Check data format
     npx_check <- npxCheck(df2)
@@ -157,9 +157,9 @@ olink_norm_input_check <- function(df1,
   } else {
     
     # bridge, subset, or cross_product normalization
-    
+
     reference_medians <- NULL
-    
+  
     lst_df <- list(df1, df2)
     names(lst_df) <- c(df1_project_nr, df2_project_nr)
     lst_cols <- olink_norm_input_check_df_cols(lst_df = lst_df)
@@ -334,7 +334,7 @@ olink_norm_input_check <- function(df1,
   # if multiple versions, select the newest format
   
   # check that subset of required columns are present in both datasets
-  if (!identical(lst_cols[[1]], lst_cols[[2]])) {
+  if (length(lst_cols) > 1 && !identical(lst_cols[[1]], lst_cols[[2]])) {
     
     software_cols <- list()
     
@@ -1153,7 +1153,7 @@ olink_norm_input_check_software <- function(lst_req_col_software) {
     # no quantification identified in at least one datasets
     cli::cli_inform(
       c(
-        "!" = "No software version column identified in either dataset.",
+        "!" = "No software version column identified in at least one dataset.",
         "i" = "The default format from the `olink_normalization` function will
                be reported."
       )
