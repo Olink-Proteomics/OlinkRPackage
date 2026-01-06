@@ -260,7 +260,7 @@ negative control and fixed LOD methods.
 
 ## Handling LOD in Bridge-Normalized Data
 
-When using the `olink_normalization_bridge()` function to bridge two datasets, the reference project remains unchanged throughout the bridging procedure, including the NC LOD (calculated from negative controls in the reference project) and the fixed LOD. In contrast, the LOD values (both NC LOD and fixed LOD) for the non-reference project are adjusted using the same adjustment factor that is applied to all other samples for the corresponding assay.  This adjustment factor is the median of the paired NPX differences per assay between the bridging samples.
+When using the `olink_normalization_bridge()` function to bridge two datasets, the reference project remains unchanged throughout the bridging procedure, including the NC LOD (calculated from negative controls in the reference project) and the fixed LOD. In contrast, the LOD values (both NC LOD and fixed LOD) for the non-reference project are adjusted using the same adjustment factor that is applied to all other samples for the corresponding assay. This adjustment factor is the median of the paired NPX differences per assay between the bridging samples.
 
 Consequently, for **within-product bridging**, LOD values from both the reference and non-reference projects can be used for downstream analysis. In contrast, for **between-product bridging**, differences in assay bridgeability between products and the use of distinct normalization methods (median centering versus quantile smoothing) should be taken into account. Therefore, we recommend applying the LOD values from the reference project to the non-reference project in between-product bridging.
 
