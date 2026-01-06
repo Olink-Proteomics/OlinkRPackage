@@ -258,10 +258,6 @@ PC normalized negative control LOD.
 The intensity normalization LOD adjustment is applied to both the
 negative control and fixed LOD methods.
 
-## Integrating LOD in Cross-Product Bridging
-
-The reference project is not altered during bridging normalization. As a result, both the NC LOD calculated from negative controls in the reference project and the fixed LOD attached to the reference project stay the same. After bridging normalization, we recommend applying the LOD values from the reference project to the non-reference project.
-
 ## Handling LOD in Bridge-Normalized Data
 
 When using the `olink_normalization_bridge()` function to bridge two datasets, the reference project remains unchanged throughout the bridging procedure. Both the NC LOD calculated from negative controls in the reference project and the fixed LOD attached to the reference project stay the same. In contrast, the LOD values (both NC LOD and fixed LOD) for the non-reference project are adjusted using an adjustment factor calculated from the median of the paired NPX LOD differences per assay across the bridging samples.
