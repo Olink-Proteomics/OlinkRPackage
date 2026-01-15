@@ -105,7 +105,7 @@ olink_norm_input_check <- function(df1,
   npx_check <- npxCheck(df1)
   # Rename duplicate UniProts
   df1 <- uniprot_replace(df1, npx_check)
-
+  
   if (!is.null(df2)) {
     #Check data format
     npx_check <- npxCheck(df2)
@@ -137,198 +137,185 @@ olink_norm_input_check <- function(df1,
     norm_mode = norm_mode
   )
   
-  # Check column names ----
-  
-  if (norm_mode == olink_norm_modes$ref_median) {
-    # reference median normalization
+  olink_norm_input_check <- function(df1,
+                                     df2,
+                                     overlapping_samples_df1,
+                                     overlapping_samples_df2,
+                                     df1_project_nr,
+                                     df2_project_nr,
+                                     reference_project,
+                                     reference_medians) {
+    # Validate the normalization input ----
+    #Check data format
+    npx_check <- npxCheck(df1)
+    # Rename duplicate UniProts
+    df1 <- uniprot_replace(df1, npx_check)
     
-    # check columns of df1
-    lst_df <- list(df1)
-    names(lst_df) <- df1_project_nr
-    lst_cols <- olink_norm_input_check_df_cols(lst_df = lst_df)
-    
-    # list of samples
-    lst_ref_samples <- list(overlapping_samples_df1)
-    names(lst_ref_samples) <- df1_project_nr
-    
-    # check reference_medians
-    olink_norm_input_ref_medians(reference_medians = reference_medians)
-    
-  } else {
-    
-    # bridge, subset, or cross_product normalization
-
-    reference_medians <- NULL
-  
-    lst_df <- list(df1, df2)
-    names(lst_df) <- c(df1_project_nr, df2_project_nr)
-    lst_cols <- olink_norm_input_check_df_cols(lst_df = lst_df)
-    product_ids <- olink_norm_product_id(
-      lst_df = lst_df,
-      lst_cols = lst_cols
-    )
-    ref_ids <- olink_norm_reference_id(
-      lst_product = product_ids,
-      reference_project = reference_project
-    )
-    
-    if (norm_mode %in% c(olink_norm_modes$bridge,
-                         olink_norm_modes$norm_cross_product)) {
-      # check if it is cross_product normalization, or bridge normalization
-      norm_cross_product <- olink_norm_input_cross_product(
-        lst_df = lst_df,
-        lst_cols = lst_cols,
-        reference_project = reference_project,
-        product_ids = product_ids,
-        ref_ids = ref_ids
-      )
-      norm_mode <- norm_cross_product$norm_mode
-      lst_df <- norm_cross_product$lst_df
-      # bridge or 3k-HT normalization normalization
-      lst_ref_samples <- list(overlapping_samples_df1, overlapping_samples_df1)
-    } else if (norm_mode == olink_norm_modes$subset) {
-      # subset normalization
-      lst_ref_samples <- list(overlapping_samples_df1, overlapping_samples_df2)
+    if (!is.null(df2)) {
+      #Check data format
+      npx_check <- npxCheck(df2)
+      # Rename duplicate UniProts
+      df2 <- uniprot_replace(df2, npx_check)
     }
-    names(lst_ref_samples) <- c(df1_project_nr, df2_project_nr)
     
-  }
-  
-  # Update normalization message ----
-  
-  # Update the message to inform what type of normalization we will perform
-  if (norm_mode == olink_norm_modes$norm_cross_product) {
-    norm_msg <- gsub(
-      pattern = "Bridge",
-      replacement = "Cross-product",
-      x = norm_msg
+    norm_valid <- olink_norm_input_validate(
+      df1 = df1,
+      df2 = df2,
+      overlapping_samples_df1 = overlapping_samples_df1,
+      overlapping_samples_df2 = overlapping_samples_df2,
+      reference_medians = reference_medians
     )
-  }
+    norm_mode <- norm_valid$norm_mode
+    norm_msg <- norm_valid$norm_msg
+    
+    # Check that input classes are correct ----
+    
+    olink_norm_input_class(
+      df1 = df1,
+      df2 = df2,
+      overlapping_samples_df1 = overlapping_samples_df1,
+      overlapping_samples_df2 = overlapping_samples_df2,
+      df1_project_nr = df1_project_nr,
+      df2_project_nr = df2_project_nr,
+      reference_project = reference_project,
+      reference_medians = reference_medians,
+      norm_mode = norm_mode
+    )
   
-  # Check samples ----
-  
-  # extract all unique sample identifiers
-  lst_df_samples <- lapply(names(lst_cols), function(l_col) {
-    lst_df[[l_col]] |> # nolint return_linter
-      dplyr::select(
-        dplyr::all_of(
-          lst_cols[[l_col]]$sample_id
+    # Update normalization message ----
+    
+    # Update the message to inform what type of normalization we will perform
+    if (norm_mode == olink_norm_modes$norm_cross_product) {
+      norm_msg <- gsub(
+        pattern = "Bridge",
+        replacement = "Cross-product",
+        x = norm_msg
+      )
+    }
+    
+    # Check samples ----
+    
+    # extract all unique sample identifiers
+    lst_df_samples <- lapply(names(lst_cols), function(l_col) {
+      lst_df[[l_col]] |> # nolint return_linter
+        dplyr::select(
+          dplyr::all_of(
+            lst_cols[[l_col]]$sample_id
+          )
+        ) |>
+        dplyr::distinct() |>
+        dplyr::collect() |>
+        dplyr::pull(
+          .data[[lst_cols[[l_col]]$sample_id]]
         )
-      ) |>
-      dplyr::distinct() |>
-      dplyr::collect() |>
-      dplyr::pull(
-        .data[[lst_cols[[l_col]]$sample_id]]
-      )
-  })
-  names(lst_df_samples) <- names(lst_cols)
-  
-  olink_norm_input_check_samples(
-    lst_df_samples = lst_df_samples,
-    lst_ref_samples = lst_ref_samples,
-    norm_mode = norm_mode
-  )
-  
-  # Clean assays ----
-  
-  # clear df and reference_medians from excluded assays and assays not shared
-  # across all inputs
-  lst_df_clean_assays <- olink_norm_input_clean_assays(
-    lst_df = lst_df,
-    reference_medians = reference_medians,
-    lst_cols = lst_cols,
-    norm_mode = norm_mode
-  )
-  lst_df <- lst_df_clean_assays$lst_df
-  reference_medians <- lst_df_clean_assays$reference_medians
-  
-  # Check assays shared across inputs ----
-  
-  # check if all assays from input are in all datasets, and remove them if not
-  lst_df_overlap_assay <- olink_norm_input_assay_overlap(
-    lst_df = lst_df_clean_assays$lst_df,
-    reference_medians = lst_df_clean_assays$reference_medians,
-    lst_cols = lst_cols,
-    norm_mode = norm_mode
-  )
-  lst_df <- lst_df_overlap_assay$lst_df
-  reference_medians <- lst_df_overlap_assay$reference_medians
-  
-  # Check normalization approach ----
-  
-  all_norm_present <- lst_cols |>
-    sapply(function(x) !identical(x = x$normalization, y = character(0L))) |>
-    all()
-  
-  if (all_norm_present && length(lst_df) == 2L) {
-    olink_norm_input_norm_method(
-      lst_df = lst_df,
-      lst_cols = lst_cols
+    })
+    names(lst_df_samples) <- names(lst_cols)
+    
+    olink_norm_input_check_samples(
+      lst_df_samples = lst_df_samples,
+      lst_ref_samples = lst_ref_samples,
+      norm_mode = norm_mode
     )
-  }
-
-  # return to normalize ----
+    
+    # Clean assays ----
+    
+    # clear df and reference_medians from excluded assays and assays not shared
+    # across all inputs
+    lst_df_clean_assays <- olink_norm_input_clean_assays(
+      lst_df = lst_df,
+      reference_medians = reference_medians,
+      lst_cols = lst_cols,
+      norm_mode = norm_mode
+    )
+    lst_df <- lst_df_clean_assays$lst_df
+    reference_medians <- lst_df_clean_assays$reference_medians
+    
+    # Check assays shared across inputs ----
+    
+    # check if all assays from input are in all datasets, and remove them if not
+    lst_df_overlap_assay <- olink_norm_input_assay_overlap(
+      lst_df = lst_df_clean_assays$lst_df,
+      reference_medians = lst_df_clean_assays$reference_medians,
+      lst_cols = lst_cols,
+      norm_mode = norm_mode
+    )
+    lst_df <- lst_df_overlap_assay$lst_df
+    reference_medians <- lst_df_overlap_assay$reference_medians
+    
+    # Check normalization approach ----
+    
+    all_norm_present <- lst_cols |>
+      sapply(function(x) !identical(x = x$normalization, y = character(0L))) |>
+      all()
+    
+    if (all_norm_present && length(lst_df) == 2L) {
+      olink_norm_input_norm_method(
+        lst_df = lst_df,
+        lst_cols = lst_cols
+      )
+    }
+    # return to normalize ----
+    
+    # message to inform user
+    cli::cli_inform(message = norm_msg)
+    
+    lst_out <- list(
+      ref_df = NULL,
+      ref_samples = NULL,
+      ref_name = NULL,
+      ref_cols = NULL,
+      ref_product = NULL,
+      not_ref_df = NULL,
+      not_ref_samples = NULL,
+      not_ref_name = NULL,
+      not_ref_cols = NULL,
+      not_ref_product = NULL,
+      reference_medians = NULL,
+      norm_mode = NULL
+    )
   
-  # message to inform user
-  cli::cli_inform(message = norm_msg)
-  
-  lst_out <- list(
-    ref_df = NULL,
-    ref_samples = NULL,
-    ref_name = NULL,
-    ref_cols = NULL,
-    ref_product = NULL,
-    not_ref_df = NULL,
-    not_ref_samples = NULL,
-    not_ref_name = NULL,
-    not_ref_cols = NULL,
-    not_ref_product = NULL,
-    reference_medians = NULL,
-    norm_mode = NULL
-  )
-  
-  # set normalization mode
-  lst_out$norm_mode <- norm_mode
-  
-  if (norm_mode %in% olink_norm_modes$ref_median) {
-    # reference median normalization
-    lst_out$ref_name <- df1_project_nr
-    lst_out$ref_samples <- overlapping_samples_df1
-    lst_out$ref_df <- lst_df[[lst_out$ref_name]]
-    lst_out$ref_cols <- lst_cols[[lst_out$ref_name]]
-    lst_out$reference_medians <- reference_medians
-  } else if (norm_mode %in% c(olink_norm_modes$subset,
-                              olink_norm_modes$bridge,
-                              olink_norm_modes$norm_cross_product)) {
-    # bridge or subset normalization
-    if (reference_project == df1_project_nr) {
+    # set normalization mode
+    lst_out$norm_mode <- norm_mode
+    
+    if (norm_mode %in% olink_norm_modes$ref_median) {
+      # reference median normalization
       lst_out$ref_name <- df1_project_nr
-      lst_out$not_ref_name <- df2_project_nr
-    } else {
-      lst_out$ref_name <- df2_project_nr
-      lst_out$not_ref_name <- df1_project_nr
-    }
-    lst_out$ref_df <- lst_df[[lst_out$ref_name]]
-    lst_out$ref_cols <- lst_cols[[lst_out$ref_name]]
-    lst_out$not_ref_df <- lst_df[[lst_out$not_ref_name]]
-    lst_out$not_ref_cols <- lst_cols[[lst_out$not_ref_name]]
-    if (norm_mode == olink_norm_modes$subset) {
-      if (reference_project == df1_project_nr) {
-        lst_out$ref_samples <- overlapping_samples_df1
-        lst_out$not_ref_samples <- overlapping_samples_df2
-      } else {
-        lst_out$ref_samples <- overlapping_samples_df2
-        lst_out$not_ref_samples <- overlapping_samples_df1
-      }
-    } else if (norm_mode %in% c(olink_norm_modes$bridge,
-                                olink_norm_modes$norm_cross_product)) {
       lst_out$ref_samples <- overlapping_samples_df1
-      lst_out$ref_product <- product_ids[names(product_ids) == lst_out$ref_name] |> # nolint line_length_linter
-        unname()
-      lst_out$not_ref_product <- product_ids[names(product_ids) == lst_out$not_ref_name] |> # nolint line_length_linter
-        unname()
+      lst_out$ref_df <- lst_df[[lst_out$ref_name]]
+      lst_out$ref_cols <- lst_cols[[lst_out$ref_name]]
+      lst_out$reference_medians <- reference_medians
+    } else if (norm_mode %in% c(olink_norm_modes$subset,
+                                olink_norm_modes$bridge,
+                                olink_norm_modes$norm_cross_product)) {
+      # bridge or subset normalization
+      if (reference_project == df1_project_nr) {
+        lst_out$ref_name <- df1_project_nr
+        lst_out$not_ref_name <- df2_project_nr
+      } else {
+        lst_out$ref_name <- df2_project_nr
+        lst_out$not_ref_name <- df1_project_nr
+      }
+      lst_out$ref_df <- lst_df[[lst_out$ref_name]]
+      lst_out$ref_cols <- lst_cols[[lst_out$ref_name]]
+      lst_out$not_ref_df <- lst_df[[lst_out$not_ref_name]]
+      lst_out$not_ref_cols <- lst_cols[[lst_out$not_ref_name]]
+      if (norm_mode == olink_norm_modes$subset) {
+        if (reference_project == df1_project_nr) {
+          lst_out$ref_samples <- overlapping_samples_df1
+          lst_out$not_ref_samples <- overlapping_samples_df2
+        } else {
+          lst_out$ref_samples <- overlapping_samples_df2
+          lst_out$not_ref_samples <- overlapping_samples_df1
+        }
+      } else if (norm_mode %in% c(olink_norm_modes$bridge,
+                                  olink_norm_modes$norm_cross_product)) {
+        lst_out$ref_samples <- overlapping_samples_df1
+        lst_out$ref_product <- product_ids[names(product_ids) == lst_out$ref_name] |> # nolint line_length_linter
+          unname()
+        lst_out$not_ref_product <- product_ids[names(product_ids) == lst_out$not_ref_name] |> # nolint line_length_linter
+          unname()
+      }
     }
-  }
   
   # check if software versions are the same if req columns are different ----
   # if multiple versions, select the newest format

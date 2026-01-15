@@ -239,7 +239,7 @@ olink_normalization <- function(df1,
                                 reference_project = "P1",
                                 reference_medians = NULL,
                                 format = FALSE) {
-
+  browser()
   # check input ----
   lst_check <- olink_norm_input_check(
     df1 = df1,
@@ -251,7 +251,7 @@ olink_normalization <- function(df1,
     reference_project = reference_project,
     reference_medians = reference_medians
   )
-
+  
   # normalize ----
 
   if (lst_check$norm_mode == olink_norm_modes$ref_median) {
@@ -267,7 +267,7 @@ olink_normalization <- function(df1,
 
   } else {
     ## rename non-reference columns to reference columns ----
-
+    # browser()
     # update selected colnames of not_ref_df based on colnames of ref_df
     lst_check$not_ref_df <- norm_internal_rename_cols(
       ref_cols = lst_check$ref_cols,
