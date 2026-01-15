@@ -139,10 +139,14 @@ olink_pca_plot <- function (df,
   }
 
   if(byPanel){
-    # Convert color_g variable to factor
-    if(!is.factor(df[[paste(color_g)]])){
-      df[[paste(color_g)]] <- as.factor(df[[paste(color_g)]])
+    # Convert color_g variable to factor (but keep OSI columns continuous)
+    osi_cols <- c("OSITimeToCentrifugation", "OSIPreparationTemperature", "OSISummary")
+    if(!(color_g %in% osi_cols)){
+      if(!is.factor(df[[paste(color_g)]])){
+        df[[paste(color_g)]] <- as.factor(df[[paste(color_g)]])
+      }
     }
+
     df <- df |>
       dplyr::mutate(Panel = Panel |> stringr::str_replace("Olink ", "")) #Strip "Olink" from the panel names
 
@@ -283,6 +287,14 @@ olink_pca_plot.internal <- function(df,
                                     verbose = TRUE,
                                     ...) {
 
+  # Ensure one unique color value per SampleID (required by npxProcessing_forDimRed)
+  df <- df |>
+    dplyr::group_by(SampleID) |>
+    dplyr::mutate(
+      !!rlang::sym(color_g) := dplyr::first(stats::na.omit(.data[[color_g]]))
+    ) |>
+    dplyr::ungroup()
+
   #Data pre-processing
   procData <- npxProcessing_forDimRed(df = df,
                                       color_g = color_g,
@@ -379,6 +391,23 @@ olink_pca_plot.internal <- function(df,
 
   }
 
+  # Continuous color scale for OSI columns
+  osi_cols <- c("OSITimeToCentrifugation", "OSIPreparationTemperature", "OSISummary")
+  if(color_g %in% osi_cols){
+
+    # Ensure numeric for continuous scale (handles character/factor inputs)
+    if(is.factor(scores$colors)) scores$colors <- as.character(scores$colors)
+    scores$colors <- suppressWarnings(as.numeric(scores$colors))
+
+    pca_plot <- pca_plot +
+      ggplot2::scale_color_gradient(
+        low = "#FFB200FF",
+        high = "#332D56FF",
+        limits = c(0L, 1L),
+        breaks = seq(from = 0L, to = 1L, by = 0.25),
+        oob = scales::squish
+      )
+  }
 
   #Drawing loadings
 
@@ -459,14 +488,16 @@ olink_pca_plot.internal <- function(df,
                           color = 'grey')
   }
 
-
-
   pca_plot <- pca_plot +
-    OlinkAnalyze::set_plot_theme() +
-    OlinkAnalyze::olink_color_discrete(...,drop=FALSE)
+    OlinkAnalyze::set_plot_theme()
+
+  osi_cols <- c("OSITimeToCentrifugation", "OSIPreparationTemperature", "OSISummary")
+  if(!(color_g %in% osi_cols)){
+    pca_plot <- pca_plot +
+      OlinkAnalyze::olink_color_discrete(...,drop=FALSE)
+  }
 
   return(pca_plot)
-
 
 }
 
