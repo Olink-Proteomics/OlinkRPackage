@@ -280,8 +280,29 @@ read_NPX_explore <- function(filename) {
                             "PanelDataArchiveVersion",
                             "PreProcessingVersion",
                             "PreProcessingSoftware",
-                            "InstrumentType")
-
+                            "InstrumentType"),
+    "header_npx_map_2" = c(header_base,
+                            "SampleType",
+                            "WellID",
+                            "DataAnalysisRefID",
+                            "AssayType",
+                            "Block",
+                            "Count",
+                            "ExtNPX",
+                            "Normalization",
+                            "PCNormalizedNPX",
+                            "AssayQC",
+                            "SampleQC",
+                            "SoftwareVersion",
+                            "SoftwareName",
+                            "PanelDataArchiveVersion",
+                            "PreProcessingVersion",
+                            "PreProcessingSoftware",
+                            "InstrumentType",
+                            "OSICategory",
+                            "OSISummary",
+                            "OSITimeToCentrifugation",
+                            "OSIPreparationTemperature")
   )
 
   header_match <-  header_v %>%
