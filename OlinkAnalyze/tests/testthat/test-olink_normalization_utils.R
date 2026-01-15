@@ -48,7 +48,8 @@ test_that(
                         lod = "LOD",
                         normalization = character(0L),
                         count = character(0L),
-                        sample_type = character(0L)),
+                        sample_type = character(0L),
+                        software_version = character(0L)),
         ref_product = "other",
         not_ref_df = npx_data2,
         not_ref_samples = NULL,
@@ -66,7 +67,8 @@ test_that(
                             lod = "LOD",
                             normalization = character(0L),
                             count = character(0L),
-                            sample_type = character(0L)),
+                            sample_type = character(0L),
+                            software_version = character(0L)),
         not_ref_product = "other",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge
@@ -121,7 +123,8 @@ test_that(
                         lod = "LOD",
                         normalization = "Normalization",
                         count = character(0L),
-                        sample_type = character(0L)),
+                        sample_type = character(0L),
+                        software_version = character(0L)),
         ref_product = "other",
         not_ref_df = npx_data1 |>
           dplyr::mutate(
@@ -142,7 +145,8 @@ test_that(
                             lod = "LOD",
                             normalization = "Normalization",
                             count = character(0L),
-                            sample_type = character(0L)),
+                            sample_type = character(0L),
+                            software_version = character(0L)),
         not_ref_product = "other",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge
@@ -225,10 +229,11 @@ test_that(
                         qc_warn = "SampleQC",
                         assay_warn = "AssayQC",
                         quant = "NPX",
-                        lod = character(0),
+                        lod = character(0L),
                         normalization = "Normalization",
                         count = "Count",
-                        sample_type = "SampleType"),
+                        sample_type = "SampleType",
+                        software_version = character(0L)),
         ref_product = "HT",
         not_ref_df = data_3k |>
           dplyr::rename(
@@ -267,7 +272,8 @@ test_that(
                             lod = character(0),
                             normalization = "Normalization",
                             count = "Count",
-                            sample_type = "SampleType"),
+                            sample_type = "SampleType",
+                            software_version = character(0L)),
         not_ref_product = "3k",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product
@@ -341,7 +347,8 @@ test_that(
                         lod = character(0),
                         normalization = "Normalization",
                         count = "Count",
-                        sample_type = "SampleType"),
+                        sample_type = "SampleType",
+                        software_version = character(0L)),
         ref_product = "Reveal",
         not_ref_df = data_3k |>
           dplyr::rename(
@@ -381,7 +388,8 @@ test_that(
                             lod = character(0),
                             normalization = "Normalization",
                             count = "Count",
-                            sample_type = "SampleType"),
+                            sample_type = "SampleType",
+                            software_version = character(0L)),
         not_ref_product = "3k",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product
@@ -434,7 +442,8 @@ test_that(
                         lod = "LOD",
                         normalization = character(0L),
                         count = character(0L),
-                        sample_type = character(0L)),
+                        sample_type = character(0L),
+                        software_version = character(0L)),
         ref_product = NULL,
         not_ref_df = npx_data2,
         not_ref_samples = unique(npx_data2$SampleID),
@@ -452,7 +461,8 @@ test_that(
                             lod = "LOD",
                             normalization = character(0L),
                             count = character(0L),
-                            sample_type = character(0L)),
+                            sample_type = character(0L),
+                            software_version = character(0L)),
         not_ref_product = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset
@@ -503,7 +513,8 @@ test_that(
                         lod = "LOD",
                         normalization = "Normalization",
                         count = character(0L),
-                        sample_type = character(0L)),
+                        sample_type = character(0L),
+                        software_version = character(0L)),
         ref_product = NULL,
         not_ref_df = npx_data1 |>
           dplyr::mutate(
@@ -524,7 +535,8 @@ test_that(
                             lod = "LOD",
                             normalization = "Normalization",
                             count = character(0L),
-                            sample_type = character(0L)),
+                            sample_type = character(0L),
+                            software_version = character(0L)),
         not_ref_product = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset
@@ -582,7 +594,8 @@ test_that(
                         lod = "LOD",
                         normalization = character(0L),
                         count = character(0L),
-                        sample_type = character(0L)),
+                        sample_type = character(0L),
+                        software_version = character(0L)),
         ref_product = NULL,
         not_ref_df = npx_data2,
         not_ref_samples = npx_df2_samples,
@@ -600,7 +613,8 @@ test_that(
                             lod = "LOD",
                             normalization = character(0L),
                             count = character(0L),
-                            sample_type = character(0L)),
+                            sample_type = character(0L),
+                            software_version = character(0L)),
         not_ref_product = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset
@@ -651,7 +665,8 @@ test_that(
                         lod = "LOD",
                         normalization = "Normalization",
                         count = character(0L),
-                        sample_type = character(0L)),
+                        sample_type = character(0L),
+                        software_version = character(0L)),
         ref_product = NULL,
         not_ref_df = npx_data1 |>
           dplyr::mutate(
@@ -672,7 +687,8 @@ test_that(
                             lod = "LOD",
                             normalization = "Normalization",
                             count = character(0L),
-                            sample_type = character(0L)),
+                            sample_type = character(0L),
+                            software_version = character(0L)),
         not_ref_product = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset
@@ -741,7 +757,8 @@ test_that(
                         lod = "LOD",
                         normalization = character(0L),
                         count = character(0L),
-                        sample_type = character(0L)),
+                        sample_type = character(0L),
+                        software_version = character(0L)),
         ref_product = NULL,
         not_ref_df = NULL,
         not_ref_samples = NULL,
@@ -798,7 +815,8 @@ test_that(
                         lod = "LOD",
                         normalization = "Normalization",
                         count = character(0L),
-                        sample_type = character(0L)),
+                        sample_type = character(0L),
+                        software_version = character(0L)),
         ref_product = NULL,
         not_ref_df = NULL,
         not_ref_samples = NULL,
@@ -1722,7 +1740,8 @@ test_that(
           lod = "LOD",
           normalization = character(0L),
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          software_version = character(0L)
         )
       )
     )
@@ -1762,7 +1781,8 @@ test_that(
           lod = "LOD",
           normalization = character(0L),
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          software_version = character(0L)
         )
       )
     )
@@ -1804,7 +1824,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          software_version = character(0L)
         )
       )
     )
@@ -1847,7 +1868,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          software_version = character(0L)
         )
       )
     )
@@ -1894,7 +1916,8 @@ test_that(
           lod = "LOD",
           normalization = character(0L),
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          software_version = character(0L)
         ),
         "p2" = list(
           sample_id = "SampleID",
@@ -1910,7 +1933,8 @@ test_that(
           lod = "LOD",
           normalization = character(0L),
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          software_version = character(0L)
         )
       )
     )
@@ -1953,7 +1977,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          software_version = character(0L)
         ),
         "p2" = list(
           sample_id = "SampleID",
@@ -1969,7 +1994,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          software_version = character(0L)
         )
       )
     )
@@ -2008,7 +2034,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          software_version = character(0L)
         ),
         "p2" = list(
           sample_id = "SampleID",
@@ -2024,7 +2051,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          software_version = character(0L)
         )
       )
     )
@@ -2091,7 +2119,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          software_version = character(0L)
         ),
         "p2" = list(
           sample_id = "SampleID",
@@ -2107,7 +2136,8 @@ test_that(
           lod = "LODNPX",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          software_version = character(0L)
         )
       )
     )
@@ -2147,7 +2177,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          software_version = character(0L)
         ),
         "p2" = list(
           sample_id = "SampleID",
@@ -2163,7 +2194,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          software_version = character(0L)
         )
       )
     )
@@ -2244,7 +2276,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          software_version = character(0L)
         ),
         "p2" = list(
           sample_id = "SampleID",
@@ -2260,7 +2293,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          software_version = character(0L)
         ),
         "p3" = list(
           sample_id = "SampleID",
@@ -2276,7 +2310,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          software_version = character(0L)
         ),
         "p4" = list(
           sample_id = "SampleID",
@@ -2292,7 +2327,8 @@ test_that(
           lod = "LOD",
           normalization = "Normalization",
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          software_version = character(0L)
         )
       )
     )
@@ -2327,7 +2363,8 @@ test_that(
           lod = "LOD",
           normalization = character(0L),
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          software_version = character(0L)
         ),
         "p2" = list(
           sample_id = "SampleID",
@@ -2343,7 +2380,8 @@ test_that(
           lod = "LOD",
           normalization = character(0L),
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          software_version = character(0L)
         ),
         "p3" = list(
           sample_id = "SampleID",
@@ -2359,7 +2397,8 @@ test_that(
           lod = "LOD",
           normalization = character(0L),
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          software_version = character(0L)
         ),
         "p4" = list(
           sample_id = "SampleID",
@@ -2375,7 +2414,8 @@ test_that(
           lod = "LOD",
           normalization = character(0L),
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          software_version = character(0L)
         )
       )
     )
@@ -2489,7 +2529,8 @@ test_that(
           lod = "LOD",
           normalization = character(0L),
           count = character(0L),
-          sample_type = character(0L)
+          sample_type = character(0L),
+          software_version = character(0L)
         )
       )
     )
@@ -2528,7 +2569,8 @@ test_that(
           lod = "LOD",
           normalization = character(0L),
           count = "Count",
-          sample_type = character(0L)
+          sample_type = character(0L),
+          software_version = character(0L)
         )
       )
     )
@@ -2830,92 +2872,242 @@ test_that(
 # Test olink_norm_input_check_quant ----
 
 test_that(
-  "olink_norm_input_check_quant - quant col present",
+  "olink_norm_input_check_quant - error - at least one quant col present",
   {
-    skip_if_not_installed("arrow")
-
-    # df does not have quant col ----
-
+    # df does not have quant col - one df ----
+    
     quant_cols <- list(
       "DF1" = character(0L) ### empty quant list
     )
-
-
+    
     expect_error(
-      object = olink_norm_input_check_quant(quant_cols),
+      object = olink_norm_input_check_quant(
+        quant_cols = quant_cols,
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
+      ),
+      regexp = "No quantification column identified in at least one of the"
+    )
+    
+    # df does not have quant col - two df ----
+    
+    quant_cols <- list(
+      "DF1" = character(0L),
+      "DF2" = "Ct"
+    )
+    
+    expect_error(
+      object = olink_norm_input_check_quant(
+        quant_cols = quant_cols,
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
+      ),
       regexp = "No quantification column identified in at least one of the"
     )
   }
 )
 
 test_that(
-  "olink_norm_input_check_quant - different quant cols in datasets",
+  "olink_norm_input_check_quant - error - different quant cols in datasets",
   {
-    skip_if_not_installed("arrow")
-
     # dfs does not have matching quant col ----
-
+    
     quant_cols <- list(
       "DF1" =  "NPX",
       "DF2" =  "Ct"
     )
-
+    
     expect_error(
-      object = olink_norm_input_check_quant(quant_cols),
+      object = olink_norm_input_check_quant(
+        quant_cols = quant_cols,
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
+      ),
+      regexp = "Re-export data with at least one shared quantification method"
+    )
+    
+    # dfs does not have matching quant col v2 ----
+    
+    quant_cols <- list(
+      "DF1" =  "NPX",
+      "DF2" =  c("Quantified_value", "Ct")
+    )
+    
+    expect_error(
+      object = olink_norm_input_check_quant(
+        quant_cols = quant_cols,
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
+      ),
       regexp = "Re-export data with at least one shared quantification method"
     )
   }
 )
 
 test_that(
-  "olink_norm_input_check_quant - same and different quant cols in datasets",
+  "olink_norm_input_check_quant - works - one dataset",
   {
-    skip_if_not_installed("arrow")
+    # dfs has one col ----
+    
+    quant_cols <- list(
+      "DF1" =  "NPX"
+    )
+    
+    expect_identical(
+      object = olink_norm_input_check_quant(
+        quant_cols = quant_cols,
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
+      ),
+      expected = list("DF1" =  "NPX")
+    )
+    
+    # dfs has one col v2 ----
+    
+    quant_cols <- list(
+      "DF1" =  "Quantified_value"
+    )
+    
+    expect_identical(
+      object = olink_norm_input_check_quant(
+        quant_cols = quant_cols,
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
+      ),
+      expected = list("DF1" =  "Quantified_value")
+    )
+    
+    # dfs has two cols ----
+    
+    quant_cols <- list(
+      "DF1" =  c("NPX", "Quantified_value")
+    )
+    
+    expect_message(
+      object = quant_check <- olink_norm_input_check_quant(
+        quant_cols = quant_cols,
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
+      ),
+      regexp = "Multiple quantification methods detected in dataset \"DF1\""
+    )
+    
+    expect_identical(
+      object = quant_check,
+      expected = list("DF1" =  "NPX")
+    )
+    
+    # dfs has two cols v2 ----
+    
+    quant_cols <- list(
+      "DF1" =  c("Ct", "Quantified_value")
+    )
+    
+    expect_message(
+      object = quant_check <- olink_norm_input_check_quant(
+        quant_cols = quant_cols,
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
+      ),
+      regexp = "Multiple quantification methods detected in dataset \"DF1\""
+    )
+    
+    expect_identical(
+      object = quant_check,
+      expected = list("DF1" =  "Quantified_value")
+    )
+  }
+)
 
-    # dfs have one or more matching quant col, 2 dfs ----
-
+test_that(
+  "olink_norm_input_check_quant - works - two datasets",
+  {
+    # dfs have one matching quant col, 2 dfs ----
+    
     quant_cols <- list(
       "DF1" = c("Ct", "NPX"),
       "DF2" = c("Quantified_value", "NPX")
     )
-
+    
     expect_message(
-      object = olink_norm_input_check_quant(quant_cols),
-      regexp = "NPX will be used for normalization."
+      object = quant_check <- olink_norm_input_check_quant(
+        quant_cols = quant_cols,
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
+      ),
+      regexp = "\"NPX\" will be used for normalization."
     )
-
+    
+    expect_identical(
+      object = quant_check,
+      expected = list(
+        "DF1" = "NPX",
+        "DF2" = "NPX"
+      )
+    )
+    
+    # dfs have one matching quant col, 2 dfs ----
+    
+    quant_cols <- list(
+      "DF1" = c("NPX"),
+      "DF2" = c("Quantified_value", "NPX", "Ct")
+    )
+    
+    expect_message(
+      object = quant_check <- olink_norm_input_check_quant(
+        quant_cols = quant_cols,
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
+      ),
+      regexp = "\"NPX\" will be used for normalization."
+    )
+    
+    expect_identical(
+      object = quant_check,
+      expected = list(
+        "DF1" = "NPX",
+        "DF2" = "NPX"
+      )
+    )
+    
+    # dfs have multiple matching quant col, 2 dfs ----
+    
     quant_cols <- list(
       "DF1" =  c("Ct", "NPX", "Quantified_value"),
       "DF2" =  c("Quantified_value", "Ct", "NPX")
     )
-
+    
     expect_message(
-      object = olink_norm_input_check_quant(quant_cols),
-      regexp = "Multiple matching quantification methods detected."
+      object = quant_check <- olink_norm_input_check_quant(
+        quant_cols = quant_cols,
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
+      ),
+      regexp = "Multiple matching quantification methods detected in datasets"
     )
-
-    expect_message(
-      object = olink_norm_input_check_quant(quant_cols),
-      regexp = "NPX"
+    
+    expect_identical(
+      object = quant_check,
+      expected = list(
+        "DF1" = "NPX",
+        "DF2" = "NPX"
+      )
     )
-
-    # dfs have two or more matching quant col, ref normalization ----
-
+    
+    # dfs have multiple matching quant col, 2 dfs  - v2----
+    
     quant_cols <- list(
-      "DF1" =  c("Ct", "NPX", "Quantified_value")
+      "DF1" =  c("Ct", "Quantified_value"),
+      "DF2" =  c("Quantified_value", "Ct", "NPX")
     )
-
+    
     expect_message(
-      object = olink_norm_input_check_quant(quant_cols),
-      regexp = "Multiple quantification methods detected."
+      object = quant_check <- olink_norm_input_check_quant(
+        quant_cols = quant_cols,
+        quant_cols_set = c("NPX", "Quantified_value", "Ct")
+      ),
+      regexp = "Multiple matching quantification methods detected in datasets"
     )
-
-    expect_message(
-      object = olink_norm_input_check_quant(quant_cols),
-      regexp = "NPX"
+    
+    expect_identical(
+      object = quant_check,
+      expected = list(
+        "DF1" = "Quantified_value",
+        "DF2" = "Quantified_value"
+      )
     )
   }
 )
+
 
 # Test olink_norm_input_cross_product ----
 
