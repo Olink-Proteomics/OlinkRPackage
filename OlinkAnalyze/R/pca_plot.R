@@ -114,6 +114,124 @@ olink_pca_plot <- function (df,
   # Rename duplicate UniProts
   df <- uniprot_replace(df, npxCheck)
 
+  # Validate OSI category column: must contain only 0,1,2,3,4; then convert to factor if not already
+  osi_cat_candidates <- c("OSICategory", "OSI_Category", "OSI_category", "OSIcategory")
+  osi_cat_found <- intersect(osi_cat_candidates, colnames(df))
+
+  if (length(osi_cat_found) > 0) {
+    cat_col <- osi_cat_found[1]
+
+    v_raw <- df[[cat_col]]
+    v_chr <- if (is.factor(v_raw)) as.character(v_raw) else as.character(v_raw)
+
+    allowed <- as.character(0:4)
+
+    invalid_vals <- unique(v_chr[!is.na(v_chr) & !(v_chr %in% allowed)])
+    if (length(invalid_vals) > 0) {
+      stop(
+        paste0(
+          "Invalid values detected in ", cat_col,
+          ". Expected only 0, 1, 2, 3, or 4. Found: ",
+          paste(invalid_vals, collapse = ", ")
+        )
+      )
+    }
+
+    if (!is.factor(df[[cat_col]])) {
+      df[[cat_col]] <- factor(v_chr, levels = allowed)
+    }
+  }
+
+  # Validate OSI category column: must contain only 0,1,2,3,4; then convert to factor if not already
+  osi_cat_candidates <- c("OSICategory", "OSI_Category", "OSI_category", "OSIcategory")
+  osi_cat_found <- intersect(osi_cat_candidates, colnames(df))
+
+  if (length(osi_cat_found) > 0) {
+    cat_col <- osi_cat_found[1]
+
+    v_raw <- df[[cat_col]]
+
+    # ERROR if column exists but is entirely NA
+    if (all(is.na(v_raw))) {
+      stop(
+        paste0(
+          "All values are NA in ", cat_col,
+          ". Please provide at least one non-missing value."
+        )
+      )
+    }
+
+    v_chr <- if (is.factor(v_raw)) as.character(v_raw) else as.character(v_raw)
+
+    allowed <- as.character(0:4)
+
+    invalid_vals <- unique(v_chr[!is.na(v_chr) & !(v_chr %in% allowed)])
+    if (length(invalid_vals) > 0) {
+      stop(
+        paste0(
+          "Invalid values detected in ", cat_col,
+          ". Expected only 0, 1, 2, 3, or 4. Found: ",
+          paste(invalid_vals, collapse = ", ")
+        )
+      )
+    }
+
+    if (!is.factor(df[[cat_col]])) {
+      df[[cat_col]] <- factor(v_chr, levels = allowed)
+    }
+  }
+
+  # Validate OSI continuous columns: must be numeric and within [0, 1]
+  osi_cont_cols <- c("OSITimeToCentrifugation", "OSIPreparationTemperature", "OSISummary")
+  osi_cont_found <- intersect(osi_cont_cols, colnames(df))
+
+  if (length(osi_cont_found) > 0) {
+    for (cc in osi_cont_found) {
+
+      v_raw <- df[[cc]]
+
+      # ERROR if column exists but is entirely NA
+      if (all(is.na(v_raw))) {
+        stop(
+          paste0(
+            "All values are NA in ", cc,
+            ". Please provide at least one non-missing value."
+          )
+        )
+      }
+
+      v_chr <- if (is.factor(v_raw)) as.character(v_raw) else as.character(v_raw)
+
+      v_num <- suppressWarnings(as.numeric(v_chr))
+
+      # Detect non-numeric entries (introduced NA after coercion)
+      non_numeric_idx <- which(!is.na(v_chr) & is.na(v_num))
+      if (length(non_numeric_idx) > 0) {
+        bad_vals <- unique(v_chr[non_numeric_idx])
+        stop(
+          paste0(
+            "Invalid values detected in ", cc,
+            ". Expected continuous numeric values between 0 and 1. ",
+            "Found non-numeric value(s): ", paste(bad_vals, collapse = ", ")
+          )
+        )
+      }
+
+      # Detect out-of-range values
+      out_of_range_idx <- which(!is.na(v_num) & (v_num < 0 | v_num > 1))
+      if (length(out_of_range_idx) > 0) {
+        bad_vals <- unique(v_num[out_of_range_idx])
+        stop(
+          paste0(
+            "Invalid values detected in ", cc,
+            ". Expected continuous numeric values between 0 and 1. ",
+            "Found out-of-range value(s): ", paste(bad_vals, collapse = ", ")
+          )
+        )
+      }
+    }
+  }
+
   # Stop if duplicate sample ID's detected
   if (length(npxCheck$duplicate_samples) > 0) {
     stop("Duplicate SampleID(s) detected: ", paste(npxCheck$duplicate_samples, collapse = ", "),". Each sample ID must be unique. Please check your data and ensure that each sample has a unique identifier.")
