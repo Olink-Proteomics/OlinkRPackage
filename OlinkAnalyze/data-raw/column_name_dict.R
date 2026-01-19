@@ -22,7 +22,8 @@ column_name_dict <- dplyr::tibble(
     "count",
     "qc_warning",
     "assay_warn",
-    "normalization"
+    "normalization",
+    "qc_version"
   ),
   # list of alternative column names matching the keys
   col_names = list(
@@ -120,7 +121,13 @@ column_name_dict <- dplyr::tibble(
                         "AssayQC",
                         "assay_qc"),
     "normalization" = c("Normalization",
-                        "normalization")
+                        "normalization"),
+    "qc_version" =    c("PanelDataArchiveVersion",
+                        "panel_data_archive_version",
+                        "paneldataarchiveversion",
+                        "ExploreVersion",
+                        "explore_version",
+                        "exploreversion")
   ),
   # boolean array marking if a column is allowed to be absent from the dataset
   col_miss = c(
@@ -140,7 +147,8 @@ column_name_dict <- dplyr::tibble(
     TRUE, # count
     FALSE, # qc_warning
     TRUE, # assay_warn
-    TRUE # normalization
+    TRUE, # normalization
+    TRUE # qc_version
   ),
   # boolean array marking if a column is allowed to have multiple names on
   # the same dataset (e.g. "PlateLOD" and "MaxLOD")
@@ -161,7 +169,8 @@ column_name_dict <- dplyr::tibble(
     FALSE, # count
     FALSE, # qc_warning
     FALSE, # assay_warn
-    FALSE # normalization
+    FALSE, # normalization
+    FALSE # qc_version
   ),
   # boolean array marking if columns with multiple names on the same dataset
   # should have a unique match to use in the downstream functions; for example,
@@ -184,7 +193,8 @@ column_name_dict <- dplyr::tibble(
     FALSE, # count
     FALSE, # qc_warning
     FALSE, # assay_warn
-    FALSE # normalization
+    FALSE, # normalization
+    FALSE # qc_version
   ),
   col_class = c(
     "character", # sample_id
@@ -203,7 +213,8 @@ column_name_dict <- dplyr::tibble(
     "numeric", # count
     "character", # qc_warning
     "character", # assay_warn
-    "character" # normalization
+    "character", # normalization
+    "character" # qc_version
   ),
   col_class_check = c(
     FALSE, # sample_id
@@ -222,6 +233,7 @@ column_name_dict <- dplyr::tibble(
     TRUE, # count
     FALSE, # qc_warning
     FALSE, # assay_warn
-    FALSE # normalization
+    FALSE, # normalization
+    FALSE # qc_version
   )
 )
