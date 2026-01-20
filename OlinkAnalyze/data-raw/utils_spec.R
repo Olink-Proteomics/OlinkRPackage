@@ -75,5 +75,6 @@ check_npx_lst_names <- c(
   "sample_id_na",
   "col_class",
   "assay_qc",
-  "non_unique_uniprot"
+  "non_unique_uniprot",
+  "darid_invalid"
 )
