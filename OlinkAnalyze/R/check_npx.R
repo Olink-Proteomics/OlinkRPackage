@@ -1275,40 +1275,46 @@ check_npx_nonunique_uniprot <- function(df, col_names) {
 #'
 check_darid <- function(df, col_names) {
 
-  if(all(c("panel_version", "qc_version") %in% names(col_names))) {
+  # Default return: empty string and no warning
+  invalid_darid_msg <- character(0L)
 
-    # Identify invalid panel_version and qc_version combinations
-    invalid_darid <- df |>
-      dplyr::distinct(
+  # Return empty string when no qc_version is present
+  if(!all(c("panel_version", "qc_version") %in% names(col_names))) {
+    return(invalid_darid_msg)
+  }
+
+  # Identify invalid panel_version and qc_version combinations
+  invalid_darid <- df |>
+    dplyr::distinct(
+      .data[[col_names$panel_version]],
+      .data[[col_names$qc_version]]
+    ) |>
+    dplyr::collect() |>
+    dplyr::filter(
+      any(stringr::str_detect(
         .data[[col_names$panel_version]],
-        .data[[col_names$qc_version]]
-      ) |>
-      dplyr::collect() |>
-      dplyr::filter(
-        any(stringr::str_detect(
-          .data[[col_names$panel_version]],
-          "D.*0007|D.*0008|D.*0010|D.*0014"
-        )) &&
-          any(sapply(.data[[col_names$qc_version]], function(x) {
-            utils::compareVersion("1.5", x)
-          }) == 1)
-      )
+        "D.*0007|D.*0008|D.*0010|D.*0014"
+      )) &&
+        any(sapply(.data[[col_names$qc_version]], function(x) {
+          utils::compareVersion("1.5", x)
+        }) == 1)
+    )
 
-    # Emit a warning if any invalid combinations are found
-    if(nrow(invalid_darid) > 0L) {
+  # Emit a warning if any invalid combinations are found
+  if(nrow(invalid_darid) > 0L) {
 
-      invalid_darid_msg <- paste0(
-        col_names$panel_version, ": ",
-        paste(unique(invalid_darid[[col_names$panel_version]]),
-              collapse = ", "),
-        "; ", col_names$qc_version, ": ",
-        paste(unique(invalid_darid[[col_names$qc_version]]),
-              collapse = ", "),
-        "."
-      )
+    invalid_darid_msg <- paste0(
+      col_names$panel_version, ": ",
+      paste(unique(invalid_darid[[col_names$panel_version]]),
+            collapse = ", "),
+      "; ", col_names$qc_version, ": ",
+      paste(unique(invalid_darid[[col_names$qc_version]]),
+            collapse = ", "),
+      "."
+    )
 
-      cli::cli_warn(
-        c(
+    cli::cli_warn(
+      c(
         "Outdated Data Analysis Reference ID and
         Panel Archive Version combination detected.",
         "*" = invalid_darid_msg,
@@ -1320,13 +1326,10 @@ check_darid <- function(df, col_names) {
         "i" = "Failure to re-export may result in
         incorrect PC normalization across lots and Fixed LOD
         calculations."
-        )
       )
-    }
-  } else {
-    invalid_darid_msg <- character(0L)
+    )
   }
 
   return(invalid_darid_msg)
-}
 
+}
