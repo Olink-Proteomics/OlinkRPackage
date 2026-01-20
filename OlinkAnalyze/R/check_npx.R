@@ -59,7 +59,7 @@
 #'   with at least one assay warning.
 #'   \item\strong{non_unique_uniprot} Character vector of \var{OlinkID} mapped
 #'   to more than one \var{UniProt} ID.
-#'   \item \strong{invalid_darid} Character vector containing outdated
+#'   \item \strong{darid_invalid} Character vector containing outdated
 #'   combinations of \var{DataAnalysisRefID} and \var{PanelDataArchiveVersion}.
 #' }
 #'
@@ -169,7 +169,7 @@ check_npx <- function(df,
   )
 
   # check Data Analysis Reference ID and Panel Archive Version combination
-  check_npx_out_lst$invalid_darid <- check_darid(
+  check_npx_out_lst$darid_invalid <- check_darid(
     df = df,
     col_names = check_npx_out_lst$col_names
   )
