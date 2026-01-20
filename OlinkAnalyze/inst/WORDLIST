@@ -12,6 +12,7 @@ Benjamini
 BgRatio
 BioConductor
 Bo
+bridgeable
 bridgeability
 bridgeselector
 bridgings
@@ -32,6 +33,8 @@ cran
 csv
 CXCL
 Dai
+DarID
+DarIDs
 darkblue
 DenDF
 detectability
@@ -43,6 +46,7 @@ dplyr
 dunnTest
 ECDF
 eHT
+eht
 emmeans
 enrichmentScore
 ExploreVersion
@@ -92,6 +96,7 @@ LMOD
 loadings
 LOD
 LODNPX
+lst
 magrittr
 MAPK
 md

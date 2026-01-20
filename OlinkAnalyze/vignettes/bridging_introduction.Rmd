@@ -135,7 +135,7 @@ data below LOD is expected. In this case `sampleMissingFreq = 0.5` can
 be a good starting point. Note that these values may need to be adjusted
 based on the Olink product, sample matrix, and biological context of the
 samples, for example, specific disease types. `sampleMissingFreq = 1`
-will provide a list of all elegible samples, regardless of the % of data
+will provide a list of all eligible samples, regardless of the % of data
 below LOD and the function output provides the percent of assays below
 LOD (`PercAssaysBelowLOD`) which can help inform a good starting point
 for a specific study.
