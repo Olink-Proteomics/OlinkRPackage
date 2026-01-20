@@ -56,7 +56,8 @@ test_that(
         "expected_col_class" = character(0L)
       ),
       assay_qc = character(0L),
-      non_unique_uniprot = character(0L)
+      non_unique_uniprot = character(0L),
+      darid_invalid = character(0L)
     )
 
     expect_equal(
@@ -122,7 +123,8 @@ test_that(
         "expected_col_class" = character(0L)
       ),
       assay_qc = c("OID12345"),
-      non_unique_uniprot = character(0L)
+      non_unique_uniprot = character(0L),
+      darid_invalid = character(0L)
     )
 
     expect_equal(
@@ -177,7 +179,8 @@ test_that(
         "expected_col_class" = c("numeric")
       ),
       assay_qc = character(0L),
-      non_unique_uniprot = character(0L)
+      non_unique_uniprot = character(0L),
+      darid_invalid = character(0L)
     )
 
     expect_equal(
@@ -254,7 +257,8 @@ test_that(
         "expected_col_class" = character(0L)
       ),
       assay_qc = character(0L),
-      non_unique_uniprot = c("OID00002")
+      non_unique_uniprot = c("OID00002"),
+      darid_invalid = character(0L)
 
     )
 
@@ -338,7 +342,8 @@ test_that(
       object = run_check_npx(df = npx_data1,
                              check_log = test_check_log),
       regexp = paste("Elements \"sample_id_na\", \"col_class\", \"assay_qc\",",
-                     "and \"non_unique_uniprot\" are missing from `check_log`!")
+                     "\"non_unique_uniprot\", and \"darid_invalid\" are",
+                     "missing from `check_log`!")
     )
   }
 )
@@ -1622,3 +1627,26 @@ test_that(
     )
   }
 )
+
+# Test check_darid ----
+test_that("does not warn when archive version is >= 1.5.0", {
+  df <- dplyr::tibble(
+    SampleID = c("Sample1", "Sample1", "Sample1"),
+    OlinkID = c("OID00001", "OID00002", "OID00002"),
+    DataAnalysisRefID = c("D10007", "D20007", "D30007"),
+    PanelDataArchiveVersion = rep("1.6.0", 3)
+  )
+
+  col_names <- list(
+    sample_id = "SampleID",
+    olink_id = "OlinkID",
+    panel_version = "DataAnalysisRefID",
+    qc_version = "PanelDataArchiveVersion"
+  )
+
+  expect_no_warning(res <- check_darid(df, col_names = col_names))
+  expect_no_message(res <- check_darid(df, col_names = col_names))
+  expect_identical(res <- check_darid(df, col_names = col_names),
+                   character(0L))
+})
+
