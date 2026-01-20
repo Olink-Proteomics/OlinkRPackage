@@ -59,6 +59,8 @@
 #'   with at least one assay warning.
 #'   \item\strong{non_unique_uniprot} Character vector of \var{OlinkID} mapped
 #'   to more than one \var{UniProt} ID.
+#'   \item \strong{invalid_darid} Character vector containing outdated
+#'   combinations of \var{DataAnalysisRefID} and \var{PanelDataArchiveVersion}.
 #' }
 #'
 #' @export
@@ -162,6 +164,12 @@ check_npx <- function(df,
 
   # non-unique uniprot id
   check_npx_out_lst$non_unique_uniprot <- check_npx_nonunique_uniprot(
+    df = df,
+    col_names = check_npx_out_lst$col_names
+  )
+
+  # outdated Data Analysis Reference ID and Panel Archive Version combination
+  check_npx_out_lst$invalid_darid <- check_darid(
     df = df,
     col_names = check_npx_out_lst$col_names
   )
@@ -1246,3 +1254,79 @@ check_npx_nonunique_uniprot <- function(df, col_names) {
 
   return(oid_uniprot_dups)
 }
+
+#' Help function checking for DARID and PanelDataArchiveVersion combinations
+#'
+#' @author
+#'  Kathleen Nevola
+#'  Kang Dong
+#'  Klev Diamanti
+#'
+#' @description
+#' DarIDs D.07, 08, 10, and 14 need to exported with Panel Data Archive Version
+#' 1.5 or later. This function identifies cases where \var{DataAnalysisRefID}
+#' are paired with earlier \var{PanelDataArchiveVersion}.
+#'
+#' @inheritParams check_npx
+#'
+#' @keywords internal
+#'
+#' @return A warning message if any invalid combinations are found.
+#'
+check_darid <- function(df, col_names) {
+
+  if(all(c("panel_version", "qc_version") %in% names(col_names))) {
+
+    # Identify invalid panel_version and qc_version combinations
+    invalid_darid <- df |>
+      dplyr::distinct(
+        .data[[col_names$panel_version]],
+        .data[[col_names$qc_version]]
+      ) |>
+      dplyr::collect() |>
+      dplyr::filter(
+        any(stringr::str_detect(
+          .data[[col_names$panel_version]],
+          "D.*0007|D.*0008|D.*0010|D.*0014"
+        )) &&
+          any(sapply(.data[[col_names$qc_version]], function(x) {
+            utils::compareVersion("1.5", x)
+          }) == 1)
+      )
+
+    # Emit a warning if any invalid combinations are found
+    if(nrow(invalid_darid) > 0L) {
+
+      invalid_darid_msg <- paste0(
+        col_names$panel_version, ": ",
+        paste(unique(invalid_darid[[col_names$panel_version]]),
+              collapse = ", "),
+        "; ", col_names$qc_version, ": ",
+        paste(unique(invalid_darid[[col_names$qc_version]]),
+              collapse = ", "),
+        "."
+      )
+
+      cli::cli_warn(
+        c(
+        "Outdated Data Analysis Reference ID and
+        Panel Archive Version combination detected.",
+        "*" = invalid_darid_msg,
+
+        "i" = "Re-export data using Panel Archive Version 1.5.0+ and
+        use the newest version of the Fixed LOD file
+        when calculating LOD (Version 6+).",
+
+        "i" = "Failure to re-export may result in
+        incorrect PC normalization across lots and Fixed LOD
+        calculations."
+        )
+      )
+    }
+  } else {
+    invalid_darid_msg <- character(0L)
+  }
+
+  return(invalid_darid_msg)
+}
+
