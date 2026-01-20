@@ -1291,13 +1291,15 @@ check_darid <- function(df, col_names) {
     ) |>
     dplyr::collect() |>
     dplyr::filter(
-      any(stringr::str_detect(
+      stringr::str_detect(
         .data[[col_names$panel_version]],
-        "D.*0007|D.*0008|D.*0010|D.*0014"
-      )) &&
-        any(sapply(.data[[col_names$qc_version]], function(x) {
-          utils::compareVersion("1.5", x)
-        }) == 1)
+        "D.*(0007|0008|0010|0014)"
+      )
+    ) |>
+    dplyr::filter(
+      sapply(.data[[col_names$qc_version]], function(x) {
+        utils::compareVersion("1.5", x)
+      }) == 1
     )
 
   # Emit a warning if any invalid combinations are found
