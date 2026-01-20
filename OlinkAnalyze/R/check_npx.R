@@ -168,7 +168,7 @@ check_npx <- function(df,
     col_names = check_npx_out_lst$col_names
   )
 
-  # outdated Data Analysis Reference ID and Panel Archive Version combination
+  # check Data Analysis Reference ID and Panel Archive Version combination
   check_npx_out_lst$invalid_darid <- check_darid(
     df = df,
     col_names = check_npx_out_lst$col_names
