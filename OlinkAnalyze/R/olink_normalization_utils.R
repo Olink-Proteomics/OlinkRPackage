@@ -1220,7 +1220,7 @@ olink_norm_input_cross_product <- function(lst_df,
     l_name <- names(product_ids)[!ref_ids == "ref"]
     not_ref_product <- product_ids[ref_ids == "not_ref"] |> unname()
 
-    # Change name for E3072
+    # Change name for not ref product 
     not_ref_oid_rename <- paste0("_", not_ref_product)
 
     l_oid_rename <- paste0(lst_cols[[l_name]]$olink_id, not_ref_oid_rename)
