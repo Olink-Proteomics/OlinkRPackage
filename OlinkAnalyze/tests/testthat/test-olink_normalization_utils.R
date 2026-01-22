@@ -452,7 +452,7 @@ test_that(
 )
 
 test_that(
-  "olink_norm_input_check - works - cross-platform normalization - HT-3k",
+  "olink_norm_input_check - works - cross-platform normalization - HT-E3072",
   {
     skip_if_not_installed("arrow")
     skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
@@ -474,7 +474,7 @@ test_that(
           df2 = data_ht,
           overlapping_samples_df1 = bridge_samples,
           overlapping_samples_df2 = NULL,
-          df1_project_nr = "3K",
+          df1_project_nr = "E3072",
           df2_project_nr = "HT",
           reference_project = "HT",
           reference_medians = NULL
@@ -551,7 +551,7 @@ test_that(
           ),
         not_ref_original_df = data_3k,
         not_ref_samples = NULL,
-        not_ref_name = "3K",
+        not_ref_name = "E3072",
         not_ref_cols = list(sample_id = "SampleID",
                             olink_id = "OlinkID",
                             uniprot = "UniProt",
@@ -570,7 +570,7 @@ test_that(
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product,
         non_overlapping_oid = list("HT" = "OID54321",
-                                   "3K" = "OID12345")
+                                   "E3072" = "OID12345")
       )
     )
 
@@ -578,7 +578,7 @@ test_that(
 )
 
 test_that(
-  "olink_norm_input_check - works - cross-platform normalization - 3k-Reveal",
+  "olink_norm_input_check - works - cross-product normalization - E3072-Reveal",
   {
     skip_if_not_installed("arrow")
     skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
@@ -607,7 +607,7 @@ test_that(
           overlapping_samples_df1 = bridge_samples,
           overlapping_samples_df2 = NULL,
           df1_project_nr = "Reveal",
-          df2_project_nr = "3K",
+          df2_project_nr = "E3072",
           reference_project = "Reveal",
           reference_medians = NULL
         ),
@@ -685,7 +685,7 @@ test_that(
           ),
         not_ref_original_df = data_3k,
         not_ref_samples = NULL,
-        not_ref_name = "3K",
+        not_ref_name = "E3072",
         not_ref_cols = list(sample_id = "SampleID",
                             olink_id = "OlinkID",
                             uniprot = "UniProt",
@@ -704,23 +704,27 @@ test_that(
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product,
         non_overlapping_oid = list(
-          "3K" = c("OID31162", "OID30796", "OID20054", "OID20055", "OID30420",
-                   "OID20059", "OID20791", "OID20051", "OID31159", "OID20057",
-                   "OID31160", "OID31163", "OID31158", "OID20790", "OID20058",
-                   "OID20053", "OID30146", "OID30130", "OID31277", "OID30080",
-                   "OID20435", "OID30471", "OID21188", "OID30877", "OID30067",
-                   "OID21243", "OID30956", "OID21244", "OID30955", "OID20062",
-                   "OID30488", "OID31275", "OID20437", "OID20806", "OID30881",
-                   "OID20492", "OID31351", "OID30161", "OID31173", "OID21162",
-                   "OID20810", "OID31348", "OID30949", "OID31260", "OID31339",
-                   "OID21202", "OID21255", "OID31190", "OID30871", "OID30861",
-                   "OID20803", "OID30166", "OID30121", "OID30792", "OID20432",
-                   "OID30828", "OID20446", "OID21246", "OID30124", "OID30118",
-                   "OID30065", "OID31230", "OID30062", "OID30079", "OID20811",
-                   "OID20865", "OID30850", "OID30980", "OID30165", "OID30466",
-                   "OID21267", "OID30896", "OID30844", "OID31218", "OID31202",
-                   "OID30873", "OID30051", "OID21217", "OID30856", "OID20074",
-                   "OID50330_OID20473", "OID20848", "OID21237", "OID12345"),
+          "E3072" = c("OID31162", "OID30796", "OID20054", "OID20055",
+                      "OID30420", "OID20059", "OID20791", "OID20051",
+                      "OID31159", "OID20057", "OID31160", "OID31163",
+                      "OID31158", "OID20790", "OID20058", "OID20053",
+                      "OID30146", "OID30130", "OID31277", "OID30080",
+                      "OID20435", "OID30471", "OID21188", "OID30877",
+                      "OID30067", "OID21243", "OID30956", "OID21244",
+                      "OID30955", "OID20062", "OID30488", "OID31275",
+                      "OID20437", "OID20806", "OID30881", "OID20492",
+                      "OID31351", "OID30161", "OID31173", "OID21162",
+                      "OID20810", "OID31348", "OID30949", "OID31260",
+                      "OID31339",  "OID21202", "OID21255", "OID31190",
+                      "OID30871", "OID30861", "OID20803", "OID30166",
+                      "OID30121", "OID30792", "OID20432", "OID30828",
+                      "OID20446", "OID21246", "OID30124", "OID30118",
+                      "OID30065", "OID31230", "OID30062", "OID30079",
+                      "OID20811", "OID20865", "OID30850", "OID30980",
+                      "OID30165", "OID30466", "OID21267", "OID30896",
+                      "OID30844", "OID31218", "OID31202", "OID30873",
+                      "OID30051", "OID21217", "OID30856", "OID20074",
+                      "OID50330_OID20473", "OID20848", "OID21237", "OID12345"),
           "Reveal" = c("OID56789")
         )
       )
@@ -3866,7 +3870,7 @@ test_that(
     data_ht <- get_example_data(filename = "example_HT_data.rds")
     data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
 
-    # 3k-HT ----
+    # E3072-HT ----
 
     expect_no_condition(
       object = lst_cross_prod_out_ht <- olink_norm_input_cross_product(
@@ -3935,7 +3939,7 @@ test_that(
       )
     )
 
-    # 3k-Reveal ----
+    # E3072-Reveal ----
 
     expect_no_condition(
       object = lst_cross_prod_out_rev <- olink_norm_input_cross_product(
@@ -4163,16 +4167,16 @@ test_that(
     expect_error(
       object = olink_norm_input_cross_product(
         lst_df = list(
-          "3K" = data_3k,
+          "E3072" = data_3k,
           "T96" = npx_data1
         ),
         lst_cols = list(
-          "3K" = list(panel = "Panel"),
+          "E3072" = list(panel = "Panel"),
           "T96" = list(panel = "Panel")
         ),
-        reference_project = "3K",
-        product_ids = c("3K" = "3k", "T96" = "other"),
-        ref_ids = c("3K" = "ref", "T96" = "not_ref")
+        reference_project = "E3072",
+        product_ids = c("E3072" = "E3072", "T96" = "other"),
+        ref_ids = c("E3072" = "ref", "T96" = "not_ref")
       ),
       regexp = "Unexpected datasets to be bridge normalized!"
     )
@@ -4233,16 +4237,16 @@ test_that(
     expect_error(
       object = olink_norm_input_cross_product(
         lst_df = list(
-          "3K" = data_3k,
+          "E3072" = data_3k,
           "HT" = data_ht
         ),
         lst_cols = list(
-          "3K" = list(panel = "Panel"),
+          "E3072" = list(panel = "Panel"),
           "HT" = list(panel = "Panel")
         ),
-        reference_project = "3K",
-        product_ids = c("3K" = "E3072", "HT" = "HT"),
-        ref_ids = c("3K" = "ref", "HT" = "not_ref")
+        reference_project = "E3072",
+        product_ids = c("E3072" = "E3072", "HT" = "HT"),
+        ref_ids = c("E3072" = "ref", "HT" = "not_ref")
       ),
       regexp = "Incorrect reference project!"
     )
@@ -4250,16 +4254,16 @@ test_that(
     expect_error(
       object = olink_norm_input_cross_product(
         lst_df = list(
-          "3K" = data_3k,
+          "E3072" = data_3k,
           "reveal" = data_reveal
         ),
         lst_cols = list(
-          "3K" = list(panel = "Panel"),
+          "E3072" = list(panel = "Panel"),
           "reveal" = list(panel = "Panel")
         ),
-        reference_project = "3K",
-        product_ids = c("3K" = "E3072", "reveal" = "Reveal"),
-        ref_ids = c("3K" = "ref", "reveal" = "not_ref")
+        reference_project = "E3072",
+        product_ids = c("E3072" = "E3072", "reveal" = "Reveal"),
+        ref_ids = c("E3072" = "ref", "reveal" = "not_ref")
       ),
       regexp = "Incorrect reference project!"
     )
@@ -6961,7 +6965,7 @@ test_that(
       expected = c("p1" = "other", "p2" = "other")
     )
 
-    # T96-3k ----
+    # T96-E3072 ----
 
     expect_identical(
       object = olink_norm_product_id(
@@ -7009,7 +7013,7 @@ test_that(
       expected = c("p1" = "other", "p2" = "Reveal")
     )
 
-    # 3k-3k ----
+    # E3072-E3072 ----
 
     expect_identical(
       object = olink_norm_product_id(
@@ -7025,7 +7029,7 @@ test_that(
       expected = c("p1" = "E3072", "p2" = "E3072")
     )
 
-    # 3k-HT ----
+    # E3072-HT ----
 
     expect_identical(
       object = olink_norm_product_id(
@@ -7041,7 +7045,7 @@ test_that(
       expected = c("p1" = "E3072", "p2" = "HT")
     )
 
-    # 3k-Reveal ----
+    # E3072-Reveal ----
 
     expect_identical(
       object = olink_norm_product_id(
@@ -7139,11 +7143,11 @@ test_that(
       expected = c("p1" = "ref", "p2" = "not_ref")
     )
 
-    # 3k-3k ----
+    # E3072-E3072 ----
 
     expect_identical(
       object = olink_norm_reference_id(
-        lst_product = c("p1" = "3k", "p2" = "3k"),
+        lst_product = c("p1" = "E3072", "p2" = "E3072"),
         reference_project = "p2"
       ),
       expected = c("p1" = "not_ref", "p2" = "ref")
@@ -7169,21 +7173,21 @@ test_that(
       expected = c("p1" = "ref", "p2" = "not_ref")
     )
 
-    # 3k-reveal ----
+    # E3072-reveal ----
 
     expect_identical(
       object = olink_norm_reference_id(
-        lst_product = c("p1" = "3k", "p2" = "Reveal"),
+        lst_product = c("p1" = "E3072", "p2" = "Reveal"),
         reference_project = "p1"
       ),
       expected = c("p1" = "ref", "p2" = "not_ref")
     )
 
-    # 3k-ht ----
+    # E3072-ht ----
 
     expect_identical(
       object = olink_norm_reference_id(
-        lst_product = c("p1" = "3k", "p2" = "HT"),
+        lst_product = c("p1" = "E3072", "p2" = "HT"),
         reference_project = "p2"
       ),
       expected = c("p1" = "not_ref", "p2" = "ref")

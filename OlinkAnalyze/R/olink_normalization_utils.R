@@ -1220,7 +1220,7 @@ olink_norm_input_cross_product <- function(lst_df,
     l_name <- names(product_ids)[!ref_ids == "ref"]
     not_ref_product <- product_ids[ref_ids == "not_ref"] |> unname()
 
-    # Change name for not ref product 
+    # Change name for not ref product
     not_ref_oid_rename <- paste0("_", not_ref_product)
 
     l_oid_rename <- paste0(lst_cols[[l_name]]$olink_id, not_ref_oid_rename)
@@ -1993,7 +1993,7 @@ olink_norm_input_assay_overlap <- function(lst_df,
           "Assay{?s} {.val {unique(unlist(oid_removed))}} not shared across
           input dataset(s):",
           dplyr::pull(oid_combos_miss, .data[["M"]]),
-          "i" = "{cli::qty(unique(unlist(oid_removed)))} Assay{?s} will be
+          "i" = "{length(unique(unlist(oid_removed)))} Assay{?s} will be
           removed from normalization."
         ),
         wrap = FALSE

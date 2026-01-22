@@ -732,6 +732,70 @@ test_that(
       regexp = paste("10 Plate Controls were removed from dataset")
     )
 
+    # cross-product normalization - vanilla - check combined panel column ----
+    # Check that function concatenates panels correctly
+
+    # Get non-overlapping assay data
+    data_ht_3k_v1_no_overlap <- olink_format_oid_no_overlap(
+      lst_check = lst_check_cross_product_v1
+    ) |>
+      suppressMessages()
+
+
+    # Get not bridgeable assay data
+    data_ht_3k_v1_not_bridge <- data_ht_3k_norm_v1 |>
+      dplyr::filter(
+        # keep only assays that are not bridgeable
+        .data[["BridgingRecommendation"]] == "NotBridgeable"
+      ) |>
+      dplyr::mutate(
+        OlinkID = dplyr::if_else(
+          .data[["Project"]] == lst_check_cross_product_v1$ref_name,
+          .data[["OlinkID"]],
+          .data[["OlinkID_E3072"]]
+        )
+      )
+
+    # Combine and set combined OlinkIDs for bridgeable assays
+    data_ht_3k_norm_v1_combo <- data_ht_3k_norm_v1 |>
+      dplyr::filter(BridgingRecommendation %in% c(
+        "MedianCentering", "QuantileSmoothing"
+      )) |>
+      dplyr::bind_rows(
+        data_ht_3k_v1_not_bridge,
+        data_ht_3k_v1_no_overlap
+      ) |>
+      dplyr::mutate(OID_combo = paste0(OlinkID, "_", OlinkID_E3072)) |>
+      dplyr::mutate(OlinkID = ifelse(BridgingRecommendation %in% c(
+        "MedianCentering", "QuantileSmoothing"
+      ), OID_combo, OlinkID))
+
+    # Combined panels for bridgeable OlinkIDs
+    panels_per_oid <- data_ht_3k_norm_v1_combo |>
+      dplyr::mutate(Panel = forcats::fct_relevel(Panel, "Explore_HT")) |>
+      dplyr::group_by(OlinkID) |>
+      dplyr::summarise(Panel = paste(sort(unique(Panel)), collapse = "_")) |>
+      dplyr::select(all_of(c("OlinkID", "Panel"))) |>
+      dplyr::arrange(OlinkID)
+
+
+    # Format function output
+    data_ht_3k_norm_v1_format <- olink_normalization_format(
+      df_norm = data_ht_3k_norm_v1,
+      lst_check = lst_check_cross_product_v1
+    ) |>
+      suppressMessages()
+
+    # Combined panels from format function output
+    panels_format <- data_ht_3k_norm_v1_format |>
+      dplyr::select(all_of(c("OlinkID", "Panel"))) |>
+      dplyr::distinct() |>
+      dplyr::arrange(OlinkID)
+
+
+    expect_identical(as.matrix(panels_per_oid),
+                     as.matrix(panels_format))
+
     # cross-product normalization - remove additional assays from both ----
 
     drop_assays <- eHT_e3072_mapping |>
