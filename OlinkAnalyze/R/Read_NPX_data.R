@@ -863,7 +863,7 @@ check_data_completeness <- function(df){
 check_darid <- function(df){
   if (all(c("PanelDataArchiveVersion", "DataAnalysisRefID") %in% names(df)) &&
       any(stringr::str_detect(df[["DataAnalysisRefID"]],
-                              "D.*0007 || D.*0008 || D.*0010 || D.*0014")) &&
+                              "D.*0007|D.*0008|D.*0010|D.*0014")) &&
       any(sapply(df[["PanelDataArchiveVersion"]], function(x){
         utils::compareVersion("1.5", x)
       }) == 1)){
@@ -882,7 +882,7 @@ check_darid <- function(df){
 
   if(all(c("ExploreVersion", "DataAnalysisRefID") %in% names(df)) &&
      any(stringr::str_detect(df[["DataAnalysisRefID"]],
-                             "D.*0007 || D.*0008 || D.*0010 || D.*0014"))){
+                             "D.*0007|D.*0008|D.*0010|D.*0014"))){
     cli::cli_alert_info(
       paste0("Outdated Data Analysis Reference ID and ",
              "Software Version combination detected."))
