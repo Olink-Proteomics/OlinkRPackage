@@ -295,3 +295,20 @@ test_that("DarIDs & ExploreVersion trigger re-export message", {
   expect_true(any(grepl("Failure to re-export", messages)))
 
 })
+
+test_that("No message: check_darid",{
+  expect_no_message(check_darid(
+    npx_data1 |>
+      dplyr::mutate(DataAnalysisRefID = "D10007") |>
+      dplyr::mutate(PanelDataArchiveVersion = "1.6")
+  ))
+  expect_no_message(check_darid(
+    npx_data1 |>
+      dplyr::mutate(DataAnalysisRefID = "R10007") |>
+      dplyr::mutate(PanelDataArchiveVersion = "1.0")))
+  
+  expect_no_message(check_darid(
+    npx_data1 |>
+      dplyr::mutate(DataAnalysisRefID = "R10007") |>
+      dplyr::mutate(ExploreVersion = "1.0")))
+})
