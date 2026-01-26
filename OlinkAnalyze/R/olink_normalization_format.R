@@ -193,8 +193,8 @@ olink_normalization_format <- function(df_norm,
       dplyr::mutate(
         Panel_order = forcats::fct_relevel(Panel, ref_product_panels[[lst_check$ref_product]])) |> # nolint: line_length_linter
       dplyr::group_by(.data[[oid_col_name]]) |>
-      dplyr::mutate(Panel = paste(sort(unique(Panel_order)), collapse = "_")) |>
-      dplyr::select(-Panel_order)
+      dplyr::mutate(Panel = paste(sort(unique(.data[["Panel_order"]])), collapse = "_")) |>
+      dplyr::select(-.data[["Panel_order"]])
 
 
     # clean up

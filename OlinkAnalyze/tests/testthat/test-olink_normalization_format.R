@@ -732,70 +732,6 @@ test_that(
       regexp = paste("10 Plate Controls were removed from dataset")
     )
 
-    # cross-product normalization - vanilla - check combined panel column ----
-    # Check that function concatenates panels correctly
-
-    # Get non-overlapping assay data
-    data_ht_3k_v1_no_overlap <- olink_format_oid_no_overlap(
-      lst_check = lst_check_cross_product_v1
-    ) |>
-      suppressMessages()
-
-
-    # Get not bridgeable assay data
-    data_ht_3k_v1_not_bridge <- data_ht_3k_norm_v1 |>
-      dplyr::filter(
-        # keep only assays that are not bridgeable
-        .data[["BridgingRecommendation"]] == "NotBridgeable"
-      ) |>
-      dplyr::mutate(
-        OlinkID = dplyr::if_else(
-          .data[["Project"]] == lst_check_cross_product_v1$ref_name,
-          .data[["OlinkID"]],
-          .data[["OlinkID_E3072"]]
-        )
-      )
-
-    # Combine and set combined OlinkIDs for bridgeable assays
-    data_ht_3k_norm_v1_combo <- data_ht_3k_norm_v1 |>
-      dplyr::filter(BridgingRecommendation %in% c(
-        "MedianCentering", "QuantileSmoothing"
-      )) |>
-      dplyr::bind_rows(
-        data_ht_3k_v1_not_bridge,
-        data_ht_3k_v1_no_overlap
-      ) |>
-      dplyr::mutate(OID_combo = paste0(OlinkID, "_", OlinkID_E3072)) |>
-      dplyr::mutate(OlinkID = ifelse(BridgingRecommendation %in% c(
-        "MedianCentering", "QuantileSmoothing"
-      ), OID_combo, OlinkID))
-
-    # Combined panels for bridgeable OlinkIDs
-    panels_per_oid <- data_ht_3k_norm_v1_combo |>
-      dplyr::mutate(Panel = forcats::fct_relevel(Panel, "Explore_HT")) |>
-      dplyr::group_by(OlinkID) |>
-      dplyr::summarise(Panel = paste(sort(unique(Panel)), collapse = "_")) |>
-      dplyr::select(all_of(c("OlinkID", "Panel"))) |>
-      dplyr::arrange(OlinkID)
-
-
-    # Format function output
-    data_ht_3k_norm_v1_format <- olink_normalization_format(
-      df_norm = data_ht_3k_norm_v1,
-      lst_check = lst_check_cross_product_v1
-    ) |>
-      suppressMessages()
-
-    # Combined panels from format function output
-    panels_format <- data_ht_3k_norm_v1_format |>
-      dplyr::select(all_of(c("OlinkID", "Panel"))) |>
-      dplyr::distinct() |>
-      dplyr::arrange(OlinkID)
-
-
-    expect_identical(as.matrix(panels_per_oid),
-                     as.matrix(panels_format))
-
     # cross-product normalization - remove additional assays from both ----
 
     drop_assays <- eHT_e3072_mapping |>
@@ -1979,5 +1915,217 @@ test_that(
           .data[["SampleID"]], .data[["OlinkID"]]
         )
     )
+  }
+)
+
+# cross-product normalization - check combined panel column ----
+
+test_that(
+  "olink_normalization_format - works - HT-E3072 panel concatenation",
+  {
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
+
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
+
+    data_3k_v1 <- data_3k
+    data_ht_v1 <- data_ht
+
+    bridge_samples_crossproduct_v1 <- intersect(
+      x = unique(data_3k_v1$SampleID),
+      y = unique(data_ht_v1$SampleID)
+    ) |>
+      (\(x) x[!grepl("CONTROL", x)])()
+
+    lst_check_cross_product_v1 <- olink_norm_input_check(
+      df1 = data_ht_v1,
+      df2 = data_3k_v1,
+      overlapping_samples_df1 = bridge_samples_crossproduct_v1,
+      overlapping_samples_df2 = NULL,
+      df1_project_nr = "HT",
+      df2_project_nr = "3K",
+      reference_project = "HT",
+      reference_medians = NULL
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    data_ht_3k_norm_v1 <- olink_normalization(
+      df1 = data_ht_v1,
+      df2 = data_3k_v1,
+      overlapping_samples_df1 = bridge_samples_crossproduct_v1,
+      df1_project_nr = "HT",
+      df2_project_nr = "3K",
+      reference_project = "HT",
+      format = FALSE
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # Get non-overlapping assay data
+    data_ht_3k_v1_no_overlap <- olink_format_oid_no_overlap(
+      lst_check = lst_check_cross_product_v1
+    ) |>
+      suppressMessages()
+
+
+    # Get not bridgeable assay data
+    data_ht_3k_v1_not_bridge <- data_ht_3k_norm_v1 |>
+      dplyr::filter(
+        # keep only assays that are not bridgeable
+        .data[["BridgingRecommendation"]] == "NotBridgeable"
+      ) |>
+      dplyr::mutate(
+        OlinkID = dplyr::if_else(
+          .data[["Project"]] == lst_check_cross_product_v1$ref_name,
+          .data[["OlinkID"]],
+          .data[["OlinkID_E3072"]]
+        )
+      )
+
+    # Combine and set combined OlinkIDs for bridgeable assays
+    data_ht_3k_norm_v1_combo <- data_ht_3k_norm_v1 |>
+      dplyr::filter(BridgingRecommendation %in% c(
+        "MedianCentering", "QuantileSmoothing"
+      )) |>
+      dplyr::bind_rows(
+        data_ht_3k_v1_not_bridge,
+        data_ht_3k_v1_no_overlap
+      ) |>
+      dplyr::mutate(OID_combo = paste0(OlinkID, "_", OlinkID_E3072)) |>
+      dplyr::mutate(OlinkID = ifelse(BridgingRecommendation %in% c(
+        "MedianCentering", "QuantileSmoothing"
+      ), OID_combo, OlinkID))
+
+    # Combined panels for bridgeable OlinkIDs
+    panels_per_oid <- data_ht_3k_norm_v1_combo |>
+      dplyr::mutate(Panel = forcats::fct_relevel(Panel, "Explore_HT")) |>
+      dplyr::group_by(OlinkID) |>
+      dplyr::summarise(Panel = paste(sort(unique(Panel)), collapse = "_")) |>
+      dplyr::select(all_of(c("OlinkID", "Panel"))) |>
+      dplyr::arrange(OlinkID)
+
+
+    # Format function output
+    data_ht_3k_norm_v1_format <- olink_normalization_format(
+      df_norm = data_ht_3k_norm_v1,
+      lst_check = lst_check_cross_product_v1
+    ) |>
+      suppressMessages()
+
+    # Combined panels from format function output
+    panels_format <- data_ht_3k_norm_v1_format |>
+      dplyr::select(all_of(c("OlinkID", "Panel"))) |>
+      dplyr::distinct() |>
+      dplyr::arrange(OlinkID)
+
+
+    expect_identical(as.matrix(panels_per_oid),
+                     as.matrix(panels_format))
+  }
+)
+
+test_that(
+  "olink_normalization_format - works - Reveal-E3072 panel concatenation",
+  {
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_Reveal_data.rds")))
+
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
+
+
+    bridge_samples_crossproduct <- intersect(
+      x = unique(data_3k$SampleID),
+      y = unique(data_reveal$SampleID)
+    ) |>
+      (\(x) x[!grepl("CONTROL", x)])()
+
+    lst_check_cross_product <- olink_norm_input_check(
+      df1 = data_reveal,
+      df2 = data_3k,
+      overlapping_samples_df1 = bridge_samples_crossproduct,
+      overlapping_samples_df2 = NULL,
+      df1_project_nr = "Reveal",
+      df2_project_nr = "E3072",
+      reference_project = "Reveal",
+      reference_medians = NULL
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    data_reveal_3k_norm <- olink_normalization(
+      df1 = data_reveal,
+      df2 = data_3k,
+      overlapping_samples_df1 = bridge_samples_crossproduct,
+      df1_project_nr = "Reveal",
+      df2_project_nr = "E3072",
+      reference_project = "Reveal",
+      format = FALSE
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # Get non-overlapping assay data
+    data_reveal_3k_no_overlap <- olink_format_oid_no_overlap(
+      lst_check = lst_check_cross_product
+    ) |>
+      suppressMessages()
+
+
+    # Get not bridgeable assay data
+    data_reveal_3k_not_bridge <- data_reveal_3k_norm |>
+      dplyr::filter(
+        # keep only assays that are not bridgeable
+        .data[["BridgingRecommendation"]] == "NotBridgeable"
+      ) |>
+      dplyr::mutate(
+        OlinkID = dplyr::if_else(
+          .data[["Project"]] == lst_check_cross_product$ref_name,
+          .data[["OlinkID"]],
+          .data[["OlinkID_E3072"]]
+        )
+      )
+
+    # Combine and set combined OlinkIDs for bridgeable assays
+    data_reveal_3k_norm_combo <- data_reveal_3k_norm |>
+      dplyr::filter(BridgingRecommendation %in% c(
+        "MedianCentering", "QuantileSmoothing"
+      )) |>
+      dplyr::bind_rows(
+        data_reveal_3k_not_bridge,
+        data_reveal_3k_no_overlap
+      ) |>
+      dplyr::mutate(OID_combo = paste0(OlinkID, "_", OlinkID_E3072)) |>
+      dplyr::mutate(OlinkID = ifelse(BridgingRecommendation %in% c(
+        "MedianCentering", "QuantileSmoothing"
+      ), OID_combo, OlinkID))
+
+    # Combined panels for bridgeable OlinkIDs
+    panels_per_oid <- data_reveal_3k_norm_combo |>
+      dplyr::mutate(Panel = forcats::fct_relevel(Panel, "Reveal")) |>
+      dplyr::group_by(OlinkID) |>
+      dplyr::summarise(Panel = paste(sort(unique(Panel)), collapse = "_")) |>
+      dplyr::select(all_of(c("OlinkID", "Panel"))) |>
+      dplyr::arrange(OlinkID)
+
+
+    # Format function output
+    data_reveal_3k_norm_format <- olink_normalization_format(
+      df_norm = data_reveal_3k_norm,
+      lst_check = lst_check_cross_product
+    ) |>
+      suppressMessages()
+
+    # Combined panels from format function output
+    panels_format <- data_reveal_3k_norm_format |>
+      dplyr::select(all_of(c("OlinkID", "Panel"))) |>
+      dplyr::distinct() |>
+      dplyr::arrange(OlinkID)
+
+
+    expect_identical(as.matrix(panels_per_oid),
+                     as.matrix(panels_format))
   }
 )
