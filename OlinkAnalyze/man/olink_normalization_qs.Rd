@@ -104,7 +104,7 @@ qs_result <- OlinkAnalyze:::olink_normalization_qs(
  ref_cols = ref_cols,
  not_ref_cols = not_ref_cols,
  bridge_samples = bridge_samples,
- prod_uniq = c("3k","HT")
+ prod_uniq = c("E3072","HT")
 )
 }
 
