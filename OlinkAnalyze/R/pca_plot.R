@@ -10,7 +10,7 @@
 #' The arguments outlierDefX and outlierDefY can be used to identify outliers in the PCA. Samples more than +/- outlierDefX and outlierDefY standard deviations from the mean of the plotted PC will be labelled. Both arguments have to be specified.
 #'
 #' @param df data frame in long format with Sample Id, NPX and column of choice for colors
-#' @param color_g Character value indicating which column to use for colors (default QC_Warning)
+#' @param color_g Character value indicating which column to use for colors (default QC_Warning). Continuous color scale for OSI columns OSITimeToCentrifugation, OSIPreparationTemperature and OSISummary is also supported.
 #' @param x_val Integer indicating which principal component to plot along the x-axis (default 1)
 #' @param y_val Integer indicating which principal component to plot along the y-axis (default 2)
 #' @param label_samples Logical. If TRUE, points are replaced with SampleID (default FALSE)
