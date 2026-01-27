@@ -10,7 +10,7 @@
 #' The arguments outlierDefX and outlierDefY can be used to identify outliers in the PCA. Samples more than +/- outlierDefX and outlierDefY standard deviations from the mean of the plotted PC will be labelled. Both arguments have to be specified.
 #'
 #' @param df data frame in long format with Sample Id, NPX and column of choice for colors
-#' @param color_g Character value indicating which column to use for colors (default QC_Warning)
+#' @param color_g Character value indicating which column to use for colors (default QC_Warning). Continuous color scale for OSI columns OSITimeToCentrifugation, OSIPreparationTemperature and OSISummary is also supported.
 #' @param x_val Integer indicating which principal component to plot along the x-axis (default 1)
 #' @param y_val Integer indicating which principal component to plot along the y-axis (default 2)
 #' @param label_samples Logical. If TRUE, points are replaced with SampleID (default FALSE)
@@ -114,6 +114,124 @@ olink_pca_plot <- function (df,
   # Rename duplicate UniProts
   df <- uniprot_replace(df, npxCheck)
 
+  # Validate OSI category column: must contain only 0,1,2,3,4; then convert to factor if not already
+  osi_cat_candidates <- "OSICategory"
+  osi_cat_found <- intersect(osi_cat_candidates, colnames(df))
+
+  if (length(osi_cat_found) > 0) {
+    cat_col <- osi_cat_found[1]
+
+    v_raw <- df[[cat_col]]
+    v_chr <- if (is.factor(v_raw)) as.character(v_raw) else as.character(v_raw)
+
+    allowed <- as.character(0:4)
+
+    invalid_vals <- unique(v_chr[!is.na(v_chr) & !(v_chr %in% allowed)])
+    if (length(invalid_vals) > 0) {
+      stop(
+        paste0(
+          "Invalid values detected in ", cat_col,
+          ". Expected only 0, 1, 2, 3, or 4. Found: ",
+          paste(invalid_vals, collapse = ", ")
+        )
+      )
+    }
+
+    if (!is.factor(df[[cat_col]])) {
+      df[[cat_col]] <- factor(v_chr, levels = allowed)
+    }
+  }
+
+  # Validate OSI category column: must contain only 0,1,2,3,4; then convert to factor if not already
+  osi_cat_candidates <- "OSICategory"
+  osi_cat_found <- intersect(osi_cat_candidates, colnames(df))
+
+  if (length(osi_cat_found) > 0) {
+    cat_col <- osi_cat_found[1]
+
+    v_raw <- df[[cat_col]]
+
+    # ERROR if column exists but is entirely NA
+    if (all(is.na(v_raw))) {
+      stop(
+        paste0(
+          "All values are NA in ", cat_col,
+          ". Please provide at least one non-missing value."
+        )
+      )
+    }
+
+    v_chr <- if (is.factor(v_raw)) as.character(v_raw) else as.character(v_raw)
+
+    allowed <- as.character(0:4)
+
+    invalid_vals <- unique(v_chr[!is.na(v_chr) & !(v_chr %in% allowed)])
+    if (length(invalid_vals) > 0) {
+      stop(
+        paste0(
+          "Invalid values detected in ", cat_col,
+          ". Expected only 0, 1, 2, 3, or 4. Found: ",
+          paste(invalid_vals, collapse = ", ")
+        )
+      )
+    }
+
+    if (!is.factor(df[[cat_col]])) {
+      df[[cat_col]] <- factor(v_chr, levels = allowed)
+    }
+  }
+
+  # Validate OSI continuous columns: must be numeric and within [0, 1]
+  osi_cont_cols <- c("OSITimeToCentrifugation", "OSIPreparationTemperature", "OSISummary")
+  osi_cont_found <- intersect(osi_cont_cols, colnames(df))
+
+  if (length(osi_cont_found) > 0) {
+    for (cc in osi_cont_found) {
+
+      v_raw <- df[[cc]]
+
+      # ERROR if column exists but is entirely NA
+      if (all(is.na(v_raw))) {
+        stop(
+          paste0(
+            "All values are NA in ", cc,
+            ". Please provide at least one non-missing value."
+          )
+        )
+      }
+
+      v_chr <- if (is.factor(v_raw)) as.character(v_raw) else as.character(v_raw)
+
+      v_num <- suppressWarnings(as.numeric(v_chr))
+
+      # Detect non-numeric entries (introduced NA after coercion)
+      non_numeric_idx <- which(!is.na(v_chr) & is.na(v_num))
+      if (length(non_numeric_idx) > 0) {
+        bad_vals <- unique(v_chr[non_numeric_idx])
+        stop(
+          paste0(
+            "Invalid values detected in ", cc,
+            ". Expected continuous numeric values between 0 and 1. ",
+            "Found non-numeric value(s): ", paste(bad_vals, collapse = ", ")
+          )
+        )
+      }
+
+      # Detect out-of-range values
+      out_of_range_idx <- which(!is.na(v_num) & (v_num < 0 | v_num > 1))
+      if (length(out_of_range_idx) > 0) {
+        bad_vals <- unique(v_num[out_of_range_idx])
+        stop(
+          paste0(
+            "Invalid values detected in ", cc,
+            ". Expected continuous numeric values between 0 and 1. ",
+            "Found out-of-range value(s): ", paste(bad_vals, collapse = ", ")
+          )
+        )
+      }
+    }
+  }
+
   # Stop if duplicate sample ID's detected
   if (length(npxCheck$duplicate_samples) > 0) {
     stop("Duplicate SampleID(s) detected: ", paste(npxCheck$duplicate_samples, collapse = ", "),". Each sample ID must be unique. Please check your data and ensure that each sample has a unique identifier.")
@@ -139,10 +257,14 @@ olink_pca_plot <- function (df,
   }
 
   if(byPanel){
-    # Convert color_g variable to factor
-    if(!is.factor(df[[paste(color_g)]])){
-      df[[paste(color_g)]] <- as.factor(df[[paste(color_g)]])
+    # Convert color_g variable to factor (but keep OSI columns continuous)
+    osi_cols <- c("OSITimeToCentrifugation", "OSIPreparationTemperature", "OSISummary")
+    if(!(color_g %in% osi_cols)){
+      if(!is.factor(df[[paste(color_g)]])){
+        df[[paste(color_g)]] <- as.factor(df[[paste(color_g)]])
+      }
     }
+
     df <- df |>
       dplyr::mutate(Panel = Panel |> stringr::str_replace("Olink ", "")) #Strip "Olink" from the panel names
 
@@ -283,6 +405,14 @@ olink_pca_plot.internal <- function(df,
                                     verbose = TRUE,
                                     ...) {
 
+  # Ensure one unique color value per SampleID (required by npxProcessing_forDimRed)
+  df <- df |>
+    dplyr::group_by(SampleID) |>
+    dplyr::mutate(
+      !!rlang::sym(color_g) := dplyr::first(stats::na.omit(.data[[color_g]]))
+    ) |>
+    dplyr::ungroup()
+
   #Data pre-processing
   procData <- npxProcessing_forDimRed(df = df,
                                       color_g = color_g,
@@ -379,6 +509,23 @@ olink_pca_plot.internal <- function(df,
 
   }
 
+  # Continuous color scale for OSI columns
+  osi_cols <- c("OSITimeToCentrifugation", "OSIPreparationTemperature", "OSISummary")
+  if(color_g %in% osi_cols){
+
+    # Ensure numeric for continuous scale (handles character/factor inputs)
+    if(is.factor(scores$colors)) scores$colors <- as.character(scores$colors)
+    scores$colors <- suppressWarnings(as.numeric(scores$colors))
+
+    pca_plot <- pca_plot +
+      ggplot2::scale_color_gradient(
+        low = "#FFB200FF",
+        high = "#332D56FF",
+        limits = c(0L, 1L),
+        breaks = seq(from = 0L, to = 1L, by = 0.25),
+        oob = scales::squish
+      )
+  }
 
   #Drawing loadings
 
@@ -459,14 +606,16 @@ olink_pca_plot.internal <- function(df,
                           color = 'grey')
   }
 
-
-
   pca_plot <- pca_plot +
-    OlinkAnalyze::set_plot_theme() +
-    OlinkAnalyze::olink_color_discrete(...,drop=FALSE)
+    OlinkAnalyze::set_plot_theme()
+
+  osi_cols <- c("OSITimeToCentrifugation", "OSIPreparationTemperature", "OSISummary")
+  if(!(color_g %in% osi_cols)){
+    pca_plot <- pca_plot +
+      OlinkAnalyze::olink_color_discrete(...,drop=FALSE)
+  }
 
   return(pca_plot)
-
 
 }
 
