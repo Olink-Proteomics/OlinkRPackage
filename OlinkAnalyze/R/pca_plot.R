@@ -143,7 +143,7 @@ olink_pca_plot <- function (df,
   }
 
   # Validate OSI category column: must contain only 0,1,2,3,4; then convert to factor if not already
-  osi_cat_candidates <- c("OSICategory", "OSI_Category", "OSI_category", "OSIcategory")
+  osi_cat_candidates <- "OSICategory"
   osi_cat_found <- intersect(osi_cat_candidates, colnames(df))
 
   if (length(osi_cat_found) > 0) {
