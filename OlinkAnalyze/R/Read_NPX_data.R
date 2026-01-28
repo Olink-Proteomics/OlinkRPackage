@@ -280,8 +280,29 @@ read_NPX_explore <- function(filename) {
                             "PanelDataArchiveVersion",
                             "PreProcessingVersion",
                             "PreProcessingSoftware",
-                            "InstrumentType")
-
+                            "InstrumentType"),
+    "header_npx_map_2" = c(header_base,
+                            "SampleType",
+                            "WellID",
+                            "DataAnalysisRefID",
+                            "AssayType",
+                            "Block",
+                            "Count",
+                            "ExtNPX",
+                            "Normalization",
+                            "PCNormalizedNPX",
+                            "AssayQC",
+                            "SampleQC",
+                            "SoftwareVersion",
+                            "SoftwareName",
+                            "PanelDataArchiveVersion",
+                            "PreProcessingVersion",
+                            "PreProcessingSoftware",
+                            "InstrumentType",
+                            "OSICategory",
+                            "OSISummary",
+                            "OSITimeToCentrifugation",
+                            "OSIPreparationTemperature")
   )
 
   header_match <-  header_v %>%
@@ -842,7 +863,7 @@ check_data_completeness <- function(df){
 check_darid <- function(df){
   if (all(c("PanelDataArchiveVersion", "DataAnalysisRefID") %in% names(df)) &&
       any(stringr::str_detect(df[["DataAnalysisRefID"]],
-                              "D.*0007 || D.*0008 || D.*0010 || D.*0014")) &&
+                              "D.*0007|D.*0008|D.*0010|D.*0014")) &&
       any(sapply(df[["PanelDataArchiveVersion"]], function(x){
         utils::compareVersion("1.5", x)
       }) == 1)){
@@ -861,7 +882,7 @@ check_darid <- function(df){
 
   if(all(c("ExploreVersion", "DataAnalysisRefID") %in% names(df)) &&
      any(stringr::str_detect(df[["DataAnalysisRefID"]],
-                             "D.*0007 || D.*0008 || D.*0010 || D.*0014"))){
+                             "D.*0007|D.*0008|D.*0010|D.*0014"))){
     cli::cli_alert_info(
       paste0("Outdated Data Analysis Reference ID and ",
              "Software Version combination detected."))

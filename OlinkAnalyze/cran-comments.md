@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release adds additional functionality to 4.3.2 (cross product bridging Olink Explore HT and Olink Reveal) along with minor bug fixes.
+This release adds additional functionality to 4.4.0 including updates to support the new version of the ordinal package (fixing failing CRAN checks).
 
 ## R CMD check results
 

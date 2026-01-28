@@ -241,7 +241,7 @@ olink_ordinalRegression <- function(df,
       dplyr::do(generics::tidy(stats::anova(ordinal::clm(as.formula(formula_string),
                                                        data=.,
                                                        threshold = "flexible"
-                                                  ),type=3))) %>%
+                                                  ),type="marginal"))) %>%
       dplyr::ungroup() %>%
       dplyr::filter(!term %in% c('(Intercept)','Residuals')) %>%
       dplyr::mutate(covariates = term %in% covariate_filter_string) %>%

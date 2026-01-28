@@ -33,6 +33,7 @@ test_that(
       object = lst_check_out,
       expected = list(
         ref_df = npx_data1,
+        ref_original_df = npx_data1,
         ref_samples = bridge_samples,
         ref_name = "20200001",
         ref_cols = list(sample_id = "SampleID",
@@ -51,6 +52,7 @@ test_that(
                         sample_type = character(0L)),
         ref_product = "other",
         not_ref_df = npx_data2,
+        not_ref_original_df = npx_data2,
         not_ref_samples = NULL,
         not_ref_name = "20200002",
         not_ref_cols = list(sample_id = "SampleID",
@@ -69,7 +71,8 @@ test_that(
                             sample_type = character(0L)),
         not_ref_product = "other",
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$bridge
+        norm_mode = olink_norm_modes$bridge,
+        non_overlapping_oid = NULL
       )
     )
 
@@ -106,6 +109,10 @@ test_that(
           dplyr::mutate(
             Normalization = "Intensity"
           ),
+        ref_original_df = npx_data2 |>
+          dplyr::mutate(
+            Normalization = "Intensity"
+          ),
         ref_samples = bridge_samples,
         ref_name = "20200002",
         ref_cols = list(sample_id = "SampleID",
@@ -127,6 +134,10 @@ test_that(
           dplyr::mutate(
             Normalization = "Intensity"
           ),
+        not_ref_original_df = npx_data1 |>
+          dplyr::mutate(
+            Normalization = "Intensity"
+          ),
         not_ref_samples = NULL,
         not_ref_name = "20200001",
         not_ref_cols = list(sample_id = "SampleID",
@@ -145,7 +156,105 @@ test_that(
                             sample_type = character(0L)),
         not_ref_product = "other",
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$bridge
+        norm_mode = olink_norm_modes$bridge,
+        non_overlapping_oid = NULL
+      )
+    )
+
+    # with non-overlapping OlinkIDs ----
+
+    bridge_samples <- intersect(x = npx_data1$SampleID,
+                                y = npx_data2$SampleID) |>
+      (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x)])()
+
+    expect_message(
+      expect_warning(
+        object = lst_check_out <- olink_norm_input_check(
+          df1 = npx_data1 |>
+            dplyr::mutate(
+              Normalization = "Intensity"
+            ) |>
+            dplyr::mutate(OlinkID = ifelse(.data[["OlinkID"]] == "OID01216",
+                                           "OID00000",
+                                           .data[["OlinkID"]])),
+          df2 = npx_data2 |>
+            dplyr::mutate(
+              Normalization = "Intensity"
+            ),
+          overlapping_samples_df1 = bridge_samples,
+          overlapping_samples_df2 = NULL,
+          df1_project_nr = "20200001",
+          df2_project_nr = "20200002",
+          reference_project = "20200002",
+          reference_medians = NULL
+        ),
+        regexp = "*not shared across input dataset(s)*"
+      ),
+      regexp = "Bridge normalization will be performed!"
+    )
+
+    expect_identical(
+      object = lst_check_out,
+      expected = list(
+        ref_df = npx_data2 |>
+          dplyr::mutate(
+            Normalization = "Intensity"
+          ) |>
+          dplyr::filter(!(.data[["OlinkID"]] == "OID01216")), # rm changed assay
+        ref_original_df = npx_data2 |>
+          dplyr::mutate(
+            Normalization = "Intensity"
+          ),
+        ref_samples = bridge_samples,
+        ref_name = "20200002",
+        ref_cols = list(sample_id = "SampleID",
+                        olink_id = "OlinkID",
+                        uniprot = "UniProt",
+                        assay = "Assay",
+                        panel = "Panel",
+                        panel_version = "Panel_Version",
+                        plate_id = "PlateID",
+                        qc_warn = "QC_Warning",
+                        assay_warn = character(0L),
+                        quant = "NPX",
+                        lod = "LOD",
+                        normalization = "Normalization",
+                        count = character(0L),
+                        sample_type = character(0L)),
+        ref_product = "other",
+        not_ref_df = npx_data1 |>
+          dplyr::mutate(
+            Normalization = "Intensity"
+          ) |>
+          dplyr::filter(!(.data[["OlinkID"]] == "OID01216")), # rm changed assay
+        not_ref_original_df = npx_data1 |>
+          dplyr::mutate(
+            Normalization = "Intensity"
+          ) |>
+          dplyr::mutate(OlinkID = ifelse(.data[["OlinkID"]] == "OID01216",
+                                         "OID00000",
+                                         .data[["OlinkID"]])),
+        not_ref_samples = NULL,
+        not_ref_name = "20200001",
+        not_ref_cols = list(sample_id = "SampleID",
+                            olink_id = "OlinkID",
+                            uniprot = "UniProt",
+                            assay = "Assay",
+                            panel = "Panel",
+                            panel_version = "Panel_Version",
+                            plate_id = "PlateID",
+                            qc_warn = "QC_Warning",
+                            assay_warn = character(0L),
+                            quant = "NPX",
+                            lod = "LOD",
+                            normalization = "Normalization",
+                            count = character(0L),
+                            sample_type = character(0L)),
+        not_ref_product = "other",
+        reference_medians = NULL,
+        norm_mode = olink_norm_modes$bridge,
+        non_overlapping_oid = list("20200002" = "OID01216",
+                                   "20200001" = "OID00000")
       )
     )
 
@@ -191,6 +300,11 @@ test_that(
             Normalization = "Intensity",
             Quantified_value = .data[["NPX"]]
           ),
+        ref_original_df = npx_data2 |>
+          dplyr::mutate(
+            Normalization = "Intensity",
+            Quantified_value = .data[["NPX"]]
+          ),
         ref_samples = bridge_samples,
         ref_name = "20200002",
         ref_cols = list(sample_id = "SampleID",
@@ -213,6 +327,11 @@ test_that(
             Normalization = "Intensity",
             Ct = .data[["NPX"]]
           ),
+        not_ref_original_df = npx_data1 |>
+          dplyr::mutate(
+            Normalization = "Intensity",
+            Ct = .data[["NPX"]]
+          ),
         not_ref_samples = NULL,
         not_ref_name = "20200001",
         not_ref_cols = list(sample_id = "SampleID",
@@ -231,7 +350,8 @@ test_that(
                             sample_type = character(0L)),
         not_ref_product = "other",
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$bridge
+        norm_mode = olink_norm_modes$bridge,
+        non_overlapping_oid = NULL
       )
     )
 
@@ -274,6 +394,11 @@ test_that(
             Normalization = "Intensity",
             Quantified_value = .data[["NPX"]]
           ),
+        ref_original_df = npx_data2 |>
+          dplyr::mutate(
+            Normalization = "Intensity",
+            Quantified_value = .data[["NPX"]]
+          ),
         ref_samples = bridge_samples,
         ref_name = "20200002",
         ref_cols = list(sample_id = "SampleID",
@@ -296,6 +421,11 @@ test_that(
             Normalization = "Intensity",
             Quantified_value = .data[["NPX"]]
           ),
+        not_ref_original_df = npx_data1 |>
+          dplyr::mutate(
+            Normalization = "Intensity",
+            Quantified_value = .data[["NPX"]]
+          ),
         not_ref_samples = NULL,
         not_ref_name = "20200001",
         not_ref_cols = list(sample_id = "SampleID",
@@ -314,29 +444,22 @@ test_that(
                             sample_type = character(0L)),
         not_ref_product = "other",
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$bridge
+        norm_mode = olink_norm_modes$bridge,
+        non_overlapping_oid = NULL
       )
     )
   }
 )
 
 test_that(
-  "olink_norm_input_check - works - cross-platform normalization",
+  "olink_norm_input_check - works - cross-platform normalization - HT-E3072",
   {
     skip_if_not_installed("arrow")
     skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
     skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
-    skip_if_not(file.exists(test_path("data", "example_Reveal_data.rds")))
 
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
-    data_reveal <- get_example_data(filename = "example_Reveal_data.rds") |>
-      # Set unique OlinkID for TEST_Reveal assay
-      dplyr::mutate(OlinkID = ifelse(.data[["Assay"]] == "TEST_Reveal",
-                                     "OID56789",
-                                     OlinkID))
-
-    # 3k-HT normalization ----
 
     bridge_samples <- intersect(x = data_3k$SampleID,
                                 y = data_ht$SampleID) |>
@@ -351,7 +474,7 @@ test_that(
           df2 = data_ht,
           overlapping_samples_df1 = bridge_samples,
           overlapping_samples_df2 = NULL,
-          df1_project_nr = "3K",
+          df1_project_nr = "E3072",
           df2_project_nr = "HT",
           reference_project = "HT",
           reference_medians = NULL
@@ -386,6 +509,7 @@ test_that(
           dplyr::filter(
             .data[["OlinkID_HT"]] != .data[["OlinkID"]]
           ),
+        ref_original_df = data_ht,
         ref_samples = bridge_samples,
         ref_name = "HT",
         ref_cols = list(sample_id = "SampleID",
@@ -425,8 +549,9 @@ test_that(
           dplyr::filter(
             .data[["OlinkID_E3072"]] != .data[["OlinkID"]]
           ),
+        not_ref_original_df = data_3k,
         not_ref_samples = NULL,
-        not_ref_name = "3K",
+        not_ref_name = "E3072",
         not_ref_cols = list(sample_id = "SampleID",
                             olink_id = "OlinkID",
                             uniprot = "UniProt",
@@ -441,13 +566,30 @@ test_that(
                             normalization = "Normalization",
                             count = "Count",
                             sample_type = "SampleType"),
-        not_ref_product = "3k",
+        not_ref_product = "E3072",
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$norm_cross_product
+        norm_mode = olink_norm_modes$norm_cross_product,
+        non_overlapping_oid = list("HT" = "OID54321",
+                                   "E3072" = "OID12345")
       )
     )
 
-    # 3k-Reveal normalization ----
+  }
+)
+
+test_that(
+  "olink_norm_input_check - works - cross-product normalization - E3072-Reveal",
+  {
+    skip_if_not_installed("arrow")
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_Reveal_data.rds")))
+
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_reveal <- get_example_data(filename = "example_Reveal_data.rds") |>
+      # Set unique OlinkID for TEST_Reveal assay
+      dplyr::mutate(OlinkID = ifelse(.data[["Assay"]] == "TEST_Reveal",
+                                     "OID56789",
+                                     OlinkID))
 
     bridge_samples <- intersect(
       x = unique(data_reveal$SampleID),
@@ -465,7 +607,7 @@ test_that(
           overlapping_samples_df1 = bridge_samples,
           overlapping_samples_df2 = NULL,
           df1_project_nr = "Reveal",
-          df2_project_nr = "3K",
+          df2_project_nr = "E3072",
           reference_project = "Reveal",
           reference_medians = NULL
         ),
@@ -499,6 +641,7 @@ test_that(
           dplyr::filter(
             .data[["OlinkID_Reveal"]] != .data[["OlinkID"]]
           ),
+        ref_original_df = data_reveal,
         ref_samples = bridge_samples,
         ref_name = "Reveal",
         ref_cols = list(sample_id = "SampleID",
@@ -540,8 +683,9 @@ test_that(
               # Rm assay found in mapping file but not in Reveal dataset
               .data[["OlinkID_E3072"]] != "OID20473"
           ),
+        not_ref_original_df = data_3k,
         not_ref_samples = NULL,
-        not_ref_name = "3K",
+        not_ref_name = "E3072",
         not_ref_cols = list(sample_id = "SampleID",
                             olink_id = "OlinkID",
                             uniprot = "UniProt",
@@ -556,13 +700,52 @@ test_that(
                             normalization = "Normalization",
                             count = "Count",
                             sample_type = "SampleType"),
-        not_ref_product = "3k",
+        not_ref_product = "E3072",
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$norm_cross_product
+        norm_mode = olink_norm_modes$norm_cross_product,
+        non_overlapping_oid = list(
+          "E3072" = c("OID31162", "OID30796", "OID20054", "OID20055",
+                      "OID30420", "OID20059", "OID20791", "OID20051",
+                      "OID31159", "OID20057", "OID31160", "OID31163",
+                      "OID31158", "OID20790", "OID20058", "OID20053",
+                      "OID30146", "OID30130", "OID31277", "OID30080",
+                      "OID20435", "OID30471", "OID21188", "OID30877",
+                      "OID30067", "OID21243", "OID30956", "OID21244",
+                      "OID30955", "OID20062", "OID30488", "OID31275",
+                      "OID20437", "OID20806", "OID30881", "OID20492",
+                      "OID31351", "OID30161", "OID31173", "OID21162",
+                      "OID20810", "OID31348", "OID30949", "OID31260",
+                      "OID31339",  "OID21202", "OID21255", "OID31190",
+                      "OID30871", "OID30861", "OID20803", "OID30166",
+                      "OID30121", "OID30792", "OID20432", "OID30828",
+                      "OID20446", "OID21246", "OID30124", "OID30118",
+                      "OID30065", "OID31230", "OID30062", "OID30079",
+                      "OID20811", "OID20865", "OID30850", "OID30980",
+                      "OID30165", "OID30466", "OID21267", "OID30896",
+                      "OID30844", "OID31218", "OID31202", "OID30873",
+                      "OID30051", "OID21217", "OID30856", "OID20074",
+                      "OID50330_OID20473", "OID20848", "OID21237", "OID12345"),
+          "Reveal" = c("OID56789")
+        )
       )
     )
 
-    # Reveal-HT normalization ----
+  }
+)
+
+test_that(
+  "olink_norm_input_check - works - cross-platform normalization - HT-Reveal",
+  {
+    skip_if_not_installed("arrow")
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_Reveal_data.rds")))
+
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
+    data_reveal <- get_example_data(filename = "example_Reveal_data.rds") |>
+      # Set unique OlinkID for TEST_Reveal assay
+      dplyr::mutate(OlinkID = ifelse(.data[["Assay"]] == "TEST_Reveal",
+                                     "OID56789",
+                                     OlinkID))
 
     bridge_samples <- intersect(x = data_reveal$SampleID,
                                 y = data_ht$SampleID) |>
@@ -570,9 +753,11 @@ test_that(
       sort() |>
       head(32L)
 
+    # HT-Reveal normalization - HT is ref ----
+
     expect_message(
       expect_warning(
-        object = lst_check_out <- olink_norm_input_check(
+        object = lst_check_out_ht_reveal <- olink_norm_input_check(
           df1 = data_reveal,
           df2 = data_ht,
           overlapping_samples_df1 = bridge_samples,
@@ -588,7 +773,7 @@ test_that(
     )
 
     expect_identical(
-      object = lst_check_out,
+      object = lst_check_out_ht_reveal,
       expected = list(
         ref_df = data_ht |>
           dplyr::rename(
@@ -614,6 +799,7 @@ test_that(
               # Rm assays found in mapping file but not in Reveal dataset
               !(.data[["OlinkID_HT"]] %in% c("OID42114", "OID43204"))
           ),
+        ref_original_df = data_ht,
         ref_samples = bridge_samples,
         ref_name = "HT",
         ref_cols = list(sample_id = "SampleID",
@@ -653,6 +839,7 @@ test_that(
           dplyr::filter(
             .data[["OlinkID_Reveal"]] != .data[["OlinkID"]]
           ),
+        not_ref_original_df = data_reveal,
         not_ref_samples = NULL,
         not_ref_name = "Reveal",
         not_ref_cols = list(sample_id = "SampleID",
@@ -671,22 +858,36 @@ test_that(
                             sample_type = "SampleType"),
         not_ref_product = "Reveal",
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$norm_cross_product
+        norm_mode = olink_norm_modes$norm_cross_product,
+        non_overlapping_oid = list(
+          "HT" = c("OID40835", "OID40981", "OID41012", "OID41054", "OID41077",
+                   "OID41129", "OID41215", "OID41296", "OID41349", "OID41470",
+                   "OID41486", "OID41550", "OID41591", "OID41786", "OID41922",
+                   "OID42011", "OID42080", "OID42081", "OID42083", "OID42085",
+                   "OID42087", "OID42090", "OID42091", "OID42093", "OID42095",
+                   "OID42098", "OID42099", "OID42103", "OID42104", "OID42105",
+                   "OID42106", "OID42109", "OID42111", "OID42112", "OID42113",
+                   "OID50095_OID42114", "OID42115", "OID42116", "OID42117",
+                   "OID42121", "OID42125", "OID42129", "OID42130", "OID42131",
+                   "OID42132", "OID42133", "OID42135", "OID42136", "OID42137",
+                   "OID42139", "OID42140", "OID42141", "OID42142", "OID42144",
+                   "OID42145", "OID42146", "OID42147", "OID42153", "OID42154",
+                   "OID42155", "OID42156", "OID42157", "OID42158", "OID42159",
+                   "OID42161", "OID42164", "OID42165", "OID42166", "OID42167",
+                   "OID42168", "OID42172", "OID42174", "OID42176", "OID42178",
+                   "OID42180", "OID42182", "OID42183", "OID42186", "OID42187",
+                   "OID50330_OID43204", "OID54321"),
+          "Reveal" = c("OID56789")
+        )
       )
     )
 
 
-    # HT-Reveal normalization ----
-
-    bridge_samples <- intersect(x = data_reveal$SampleID,
-                                y = data_ht$SampleID) |>
-      (\(x) x[!grepl(pattern = "CONTROL", x = x)])() |>
-      sort() |>
-      head(32L)
+    # HT-Reveal normalization - Reveal is ref ----
 
     expect_message(
       expect_warning(
-        object = lst_check_out <- olink_norm_input_check(
+        object = lst_check_out_reveal_ht <- olink_norm_input_check(
           df1 = data_reveal,
           df2 = data_ht,
           overlapping_samples_df1 = bridge_samples,
@@ -702,7 +903,7 @@ test_that(
     )
 
     expect_identical(
-      object = lst_check_out,
+      object = lst_check_out_reveal_ht,
       expected = list(
         ref_df = data_reveal |>
           dplyr::rename(
@@ -726,6 +927,7 @@ test_that(
           dplyr::filter(
             .data[["OlinkID_Reveal"]] != .data[["OlinkID"]]
           ),
+        ref_original_df = data_reveal,
         ref_samples = bridge_samples,
         ref_name = "Reveal",
         ref_cols = list(sample_id = "SampleID",
@@ -767,6 +969,7 @@ test_that(
               # Rm assays found in mapping file but not in Reveal dataset
               !(.data[["OlinkID_HT"]] %in% c("OID42114", "OID43204"))
           ),
+        not_ref_original_df = data_ht,
         not_ref_samples = NULL,
         not_ref_name = "HT",
         not_ref_cols = list(sample_id = "SampleID",
@@ -785,7 +988,27 @@ test_that(
                             sample_type = "SampleType"),
         not_ref_product = "HT",
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$norm_cross_product
+        norm_mode = olink_norm_modes$norm_cross_product,
+        non_overlapping_oid = list(
+          "HT" = c("OID40835", "OID40981", "OID41012", "OID41054", "OID41077",
+                   "OID41129", "OID41215", "OID41296", "OID41349", "OID41470",
+                   "OID41486", "OID41550", "OID41591", "OID41786", "OID41922",
+                   "OID42011", "OID42080", "OID42081", "OID42083", "OID42085",
+                   "OID42087", "OID42090", "OID42091", "OID42093", "OID42095",
+                   "OID42098", "OID42099", "OID42103", "OID42104", "OID42105",
+                   "OID42106", "OID42109", "OID42111", "OID42112", "OID42113",
+                   "OID50095_OID42114", "OID42115", "OID42116", "OID42117",
+                   "OID42121", "OID42125", "OID42129", "OID42130", "OID42131",
+                   "OID42132", "OID42133", "OID42135", "OID42136", "OID42137",
+                   "OID42139", "OID42140", "OID42141", "OID42142", "OID42144",
+                   "OID42145", "OID42146", "OID42147", "OID42153", "OID42154",
+                   "OID42155", "OID42156", "OID42157", "OID42158", "OID42159",
+                   "OID42161", "OID42164", "OID42165", "OID42166", "OID42167",
+                   "OID42168", "OID42172", "OID42174", "OID42176", "OID42178",
+                   "OID42180", "OID42182", "OID42183", "OID42186", "OID42187",
+                   "OID50330_OID43204", "OID54321"),
+          "Reveal" = c("OID56789")
+        )
       )
     )
 
@@ -821,6 +1044,7 @@ test_that(
       object = lst_check_out,
       expected = list(
         ref_df = npx_data1,
+        ref_original_df = npx_data1,
         ref_samples = unique(npx_data1$SampleID),
         ref_name = "20200001",
         ref_cols = list(sample_id = "SampleID",
@@ -839,6 +1063,7 @@ test_that(
                         sample_type = character(0L)),
         ref_product = NULL,
         not_ref_df = npx_data2,
+        not_ref_original_df = npx_data2,
         not_ref_samples = unique(npx_data2$SampleID),
         not_ref_name = "20200002",
         not_ref_cols = list(sample_id = "SampleID",
@@ -857,7 +1082,8 @@ test_that(
                             sample_type = character(0L)),
         not_ref_product = NULL,
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$subset
+        norm_mode = olink_norm_modes$subset,
+        non_overlapping_oid = NULL
       )
     )
 
@@ -890,6 +1116,10 @@ test_that(
           dplyr::mutate(
             Normalization = "Intensity"
           ),
+        ref_original_df = npx_data2 |>
+          dplyr::mutate(
+            Normalization = "Intensity"
+          ),
         ref_samples = unique(npx_data2$SampleID),
         ref_name = "20200002",
         ref_cols = list(sample_id = "SampleID",
@@ -911,6 +1141,10 @@ test_that(
           dplyr::mutate(
             Normalization = "Intensity"
           ),
+        not_ref_original_df = npx_data1 |>
+          dplyr::mutate(
+            Normalization = "Intensity"
+          ),
         not_ref_samples = unique(npx_data1$SampleID),
         not_ref_name = "20200001",
         not_ref_cols = list(sample_id = "SampleID",
@@ -929,7 +1163,8 @@ test_that(
                             sample_type = character(0L)),
         not_ref_product = NULL,
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$subset
+        norm_mode = olink_norm_modes$subset,
+        non_overlapping_oid = NULL
       )
     )
   }
@@ -969,6 +1204,7 @@ test_that(
       object = lst_check_out,
       expected = list(
         ref_df = npx_data1,
+        ref_original_df = npx_data1,
         ref_samples = unique(npx_data1$SampleID),
         ref_name = "20200001",
         ref_cols = list(sample_id = "SampleID",
@@ -987,6 +1223,7 @@ test_that(
                         sample_type = character(0L)),
         ref_product = NULL,
         not_ref_df = npx_data2,
+        not_ref_original_df = npx_data2,
         not_ref_samples = npx_df2_samples,
         not_ref_name = "20200002",
         not_ref_cols = list(sample_id = "SampleID",
@@ -1005,7 +1242,8 @@ test_that(
                             sample_type = character(0L)),
         not_ref_product = NULL,
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$subset
+        norm_mode = olink_norm_modes$subset,
+        non_overlapping_oid = NULL
       )
     )
 
@@ -1038,6 +1276,10 @@ test_that(
           dplyr::mutate(
             Normalization = "Intensity"
           ),
+        ref_original_df = npx_data2 |>
+          dplyr::mutate(
+            Normalization = "Intensity"
+          ),
         ref_samples = npx_df2_samples,
         ref_name = "20200002",
         ref_cols = list(sample_id = "SampleID",
@@ -1059,6 +1301,10 @@ test_that(
           dplyr::mutate(
             Normalization = "Intensity"
           ),
+        not_ref_original_df = npx_data1 |>
+          dplyr::mutate(
+            Normalization = "Intensity"
+          ),
         not_ref_samples = unique(npx_data1$SampleID),
         not_ref_name = "20200001",
         not_ref_cols = list(sample_id = "SampleID",
@@ -1077,7 +1323,8 @@ test_that(
                             sample_type = character(0L)),
         not_ref_product = NULL,
         reference_medians = NULL,
-        norm_mode = olink_norm_modes$subset
+        norm_mode = olink_norm_modes$subset,
+        non_overlapping_oid = NULL
       )
     )
   }
@@ -1128,6 +1375,7 @@ test_that(
       object = lst_check_out,
       expected = list(
         ref_df = npx_data1,
+        ref_original_df = npx_data1,
         ref_samples = npx_df1_samples,
         ref_name = "20200001",
         ref_cols = list(sample_id = "SampleID",
@@ -1146,12 +1394,14 @@ test_that(
                         sample_type = character(0L)),
         ref_product = NULL,
         not_ref_df = NULL,
+        not_ref_original_df = NULL,
         not_ref_samples = NULL,
         not_ref_name = NULL,
         not_ref_cols = NULL,
         not_ref_product = NULL,
         reference_medians = ref_median_df,
-        norm_mode = olink_norm_modes$ref_median
+        norm_mode = olink_norm_modes$ref_median,
+        non_overlapping_oid = NULL
       )
     )
 
@@ -1185,6 +1435,10 @@ test_that(
           dplyr::mutate(
             Normalization = "Plate control"
           ),
+        ref_original_df = npx_data1 |>
+          dplyr::mutate(
+            Normalization = "Plate control"
+          ),
         ref_samples = npx_df1_samples,
         ref_name = "20200001",
         ref_cols = list(sample_id = "SampleID",
@@ -1203,12 +1457,14 @@ test_that(
                         sample_type = character(0L)),
         ref_product = NULL,
         not_ref_df = NULL,
+        not_ref_original_df = NULL,
         not_ref_samples = NULL,
         not_ref_name = NULL,
         not_ref_cols = NULL,
         not_ref_product = NULL,
         reference_medians = ref_median_df,
-        norm_mode = olink_norm_modes$ref_median
+        norm_mode = olink_norm_modes$ref_median,
+        non_overlapping_oid = NULL
       )
     )
   }
@@ -3496,7 +3752,7 @@ test_that(
           "3K_2" = list(panel = "Panel")
         ),
         reference_project = "3K_1",
-        product_ids = c("3K_1" = "3k", "3K_2" = "3k"),
+        product_ids = c("3K_1" = "E3072", "3K_2" = "E3072"),
         ref_ids = c("3K_1" = "ref", "3K_2" = "not_ref")
       )
     )
@@ -3614,7 +3870,7 @@ test_that(
     data_ht <- get_example_data(filename = "example_HT_data.rds")
     data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
 
-    # 3k-HT ----
+    # E3072-HT ----
 
     expect_no_condition(
       object = lst_cross_prod_out_ht <- olink_norm_input_cross_product(
@@ -3631,7 +3887,7 @@ test_that(
                       count = "Count")
         ),
         reference_project = "p2",
-        product_ids = c("p1" = "3k", "p2" = "HT"),
+        product_ids = c("p1" = "E3072", "p2" = "HT"),
         ref_ids = c("p1" = "not_ref", "p2" = "ref")
       )
     )
@@ -3683,7 +3939,7 @@ test_that(
       )
     )
 
-    # 3k-Reveal ----
+    # E3072-Reveal ----
 
     expect_no_condition(
       object = lst_cross_prod_out_rev <- olink_norm_input_cross_product(
@@ -3700,7 +3956,7 @@ test_that(
                       count = "Count")
         ),
         reference_project = "p2",
-        product_ids = c("p1" = "3k", "p2" = "Reveal"),
+        product_ids = c("p1" = "E3072", "p2" = "Reveal"),
         ref_ids = c("p1" = "not_ref", "p2" = "ref")
       )
     )
@@ -3911,16 +4167,16 @@ test_that(
     expect_error(
       object = olink_norm_input_cross_product(
         lst_df = list(
-          "3K" = data_3k,
+          "E3072" = data_3k,
           "T96" = npx_data1
         ),
         lst_cols = list(
-          "3K" = list(panel = "Panel"),
+          "E3072" = list(panel = "Panel"),
           "T96" = list(panel = "Panel")
         ),
-        reference_project = "3K",
-        product_ids = c("3K" = "3k", "T96" = "other"),
-        ref_ids = c("3K" = "ref", "T96" = "not_ref")
+        reference_project = "E3072",
+        product_ids = c("E3072" = "E3072", "T96" = "other"),
+        ref_ids = c("E3072" = "ref", "T96" = "not_ref")
       ),
       regexp = "Unexpected datasets to be bridge normalized!"
     )
@@ -3981,16 +4237,16 @@ test_that(
     expect_error(
       object = olink_norm_input_cross_product(
         lst_df = list(
-          "3K" = data_3k,
+          "E3072" = data_3k,
           "HT" = data_ht
         ),
         lst_cols = list(
-          "3K" = list(panel = "Panel"),
+          "E3072" = list(panel = "Panel"),
           "HT" = list(panel = "Panel")
         ),
-        reference_project = "3K",
-        product_ids = c("3K" = "3k", "HT" = "HT"),
-        ref_ids = c("3K" = "ref", "HT" = "not_ref")
+        reference_project = "E3072",
+        product_ids = c("E3072" = "E3072", "HT" = "HT"),
+        ref_ids = c("E3072" = "ref", "HT" = "not_ref")
       ),
       regexp = "Incorrect reference project!"
     )
@@ -3998,16 +4254,16 @@ test_that(
     expect_error(
       object = olink_norm_input_cross_product(
         lst_df = list(
-          "3K" = data_3k,
+          "E3072" = data_3k,
           "reveal" = data_reveal
         ),
         lst_cols = list(
-          "3K" = list(panel = "Panel"),
+          "E3072" = list(panel = "Panel"),
           "reveal" = list(panel = "Panel")
         ),
-        reference_project = "3K",
-        product_ids = c("3K" = "3k", "reveal" = "Reveal"),
-        ref_ids = c("3K" = "ref", "reveal" = "not_ref")
+        reference_project = "E3072",
+        product_ids = c("E3072" = "E3072", "reveal" = "Reveal"),
+        ref_ids = c("E3072" = "ref", "reveal" = "not_ref")
       ),
       regexp = "Incorrect reference project!"
     )
@@ -4044,7 +4300,7 @@ test_that(
                       count = "Count")
         ),
         reference_project = "p2",
-        product_ids = c("p1" = "3k", "p2" = "HT"),
+        product_ids = c("p1" = "E3072", "p2" = "HT"),
         ref_ids = c("p1" = "not_ref", "p2" = "ref")
       ),
       regexp = "Column \"Count\" not found in dataset \"p1\"!"
@@ -4067,7 +4323,7 @@ test_that(
                       olink_id = "OlinkID")
         ),
         reference_project = "p2",
-        product_ids = c("p1" = "3k", "p2" = "HT"),
+        product_ids = c("p1" = "E3072", "p2" = "HT"),
         ref_ids = c("p1" = "not_ref", "p2" = "ref")
       ),
       regexp = "Column \"Count\" not found in dataset \"p2\"!"
@@ -4090,7 +4346,7 @@ test_that(
                       olink_id = "OlinkID")
         ),
         reference_project = "p2",
-        product_ids = c("p1" = "3k", "p2" = "Reveal"),
+        product_ids = c("p1" = "E3072", "p2" = "Reveal"),
         ref_ids = c("p1" = "not_ref", "p2" = "ref")
       ),
       regexp = "Column \"Count\" not found in datasets \"p1\" and \"p2\"!"
@@ -6709,7 +6965,7 @@ test_that(
       expected = c("p1" = "other", "p2" = "other")
     )
 
-    # T96-3k ----
+    # T96-E3072 ----
 
     expect_identical(
       object = olink_norm_product_id(
@@ -6722,7 +6978,7 @@ test_that(
           "p2" = list(panel = "Panel")
         )
       ),
-      expected = c("p1" = "other", "p2" = "3k")
+      expected = c("p1" = "other", "p2" = "E3072")
     )
 
     # T96-HT ----
@@ -6757,7 +7013,7 @@ test_that(
       expected = c("p1" = "other", "p2" = "Reveal")
     )
 
-    # 3k-3k ----
+    # E3072-E3072 ----
 
     expect_identical(
       object = olink_norm_product_id(
@@ -6770,10 +7026,10 @@ test_that(
           "p2" = list(panel = "Panel")
         )
       ),
-      expected = c("p1" = "3k", "p2" = "3k")
+      expected = c("p1" = "E3072", "p2" = "E3072")
     )
 
-    # 3k-HT ----
+    # E3072-HT ----
 
     expect_identical(
       object = olink_norm_product_id(
@@ -6786,10 +7042,10 @@ test_that(
           "p2" = list(panel = "Panel")
         )
       ),
-      expected = c("p1" = "3k", "p2" = "HT")
+      expected = c("p1" = "E3072", "p2" = "HT")
     )
 
-    # 3k-Reveal ----
+    # E3072-Reveal ----
 
     expect_identical(
       object = olink_norm_product_id(
@@ -6802,7 +7058,7 @@ test_that(
           "p2" = list(panel = "Panel")
         )
       ),
-      expected = c("p1" = "3k", "p2" = "Reveal")
+      expected = c("p1" = "E3072", "p2" = "Reveal")
     )
 
     # Reveal-Reveal ----
@@ -6887,11 +7143,11 @@ test_that(
       expected = c("p1" = "ref", "p2" = "not_ref")
     )
 
-    # 3k-3k ----
+    # E3072-E3072 ----
 
     expect_identical(
       object = olink_norm_reference_id(
-        lst_product = c("p1" = "3k", "p2" = "3k"),
+        lst_product = c("p1" = "E3072", "p2" = "E3072"),
         reference_project = "p2"
       ),
       expected = c("p1" = "not_ref", "p2" = "ref")
@@ -6917,21 +7173,21 @@ test_that(
       expected = c("p1" = "ref", "p2" = "not_ref")
     )
 
-    # 3k-reveal ----
+    # E3072-reveal ----
 
     expect_identical(
       object = olink_norm_reference_id(
-        lst_product = c("p1" = "3k", "p2" = "Reveal"),
+        lst_product = c("p1" = "E3072", "p2" = "Reveal"),
         reference_project = "p1"
       ),
       expected = c("p1" = "ref", "p2" = "not_ref")
     )
 
-    # 3k-ht ----
+    # E3072-ht ----
 
     expect_identical(
       object = olink_norm_reference_id(
-        lst_product = c("p1" = "3k", "p2" = "HT"),
+        lst_product = c("p1" = "E3072", "p2" = "HT"),
         reference_project = "p2"
       ),
       expected = c("p1" = "not_ref", "p2" = "ref")
@@ -6967,13 +7223,13 @@ test_that(
   {
     # returns HT mapping file
     expect_identical(
-      object = mapping_file_id(prod_uniq = c("3k", "HT")),
+      object = mapping_file_id(prod_uniq = c("E3072", "HT")),
       expected = eHT_e3072_mapping
     )
 
     # returns Reveal mapping file
     expect_identical(
-      object = mapping_file_id(prod_uniq = c("3k", "Reveal")),
+      object = mapping_file_id(prod_uniq = c("E3072", "Reveal")),
       expected = reveal_e3072_mapping
     )
 
