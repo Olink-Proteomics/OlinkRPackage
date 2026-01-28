@@ -27,7 +27,7 @@ olink_pca_plot(
 \arguments{
 \item{df}{data frame in long format with Sample Id, NPX and column of choice for colors}
 
-\item{color_g}{Character value indicating which column to use for colors (default QC_Warning). Continuous color scale for OSI columns OSITimeToCentrifugation, OSIPreparationTemperature and OSISummary is also supported.}
+\item{color_g}{Character value indicating which column to use for colors (default QC_Warning). Continuous color scale for Olink(R) Sample Index (OSI) columns OSITimeToCentrifugation, OSIPreparationTemperature and OSISummary is also supported.}
 
 \item{x_val}{Integer indicating which principal component to plot along the x-axis (default 1)}
 
