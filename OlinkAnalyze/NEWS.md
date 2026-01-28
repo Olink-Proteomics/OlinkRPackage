@@ -2,7 +2,7 @@
 ## Minor Changes
 * Added section to LOD vignette about how to handle LOD in bridged data (#656, @KangD-dev)
 * Support for NPX files from NPX Map 2.0 was added to read_NPX (#660, @kathy-nevola)
-* Continuous color scale was added to PCA for graphing OSI continuous columns (#659, @amrita-kar)
+* Continuous color scale was added to PCA for graphing Olink Sample Index (OSI) continuous columns (#659, @amrita-kar)
 * Function for formatting bridged data was updated to work with other types of normalization (#643, @dtopouza, #644, @klevdiamanti) 
 
 ## Bug Fixes
