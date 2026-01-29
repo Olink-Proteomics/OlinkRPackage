@@ -33,6 +33,8 @@ column type \var{col_class} and expected column type
 with at least one assay warning.
 \item\strong{non_unique_uniprot} Character vector of \var{OlinkID} mapped
 to more than one \var{UniProt} ID.
+\item \strong{darid_invalid} Character vector containing outdated
+combinations of \var{DataAnalysisRefID} and \var{PanelDataArchiveVersion}.
 }
 }
 \description{
@@ -65,7 +67,7 @@ example 4.
 The argument \var{preferred_names} is a named character vector with internal
 column names as names and column names of the current data set as values.
 Names of the input vector can be one or more of the following:
-"sample_id", "sample_type", "assay_type", "olink_id", "uniprot", "assay", "panel", "block", "plate_id", "panel_version", "lod", "quant", "ext_npx", "count", "qc_warning", "assay_warn", and "normalization"
+"sample_id", "sample_type", "assay_type", "olink_id", "uniprot", "assay", "panel", "block", "plate_id", "panel_version", "lod", "quant", "ext_npx", "count", "qc_warning", "assay_warn", "normalization", and "qc_version"
 }
 \examples{
 \dontrun{
