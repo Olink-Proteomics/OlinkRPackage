@@ -275,7 +275,9 @@ generate_plate_layout <- function(product,
                                 available_spots = available_spots,
                                 control_wells = control_wells,
                                 starting_well = "A1")
-  
+
+# Still need to handle split here -----------------------------------------
+  return(well_ids)
 } 
 
 #' Title
@@ -293,6 +295,8 @@ internal_randomizer <- function(manifest,
                                 type,
                                 plate_layout,
                                 num_rand_controls){
+  
+  
   
 } 
 
@@ -377,10 +381,21 @@ generate_well_ids <- function(plate_size,
   plate_wells <- paste0(rep(LETTERS[1:8], times = 12), rep(1:12, each = 8))
   plate_wells <- plate_wells[1:(length(plate_wells)-control_wells)]
   nplates <- length(available_spots)
-  plate1 <- plate_wells[which(plate_wells == starting_well):length(plate_wells)]
   
-
+  # list, name of plate = array of wells on that plate
   
+  starting_well_index <- which(plate_wells == starting_well)
+  sample_well_ids <- c(list(plate_wells[starting_well_index:(starting_well_index+available_spots[1]-1)]),
+                       lapply(2:nplates, function(x){
+                         plate_wells[1:available_spots[x]]
+                       }))
+  names(sample_well_ids)<- paste0("plate_", 1:nplates)
+  
+  control_well_ids <- tail(plate_wells,control_wells)
+  
+  
+  return(list(sample_wells =sample_well_ids,
+              control_wells = control_well_ids))
 }
 
 #' Title
