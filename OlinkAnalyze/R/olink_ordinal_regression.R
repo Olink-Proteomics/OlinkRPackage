@@ -323,7 +323,7 @@ olink_ordinal_regression <- function(df,
                 data = .x,
                 threshold = "flexible"
               ),
-              type = 3L
+              type = "marginal"
             )
           )
         }) |>
@@ -527,7 +527,7 @@ olink_ordinal_regression_posthoc <- function(df, # nolint object_length_linter
         )
 
       # if no list of OlinkID was provided, use all assays
-      if (is.null(olinkid_list)) {
+      if (is.null(olinkid_list) || length(olinkid_list) == 0L) {
         olinkid_list <- df |>
           dplyr::pull(
             .data[["OlinkID"]]
