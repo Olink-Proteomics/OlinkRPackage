@@ -631,6 +631,7 @@ read_npx_format_get_platform <- function(df_top_n,
   olink_platform_auto <- accepted_olink_platforms |>
     dplyr::filter(
       .data[["broader_platform"]] == .env[["broad_platform"]]
+      & !is.na(.data[["regexp"]])
     ) |>
     dplyr::mutate(
       detected_platform = stringr::str_detect(
