@@ -326,7 +326,6 @@ olink_anova <- function(df,
             .data[["OlinkID"]]
           )
 
-
         if (length(current_nas) > 0L) {
 
           nas_in_var <- c(nas_in_var, current_nas)
