@@ -447,7 +447,7 @@ read_npx_wide_check_top <- function(df,
 
   if (!identical(dplyr::pull(df, .data[["V1"]]), top_mat_v1)) {
 
-    top_v1_miss <- top_mat_v1[!(top_mat_v1 %in% df$V1)] # nolint object_usage_linter
+    top_v1_miss <- top_mat_v1[!(top_mat_v1 %in% df$V1)] # nolint: object_usage_linter
 
     cli::cli_abort(
       message = c(
@@ -472,7 +472,7 @@ read_npx_wide_check_top <- function(df,
 
   if (!all(top_mat_assay_labels %in% df[2L, ])) {
 
-    top_mat_assay_miss <- top_mat_assay_labels[ # nolint object_usage_linter
+    top_mat_assay_miss <- top_mat_assay_labels[ # nolint: object_usage_linter
       !(top_mat_assay_labels %in% df[2L, ])
     ]
 
@@ -674,7 +674,7 @@ read_npx_wide_check_top <- function(df,
 
       if (nrow(dev_int_ctrl_df_missing) > 0L) {
 
-        cli::cli_abort( # nolint return_linter
+        cli::cli_abort( # nolint: return_linter
           message = c(
             "x" = "{cli::qty(unique(int_ctrl_df_missing$panel))} Panel{?s}
             {.val {unique(dev_int_ctrl_df_missing$panel)}} {?is/are} missing one
@@ -768,7 +768,7 @@ read_npx_wide_top <- function(df,
   df_pid_qcw <- lapply(
     unlist(format_spec$top_matrix_assay_labels),
     function(x) {
-      df_t |> # nolint return_linter
+      df_t |> # nolint: return_linter
         dplyr::filter(
           is.na(.data[["OlinkID"]])
           & .data[["Assay"]] %in% .env[["x"]]
@@ -809,7 +809,7 @@ read_npx_wide_top <- function(df,
                      + nrow(df_top_int_ctrl)
                      + nrow(df_top_dev_int_ctrl))) {
 
-    top_mat_unknown_cols <- setdiff(df_t$col_index, # nolint object_usage_linter
+    top_mat_unknown_cols <- setdiff(df_t$col_index, # nolint: object_usage_linter
                                     c(df_top_oid$col_index,
                                       sapply(df_pid_qcw, \(x) x$col_index) |>
                                         unname() |>
@@ -1187,7 +1187,7 @@ read_npx_wide_panel_version <- function(df) {
           lapply(utils::tail, 1L) |>
           unlist() |>
           (\(x) {
-            sub(pattern = ")", # nolint return_linter
+            sub(pattern = ")", # nolint: return_linter
                 replacement = "",
                 x = x,
                 fixed = TRUE)
@@ -1428,7 +1428,7 @@ read_npx_wide_bottom_version <- function(df,
 
     list_bottom_v <- lapply(format_spec_bottom_v,
                             function(x) {
-                              format_spec_bottom |> # nolint return_linter
+                              format_spec_bottom |> # nolint: return_linter
                                 dplyr::filter(
                                   .data[["version"]] %in% c(0L, x)
                                 ) |>
@@ -1453,11 +1453,11 @@ read_npx_wide_bottom_version <- function(df,
   # contains all names in V1
   format_spec_bottom <- lapply(format_spec_bottom, function(x) {
     name_in_df <- lapply(x$variable_alt_names,
-                         \(y) (y[y %in% df$V1])) |> # nolint return_linter
+                         \(y) (y[y %in% df$V1])) |> # nolint: return_linter
       lapply(\(y) (ifelse(length(y) == 0L, NA_character_, y))) |>
       unlist()
 
-    x |> # nolint return_linter
+    x |> # nolint: return_linter
       dplyr::mutate(
         variable_name_in_df = name_in_df,
         in_df = dplyr::if_else(
@@ -1469,7 +1469,7 @@ read_npx_wide_bottom_version <- function(df,
   })
 
   names_in_v1 <- lapply(format_spec_bottom, function(.x) {
-    .x |> # nolint return_linter
+    .x |> # nolint: return_linter
       dplyr::mutate(
         total_n = dplyr::n(),
         true_n = sum(.data[["in_df"]])
@@ -1503,7 +1503,7 @@ read_npx_wide_bottom_version <- function(df,
     bottom_mat_v1_expected <- sapply(
       format_spec_bottom,
       function(x) {
-        sapply(x$variable_alt_names, utils::head, 1L) |> # nolint return_linter
+        sapply(x$variable_alt_names, utils::head, 1L) |> # nolint: return_linter
           cli::ansi_collapse() |>
           (\(.x) paste("*", .x))()
       }
@@ -1652,7 +1652,7 @@ read_npx_wide_bottom <- function(df,
     df_plate_spec <- lapply(
       format_spec_bottom_plate_spec,
       function(x) {
-        df_plate_spec |> # nolint return_linter
+        df_plate_spec |> # nolint: return_linter
           # keep only one Vq variable at a time
           dplyr::filter(
             .data[["V1"]] == .env[["x"]]
@@ -1683,7 +1683,7 @@ read_npx_wide_bottom <- function(df,
 
     # left join all data frames from the list
     df_plate_spec <- Reduce(f = function(df_1, df_2) {
-      dplyr::left_join(x = df_1, # nolint return_linter
+      dplyr::left_join(x = df_1, # nolint: return_linter
                        y = df_2,
                        by = c("PlateID", "col_index"),
                        relationship = "one-to-one")

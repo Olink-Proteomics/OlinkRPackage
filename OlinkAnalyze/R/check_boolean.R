@@ -13,7 +13,7 @@ check_is_boolean <- function(x,
 
     if (error == TRUE) {
 
-      cli::cli_abort( # nolint return_linter
+      cli::cli_abort( # nolint: return_linter
         c(
           "x" = "{.arg {rlang::caller_arg(x)}} must be a boolean vector!"
         ),
@@ -50,7 +50,7 @@ check_is_scalar_boolean <- function(x,
 
     if (error == TRUE) {
 
-      cli::cli_abort( # nolint return_linter
+      cli::cli_abort( # nolint: return_linter
         c(
           "x" = "{.arg {rlang::caller_arg(x)}} must be a scalar boolean!"
         ),

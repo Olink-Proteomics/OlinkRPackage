@@ -95,7 +95,7 @@ olink_ttest <- function(df,
     stop("The df and variable arguments need to be specified.")
   }
 
-  dot_lst <- rlang::list2(...) # nolint object_usage_linter
+  dot_lst <- rlang::list2(...) # nolint: object_usage_linter
 
   # Filtering on valid OlinkID
   df <- df |>
@@ -107,7 +107,7 @@ olink_ttest <- function(df,
     )
 
   # Removing SampleID:s with no level for variable
-  removed.sampleids <- df |> # nolint object_name_linter
+  removed.sampleids <- df |> # nolint: object_name_linter
     dplyr::filter(
       is.na(.data[[variable]])
     ) |>
@@ -125,7 +125,7 @@ olink_ttest <- function(df,
     )
 
   if (!missing(pair_id)) {
-    missing.pair <- df |> # nolint object_name_linter
+    missing.pair <- df |> # nolint: object_name_linter
       dplyr::filter(
         is.na(.data[[pair_id]])
       ) |>
@@ -142,7 +142,7 @@ olink_ttest <- function(df,
         !is.na(.data[[pair_id]])
       )
 
-    removed.sampleids <- unique(c(removed.sampleids, missing.pair)) # nolint object_name_linter
+    removed.sampleids <- unique(c(removed.sampleids, missing.pair)) # nolint: object_name_linter
   }
 
   # Factor conversion
@@ -264,7 +264,7 @@ olink_ttest <- function(df,
     message(paste0("Paired t-test is performed on ",
                    var_levels[1L], " - ", var_levels[2L], "."))
 
-    p.val <- df |> # nolint object_name_linter
+    p.val <- df |> # nolint: object_name_linter
       dplyr::select(
         dplyr::all_of(
           c("OlinkID", "UniProt", "Assay", "Panel", "NPX",
@@ -309,7 +309,7 @@ olink_ttest <- function(df,
     message(paste0("T-test is performed on ",
                    var_levels[1L], " - ", var_levels[2L], "."))
 
-    p.val <- df |> # nolint object_name_linter
+    p.val <- df |> # nolint: object_name_linter
       dplyr::select(
         dplyr::all_of(
           c("OlinkID", "UniProt", "Assay", "Panel", "NPX", variable)

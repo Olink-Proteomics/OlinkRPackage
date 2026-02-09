@@ -319,7 +319,7 @@ pc_norm_count <- function(data,
         is.na(.data[["NPX"]]) ~ NA_real_,
         !is.na(.data[["NPX"]]) & .data[["LODMethod"]] == "lod_npx" ~
           .data[["LODNPX"]],
-        TRUE ~ log2(.data[["LODCount"]] / .data[["ExtCount"]]) - .data[["PCMedian"]], # nolint line_length_linter
+        TRUE ~ log2(.data[["LODCount"]] / .data[["ExtCount"]]) - .data[["PCMedian"]], # nolint: line_length_linter
         .default = NA_real_
       )
     ) |>

@@ -441,7 +441,7 @@ check_npx_col_names <- function(df,
       col_df = lapply(
         .data[["col_names"]],
         function(x) {
-          intersect( # nolint return_linter
+          intersect( # nolint: return_linter
             x = x,
             y = names(df)
           )
@@ -656,7 +656,7 @@ check_npx_update_col_names <- function(preferred_names) {
 
     # identify names of the vector preferred_names that do not match names from
     # column_name_dict. Names should match to be able to update the field.
-    missing_names <- setdiff(x = names(preferred_names), # nolint object_usage_linter
+    missing_names <- setdiff(x = names(preferred_names), # nolint: object_usage_linter
                              y = column_name_dict$col_key)
 
     cli::cli_abort(

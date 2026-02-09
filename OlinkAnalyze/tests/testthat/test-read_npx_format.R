@@ -1965,7 +1965,7 @@ test_that(
           object = df_npx_null$data_cells,
           expected = colnames(df_rand$list_df_long$df_long) |>
             (\(.x) {
-              .x[!grepl(pattern = "Version", # nolint return_linter
+              .x[!grepl(pattern = "Version", # nolint: return_linter
                         x = .x,
                         ignore.case = TRUE)]
             })()
@@ -2190,7 +2190,7 @@ test_that(
             dplyr::slice_head(n = 1L) |>
             as.character() |>
             (\(.x) {
-              .x[!grepl(pattern = "Version", # nolint return_linter
+              .x[!grepl(pattern = "Version", # nolint: return_linter
                         x = .x,
                         ignore.case = TRUE)]
             })()
