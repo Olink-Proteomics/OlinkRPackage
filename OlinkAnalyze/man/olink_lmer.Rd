@@ -104,10 +104,26 @@ towards adjusted \code{p-value<0.05}.
 }
 \examples{
 \donttest{
-if (rlang::is_installed(pkg = c("lme4", "lmerTest"))) {
+if (rlang::is_installed(pkg = c("lme4", "lmerTest", "broom"))) {
+  #data
+  npx_df <- OlinkAnalyze::npx_data1 |>
+    dplyr::filter(
+      !grepl(
+        pattern = "control|ctrl",
+        x = .data[["SampleID"]],
+        ignore.case = TRUE
+      )
+    )
+
+  # check data
+  npx_df_check_log <- OlinkAnalyze::check_npx(
+    df = npx_df
+  )
+
   # Results in model NPX ~ Time * Treatment + (1 | Subject) + (1 | Site)
   lmer_results <- OlinkAnalyze::olink_lmer(
-    df = npx_data1,
+    df = npx_df,
+    check_log = npx_df_check_log,
     variable = c("Time", "Treatment"),
     random = c("Subject", "Site")
   )
