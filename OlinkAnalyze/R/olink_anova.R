@@ -811,7 +811,7 @@ olink_anova_posthoc <- function(df,
           )
         )
 
-      if (is.null(olinkid_list)) {
+      if (is.null(olinkid_list) || length(olinkid_list) == 0L) {
         olinkid_list <- df |>
           dplyr::select(
             dplyr::all_of("OlinkID")
@@ -1027,7 +1027,8 @@ olink_anova_posthoc <- function(df,
 
       return(anova_posthoc_results)
 
-    }, warning = function(w) {
+    },
+    warning = function(w) {
       restart_if_spec_warn <- grepl(
         x = w,
         pattern = utils::glob2rx("*contains implicit NA, consider using*")
