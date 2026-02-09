@@ -1003,7 +1003,7 @@ single_posthoc <- function(data,
     # effect must be string to be converted to as.formula
     specs = stats::as.formula(effect),
     cov.reduce = function(x) {
-      round(x = c(mean(x), mean(x) + stats::sd(x)), digits = 4L) # nolint: return_liter
+      round(x = c(mean(x), mean(x) + stats::sd(x)), digits = 4L) # nolint: return_linter
     },
     lmer.df = "satterthwaite",
     infer = c(TRUE, TRUE),
