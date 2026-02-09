@@ -13,6 +13,7 @@
 ^data/.*_original[.]rda
 ^tests/testthat/data/.*[.]rds
 ^tests/testthat/data/.*[.]R
+^tests/testthat/data/.*[.]RData
 ^inst/WORDLIST
 ^inst/extdata/.*[.]zip
 ^inst/extdata/.*_csv[.]csv

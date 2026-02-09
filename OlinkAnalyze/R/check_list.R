@@ -16,7 +16,7 @@ check_is_list <- function(x,
     if (error == TRUE) {
 
       # error if lst is not a list
-      cli::cli_abort( # nolint return_linter
+      cli::cli_abort( # nolint: return_linter
         c(
           "x" = "{.arg {rlang::caller_arg(x)}} is not a list!"
         ),

@@ -2,6 +2,10 @@
 
 # read NPX ----
 
+# OlinkAnalyze v4.3.1 was used to read in the data below. These reference
+# datasets are used for testing purposes that the newer versions of code will
+# continue reproducing the same results.
+
 npx_data_parquet <- OlinkAnalyze::read_NPX(
   filename = "inst/extdata/npx_data_ext.parquet"
 )
@@ -29,6 +33,10 @@ t_test <- OlinkAnalyze::olink_ttest(
   df = OlinkAnalyze::npx_data1,
   variable = "Treatment"
 )
+# Samples removed due to missing variable levels: CONTROL_SAMPLE_AS 1,
+# CONTROL_SAMPLE_AS 2
+# Variable converted from character to factor: Treatment
+# T-test is performed on Treated - Untreated.
 
 # paired t-test
 t_test_paired <- OlinkAnalyze::npx_data1 |>
@@ -39,6 +47,8 @@ t_test_paired <- OlinkAnalyze::npx_data1 |>
     variable = "Time",
     pair_id = "Subject"
   )
+# Variable converted from character to factor: Time
+# Paired t-test is performed on Baseline - Week.6.
 
 # Mann-Whitney U Test ----
 
@@ -47,6 +57,10 @@ wilcox_test <- OlinkAnalyze::olink_wilcox(
   df = OlinkAnalyze::npx_data1,
   variable = "Treatment"
 )
+# Samples removed due to missing variable levels: CONTROL_SAMPLE_AS 1,
+# CONTROL_SAMPLE_AS 2
+# Variable converted from character to factor: Treatment
+# Mann-Whitney U Test is performed on Treated - Untreated.
 
 # paired Mann-Whitney U Test
 wilcox_test_paired <- OlinkAnalyze::npx_data1 |>
@@ -57,6 +71,8 @@ wilcox_test_paired <- OlinkAnalyze::npx_data1 |>
     variable = "Time",
     pair_id = "Subject"
   )
+# Variable converted from character to factor: Time
+# Paired Mann-Whitney U Test is performed on Baseline - Week.6.
 
 # One-way non-parametric test ----
 
@@ -67,6 +83,10 @@ kruskal <- OlinkAnalyze::olink_one_non_parametric(
   df = OlinkAnalyze::npx_data1,
   variable = "Site"
 )
+# Samples removed due to missing variable CONTROL_SAMPLE_AS 1,
+# CONTROL_SAMPLE_AS 2
+# Variables converted from character to factors: Site
+# Kruskal model fit to each assay: NPX~Site
 
 kruskal_sign <- kruskal |>
   dplyr::filter(
@@ -96,6 +116,13 @@ kruskal_posthoc <-
   dplyr::select(
     -dplyr::all_of("id")
   )
+# Duplicate SampleID(s) detected:
+#  CONTROL_SAMPLE_AS 1
+#  CONTROL_SAMPLE_AS 2
+# Samples removed due to missing variable: CONTROL_SAMPLE_AS 1,
+# CONTROL_SAMPLE_AS 2
+# Variables converted from character to factors: Site
+# Pairwise comparisons for Kruskal-Wallis test using Dunn test were performed
 
 rm(kruskal_sign)
 
@@ -108,6 +135,10 @@ friedman <- OlinkAnalyze::olink_one_non_parametric(
   subject = "Subject",
   dependence = TRUE
 )
+# Samples removed due to missing variable CONTROL_SAMPLE_AS 1,
+# CONTROL_SAMPLE_AS 2
+# Variables converted from character to factors: Time
+# Friedman model fit to each assay: NPX~Time
 
 friedman_sign <- friedman |>
   dplyr::filter(
@@ -136,6 +167,14 @@ friedman_posthoc <- OlinkAnalyze::olink_one_non_parametric_posthoc(
   dplyr::select(
     -dplyr::all_of("id")
   )
+# Duplicate SampleID(s) detected:
+#  CONTROL_SAMPLE_AS 1
+#  CONTROL_SAMPLE_AS 2
+# Samples removed due to missing variable: CONTROL_SAMPLE_AS 1,
+# CONTROL_SAMPLE_AS 2
+# Variables converted from character to factors: Time
+# Pairwise comparisons for Friedman test using paired Wilcoxon signed-rank test
+# were performed
 
 rm(friedman_sign)
 
@@ -157,10 +196,14 @@ ordinal_regression <- OlinkAnalyze::olink_ordinalRegression(
   dplyr::select(
     -dplyr::all_of("id")
   )
+# Samples removed due to missing variable or covariate levels:
+# CONTROL_SAMPLE_AS 1, CONTROL_SAMPLE_AS 2
+# Variables and covariates converted from character to factors: Treatment, Time
+# ANOVA model fit to each assay: NPX~Treatment*Time
 
 ord_reg_sign <- ordinal_regression |>
   dplyr::filter(.data[["Threshold"]] == "Significant"
-                & .data[["term"]] == "Treatment:Time") |>
+                & .data[["term"]] == "Time") |>
   dplyr::pull(.data[["OlinkID"]]) |>
   unique()
 
@@ -169,9 +212,8 @@ ordinal_regression_posthoc <-
   OlinkAnalyze::olink_ordinalRegression_posthoc(
     df = OlinkAnalyze::npx_data1,
     variable = c("Treatment:Time"),
-    covariates = "Site",
     olinkid_list = ord_reg_sign,
-    effect = "Treatment:Time"
+    effect = "Time"
   ) |>
   dplyr::mutate(
     id = as.character(.data[["OlinkID"]])
@@ -184,6 +226,14 @@ ordinal_regression_posthoc <-
   dplyr::select(
     -dplyr::all_of("id")
   )
+# Duplicate SampleID(s) detected:
+#  CONTROL_SAMPLE_AS 1
+#  CONTROL_SAMPLE_AS 2
+# Samples removed due to missing variable or covariate levels:
+# CONTROL_SAMPLE_AS 1, CONTROL_SAMPLE_AS 2
+# Variables and covariates converted from character to factors: Treatment, Time
+# Means estimated for each assay from ANOVA model:  NPX~Treatment*Time
+# NOTE: Results may be misleading due to involvement in interactions
 
 rm(ord_reg_sign)
 
@@ -205,6 +255,10 @@ anova_site <- OlinkAnalyze::olink_anova(
   dplyr::select(
     -dplyr::all_of("id")
   )
+# Samples removed due to missing variable or covariate levels:
+# CONTROL_SAMPLE_AS 1, CONTROL_SAMPLE_AS 2
+# Variables and covariates converted from character to factors: Site
+# ANOVA model fit to each assay: NPX~Site
 
 anova_site_sign <- anova_site |>
   dplyr::slice_head(
@@ -232,6 +286,13 @@ anova_site_posthoc <- OlinkAnalyze::olink_anova_posthoc(
   dplyr::select(
     -dplyr::all_of("id")
   )
+# Duplicate SampleID(s) detected:
+#  CONTROL_SAMPLE_AS 1
+#  CONTROL_SAMPLE_AS 2
+# Samples removed due to missing variable or covariate levels:
+# CONTROL_SAMPLE_AS 1, CONTROL_SAMPLE_AS 2
+# Variables and covariates converted from character to factors: Site
+# Means estimated for each assay from ANOVA model:  NPX~Site
 
 rm(anova_site_sign)
 
@@ -251,6 +312,10 @@ anova_time <- OlinkAnalyze::olink_anova(
   dplyr::select(
     -dplyr::all_of("id")
   )
+# Samples removed due to missing variable or covariate levels:
+# CONTROL_SAMPLE_AS 1, CONTROL_SAMPLE_AS 2
+# Variables and covariates converted from character to factors: Time
+# ANOVA model fit to each assay: NPX~Time
 
 anova_time_sign <- anova_time |>
   dplyr::slice_head(
@@ -278,6 +343,13 @@ anova_time_posthoc <- OlinkAnalyze::olink_anova_posthoc(
   dplyr::select(
     -dplyr::all_of("id")
   )
+# Duplicate SampleID(s) detected:
+#   CONTROL_SAMPLE_AS 1
+# CONTROL_SAMPLE_AS 2
+# Samples removed due to missing variable or covariate levels:
+# CONTROL_SAMPLE_AS 1, CONTROL_SAMPLE_AS 2
+# Variables and covariates converted from character to factors: Time
+# Means estimated for each assay from ANOVA model:  NPX~Time
 
 rm(anova_time_sign)
 
@@ -299,6 +371,10 @@ anova_site_time <- OlinkAnalyze::olink_anova(
   dplyr::select(
     -dplyr::all_of("id")
   )
+# Samples removed due to missing variable or covariate levels:
+# CONTROL_SAMPLE_AS 1, CONTROL_SAMPLE_AS 2
+# Variables and covariates converted from character to factors: Site, Time
+# ANOVA model fit to each assay: NPX~Site*Time
 
 # LMER ----
 
@@ -319,6 +395,11 @@ lmer <- OlinkAnalyze::olink_lmer(
   dplyr::select(
     -dplyr::all_of("id")
   )
+# Samples removed due to missing variable or covariate levels:
+# CONTROL_SAMPLE_AS 1, CONTROL_SAMPLE_AS 2
+# Variables and covariates converted from character to factors: Treatment, Time,
+# Subject
+# Linear mixed effects model fit to each assay: NPX~Treatment*Time+(1|Subject)
 
 lmer_sign <- lmer |>
   dplyr::filter(
@@ -347,6 +428,14 @@ lmer_posthoc <- OlinkAnalyze::olink_lmer_posthoc(
   dplyr::select(
     -dplyr::all_of("id")
   )
+# Duplicate SampleID(s) detected:
+#  CONTROL_SAMPLE_AS 1
+#  CONTROL_SAMPLE_AS 2
+# Samples removed due to missing variable or covariate levels:
+# CONTROL_SAMPLE_AS 1, CONTROL_SAMPLE_AS 2
+# Variables and covariates converted from character to factors: Treatment, Time
+# Means estimated for each assay from linear mixed effects model:
+# NPX~Treatment*Time+(1|Subject) # nolint: commented_code_linter
 
 rm(lmer_sign)
 
@@ -375,6 +464,16 @@ normalization_bridge <- OlinkAnalyze::olink_normalization(
   dplyr::filter(
     .data[["SampleID"]] %in% .env[["norm_out_sample_set"]]
   )
+# Duplicate SampleID(s) detected:
+#  CONTROL_SAMPLE_AS 1
+#  CONTROL_SAMPLE_AS 2
+# Duplicate SampleID(s) detected:
+#  CONTROL_SAMPLE_AS 1
+#  CONTROL_SAMPLE_AS 2
+# Bridge normalization will be performed!
+# Warning message:
+# Datasets "20200001" and "20200002" do not contain a column named
+# "Normalization".
 
 ## Intensity normalization ----
 
@@ -387,6 +486,15 @@ normalization_intensity <- OlinkAnalyze::olink_normalization(
   dplyr::filter(
     .data[["SampleID"]] %in% .env[["norm_out_sample_set"]]
   )
+# Duplicate SampleID(s) detected:
+#  CONTROL_SAMPLE_AS 1
+#  CONTROL_SAMPLE_AS 2
+# Duplicate SampleID(s) detected:
+#  CONTROL_SAMPLE_AS 1
+#  CONTROL_SAMPLE_AS 2
+# Subset normalization will be performed!
+# Warning message:
+# Datasets "P1" and "P2" do not contain a column named "Normalization".
 
 ## Subset normalization ----
 
@@ -405,6 +513,16 @@ normalization_subset <- OlinkAnalyze::olink_normalization(
   dplyr::filter(
     .data[["SampleID"]] %in% .env[["norm_out_sample_set"]]
   )
+# Duplicate SampleID(s) detected:
+#  CONTROL_SAMPLE_AS 1
+#  CONTROL_SAMPLE_AS 2
+# Duplicate SampleID(s) detected:
+#  CONTROL_SAMPLE_AS 1
+#  CONTROL_SAMPLE_AS 2
+# Subset normalization will be performed!
+# Warning message:
+# Datasets "20200001" and "20200002" do not contain a column named
+# "Normalization".
 
 ## Multi-batch normalization ----
 
@@ -555,6 +673,9 @@ normalization_multibatch <-
     .data[["OlinkID"]],
     .data[["SampleID"]]
   )
+# Bridge normalization will be performed!
+# Bridge normalization will be performed!
+# Subset normalization will be performed!
 
 rm(
   norm_out_sample_set,
@@ -575,6 +696,7 @@ randomized_samples <- OlinkAnalyze::olink_plate_randomizer(
   Manifest = OlinkAnalyze::manifest,
   seed = 12345L
 )
+# Random assignment of SAMPLES to plates
 
 randomized_subjects <- OlinkAnalyze::olink_plate_randomizer(
   Manifest = OlinkAnalyze::manifest,
@@ -582,6 +704,9 @@ randomized_subjects <- OlinkAnalyze::olink_plate_randomizer(
   available.spots = c(88L, 88L),
   seed = 12345L
 )
+# Assigning subjects to plates
+# ...
+# Random assignment of SUBJECTS to plates
 
 randomized_subjects_spots <- OlinkAnalyze::manifest |>
   dplyr::mutate(
@@ -594,6 +719,32 @@ randomized_subjects_spots <- OlinkAnalyze::manifest |>
     available.spots = c(88L, 88L),
     seed = 12345L
   )
+# study column detected in manifest. Optional study argument is set to "study".
+# Assigning subjects to plates. Keeping studies together during randomization."
+#
+# Testing with 0 empty well(s) in the plate."
+# ...
+# study1 successful!
+#
+# Testing with 0 empty well(s) in the plate.
+# ...
+# Testing with 1 empty well(s) in the plate.
+# ...
+# Testing with 2 empty well(s) in the plate.
+# ...
+# Testing with 3 empty well(s) in the plate.
+# ...
+# Testing with 4 empty well(s) in the plate.
+# ...
+# study2 successful!
+#
+# Random assignment of SUBJECTS to plates
+#
+# Totally included 4 empty well(s) in first and/or intermediate plate(s) to
+# accomplish the randomization.
+#
+# Please try another seed or increase the number of iterations if there are
+# indications that another randomization might leave fewer empty wells.
 
 randomized_samples_spots <- OlinkAnalyze::manifest |>
   dplyr::mutate(
@@ -605,6 +756,11 @@ randomized_samples_spots <- OlinkAnalyze::manifest |>
     available.spots = c(88L, 88L),
     seed = 12345L
   )
+# study column detected in manifest. Optional study argument is set to "study".
+# Assigning subjects to plates. Multi-study project detected.
+# Studies will be kept together during randomization.
+#
+# Random assignment of SAMPLES to plates by study
 
 # NPX pre-processing for dimansionality reduction ----
 
@@ -665,6 +821,10 @@ preprocessing_dim_red_miss <- OlinkAnalyze:::npxProcessing_forDimRed(
   drop_samples = FALSE,
   verbose = TRUE
 )
+# Warning message:
+#  In OlinkAnalyze:::npxProcessing_forDimRed(df = preproc_npx_data1_missing_data
+# There are 3 assay(s) that were imputed by their medians.
+
 # keep only the data frame
 preprocessing_dim_red_miss <- preprocessing_dim_red_miss$df_wide
 
@@ -728,7 +888,7 @@ i_want_to_override <- FALSE
 if (i_want_to_override == TRUE) {
   saveRDS(
     reference_results,
-    file = "tests/data/reference_results/reference_results.rds",
+    file = "tests/testthat/data/reference_results.rds",
     version = 2L,
     compress = "gzip"
   )

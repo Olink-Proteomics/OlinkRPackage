@@ -80,7 +80,7 @@ read_npx_zip <- function(file,
 
     }, error = function(msg) {
 
-      cli::cli_abort( # nolint return_linter
+      cli::cli_abort( # nolint: return_linter
         c(
           "x" = "Unable to open compressed file: {.file {file}}",
           "i" = "Check if the file is {get_file_ext(name_sub = \"compressed\")}
@@ -430,7 +430,7 @@ check_checksum <- function(checksum_file,
   if (checksum_file_content != npx_file_checksum) {
 
     # error message
-    cli::cli_abort( # nolint return_linter
+    cli::cli_abort( # nolint: return_linter
       c(
         "x" = "The checksum of the NPX file does not match the one included in
         the compressed file",
