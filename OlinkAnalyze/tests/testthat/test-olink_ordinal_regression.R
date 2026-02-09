@@ -119,6 +119,7 @@ test_that(
   {
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "ordinal")
+    skip_on_cran()
 
     expect_no_warning(
       object = expect_no_error(
@@ -190,6 +191,7 @@ test_that(
   {
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "ordinal")
+    skip_on_cran()
 
     expect_no_warning(
       object = expect_no_error(
@@ -262,6 +264,7 @@ test_that(
 
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "ordinal")
+    skip_on_cran()
 
     expect_no_warning(
       object = expect_no_error(
@@ -304,6 +307,7 @@ test_that(
   {
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "ordinal")
+    skip_on_cran()
 
     expect_warning(
       object = expect_message(
@@ -341,6 +345,7 @@ test_that(
   {
     skip_if_not_installed(pkg = "ordinal")
     skip_if_not_installed(pkg = "broom")
+    skip_on_cran()
 
     expect_error(
       object = olink_ordinal_regression(),
@@ -364,6 +369,7 @@ test_that(
   {
     skip_if_not_installed(pkg = "ordinal")
     skip_if_not_installed(pkg = "broom")
+    skip_on_cran()
 
     expect_no_error(
       object = expect_no_warning(
@@ -394,6 +400,7 @@ test_that(
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "ordinal")
     skip_if_not_installed(pkg = "emmeans")
+    skip_on_cran()
 
     ord_regs_res_site <- olink_ordinal_regression(
       df = npx_data1_mod,
@@ -507,6 +514,7 @@ test_that(
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")
     skip_if_not_installed(pkg = "ordinal")
+    skip_on_cran()
 
     ord_regs_res_treat_time <- olink_ordinal_regression(
       df = npx_data1_mod,
@@ -577,6 +585,7 @@ test_that(
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "ordinal")
     skip_if_not_installed(pkg = "emmeans")
+    skip_on_cran()
 
     expect_warning(
       object = expect_message(
@@ -654,6 +663,7 @@ test_that(
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "ordinal")
     skip_if_not_installed(pkg = "emmeans")
+    skip_on_cran()
 
     expect_error(
       object = olink_ordinal_regression_posthoc(),
@@ -686,6 +696,7 @@ test_that(
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "ordinal")
     skip_if_not_installed(pkg = "emmeans")
+    skip_on_cran()
 
     expect_no_error(
       object = expect_no_warning(

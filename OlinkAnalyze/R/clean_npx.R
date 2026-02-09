@@ -224,8 +224,8 @@ clean_npx <- function(df,
   if (grepl(pattern = "quantified",
             x = check_log$col_names$quant,
             ignore.case = TRUE)) {
-    q_col <- check_log$col_names$quant # nolint object_usage_linter
-    q_log2 <- paste0(check_log$col_names$quant, "_log2") # nolint object_usage_linter
+    q_col <- check_log$col_names$quant # nolint: object_usage_linter
+    q_log2 <- paste0(check_log$col_names$quant, "_log2") # nolint: object_usage_linter
     cli::cli_inform(
       c(
         "Detected data in absolute quantification in column
@@ -492,7 +492,7 @@ clean_sample_type <- function(df,
                                              %in% remove_control_sample] |>
         unlist() |>
         unname()
-      olink_sampless_compl <- setdiff(x = remove_control_sample, # nolint object_usage_linter
+      olink_sampless_compl <- setdiff(x = remove_control_sample, # nolint: object_usage_linter
                                       y = names(olink_sample_types))
 
       cli::cli_inform(
@@ -554,7 +554,7 @@ clean_sample_type <- function(df,
 
   # message that we are excluding control samples
   if (any(ctrl_sample_type %in% uniq_sample_type)) {
-    uniq_sid <- df_sid_stype |> # nolint object_usage_linter
+    uniq_sid <- df_sid_stype |> # nolint: object_usage_linter
       dplyr::filter(
         .data[[check_log$col_names$sample_type]] %in% .env[["ctrl_sample_type"]]
       ) |>
@@ -625,7 +625,7 @@ clean_assay_type <- function(df,
                                            %in% remove_control_assay] |>
         unlist() |>
         unname()
-      olink_assays_compl <- setdiff(x = remove_control_assay, # nolint object_usage_linter
+      olink_assays_compl <- setdiff(x = remove_control_assay, # nolint: object_usage_linter
                                     y = names(olink_assay_types))
 
       cli::cli_inform(
@@ -687,7 +687,7 @@ clean_assay_type <- function(df,
 
   # message that we are excluding control samples
   if (any(ctrl_assay_type %in% uniq_atype)) {
-    uniq_oid <- df_oid_atype |> # nolint object_usage_linter
+    uniq_oid <- df_oid_atype |> # nolint: object_usage_linter
       dplyr::filter(
         .data[[check_log$col_names$assay_type]] %in% .env[["ctrl_assay_type"]]
       ) |>
@@ -760,7 +760,7 @@ clean_qc_warning <- function(df,
       ) |>
       dplyr::collect()
 
-    fail_sample_n <- df_fail_sample |> # nolint object_usage_linter
+    fail_sample_n <- df_fail_sample |> # nolint: object_usage_linter
       dplyr::pull(
         .data[[check_log$col_names$sample_id]]
       ) |>
@@ -863,7 +863,7 @@ clean_assay_warning <- function(df,
       ) |>
       dplyr::collect()
 
-    warn_assay_n <- df_warn_assay |> # nolint object_usage_linter
+    warn_assay_n <- df_warn_assay |> # nolint: object_usage_linter
       dplyr::pull(
         .data[[check_log$col_names$olink_id]]
       ) |>
@@ -980,8 +980,8 @@ clean_control_sample_id <- function(df,
         "v" = "Returning cleaned dataset."
       )
     } else {
-      ctrl_sid_shared <- intersect(x = control_sample_ids, y = sid) # nolint object_usage_linter
-      ctrl_sid_setdiff <- setdiff(x = control_sample_ids, y = sid) # nolint object_usage_linter
+      ctrl_sid_shared <- intersect(x = control_sample_ids, y = sid) # nolint: object_usage_linter
+      ctrl_sid_setdiff <- setdiff(x = control_sample_ids, y = sid) # nolint: object_usage_linter
       cli::cli_inform(
         "{cli::qty(ctrl_sid_shared)} Excluding sample{?s}:
         {.val {ctrl_sid_shared}}. {cli::qty(ctrl_sid_setdiff)}Sample{?s} not in
@@ -1141,7 +1141,7 @@ clean_nonunique_uniprot <- function(df,
   } else {
 
     # Map Olink ID - UniProt ID
-    oid_uniprot_map <- df |> # nolint object_usage_linter
+    oid_uniprot_map <- df |> # nolint: object_usage_linter
       dplyr::filter(
         .data[[check_log$col_names$olink_id]] %in% check_log$non_unique_uniprot
       ) |>

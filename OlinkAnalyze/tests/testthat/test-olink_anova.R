@@ -123,6 +123,7 @@ test_that(
 
     skip_if_not_installed(pkg = "car")
     skip_if_not_installed(pkg = "broom")
+    skip_on_cran()
 
     expect_no_warning(
       object = expect_no_error(
@@ -166,6 +167,7 @@ test_that(
 
     skip_if_not_installed(pkg = "car")
     skip_if_not_installed(pkg = "broom")
+    skip_on_cran()
 
     expect_no_warning(
       object = expect_no_error(
@@ -209,6 +211,7 @@ test_that(
 
     skip_if_not_installed(pkg = "car")
     skip_if_not_installed(pkg = "broom")
+    skip_on_cran()
 
     expect_no_warning(
       object = expect_no_error(
@@ -250,6 +253,7 @@ test_that(
   {
     skip_if_not_installed(pkg = "car")
     skip_if_not_installed(pkg = "broom")
+    skip_on_cran()
 
     expect_warning(
       object = expect_message(
@@ -285,6 +289,7 @@ test_that(
   {
     skip_if_not_installed(pkg = "car")
     skip_if_not_installed(pkg = "broom")
+    skip_on_cran()
 
     expect_error(
       object = olink_anova(),
@@ -308,6 +313,7 @@ test_that(
   {
     skip_if_not_installed(pkg = "car")
     skip_if_not_installed(pkg = "broom")
+    skip_on_cran()
 
     expect_error(
       object = olink_anova(
@@ -336,6 +342,7 @@ test_that(
   {
     skip_if_not_installed(pkg = "car")
     skip_if_not_installed(pkg = "broom")
+    skip_on_cran()
 
     expect_no_error(
       object = expect_no_warning(
@@ -368,6 +375,7 @@ test_that(
     skip_if_not_installed(pkg = "car")
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")
+    skip_on_cran()
 
     # this has been tested earlier
     anova_res_site <- olink_anova(
@@ -446,6 +454,7 @@ test_that(
     skip_if_not_installed(pkg = "car")
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")
+    skip_on_cran()
 
     # this has been tested earlier
     anova_res_time <- olink_anova(
@@ -520,6 +529,7 @@ test_that(
     skip_if_not_installed(pkg = "car")
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")
+    skip_on_cran()
 
     # this has been tested earlier
     anova_res_site_time <- olink_anova(
@@ -627,6 +637,7 @@ test_that(
     skip_if_not_installed(pkg = "car")
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")
+    skip_on_cran()
 
     expect_warning(
       object = expect_message(
@@ -701,6 +712,7 @@ test_that(
     skip_if_not_installed(pkg = "car")
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")
+    skip_on_cran()
 
     expect_error(
       object = olink_anova_posthoc(),
@@ -725,6 +737,7 @@ test_that(
     skip_if_not_installed(pkg = "car")
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")
+    skip_on_cran()
 
     expect_error(
       object = olink_anova_posthoc(
@@ -756,6 +769,7 @@ test_that(
     skip_if_not_installed(pkg = "car")
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")
+    skip_on_cran()
 
     expect_no_error(
       object = expect_no_warning(

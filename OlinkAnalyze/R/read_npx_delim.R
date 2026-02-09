@@ -135,7 +135,7 @@ read_npx_delim <- function(file,
       && grepl("warning|error", df_olink)) {
 
     # If both functions throw errors, return an error message
-    cli::cli_abort( # nolint return_linter
+    cli::cli_abort( # nolint: return_linter
       c(
         "x" = "Unable to open delimited file: {.file {file}}!",
         "i" = "Check if {.arg file} is delimited or corrupt."
@@ -342,7 +342,7 @@ get_field_separator <- function(file) {
     # convert warning to error
     stop()
   }, error = function(e) {
-    cli::cli_abort( # nolint return_linter
+    cli::cli_abort( # nolint: return_linter
       c(
         "x" = "Unable to open delimited file: {.file {file}}!",
         "i" = "Check if {.arg file} is delimited or corrupt."
@@ -358,7 +358,7 @@ get_field_separator <- function(file) {
 
   # no match to delimiters
   if (all(count_sep_occur == 0L)) {
-    cli::cli_abort( # nolint return_linter
+    cli::cli_abort( # nolint: return_linter
       c(
         "x" = "Unable to identify the separator of the file: {.file {file}}",
         "i" = "Expected one of {.val {accepted_field_sep}}!"

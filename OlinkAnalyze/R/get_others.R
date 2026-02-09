@@ -31,7 +31,7 @@ get_file_ext_summary <- function() {
   x <- sapply(
     get_file_formats(),
     function(ff) {
-      paste0( # nolint return_linter
+      paste0( # nolint: return_linter
         get_file_ext(name_sub = ff) |> ansi_collapse_quot(sep = "or"),
         " for ", ff, " files"
       )
@@ -80,7 +80,7 @@ get_file_ext <- function(name_sub = NULL) {
                        error = TRUE)
 
     if (!all(name_sub %in% get_file_formats())) {
-      no_overlap <- name_sub[!(name_sub %in% get_file_formats())] # nolint object_usage_linter
+      no_overlap <- name_sub[!(name_sub %in% get_file_formats())] # nolint: object_usage_linter
       cli::cli_abort(
         c(
           "x" = "{.val {no_overlap}} {?does/do} not reflect an acceptable file
