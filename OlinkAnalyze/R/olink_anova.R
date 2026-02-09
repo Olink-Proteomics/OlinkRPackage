@@ -38,11 +38,11 @@
 #'
 #' @param df NPX data frame in long format with at least protein name (Assay),
 #' OlinkID, UniProt, Panel and a factor with at least 3 levels.
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
 #' @param variable Single character value or character array. Variable(s) to
 #' test. If length > 1, the included variable names will be used in crossed
 #' analyses. Also takes ':' or '*' notation.
+#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
+#' [`check_npx()`] will be run internally using `df`.
 #' @param outcome Character. The dependent variable. Default: NPX.
 #' @param covariates Single character value or character array. Default: NULL.
 #' Covariates to include. Takes ':' or '*' notation. Crossed analysis will not
@@ -130,7 +130,7 @@ olink_anova <- function(df,
                         outcome = "NPX",
                         covariates = NULL,
                         model_formula,
-                        return.covariates = FALSE, # nolint object_name_linter
+                        return.covariates = FALSE, # nolint: object_name_linter
                         verbose = TRUE) {
 
   # Check if all required libraries for this function are installed
@@ -228,7 +228,7 @@ olink_anova <- function(df,
 
   anova_result <- withCallingHandlers(
     {
-      #Filtering on valid OlinkID
+      # Filtering on valid OlinkID
       df <- df |>
         dplyr::filter(
           stringr::str_detect(
@@ -237,37 +237,38 @@ olink_anova <- function(df,
           )
         )
 
-      #Allow for :/* notation in covariates
+      # Allow for :/* notation in covariates
       variable <- gsub(pattern = "\\*", replacement = ":", x = variable)
       if (!is.null(covariates)) {
         covariates <- gsub(pattern = "\\*", replacement = ":", x = covariates)
       }
 
-      add.main.effects <- NULL # nolint object_name_linter
+      add.main.effects <- NULL # nolint: object_name_linter
       if (any(grepl(":", covariates))) {
         tmp <- unlist(strsplit(covariates, ":"))
-        add.main.effects <- c(add.main.effects, setdiff(tmp, covariates)) # nolint object_name_linter
+        add.main.effects <- c(add.main.effects, setdiff(tmp, covariates)) # nolint: object_name_linter
         covariates <- union(covariates, add.main.effects)
       }
       if (any(grepl(":", variable))) {
         tmp <- unlist(strsplit(variable, ":"))
-        add.main.effects <- c(add.main.effects, setdiff(tmp, variable)) # nolint object_name_linter
+        add.main.effects <- c(add.main.effects, setdiff(tmp, variable)) # nolint: object_name_linter
         variable <- union(variable, unlist(strsplit(variable, ":")))
         variable <- variable[!grepl(":", variable)]
       }
       # If variable is in both variable and covariate, keep it in variable or
       # will get removed from final table
       covariates <- setdiff(x = covariates, y = variable)
-      add.main.effects <- setdiff(x = add.main.effects, y = variable) # nolint object_name_linter
+      add.main.effects <- setdiff(x = add.main.effects, y = variable) # nolint: object_name_linter
 
       # Variables to check
       variable_testers <- intersect(x = c(variable, covariates), y = names(df))
 
-      # Remove rows where variables or covariate is NA (cant include in analysis
-      # anyway)
-      removed.sampleids <- NULL # nolint object_name_linter
+      # Remove rows where variables or covariate is NA (can't include in
+      # analysis anyway)
+      removed.sampleids <- NULL # nolint: object_name_linter
       for (i in variable_testers) {
-        removed.sampleids <- c(removed.sampleids, df$SampleID[is.na(df[[i]])]) |> # nolint object_name_linter
+        removed.sampleids <- c(removed.sampleids, # nolint: object_name_linter
+                               df$SampleID[is.na(df[[i]])]) |>
           unique()
         df <- df[!is.na(df[[i]]), ]
       }
@@ -275,15 +276,15 @@ olink_anova <- function(df,
       # Check data format
       check_log <- run_check_npx(df = df, check_log = check_log)
 
-      ##Convert character vars to factor
-      converted.vars <- NULL # nolint object_name_linter
-      num.vars <- NULL # nolint object_name_linter
+      # Convert character vars to factor
+      converted.vars <- NULL # nolint: object_name_linter
+      num.vars <- NULL # nolint: object_name_linter
       for (i in variable_testers) {
         if (is.character(df[[i]])) {
           df[[i]] <- factor(df[[i]])
-          converted.vars <- c(converted.vars, i) # nolint object_name_linter
+          converted.vars <- c(converted.vars, i) # nolint: object_name_linter
         } else if (is.numeric(df[[i]])) {
-          num.vars <- c(num.vars, i) # nolint object_name_linter
+          num.vars <- c(num.vars, i) # nolint: object_name_linter
         }
       }
 
@@ -324,7 +325,6 @@ olink_anova <- function(df,
           dplyr::pull(
             .data[["OlinkID"]]
           )
-
 
         if (length(current_nas) > 0L) {
 
@@ -380,8 +380,8 @@ olink_anova <- function(df,
       }
 
       #Get factors
-      fact.vars <- sapply(variable_testers, function(x) is.factor(df[[x]])) # nolint object_name_linter
-      fact.vars <- names(fact.vars)[fact.vars] # nolint object_name_linter
+      fact.vars <- sapply(variable_testers, function(x) is.factor(df[[x]])) # nolint: object_name_linter
+      fact.vars <- names(fact.vars)[fact.vars] # nolint: object_name_linter
 
 
       #Print verbose message
@@ -418,7 +418,7 @@ olink_anova <- function(df,
       }
 
       if (!is.null(covariates) & any(grepl(":", covariates))) {
-        covariate_filter_string <- covariates[stringr::str_detect(covariates, ":")] # nolint line_length_linter
+        covariate_filter_string <- covariates[stringr::str_detect(covariates, ":")] # nolint: line_length_linter
         covariate_filter_string <- sub(
           pattern = "(.*)\\:(.*)$",
           replacement = "\\2:\\1",
@@ -429,7 +429,7 @@ olink_anova <- function(df,
         covariate_filter_string <- covariates
       }
 
-      p.val <- df |> # nolint object_name_linter
+      p.val <- df |> # nolint: object_name_linter
         # Exclude assays that have all NA:s
         dplyr::filter(
           !(.data[["OlinkID"]] %in% check_log$assay_na)
@@ -494,7 +494,7 @@ olink_anova <- function(df,
         )
 
       if (return.covariates == FALSE) {
-        p.val <- p.val |> # nolint object_name_linter
+        p.val <- p.val |> # nolint: object_name_linter
           dplyr::filter(
             !(.data[["term"]] %in% .env[["covariate_filter_string"]])
           )
@@ -811,7 +811,7 @@ olink_anova_posthoc <- function(df,
           )
         )
 
-      if (is.null(olinkid_list)) {
+      if (is.null(olinkid_list) || length(olinkid_list) == 0L) {
         olinkid_list <- df |>
           dplyr::select(
             dplyr::all_of("OlinkID")
@@ -826,31 +826,31 @@ olink_anova_posthoc <- function(df,
         covariates <- gsub(pattern = "\\*", replacement = ":", x = covariates)
       }
 
-      add.main.effects <- NULL # nolint object_name_linter
+      add.main.effects <- NULL # nolint: object_name_linter
       if (any(grepl(":", covariates))) {
         tmp <- unlist(strsplit(covariates, ":"))
-        add.main.effects <- c(add.main.effects, setdiff(tmp, covariates)) # nolint object_name_linter
+        add.main.effects <- c(add.main.effects, setdiff(tmp, covariates)) # nolint: object_name_linter
         covariates <- union(covariates, add.main.effects)
       }
       if (any(grepl(":", variable))) {
         tmp <- unlist(strsplit(variable, ":"))
-        add.main.effects <- c(add.main.effects, setdiff(tmp, variable)) # nolint object_name_linter
+        add.main.effects <- c(add.main.effects, setdiff(tmp, variable)) # nolint: object_name_linter
         variable <- union(variable, unlist(strsplit(variable, ":")))
         variable <- variable[!grepl(":", variable)]
       }
       # If variable is in both variable and covariate, keep it in variable or
       # will get removed from final table
       covariates <- setdiff(x = covariates, y = variable)
-      add.main.effects <- setdiff(x = add.main.effects, y = variable) # nolint object_name_linter
+      add.main.effects <- setdiff(x = add.main.effects, y = variable) # nolint: object_name_linter
 
       # Variables to check
       variable_testers <- intersect(x = c(variable, covariates), y = names(df))
 
       # Remove rows where variables or covariate is NA (cant include in analysis
       # anyway)
-      removed.sampleids <- NULL # nolint object_name_linter
+      removed.sampleids <- NULL # nolint: object_name_linter
       for (i in variable_testers) {
-        removed.sampleids <- c(removed.sampleids, # nolint object_name_linter
+        removed.sampleids <- c(removed.sampleids, # nolint: object_name_linter
                                df$SampleID[is.na(df[[i]])]) |>
           unique()
         df <- df[!is.na(df[[i]]), ]
@@ -860,14 +860,14 @@ olink_anova_posthoc <- function(df,
       check_log <- run_check_npx(df = df, check_log = check_log)
 
       # Convert character vars to factor
-      converted.vars <- NULL # nolint object_name_linter
-      num.vars <- NULL # nolint object_name_linter
+      converted.vars <- NULL # nolint: object_name_linter
+      num.vars <- NULL # nolint: object_name_linter
       for (i in variable_testers) {
         if (is.character(df[[i]])) {
           df[[i]] <- factor(df[[i]])
-          converted.vars <- c(converted.vars, i) # nolint object_name_linter
+          converted.vars <- c(converted.vars, i) # nolint: object_name_linter
         } else if (is.numeric(df[[i]])) {
-          num.vars <- c(num.vars, i) # nolint object_name_linter
+          num.vars <- c(num.vars, i) # nolint: object_name_linter
         }
       }
 
@@ -930,10 +930,10 @@ olink_anova_posthoc <- function(df,
       }
 
       if (!missing(effect_formula)) {
-        e_form <- stats::as.formula(effect_formula) # nolint object_usage_linter
+        e_form <- stats::as.formula(effect_formula) # nolint: object_usage_linter
       } else if (missing(effect_formula)) {
         e_form <- stats::as.formula(
-          paste0("pairwise~", paste(effect, collapse = "+")) # nolint object_usage_linter
+          paste0("pairwise~", paste(effect, collapse = "+")) # nolint: object_usage_linter
         )
       }
 
@@ -1027,7 +1027,8 @@ olink_anova_posthoc <- function(df,
 
       return(anova_posthoc_results)
 
-    }, warning = function(w) {
+    },
+    warning = function(w) {
       restart_if_spec_warn <- grepl(
         x = w,
         pattern = utils::glob2rx("*contains implicit NA, consider using*")
@@ -1053,7 +1054,7 @@ olink_anova_posthoc <- function(df,
 #'
 internal_anova <- function(x,
                            formula_string,
-                           fact.vars) {  # nolint object_name_linter
+                           fact.vars) {  # nolint: object_name_linter
   anova_out <- broom::tidy(
     x = car::Anova(
       stats::lm(

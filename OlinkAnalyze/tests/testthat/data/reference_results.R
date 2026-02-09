@@ -435,7 +435,7 @@ lmer_posthoc <- OlinkAnalyze::olink_lmer_posthoc(
 # CONTROL_SAMPLE_AS 1, CONTROL_SAMPLE_AS 2
 # Variables and covariates converted from character to factors: Treatment, Time
 # Means estimated for each assay from linear mixed effects model:
-# NPX~Treatment*Time+(1|Subject) # nolint commented_code_linter
+# NPX~Treatment*Time+(1|Subject) # nolint: commented_code_linter
 
 rm(lmer_sign)
 

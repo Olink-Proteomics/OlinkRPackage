@@ -475,7 +475,7 @@ test_that(
     test_check_log <- check_npx(df = npx_data1) |>
       suppressWarnings() |>
       suppressMessages()
-    test_check_log$col_names <- test_check_log$col_names[utils::head(x = names(test_check_log$col_names), n = 4L)] # nolint indentation_linter
+    test_check_log$col_names <- test_check_log$col_names[utils::head(x = names(test_check_log$col_names), n = 4L)] # nolint: indentation_linter
 
     expect_error(
       object = run_check_npx(df = npx_data1,

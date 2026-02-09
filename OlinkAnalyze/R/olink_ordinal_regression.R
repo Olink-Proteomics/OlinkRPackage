@@ -89,7 +89,7 @@
 olink_ordinal_regression <- function(df,
                                      variable,
                                      covariates = NULL,
-                                     return.covariates = FALSE, # nolint object_name_linter
+                                     return.covariates = FALSE, # nolint: object_name_linter
                                      check_log = NULL,
                                      verbose = TRUE) {
   # Check if all required libraries for this function are installed
@@ -119,17 +119,17 @@ olink_ordinal_regression <- function(df,
         covariates <- gsub(pattern = "\\*", replacement = ":", x = covariates)
       }
 
-      add.main.effects <- NULL # nolint object_name_linter
+      add.main.effects <- NULL # nolint: object_name_linter
 
       if (any(grepl(pattern = ":", x = covariates))) {
         tmp <- strsplit(x = covariates, split = ":") |> unlist()
-        add.main.effects <- c(add.main.effects, # nolint object_name_linter
+        add.main.effects <- c(add.main.effects, # nolint: object_name_linter
                               setdiff(x = tmp, y = covariates))
         covariates <- union(x = covariates, y = add.main.effects)
       }
       if (any(grepl(pattern = ":", x = variable))) {
         tmp <- strsplit(x = variable, split = ":") |> unlist()
-        add.main.effects <- c(add.main.effects, # nolint object_name_linter
+        add.main.effects <- c(add.main.effects, # nolint: object_name_linter
                               setdiff(x = tmp, y = variable))
         variable <- union(x = variable,
                           y = unlist(strsplit(x = variable, split = ":")))
@@ -139,7 +139,7 @@ olink_ordinal_regression <- function(df,
       # If variable is in both variable and covariate, keep it in variable or
       # will get removed from final table
       covariates <- setdiff(x = covariates, y = variable)
-      add.main.effects <- setdiff(x = add.main.effects, y = variable) # nolint object_name_linter
+      add.main.effects <- setdiff(x = add.main.effects, y = variable) # nolint: object_name_linter
 
       # Variables to check
       variable_testers <- intersect(x = c(variable, covariates),
@@ -147,9 +147,9 @@ olink_ordinal_regression <- function(df,
 
       # Remove rows where variables or covariate is NA (cant include in analysis
       # anyway)
-      removed.sampleids <- NULL # nolint object_name_linter
+      removed.sampleids <- NULL # nolint: object_name_linter
       for (i in variable_testers) {
-        removed.sampleids <- c(removed.sampleids, # nolint object_name_linter
+        removed.sampleids <- c(removed.sampleids, # nolint: object_name_linter
                                df$SampleID[is.na(df[[i]])]) |>
           unique()
         df <- df |>
@@ -169,17 +169,17 @@ olink_ordinal_regression <- function(df,
         )
 
       # Convert character vars to factor
-      converted.vars <- NULL # nolint object_name_linter
-      num.vars <- NULL # nolint object_name_linter
+      converted.vars <- NULL # nolint: object_name_linter
+      num.vars <- NULL # nolint: object_name_linter
       for (i in variable_testers) {
         if (is.character(df[[i]])) {
           df <- df |>
             dplyr::mutate(
               !!i := factor(x = .data[[i]])
             )
-          converted.vars <- c(converted.vars, i) # nolint object_name_linter
+          converted.vars <- c(converted.vars, i) # nolint: object_name_linter
         } else if (is.numeric(df[[i]])) {
-          num.vars <- c(num.vars, i) # nolint object_name_linter
+          num.vars <- c(num.vars, i) # nolint: object_name_linter
         }
       }
 
@@ -258,8 +258,8 @@ olink_ordinal_regression <- function(df,
       }
 
       # Get factors
-      fact.vars <- sapply(variable_testers, function(x) is.factor(df[[x]])) # nolint object_name_linter
-      fact.vars <- names(fact.vars)[fact.vars] # nolint object_name_linter
+      fact.vars <- sapply(variable_testers, function(x) is.factor(df[[x]])) # nolint: object_name_linter
+      fact.vars <- names(fact.vars)[fact.vars] # nolint: object_name_linter
 
       #Print verbose message
       if (verbose) {
@@ -302,7 +302,7 @@ olink_ordinal_regression <- function(df,
         covariate_filter_str <- covariates
       }
 
-      p.val <- df |> # nolint object_name_linter
+      p.val <- df |> # nolint: object_name_linter
         dplyr::filter(
           !(.data[["OlinkID"]] %in% check_log$assay_na)
           & !(.data[["OlinkID"]] %in% .env[["nas_in_var"]])
@@ -362,7 +362,7 @@ olink_ordinal_regression <- function(df,
         )
 
       if (return.covariates == FALSE) {
-        p.val <- p.val |> # nolint object_name_linter
+        p.val <- p.val |> # nolint: object_name_linter
           dplyr::filter(
             !(.data[["term"]] %in% .env[["covariate_filter_str"]])
           )
@@ -386,7 +386,7 @@ olink_ordinal_regression <- function(df,
 
 #' @rdname olink_ordinal_regression
 #' @export
-olink_ordinalRegression <- olink_ordinal_regression  # nolint object_name_linter
+olink_ordinalRegression <- olink_ordinal_regression  # nolint: object_name_linter
 
 #' Function which performs an posthoc test per protein.
 #'
@@ -489,7 +489,7 @@ olink_ordinalRegression <- olink_ordinal_regression  # nolint object_name_linter
 #' }
 #' }
 #'
-olink_ordinal_regression_posthoc <- function(df, # nolint object_length_linter
+olink_ordinal_regression_posthoc <- function(df, # nolint: object_length_linter
                                              olinkid_list = NULL,
                                              variable,
                                              covariates = NULL,
@@ -545,17 +545,17 @@ olink_ordinal_regression_posthoc <- function(df, # nolint object_length_linter
         covariates <- gsub(pattern = "\\*", replacement = ":", x = covariates)
       }
 
-      add.main.effects <- NULL # nolint object_name_linter
+      add.main.effects <- NULL # nolint: object_name_linter
 
       if (any(grepl(pattern = ":", x = covariates))) {
         tmp <- strsplit(x = covariates, split = ":") |> unlist()
-        add.main.effects <- c(add.main.effects, # nolint object_name_linter
+        add.main.effects <- c(add.main.effects, # nolint: object_name_linter
                               setdiff(x = tmp, y = covariates))
         covariates <- union(x = covariates, y = add.main.effects)
       }
       if (any(grepl(pattern = ":", x = variable))) {
         tmp <- strsplit(x = variable, split = ":") |> unlist()
-        add.main.effects <- c(add.main.effects, # nolint object_name_linter
+        add.main.effects <- c(add.main.effects, # nolint: object_name_linter
                               setdiff(x = tmp, y = variable))
         variable <- union(x = variable,
                           y = unlist(strsplit(x = variable, split = ":")))
@@ -565,7 +565,7 @@ olink_ordinal_regression_posthoc <- function(df, # nolint object_length_linter
       # If variable is in both variable and covariate, keep it in variable or
       # will get removed from final table
       covariates <- setdiff(x = covariates, y = variable)
-      add.main.effects <- setdiff(x = add.main.effects, y = variable) # nolint object_name_linter
+      add.main.effects <- setdiff(x = add.main.effects, y = variable) # nolint: object_name_linter
 
       # Variables to check
       variable_testers <- intersect(x = c(variable, covariates),
@@ -573,9 +573,9 @@ olink_ordinal_regression_posthoc <- function(df, # nolint object_length_linter
 
       # Remove rows where variables or covariate is NA (cant include in analysis
       # anyway)
-      removed.sampleids <- NULL # nolint object_name_linter
+      removed.sampleids <- NULL # nolint: object_name_linter
       for (i in variable_testers) {
-        removed.sampleids <- c(removed.sampleids, # nolint object_name_linter
+        removed.sampleids <- c(removed.sampleids, # nolint: object_name_linter
                                df$SampleID[is.na(df[[i]])]) |>
           unique()
         df <- df |>
@@ -591,17 +591,17 @@ olink_ordinal_regression_posthoc <- function(df, # nolint object_length_linter
         )
 
       # Convert character vars to factor
-      converted.vars <- NULL # nolint object_name_linter
-      num.vars <- NULL # nolint object_name_linter
+      converted.vars <- NULL # nolint: object_name_linter
+      num.vars <- NULL # nolint: object_name_linter
       for (i in variable_testers) {
         if (is.character(df[[i]])) {
           df <- df |>
             dplyr::mutate(
               !!i := factor(x = .data[[i]])
             )
-          converted.vars <- c(converted.vars, i) # nolint object_name_linter
+          converted.vars <- c(converted.vars, i) # nolint: object_name_linter
         } else if (is.numeric(df[[i]])) {
-          num.vars <- c(num.vars, i) # nolint object_name_linter
+          num.vars <- c(num.vars, i) # nolint: object_name_linter
         }
       }
 
@@ -654,10 +654,10 @@ olink_ordinal_regression_posthoc <- function(df, # nolint object_length_linter
       }
 
       if (!missing(effect_formula)) {
-        e_form <- stats::as.formula(object = effect_formula) # nolint object_usage_linter
+        e_form <- stats::as.formula(object = effect_formula) # nolintv object_usage_linter
       } else {
         e_form <- stats::as.formula(
-          object = paste0("pairwise~", paste(effect, collapse = "+")) # nolint object_usage_linter
+          object = paste0("pairwise~", paste(effect, collapse = "+")) # nolint: object_usage_linter
         )
       }
 
@@ -739,4 +739,4 @@ olink_ordinal_regression_posthoc <- function(df, # nolint object_length_linter
 
 #' @rdname olink_ordinal_regression_posthoc
 #' @export
-olink_ordinalRegression_posthoc <- olink_ordinal_regression_posthoc  # nolint object_name_linter
+olink_ordinalRegression_posthoc <- olink_ordinal_regression_posthoc  # nolint: object_name_linter
