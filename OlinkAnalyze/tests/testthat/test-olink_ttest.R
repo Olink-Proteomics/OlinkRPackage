@@ -6,6 +6,7 @@ test_that(
     reference_results <- get_example_data(filename = "reference_results.rds")
 
     skip_if_not_installed(pkg = "broom")
+    skip_on_cran()
 
     check_log <- check_npx(df = npx_data1) |>
       suppressMessages() |>
@@ -43,6 +44,7 @@ test_that(
     reference_results <- get_example_data(filename = "reference_results.rds")
 
     skip_if_not_installed(pkg = "broom")
+    skip_on_cran()
 
     npx_df <- npx_data1 |>
       dplyr::filter(
@@ -78,6 +80,7 @@ test_that(
   "olink_ttest - error - no df and/or variable provided",
   {
     skip_if_not_installed(pkg = "broom")
+    skip_on_cran()
 
     expect_error(
       object = olink_ttest(),
@@ -104,6 +107,7 @@ test_that(
   "olink_ttest - error - more than 1 levels",
   {
     skip_if_not_installed(pkg = "broom")
+    skip_on_cran()
 
     expect_error(
       object = expect_message(
