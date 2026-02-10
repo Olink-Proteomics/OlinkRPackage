@@ -68,7 +68,7 @@ Imports:
     broom,
     car,
     cli (>= 3.6.2),
-    dplyr (>= 1.1.1),
+    dplyr (>= 1.2.0),
     data.table,
     emmeans,
     forcats,
