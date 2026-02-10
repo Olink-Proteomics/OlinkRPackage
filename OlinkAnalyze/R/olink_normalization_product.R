@@ -424,7 +424,7 @@ olink_normalization_bridgeable <- function(lst_df,
 #'  ref_cols = ref_cols,
 #'  not_ref_cols = not_ref_cols,
 #'  bridge_samples = bridge_samples,
-#'  prod_uniq = c("3k","HT")
+#'  prod_uniq = c("E3072","HT")
 #' )
 #' }
 #'
@@ -434,9 +434,9 @@ olink_normalization_qs <- function(lst_df,
                                    bridge_samples,
                                    prod_uniq) {
 
-  if (identical(prod_uniq, c("3k", "HT"))) {
+  if (identical(prod_uniq, c("E3072", "HT"))) {
     num_samples <- 40L
-  } else if (identical(prod_uniq, c("3k", "Reveal"))) {
+  } else if (identical(prod_uniq, c("E3072", "Reveal"))) {
     num_samples <- 32L
   } else if (all(prod_uniq %in% c("HT", "Reveal"))) {
     num_samples <- 24L
@@ -713,202 +713,4 @@ olink_normalization_qs <- function(lst_df,
     dplyr::bind_rows(ecdf_transform)
 
   return(df_qq_norm)
-}
-
-
-
-#' Formatting the output of olink_normalization_product for seamless use with
-#' downstream analysis functions.
-#'
-#' @author
-#'   Danai G. Topouza
-#'   Klev Diamanti
-#'
-#' @description
-#' Replaces the NPX values of the non-reference project by the Median Centered
-#' or QS Normalized NPX, according to the Bridging Recommendation. Edits the
-#' BridgingRecommendation column to indicate whether an assay is NotBridgeable,
-#' NotOverlapping, MedianCentering, or QuantileSmoothing bridged. Replaces
-#' OlinkID by the concatenation of the Explore HT and Explore 3072 OlinkIDs to
-#' record the OlinkIDs from both projects for bridgeable assays. Assays that are
-#' NotBridgeable or NotOverlapping retain their original non-reference OlinkIDs
-#' and NPX values. Replaces SampleID with the concatenation of SampleID and
-#' Project to make unique sample IDs for downstream analysis. Removes internal
-#' and external controls. Removes  MedianCenteredNPX, QSNormalizedNPX,
-#' OlinkID_E3072 columns.
-#'
-#' @param df_norm A "tibble" of Olink data in long format resulting from the
-#' olink_normalization_product function.
-#' @param df1 First dataset to be used for normalization, pre-normalization.
-#' Must match df1 used in olink_normalization product bridging.
-#' @param df2 Second dataset to be used for normalization, pre-normalization.
-#' Must match df2 used in olink_normalization product bridging.
-#' @param df1_project_nr Project name of first dataset. Must match name used in
-#' olink_normalization product bridging.
-#' @param df2_project_nr Project name of second dataset. Must match name used in
-#' olink_normalization product bridging.
-#' @param prod_uniq Name of products (not_ref, ref)
-#' @param lst_check = lst_check
-#'
-#' @return A "tibble" of Olink data in long format containing both input
-#' datasets with the bridged NPX quantifications, with the above
-#' modifications.
-#'
-#' @examples
-#' \donttest{
-#' # bridge samples
-#' bridge_samples <- intersect(
-#'   x = unique(OlinkAnalyze:::data_ht_small$SampleID),
-#'   y = unique(OlinkAnalyze:::data_3k_small$SampleID)
-#' ) |>
-#'   (\(x) x[!grepl("CONTROL", x)])()
-#'
-#' # run olink_normalization
-#' df_norm <- olink_normalization(
-#'   df1 = OlinkAnalyze:::data_ht_small,
-#'   df2 = OlinkAnalyze:::data_3k_small,
-#'   overlapping_samples_df1 = bridge_samples,
-#'   df1_project_nr = "Explore HT",
-#'   df2_project_nr = "Explore 3072",
-#'   reference_project = "Explore HT"
-#' )
-#'
-#'# generate lst_check
-#'lst_check_3k_ht <- OlinkAnalyze:::olink_norm_input_check(
-#'  df1 = OlinkAnalyze:::data_ht_small,
-#'  df2 = OlinkAnalyze:::data_3k_small,
-#'  overlapping_samples_df1 = bridge_samples,
-#'  overlapping_samples_df2 = NULL,
-#'  df1_project_nr = "Explore HT",
-#'  df2_project_nr = "Explore 3072",
-#'  reference_project = "Explore HT",
-#'  reference_medians = NULL
-#'  )
-#'
-#' # format output
-#' OlinkAnalyze:::olink_normalization_product_format(
-#'   df_norm = df_norm,
-#'   df1 = OlinkAnalyze:::data_ht_small,
-#'   df2 = OlinkAnalyze:::data_3k_small,
-#'   df1_project_nr = "Explore HT",
-#'   df2_project_nr = "Explore 3072",
-#'   lst_check = lst_check_3k_ht,
-#'   prod_uniq = c("3k", "HT")
-#' )
-#' }
-#'
-olink_normalization_product_format <- function(df_norm, # nolint object_length_linter
-                                               df1,
-                                               df1_project_nr,
-                                               df2,
-                                               df2_project_nr,
-                                               prod_uniq,
-                                               lst_check) {
-
-  # Extract data for assays = "NotBridgeable" ----
-  not_ref_product <- ifelse(lst_check$not_ref_product == "3k",
-                            "E3072",
-                            lst_check$not_ref_product)
-
-  olinkid_not_ref <- paste0("OlinkID_", not_ref_product)
-
-  df_not_bridgeable <- df_norm |>
-    dplyr::filter(
-      .data[["SampleType"]] == "SAMPLE" # remove control samples
-      & .data[["AssayType"]] == "assay" # remove control assays
-      # keep only assays that are not bridgeable
-      & .data[["BridgingRecommendation"]] == "NotBridgeable"
-    ) |>
-    dplyr::mutate(
-      OlinkID = dplyr::if_else(
-        .data[["Project"]] == lst_check$ref_name,
-        .data[["OlinkID"]],
-        .data[[olinkid_not_ref]]
-      )
-    )
-
-  # Extract data from non-overlapping assays ----
-
-  # There are different mapping datsets for 3k-HT and 3k-Reveal. Using this
-  # function we always select the relevant mapping dataset.
-  # We also keep OlinkIDs of assays from both products that are being normalized
-  # as one vector, to identify assays that were excluded from the cross-product
-  # normalization.
-  oid_ref_notref <- mapping_file_id(prod_uniq = prod_uniq) |> # nolint object_usage_linter
-    dplyr::select(
-      dplyr::starts_with("OlinkID_")
-    ) |>
-    unlist(use.names = FALSE)
-
-  df1_no_overlap <- df1 |>
-    dplyr::filter(
-      .data[["SampleType"]] == "SAMPLE" # remove control samples
-      & .data[["AssayType"]] == "assay" # remove control assays
-      # keep non-overlapping assays
-      & !(.data[["OlinkID"]] %in% .env[["oid_ref_notref"]])
-    ) |>
-    # add missing variables
-    dplyr::mutate(
-      Project = .env[["df1_project_nr"]],
-      BridgingRecommendation = "NotOverlapping"
-    )
-
-  df2_no_overlap <- df2 |>
-    dplyr::filter(
-      .data[["SampleType"]] == "SAMPLE" # remove control samples
-      & .data[["AssayType"]] == "assay" # remove control assays
-      # keep non-overlapping assays
-      & !(.data[["OlinkID"]] %in% .env[["oid_ref_notref"]])
-    ) |>
-    # add missing variables
-    dplyr::mutate(
-      Project = .env[["df2_project_nr"]],
-      BridgingRecommendation = "NotOverlapping"
-    )
-
-  # Keep the data following BridgingRecommendation for bridgeable assays ----
-
-  df_bridgeable <- df_norm |>
-    dplyr::filter(
-      .data[["SampleType"]] == "SAMPLE" # remove control samples
-      & .data[["AssayType"]] == "assay" # remove control assays
-      # keep only assays that are bridgeable
-      & .data[["BridgingRecommendation"]] != "NotBridgeable"
-    ) |> # Remove controls
-    dplyr::mutate(
-      OlinkID = paste0(.data[["OlinkID"]], "_", .data[[olinkid_not_ref]]),
-      NPX = dplyr::case_when(
-        .data[["BridgingRecommendation"]] == "MedianCentering" ~
-          .data[["MedianCenteredNPX"]],
-        .data[["BridgingRecommendation"]] == "QuantileSmoothing" ~
-          .data[["QSNormalizedNPX"]],
-        .default = .data[["NPX"]]
-      )
-    )
-
-  # combine data and sort ----
-
-  df_full <- df_bridgeable |>
-    dplyr::bind_rows(
-      df_not_bridgeable
-    ) |>
-    dplyr::bind_rows(
-      df1_no_overlap
-    ) |>
-    dplyr::bind_rows(
-      df2_no_overlap
-    ) |>
-    dplyr::mutate(
-      SampleID = paste0(.data[["SampleID"]], "_", .data[["Project"]])
-    ) |>
-    dplyr::select( # Remove extra columns
-      -dplyr::any_of(
-        c("MedianCenteredNPX", "QSNormalizedNPX", olinkid_not_ref)
-      )
-    ) |>
-    dplyr::arrange(
-      .data[["Project"]], .data[["SampleID"]]
-    )
-
-  return(df_full)
 }

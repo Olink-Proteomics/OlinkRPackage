@@ -46,6 +46,7 @@ dplyr
 dunnTest
 ECDF
 eHT
+eht
 emmeans
 enrichmentScore
 ExploreVersion
@@ -95,6 +96,7 @@ LMOD
 loadings
 LOD
 LODNPX
+lst
 magrittr
 MAPK
 md
@@ -126,6 +128,10 @@ OlinkID's
 OlinkIDs
 olinkR
 omics
+OSI
+OSIPreparationTemperature
+OSISummary
+OSITimeToCentrifugation
 ordinalRegression
 outlierDef
 outlierDefX

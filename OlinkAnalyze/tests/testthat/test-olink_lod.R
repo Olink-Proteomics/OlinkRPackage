@@ -25,6 +25,9 @@ test_that("No message", {
   expect_no_message(check_lod_darid(lod_file,
                                     df |>
                                       mutate(PanelDataArchiveVersion = "1.0")))
+  expect_no_message(check_lod_darid(lod_file,
+                                    df |>
+                                      mutate(DataAnalysisRefID = "R10001")))
 
 })
 
