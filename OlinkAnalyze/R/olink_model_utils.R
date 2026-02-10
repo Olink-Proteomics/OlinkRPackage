@@ -186,7 +186,7 @@ detect_assays_with_na_levels <- function(df,
       warning(
         paste0(
           "The assay(s) ", current_nas,
-          " has only NA:s in atleast one level of ", effect,
+          " has only NA:s in at least one level of ", effect,
           ". It will not be tested."
         ),
         call. = FALSE
@@ -259,7 +259,7 @@ validate_unique_levels_per_sample <- function(df, single_fixed_effects) {
 #'
 build_covariate_filter_string <- function(covariates) {
 
-  if (!is.null(covariates) & any(grepl(":", covariates))) {
+  if (!is.null(covariates) && any(grepl(":", covariates))) {
     covariate_filter_string <- covariates[stringr::str_detect(covariates, ":")]
     covariate_filter_string <- sub(
       pattern = "(.*)\\:(.*)$",
@@ -300,13 +300,13 @@ print_verbose_messages <- function(verbose,
                                     model_type = "model") {
 
   if (verbose) {
-    if (!is.null(add.main.effects) & length(add.main.effects) > 0L) {
+    if (!is.null(add.main.effects) && length(add.main.effects) > 0L) {
       message(
         "Missing main effects added to the model formula: ",
         paste(add.main.effects, collapse = ", ")
       )
     }
-    if (!is.null(removed.sampleids) & length(removed.sampleids) > 0L) {
+    if (!is.null(removed.sampleids) && length(removed.sampleids) > 0L) {
       message(
         "Samples removed due to missing variable or covariate levels: ",
         paste(removed.sampleids, collapse = ", ")
