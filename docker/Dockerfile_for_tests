@@ -51,7 +51,19 @@ RUN if [ "$R_VERSION" = "4.2.3" ]; then \
         echo "  CRAN = \"https://packagemanager.posit.co/cran/__linux__/focal/2023-12-12\"" >> "$r_profile"; \
         echo "))" >> "$r_profile"; \
       else \
-        echo "Running on R > 4.2.3. Nothing to update!"; \
+        # For R 4.3.3
+        if [ "$R_VERSION" = "4.3.3" ]; then \
+          echo "Setting up snapshot for R 4.3.3 on Ubuntu 22.04 Jammy from 2026-02-04"; \
+          echo "options(repos = c(" > "$r_profile"; \
+          echo "  CRAN = \"https://packagemanager.posit.co/cran/__linux__/jammy/2026-02-04\"" >> "$r_profile"; \
+          echo "))" >> "$r_profile"; \
+        else \
+          # For R 4.4.3
+          echo "Setting up snapshot for R 4.4.3 on Ubuntu 24.04 Noble Numbat from 2026-02-04"; \
+          echo "options(repos = c(" > "$r_profile"; \
+          echo "  CRAN = \"https://packagemanager.posit.co/cran/__linux__/noble/2026-02-04\"" >> "$r_profile"; \
+          echo "))" >> "$r_profile"; \
+        fi \
       fi \
     fi
 
