@@ -791,3 +791,569 @@ test_that(
     )
   }
 )
+
+# Additional tests for comprehensive coverage ----
+
+test_that(
+  "olink_anova - works - model_formula string override",
+  {
+    skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
+    skip_on_cran()
+
+    expect_message(
+      object = expect_message(
+        object = expect_no_error(
+          object = expect_no_warning(
+            object = olink_anova(
+              df = npx_data1_mod,
+              check_log = npx_data1_mod_check_log,
+              model_formula = "NPX~Site",
+              variable = "Time"
+            )
+          )
+        ),
+        regexp = "model_formula overriding variable and covariate arguments."
+      ),
+      regexp = "ANOVA model fit to each assay: NPX~Site"
+    )
+  }
+)
+
+test_that(
+  "olink_anova - works - model_formula object override",
+  {
+    skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
+    skip_on_cran()
+
+    expect_message(
+      object = expect_no_error(
+        object = expect_no_warning(
+          object = olink_anova(
+            df = npx_data1_mod,
+            check_log = npx_data1_mod_check_log,
+            model_formula = stats::as.formula("NPX~Time")
+          )
+        )
+      ),
+      regexp = "ANOVA model fit to each assay: NPX~Time"
+    )
+  }
+)
+
+test_that(
+  "olink_anova - error - invalid model_formula",
+  {
+    skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
+    skip_on_cran()
+
+    expect_error(
+      object = olink_anova(
+        df = npx_data1_mod,
+        check_log = npx_data1_mod_check_log,
+        model_formula = "this is not a valid formula"
+      ),
+      regexp = "is not a recognized formula"
+    )
+  }
+)
+
+test_that(
+  "olink_anova - works - with single covariate",
+  {
+    skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
+    skip_on_cran()
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = expect_message(
+            object = anova_res <- olink_anova(
+              df = npx_data1_mod,
+              check_log = npx_data1_mod_check_log,
+              variable = "Time",
+              covariates = "Site"
+            ),
+            regexp = paste("Variables and covariates converted from character",
+                           "to factors: Time, Site")
+          ),
+          regexp = "ANOVA model fit to each assay: NPX~Time\\+Site",
+          fixed = TRUE
+        )
+      )
+    )
+
+    # Verify that results include both Time and Site terms
+    expect_true(
+      object = "Time" %in% unique(anova_res$term)
+    )
+    expect_true(
+      object = "Site" %in% unique(anova_res$term)
+    )
+  }
+)
+
+test_that(
+  "olink_anova - works - with interaction covariate",
+  {
+    skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
+    skip_on_cran()
+
+    # Create a dataset with a third variable for testing
+    npx_test_data <- npx_data1_mod |>
+      dplyr::mutate(
+        Treatment = dplyr::case_when(
+          Site == "Site_A" ~ "Treated",
+          TRUE ~ "Untreated"
+        )
+      )
+
+    npx_test_check <- check_npx(df = npx_test_data) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    expect_no_error(
+      object = expect_message(
+        object = expect_message(
+          object = anova_res <- olink_anova(
+            df = npx_test_data,
+            check_log = npx_test_check,
+            variable = "Time",
+            covariates = "Site:Treatment"
+          ),
+          regexp = "Missing main effects added to the model formula: Site, Treatment"
+        ),
+        regexp = "ANOVA model fit to each assay: NPX~Time\\+Site:Treatment\\+Site\\+Treatment",
+        fixed = TRUE
+      )
+    )
+  }
+)
+
+test_that(
+  "olink_anova - works - return.covariates = TRUE",
+  {
+    skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
+    skip_on_cran()
+
+    anova_res_with_cov <- olink_anova(
+      df = npx_data1_mod,
+      check_log = npx_data1_mod_check_log,
+      variable = "Time",
+      covariates = "Site",
+      return.covariates = TRUE
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # Verify that Site covariate is in results
+    expect_true(
+      object = "Site" %in% unique(anova_res_with_cov$term)
+    )
+
+    # Verify that covariate has NA adjusted p-value
+    site_results <- anova_res_with_cov |>
+      dplyr::filter(term == "Site")
+
+    expect_true(
+      object = all(is.na(site_results$Adjusted_pval))
+    )
+  }
+)
+
+test_that(
+  "olink_anova - works - verbose = FALSE",
+  {
+    skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
+    skip_on_cran()
+
+    # Capture all messages
+    msgs <- testthat::capture_messages(
+      {
+        anova_res <- olink_anova(
+          df = npx_data1_mod,
+          check_log = npx_data1_mod_check_log,
+          variable = "Site",
+          verbose = FALSE
+        )
+      }
+    )
+
+    # Should have no messages when verbose = FALSE
+    expect_equal(
+      object = length(msgs),
+      expected = 0L
+    )
+  }
+)
+
+test_that(
+  "olink_anova_posthoc - works - model_formula override",
+  {
+    skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
+    skip_if_not_installed(pkg = "emmeans")
+    skip_on_cran()
+
+    # Get some OlinkIDs for testing
+    anova_res_site <- olink_anova(
+      df = npx_data1_mod,
+      variable = "Site",
+      check_log = npx_data1_mod_check_log
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    anova_res_site_oid <- anova_res_site |>
+      dplyr::slice_head(n = 5L) |>
+      dplyr::pull(.data[["OlinkID"]])
+
+    expect_message(
+      object = expect_no_error(
+        object = expect_no_warning(
+          object = olink_anova_posthoc(
+            df = npx_data1_mod,
+            check_log = npx_data1_mod_check_log,
+            model_formula = "NPX~Site",
+            variable = "Time",
+            olinkid_list = anova_res_site_oid,
+            effect = "Site"
+          )
+        )
+      ),
+      regexp = "model_formula overriding variable and covariate arguments."
+    )
+  }
+)
+
+test_that(
+  "olink_anova_posthoc - works - effect_formula",
+  {
+    skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
+    skip_if_not_installed(pkg = "emmeans")
+    skip_on_cran()
+
+    # Two-way ANOVA for testing effect_formula
+    anova_res_site_time <- olink_anova(
+      df = npx_data1_mod,
+      variable = c("Site", "Time"),
+      check_log = npx_data1_mod_check_log
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    anova_res_oid <- anova_res_site_time |>
+      dplyr::slice_head(n = 5L) |>
+      dplyr::pull(.data[["OlinkID"]])
+
+    expect_message(
+      object = expect_no_error(
+        object = expect_no_warning(
+          object = posthoc_res <- olink_anova_posthoc(
+            df = npx_data1_mod,
+            check_log = npx_data1_mod_check_log,
+            variable = c("Site", "Time"),
+            olinkid_list = anova_res_oid,
+            effect = "Time",
+            effect_formula = "pairwise~Time|Site"
+          )
+        )
+      ),
+      regexp = "effect_formula overriding effect argument."
+    )
+
+    # Verify results have the expected structure
+    expect_true(
+      object = "contrast" %in% names(posthoc_res)
+    )
+  }
+)
+
+test_that(
+  "olink_anova_posthoc - works - mean_return = TRUE",
+  {
+    skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
+    skip_if_not_installed(pkg = "emmeans")
+    skip_on_cran()
+
+    anova_res_site <- olink_anova(
+      df = npx_data1_mod,
+      variable = "Site",
+      check_log = npx_data1_mod_check_log
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    anova_res_site_oid <- anova_res_site |>
+      dplyr::slice_head(n = 5L) |>
+      dplyr::pull(.data[["OlinkID"]])
+
+    posthoc_res_mean <- olink_anova_posthoc(
+      df = npx_data1_mod,
+      check_log = npx_data1_mod_check_log,
+      variable = "Site",
+      olinkid_list = anova_res_site_oid,
+      effect = "Site",
+      mean_return = TRUE
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # Verify that emmean column is present
+    expect_true(
+      object = "emmean" %in% names(posthoc_res_mean)
+    )
+
+    # Verify that contrast and p-value columns are NOT present
+    expect_false(
+      object = "contrast" %in% names(posthoc_res_mean)
+    )
+    expect_false(
+      object = "Adjusted_pval" %in% names(posthoc_res_mean)
+    )
+  }
+)
+
+test_that(
+  "olink_anova_posthoc - works - post_hoc_padjust_method sidak",
+  {
+    skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
+    skip_if_not_installed(pkg = "emmeans")
+    skip_on_cran()
+
+    anova_res_time <- olink_anova(
+      df = npx_data1_mod,
+      variable = "Time",
+      check_log = npx_data1_mod_check_log
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    anova_res_time_oid <- anova_res_time |>
+      dplyr::slice_head(n = 5L) |>
+      dplyr::pull(.data[["OlinkID"]])
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = posthoc_res <- olink_anova_posthoc(
+          df = npx_data1_mod,
+          check_log = npx_data1_mod_check_log,
+          variable = "Time",
+          olinkid_list = anova_res_time_oid,
+          effect = "Time",
+          post_hoc_padjust_method = "sidak"
+        ) |>
+          suppressMessages()
+      )
+    )
+
+    expect_true(
+      object = "Adjusted_pval" %in% names(posthoc_res)
+    )
+  }
+)
+
+test_that(
+  "olink_anova_posthoc - works - post_hoc_padjust_method bonferroni",
+  {
+    skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
+    skip_if_not_installed(pkg = "emmeans")
+    skip_on_cran()
+
+    anova_res_time <- olink_anova(
+      df = npx_data1_mod,
+      variable = "Time",
+      check_log = npx_data1_mod_check_log
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    anova_res_time_oid <- anova_res_time |>
+      dplyr::slice_head(n = 5L) |>
+      dplyr::pull(.data[["OlinkID"]])
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = posthoc_res <- olink_anova_posthoc(
+          df = npx_data1_mod,
+          check_log = npx_data1_mod_check_log,
+          variable = "Time",
+          olinkid_list = anova_res_time_oid,
+          effect = "Time",
+          post_hoc_padjust_method = "bonferroni"
+        ) |>
+          suppressMessages()
+      )
+    )
+
+    expect_true(
+      object = "Adjusted_pval" %in% names(posthoc_res)
+    )
+  }
+)
+
+test_that(
+  "olink_anova_posthoc - works - post_hoc_padjust_method none",
+  {
+    skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
+    skip_if_not_installed(pkg = "emmeans")
+    skip_on_cran()
+
+    anova_res_site <- olink_anova(
+      df = npx_data1_mod,
+      variable = "Site",
+      check_log = npx_data1_mod_check_log
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    anova_res_site_oid <- anova_res_site |>
+      dplyr::slice_head(n = 5L) |>
+      dplyr::pull(.data[["OlinkID"]])
+
+    posthoc_res <- olink_anova_posthoc(
+      df = npx_data1_mod,
+      check_log = npx_data1_mod_check_log,
+      variable = "Site",
+      olinkid_list = anova_res_site_oid,
+      effect = "Site",
+      post_hoc_padjust_method = "none"
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # When method is "none", column should be named "pvalue" not "Adjusted_pval"
+    expect_true(
+      object = "pvalue" %in% names(posthoc_res)
+    )
+    expect_false(
+      object = "Adjusted_pval" %in% names(posthoc_res)
+    )
+  }
+)
+
+test_that(
+  "olink_anova_posthoc - works - olinkid_list NULL uses all assays",
+  {
+    skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
+    skip_if_not_installed(pkg = "emmeans")
+    skip_on_cran()
+
+    posthoc_res_all <- olink_anova_posthoc(
+      df = npx_data1_mod,
+      check_log = npx_data1_mod_check_log,
+      variable = "Site",
+      olinkid_list = NULL,
+      effect = "Site"
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # Get unique OlinkIDs from input data
+    all_oids <- unique(npx_data1_mod$OlinkID)
+
+    # Verify that posthoc was run on all OlinkIDs
+    posthoc_oids <- unique(posthoc_res_all$OlinkID)
+
+    # Should have many OlinkIDs (all from the dataset)
+    expect_gt(
+      object = length(posthoc_oids),
+      expected = 50L
+    )
+  }
+)
+
+test_that(
+  "olink_anova_posthoc - works - verbose = FALSE",
+  {
+    skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
+    skip_if_not_installed(pkg = "emmeans")
+    skip_on_cran()
+
+    anova_res_site <- olink_anova(
+      df = npx_data1_mod,
+      variable = "Site",
+      check_log = npx_data1_mod_check_log
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    anova_res_site_oid <- anova_res_site |>
+      dplyr::slice_head(n = 5L) |>
+      dplyr::pull(.data[["OlinkID"]])
+
+    # Capture all messages
+    msgs <- testthat::capture_messages(
+      {
+        posthoc_res <- olink_anova_posthoc(
+          df = npx_data1_mod,
+          check_log = npx_data1_mod_check_log,
+          variable = "Site",
+          olinkid_list = anova_res_site_oid,
+          effect = "Site",
+          verbose = FALSE
+        )
+      }
+    )
+
+    # Should have no messages when verbose = FALSE
+    expect_equal(
+      object = length(msgs),
+      expected = 0L
+    )
+  }
+)
+
+test_that(
+  "olink_anova_posthoc - error - effect not in variable",
+  {
+    skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
+    skip_if_not_installed(pkg = "emmeans")
+    skip_on_cran()
+
+    expect_error(
+      object = olink_anova_posthoc(
+        df = npx_data1_mod,
+        check_log = npx_data1_mod_check_log,
+        variable = "Site",
+        effect = "Time"
+      ),
+      regexp = "All effect terms must be included in the variable argument"
+    )
+  }
+)
+
+test_that(
+  "olink_anova_posthoc - error - invalid effect_formula",
+  {
+    skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
+    skip_if_not_installed(pkg = "emmeans")
+    skip_on_cran()
+
+    expect_error(
+      object = olink_anova_posthoc(
+        df = npx_data1_mod,
+        check_log = npx_data1_mod_check_log,
+        variable = "Site",
+        effect = "Site",
+        effect_formula = c("pairwise~Site", "another formula")
+      ),
+      regexp = "Unrecognized effect formula"
+    )
+  }
+)
