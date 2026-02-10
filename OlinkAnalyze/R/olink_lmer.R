@@ -239,6 +239,12 @@ olink_lmer <- function(df,
         outcome = outcome
       )
 
+      # Validate that samples have unique factor levels
+      validate_unique_levels_per_sample(
+        df = df,
+        single_fixed_effects = single_fixed_effects
+      )
+
       if (missing(model_formula)) {
         if (!is.null(covariates)) {
           formula_string <- paste0(
