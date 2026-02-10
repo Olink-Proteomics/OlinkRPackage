@@ -821,6 +821,33 @@ test_that(
 )
 
 test_that(
+  "olink_anova - works - model_formula override with covariates",
+  {
+    skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
+    skip_on_cran()
+
+    expect_message(
+      object = expect_message(
+        object = expect_no_error(
+          object = expect_no_warning(
+            object = olink_anova(
+              df = npx_data1_mod,
+              check_log = npx_data1_mod_check_log,
+              model_formula = "NPX~Site",
+              variable = "Time",
+              covariates = "Treatment"
+            )
+          )
+        ),
+        regexp = "model_formula overriding variable and covariate arguments."
+      ),
+      regexp = "ANOVA model fit to each assay: NPX~Site"
+    )
+  }
+)
+
+test_that(
   "olink_anova - works - model_formula object override",
   {
     skip_if_not_installed(pkg = "car")
@@ -1260,9 +1287,6 @@ test_that(
     ) |>
       suppressMessages() |>
       suppressWarnings()
-
-    # Get unique OlinkIDs from input data
-    all_oids <- unique(npx_data1_mod$OlinkID)
 
     # Verify that posthoc was run on all OlinkIDs
     posthoc_oids <- unique(posthoc_res_all$OlinkID)
