@@ -274,6 +274,7 @@ olink_lmer <- function(df,
         converted.vars = converted.vars,
         num.vars = num.vars,
         formula_string = formula_string,
+        # Note: no trailing space maintains backward compatibility with original
         model_type = "Linear mixed effects model fit to each assay:"
       )
 
