@@ -324,7 +324,7 @@ print_verbose_messages <- function(verbose,
         paste(num.vars, collapse = ", ")
       )
     }
-    message(paste(model_type, "model formula: "), formula_string)
+    message(model_type, " ", formula_string)
   }
 
   invisible(NULL)
