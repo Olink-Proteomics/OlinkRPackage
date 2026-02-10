@@ -187,28 +187,14 @@ olink_lmer <- function(df,
           )
         )
 
-      # Allow for :/* notation in covariates
-      variable <- gsub(pattern = "\\*", replacement = ":", x = variable)
-      if (!is.null(covariates)) {
-        covariates <- gsub(pattern = "\\*", replacement = ":", x = covariates)
-      }
-
-      add.main.effects <- NULL # nolint: object_name_linter
-      if (any(grepl(":", covariates))) {
-        tmp <- unlist(strsplit(covariates, ":"))
-        add.main.effects <- c(add.main.effects, setdiff(tmp, covariates)) # nolint: object_name_linter
-        covariates <- union(covariates, add.main.effects)
-      }
-      if (any(grepl(":", variable))) {
-        tmp <- unlist(strsplit(variable, ":"))
-        add.main.effects <- c(add.main.effects, setdiff(tmp, variable)) # nolint: object_name_linter
-        variable <- union(variable, unlist(strsplit(variable, ":")))
-        variable <- variable[!grepl(":", variable)]
-      }
-      # If variable is in both variable and covariate, keep it in variable or
-      # will get removed from final table
-      covariates <- setdiff(x = covariates, y = variable)
-      add.main.effects <- setdiff(x = add.main.effects, y = variable) # nolint: object_name_linter
+      # Allow for :/* notation in covariates and expand crossed terms
+      expanded_terms <- expand_crossed_formula_terms(
+        variable = variable,
+        covariates = covariates
+      )
+      variable <- expanded_terms$variable
+      covariates <- expanded_terms$covariates
+      add.main.effects <- expanded_terms$add.main.effects # nolint: object_name_linter
 
       # Variables to be checked
       variable_testers <- intersect(x = c(variable, covariates, random),
@@ -216,34 +202,26 @@ olink_lmer <- function(df,
 
       # Remove rows where variables or covariate is NA (can't include in
       # analysis anyway)
-      removed.sampleids <- NULL # nolint: object_name_linter
-      for (i in variable_testers) {
-        removed.sampleids <- c(removed.sampleids, # nolint: object_name_linter
-                               df$SampleID[is.na(df[[i]])]) |>
-          unique()
-        df <- df[!is.na(df[[i]]), ]
-      }
+      na_removed <- remove_na_samples(df = df, variable_testers = variable_testers)
+      df <- na_removed$df
+      removed.sampleids <- na_removed$removed.sampleids # nolint: object_name_linter
 
       # Check data format
       check_log <- run_check_npx(df = df, check_log = check_log)
 
       # Convert character vars to factor
-      converted.vars <- NULL # nolint: object_name_linter
-      num.vars <- NULL # nolint: object_name_linter
-      for (i in variable_testers) {
-        if (is.character(df[[i]])) {
-          df[[i]] <- factor(df[[i]])
-          converted.vars <- c(converted.vars, i) # nolint: object_name_linter
-        } else if (is.numeric(df[[i]])) {
-          num.vars <- c(num.vars, i) # nolint: object_name_linter
-        }
-      }
+      conversion_result <- convert_vars_to_factors(
+        df = df,
+        variable_testers = variable_testers
+      )
+      df <- conversion_result$df
+      converted.vars <- conversion_result$converted.vars # nolint: object_name_linter
+      num.vars <- conversion_result$num.vars # nolint: object_name_linter
 
       # Not testing assays that have all NA:s in one level
       # Every sample needs to have a unique level of the factor
 
-      nas_in_var <- character(0L)
-
+      # Identify single fixed effects to check
       if (!is.null(covariates)) {
         factors_in_df <- names(df)[sapply(df, is.factor)]
         single_fixed_effects <- c(variable,
@@ -253,75 +231,13 @@ olink_lmer <- function(df,
         single_fixed_effects <- variable
       }
 
-      for (effect in single_fixed_effects) {
-
-        current_nas <- df |>
-          dplyr::filter( # Exclude assays that have all NA:s
-            !(.data[["OlinkID"]] %in% check_log$assay_na)
-          ) |>
-          dplyr::group_by(
-            dplyr::across(
-              dplyr::all_of(
-                c("OlinkID", effect)
-              )
-            )
-          ) |>
-          dplyr::summarise(
-            n = dplyr::n(),
-            n_na = sum(is.na(.data[[outcome]])),
-            .groups = "drop"
-          ) |>
-          dplyr::filter(
-            .data[["n"]] == .data[["n_na"]]
-          ) |>
-          dplyr::distinct(
-            .data[["OlinkID"]]
-          ) |>
-          dplyr::pull(
-            .data[["OlinkID"]]
-          )
-
-        if (length(current_nas) > 0L) {
-
-          nas_in_var <- c(nas_in_var, current_nas)
-
-          warning(
-            paste0(
-              "The assay(s) ", current_nas,
-              " has only NA:s in atleast one level of ", effect,
-              ". It will not be tested."
-            ),
-            call. = FALSE
-          )
-        }
-
-        n_samples_w_more_than_1_level <- df |>
-          dplyr::group_by(
-            dplyr::across(
-              dplyr::all_of(
-                c("SampleID")
-              )
-            )
-          ) |>
-          dplyr::summarise(
-            n_levels = dplyr::n_distinct(.data[[effect]], na.rm = TRUE),
-            .groups = "drop"
-          ) |>
-          dplyr::filter(
-            .data[["n_levels"]] > 1L
-          ) |>
-          nrow()
-
-        if (n_samples_w_more_than_1_level > 0L) {
-          stop(
-            paste0(
-              "There are ", n_samples_w_more_than_1_level,
-              " samples that do not have a unique level for the effect ",
-              effect, ". Only one level per sample is allowed."
-            )
-          )
-        }
-      }
+      # Detect assays with all NAs in at least one level
+      nas_in_var <- detect_assays_with_na_levels(
+        df = df,
+        single_fixed_effects = single_fixed_effects,
+        check_log = check_log,
+        outcome = outcome
+      )
 
       if (missing(model_formula)) {
         if (!is.null(covariates)) {
@@ -344,50 +260,19 @@ olink_lmer <- function(df,
       fact.vars <- sapply(variable_testers, function(x) is.factor(df[[x]])) # nolint: object_name_linter
       fact.vars <- names(fact.vars)[fact.vars] # nolint: object_name_linter
 
-      #Print verbose message
-      if (verbose) {
-        if (!is.null(add.main.effects) & length(add.main.effects) > 0L) {
-          message(
-            "Missing main effects added to the model formula: ",
-            paste(add.main.effects, collapse = ", ")
-          )
-        }
-        if (!is.null(removed.sampleids) & length(removed.sampleids) > 0L) {
-          message(
-            "Samples removed due to missing variable or covariate levels: ",
-            paste(removed.sampleids, collapse = ", ")
-          )
-        }
-        if (!is.null(converted.vars)) {
-          message(
-            paste0(
-              "Variables and covariates converted from character to factors: ",
-              paste(converted.vars, collapse = ", ")
-            )
-          )
-        }
-        if (!is.null(num.vars)) {
-          message(
-            paste0("Variables and covariates treated as numeric: ",
-                   paste(num.vars, collapse = ", "))
-          )
-        }
-        message(
-          paste("Linear mixed effects model fit to each assay:"), formula_string
-        )
-      }
+      # Print verbose messages
+      print_verbose_messages(
+        verbose = verbose,
+        add.main.effects = add.main.effects,
+        removed.sampleids = removed.sampleids,
+        converted.vars = converted.vars,
+        num.vars = num.vars,
+        formula_string = formula_string,
+        model_type = "Linear mixed effects model fit to each assay:"
+      )
 
-      if (!is.null(covariates) & any(grepl(":", covariates))) {
-        covariate_filter_string <- covariates[stringr::str_detect(covariates, ":")] # nolint: line_length_linter
-        covariate_filter_string <- sub(
-          pattern = "(.*)\\:(.*)$",
-          replacement = "\\2:\\1",
-          x = covariate_filter_string
-        )
-        covariate_filter_string <- c(covariates, covariate_filter_string)
-      } else {
-        covariate_filter_string <- covariates
-      }
+      # Build covariate filter string
+      covariate_filter_string <- build_covariate_filter_string(covariates = covariates)
 
       ##make LMM
       lmer_model <- df |>
