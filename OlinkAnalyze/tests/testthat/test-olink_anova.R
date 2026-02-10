@@ -1498,3 +1498,53 @@ test_that(
     )
   }
 )
+
+test_that(
+  "olink_anova_posthoc - works - olinkid_list empty vector uses all assays",
+  {
+    skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
+    skip_if_not_installed(pkg = "emmeans")
+    skip_on_cran()
+
+    # Use empty character vector
+    posthoc_res_empty <- olink_anova_posthoc(
+      df = npx_data1_mod,
+      check_log = npx_data1_mod_check_log,
+      variable = "Site",
+      olinkid_list = character(0),
+      effect = "Site"
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # Verify that posthoc was run on all OlinkIDs (empty vector treated as NULL)
+    posthoc_oids <- unique(posthoc_res_empty$OlinkID)
+
+    # Should have many OlinkIDs (all from the dataset)
+    expect_gt(
+      object = length(posthoc_oids),
+      expected = 50L
+    )
+  }
+)
+
+test_that(
+  "olink_anova_posthoc - error - invalid model_formula",
+  {
+    skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
+    skip_if_not_installed(pkg = "emmeans")
+    skip_on_cran()
+
+    expect_error(
+      object = olink_anova_posthoc(
+        df = npx_data1_mod,
+        check_log = npx_data1_mod_check_log,
+        model_formula = "this is not valid",
+        effect = "Site"
+      ),
+      regexp = "is not a recognized formula"
+    )
+  }
+)
