@@ -127,7 +127,7 @@ olink_normalization_bridgeable <- function(lst_df,
           # remove interal control assays
           & .data[["AssayType"]] == "assay"
           # remove datapoints with very few counts
-          & .data[["Count"]] > .env[["min_datapoint_cnt"]]
+          & .data[[ref_cols$count]] > .env[["min_datapoint_cnt"]]
         ) |>
         # keep only relevant columns (e.g. SampleID, OlinkID, NPX, Count)
         dplyr::select(
@@ -136,7 +136,7 @@ olink_normalization_bridgeable <- function(lst_df,
               ref_cols$sample_id,
               ref_cols$olink_id,
               ref_cols$quant,
-              "Count"
+              ref_cols$count
             )
           )
         )
@@ -159,7 +159,7 @@ olink_normalization_bridgeable <- function(lst_df,
       values_from = dplyr::all_of(
         c(
           ref_cols$quant,
-          "Count"
+          ref_cols$count
         )
       )
     ) |>
@@ -192,7 +192,7 @@ olink_normalization_bridgeable <- function(lst_df,
       ),
       # median counts
       dplyr::across(
-        dplyr::starts_with("Count"),
+        dplyr::starts_with(ref_cols$count),
         list(
           low_cnt = ~ median(x = .x, na.rm = TRUE) < .env[["med_cnt"]]
         ),
@@ -565,7 +565,7 @@ olink_normalization_qs <- function(lst_df,
               ref_cols$sample_id,
               ref_cols$olink_id,
               ref_cols$quant,
-              "Count"
+              ref_cols$count
             )
           )
         )
@@ -589,7 +589,7 @@ olink_normalization_qs <- function(lst_df,
       values_from = dplyr::all_of(
         c(
           ref_cols$quant,
-          "Count"
+          ref_cols$count
         )
       )
     ) |>
@@ -620,7 +620,7 @@ olink_normalization_qs <- function(lst_df,
   quant_col <- paste(ref_cols$quant, names(lst_df), sep = "_") |>
     as.list()
   names(quant_col) <- c("ref", "notref")
-  cnt_ref_col <- paste("Count", names(lst_df[1L]), sep = "_")
+  cnt_ref_col <- paste(ref_cols$count, names(lst_df[1L]), sep = "_")
 
   # transform the data
   ecdf_transform <- df_combo |>
