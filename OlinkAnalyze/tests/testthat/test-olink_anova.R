@@ -1357,3 +1357,144 @@ test_that(
     )
   }
 )
+
+test_that(
+  "olink_anova - works - with numeric variable",
+  {
+    skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
+    skip_on_cran()
+
+    # Create a dataset with a numeric variable
+    npx_numeric_data <- npx_data1_mod |>
+      dplyr::mutate(
+        Age = as.numeric(dplyr::case_when(
+          Site == "Site_A" ~ 30,
+          Site == "Site_B" ~ 45,
+          Site == "Site_C" ~ 60,
+          TRUE ~ 50
+        ))
+      )
+
+    npx_numeric_check <- check_npx(df = npx_numeric_data) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    expect_message(
+      object = expect_message(
+        object = expect_no_error(
+          object = expect_no_warning(
+            object = anova_res <- olink_anova(
+              df = npx_numeric_data,
+              check_log = npx_numeric_check,
+              variable = "Age"
+            )
+          )
+        ),
+        regexp = "Variables and covariates treated as numeric: Age"
+      ),
+      regexp = "ANOVA model fit to each assay: NPX~Age"
+    )
+
+    # Verify results exist
+    expect_true(
+      object = nrow(anova_res) > 0L
+    )
+  }
+)
+
+test_that(
+  "olink_anova_posthoc - works - with numeric variable",
+  {
+    skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
+    skip_if_not_installed(pkg = "emmeans")
+    skip_on_cran()
+
+    # Create a dataset with a numeric variable
+    npx_numeric_data <- npx_data1_mod |>
+      dplyr::mutate(
+        Age = as.numeric(dplyr::case_when(
+          Site == "Site_A" ~ 30,
+          Site == "Site_B" ~ 45,
+          Site == "Site_C" ~ 60,
+          TRUE ~ 50
+        ))
+      )
+
+    npx_numeric_check <- check_npx(df = npx_numeric_data) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    anova_res <- olink_anova(
+      df = npx_numeric_data,
+      check_log = npx_numeric_check,
+      variable = "Age"
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    anova_res_oid <- anova_res |>
+      dplyr::slice_head(n = 5L) |>
+      dplyr::pull(.data[["OlinkID"]])
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = expect_no_error(
+            object = expect_no_warning(
+              object = posthoc_res <- olink_anova_posthoc(
+                df = npx_numeric_data,
+                check_log = npx_numeric_check,
+                variable = "Age",
+                olinkid_list = anova_res_oid,
+                effect = "Age"
+              )
+            )
+          ),
+          regexp = "Variables and covariates treated as numeric: Age"
+        ),
+        regexp = "Numeric variables post-hoc performed using Mean and Mean \\+ 1SD: Age"
+      ),
+      regexp = "Means estimated for each assay from ANOVA model: NPX~Age"
+    )
+
+    # Verify results exist
+    expect_true(
+      object = nrow(posthoc_res) > 0L
+    )
+  }
+)
+
+test_that(
+  "olink_anova - message - removed samples with NA variables",
+  {
+    skip_if_not_installed(pkg = "car")
+    skip_if_not_installed(pkg = "broom")
+    skip_on_cran()
+
+    # Create a dataset with NA values in a variable
+    npx_na_data <- npx_data1_mod |>
+      dplyr::mutate(
+        Site = dplyr::if_else(
+          dplyr::row_number() <= 5L,
+          NA_character_,
+          Site
+        )
+      )
+
+    npx_na_check <- check_npx(df = npx_na_data) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    expect_message(
+      object = olink_anova(
+        df = npx_na_data,
+        check_log = npx_na_check,
+        variable = "Site"
+      ) |>
+        suppressMessages(),
+      regexp = "Samples removed due to missing variable or covariate levels:"
+    )
+  }
+)
