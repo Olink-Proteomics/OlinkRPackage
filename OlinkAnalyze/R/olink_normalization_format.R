@@ -191,11 +191,17 @@ olink_normalization_format <- function(df_norm,
     # NotBridgeable or NotOverlapping assays retain their original panel
     df_combo  <- df_combo |>
       dplyr::mutate(
-        Panel_order = forcats::fct_relevel(Panel, ref_product_panels[[ lst_check$ref_product]])) |> # nolint: line_length_linter
+        Panel_order = forcats::fct_relevel(
+          Panel,
+          ref_product_panels[[lst_check$ref_product]]
+        )
+      ) |> # nolint: line_length_linter
       dplyr::group_by(.data[[oid_col_name]]) |>
       dplyr::mutate(Panel = paste(sort(unique(.data[["Panel_order"]])),
                                   collapse = "_")) |>
-      dplyr::select(-.data[["Panel_order"]])
+      dplyr::select(
+        -dplyr::all_of("Panel_order")
+      )
 
 
     # clean up
