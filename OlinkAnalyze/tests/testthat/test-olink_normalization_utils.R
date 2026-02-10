@@ -5218,7 +5218,7 @@ test_that(
     lst_df_v3 <- list(
       "p1" = lst_out <- npx_data1 |>
         dplyr::mutate(
-          OlinkID = dplyr::case_match(
+          OlinkID = dplyr::recode_values(
             .data[["OlinkID"]],
             "OID00471" ~ "OID00471A",
             "OID00472" ~ "OID00471B",
@@ -5228,7 +5228,7 @@ test_that(
             "OID00477" ~ "OID0047",
             "OID00478" ~ "OID00471#",
             "OID00479" ~ "OID00471&",
-            .default = .data[["OlinkID"]]
+            default = .data[["OlinkID"]]
           )
         )
     )
@@ -5329,7 +5329,7 @@ test_that(
     lst_df_v6 <- list(
       "p1" = npx_data1 |>
         dplyr::mutate(
-          OlinkID = dplyr::case_match(
+          OlinkID = dplyr::recode_values(
             .data[["OlinkID"]],
             "OID00471" ~ "OID00471A",
             "OID00472" ~ "OID00471B",
@@ -5339,12 +5339,12 @@ test_that(
             "OID00477" ~ "OID0047",
             "OID00478" ~ "OID00471#",
             "OID00479" ~ "OID00471&",
-            .default = .data[["OlinkID"]]
+            default = .data[["OlinkID"]]
           )
         ),
       "p2" = npx_data2 |>
         dplyr::mutate(
-          OlinkID = dplyr::case_match(
+          OlinkID = dplyr::recode_values(
             .data[["OlinkID"]],
             "OID01301" ~ "OID01301A",
             "OID01302" ~ "OID01302B",
@@ -5353,7 +5353,7 @@ test_that(
             "OID01305" ~ "OID01305E",
             "OID01306" ~ "OID0130",
             "OID01307" ~ "OID01307#",
-            .default = .data[["OlinkID"]]
+            default = .data[["OlinkID"]]
           )
         )
     )
@@ -5675,7 +5675,7 @@ test_that(
       dplyr::distinct() |>
       dplyr::mutate(
         Reference_NPX = 0.1,
-        OlinkID = dplyr::case_match(
+        OlinkID = dplyr::recode_values(
           .data[["OlinkID"]],
           "OID00471" ~ "OID00471A",
           "OID00472" ~ "OID00471B",
@@ -5685,7 +5685,7 @@ test_that(
           "OID00477" ~ "OID0047",
           "OID00478" ~ "OID00471#",
           "OID00479" ~ "OID00471&",
-          .default = .data[["OlinkID"]]
+          default = .data[["OlinkID"]]
         )
       )
 

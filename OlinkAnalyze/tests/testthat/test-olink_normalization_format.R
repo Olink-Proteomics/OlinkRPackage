@@ -84,32 +84,32 @@ test_that(
 
     df1_bridge_v3 <- ref_norm_res$lst_df$df1_norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
     df2_bridge_v3 <- ref_norm_res$lst_df$df2_norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "C66" ~ "NEG_CTRL",
           "D1" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
 
     df_norm_bridge_v3 <- ref_norm_res$lst_norm$bridge_norm$norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "PLATE_CTRL",
           "C66" ~ "NEG_CTRL",
           "D1" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
 
@@ -152,11 +152,11 @@ test_that(
         !(.data[["OlinkID"]] %in% .env[["oid_only_in_nonref_v4"]])
       ) |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
     df2_bridge_v4 <- ref_norm_res$lst_df$df2_norm |>
@@ -164,23 +164,23 @@ test_that(
         !(.data[["OlinkID"]] %in% .env[["oid_only_in_ref_v4"]])
       ) |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "C66" ~ "NEG_CTRL",
           "D1" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
 
     df_norm_bridge_v4 <- ref_norm_res$lst_norm$bridge_norm$norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "PLATE_CTRL",
           "C66" ~ "NEG_CTRL",
           "D1" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
 
@@ -299,32 +299,32 @@ test_that(
 
     df1_subset_v3 <- ref_norm_res$lst_df$df1_norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
     df2_subset_v3 <- ref_norm_res$lst_df$df2_norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "C66" ~ "NEG_CTRL",
           "D1" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
 
     df_norm_subset_v3 <- ref_norm_res$lst_norm$subset_norm$norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "PLATE_CTRL",
           "C66" ~ "NEG_CTRL",
           "D1" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
 
@@ -367,11 +367,11 @@ test_that(
         !(.data[["OlinkID"]] %in% .env[["oid_only_in_nonref_v4"]])
       ) |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
     df2_subset_v4 <- ref_norm_res$lst_df$df2_norm |>
@@ -379,23 +379,23 @@ test_that(
         !(.data[["OlinkID"]] %in% .env[["oid_only_in_ref_v4"]])
       ) |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "C66" ~ "NEG_CTRL",
           "D1" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
 
     df_norm_subset_v4 <- ref_norm_res$lst_norm$subset_norm$norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "PLATE_CTRL",
           "C66" ~ "NEG_CTRL",
           "D1" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
 
@@ -514,22 +514,22 @@ test_that(
 
     df1_refmed_v3 <- ref_norm_res$lst_df$df1_norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
     refmed_v3 <- ref_norm_res$lst_df$ref_med
 
     df_norm_refmed_v3 <- ref_norm_res$lst_norm$ref_med_norm$norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
 
@@ -572,11 +572,11 @@ test_that(
         !(.data[["OlinkID"]] %in% .env[["oid_only_in_nonref_v4"]])
       ) |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
     refmed_v4 <- ref_norm_res$lst_df$ref_med |>
@@ -586,11 +586,11 @@ test_that(
 
     df_norm_refmed_v4 <- ref_norm_res$lst_norm$ref_med_norm$norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
 
@@ -1095,7 +1095,7 @@ test_that(
     # Add NCs to remove
     bridge_norm_wctrl_nc <- ref_norm_res$lst_norm$bridge_norm$no_norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "NEGATIVE_CONTROL",
@@ -1103,7 +1103,7 @@ test_that(
           "D1" ~ "NEG_CTRL_2",
           "D52" ~ "NEGATIVE_CONTROL_2",
           "D75" ~ "Neg_Ctrl_2",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
 
@@ -1126,7 +1126,7 @@ test_that(
     # Add PCs to remove
     bridge_norm_wctrl_pc <- ref_norm_res$lst_norm$bridge_norm$no_norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "PLATE",
           "A38" ~ "IPC",
@@ -1134,7 +1134,7 @@ test_that(
           "D1" ~ "plate",
           "D52" ~ "plate_control",
           "D75" ~ "Plate_Control",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
 
@@ -1155,7 +1155,7 @@ test_that(
 
     bridge_norm_wctrl_ncpc <- ref_norm_res$lst_norm$bridge_norm$no_norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "IPC",
@@ -1163,7 +1163,7 @@ test_that(
           "D1" ~ "plate",
           "D52" ~ "NEGATIVE_CONTROL_2",
           "D75" ~ "Plate_Control",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
 

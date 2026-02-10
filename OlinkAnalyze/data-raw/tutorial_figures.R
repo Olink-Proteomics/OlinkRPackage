@@ -5,11 +5,11 @@
 # Figure 1
 outlier_data <- npx_data1 |>
   dplyr::mutate(
-    NPX = dplyr::case_match(
+    NPX = dplyr::recode_values(
       .data[["SampleID"]],
       "A25" ~ .data[["NPX"]] + 4L,
       "A52" ~ .data[["NPX"]] - 4L,
-      .default = .data[["NPX"]]
+      default = .data[["NPX"]]
     )
   ) |>
   dplyr::filter(
@@ -469,11 +469,11 @@ npx_after_br_reco <- npx_br_data |>
     & .data[["AssayType"]] == "assay"
   ) |>
   dplyr::mutate(
-    NPX = dplyr::case_match(
+    NPX = dplyr::recode_values(
       .data[["BridgingRecommendation"]],
       "MedianCentering" ~ .data[["MedianCenteredNPX"]],
       "QuantileSmoothing" ~ .data[["QSNormalizedNPX"]],
-      .default = .data[["NPX"]]
+      default = .data[["NPX"]]
     ),
     OlinkID = paste0(.data[["OlinkID"]], "_", .data[["OlinkID_E3072"]])
   )
