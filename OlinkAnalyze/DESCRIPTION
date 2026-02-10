@@ -76,6 +76,7 @@ Imports:
     dbplyr,
     dplyr,
     duckdb,
+    ggplot2,
     rlang,
     stringr,
     tidyr
