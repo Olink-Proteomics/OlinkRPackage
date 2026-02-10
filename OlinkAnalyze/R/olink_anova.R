@@ -322,7 +322,7 @@ olink_anova <- function(df,
         converted.vars = converted.vars,
         num.vars = num.vars,
         formula_string = formula_string,
-        model_type = "ANOVA model fit to each assay:"
+        model_type = "ANOVA model fit to each assay: "
       )
 
       # Build covariate filter string
