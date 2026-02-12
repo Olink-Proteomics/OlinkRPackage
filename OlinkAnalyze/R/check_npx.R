@@ -1301,7 +1301,12 @@ check_darid <- function(df, col_names) {
       as.numeric_version(.data[[col_names$qc_version]]) <
         as.numeric_version(.data[["min_version"]])
     ) |>
-    dplyr::select(!min_version)
+    dplyr::select(
+      dplyr::all_of(c(
+        col_names$panel_version,
+        col_names$qc_version
+      ))
+    )
 
   # Emit a warning if any invalid combinations are found
   if (nrow(invalid_darid) > 0L) {
