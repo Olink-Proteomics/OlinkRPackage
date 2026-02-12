@@ -88,7 +88,7 @@
 #' }
 #'
 olink_lmer_plot <- function(df,
-                            check_log,
+                            check_log = NULL,
                             variable,
                             outcome = "NPX",
                             random,

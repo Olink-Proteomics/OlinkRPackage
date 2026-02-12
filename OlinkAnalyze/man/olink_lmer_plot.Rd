@@ -7,7 +7,7 @@ model}
 \usage{
 olink_lmer_plot(
   df,
-  check_log,
+  check_log = NULL,
   variable,
   outcome = "NPX",
   random,
