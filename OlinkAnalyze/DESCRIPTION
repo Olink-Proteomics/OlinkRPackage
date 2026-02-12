@@ -89,6 +89,7 @@ Suggests:
     lmerTest,
     ordinal,
     readxl,
+    scales,
     showtext,
     sysfonts,
     systemfonts,
