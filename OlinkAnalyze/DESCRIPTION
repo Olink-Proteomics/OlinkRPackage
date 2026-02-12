@@ -76,6 +76,8 @@ Imports:
     dbplyr,
     dplyr,
     duckdb,
+    ggplot2,
+    grDevices,
     rlang,
     stringr,
     tidyr
@@ -87,7 +89,12 @@ Suggests:
     lmerTest,
     ordinal,
     readxl,
+    scales,
+    showtext,
+    sysfonts,
+    systemfonts,
     testthat (>= 3.0.0),
+    vdiffr,
     withr,
     writexl,
     zip
