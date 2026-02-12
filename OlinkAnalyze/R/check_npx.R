@@ -1277,9 +1277,12 @@ check_darid <- function(df, col_names) {
 
   # Return empty string and no warning when no qc_version is present
   if (!("qc_version" %in% names(col_names))) {
-
-    return(character(0L))
-
+    return(
+      dplyr::tibble(
+        DataAnalysisRefID = character(0L),
+        PanelDataArchiveVersion = character(0L)
+      )
+    )
   }
 
   # Identify invalid panel_version and qc_version combinations
@@ -1289,16 +1292,16 @@ check_darid <- function(df, col_names) {
       .data[[col_names$qc_version]]
     ) |>
     dplyr::collect() |>
-    dplyr::filter(
-      .data[[col_names$panel_version]] %in%
-        outdated_darid_panel_archive$darid_list
+    dplyr::inner_join(
+      outdated_darid_panel_archive,
+      by = setNames("darid_list",
+                    col_names$panel_version)
     ) |>
     dplyr::filter(
-      sapply(
-        .data[[col_names$qc_version]],
-        \(x) utils::compareVersion(outdated_darid_panel_archive$min_version, x)
-      ) == 1L
-    )
+      as.numeric_version(.data[[col_names$qc_version]]) <
+        as.numeric_version(.data[["min_version"]])
+    ) |>
+    dplyr::select(!min_version)
 
   # Emit a warning if any invalid combinations are found
   if (nrow(invalid_darid) > 0L) {
@@ -1333,7 +1336,12 @@ check_darid <- function(df, col_names) {
 
   } else {
 
-    return(character(0L))
+    return(
+      dplyr::tibble(
+        DataAnalysisRefID = character(0L),
+        PanelDataArchiveVersion = character(0L)
+      )
+    )
 
   }
 
