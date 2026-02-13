@@ -74,7 +74,7 @@ Imports:
     cli (>= 3.6.2),
     data.table,
     dbplyr,
-    dplyr,
+    dplyr (>= 1.2.0),
     duckdb,
     ggplot2,
     grDevices,
