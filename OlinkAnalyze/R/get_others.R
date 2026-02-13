@@ -104,3 +104,31 @@ get_file_ext <- function(name_sub = NULL) {
   f_ext <- accepted_npx_file_ext[grepl(name_sub, names(accepted_npx_file_ext))]
   return(f_ext)
 }
+
+#' Gets alternative column names for a given column key.
+#'
+#' @param col_key Column key for which to retrieve alternative column names. One
+#' of `r ansi_collapse_quot(unique(column_name_dict[["col_key"]]))`.
+#'
+#' @keywords internal
+#'
+#' @returns A character vector of alternative column names corresponding to the
+#' provided column key.
+#'
+#' @examples
+#' \donttest{
+#'   OlinkAnalyze:::get_alternative_colnames(col_key = "sample_id")
+#' }
+get_alternative_colnames <- function(col_key) {
+  alt_colnames <- column_name_dict |>
+    dplyr::filter(
+      .data[["col_key"]] == .env[["col_key"]]
+    ) |>
+    dplyr::pull(
+      .data[["col_names"]]
+    ) |>
+    unlist() |>
+    unname() |>
+    unique()
+  return(alt_colnames)
+}
