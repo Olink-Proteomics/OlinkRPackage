@@ -9,7 +9,7 @@
 #' NOTE: UMAP is a non-linear data transformation that might not accurately preserve the properties of the data. Distances in the UMAP plane should therefore be interpreted with caution.
 #'
 #' @param df data frame in long format with Sample Id, NPX and column of choice for colors
-#' @param color_g Character value indicating which column to use for colors (default QC_Warning)
+#' @param color_g Character value indicating which column to use for colors (default QC_Warning). Continuous color scale for Olink(R) Sample Index (OSI) columns OSITimeToCentrifugation, OSIPreparationTemperature and OSISummary is also supported.
 #' @param x_val Integer indicating which UMAP component to plot along the x-axis (default 1)
 #' @param y_val Integer indicating which UMAP component to plot along the y-axis (default 2)
 #' @param label_samples Logical. If TRUE, points are replaced with SampleID (default FALSE)
@@ -127,6 +127,124 @@ olink_umap_plot <- function (df,
   # Rename duplicate UniProts
   df <- uniprot_replace(df, npxCheck)
 
+  # Validate OSI category column: must contain only 0,1,2,3,4; then convert to factor if not already
+  osi_cat_candidates <- "OSICategory"
+  osi_cat_found <- intersect(osi_cat_candidates, colnames(df))
+
+  if (length(osi_cat_found) > 0) {
+    cat_col <- osi_cat_found[1]
+
+    v_raw <- df[[cat_col]]
+    v_chr <- if (is.factor(v_raw)) as.character(v_raw) else as.character(v_raw)
+
+    allowed <- as.character(0:4)
+
+    invalid_vals <- unique(v_chr[!is.na(v_chr) & !(v_chr %in% allowed)])
+    if (length(invalid_vals) > 0) {
+      stop(
+        paste0(
+          "Invalid values detected in ", cat_col,
+          ". Expected only 0, 1, 2, 3, or 4. Found: ",
+          paste(invalid_vals, collapse = ", ")
+        )
+      )
+    }
+
+    if (!is.factor(df[[cat_col]])) {
+      df[[cat_col]] <- factor(v_chr, levels = allowed)
+    }
+  }
+
+  # Validate OSI category column: must contain only 0,1,2,3,4; then convert to factor if not already
+  osi_cat_candidates <- "OSICategory"
+  osi_cat_found <- intersect(osi_cat_candidates, colnames(df))
+
+  if (length(osi_cat_found) > 0) {
+    cat_col <- osi_cat_found[1]
+
+    v_raw <- df[[cat_col]]
+
+    # ERROR if column exists but is entirely NA
+    if (all(is.na(v_raw))) {
+      stop(
+        paste0(
+          "All values are NA in ", cat_col,
+          ". Please provide at least one non-missing value."
+        )
+      )
+    }
+
+    v_chr <- if (is.factor(v_raw)) as.character(v_raw) else as.character(v_raw)
+
+    allowed <- as.character(0:4)
+
+    invalid_vals <- unique(v_chr[!is.na(v_chr) & !(v_chr %in% allowed)])
+    if (length(invalid_vals) > 0) {
+      stop(
+        paste0(
+          "Invalid values detected in ", cat_col,
+          ". Expected only 0, 1, 2, 3, or 4. Found: ",
+          paste(invalid_vals, collapse = ", ")
+        )
+      )
+    }
+
+    if (!is.factor(df[[cat_col]])) {
+      df[[cat_col]] <- factor(v_chr, levels = allowed)
+    }
+  }
+
+  # Validate OSI continuous columns: must be numeric and within [0, 1]
+  osi_cont_cols <- c("OSITimeToCentrifugation", "OSIPreparationTemperature", "OSISummary")
+  osi_cont_found <- intersect(osi_cont_cols, colnames(df))
+
+  if (length(osi_cont_found) > 0) {
+    for (cc in osi_cont_found) {
+
+      v_raw <- df[[cc]]
+
+      # ERROR if column exists but is entirely NA
+      if (all(is.na(v_raw))) {
+        stop(
+          paste0(
+            "All values are NA in ", cc,
+            ". Please provide at least one non-missing value."
+          )
+        )
+      }
+
+      v_chr <- if (is.factor(v_raw)) as.character(v_raw) else as.character(v_raw)
+
+      v_num <- suppressWarnings(as.numeric(v_chr))
+
+      # Detect non-numeric entries (introduced NA after coercion)
+      non_numeric_idx <- which(!is.na(v_chr) & is.na(v_num))
+      if (length(non_numeric_idx) > 0) {
+        bad_vals <- unique(v_chr[non_numeric_idx])
+        stop(
+          paste0(
+            "Invalid values detected in ", cc,
+            ". Expected continuous numeric values between 0 and 1. ",
+            "Found non-numeric value(s): ", paste(bad_vals, collapse = ", ")
+          )
+        )
+      }
+
+      # Detect out-of-range values
+      out_of_range_idx <- which(!is.na(v_num) & (v_num < 0 | v_num > 1))
+      if (length(out_of_range_idx) > 0) {
+        bad_vals <- unique(v_num[out_of_range_idx])
+        stop(
+          paste0(
+            "Invalid values detected in ", cc,
+            ". Expected continuous numeric values between 0 and 1. ",
+            "Found out-of-range value(s): ", paste(bad_vals, collapse = ", ")
+          )
+        )
+      }
+    }
+  }
+
   #Check that the user didn't specify just one of outlierDefX and outlierDefY
   if(sum(c(is.numeric(outlierDefX), is.numeric(outlierDefY))) == 1){
     stop('To label outliers, both outlierDefX and outlierDefY have to be specified as numerical values')
@@ -140,10 +258,14 @@ olink_umap_plot <- function (df,
   }
 
   if(byPanel){
-    # Convert color_g variable to factor
-    if(!is.factor(df[[paste(color_g)]])){
-      df[[paste(color_g)]] <- as.factor(df[[paste(color_g)]])
+    # Convert color_g variable to factor (but keep OSI columns continuous)
+    osi_cols <- c("OSITimeToCentrifugation", "OSIPreparationTemperature", "OSISummary")
+    if(!(color_g %in% osi_cols)){
+      if(!is.factor(df[[paste(color_g)]])){
+        df[[paste(color_g)]] <- as.factor(df[[paste(color_g)]])
+      }
     }
+
     df <- df %>%
       dplyr::mutate(Panel = Panel  %>% stringr::str_replace("Olink ", "")) #Strip "Olink" from the panel names
 
@@ -212,6 +334,14 @@ olink_umap_plot.internal <- function (df,
                                      verbose = TRUE,
                                      ...){
 
+  # Ensure one unique color value per SampleID (required by npxProcessing_forDimRed)
+  df <- df |>
+    dplyr::group_by(SampleID) |>
+    dplyr::mutate(
+      !!rlang::sym(color_g) := dplyr::first(stats::na.omit(.data[[color_g]]))
+    ) |>
+    dplyr::ungroup()
+
   ### Data pre-processing ###
   procData <- npxProcessing_forDimRed(df = df,
                                       color_g = color_g,
@@ -231,7 +361,14 @@ olink_umap_plot.internal <- function (df,
   umapY <- umap_fit$layout[, y_val]
   observation_names <- procData$df_wide$SampleID
   observation_colors <- procData$df_wide$colors
-  scores <- data.frame(umapX, umapY)
+
+  scores <- data.frame(
+    SampleID = observation_names,
+    umapX    = umapX,
+    umapY    = umapY,
+    colors   = observation_colors,
+    stringsAsFactors = FALSE
+  )
 
   #Identify outliers
   if(!is.na(outlierDefX) & !is.na(outlierDefY)){
@@ -255,21 +392,34 @@ olink_umap_plot.internal <- function (df,
 
 
   #Drawing scores
-
   if(label_samples){
-
     umap_plot <- umap_plot +
-      ggplot2::geom_text(ggplot2::aes(label = observation_names, color = observation_colors), size = 3) +
+      ggplot2::geom_text(ggplot2::aes(label = SampleID, color = colors), size = 3) +
       ggplot2::labs(color = color_g) +
       ggplot2::guides(size = "none")
-
-  }else{
-
+  } else {
     umap_plot <- umap_plot +
-      ggplot2::geom_point(ggplot2::aes(color = observation_colors), size = 2.5) +
+      ggplot2::geom_point(ggplot2::aes(color = colors), size = 2.5) +
       ggplot2::labs(color = color_g) +
       ggplot2::guides(size = "none")
+  }
 
+  # Continuous color scale for OSI columns
+  osi_cols <- c("OSITimeToCentrifugation", "OSIPreparationTemperature", "OSISummary")
+  if(color_g %in% osi_cols){
+
+    # Ensure numeric for continuous scale (handles character/factor inputs)
+    if(is.factor(scores$colors)) scores$colors <- as.character(scores$colors)
+    scores$colors <- suppressWarnings(as.numeric(scores$colors))
+
+    umap_plot <- umap_plot +
+      ggplot2::scale_color_gradient(
+        low = "#FFB200FF",
+        high = "#332D56FF",
+        limits = c(0L, 1L),
+        breaks = seq(from = 0L, to = 1L, by = 0.25),
+        oob = scales::squish
+      )
   }
 
 
@@ -305,10 +455,13 @@ olink_umap_plot.internal <- function (df,
 
 
   umap_plot <- umap_plot +
-    OlinkAnalyze::set_plot_theme() +
-    OlinkAnalyze::olink_color_discrete(...,drop=FALSE)
+    OlinkAnalyze::set_plot_theme()
+
+  osi_cols <- c("OSITimeToCentrifugation", "OSIPreparationTemperature", "OSISummary")
+  if(!(color_g %in% osi_cols)){
+    umap_plot <- umap_plot +
+      OlinkAnalyze::olink_color_discrete(...,drop=FALSE)
+  }
 
   return(umap_plot)
-
-
 }
