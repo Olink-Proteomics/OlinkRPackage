@@ -1278,9 +1278,9 @@ check_darid <- function(df, col_names) {
   # Return empty string and no warning when no qc_version is present
   if (!("qc_version" %in% names(col_names))) {
     return(
-      dplyr::tibble(
-        DataAnalysisRefID = character(0L),
-        PanelDataArchiveVersion = character(0L)
+      setNames(
+        dplyr::tibble(character(0L)),
+        col_names$panel_version
       )
     )
   }
@@ -1342,9 +1342,12 @@ check_darid <- function(df, col_names) {
   } else {
 
     return(
-      dplyr::tibble(
-        DataAnalysisRefID = character(0L),
-        PanelDataArchiveVersion = character(0L)
+      tibble::as_tibble(
+        setNames(
+          list(character(0L), character(0L)),
+          c(col_names$panel_version,
+            col_names$qc_version)
+        )
       )
     )
 
