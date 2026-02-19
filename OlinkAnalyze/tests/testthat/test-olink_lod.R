@@ -41,7 +41,8 @@ test_that(
     expect_warning(
       object = check_ht_fixed_lod_version(
         check_log = check_log,
-        lod_file  = lod_file),
+        lod_file  = lod_file
+      ),
 
       regexp = "Outdated version of Fixed LOD file detected."
     )
@@ -66,7 +67,8 @@ test_that(
     expect_warning(
       object = check_ht_fixed_lod_version(
         check_log = check_log,
-        lod_file  = lod_file),
+        lod_file  = lod_file
+      ),
 
       regexp = "Multiple versions detected: \"7.0.0\" and \"9.0.0\"."
     )
@@ -91,7 +93,8 @@ test_that(
     expect_warning(
       object = check_ht_fixed_lod_version(
         check_log = check_log,
-        lod_file  = lod_file),
+        lod_file  = lod_file
+      ),
 
       regexp = "Outdated version of Fixed LOD file detected."
     )
