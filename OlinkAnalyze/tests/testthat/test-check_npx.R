@@ -57,7 +57,9 @@ test_that(
       ),
       assay_qc = character(0L),
       non_unique_uniprot = character(0L),
-      darid_invalid = character(0L)
+      darid_invalid = dplyr::tibble(
+        "Panel_Lot_Nr" = character(0L)
+      )
     )
 
     expect_equal(
@@ -92,7 +94,8 @@ test_that(
       PlateID = rep("plate1", 4L),
       QC_Warning = rep("Pass", 4L),
       AssayQC = c(rep("Pass", 3L), "Warning"),
-      Normalization = LETTERS[1L:4L]
+      Normalization = LETTERS[1L:4L],
+      PanelDataArchiveVersion = rep("1.6.0", 4L)
     )
 
     expected_result <- list(
@@ -111,7 +114,8 @@ test_that(
                        count = "Count",
                        qc_warning = "QC_Warning",
                        assay_warn = "AssayQC",
-                       normalization = "Normalization"),
+                       normalization = "Normalization",
+                       qc_version = "PanelDataArchiveVersion"),
       oid_invalid = character(0L),
       assay_na = character(0L),
       sample_id_dups = character(0L),
@@ -124,7 +128,10 @@ test_that(
       ),
       assay_qc = c("OID12345"),
       non_unique_uniprot = character(0L),
-      darid_invalid = character(0L)
+      darid_invalid = dplyr::tibble(
+        "Panel_Lot_Nr" = character(0L),
+        "PanelDataArchiveVersion" = character(0L)
+      )
     )
 
     expect_equal(
@@ -180,7 +187,9 @@ test_that(
       ),
       assay_qc = character(0L),
       non_unique_uniprot = character(0L),
-      darid_invalid = character(0L)
+      darid_invalid = dplyr::tibble(
+        "Panel_Lot_Nr" = character(0L)
+      )
     )
 
     expect_equal(
@@ -258,7 +267,9 @@ test_that(
       ),
       assay_qc = character(0L),
       non_unique_uniprot = c("OID00002"),
-      darid_invalid = character(0L)
+      darid_invalid = dplyr::tibble(
+        "PanelVersion" = character(0L)
+      )
 
     )
 
@@ -333,8 +344,10 @@ test_that(
       ),
       assay_qc = character(0L),
       non_unique_uniprot = character(0L),
-      darid_invalid = paste("DataAnalysisRefID: D10007, D20007,",
-                            "D30007, D40007; PanelDataArchiveVersion: 1.2.1.")
+      darid_invalid = dplyr::tibble(
+        DataAnalysisRefID = c("D10007", "D20007", "D30007", "D40007"),
+        PanelDataArchiveVersion = rep("1.2.1", 4L)
+      )
     )
 
     expect_equal(
@@ -342,44 +355,18 @@ test_that(
       expected = check_npx_lst_names |> sort()
     )
 
-    warnings <- capture_warnings(
-      expect_equal(
+    expect_warning(
+      object = expect_equal(
         object = check_npx(df = df,
                            preferred_names = NULL),
         expected = expected_result
-      )
-    )
-
-    expect_true(
-      any(stringr::str_detect(
-        warnings,
-        paste("Outdated Data Analysis Reference ID and Panel Archive Version",
-              "combination detected.")
-      ))
-    )
-
-    expect_true(
-      any(stringr::str_detect(
-        warnings,
-        stringr::fixed(
-          paste("Re-export data using Panel Archive Version 1.5.0+",
-                "and use the newest version of the Fixed LOD file",
-                "when calculating LOD (Version 6+).")
-        )
-      ))
-    )
-
-    expect_true(
-      any(stringr::str_detect(
-        warnings,
-        paste("Failure to re-export may result in incorrect PC normalization",
-              "across lots and Fixed LOD calculations.")
-      ))
+      ),
+      regexp = paste("DataAnalysisRefID: D10007, D20007, D30007, D40007;",
+                     "PanelDataArchiveVersion: 1.2.1.")
     )
 
   }
 )
-
 
 # Test run_check_npx ----
 
@@ -1730,122 +1717,94 @@ test_that(
 )
 
 # Test check_darid ----
-test_that("does not warn when archive version is >= 1.5.0", {
-  df <- dplyr::tibble(
-    SampleID = c("Sample1", "Sample1", "Sample1"),
-    OlinkID = c("OID00001", "OID00002", "OID00002"),
-    DataAnalysisRefID = c("D10007", "D20007", "D30007"),
-    PanelDataArchiveVersion = rep("1.6.0", 3)
-  )
 
-  col_names <- list(
-    sample_id = "SampleID",
-    olink_id = "OlinkID",
-    panel_version = "DataAnalysisRefID",
-    qc_version = "PanelDataArchiveVersion"
-  )
+test_that(
+  "does not warn when archive version is >= 1.5.0",
+  {
+    df <- dplyr::tibble(
+      SampleID = rep("Sample1", 3L),
+      OlinkID = c("OID00001", "OID00002", "OID00002"),
+      DataAnalysisRefID = c("D10007", "D20007", "D30007"),
+      PanelDataArchiveVersion = rep("1.6.0", 3L)
+    )
 
-  expect_no_warning(res <- check_darid(df, col_names = col_names))
-  expect_no_message(res)
-  expect_identical(res, character(0L))
-})
+    col_names <- list(
+      sample_id = "SampleID",
+      olink_id = "OlinkID",
+      panel_version = "DataAnalysisRefID",
+      qc_version = "PanelDataArchiveVersion"
+    )
 
-test_that("does not warn when DARID is not D*07, D*08, D*10, or D*14", {
-  df <- dplyr::tibble(
-    SampleID = c("Sample1", "Sample1", "Sample1"),
-    OlinkID = c("OID00001", "OID00002", "OID00002"),
-    DataAnalysisRefID = c("D10011", "D20011", "D30011"),
-    PanelDataArchiveVersion = rep("1.2.0", 3)
-  )
-
-  col_names <- list(
-    sample_id    = "SampleID",
-    olink_id     = "OlinkID",
-    panel_version = "DataAnalysisRefID",
-    qc_version   = "PanelDataArchiveVersion"
-  )
-
-  expect_no_warning(res <- check_darid(df, col_names = col_names))
-  expect_no_message(res)
-  expect_identical(res, character(0L))
-})
-
-test_that("warn when outdated DARID and Panel Data Archive Version used", {
-  df <- dplyr::tibble(
-    SampleID = c("Sample1", "Sample1", "Sample1"),
-    OlinkID = c("OID00001", "OID00002", "OID00002"),
-    DataAnalysisRefID = c("D10007", "D20007", "D30007"),
-    PanelDataArchiveVersion = rep("1.2.0", 3)
-  )
-
-  col_names <- list(
-    sample_id    = "SampleID",
-    olink_id     = "OlinkID",
-    panel_version = "DataAnalysisRefID",
-    qc_version   = "PanelDataArchiveVersion"
-  )
-
-  warnings <- capture_warnings(
-    res <- check_darid(df, col_names = col_names)
-  )
-
-  expect_true(any(grepl("Outdated Data Analysis Reference ID and Panel Archive Version combination detected.", warnings)))
-  expect_true(any(grepl("Re-export data using Panel Archive", warnings)))
-  expect_true(any(grepl("Failure to re-export", warnings)))
-  expect_identical(res,"DataAnalysisRefID: D10007, D20007, D30007; PanelDataArchiveVersion: 1.2.0.")
-
-})
-
-test_that("warns when outdated DARID and Panel Data Archive Version are used", {
-  df <- dplyr::tibble(
-    SampleID = c("Sample1", "Sample1", "Sample1"),
-    OlinkID = c("OID00001", "OID00002", "OID00002"),
-    DataAnalysisRefID = c("D10007", "D20007", "D30007"),
-    PanelDataArchiveVersion = rep("1.2.0", 3)
-  )
-
-  col_names <- list(
-    sample_id     = "SampleID",
-    olink_id      = "OlinkID",
-    panel_version = "DataAnalysisRefID",
-    qc_version    = "PanelDataArchiveVersion"
-  )
-
-  warnings <- capture_warnings(
-    res <- check_darid(df, col_names = col_names)
-  )
-
-  expect_true(
-    any(stringr::str_detect(
-      warnings,
-      paste("Outdated Data Analysis Reference ID and Panel Archive Version",
-            "combination detected.")
-    ))
-  )
-
-  expect_true(
-    any(stringr::str_detect(
-      warnings,
-      stringr::fixed(
-        paste("Re-export data using Panel Archive Version 1.5.0+",
-              "and use the newest version of the Fixed LOD file",
-              "when calculating LOD (Version 6+).")
+    expect_equal(
+      object = check_darid(df = df,
+                           col_names = col_names),
+      expected = dplyr::tibble(
+        "DataAnalysisRefID" = character(0L),
+        "PanelDataArchiveVersion" = character(0L)
       )
-    ))
-  )
+    )
 
-  expect_true(
-    any(stringr::str_detect(
-      warnings,
-      paste("Failure to re-export may result in incorrect PC normalization",
-            "across lots and Fixed LOD calculations.")
-    ))
-  )
+  }
+)
 
-  expect_identical(
-    res,
-    "DataAnalysisRefID: D10007, D20007, D30007; PanelDataArchiveVersion: 1.2.0."
-  )
-})
+test_that(
+  "does not warn when DARID is not D*07, D*08, D*10, or D*14",
+  {
+    df <- dplyr::tibble(
+      SampleID = rep("Sample1", 3L),
+      OlinkID = c("OID00001", "OID00002", "OID00002"),
+      DataAnalysisRefID = c("D10011", "D20011", "D30011"),
+      PanelDataArchiveVersion = rep("1.2.0", 3L)
+    )
 
+    col_names <- list(
+      sample_id    = "SampleID",
+      olink_id     = "OlinkID",
+      panel_version = "DataAnalysisRefID",
+      qc_version   = "PanelDataArchiveVersion"
+    )
 
+    expect_equal(
+      object = check_darid(df = df,
+                           col_names = col_names),
+      expected = dplyr::tibble(
+        "DataAnalysisRefID" = character(0L),
+        "PanelDataArchiveVersion" = character(0L)
+      )
+    )
+  }
+)
+
+test_that(
+  "warn when outdated DARID and Panel Data Archive Version used",
+  {
+    df <- dplyr::tibble(
+      SampleID = rep("Sample1", 3L),
+      OlinkID = c("OID00001", "OID00002", "OID00002"),
+      DataAnalysisRefID = c("D10007", "D20007", "D30007"),
+      PanelDataArchiveVersion = rep("1.2.0", 3L)
+    )
+
+    col_names <- list(
+      sample_id    = "SampleID",
+      olink_id     = "OlinkID",
+      panel_version = "DataAnalysisRefID",
+      qc_version   = "PanelDataArchiveVersion"
+    )
+
+    expected_result <- dplyr::tibble(
+      DataAnalysisRefID = c("D10007", "D20007", "D30007"),
+      PanelDataArchiveVersion = rep("1.2.0", 3L)
+    )
+
+    expect_warning(
+      object = expect_equal(
+        object = check_darid(df = df,
+                             col_names = col_names),
+        expected = expected_result
+      ),
+      regexp = paste("DataAnalysisRefID: D10007, D20007, D30007;",
+                     "PanelDataArchiveVersion: 1.2.0.")
+    )
+  }
+)
