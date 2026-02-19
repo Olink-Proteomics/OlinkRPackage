@@ -4,21 +4,13 @@
 \alias{check_ht_fixed_lod_version}
 \title{Help function to check Explore HT Fixed LOD file version}
 \usage{
-check_ht_fixed_lod_version(check_log, lod_file, min_version = "6.0.0")
+check_ht_fixed_lod_version(check_log, lod_file)
 }
 \arguments{
-\item{check_log}{A list object (output from \code{check_npx}). The
-element \code{check_log[["darid_invalid"]]} indicates whether the check is
-relevant (the check runs only when this element has length > 0).}
-
 \item{lod_file}{A data frame (or tibble) representing the Fixed LOD file.
 It must contain a \code{Panel} column. If present, a \code{Version}
 column (character) is used to determine whether the file meets the
 \code{min_version} requirement.}
-
-\item{min_version}{Character scalar. Minimum allowed Fixed LOD version
-(defaults to \code{"6.0.0"}). Comparison is performed with
-\code{utils::compareVersion()}.}
 }
 \value{
 A logical scalar returned invisibly:
