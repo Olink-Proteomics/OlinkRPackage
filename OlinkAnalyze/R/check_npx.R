@@ -1278,7 +1278,7 @@ check_darid <- function(df, col_names) {
   # Return empty string and no warning when no qc_version is present
   if (!("qc_version" %in% names(col_names))) {
     return(
-      setNames(
+      stats::setNames(
         dplyr::tibble(character(0L)),
         col_names$panel_version
       )
@@ -1294,8 +1294,8 @@ check_darid <- function(df, col_names) {
     dplyr::collect() |>
     dplyr::inner_join(
       outdated_darid_panel_archive,
-      by = setNames("darid_list",
-                    col_names$panel_version)
+      by = stats::setNames("darid_list",
+                           col_names$panel_version)
     ) |>
     dplyr::filter(
       as.numeric_version(.data[[col_names$qc_version]]) <
@@ -1343,7 +1343,7 @@ check_darid <- function(df, col_names) {
 
     return(
       tibble::as_tibble(
-        setNames(
+        stats::setNames(
           list(character(0L), character(0L)),
           c(col_names$panel_version,
             col_names$qc_version)
