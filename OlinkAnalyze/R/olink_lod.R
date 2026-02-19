@@ -164,8 +164,7 @@ olink_lod_internal <- function(data,
 
     # check for outdated fixed LOD file for Explore HT panels
     check_ht_fixed_lod_version(check_log = check_log,
-                               lod_file = lod_file,
-                               min_version = "6.0.0")
+                               lod_file = lod_file)
 
     lod_data <- olink_fixed_lod(data_analysis_ref_id = data$DataAnalysisRefID,
                                 lod_file = lod_file)
@@ -382,7 +381,6 @@ int_norm_count <- function(data,
 
 }
 
-
 #' Help function to check Explore HT Fixed LOD file version
 #'
 #' @description
@@ -395,20 +393,12 @@ int_norm_count <- function(data,
 #' Kathleen Nevola
 #' Kang Dong
 #'
-#' @inheritParams olink_lod
-#'
 #' @keywords internal
 #'
-#' @param check_log A list object (output from \code{check_npx}). The
-#'   element \code{check_log[["darid_invalid"]]} indicates whether the check is
-#'   relevant (the check runs only when this element has length > 0).
 #' @param lod_file A data frame (or tibble) representing the Fixed LOD file.
 #'   It must contain a \code{Panel} column. If present, a \code{Version}
 #'   column (character) is used to determine whether the file meets the
 #'   \code{min_version} requirement.
-#' @param min_version Character scalar. Minimum allowed Fixed LOD version
-#'   (defaults to \code{"6.0.0"}). Comparison is performed with
-#'   \code{utils::compareVersion()}.
 #'
 #' @return A logical scalar returned invisibly:
 #'   \itemize{
@@ -418,15 +408,12 @@ int_norm_count <- function(data,
 #'           meets the minimum version requirement.
 #'   }
 #'
-#' @export
-#'
 check_ht_fixed_lod_version <- function(check_log,
-                                       lod_file,
-                                       min_version = "6.0.0") {
+                                       lod_file) {
 
   # Only relevant if darid_invalid exists and Explore HT panel is used
   is_relevant <-
-    length(check_log[["darid_invalid"]]) > 0 &&
+    nrow(check_log[["darid_invalid"]]) > 0L &&
     all(lod_file[["Panel"]] == "Explore_HT")
 
   if (!is_relevant) {
@@ -434,32 +421,46 @@ check_ht_fixed_lod_version <- function(check_log,
   }
 
   # Case 1: Version column missing
-  if (!"Version" %in% names(lod_file)) {
-    cli::cli_alert_info("Outdated version of Fixed LOD file detected.")
-    cli::cli_alert("Please download the newest version from Olink.com.")
+  if (!("Version" %in% names(lod_file))) {
+
+    cli::cli_warn(
+      c(
+        "i" = "Outdated version of Fixed LOD file detected.",
+        ">" = "Please download the newest version from Olink.com."
+      )
+    )
+
     return(invisible(TRUE))
   }
 
-  # Case 2: Version column present but < min_version
+  # Case 2: Version column present but < version "6.0.0"
   version <- unique(as.character(lod_file[["Version"]]))
 
   # Defensive: multiple versions in one file
-  if (length(version) != 1) {
-    cli::cli_alert_warning(
-      "Multiple Fixed LOD versions detected in the file;
-      please verify the input."
+  if (length(version) != 1L) {
+
+    cli::cli_warn(
+      c(
+        "i" = "Multiple versions detected: {.val {version}}.",
+        ">" = "Please verify that the correct Fixed LOD file is used."
+      )
     )
+
     return(invisible(TRUE))
   }
 
-  if (utils::compareVersion(version, min_version) == -1) {
-    cli::cli_alert_info("Outdated version of Fixed LOD file detected.")
-    cli::cli_alert(
-      "Detected version: {version}. Minimum required version: {min_version}."
+  if (utils::compareVersion(version, "6.0.0") == -1L) {
+
+    cli::cli_warn(
+      c(
+        "i" = "Outdated version of Fixed LOD file detected. Detected version
+        {.val {version}}. Minimum required version 6.0.0",
+        ">" = "Please download the newest version from Olink.com."
+      )
     )
-    cli::cli_alert("Please download the newest version from Olink.com.")
+
     return(invisible(TRUE))
   }
 
-  invisible(FALSE)
+  return(invisible(FALSE))
 }
