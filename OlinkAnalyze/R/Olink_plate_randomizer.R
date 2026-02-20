@@ -833,7 +833,7 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
                                 "empty well(s) in first and/or",
                                 "intermediate plate(s) to accomplish",
                                 "the randomization.\n"))
-      cli::cli_alert_warning(paste("Please try another seed or increase the", 
+      cli::cli_alert_warning(paste("Please try another seed or increase the",
                                    "number of iterations if there are",
                                    "indications that",
                                    "another randomization might leave fewer",
