@@ -1,3 +1,4 @@
+# nolint start
 #' Function to make a UMAP plot from the data
 #'
 #' Computes a manifold approximation and projection using umap::umap and plots the two specified components.
@@ -65,100 +66,65 @@
 #' @importFrom ggrepel geom_label_repel
 #' @importFrom utils head
 #' @importFrom grid unit
+# nolint end
 
-olink_umap_plot <- function (df,
-                             color_g = "QC_Warning",
-                             x_val = 1,
-                             y_val = 2,
-                             config = NULL,
-                             label_samples = FALSE,
-                             drop_assays = FALSE,
-                             drop_samples = FALSE,
-                             byPanel = FALSE,
-                             outlierDefX = NA,
-                             outlierDefY = NA,
-                             outlierLines = FALSE,
-                             label_outliers = TRUE,
-                             quiet = FALSE,
-                             verbose = TRUE,
-                             ...){
+olink_umap_plot <- function(df,
+                            color_g = "QC_Warning",
+                            x_val = 1,
+                            y_val = 2,
+                            config = NULL,
+                            label_samples = FALSE,
+                            drop_assays = FALSE,
+                            drop_samples = FALSE,
+                            byPanel = FALSE, # nolint object_name_linter
+                            outlierDefX = NA, # nolint object_name_linter
+                            outlierDefY = NA, # nolint object_name_linter
+                            outlierLines = FALSE, # nolint object_name_linter
+                            label_outliers = TRUE,
+                            quiet = FALSE,
+                            verbose = TRUE,
+                            ...) {
   #Is the umap package installed?
-  if(!requireNamespace("umap")){
+  if (!requireNamespace("umap")) {
     stop("Could not load the package umap")
   }
 
-  if(is.null(config)){
+  if (is.null(config)) {
     config <- umap::umap.defaults
   }
 
   #checking ellipsis
-  if(length(list(...)) > 0){
+  if (length(list(...)) > 0) {
 
     ellipsis_variables <- names(list(...))
 
-    if(length(ellipsis_variables) == 1){
+    if (length(ellipsis_variables) == 1) {
 
-      if(!(ellipsis_variables == 'coloroption')){
+      if (!(ellipsis_variables == "coloroption")) {
 
-        stop(paste0('The ... option only takes the coloroption argument. ... currently contains the variable ',
+        stop(paste0("The ... option only takes the coloroption argument. ... currently contains the variable ", #nolint
                     ellipsis_variables,
-                    '.'))
+                    ".")) #nolint
 
       }
 
-    }else{
+    }else {
 
-      stop(paste0('The ... option only takes one argument. ... currently contains the variables ',
-                  paste(ellipsis_variables, collapse = ', '),
-                  '.'))
+      stop(paste0("The ... option only takes one argument. ... currently contains the variables ", #nolint
+                  paste(ellipsis_variables, collapse = ", "),
+                  "."))
     }
   }
-
-  #Filtering on valid OlinkID
-  # df <- df |>
-  #   dplyr::filter(stringr::str_detect(OlinkID,
-  #                                     "OID[0-9]{5}"))
-  #
-  # #Check data format
-  # npxCheck <- check_npx(df)
-  # df <- df |> dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) #Exclude assays that have all NA:s
 
   #Filtering on valid OlinkID
   #Exclude assays that have all NA:s
   # Rename duplicate UniProts
-  check_log = NULL
+  check_log <- NULL
   check_log <- run_check_npx(df = df, check_log = check_log) # uses check_npx
-  df <- clean_npx(df, check_log = check_log, out_df = "tibble", verbose = FALSE) # uses clean_npx
+  df <- clean_npx(df, check_log = check_log, out_df = "tibble",
+                  verbose = FALSE) # uses clean_npx
 
-  # Validate OSI category column: must contain only 0,1,2,3,4; then convert to factor if not already
-  osi_cat_candidates <- "OSICategory"
-  osi_cat_found <- intersect(osi_cat_candidates, colnames(df))
-
-  if (length(osi_cat_found) > 0) {
-    cat_col <- osi_cat_found[1]
-
-    v_raw <- df[[cat_col]]
-    v_chr <- if (is.factor(v_raw)) as.character(v_raw) else as.character(v_raw)
-
-    allowed <- as.character(0:4)
-
-    invalid_vals <- unique(v_chr[!is.na(v_chr) & !(v_chr %in% allowed)])
-    if (length(invalid_vals) > 0) {
-      stop(
-        paste0(
-          "Invalid values detected in ", cat_col,
-          ". Expected only 0, 1, 2, 3, or 4. Found: ",
-          paste(invalid_vals, collapse = ", ")
-        )
-      )
-    }
-
-    if (!is.factor(df[[cat_col]])) {
-      df[[cat_col]] <- factor(v_chr, levels = allowed)
-    }
-  }
-
-  # Validate OSI category column: must contain only 0,1,2,3,4; then convert to factor if not already
+  # Validate OSI category column: must contain only 0,1,2,3,4; then convert to factor if not already #nolint
   osi_cat_candidates <- "OSICategory"
   osi_cat_found <- intersect(osi_cat_candidates, colnames(df))
 
@@ -198,7 +164,8 @@ olink_umap_plot <- function (df,
   }
 
   # Validate OSI continuous columns: must be numeric and within [0, 1]
-  osi_cont_cols <- c("OSITimeToCentrifugation", "OSIPreparationTemperature", "OSISummary")
+  osi_cont_cols <- c("OSITimeToCentrifugation", "OSIPreparationTemperature",
+                     "OSISummary")
   osi_cont_found <- intersect(osi_cont_cols, colnames(df))
 
   if (length(osi_cont_found) > 0) {
@@ -216,7 +183,8 @@ olink_umap_plot <- function (df,
         )
       }
 
-      v_chr <- if (is.factor(v_raw)) as.character(v_raw) else as.character(v_raw)
+      v_chr <- if (is.factor(v_raw)) as.character(v_raw) else
+        as.character(v_raw)
 
       v_num <- suppressWarnings(as.numeric(v_chr))
 
@@ -249,34 +217,35 @@ olink_umap_plot <- function (df,
   }
 
   #Check that the user didn't specify just one of outlierDefX and outlierDefY
-  if(sum(c(is.numeric(outlierDefX), is.numeric(outlierDefY))) == 1){
-    stop('To label outliers, both outlierDefX and outlierDefY have to be specified as numerical values')
+  if (sum(c(is.numeric(outlierDefX), is.numeric(outlierDefY))) == 1) {
+    stop("To label outliers, both outlierDefX and outlierDefY have to be specified as numerical values") #nolint
   }
 
-  #If outlierLines == TRUE, both outlierDefX and outlierDefY have to be specified
-  if(outlierLines){
-    if(!all(is.numeric(outlierDefX), is.numeric(outlierDefY))){
-      stop('outlierLines requested but boundaries not specified. To draw lines, both outlierDefX and outlierDefY have to be specified as numerical values')
+  #If outlierLines == TRUE, both outlierDefX and outlierDefY have to be specified #nolint
+  if (outlierLines) {
+    if (!all(is.numeric(outlierDefX), is.numeric(outlierDefY))) {
+      stop("outlierLines requested but boundaries not specified. To draw lines, both outlierDefX and outlierDefY have to be specified as numerical values") #nolint
     }
   }
 
-  if(byPanel){
+  if (byPanel) {
     # Convert color_g variable to factor (but keep OSI columns continuous)
-    osi_cols <- c("OSITimeToCentrifugation", "OSIPreparationTemperature", "OSISummary")
-    if(!(color_g %in% osi_cols)){
-      if(!is.factor(df[[paste(color_g)]])){
+    osi_cols <- c("OSITimeToCentrifugation", "OSIPreparationTemperature",
+                  "OSISummary")
+    if (!(color_g %in% osi_cols)) {
+      if (!is.factor(df[[paste(color_g)]])) {
         df[[paste(color_g)]] <- as.factor(df[[paste(color_g)]])
       }
     }
 
+    # Strip "Olink" from the panel names
     df <- df |>
-      dplyr::mutate(Panel = Panel  |> stringr::str_replace("Olink ", "")) #Strip "Olink" from the panel names
+      dplyr::mutate(Panel = .data$Panel  |> stringr::str_replace("Olink ", ""))
 
-    plotList <- lapply(unique(df$Panel), function(x) {
+    plotList <- lapply(unique(df$Panel), function(x) { # nolint object_name_linter
       g <- df |>
-        dplyr::filter(Panel == x) |>
-        olink_umap_plot.internal(df = .,
-                                 color_g = color_g,
+        dplyr::filter(.data$Panel == x) |>
+        olink_umap_plot.internal(color_g = color_g,
                                  x_val = x_val,
                                  y_val = y_val,
                                  label_samples = label_samples,
@@ -295,34 +264,36 @@ olink_umap_plot <- function (df,
       g$data <- g$data |>
         dplyr::mutate(Panel = x)
 
-      g
+      return(g)
     })
-    names(plotList) <- unique(df$Panel)
-    if(!quiet) print(ggpubr::ggarrange(plotlist = plotList, common.legend = TRUE))
+    names(plotList) <- unique(df$Panel) # nolint object_name_linter
+    if (!quiet) print(ggpubr::ggarrange(plotlist = plotList,
+                                        common.legend = TRUE))
 
-  } else{
+  } else {
     umap_plot <- olink_umap_plot.internal(df = df,
-                                         color_g = color_g,
-                                         x_val = x_val,
-                                         y_val = y_val,
-                                         label_samples = label_samples,
-                                         config = config,
-                                         drop_assays = drop_assays,
-                                         drop_samples = drop_samples,
-                                         outlierDefX = outlierDefX,
-                                         outlierDefY = outlierDefY,
-                                         outlierLines = outlierLines,
-                                         label_outliers = label_outliers,
-                                         verbose = verbose,
-                                         ...)
-    if(!quiet) print(umap_plot)
-    plotList <- list(umap_plot) #For consistency, return a list even when there's just one plot
+                                          color_g = color_g,
+                                          x_val = x_val,
+                                          y_val = y_val,
+                                          label_samples = label_samples,
+                                          config = config,
+                                          drop_assays = drop_assays,
+                                          drop_samples = drop_samples,
+                                          outlierDefX = outlierDefX,
+                                          outlierDefY = outlierDefY,
+                                          outlierLines = outlierLines,
+                                          label_outliers = label_outliers,
+                                          verbose = verbose,
+                                          ...)
+    if (!quiet) print(umap_plot)
+    #For consistency, return a list even when there's just one plot
+    plotList <- list(umap_plot) # nolint
   }
 
   return(invisible(plotList))
 }
 
-olink_umap_plot.internal <- function (df,
+olink_umap_plot.internal <- function(df, #nolint
                                      color_g,
                                      x_val,
                                      y_val,
@@ -330,15 +301,15 @@ olink_umap_plot.internal <- function (df,
                                      config,
                                      drop_assays,
                                      drop_samples,
-                                     outlierDefX,
-                                     outlierDefY,
-                                     outlierLines,
+                                     outlierDefX, # nolint object_name_linter
+                                     outlierDefY, # nolint object_name_linter
+                                     outlierLines, # nolint object_name_linter
                                      label_outliers,
                                      verbose = TRUE,
-                                     ...){
+                                     ...) {
 
   ### Data pre-processing ###
-  procData <- npxProcessing_forDimRed(df = df,
+  procData <- npxProcessing_forDimRed(df = df, #nolint
                                       color_g = color_g,
                                       drop_assays = drop_assays,
                                       drop_samples = drop_samples,
@@ -347,13 +318,14 @@ olink_umap_plot.internal <- function (df,
   #### UMAP ####
   #Determine number of UMAP components
   n_components <- config$n_components
-  if(max(c(x_val, y_val)) > n_components){
+  if (max(c(x_val, y_val)) > n_components) {
     n_components <- max(c(x_val, y_val))
   }
 
-  umap_fit <- umap::umap(procData$df_wide_matrix, config = config, n_components = n_components)
-  umapX <- umap_fit$layout[, x_val]
-  umapY <- umap_fit$layout[, y_val]
+  umap_fit <- umap::umap(procData$df_wide_matrix, config = config,
+                         n_components = n_components)
+  umapX <- umap_fit$layout[, x_val] # nolint object_name_linter
+  umapY <- umap_fit$layout[, y_val] # nolint object_name_linter
   observation_names <- procData$df_wide$SampleID
   observation_colors <- procData$df_wide$colors
 
@@ -366,30 +338,34 @@ olink_umap_plot.internal <- function (df,
   )
 
   #Identify outliers
-  if(!is.na(outlierDefX) & !is.na(outlierDefY)){
+  if (!is.na(outlierDefX) && !is.na(outlierDefY)) {
     scores <- scores |>
-      tibble::rownames_to_column(var = 'SampleID') |>
-      dplyr::mutate( umapX_low = mean(umapX, na.rm = TRUE) - outlierDefX*sd(umapX, na.rm = TRUE),
-                     umapX_high = mean(umapX, na.rm = TRUE) + outlierDefX*sd(umapX, na.rm = TRUE),
-                     umapY_low = mean(umapY, na.rm = TRUE) - outlierDefY*sd(umapY, na.rm = TRUE),
-                     umapY_high = mean(umapY, na.rm = TRUE) + outlierDefY*sd(umapY, na.rm = TRUE)) |>
-      dplyr::mutate(Outlier = dplyr::if_else(umapX < umapX_high &
-                                               umapX > umapX_low &
-                                               umapY > umapY_low &
-                                               umapY < umapY_high,
+      dplyr::mutate(umapX_low = mean(umapX, na.rm = TRUE) -
+                      outlierDefX * sd(umapX, na.rm = TRUE),
+                    umapX_high = mean(umapX, na.rm = TRUE) +
+                      outlierDefX * sd(umapX, na.rm = TRUE),
+                    umapY_low = mean(umapY, na.rm = TRUE) -
+                      outlierDefY * sd(umapY, na.rm = TRUE),
+                    umapY_high = mean(umapY, na.rm = TRUE) +
+                      outlierDefY * sd(umapY, na.rm = TRUE)) |>
+      dplyr::mutate(Outlier = dplyr::if_else(umapX < .data$umapX_high &
+                                               umapX > .data$umapX_low &
+                                               umapY > .data$umapY_low &
+                                               umapY < .data$umapY_high,
                                              0, 1))
   }
 
   #### Plotting ####
   umap_plot <- ggplot2::ggplot(scores, ggplot2::aes(x = umapX, y = umapY)) +
-    ggplot2::xlab(paste0('UMAP', x_val)) +
-    ggplot2::ylab(paste0('UMAP', y_val))
+    ggplot2::xlab(paste0("UMAP", x_val)) +
+    ggplot2::ylab(paste0("UMAP", y_val))
 
 
   #Drawing scores
-  if(label_samples){
+  if (label_samples) {
     umap_plot <- umap_plot +
-      ggplot2::geom_text(ggplot2::aes(label = SampleID, color = colors), size = 3) +
+      ggplot2::geom_text(ggplot2::aes(label = .data$SampleID, color = colors),
+                         size = 3) +
       ggplot2::labs(color = color_g) +
       ggplot2::guides(size = "none")
   } else {
@@ -400,11 +376,12 @@ olink_umap_plot.internal <- function (df,
   }
 
   # Continuous color scale for OSI columns
-  osi_cols <- c("OSITimeToCentrifugation", "OSIPreparationTemperature", "OSISummary")
-  if(color_g %in% osi_cols){
+  osi_cols <- c("OSITimeToCentrifugation", "OSIPreparationTemperature",
+                "OSISummary")
+  if (color_g %in% osi_cols) {
 
     # Ensure numeric for continuous scale (handles character/factor inputs)
-    if(is.factor(scores$colors)) scores$colors <- as.character(scores$colors)
+    if (is.factor(scores$colors)) scores$colors <- as.character(scores$colors)
     scores$colors <- suppressWarnings(as.numeric(scores$colors))
 
     umap_plot <- umap_plot +
@@ -419,32 +396,39 @@ olink_umap_plot.internal <- function (df,
 
 
   #Label outliers in figure
-  if(!is.na(outlierDefX) & !is.na(outlierDefY) & label_outliers){
+  if (!is.na(outlierDefX) && !is.na(outlierDefY) && label_outliers) {
     umap_plot <- umap_plot +
-      ggrepel::geom_label_repel(data = . |> dplyr::mutate(SampleIDPlot = dplyr::case_when(Outlier == 1 ~ SampleID,
-                                                                                           TRUE ~ "")),
-                                ggplot2::aes(label=SampleIDPlot),
-                                box.padding = 0.5,
-                                min.segment.length = 0.1,
-                                show.legend=FALSE,
-                                size = 3)
+      ggrepel::geom_label_repel(
+        data = scores |>
+          dplyr::mutate(
+            SampleIDPlot = dplyr::case_when(
+              .data$Outlier == 1 ~ .data$SampleID,
+              TRUE ~ ""
+            )
+          ),
+        ggplot2::aes(label = .data$SampleIDPlot),
+        box.padding = 0.5,
+        min.segment.length = 0.1,
+        show.legend = FALSE,
+        size = 3
+      )
   }
 
   #Add outlier lines
-  if(outlierLines){
+  if (outlierLines) {
     umap_plot <- umap_plot +
-      ggplot2::geom_hline(ggplot2::aes(yintercept=umapY_low),
-                          linetype = 'dashed',
-                          color = 'grey') +
-      ggplot2::geom_hline(ggplot2::aes(yintercept=umapY_high),
-                          linetype = 'dashed',
-                          color = 'grey') +
-      ggplot2::geom_vline(ggplot2::aes(xintercept = umapX_low),
-                          linetype = 'dashed',
-                          color = 'grey') +
-      ggplot2::geom_vline(ggplot2::aes(xintercept = umapX_high),
-                          linetype = 'dashed',
-                          color = 'grey')
+      ggplot2::geom_hline(ggplot2::aes(yintercept = .data$umapY_low),
+                          linetype = "dashed",
+                          color = "grey") +
+      ggplot2::geom_hline(ggplot2::aes(yintercept = .data$umapY_high),
+                          linetype = "dashed",
+                          color = "grey") +
+      ggplot2::geom_vline(ggplot2::aes(xintercept = .data$umapX_low),
+                          linetype = "dashed",
+                          color = "grey") +
+      ggplot2::geom_vline(ggplot2::aes(xintercept = .data$umapX_high),
+                          linetype = "dashed",
+                          color = "grey")
   }
 
 
@@ -452,10 +436,9 @@ olink_umap_plot.internal <- function (df,
   umap_plot <- umap_plot +
     OlinkAnalyze::set_plot_theme()
 
-  osi_cols <- c("OSITimeToCentrifugation", "OSIPreparationTemperature", "OSISummary")
-  if(!(color_g %in% osi_cols)){
+  if (!(color_g %in% osi_cols)) {
     umap_plot <- umap_plot +
-      OlinkAnalyze::olink_color_discrete(...,drop=FALSE)
+      OlinkAnalyze::olink_color_discrete(..., drop = FALSE)
   }
 
   return(umap_plot)
