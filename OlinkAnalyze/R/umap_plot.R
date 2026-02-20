@@ -116,16 +116,20 @@ olink_umap_plot <- function (df,
   }
 
   #Filtering on valid OlinkID
-  df <- df %>%
-    dplyr::filter(stringr::str_detect(OlinkID,
-                                      "OID[0-9]{5}"))
+  # df <- df %>%
+  #   dplyr::filter(stringr::str_detect(OlinkID,
+  #                                     "OID[0-9]{5}"))
+  #
+  # #Check data format
+  # npxCheck <- check_npx(df)
+  # df <- df %>% dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) #Exclude assays that have all NA:s
 
-  #Check data format
-  npxCheck <- npxCheck(df)
-  df <- df %>% dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) #Exclude assays that have all NA:s
-
+  #Filtering on valid OlinkID
+  #Exclude assays that have all NA:s
   # Rename duplicate UniProts
-  df <- uniprot_replace(df, npxCheck)
+  check_log = NULL
+  check_log <- run_check_npx(df = df, check_log = check_log) # uses check_npx
+  df <- clean_npx(df, check_log = check_log, out_df = "tibble", verbose = FALSE) # uses clean_npx
 
   # Validate OSI category column: must contain only 0,1,2,3,4; then convert to factor if not already
   osi_cat_candidates <- "OSICategory"
@@ -335,12 +339,12 @@ olink_umap_plot.internal <- function (df,
                                      ...){
 
   # Ensure one unique color value per SampleID (required by npxProcessing_forDimRed)
-  df <- df |>
-    dplyr::group_by(SampleID) |>
-    dplyr::mutate(
-      !!rlang::sym(color_g) := dplyr::first(stats::na.omit(.data[[color_g]]))
-    ) |>
-    dplyr::ungroup()
+  # df <- df |>
+  #   dplyr::group_by(SampleID) |>
+  #   dplyr::mutate(
+  #     !!rlang::sym(color_g) := dplyr::first(stats::na.omit(.data[[color_g]]))
+  #   ) |>
+  #   dplyr::ungroup()
 
   ### Data pre-processing ###
   procData <- npxProcessing_forDimRed(df = df,
