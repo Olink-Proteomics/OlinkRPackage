@@ -100,19 +100,20 @@ olink_norm_input_check <- function(df1,
                                    df2_project_nr,
                                    reference_project,
                                    reference_medians) {
+
   # Validate the normalization input ----
   #Check data format
   npx_check <- npxCheck(df1)
   # Rename duplicate UniProts
   df1 <- uniprot_replace(df1, npx_check)
-  
+
   if (!is.null(df2)) {
     #Check data format
     npx_check <- npxCheck(df2)
     # Rename duplicate UniProts
     df2 <- uniprot_replace(df2, npx_check)
   }
-  
+
   norm_valid <- olink_norm_input_validate(
     df1 = df1,
     df2 = df2,
@@ -122,9 +123,9 @@ olink_norm_input_check <- function(df1,
   )
   norm_mode <- norm_valid$norm_mode
   norm_msg <- norm_valid$norm_msg
-  
+
   # Check that input classes are correct ----
-  
+
   olink_norm_input_class(
     df1 = df1,
     df2 = df2,
@@ -136,55 +137,67 @@ olink_norm_input_check <- function(df1,
     reference_medians = reference_medians,
     norm_mode = norm_mode
   )
-  
-  olink_norm_input_check <- function(df1,
-                                     df2,
-                                     overlapping_samples_df1,
-                                     overlapping_samples_df2,
-                                     df1_project_nr,
-                                     df2_project_nr,
-                                     reference_project,
-                                     reference_medians) {
-    # Validate the normalization input ----
-    #Check data format
-    npx_check <- npxCheck(df1)
-    # Rename duplicate UniProts
-    df1 <- uniprot_replace(df1, npx_check)
-    
-    if (!is.null(df2)) {
-      #Check data format
-      npx_check <- npxCheck(df2)
-      # Rename duplicate UniProts
-      df2 <- uniprot_replace(df2, npx_check)
+
+  # Check column names ----
+
+  if (norm_mode == olink_norm_modes$ref_median) {
+    # reference median normalization
+
+    # check columns of df1
+    lst_df <- list(df1)
+    names(lst_df) <- df1_project_nr
+    lst_cols <- olink_norm_input_check_df_cols(lst_df = lst_df)
+
+    # list of samples
+    lst_ref_samples <- list(overlapping_samples_df1)
+    names(lst_ref_samples) <- df1_project_nr
+
+    # check reference_medians
+    olink_norm_input_ref_medians(reference_medians = reference_medians)
+
+  } else {
+
+    # bridge, subset, or cross_product normalization
+
+    reference_medians <- NULL
+
+    lst_df <- list(df1, df2)
+    names(lst_df) <- c(df1_project_nr, df2_project_nr)
+    lst_cols <- olink_norm_input_check_df_cols(lst_df = lst_df)
+    product_ids <- olink_norm_product_id(
+      lst_df = lst_df,
+      lst_cols = lst_cols
+    )
+    ref_ids <- olink_norm_reference_id(
+      lst_product = product_ids,
+      reference_project = reference_project
+    )
+
+    if (norm_mode %in% c(olink_norm_modes$bridge,
+                         olink_norm_modes$norm_cross_product)) {
+      # check if it is cross_product normalization, or bridge normalization
+      norm_cross_product <- olink_norm_input_cross_product(
+        lst_df = lst_df,
+        lst_cols = lst_cols,
+        reference_project = reference_project,
+        product_ids = product_ids,
+        ref_ids = ref_ids
+      )
+      norm_mode <- norm_cross_product$norm_mode
+      lst_df <- norm_cross_product$lst_df
+      # bridge or E3072-HT normalization normalization
+      lst_ref_samples <- list(overlapping_samples_df1, overlapping_samples_df1)
+    } else if (norm_mode == olink_norm_modes$subset) {
+      # subset normalization
+      lst_ref_samples <- list(overlapping_samples_df1, overlapping_samples_df2)
     }
-    
-    norm_valid <- olink_norm_input_validate(
-      df1 = df1,
-      df2 = df2,
-      overlapping_samples_df1 = overlapping_samples_df1,
-      overlapping_samples_df2 = overlapping_samples_df2,
-      reference_medians = reference_medians
-    )
-    norm_mode <- norm_valid$norm_mode
-    norm_msg <- norm_valid$norm_msg
-    
-    # Check that input classes are correct ----
-    
-    olink_norm_input_class(
-      df1 = df1,
-      df2 = df2,
-      overlapping_samples_df1 = overlapping_samples_df1,
-      overlapping_samples_df2 = overlapping_samples_df2,
-      df1_project_nr = df1_project_nr,
-      df2_project_nr = df2_project_nr,
-      reference_project = reference_project,
-      reference_medians = reference_medians,
-      norm_mode = norm_mode
-    )
-  
-    # Update normalization message ----
-    
-    # Update the message to inform what type of normalization we will perform
+    names(lst_ref_samples) <- c(df1_project_nr, df2_project_nr)
+
+  }
+
+  # Update normalization message ----
+
+  # Update the message to inform what type of normalization we will perform
     if (norm_mode == olink_norm_modes$norm_cross_product) {
       norm_msg <- gsub(
         pattern = "Bridge",
@@ -192,10 +205,10 @@ olink_norm_input_check <- function(df1,
         x = norm_msg
       )
     }
-    
-    # Check samples ----
-    
-    # extract all unique sample identifiers
+
+  # Check samples ----
+
+  # extract all unique sample identifiers
     lst_df_samples <- lapply(names(lst_cols), function(l_col) {
       lst_df[[l_col]] |> # nolint return_linter
         dplyr::select(
@@ -210,7 +223,7 @@ olink_norm_input_check <- function(df1,
         )
     })
     names(lst_df_samples) <- names(lst_cols)
-    
+
     olink_norm_input_check_samples(
       lst_df_samples = lst_df_samples,
       lst_ref_samples = lst_ref_samples,
@@ -319,7 +332,7 @@ olink_norm_input_check <- function(df1,
   
   # check if software versions are the same if req columns are different ----
   # if multiple versions, select the newest format
-  
+
   # check that subset of required columns are present in both datasets
   if (length(lst_cols) > 1 && !identical(lst_cols[[1]], lst_cols[[2]])) {
     
@@ -330,58 +343,79 @@ olink_norm_input_check <- function(df1,
         software_cols[[i]] <- lst_cols[[i]][["software_version"]] # nolint return_linter
       })
     
-    new_format_df_index <- olink_norm_input_check_software(software_cols)
+    # if no software versions are present, skip
+    if(length(unlist(software_cols)) == 0L) {
+      
+    } 
     
-    # if software is the same, check for software version
-    if(is.null(new_format_df_index)) {
-      
-      software_version <- list()
-      
-      software_version <-
-        lapply(seq_along(lst_df), function(i) {
-          software_version[i] <- lst_df[[i]] |>
-            select(any_of(c("MapVersion",
-                            "ExploreVersion",
-                            "SoftwareVersion"))
-            ) |>
-            distinct() |>
-            pull() # nolint return_linter
-          
-        })
-      
-      software_version <- software_version |> unlist()
-      new_format_df_index <- which(software_version == max(software_version))
-      
-    }
+    # if software versions are present, assign index of newer format
+    else {
+      new_format_df_index <- olink_norm_input_check_software(software_cols)
 
-    # if new df is not the reference project, swap the ref and non-ref cols
-    if (!new_format_df_index == 
-        which(c(df1_project_nr, df2_project_nr) == reference_project)) {
+      # if software is the same, check for software version
+      if(is.null(new_format_df_index)) {
+        
+        software_version <- list()
+        
+        software_version <-
+          lapply(seq_along(lst_df), function(i) {
+            software_version[i] <- lst_df[[i]] |>
+              select(any_of(c("MapVersion",
+                              "ExploreVersion",
+                              "SoftwareVersion"))
+              ) |>
+              distinct() |>
+              pull() # nolint return_linter
+            
+          })
+        
+        software_version <- software_version |> unlist()
+        new_format_df_index <- which(software_version == max(software_version))
+
+      }
       
-      col_rename_dict_ref_notref <- stats::setNames(
-        lst_out$ref_cols |> unlist(),
-        lst_out$not_ref_cols |> unlist()
-      )
+      # if new df is not the reference project, swap ref and non-ref col names
+      if (!new_format_df_index == 
+          which(c(df1_project_nr, df2_project_nr) == reference_project)) {
+
+        col_rename_dict_ref_notref <- stats::setNames(
+          lst_out$ref_cols |>
+            replace(list = lengths(lst_out$ref_cols) == 0,
+                    values = "") |>
+            unlist(),
+          lst_out$not_ref_cols |>
+            replace(list = lengths(lst_out$ref_cols) == 0,
+                    values = "") |>
+            unlist()
+        )
+        
+        col_rename_dict_notref_ref <- stats::setNames(
+          lst_out$not_ref_cols |>
+            replace(list = lengths(lst_out$ref_cols) == 0,
+                    values = "") |>
+            unlist(),
+          lst_out$ref_cols |>
+            replace(list = lengths(lst_out$ref_cols) == 0,
+                    values = "") |>
+            unlist()
+        )
+        
+        # rename ref_df with not_ref_df required column names
+        lst_out$ref_df <- lst_out$ref_df |>
+          rename(any_of(col_rename_dict_ref_notref))
+        
+        # rename not_ref_df with ref_df required column names
+        lst_out$not_ref_df <- lst_out$not_ref_df |>
+          rename(any_of(col_rename_dict_notref_ref))
+        
+        # swap not_ref col and ref col lists in lst_out
+        lst_out$not_ref_cols <- lst_cols[[lst_out$ref_name]]
+        lst_out$ref_cols <- lst_cols[[lst_out$not_ref_name]]
+        
+      }
       
-      col_rename_dict_notref_ref <- stats::setNames(
-        lst_out$not_ref_cols |> unlist(),
-        lst_out$ref_cols |> unlist()
-      )
-      
-      # rename ref_df with not_ref_df required column names
-      lst_out$ref_df <- lst_out$ref_df |>
-        rename(any_of(col_rename_dict_ref_notref))
-      
-      # rename not_ref_df with ref_df required column names
-      lst_out$not_ref_df <- lst_out$not_ref_df |>
-        rename(any_of(col_rename_dict_notref_ref))
-      
-      # swap not_ref col and ref col lists in lst_out
-      lst_out$not_ref_cols <- lst_cols[[lst_out$ref_name]]
-      lst_out$ref_cols <- lst_cols[[lst_out$not_ref_name]]
-      
-      
-    }
+      }
+    
   }
     
   return(lst_out)
@@ -750,7 +784,7 @@ olink_norm_input_check_df_cols <- function(lst_df) {
     sample_type = c("SampleType", "Sample_Type"),
     software_version = c("SoftwareVersion", "ExploreVersion", "MapVersion")
     )
-
+  
   # intersect required column names with columns of df
   lst_req_col <- lapply(lst_df, function(l_df) { # nolint return_linter
     lapply(required_cols, function(r_col) r_col[r_col %in% names(l_df)]) # nolint return_linter
@@ -1167,21 +1201,20 @@ olink_norm_input_check_software <- function(lst_req_col_software) {
                           "SoftwareName"))  # NPX Signature
       )
       
-      
       # find the df with the most up-to-date software
       new_format_index <- which(
         match(c(lst_req_col_software), software_col_shared) == 1
       )
       
-      # lst_req_col_software <-
-      #   lapply(seq_along(lst_req_col_software), function(i) {
-      #     lst_req_col_software[[i]] <- software_col_shared[1L] |> 
-      #       as.character() # nolinter return lint
-      #   })
+      lst_req_col_software <-
+        lapply(seq_along(lst_req_col_software), function(i) {
+          lst_req_col_software[[i]] <- software_col_shared[1L] |>
+            as.character() # nolinter return lint
+        })
       
       
       cli::cli_inform(
-        c("Multiple matching quantification methods detected.",
+        c(#"Multiple matching quantification methods detected.",
           "i" = paste0("Bridged dataset will be formatted to match ", 
                        software_col_shared[1L] |> as.character()
           )),

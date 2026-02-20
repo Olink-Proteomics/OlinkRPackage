@@ -239,7 +239,7 @@ olink_normalization <- function(df1,
                                 reference_project = "P1",
                                 reference_medians = NULL,
                                 format = FALSE) {
-
+  
   # check input ----
   lst_check <- olink_norm_input_check(
     df1 = df1,
@@ -251,9 +251,9 @@ olink_normalization <- function(df1,
     reference_project = reference_project,
     reference_medians = reference_medians
   )
-  
-  # normalize ----
 
+  # normalize ----
+  
   if (lst_check$norm_mode == olink_norm_modes$ref_median) {
     ## reference median normalization ----
 
@@ -338,6 +338,19 @@ olink_normalization <- function(df1,
       )
 
     }
+  }
+  
+  # inform about duplicated SampleIDs ----
+  
+  if (lst_check$norm_mode %in% c(olink_norm_modes$bridge,
+                                 olink_norm_modes$norm_cross_product)) {
+    cli::cli_inform(
+      c(
+        "i" = "Output includes two sets of bridging samples.",
+        "We recommend retaining only bridge samples from the reference dataset
+          for downstream analysis."
+      )
+    )
   }
 
   # Recalculate MaxLOD
