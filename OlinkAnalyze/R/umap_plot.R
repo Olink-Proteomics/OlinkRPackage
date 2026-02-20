@@ -30,7 +30,7 @@
 #' @examples
 #' \donttest{
 #' library(dplyr)
-#' npx_data <- npx_data1 %>%
+#' npx_data <- npx_data1 |>
 #'     mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
 #' try({ # Requires umap package dependency
 #' #UMAP using all the data
@@ -49,12 +49,11 @@
 #' #Retrieve the outliers
 #' g <- olink_umap_plot(df=npx_data, color_g = "QC_Warning",
 #'                     outlierDefX = 3, outlierDefY = 2, byPanel = TRUE)
-#' outliers <- lapply(g, function(x){x$data}) %>%
-#'     bind_rows() %>%
+#' outliers <- lapply(g, function(x){x$data}) |>
+#'     bind_rows() |>
 #'     filter(Outlier == 1)
 #' })
 #' }
-#' @importFrom magrittr %>%
 #' @importFrom dplyr filter select group_by ungroup mutate mutate_at if_else n_distinct summarise left_join arrange distinct
 #' @importFrom stringr str_detect
 #' @importFrom tidyr spread
@@ -116,13 +115,13 @@ olink_umap_plot <- function (df,
   }
 
   #Filtering on valid OlinkID
-  # df <- df %>%
+  # df <- df |>
   #   dplyr::filter(stringr::str_detect(OlinkID,
   #                                     "OID[0-9]{5}"))
   #
   # #Check data format
   # npxCheck <- check_npx(df)
-  # df <- df %>% dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) #Exclude assays that have all NA:s
+  # df <- df |> dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) #Exclude assays that have all NA:s
 
   #Filtering on valid OlinkID
   #Exclude assays that have all NA:s
@@ -270,12 +269,12 @@ olink_umap_plot <- function (df,
       }
     }
 
-    df <- df %>%
-      dplyr::mutate(Panel = Panel  %>% stringr::str_replace("Olink ", "")) #Strip "Olink" from the panel names
+    df <- df |>
+      dplyr::mutate(Panel = Panel  |> stringr::str_replace("Olink ", "")) #Strip "Olink" from the panel names
 
     plotList <- lapply(unique(df$Panel), function(x) {
-      g <- df %>%
-        dplyr::filter(Panel == x) %>%
+      g <- df |>
+        dplyr::filter(Panel == x) |>
         olink_umap_plot.internal(df = .,
                                  color_g = color_g,
                                  x_val = x_val,
@@ -293,7 +292,7 @@ olink_umap_plot <- function (df,
         ggplot2::labs(title = x)
 
       #Add Panel info inside the ggplot object
-      g$data <- g$data %>%
+      g$data <- g$data |>
         dplyr::mutate(Panel = x)
 
       g
@@ -338,14 +337,6 @@ olink_umap_plot.internal <- function (df,
                                      verbose = TRUE,
                                      ...){
 
-  # Ensure one unique color value per SampleID (required by npxProcessing_forDimRed)
-  # df <- df |>
-  #   dplyr::group_by(SampleID) |>
-  #   dplyr::mutate(
-  #     !!rlang::sym(color_g) := dplyr::first(stats::na.omit(.data[[color_g]]))
-  #   ) |>
-  #   dplyr::ungroup()
-
   ### Data pre-processing ###
   procData <- npxProcessing_forDimRed(df = df,
                                       color_g = color_g,
@@ -376,12 +367,12 @@ olink_umap_plot.internal <- function (df,
 
   #Identify outliers
   if(!is.na(outlierDefX) & !is.na(outlierDefY)){
-    scores <- scores %>%
-      tibble::rownames_to_column(var = 'SampleID') %>%
+    scores <- scores |>
+      tibble::rownames_to_column(var = 'SampleID') |>
       dplyr::mutate( umapX_low = mean(umapX, na.rm = TRUE) - outlierDefX*sd(umapX, na.rm = TRUE),
                      umapX_high = mean(umapX, na.rm = TRUE) + outlierDefX*sd(umapX, na.rm = TRUE),
                      umapY_low = mean(umapY, na.rm = TRUE) - outlierDefY*sd(umapY, na.rm = TRUE),
-                     umapY_high = mean(umapY, na.rm = TRUE) + outlierDefY*sd(umapY, na.rm = TRUE)) %>%
+                     umapY_high = mean(umapY, na.rm = TRUE) + outlierDefY*sd(umapY, na.rm = TRUE)) |>
       dplyr::mutate(Outlier = dplyr::if_else(umapX < umapX_high &
                                                umapX > umapX_low &
                                                umapY > umapY_low &
@@ -430,7 +421,7 @@ olink_umap_plot.internal <- function (df,
   #Label outliers in figure
   if(!is.na(outlierDefX) & !is.na(outlierDefY) & label_outliers){
     umap_plot <- umap_plot +
-      ggrepel::geom_label_repel(data = . %>% dplyr::mutate(SampleIDPlot = dplyr::case_when(Outlier == 1 ~ SampleID,
+      ggrepel::geom_label_repel(data = . |> dplyr::mutate(SampleIDPlot = dplyr::case_when(Outlier == 1 ~ SampleID,
                                                                                            TRUE ~ "")),
                                 ggplot2::aes(label=SampleIDPlot),
                                 box.padding = 0.5,
