@@ -577,9 +577,8 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
 
   #### Keep subjects together ####
   if (!missing(SubjectColumn) && is.null(study)) {
-    cli::cli_progress_bar("Assigning subjects to plates\n")
+    cli::cli_progress_message("Assigning subjects to plates...")
     for (i in 1:iterations) {
-      cli::cli_progress_update()
 
       # Create new column sampleID
       all.plates$SampleID <- NA_character_
@@ -774,13 +773,11 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
                                                     j_tot +
                                                     j))))
         }
-        cli::cli_inform(paste0("Testing with ",
-                               j,
-                               " empty well(s) in the plate. \n"))
+        cli::cli_progress_message(paste0("Testing with ",
+                                         j,
+                                         " empty well(s) in the plate..."))
         manifest_study <- Manifest[study_interval, ]
-        cli::cli_progress_bar()
         for (i in 1:iterations) {
-          cli::cli_progress_update()
           for (sub in rand_subjects) {
             all.plates.tmp <- assign_subject2plate(plate_map =
                                                      all.plates[
@@ -829,17 +826,18 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
         if (passed) break
       }
     }
-    cli::cli_inform("Random assignment of SUBJECTS to plates\n")
+    cli::cli_alert_info("Random assignment of SUBJECTS to plates\n")
     if (passed) {
-      cli::cli_inform(paste("Totally included",
-                            j_tot,
-                            "empty well(s) in first and/or",
-                            "intermediate plate(s) to accomplish",
-                            "the randomization.\n"))
-      cli::cli_inform(paste("Please try another seed or increase the number",
-                            "of iterations if there are indications that",
-                            "another randomization might leave fewer",
-                            "empty wells.\n"))
+      cli::cli_alert_info(paste("Included total of",
+                                j_tot,
+                                "empty well(s) in first and/or",
+                                "intermediate plate(s) to accomplish",
+                                "the randomization.\n"))
+      cli::cli_alert_warning(paste("Please try another seed or increase the", 
+                                   "number of iterations if there are",
+                                   "indications that",
+                                   "another randomization might leave fewer",
+                                   "empty wells.\n"))
       out_manifest <- out_manifest |>
         dplyr::bind_rows(ctrl_locations) |>
         dplyr::mutate(well = paste0(row,
@@ -864,10 +862,10 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
 
   #### Complete randomization within studies when subjectID is not given ####
   if (missing(SubjectColumn) && !is.null(study)) {
-    cli::cli_inform(paste0("Assigning subjects to plates. ",
-                           "Multi-study project detected. ",
-                           "Studies will be kept together during ",
-                           "randomization. \n"))
+    cli::cli_alert_info(paste0("Assigning subjects to plates. ",
+                               "Multi-study project detected. ",
+                               "Studies will be kept together during ",
+                               "randomization. \n"))
 
     out_manifest <- matrix(nrow = 0, ncol = ncol(Manifest))
 
