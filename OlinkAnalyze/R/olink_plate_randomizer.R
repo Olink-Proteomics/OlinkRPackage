@@ -103,8 +103,8 @@ olink_displayPlateLayout <- function(data, # nolint object_name_linter
   }
 
 
-  p <- ggplot2::ggplot(ggplot2::aes(x = column,
-                                    y = row,
+  p <- ggplot2::ggplot(ggplot2::aes(x = .data[["column"]],
+                                    y = .data[["row"]],
                                     fill = fill.color),
                        data = data) +
     ggplot2::geom_tile(color = "black") +
