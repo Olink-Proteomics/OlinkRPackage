@@ -138,7 +138,6 @@ olink_displayPlateLayout <- function(data, # nolint object_name_linter
 #' @param data tibble/data frame in long format returned from the
 #' olink_plate_randomizer function.
 #' @param fill.color Column name to be used as coloring variable for wells.
-#' @keywords randomized plates ggplot
 #' @export
 #' @seealso \itemize{
 #' \item{
@@ -549,7 +548,7 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
                                                       times = 8)))) |>
       # This could use the row column in all.plates instead of regenerating it.
       dplyr::arrange(.data[["plate"]], column, row) |>
-      select(-any_of("ID"))
+      dplyr::select(-any_of("ID"))
     cli::cli_alert_info("Random assignment of SAMPLES to plates\n")
     class(out_manifest) <- c("randomizedManifest", class(out_manifest))
     return(out_manifest)
