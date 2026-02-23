@@ -46,19 +46,3 @@ using ggplot and ggplot2::geom_tile.
 fill.color="Site")}
 
 }
-\seealso{
-\itemize{
-\item{
-\code{
-\link[OlinkAnalyze:olink_plate_randomizer]{olink_plate_randomizer()}}
-for generating a plating scheme}
-\item{
-\code{
-\link[OlinkAnalyze:olink_displayPlateDistributions]
-{olink_displayPlateDistributions()}} for validating that sites are properly
-randomized}
-}
-}
-\keyword{ggplot}
-\keyword{plates}
-\keyword{randomized}

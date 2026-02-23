@@ -4,7 +4,7 @@
 \alias{olink_displayPlateDistributions}
 \title{Plot distributions of a given variable for all plates}
 \usage{
-olink_displayPlateDistributions(data, fill.color)
+olink_displayPlateDistributions(data, fill.color = "plate")
 }
 \arguments{
 \item{data}{tibble/data frame in long format returned from the

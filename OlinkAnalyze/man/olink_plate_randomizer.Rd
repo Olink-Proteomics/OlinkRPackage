@@ -11,7 +11,7 @@ olink_plate_randomizer(
   SubjectColumn,
   iterations = 500,
   available.spots,
-  num_ctrl = 8,
+  num_ctrl = 8L,
   rand_ctrl = FALSE,
   seed,
   study = NULL
@@ -115,5 +115,3 @@ olink_displayPlateDistributions()}}
 for validating that sites are properly randomized}
 }
 }
-\keyword{plates}
-\keyword{randomized}
