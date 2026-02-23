@@ -33,28 +33,14 @@ product_to_platesize <- function(product) {
 #' @param rand_ctrl Logical. Whether controls are added to be randomized across
 #' the plate (default = FALSE)
 #' @param include.label Should the variable group be shown in the plot.
-#' @keywords randomized plates ggplot
 #' @return An object of class "ggplot" showing each plate in a facet with the
 #' cells colored by values in column fill.color in input \code{data}.
 #' @export
-#' @seealso \itemize{
-#' \item{
-#' \code{
-#' \link[OlinkAnalyze:olink_plate_randomizer]{olink_plate_randomizer()}}
-#' for generating a plating scheme}
-#' \item{
-#' \code{
-#' \link[OlinkAnalyze:olink_displayPlateDistributions]
-#' {olink_displayPlateDistributions()}} for validating that sites are properly
-#' randomized}
-#' }
-#'
 #' @examples
 #' \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
 #' \donttest{olink_displayPlateLayout(data = randomized.manifest,
 #' fill.color="Site")}
 #'
-#' @importFrom dplyr n filter select mutate
 
 olink_displayPlateLayout <- function(data, # nolint object_name_linter
                                      fill.color, # nolint object_name_linter
@@ -171,9 +157,6 @@ olink_displayPlateLayout <- function(data, # nolint object_name_linter
 #' \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
 #' \donttest{olink_displayPlateDistributions(data=randomized.manifest,
 #' fill.color="Site")}
-#' @importFrom dplyr group_by tally ungroup mutate summarize as_tibble arrange
-#' @importFrom ggplot2 ggplot aes theme labs geom_bar element_text
-
 
 olink_displayPlateDistributions <- function(data, # nolint object_length_linter
                                             fill.color = "plate") { # nolint object_name_linter
@@ -389,8 +372,6 @@ generate_plate_holder <- function(nplates,
 #' }
 #'
 #'
-#' @importFrom dplyr as_tibble mutate arrange left_join group_by ungroup select
-#' @importFrom tibble is_tibble
 
 #Main randomization function
 olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
@@ -403,8 +384,8 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
                                    rand_ctrl = FALSE,
                                    seed,
                                    study = NULL) {
-  if (num_ctrl < 1 || !is.numeric(num_ctrl) || 
-      (is.numeric(num_ctrl) && num_ctrl != as.integer(num_ctrl))) {
+  if (num_ctrl < 1 || !is.numeric(num_ctrl) ||
+        (is.numeric(num_ctrl) && num_ctrl != as.integer(num_ctrl))) {
     cli::cli_abort("`num_ctrl` must be a positive integer.")
   }
 
@@ -429,8 +410,8 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
   if (any(which(duplicated(Manifest$SampleID)))) {
     duplications <- Manifest$SampleID[which(duplicated(Manifest$SampleID))]
     cli::cli_warn(paste("Following SampleID(s) was/were duplicated:",
-                                 paste(duplications, collapse = "\n"),
-                                 sep = "\n"))
+                        paste(duplications, collapse = "\n"),
+                        sep = "\n"))
   }
 
   # Check if there are any NAs in SampleID column
@@ -816,8 +797,8 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
               dplyr::group_by(.data[["plate"]]) |>
               dplyr::mutate(scramble = sample(seq_len(dplyr::n())))
             manifest_study2 <- manifest_study2 |>
-              mutate(row = row[.data[["scramble"]]],
-                     column = column[.data[["scramble"]]])
+              dplyr::mutate(row = row[.data[["scramble"]]],
+                            column = column[.data[["scramble"]]])
           }
           if (passed) {
             j_tot <- j_tot + j
