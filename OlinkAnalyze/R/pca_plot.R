@@ -26,6 +26,7 @@
 #' outlierDefY standard deviations from the mean of the plotted PC
 #' will be labelled. Both arguments have to be specified.
 #'
+#' @inherit .downstream_fun_args params
 #' @param df data frame in long format with Sample Id, NPX and column
 #' of choice for colors
 #' @param color_g Character value indicating which column to use for
@@ -100,7 +101,7 @@
 #' }) |>
 #'   bind_rows() |>
 #'   filter(Outlier == 1)
-#' }
+#'
 #' @importFrom dplyr filter select group_by ungroup mutate mutate_at if_else
 #' n_distinct summarise left_join arrange distinct
 #' @importFrom stringr str_detect
@@ -115,23 +116,26 @@
 #' @importFrom utils head
 #' @importFrom grid unit
 
-olink_pca_plot <- function(df,
-                           color_g = "QC_Warning",
-                           x_val = 1,
-                           y_val = 2,
-                           label_samples = FALSE,
-                           drop_assays = FALSE,
-                           drop_samples = FALSE,
-                           n_loadings = 0,
-                           loadings_list = NULL,
-                           byPanel = FALSE, #nolint object_name_linter
-                           outlierDefX = NA, #nolint object_name_linter
-                           outlierDefY = NA, #nolint object_name_linter
-                           outlierLines = FALSE, #nolint object_name_linter
-                           label_outliers = TRUE,
-                           quiet = FALSE,
-                           verbose = TRUE,
-                           ...) {
+olink_pca_plot <- function(
+  df,
+  check_log = NULL,
+  color_g = "QC_Warning",
+  x_val = 1,
+  y_val = 2,
+  label_samples = FALSE,
+  drop_assays = FALSE,
+  drop_samples = FALSE,
+  n_loadings = 0,
+  loadings_list = NULL,
+  byPanel = FALSE, # nolint object_name_linter
+  outlierDefX = NA, # nolint object_name_linter
+  outlierDefY = NA, # nolint object_name_linter
+  outlierLines = FALSE, # nolint object_name_linter
+  label_outliers = TRUE,
+  quiet = FALSE,
+  verbose = TRUE,
+  ...
+) {
   # checking ellipsis
   if (length(list(...)) > 0) {
     ellipsis_variables <- names(list(...))
@@ -151,10 +155,34 @@ olink_pca_plot <- function(df,
     }
   }
 
-  # Check data format
-  npxCheck <- npxCheck(df)
-  # Rename duplicate UniProts
-  df <- uniprot_replace(df, npxCheck)
+  # Check if check_log is correct
+  check_log <- run_check_npx(df = df, check_log = check_log)
+
+  # Make sure data is a tibble
+  df <- convert_read_npx_output(df = df, out_df = "tibble")
+
+  # Stop if duplicate sample ID's detected
+  # if (length(check_log$sample_id_dups) > 0) {
+  #   cli::cli_abort(
+  #     "Duplicate SampleID(s) detected:
+  #     {paste(check_log$sample_id_dups, collapse = ', ')}.
+  #     Each sample ID must be unique. Please check your data and ensure that
+  #     each sample has a unique identifier."
+  #   )
+  # }
+  
+  # Warn if duplicate sample ID's detected
+  if (length(check_log$sample_id_dups) > 0) {
+    cli::cli_warn(
+      "Duplicate SampleID(s) detected:
+      {paste(check_log$sample_id_dups, collapse = ', ')}.
+      Each sample ID must be unique. Please check your data and ensure that
+      each sample has a unique identifier."
+    )
+  }
+
+  # Clean data using clean_npx()
+  df <- clean_npx(df, check_log = check_log)
 
   # Validate OSI category column: must contain only 0,1,2,3,4; then convert to
   # factor if not already
@@ -227,7 +255,6 @@ olink_pca_plot <- function(df,
 
   if (length(osi_cont_found) > 0) {
     for (cc in osi_cont_found) {
-
       v_raw <- df[[cc]]
 
       # ERROR if column exists but is entirely NA
@@ -263,31 +290,12 @@ olink_pca_plot <- function(df,
         bad_vals <- unique(v_num[out_of_range_idx])
         cli::cli_abort(
           "Invalid values detected in {cc}. Expected continuous numeric values
-          between 0 and 1. Found out-of-range value(s): 
+          between 0 and 1. Found out-of-range value(s):
           {paste(bad_vals, collapse = ', ')}."
         )
       }
     }
   }
-
-  # Stop if duplicate sample ID's detected
-  if (length(npxCheck$duplicate_samples) > 0) {
-    cli::cli_abort(
-      "Duplicate SampleID(s) detected:
-      {paste(npxCheck$duplicate_samples, collapse = ', ')}.
-      Each sample ID must be unique. Please check your data and ensure that
-      each sample has a unique identifier."
-    )
-  }
-
-  df <- df |> dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) # Exclude assays that have all NA:s
-
-  # Filtering on valid OlinkID
-  # df <- df |> dplyr::filter(!(OlinkID %in% npx_Check$non_conforming_OID)) # Exclude non-recognized OlinkIDs
-  df <- df |> dplyr::filter(stringr::str_detect(
-    OlinkID,
-    "OID[0-9]{5}"
-  ))
 
   # Check that the user didn't specify just one of outlierDefX and outlierDefY
   if (sum(c(is.numeric(outlierDefX), is.numeric(outlierDefY))) == 1) {
@@ -386,11 +394,11 @@ olink_pca_plot <- function(df,
 
 
 olink_calculate_pca <- function(
-  procData, #nolint object_name_linter
+  procData, # nolint object_name_linter
   x_val = 1,
   y_val = 2,
-  outlierDefX = NA, #nolint object_name_linter
-  outlierDefY = NA #nolint object_name_linter
+  outlierDefX = NA, # nolint object_name_linter
+  outlierDefY = NA # nolint object_name_linter
 ) {
   #### PCA ####
   pca_fit <- stats::prcomp(
@@ -402,11 +410,11 @@ olink_calculate_pca <- function(
   # Standardizing and selecting components
   scaling_factor_lambda <- pca_fit$sdev * sqrt(nrow(procData$df_wide_matrix))
 
-  PCX <- pca_fit$x[, x_val] / scaling_factor_lambda[x_val] #nolint object_name_linter
-  PCY <- pca_fit$x[, y_val] / scaling_factor_lambda[y_val] #nolint object_name_linter
-  PoV <- pca_fit$sdev^2 / sum(pca_fit$sdev^2) #nolint object_name_linter
-  LX <- pca_fit$rotation[, x_val] #nolint object_name_linter
-  LY <- pca_fit$rotation[, y_val] #nolint object_name_linter
+  PCX <- pca_fit$x[, x_val] / scaling_factor_lambda[x_val] # nolint object_name_linter
+  PCY <- pca_fit$x[, y_val] / scaling_factor_lambda[y_val] # nolint object_name_linter
+  PoV <- pca_fit$sdev^2 / sum(pca_fit$sdev^2) # nolint object_name_linter
+  LX <- pca_fit$rotation[, x_val] # nolint object_name_linter
+  LY <- pca_fit$rotation[, y_val] # nolint object_name_linter
 
 
   # Sort order is dependent on locale -> set locale here to make code
@@ -465,7 +473,8 @@ olink_calculate_pca <- function(
 }
 
 
-olink_pca_plot.internal <- function( #nolint object_name_linter
+olink_pca_plot.internal <- function(
+  # nolint object_name_linter
   df,
   color_g = "QC_Warning",
   x_val = 1,
@@ -475,14 +484,14 @@ olink_pca_plot.internal <- function( #nolint object_name_linter
   drop_samples = FALSE,
   n_loadings = 0,
   loadings_list = NULL,
-  outlierDefX, #nolint object_name_linter
-  outlierDefY, #nolint object_name_linter
-  outlierLines, #nolint object_name_linter
+  outlierDefX, # nolint object_name_linter
+  outlierDefY, # nolint object_name_linter
+  outlierLines, # nolint object_name_linter
   label_outliers,
   verbose = verbose,
   ...
 ) {
-  # Ensure one unique color value per SampleID (required by 
+  # Ensure one unique color value per SampleID (required by
   # npxProcessing_forDimRed)
   df <- df |>
     dplyr::group_by(SampleID) |>
@@ -492,7 +501,7 @@ olink_pca_plot.internal <- function( #nolint object_name_linter
     dplyr::ungroup()
 
   # Data pre-processing
-  procData <- npxProcessing_forDimRed(# nolint object_name_linter
+  procData <- npxProcessing_forDimRed( # nolint object_name_linter
     df = df,
     color_g = color_g,
     drop_assays = drop_assays,
@@ -510,11 +519,10 @@ olink_pca_plot.internal <- function( #nolint object_name_linter
 
     if (length(dropped_loadings) > 0) {
       if (verbose) {
-        warning(paste0(
-          "The loading(s) ",
-          paste0(dropped_loadings, collapse = ", "),
-          " from the loadings_list contain NA and are dropped . "
-        ))
+        cli::cli_warn(
+          "The loading(s) {paste0(dropped_loadings, collapse = ', ')} from the
+          loadings_list contain NA and are dropped."
+        )
       }
 
       loadings_list <- setdiff(loadings_list, dropped_loadings)
