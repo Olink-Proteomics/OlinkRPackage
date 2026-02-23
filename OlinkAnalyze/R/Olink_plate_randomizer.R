@@ -176,9 +176,10 @@ olink_displayPlateLayout <- function(data, # nolint object_name_linter
 
 
 olink_displayPlateDistributions <- function(data, # nolint object_length_linter
-                                            fill.color) { # nolint object_name_linter
+                                            fill.color = "plate") { # nolint object_name_linter
 
-  data$group.var <- data[[fill.color]]
+  data <- data |>
+    dplyr::mutate(group.var = data[[fill.color]])
 
   p1 <- data |>
     dplyr::group_by(.data[["plate"]],
@@ -346,7 +347,6 @@ generate_plate_holder <- function(nplates,
 #'    \item{row:} Row on the plate
 #'    \item{well:} Well location on the plate
 #' }
-#' @keywords randomized plates
 #' @export
 #' @seealso \itemize{
 #' \item{
