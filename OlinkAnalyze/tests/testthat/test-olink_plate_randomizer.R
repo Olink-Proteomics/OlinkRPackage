@@ -79,7 +79,7 @@ test_that("olink_plate_randomizer works - vdiffr", {
   skip_on_cran()
 
   plate_randomizer_name <- "Randomized_Data"
-  check_snap_exist(test_dir_name = "Olink_plate_randomizer",
+  check_snap_exist(test_dir_name = "olink_plate_randomizer",
                    snap_name = plate_randomizer_name)
   vdiffr::expect_doppelganger(plate_randomizer_name,
                               olink_displayPlateLayout(randomized_result5,
@@ -93,36 +93,36 @@ test_that("olink_plate_randomizer works - vdiffr", {
   expect_error(olink_plate_randomizer(manifest,
                                       num_ctrl = 10.6),
                "positive integer")
-  
+
   expect_error(olink_plate_randomizer(Manifest = {
     manifest |>
       rename("sample_id" = "SampleID")
   },
   "SampleID not found"))
-  
+
   expect_warning(olink_plate_randomizer(Manifest = {
     manifest |>
       rbind(manifest[1, ])
   }),
   "duplicated")
-  
+
   expect_error(olink_plate_randomizer(Manifest = {
     manifest |>
       dplyr::mutate(SampleID = ifelse(SampleID = "A 1", NA, SampleID))
   },
   "No NA"))
-  
+
   expect_error(olink_plate_randomizer(manifest,
                                       SubjectColumn = "Hi"),
                "SubjectColumn name was not found")
-  
+
   expect_error(olink_displayPlateLayout(randomized_result5,
                                         num_ctrl = 10,
                                         rand_ctrl = TRUE,
                                         fill.color = "Visit",
                                         PlateSize = 100),
                "Plate size needs to be either 48 or 96")
-  
+
 })
 
 test_that("product_to_platesize works", {
@@ -153,7 +153,7 @@ test_that("generate_plate_holder works", {
                                      num_ctrl = 8,
                                      rand_ctrl = FALSE),
                "Vector of available spots must equal number of plates")
-  
+
   expect_error(generate_plate_holder(nplates = 2,
                                      nspots = c(22, 100),
                                      nsamples = 16,
@@ -161,7 +161,7 @@ test_that("generate_plate_holder works", {
                                      num_ctrl = 8,
                                      rand_ctrl = FALSE),
                "Number of samples per plates cannot exceed")
-  
+
   expect_error(generate_plate_holder(nplates = 2,
                                      nspots = c(22, 22),
                                      nsamples = 100,
