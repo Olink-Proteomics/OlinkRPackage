@@ -399,11 +399,12 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
                                    SubjectColumn, # nolint object_name_linter
                                    iterations = 500,
                                    available.spots, # nolint object_name_linter
-                                   num_ctrl = 8,
+                                   num_ctrl = 8L,
                                    rand_ctrl = FALSE,
                                    seed,
                                    study = NULL) {
-  if (num_ctrl < 1 || num_ctrl != as.integer(num_ctrl)) {
+  if (num_ctrl < 1 || !is.numeric(num_ctrl) || 
+      (is.numeric(num_ctrl) && num_ctrl != as.integer(num_ctrl))) {
     cli::cli_abort("`num_ctrl` must be a positive integer.")
   }
 
@@ -427,7 +428,7 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
   # Check if there are any duplicated Sample IDs in manifest
   if (any(which(duplicated(Manifest$SampleID)))) {
     duplications <- Manifest$SampleID[which(duplicated(Manifest$SampleID))]
-    cli::cli_alert_warning(paste("Following SampleID(s) was/were duplicated:",
+    cli::cli_warn(paste("Following SampleID(s) was/were duplicated:",
                                  paste(duplications, collapse = "\n"),
                                  sep = "\n"))
   }
