@@ -64,14 +64,14 @@ olink_displayPlateLayout <- function(data, # nolint object_name_linter
                                column = paste("Column",
                                               1:(ncols_per_plate)),
                                fill.color = "Empty")
-  missing_spots$unique.id <- paste(missing_spots$plate,
-                                   missing_spots$row,
-                                   missing_spots$column)
+  missing_spots$unique.id <- paste(missing_spots[["plate"]],
+                                   missing_spots[["row"]],
+                                   missing_spots[["column"]])
   missing_spots <- missing_spots |>
-    dplyr::filter(!.data[["unique.id"]] %in% paste(data$plate,
-                                                   data$row,
-                                                   data$column)) |>
-    dplyr::select(-any_of("unique.id"))
+    dplyr::filter(!.data[["unique.id"]] %in% paste(data[["plate"]],
+                                                   data[["row"]],
+                                                   data[["column"]])) |>
+    dplyr::select(-tidyselect::any_of("unique.id"))
 
   if (missing(fill.color)) fill.color <- "plate" # nolint object_name_linter
 
@@ -81,13 +81,13 @@ olink_displayPlateLayout <- function(data, # nolint object_name_linter
                                       "CONTROL",
                                       fill.color))
   data <- data |>
-    dplyr::select(any_of(c("plate",
-                           "row",
-                           "column",
-                           "fill.color"))) |>
+    dplyr::select(tidyselect::any_of(c("plate",
+                                       "row",
+                                       "column",
+                                       "fill.color"))) |>
     rbind(missing_spots) |>
-    dplyr::mutate(row = factor(row, levels = LETTERS[8:1]),
-                  column = factor(column,
+    dplyr::mutate(row = factor(.data[["row"]], levels = LETTERS[8:1]),
+                  column = factor(.data[["column"]],
                                   levels = paste("Column",
                                                  1:(ncols_per_plate))),
                   fill.color = factor(fill.color))
@@ -169,7 +169,7 @@ olink_displayPlateDistributions <- function(data, # nolint object_length_linter
     dplyr::tally() |>
     dplyr::ungroup() |>
     dplyr::group_by(.data[["plate"]]) |>
-    dplyr::mutate(percent = 100 * n / sum(n)) |>
+    dplyr::mutate(percent = 100 * .data[["n"]] / sum(.data[["n"]])) |>
     ggplot2::ggplot(ggplot2::aes(x = .data[["plate"]],
                                  y = .data[["percent"]],
                                  fill = .data[["group.var"]])) +
@@ -260,7 +260,7 @@ generate_plate_holder <- function(nplates,
                               stringsAsFactors = TRUE) |>
     # String as factor needed so Column 10 doesn't come before column 2
     # in ordering
-    dplyr::arrange(column, row) |>
+    dplyr::arrange(.data[["column"]], .data[["row"]]) |>
     #row is unnecessary here but its fine
     dplyr::slice_head(n = plate_size - num_ctrl * !rand_ctrl)
 
@@ -515,7 +515,9 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
     ctrl_locations <- all.plates |>
       dplyr::group_by(.data[["plate"]]) |>
       dplyr::slice(0) |>
-      dplyr::mutate(ID = paste0(.data[["plate"]], column, row)) |>
+      dplyr::mutate(ID = paste0(.data[["plate"]],
+                                .data[["column"]],
+                                .data[["row"]])) |>
       dplyr::mutate(SampleID = "CONTROL_SAMPLE")
 
     # When randomizing controls
@@ -524,31 +526,37 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
         dplyr::group_by(.data[["plate"]]) |>
         dplyr::slice_sample(n = num_ctrl * rand_ctrl) |>
         # Select random locations from each plate when randomizing controls
-        dplyr::mutate(ID = paste0(.data[["plate"]], column, row)) |>
+        dplyr::mutate(ID = paste0(.data[["plate"]],
+                                  .data[["column"]],
+                                  .data[["row"]])) |>
         dplyr::mutate(SampleID = "CONTROL_SAMPLE")
     }
 
     # Remove ctrl locations from list of possible locations
     all.plates <- all.plates |>
-      dplyr::mutate(ID = paste0(.data[["plate"]], column, row)) |>
+      dplyr::mutate(ID = paste0(.data[["plate"]],
+                                .data[["column"]],
+                                .data[["row"]])) |>
       dplyr::filter(!(.data[["ID"]] %in% ctrl_locations$ID))
 
 
     out_manifest <- dplyr::as_tibble(cbind(Manifest,
                                            all.plates)) |>
       dplyr::bind_rows(ctrl_locations) |>
-      dplyr::mutate(well = paste0(row,
+      dplyr::mutate(well = paste0(.data[["row"]],
                                   gsub("Column ",
                                        "",
-                                       as.character(column)))) |>
+                                       as.character(.data[["column"]])))) |>
       dplyr::mutate(well = factor(.data[["well"]],
                                   levels = paste0(rep(LETTERS[1:8],
                                                       each = ncols_per_plate),
                                                   rep(1:ncols_per_plate,
                                                       times = 8)))) |>
       # This could use the row column in all.plates instead of regenerating it.
-      dplyr::arrange(.data[["plate"]], column, row) |>
-      dplyr::select(-any_of("ID"))
+      dplyr::arrange(.data[["plate"]],
+                     .data[["column"]],
+                     .data[["row"]]) |>
+      dplyr::select(-tidyselect::any_of("ID"))
     cli::cli_alert_info("Random assignment of SAMPLES to plates\n")
     class(out_manifest) <- c("randomizedManifest", class(out_manifest))
     return(out_manifest)
@@ -572,7 +580,9 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
           dplyr::group_by(.data[["plate"]]) |>
           dplyr::slice_sample(n = num_ctrl * rand_ctrl) |>
           # Select random locations from each plate when randomizing controls
-          dplyr::mutate(ID = paste0(.data[["plate"]], column, row)) |>
+          dplyr::mutate(ID = paste0(.data[["plate"]],
+                                    .data[["column"]],
+                                    .data[["row"]])) |>
           dplyr::mutate(SampleID = "CONTROL_SAMPLE")
       }
 
@@ -580,7 +590,9 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
       # Remove ctrl locations from list of possible locations when
       # randomizing controls
       all.plates <- all.plates |>
-        dplyr::mutate(ID = paste0(.data[["plate"]], column, row)) |>
+        dplyr::mutate(ID = paste0(.data[["plate"]],
+                                  .data[["column"]],
+                                  .data[["row"]])) |>
         dplyr::filter(!(.data[["ID"]] %in% ctrl_locations$ID))
 
       # randomize subject order
@@ -595,7 +607,7 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
         # Check if assign subject 2 plate returned a df or a warning string
         # (passed or didn't)
         # This could be written such that it didnt include a break statement
-        if (tibble::is_tibble(all.plates.tmp)) {
+        if (is.data.frame(all.plates.tmp)) {
           # reassign plate_map to now include assigned sample
           all.plates <- all.plates.tmp
         } else if (is.character(all.plates.tmp)) {
@@ -614,35 +626,37 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
           dplyr::group_by(.data[["plate"]]) |> # group by plates
           dplyr::mutate(scramble = sample(seq_len(dplyr::n()))) |>
           # assign random number per sample in each plate
-          dplyr::mutate(row = row[.data[["scramble"]]],
-                        column = column[.data[["scramble"]]]) |>
+          dplyr::mutate(row = .data[["row"]][.data[["scramble"]]],
+                        column = .data[["column"]][.data[["scramble"]]]) |>
           # Move the sample to the row of the scramble number,
           # now each row and column has been moved to the location of
           # its scramble number
           dplyr::ungroup() |>
-          dplyr::select(-any_of("scramble"))
+          dplyr::select(-tidyselect::any_of("scramble"))
         break
       }
 
     }
-    cli::cli_process_done()
 
     cli::cli_alert_info("Random assignment of SUBJECTS to plates\n")
     if (passed) {
       # Arrange updated manifest in order
       out_manifest <- out_manifest |>
         dplyr::bind_rows(ctrl_locations) |>
-        dplyr::mutate(well = paste0(row,
+        dplyr::mutate(well = paste0(.data[["row"]],
                                     gsub("Column ",
-                                         "", as.character(column)))) |>
+                                         "",
+                                         as.character(.data[["column"]])))) |>
         dplyr::mutate(well = factor(.data[["well"]],
                                     levels = paste0(rep(LETTERS[1:8],
                                                         each =
                                                           ncols_per_plate),
                                                     rep(1:ncols_per_plate,
                                                         times = 8)))) |>
-        dplyr::arrange(.data[["plate"]], column, row) |>
-        dplyr::select(-any_of("ID"))
+        dplyr::arrange(.data[["plate"]],
+                       .data[["column"]],
+                       .data[["row"]]) |>
+        dplyr::select(-tidyselect::any_of("ID"))
 
       class(out_manifest) <- c("randomizedManifest", class(out_manifest))
       return(out_manifest)
@@ -669,7 +683,9 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
       ctrl_locations <- all.plates |>
         dplyr::group_by(.data[["plate"]]) |>
         dplyr::slice_sample(n = num_ctrl * rand_ctrl) |>
-        dplyr::mutate(ID = paste0(.data[["plate"]], column, row)) |>
+        dplyr::mutate(ID = paste0(.data[["plate"]],
+                                  .data[["column"]],
+                                  .data[["row"]])) |>
         dplyr::mutate(SampleID = "CONTROL_SAMPLE")
     }
 
@@ -677,7 +693,9 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
     # Remove ctrl locations from list of possible locations
     # when randomizing controls
     all.plates <- all.plates |>
-      dplyr::mutate(ID = paste0(.data[["plate"]], column, row)) |>
+      dplyr::mutate(ID = paste0(.data[["plate"]],
+                                .data[["column"]],
+                                .data[["row"]])) |>
       dplyr::filter(!(.data[["ID"]] %in% ctrl_locations$ID))
 
 
@@ -696,15 +714,17 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
     #Keep every study together
     for (studyNo in unique(Manifest[[study]])){
       passed <- FALSE
-      rand_subjects <- sample(Manifest |>
-                                dplyr::filter(.data[[study]] == studyNo) |>
-                                dplyr::select(any_of("SubjectID")) |>
-                                unique() |>
-                                dplyr::pull())
+      rand_subjects <- sample({
+        Manifest |>
+          dplyr::filter(.data[[study]] == studyNo) |>
+          dplyr::select(tidyselect::any_of("SubjectID")) |>
+          unique() |>
+          dplyr::pull()
+      })
       study_interval <- which(Manifest[[study]] == studyNo)
       sub_groups <- Manifest |>
         dplyr::filter(study == studyNo) |>
-        dplyr::select(any_of("SubjectID")) |>
+        dplyr::select(tidyselect::any_of("SubjectID")) |>
         table()
       sub_groups_max <- as.numeric(max(sub_groups))
 
@@ -781,12 +801,14 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
               dplyr::arrange(.data[["plate"]]) |>
               dplyr::group_by(.data[["plate"]]) |>
               dplyr::mutate(scramble = sample(seq_len(dplyr::n()))) |>
-              dplyr::mutate(row = row[.data[["scramble"]]],
-                            column = column[.data[["scramble"]]]) |>
+              dplyr::mutate(row = .data[["row"]][.data[["scramble"]]],
+                            column = .data[["column"]][.data[["scramble"]]]) |>
               dplyr::arrange(.data[["plate"]]) |>
               dplyr::ungroup() |>
-              dplyr::select(-any_of("scramble")) |>
-              dplyr::arrange(.data[["plate"]], column, row)
+              dplyr::select(-tidyselect::any_of("scramble")) |>
+              dplyr::arrange(.data[["plate"]],
+                             .data[["column"]],
+                             .data[["row"]])
 
             cli::cli_alert_success(paste(studyNo, "successful! \n"))
             out_manifest <- dplyr::bind_rows(out_manifest,
@@ -796,8 +818,8 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
               dplyr::group_by(.data[["plate"]]) |>
               dplyr::mutate(scramble = sample(seq_len(dplyr::n())))
             manifest_study2 <- manifest_study2 |>
-              dplyr::mutate(row = row[.data[["scramble"]]],
-                            column = column[.data[["scramble"]]])
+              dplyr::mutate(row = .data[["row"]][.data[["scramble"]]],
+                            column = .data[["column"]][.data[["scramble"]]])
           }
           if (passed) {
             j_tot <- j_tot + j
@@ -821,18 +843,20 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
                                    "empty wells.\n"))
       out_manifest <- out_manifest |>
         dplyr::bind_rows(ctrl_locations) |>
-        dplyr::mutate(well = paste0(row,
+        dplyr::mutate(well = paste0(.data[["row"]],
                                     gsub("Column ",
                                          "",
-                                         as.character(column)))) |>
+                                         as.character(.data[["column"]])))) |>
         dplyr::mutate(well = factor(.data[["well"]],
                                     levels = paste0(rep(LETTERS[1:8],
                                                         each = ncols_per_plate),
                                                     rep(1:ncols_per_plate,
                                                         times = 8))),
                       SubjectID = .data[["SubjectID_old"]]) |>
-        dplyr::select(-any_of(c("SubjectID_old", "ID"))) |>
-        dplyr::arrange(.data[["plate"]], column, row)
+        dplyr::select(-tidyselect::any_of(c("SubjectID_old", "ID"))) |>
+        dplyr::arrange(.data[["plate"]],
+                       .data[["column"]],
+                       .data[["row"]])
       class(out_manifest) <- c("randomizedManifest", class(out_manifest))
       return(out_manifest)
     } else {
@@ -861,8 +885,8 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
         dplyr::slice_sample(n = num_ctrl * rand_ctrl) |>
         # Select random locations from each plate when randomizing controls
         dplyr::mutate(ID = paste0(.data[["plate"]],
-                                  column,
-                                  row)) |>
+                                  .data[["column"]],
+                                  .data[["row"]])) |>
         dplyr::mutate(SampleID = "CONTROL_SAMPLE")
     }
 
@@ -871,8 +895,8 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
     # controls
     all.plates <- all.plates |>
       dplyr::mutate(ID = paste0(.data[["plate"]],
-                                column,
-                                row)) |>
+                                .data[["column"]],
+                                .data[["row"]])) |>
       dplyr::filter(!(.data[["ID"]] %in% ctrl_locations$ID))
 
     Manifest <- Manifest |> dplyr::arrange(study) # nolint object_name_linter
@@ -885,22 +909,24 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
       man_rows <- nrow(manifest_study)
 
       all.plates_study <- all.plates_study[sample(seq_len(man_rows)), ] |>
-        select(-any_of("SampleID"))
+        dplyr::select(-tidyselect::any_of("SampleID"))
 
       out_manifest_study <- dplyr::as_tibble(cbind(manifest_study,
                                                    all.plates_study)) |>
         dplyr::bind_rows(ctrl_locations) |>
-        dplyr::mutate(well = paste0(row,
+        dplyr::mutate(well = paste0(.data[["row"]],
                                     gsub("Column ",
                                          "",
-                                         as.character(column)))) |>
+                                         as.character(.data[["column"]])))) |>
         dplyr::mutate(well = factor(.data[["well"]],
                                     levels = paste0(rep(LETTERS[1:8],
                                                         each = ncols_per_plate),
                                                     rep(1:ncols_per_plate,
                                                         times = 8)))) |>
-        dplyr::arrange(.data[["plate"]], column, row) |>
-        dplyr::select(-any_of("ID"))
+        dplyr::arrange(.data[["plate"]],
+                       .data[["column"]],
+                       .data[["row"]]) |>
+        dplyr::select(-tidyselect::any_of("ID"))
       out_manifest <- rbind(out_manifest, out_manifest_study)
 
     }
