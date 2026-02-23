@@ -26,9 +26,10 @@
 #' outlierDefY standard deviations from the mean of the plotted PC
 #' will be labelled. Both arguments have to be specified.
 #'
-#' @inherit .downstream_fun_args params
 #' @param df data frame in long format with Sample Id, NPX and column
-#' of choice for colors
+#' of choice for colors.
+#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
+#' [`check_npx()`] will be run internally using `df`.
 #' @param color_g Character value indicating which column to use for
 #' colors (default QC_Warning). Continuous color scale for Olink(R)
 #' Sample Index (OSI) columns OSITimeToCentrifugation,
