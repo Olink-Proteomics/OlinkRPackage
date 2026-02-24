@@ -158,32 +158,35 @@ olink_pca_plot <- function(
 
   # Check if check_log is correct
   check_log <- run_check_npx(df = df, check_log = check_log)
-
   # Make sure data is a tibble
   df <- convert_read_npx_output(df = df, out_df = "tibble")
 
   # Stop if duplicate sample ID's detected
-  # if (length(check_log$sample_id_dups) > 0) {
-  #   cli::cli_abort(
-  #     "Duplicate SampleID(s) detected:
-  #     {paste(check_log$sample_id_dups, collapse = ', ')}.
-  #     Each sample ID must be unique. Please check your data and ensure that
-  #     each sample has a unique identifier."
-  #   )
-  # }
-  
-  # Warn if duplicate sample ID's detected
   if (length(check_log$sample_id_dups) > 0) {
-    cli::cli_warn(
+    cli::cli_abort(
       "Duplicate SampleID(s) detected:
       {paste(check_log$sample_id_dups, collapse = ', ')}.
       Each sample ID must be unique. Please check your data and ensure that
       each sample has a unique identifier."
     )
   }
-
-  # Clean data using clean_npx()
-  df <- clean_npx(df, check_log = check_log)
+  
+  # Remove invalid OlinkID, assays with all NA values, and convert non-unique
+  # Uniprot IDs. Note that we do not remove samples with duplicate SampleID, 
+  # control samples or assays, or samples/assays with QC warnings, as this 
+  # would be the user's decision.
+  df <- clean_npx(
+    df, 
+    check_log = check_log,
+    remove_assay_na = TRUE,
+    remove_invalid_oid = TRUE,
+    remove_dup_sample_id = FALSE,
+    remove_control_assay = FALSE,
+    remove_control_sample = FALSE,
+    remove_qc_warning = FALSE,
+    remove_assay_warning = FALSE,
+    convert_nonunique_uniprot = TRUE
+    )
 
   # Validate OSI category column: must contain only 0,1,2,3,4; then convert to
   # factor if not already
