@@ -1,16 +1,16 @@
-#' Performs pathway enrichment using over-representation analysis (ORA) or 
+#' Performs pathway enrichment using over-representation analysis (ORA) or
 #' gene set enrichment analysis (GSEA)
 #'
-#' This function performs enrichment analysis based on statistical test results 
+#' This function performs enrichment analysis based on statistical test results
 #' and full data using clusterProfiler's gsea and enrich functions for MSigDB.
 #'
 #' @details
-#' MSigDB is subset if the  ontology argument is KEGG, GO, or Reactome. 
+#' MSigDB is subset if the  ontology argument is KEGG, GO, or Reactome.
 #' test_results must contain estimates for all assays.
-#' Posthoc results can be used but should be filtered for one contrast to 
+#' Posthoc results can be used but should be filtered for one contrast to
 #' improve interpretability.
 #' Alternative statistical results can be used as input as long as they include
-#' the columns "OlinkID", "Assay", and "estimate". A column named 
+#' the columns "OlinkID", "Assay", and "estimate". A column named
 #' "Adjusted_pal" is also needed for ORA. Any statistical results that contains
 #' one estimate per protein will work as long as the estimates are comparable
 #' to each other.
@@ -18,7 +18,7 @@
 #' clusterProfiler is originally developed by Guangchuang Yu at the School of
 #' Basic Medical Sciences at Southern Medical University.
 #'
-#' T Wu, E Hu, S Xu, M Chen, P Guo, Z Dai, T Feng, L Zhou, W Tang, L Zhan, 
+#' T Wu, E Hu, S Xu, M Chen, P Guo, Z Dai, T Feng, L Zhou, W Tang, L Zhan,
 #' X Fu, S Liu, X Bo, and G Yu.
 #' clusterProfiler 4.0: A universal enrichment tool for interpreting omics data.
 #' The Innovation. 2021, 2(3):100141.
@@ -29,7 +29,7 @@
 #'
 #' \strong{A few notes on Pathway Enrichment with Olink Data}
 #'
-#' It is important to note that sometimes the proteins that are assayed in 
+#' It is important to note that sometimes the proteins that are assayed in
 #' Olink Panels are related to specific biological areas and therefore do not
 #' represent an unbiased overview of the proteome as a whole.
 #' Pathways can only interpreted based on the background/context they came from.
@@ -37,7 +37,7 @@
 #'  be provided. Furthermore, certain pathways cannot come up based on Olink's
 #'  coverage in this area.  Additionally, if only the Inflammation panel was
 #'  run, then the available pathways would be given based on a background
-#'   of proteins related to inflammation. Both ORA and GSEA can provide 
+#'   of proteins related to inflammation. Both ORA and GSEA can provide
 #'   mechanistic and disease related insight and are best to use when
 #'   trying to uncover pathways/annotations of interest. It is recommended to
 #'   only use pathway enrichment for hypothesis generating data, which is more
@@ -113,7 +113,7 @@
 #' @examples
 #' \donttest{
 #' library(dplyr)
-#' npx_df <- npx_data1 |> filter(!grepl("control", SampleID, 
+#' npx_df <- npx_data1 |> filter(!grepl("control", SampleID,
 #'   ignore.case = TRUE))
 #' ttest_results <- olink_ttest(
 #'   df = npx_df,
@@ -132,7 +132,7 @@
 #'
 #' @export
 
-olink_pathway_enrichment <- function(data, 
+olink_pathway_enrichment <- function(data,
                                      check_log = NULL,
                                      test_results,
                                      method = "GSEA",
@@ -141,65 +141,74 @@ olink_pathway_enrichment <- function(data,
                                      pvalue_cutoff = 0.05,
                                      estimate_cutoff = 0) {
   # Is Package installed
-  if(!requireNamespace("clusterProfiler", quietly = TRUE) ) {
-    stop(" Pathway enrichment requires clusterProfiler package.
-         Please install clusterProfiler before continuing.
-
-         if (!require(\"BiocManager\", quietly = TRUE))
-            install.packages(\"BiocManager\")
-         BiocManager::install(\"clusterProfiler\")")
+  if (!requireNamespace("clusterProfiler", quietly = TRUE)) {
+    cli::cli_abort(c(paste("Pathway enrichment requires",
+                           "clusterProfiler package.",
+                           "Please install clusterProfiler",
+                           "before continuing."),
+                     " " = "install.packages(\"BiocManager\")",
+                     " " = "BiocManager::install(\"clusterProfiler\")")
+    )
   }
 
-  if(!requireNamespace("msigdbr", quietly = TRUE)) {
-    stop(" Pathway enrichment requires the msigdbr package.
-         Please install msigdbr before continuing.
-
-         install.packages(\"msigdbr\")")
+  if (!requireNamespace("msigdbr", quietly = TRUE)) {
+    cli::cli_abort(c(paste("Pathway enrichment requires the msigdbr package.",
+                           "Please install msigdbr before continuing."),
+                     " " = "install.packages(\"msigdbr\")"))
   }
 
-  if(utils::packageVersion("msigdbr") < package_version("9.0.0")) {
-    stop(" Pathway enrichment requires version >=9.0.0 of the msigdbr package.
-         Please install a supported version of msigdbr before continuing.
-
-         install.packages(\"msigdbr\")")
+  if (utils::packageVersion("msigdbr") < package_version("9.0.0")) {
+    cli::cli_abort(c(paste("Pathway enrichment requires version >=9.0.0",
+                           "of the msigdbr package.",
+                           "Please install a supported version of msigdbr",
+                           "before continuing."),
+                     " " = "install.packages(\"msigdbr\")"))
   }
 
-  if(!rlang::is_installed(pkg = "msigdbdf")) {
-    stop(" Pathway enrichment requires msigdbdf package.
-         Please install msigdbdf before continuing.
-
-         install.packages(\"msigdbdf\", repos = c(\"https://igordot.r-universe.dev\", \"https://cloud.r-project.org\"))")
+  if (!rlang::is_installed(pkg = "msigdbdf")) {
+    cli::cli_abort(c(paste("Pathway enrichment requires msigdbdf package.",
+                           "Please install msigdbdf before continuing."),
+                     " " = paste0("install.packages(\"msigdbdf\", ",
+                                  "repos =",
+                                  " c(\"https://igordot.r-universe.dev\", ",
+                                  "\"https://cloud.r-project.org\"))")))
   }
-  
-  
-  
+
+
+
   # Data Checks
-  if(length(unique(data$OlinkID)) != length(unique(test_results$OlinkID))) {
-    warning("The number of Olink IDs in the data does not equal the number of Olink IDs in the test results.")
+  if (length(unique(data$OlinkID)) != length(unique(test_results$OlinkID))) {
+    cli::cli_warn(paste("The number of Olink IDs in the data does not equal",
+                        "the number of Olink IDs in the test results."))
   }
 
-  if("contrast" %in% colnames(test_results) && length(unique(test_results$contrast)) > 1) {
-    stop("More than one contrast is specified in test results. Filter test_results for desired contrast.")
+  if ("contrast" %in% colnames(test_results) &&
+        length(unique(test_results$contrast)) > 1) {
+    cli::cli_abort(paste("More than one contrast is specified in test results.",
+                         "Filter test_results for desired contrast."))
   }
 
-  if(!("estimate" %in% colnames(test_results))) {
-    stop("Estimate column is not present in test results. Please check arguments.")
+  if (!("estimate" %in% colnames(test_results))) {
+    cli::cli_abort(paste("Estimate column is not present in test results.",
+                         "Please check arguments."))
   }
 
-  if(!(method %in% c("GSEA", "ORA"))) {
-    stop("Method must be \"GSEA\" or \"ORA\".")
+  if (!(method %in% c("GSEA", "ORA"))) {
+    cli::cli_abort("Method must be \"GSEA\" or \"ORA\".")
   }
 
-  if(!(ontology %in% c("MSigDb", "Reactome", "KEGG", "GO"))) {
-    stop("Ontology must be one of MSigDb, Reactome, KEGG, or GO.")
+  if (!(ontology %in% c("MSigDb", "Reactome", "KEGG", "GO"))) {
+    cli::cli_abort("Ontology must be one of MSigDb, Reactome, KEGG, or GO.")
   }
 
   if (!(organism %in% c("human", "mouse"))) {
-    stop(print("organism should be \"human\" or \"mouse\""))
+    cli::cli_abort(print("organism should be \"human\" or \"mouse\""))
   }
 
   data2 <- data_prep(data = data)
-  test_results2 <- test_prep(data = data2, test_results = test_results, organism = organism)
+  test_results2 <- test_prep(data = data2,
+                             test_results = test_results,
+                             organism = organism)
   msig_df <- select_db(ontology = ontology, organism = organism)
 
   if (method == "ORA") {
@@ -207,12 +216,12 @@ olink_pathway_enrichment <- function(data,
                                      msig_df = msig_df,
                                      pvalue_cutoff = pvalue_cutoff,
                                      estimate_cutoff = estimate_cutoff)
-    message("Over-representation Analysis performed")
+    cli::cli_inform("Over-representation Analysis performed")
   } else {
-    geneList <- results_to_genelist(test_results = test_results2)
-    results <- gsea_pathwayenrichment(geneList = geneList,
+    gene_list <- results_to_genelist(test_results = test_results2)
+    results <- gsea_pathwayenrichment(gene_list = gene_list,
                                       msig_df = msig_df)
-    message("Gene set enrichment analysis used by default.")
+    cli::cli_inform("Gene set enrichment analysis used by default.")
   }
 
   return(results)
@@ -224,35 +233,41 @@ data_prep <- function(data) {
   data <- clean_npx(data, check_log)
 
   # For data missing LOD column
-  alt_plate_lods <- c("Plate LOD", "PlateLOD", "plateLOD", "Plate_LOD", "LODNPX")
-  alt_max_lods <- c("Max LOD", "MaxLOD", "maxLOD", "Max_LOD")
-  if(!("LOD" %in% names(data))){
-    if(any(alt_plate_lods %in% names(data))){
+  alt_plate_lods <- c("Plate LOD",
+                      "PlateLOD",
+                      "plateLOD",
+                      "Plate_LOD",
+                      "LODNPX")
+  alt_max_lods <- c("Max LOD",
+                    "MaxLOD",
+                    "maxLOD",
+                    "Max_LOD")
+  if (!("LOD" %in% names(data))) {
+    if (any(alt_plate_lods %in% names(data))) {
       data <- data |>
-        dplyr::rename(LOD = any_of(alt_plate_lods))
-    }
-    else if(any(alt_max_lods %in% names(data))){
+        dplyr::rename(LOD = dplyr::any_of(alt_plate_lods))
+    } else if (any(alt_max_lods %in% names(data))) {
       data <- data |>
-        dplyr::rename(LOD = any_of(alt_max_lods))
-    }
-    else{
+        dplyr::rename(LOD = dplyr::any_of(alt_max_lods))
+    } else {
       data$LOD <- -Inf
     }
   }
 
   # For data with SampleQC instead of QC_Warning
-  if("SampleQC" %in% names(data)){
+  if ("SampleQC" %in% names(data)) {
     data$QC_Warning <- data$SampleQC
   }
 
   # Filter highest detectibility for repeated IDs
   olink_ids <- data |>
-    dplyr::filter(!stringr::str_detect(string = SampleID, pattern = "CONTROL*.")) |>
+    dplyr::filter(!stringr::str_detect(string = SampleID,
+                                       pattern = "CONTROL*.")) |>
     dplyr::filter(toupper(QC_Warning) == "PASS") |>
     dplyr::mutate(Detected = as.numeric(NPX > LOD)) |>
     dplyr::select(OlinkID, Assay, Detected) |>
     dplyr::group_by(OlinkID, Assay) |>
-    dplyr::summarise(Sum = (sum(Detected) / n())) |>
+    dplyr::summarise(Sum = (sum(Detected) / dplyr::n())) |>
     dplyr::arrange(dplyr::desc(Sum)) |>
     dplyr::ungroup() |>
     dplyr::distinct(Assay, .keep_all = TRUE) |>
@@ -260,7 +275,8 @@ data_prep <- function(data) {
 
   data <- data |> dplyr::filter(OlinkID %in% olink_ids)
 
-  message("Data filtered for highest detectibility in duplicate assay names.")
+  cli::cli_inform(paste("Data filtered for highest detectibility",
+                        "in duplicate assay names."))
 
   return(data)
 }
@@ -269,23 +285,23 @@ test_prep <- function(data, test_results, organism = "human") {
   test_results <- test_results |>
     dplyr::filter(OlinkID %in% unique(data$OlinkID))
 
-  message("Test results filtered for highest detectibility in duplicate assay names.")
+  cli::cli_inform(paste("Test results filtered for highest detectibility",
+                        "in duplicate assay names."))
 
   return(test_results)
 }
 
 results_to_genelist <- function(test_results) {
   estimate <- test_results$estimate
-  # names(estimate) <- test_results$ENTREZID
   names(estimate) <- test_results$Assay
-  geneList <- sort(estimate, decreasing = TRUE)
+  gene_list <- sort(estimate, decreasing = TRUE)
 
-  message("Test results converted to gene list")
+  cli::cli_inform("Test results converted to gene list")
 
-  return(geneList)
+  return(gene_list)
 }
 
-select_db <- function(ontology = ontology, organism = organism){
+select_db <- function(ontology = ontology, organism = organism) {
   if (organism == "human") {
     msig_df <- msigdbr::msigdbr(species = "Homo sapiens", collection = "C2") |>
       rbind(msigdbr::msigdbr(species = "Homo sapiens", collection = "C5"))
@@ -295,19 +311,19 @@ select_db <- function(ontology = ontology, organism = organism){
   }
 
   if (ontology == "Reactome") {
-    message("Extracting Reactome Database from MSigDB...")
+    cli::cli_inform("Extracting Reactome Database from MSigDB...")
     msig_df <- msig_df |>
       dplyr::filter(gs_subcollection == "CP:REACTOME")
   } else if (ontology == "KEGG") {
-    message("Extracting KEGG Database from MSigDB...")
+    cli::cli_inform("Extracting KEGG Database from MSigDB...")
     msig_df <- msig_df |>
       dplyr::filter(gs_subcollection == "CP:KEGG_MEDICUS")
   } else if (ontology == "GO") {
-    message("Extracting GO Database from MSigDB...")
+    cli::cli_inform("Extracting GO Database from MSigDB...")
     msig_df <- msig_df |>
       dplyr::filter(gs_subcollection %in% c("GO:BP", "GO:CC", "GO:MF"))
   } else {
-    message("Using MSigDB...")
+    cli::cli_inform("Using MSigDB...")
   }
 
   msig_df <- msig_df |>
@@ -316,26 +332,35 @@ select_db <- function(ontology = ontology, organism = organism){
   return(msig_df)
 }
 
-gsea_pathwayenrichment <- function(geneList, msig_df) {
-  if(length(setdiff(names(geneList), msig_df$gene_symbol) != 0)) {
-    message(paste0(length(setdiff(names(geneList), msig_df$gene_symbol)),
-                   " assays are not found in the database. Please check the Assay names for the following assays:\n ",
-                   toString(setdiff(names(geneList), msig_df$gene_symbol))))
+gsea_pathwayenrichment <- function(gene_list, msig_df) {
+  if (length(setdiff(names(gene_list), msig_df$gene_symbol) != 0)) {
+    cli::cli_inform(paste0(length(setdiff(names(gene_list),
+                                          msig_df$gene_symbol)),
+                           " assays are not found in the database. ",
+                           "Please check the Assay names for the following",
+                           " assays:\n ",
+                           toString(setdiff(names(gene_list),
+                                            msig_df$gene_symbol))))
   }
 
-  GSEA <- clusterProfiler::GSEA(geneList = geneList, TERM2GENE = msig_df, pvalueCutoff = 1)
+  gsea <- clusterProfiler::GSEA(geneList = gene_list,
+                                TERM2GENE = msig_df,
+                                pvalueCutoff = 1)
 
-  if (is.null(GSEA)) {
+  if (is.null(gsea)) {
     cli::cli_warn(
       "No remaining pathways within the range 10-500 proteins!"
     )
     return(NULL)
   } else {
-    return(GSEA@result)
+    return(gsea@result)
   }
 }
 
-ora_pathwayenrichment <- function(test_results, msig_df, pvalue_cutoff = pvalue_cutoff, estimate_cutoff = estimate_cutoff) {
+ora_pathwayenrichment <- function(test_results,
+                                  msig_df,
+                                  pvalue_cutoff = pvalue_cutoff,
+                                  estimate_cutoff = estimate_cutoff) {
   sig_genes <- test_results |>
     dplyr::filter(Adjusted_pval < pvalue_cutoff) |>
     dplyr::filter(abs(estimate) > estimate_cutoff) |>
@@ -346,20 +371,25 @@ ora_pathwayenrichment <- function(test_results, msig_df, pvalue_cutoff = pvalue_
     dplyr::distinct(Assay) |>
     dplyr::pull(Assay)
 
-  if(length(setdiff(universe, msig_df$gene_symbol) != 0)){
-    message(paste0(length(setdiff(universe, msig_df$gene_symbol)),
-                   " assays are not found in the database. Please check the Assay names for the following assays:\n ",
-                   toString(setdiff(universe, msig_df$gene_symbol))))
+  if (length(setdiff(universe, msig_df$gene_symbol) != 0)) {
+    cli::cli_inform(paste0(length(setdiff(universe, msig_df$gene_symbol)),
+                           " assays are not found in the database. ",
+                           "Please check the Assay names for the following",
+                           " assays:\n ",
+                           toString(setdiff(universe, msig_df$gene_symbol))))
   }
 
-  ORA <- clusterProfiler::enricher(gene = sig_genes, universe = universe, TERM2GENE = msig_df, pvalueCutoff = 1)
+  ora <- clusterProfiler::enricher(gene = sig_genes,
+                                   universe = universe,
+                                   TERM2GENE = msig_df,
+                                   pvalueCutoff = 1)
 
-  if (is.null(ORA)) {
+  if (is.null(ora)) {
     cli::cli_warn(
       "No remaining pathways within the range 10-500 proteins!"
     )
     return(NULL)
   } else {
-    return(ORA@result)
+    return(ora@result)
   }
 }
