@@ -1,6 +1,5 @@
 #Load reference results
-ref_res_file <- test_path("data", "refResults.RData")
-load(ref_res_file)
+reference_results <- get_example_data(filename = "reference_results.rds")
 
 #Run olink_plate_randomizer
 randomized_result1 <- olink_plate_randomizer(manifest,
@@ -51,13 +50,13 @@ if (as.numeric(R.Version()$major) < 4) {
 
 test_that("olink_plate_randomizer works", {
   expect_equal(droplevels(randomized_result1),
-               droplevels(ref_results$randomized_result1))
+               droplevels(reference_results$randomized_samples))
   expect_equal(droplevels(randomized_result2),
-               droplevels(ref_results$randomized_result2))
+               droplevels(reference_results$randomized_subjects))
   expect_equal(droplevels(randomized_result3),
-               droplevels(ref_results$randomized_result3))
+               droplevels(reference_results$randomized_subjects_spots))
   expect_equal(droplevels(randomized_result4),
-               droplevels(ref_results$randomized_result4))
+               droplevels(reference_results$randomized_samples_spots))
   expect_equal(randomized_result1, randomized_result6)
 
   expect_error(olink_plate_randomizer(manifest,

@@ -80,9 +80,7 @@ Imports:
     grDevices,
     rlang,
     stringr,
-    tibble,
-    tidyr,
-    tidyselect
+    tidyr
 Suggests: 
     broom,
     car,

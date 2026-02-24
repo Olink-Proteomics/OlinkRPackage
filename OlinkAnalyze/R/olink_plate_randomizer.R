@@ -71,7 +71,7 @@ olink_displayPlateLayout <- function(data, # nolint object_name_linter
     dplyr::filter(!.data[["unique.id"]] %in% paste(data[["plate"]],
                                                    data[["row"]],
                                                    data[["column"]])) |>
-    dplyr::select(-tidyselect::any_of("unique.id"))
+    dplyr::select(-dplyr::any_of("unique.id"))
 
   if (missing(fill.color)) fill.color <- "plate" # nolint object_name_linter
 
@@ -81,7 +81,7 @@ olink_displayPlateLayout <- function(data, # nolint object_name_linter
                                       "CONTROL",
                                       fill.color))
   data <- data |>
-    dplyr::select(tidyselect::any_of(c("plate",
+    dplyr::select(dplyr::any_of(c("plate",
                                        "row",
                                        "column",
                                        "fill.color"))) |>
@@ -383,8 +383,8 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
                                    rand_ctrl = FALSE,
                                    seed,
                                    study = NULL) {
-  if (num_ctrl < 1 || !is.numeric(num_ctrl) ||
-        (is.numeric(num_ctrl) && num_ctrl != as.integer(num_ctrl))) {
+  if (num_ctrl < 1 || !check_is_numeric(num_ctrl) ||
+        (check_is_numeric(num_ctrl) && num_ctrl != as.integer(num_ctrl))) {
     cli::cli_abort("`num_ctrl` must be a positive integer.")
   }
 
@@ -556,7 +556,7 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
       dplyr::arrange(.data[["plate"]],
                      .data[["column"]],
                      .data[["row"]]) |>
-      dplyr::select(-tidyselect::any_of("ID"))
+      dplyr::select(-dplyr::any_of("ID"))
     cli::cli_alert_info("Random assignment of SAMPLES to plates\n")
     class(out_manifest) <- c("randomizedManifest", class(out_manifest))
     return(out_manifest)
@@ -607,10 +607,10 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
         # Check if assign subject 2 plate returned a df or a warning string
         # (passed or didn't)
         # This could be written such that it didnt include a break statement
-        if (is.data.frame(all.plates.tmp)) {
+        if (check_is_tibble(all.plates.tmp)) {
           # reassign plate_map to now include assigned sample
           all.plates <- all.plates.tmp
-        } else if (is.character(all.plates.tmp)) {
+        } else if (check_is_character(all.plates.tmp)) {
           passed <- FALSE
           break
         }
@@ -632,7 +632,7 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
           # now each row and column has been moved to the location of
           # its scramble number
           dplyr::ungroup() |>
-          dplyr::select(-tidyselect::any_of("scramble"))
+          dplyr::select(-dplyr::any_of("scramble"))
         break
       }
 
@@ -656,7 +656,7 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
         dplyr::arrange(.data[["plate"]],
                        .data[["column"]],
                        .data[["row"]]) |>
-        dplyr::select(-tidyselect::any_of("ID"))
+        dplyr::select(-dplyr::any_of("ID"))
 
       class(out_manifest) <- c("randomizedManifest", class(out_manifest))
       return(out_manifest)
@@ -717,14 +717,14 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
       rand_subjects <- sample({
         Manifest |>
           dplyr::filter(.data[[study]] == studyNo) |>
-          dplyr::select(tidyselect::any_of("SubjectID")) |>
+          dplyr::select(dplyr::any_of("SubjectID")) |>
           unique() |>
           dplyr::pull()
       })
       study_interval <- which(Manifest[[study]] == studyNo)
       sub_groups <- Manifest |>
         dplyr::filter(study == studyNo) |>
-        dplyr::select(tidyselect::any_of("SubjectID")) |>
+        dplyr::select(dplyr::any_of("SubjectID")) |>
         table()
       sub_groups_max <- as.numeric(max(sub_groups))
 
@@ -786,9 +786,9 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
                                                      ],
                                                    manifest = Manifest,
                                                    subject_id = sub)
-            if (tibble::is_tibble(all.plates.tmp)) {
+            if (check_is_tibble(all.plates.tmp)) {
               all.plates[extended_study_interval, ] <- all.plates.tmp
-            } else if (is.character(all.plates.tmp)) {
+            } else if (check_is_character(all.plates.tmp)) {
               passed <- FALSE
               break
             }
@@ -805,7 +805,7 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
                             column = .data[["column"]][.data[["scramble"]]]) |>
               dplyr::arrange(.data[["plate"]]) |>
               dplyr::ungroup() |>
-              dplyr::select(-tidyselect::any_of("scramble")) |>
+              dplyr::select(-dplyr::any_of("scramble")) |>
               dplyr::arrange(.data[["plate"]],
                              .data[["column"]],
                              .data[["row"]])
@@ -853,7 +853,7 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
                                                     rep(1:ncols_per_plate,
                                                         times = 8))),
                       SubjectID = .data[["SubjectID_old"]]) |>
-        dplyr::select(-tidyselect::any_of(c("SubjectID_old", "ID"))) |>
+        dplyr::select(-dplyr::any_of(c("SubjectID_old", "ID"))) |>
         dplyr::arrange(.data[["plate"]],
                        .data[["column"]],
                        .data[["row"]])
@@ -909,7 +909,7 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
       man_rows <- nrow(manifest_study)
 
       all.plates_study <- all.plates_study[sample(seq_len(man_rows)), ] |>
-        dplyr::select(-tidyselect::any_of("SampleID"))
+        dplyr::select(-dplyr::any_of("SampleID"))
 
       out_manifest_study <- dplyr::as_tibble(cbind(manifest_study,
                                                    all.plates_study)) |>
@@ -926,7 +926,7 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
         dplyr::arrange(.data[["plate"]],
                        .data[["column"]],
                        .data[["row"]]) |>
-        dplyr::select(-tidyselect::any_of("ID"))
+        dplyr::select(-dplyr::any_of("ID"))
       out_manifest <- rbind(out_manifest, out_manifest_study)
 
     }
