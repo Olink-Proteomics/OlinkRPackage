@@ -82,9 +82,9 @@ olink_displayPlateLayout <- function(data, # nolint object_name_linter
                                       fill.color))
   data <- data |>
     dplyr::select(dplyr::any_of(c("plate",
-                                       "row",
-                                       "column",
-                                       "fill.color"))) |>
+                                  "row",
+                                  "column",
+                                  "fill.color"))) |>
     rbind(missing_spots) |>
     dplyr::mutate(row = factor(.data[["row"]], levels = LETTERS[8:1]),
                   column = factor(.data[["column"]],
