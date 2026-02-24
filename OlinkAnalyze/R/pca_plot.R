@@ -334,12 +334,12 @@ olink_pca_plot <- function(
 
     df <- df |>
       dplyr::mutate(
-        Panel = stringr::str_replace(Panel, "Olink ", "")
+        Panel = stringr::str_replace(Panel, "Olink ", "") # nolint object_usage_linter
       ) # Strip "Olink" from the panel names
 
     plotList <- lapply(unique(df$Panel), function(x) { # nolint object_name_linter
       g <- olink_pca_plot.internal(
-        df = df |> dplyr::filter(Panel == x),
+        df = df |> dplyr::filter(Panel == x), # nolint object_usage_linter
         color_g = color_g,
         x_val = x_val,
         y_val = y_val,
@@ -426,7 +426,7 @@ olink_calculate_pca <- function(
 
   scores <- data.frame(cbind(PCX, PCY)) |>
     tibble::rownames_to_column() |>
-    dplyr::arrange(rowname, .locale = "C") |>
+    dplyr::arrange(rowname, .locale = "C") |> # nolint object_usage_linter
     tibble::column_to_rownames()
   loadings <- data.frame(variables = rownames(pca_fit$rotation), LX, LY)
 
@@ -456,10 +456,10 @@ olink_calculate_pca <- function(
       ) |>
       dplyr::mutate(
         Outlier = dplyr::if_else(
-          PCX < PCX_high &
-            PCX > PCX_low &
-            PCY > PCY_low &
-            PCY < PCY_high,
+          PCX < PCX_high &  # nolint object_usage_linter
+            PCX > PCX_low & # nolint object_usage_linter
+            PCY > PCY_low & # nolint object_usage_linter
+            PCY < PCY_high, # nolint object_usage_linter
           0, 1
         )
       )
@@ -495,7 +495,7 @@ olink_pca_plot.internal <- function( # nolint object_name_linter
   # Ensure one unique color value per SampleID (required by
   # npxProcessing_forDimRed)
   df <- df |>
-    dplyr::group_by(SampleID) |>
+    dplyr::group_by(SampleID) |> # nolint object_usage_linter
     dplyr::mutate(
       !!rlang::sym(color_g) := dplyr::first(stats::na.omit(.data[[color_g]]))
     ) |>
@@ -590,7 +590,7 @@ olink_pca_plot.internal <- function( # nolint object_name_linter
   # Plotting
   pca_plot <- ggplot2::ggplot(
     scores,
-    ggplot2::aes(x = PCX, y = PCY)
+    ggplot2::aes(x = PCX, y = PCY) # nolint object_usage_linter
   ) +
     ggplot2::xlab(
       paste0("PC", x_val, " (", round(PoV[x_val] * 100, digits = 2), "%)")
@@ -604,7 +604,7 @@ olink_pca_plot.internal <- function( # nolint object_name_linter
   if (label_samples) {
     pca_plot <- pca_plot +
       ggplot2::geom_text(
-        ggplot2::aes(label = SampleID, color = colors),
+        ggplot2::aes(label = SampleID, color = colors), # nolint object_usage_linter
         size = 3
       ) +
       ggplot2::labs(color = color_g) +
@@ -652,8 +652,8 @@ olink_pca_plot.internal <- function( # nolint object_name_linter
       # Largest loadings based on Pythagoras
 
       N_loadings <- loadings |> # nolint object_name_linter
-        dplyr::mutate(abs_loading = sqrt(LX^2 + LY^2)) |>
-        dplyr::arrange(desc(abs_loading)) |>
+        dplyr::mutate(abs_loading = sqrt(LX^2 + LY^2)) |> # nolint object_usage_linter
+        dplyr::arrange(desc(abs_loading)) |> # nolint object_usage_linter
         utils::head(n_loadings) |>
         dplyr::select(-abs_loading)
     }
@@ -662,7 +662,7 @@ olink_pca_plot.internal <- function( # nolint object_name_linter
       # Selected loadings
 
       L_loadings <- loadings |> # nolint object_name_linter
-        dplyr::filter(variables %in% loadings_list)
+        dplyr::filter(variables %in% loadings_list) # nolint object_usage_linter
     }
 
     loadings <- rbind(
@@ -677,8 +677,8 @@ olink_pca_plot.internal <- function( # nolint object_name_linter
         ggplot2::aes(
           x = 0,
           y = 0,
-          xend = LX * loadings_scaling_factor,
-          yend = LY * loadings_scaling_factor
+          xend = LX * loadings_scaling_factor, # nolint object_usage_linter
+          yend = LY * loadings_scaling_factor  # nolint object_usage_linter
         ),
         arrow = ggplot2::arrow(length = grid::unit(1 / 2, "picas")),
         color = "black"
@@ -688,7 +688,7 @@ olink_pca_plot.internal <- function( # nolint object_name_linter
         ggplot2::aes(
           x = LX * loadings_scaling_factor,
           y = LY * loadings_scaling_factor,
-          label = variables
+          label = variables # nolint object_usage_linter
         ),
         box.padding = 1,
         show.legend = FALSE,
@@ -707,7 +707,7 @@ olink_pca_plot.internal <- function( # nolint object_name_linter
               TRUE ~ ""
             )
           ),
-        ggplot2::aes(label = SampleIDPlot),
+        ggplot2::aes(label = SampleIDPlot), # nolint object_usage_linter
         box.padding = 0.5,
         min.segment.length = 0.1,
         show.legend = FALSE,
@@ -719,22 +719,22 @@ olink_pca_plot.internal <- function( # nolint object_name_linter
   if (outlierLines) {
     pca_plot <- pca_plot +
       ggplot2::geom_hline(
-        ggplot2::aes(yintercept = PCY_low),
+        ggplot2::aes(yintercept = PCY_low), # nolint object_usage_linter
         linetype = "dashed",
         color = "grey"
       ) +
       ggplot2::geom_hline(
-        ggplot2::aes(yintercept = PCY_high),
+        ggplot2::aes(yintercept = PCY_high), # nolint object_usage_linter
         linetype = "dashed",
         color = "grey"
       ) +
       ggplot2::geom_vline(
-        ggplot2::aes(xintercept = PCX_low),
+        ggplot2::aes(xintercept = PCX_low), # nolint object_usage_linter
         linetype = "dashed",
         color = "grey"
       ) +
       ggplot2::geom_vline(
-        ggplot2::aes(xintercept = PCX_high),
+        ggplot2::aes(xintercept = PCX_high), # nolint object_usage_linter
         linetype = "dashed",
         color = "grey"
       )
