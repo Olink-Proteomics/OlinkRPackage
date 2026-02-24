@@ -1,9 +1,9 @@
-skip_if_not_installed("dplyr")
-skip_if_not_installed("tibble")
+# skip_if_not_installed("dplyr")
+# skip_if_not_installed("tibble")
 
 set.seed(123)  # reproducible randomization
 
-osi_data <- tibble(
+osi_data <- dplyr::tibble(
   OSITimeToCentrifugation = c(
     0.3012289,0.060720572,0.94772694,0.720596273,0.142294296,
     0.549284656,0.954091239,0.585483353,0.404510282,0.647893479,
@@ -96,11 +96,23 @@ osi_data <- osi_data |>
 data1 <- OlinkAnalyze::npx_data1 |>
   dplyr::right_join(
     osi_data |>
-      select(SampleID, OSITimeToCentrifugation, OSIPreparationTemperature,
-             OSISummary, OSICategory),
+      select(all_of(c(
+        "SampleID",
+        "OSITimeToCentrifugation",
+        "OSIPreparationTemperature",
+        "OSISummary",
+         "OSICategory"
+      ))),
     by = "SampleID"
   ) |>
-  dplyr::filter(!grepl("CONTROL", SampleID))
+  dplyr::filter(
+    !grepl("CONTROL", SampleID)
+    ) |>
+  dplyr::mutate(
+    SampleType = "SAMPLE",
+    AssayType = "assay",
+    AssayQC = "PASS"
+  )
 
 test_that("OSI errors: using npx_data1 and OSI columns", {
   # ----------------------------
