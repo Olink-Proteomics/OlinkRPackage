@@ -170,13 +170,13 @@ olink_pca_plot <- function(
       each sample has a unique identifier."
     )
   }
-  
+
   # Remove invalid OlinkID, assays with all NA values, and convert non-unique
-  # Uniprot IDs. Note that we do not remove samples with duplicate SampleID, 
-  # control samples or assays, or samples/assays with QC warnings, as this 
+  # Uniprot IDs. Note that we do not remove samples with duplicate SampleID,
+  # control samples or assays, or samples/assays with QC warnings, as this
   # would be the user's decision.
   df <- clean_npx(
-    df, 
+    df,
     check_log = check_log,
     remove_assay_na = TRUE,
     remove_invalid_oid = TRUE,
@@ -186,7 +186,7 @@ olink_pca_plot <- function(
     remove_qc_warning = FALSE,
     remove_assay_warning = FALSE,
     convert_nonunique_uniprot = TRUE
-    )
+  )
 
   # Validate OSI category column: must contain only 0,1,2,3,4; then convert to
   # factor if not already
@@ -280,22 +280,20 @@ olink_pca_plot <- function(
       # Detect non-numeric entries (introduced NA after coercion)
       non_numeric_idx <- which(!is.na(v_chr) & is.na(v_num))
       if (length(non_numeric_idx) > 0) {
-        bad_vals <- unique(v_chr[non_numeric_idx])
         cli::cli_abort(
           "Non-numeric values detected in {cc}. Expected continuous numeric
           values between 0 and 1. Found non-numeric value(s):
-          {paste(bad_vals, collapse = ', ')}."
+          {paste(unique(v_chr[non_numeric_idx]), collapse = ', ')}."
         )
       }
 
       # Detect out-of-range values
       out_of_range_idx <- which(!is.na(v_num) & (v_num < 0 | v_num > 1))
       if (length(out_of_range_idx) > 0) {
-        bad_vals <- unique(v_num[out_of_range_idx])
         cli::cli_abort(
           "Invalid values detected in {cc}. Expected continuous numeric values
           between 0 and 1. Found out-of-range value(s):
-          {paste(bad_vals, collapse = ', ')}."
+          {paste(unique(v_num[out_of_range_idx]), collapse = ', ')}."
         )
       }
     }
@@ -336,7 +334,7 @@ olink_pca_plot <- function(
 
     df <- df |>
       dplyr::mutate(
-        Panel = Panel |> stringr::str_replace("Olink ", "")
+        Panel = stringr::str_replace(Panel, "Olink ", "")
       ) # Strip "Olink" from the panel names
 
     plotList <- lapply(unique(df$Panel), function(x) { # nolint object_name_linter
@@ -363,7 +361,7 @@ olink_pca_plot <- function(
       g$data <- g$data |>
         dplyr::mutate(Panel = x)
 
-      g
+      return(g)
     })
     names(plotList) <- unique(df$Panel) # nolint object_name_linter
     if (!quiet) {
@@ -398,11 +396,11 @@ olink_pca_plot <- function(
 
 
 olink_calculate_pca <- function(
-  procData, # nolint object_name_linter
-  x_val = 1,
-  y_val = 2,
-  outlierDefX = NA, # nolint object_name_linter
-  outlierDefY = NA # nolint object_name_linter
+    procData, # nolint object_name_linter
+    x_val = 1,
+    y_val = 2,
+    outlierDefX = NA, # nolint object_name_linter
+    outlierDefY = NA # nolint object_name_linter
 ) {
   #### PCA ####
   pca_fit <- stats::prcomp(
@@ -477,8 +475,7 @@ olink_calculate_pca <- function(
 }
 
 
-olink_pca_plot.internal <- function(
-  # nolint object_name_linter
+olink_pca_plot.internal <- function( # nolint object_name_linter
   df,
   color_g = "QC_Warning",
   x_val = 1,
@@ -581,7 +578,8 @@ olink_pca_plot.internal <- function(
   }
 
   scores <- scores |>
-    dplyr::left_join(procData$df_wide[, c("SampleID", "colors")],
+    dplyr::left_join(
+      procData$df_wide[, c("SampleID", "colors")],
       by = c("SampleID")
     )
 
