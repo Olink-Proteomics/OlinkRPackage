@@ -1,31 +1,56 @@
-# nolint start
 #' Function to make a UMAP plot from the data
 #'
-#' Computes a manifold approximation and projection using umap::umap and plots the two specified components.
-#' Unique sample names are required and imputation by the median is done for assays with missingness <10\% for multi-plate projects and <5\% for single plate projects.
+#' Computes a manifold approximation and projection using umap::umap and plots
+#' the two specified components.
+#' Unique sample names are required and imputation by the median is done for
+#' assays with missingness <10\% for multi-plate projects and <5\% for single
+#' plate projects.
 #'
 #' The plot is printed, and a list of ggplot objects is returned. \cr\cr
-#' If byPanel = TRUE, the data processing (imputation of missing values etc) and subsequent UMAP is performed separately per panel. A faceted plot is printed, while the individual ggplot objects are returned. \cr\cr
-#' The arguments outlierDefX and outlierDefY can be used to identify outliers in the UMAP results. Samples more than +/- outlierDefX and outlierDefY standard deviations from the mean of the plotted UMAP component will be labelled. Both arguments have to be specified.
-#' NOTE: UMAP is a non-linear data transformation that might not accurately preserve the properties of the data. Distances in the UMAP plane should therefore be interpreted with caution.
+#' If byPanel = TRUE, the data processing (imputation of missing values etc)
+#' and subsequent UMAP is performed separately per panel. A faceted plot is
+#' printed, while the individual ggplot objects are returned. \cr\cr
+#' The arguments outlierDefX and outlierDefY can be used to identify outliers
+#' in the UMAP results. Samples more than +/- outlierDefX and outlierDefY
+#' standard deviations from the mean of the plotted UMAP component will be
+#' labelled. Both arguments have to be specified.
+#' NOTE: UMAP is a non-linear data transformation that might not accurately
+#' preserve the properties of the data. Distances in the UMAP plane should
+#' therefore be interpreted with caution.
 #'
-#' @param df data frame in long format with Sample Id, NPX and column of choice for colors
-#' @param color_g Character value indicating which column to use for colors (default QC_Warning). Continuous color scale for Olink(R) Sample Index (OSI) columns OSITimeToCentrifugation, OSIPreparationTemperature and OSISummary is also supported.
-#' @param x_val Integer indicating which UMAP component to plot along the x-axis (default 1)
-#' @param y_val Integer indicating which UMAP component to plot along the y-axis (default 2)
-#' @param label_samples Logical. If TRUE, points are replaced with SampleID (default FALSE)
-#' @param config object of class umap.config, specifying the parameters for the UMAP algorithm (default umap::umap.defaults)
-#' @param drop_assays Logical. All assays with any missing values will be dropped. Takes precedence over sample drop.
-#' @param drop_samples Logical. All samples with any missing values will be dropped.
+#' @param df data frame in long format with Sample Id, NPX and column of choice
+#' for colors
+#' @param color_g Character value indicating which column to use for
+#' colors (default QC_Warning). Continuous color scale for Olink(R)
+#' Sample Index (OSI) columns OSITimeToCentrifugation,
+#' OSIPreparationTemperature and OSISummary is also supported.
+#' @param x_val Integer indicating which UMAP component to plot along the
+#' x-axis (default 1)
+#' @param y_val Integer indicating which UMAP component to plot along the
+#' y-axis (default 2)
+#' @param label_samples Logical. If TRUE, points are replaced with
+#' SampleID (default FALSE)
+#' @param config object of class umap.config, specifying the parameters for
+#' the UMAP algorithm (default umap::umap.defaults)
+#' @param drop_assays Logical. All assays with any missing values will be
+#' dropped. Takes precedence over sample drop.
+#' @param drop_samples Logical. All samples with any missing values will be
+#' dropped.
 #' @param byPanel Perform the UMAP per panel (default FALSE)
-#' @param outlierDefX The number standard deviations along the UMAP dimension plotted on the x-axis that defines an outlier. See also 'Details"
-#' @param outlierDefY The number standard deviations along the UMAP dimension plotted on the y-axis that defines an outlier. See also 'Details"
-#' @param outlierLines Draw dashed lines at +/- outlierDefX and outlierDefY standard deviations from the mean of the plotted PCs (default FALSE)
-#' @param label_outliers Use ggrepel to label samples lying outside the limits set by the outlierLines (default TRUE)
+#' @param outlierDefX The number standard deviations along the UMAP dimension
+#' plotted on the x-axis that defines an outlier. See also 'Details"
+#' @param outlierDefY The number standard deviations along the UMAP dimension
+#' plotted on the y-axis that defines an outlier. See also 'Details"
+#' @param outlierLines Draw dashed lines at +/- outlierDefX and outlierDefY
+#' standard deviations from the mean of the plotted PCs (default FALSE)
+#' @param label_outliers Use ggrepel to label samples lying outside the limits
+#' set by the outlierLines (default TRUE)
 #' @param quiet Logical. If TRUE, the resulting plot is not printed
-#' @param verbose Logical. Whether warnings about the number of samples and/or assays dropped or imputed should be printed to the console.
+#' @param verbose Logical. Whether warnings about the number of samples and/or
+#' assays dropped or imputed should be printed to the console.
 #' @param ... coloroption passed to specify color order.
-#' @return A list of objects of class "ggplot", each plot contains scatter plot of UMAPs
+#' @return A list of objects of class "ggplot", each plot contains scatter
+#' plot of UMAPs
 #' @keywords NPX UMAP
 #' @export
 #' @examples
@@ -55,20 +80,22 @@
 #'     filter(Outlier == 1)
 #' })
 #' }
-#' @importFrom dplyr filter select group_by ungroup mutate mutate_at if_else n_distinct summarise left_join arrange distinct
+#' @importFrom dplyr filter select group_by ungroup mutate mutate_at if_else
+#' n_distinct summarise left_join arrange distinct
 #' @importFrom stringr str_detect
 #' @importFrom tidyr spread
 #' @importFrom tidyselect all_of
 #' @importFrom rlang ensym
 #' @importFrom tibble column_to_rownames
 #' @importFrom stats prcomp
-#' @importFrom ggplot2 ggplot aes xlab ylab geom_text geom_point geom_segment  labs guides arrow
+#' @importFrom ggplot2 ggplot aes xlab ylab geom_text geom_point geom_segment
+#' labs guides arrow
 #' @importFrom ggrepel geom_label_repel
 #' @importFrom utils head
 #' @importFrom grid unit
-# nolint end
 
 olink_umap_plot <- function(df,
+                            check_log = NULL,
                             color_g = "QC_Warning",
                             x_val = 1,
                             y_val = 2,
@@ -116,13 +143,37 @@ olink_umap_plot <- function(df,
     }
   }
 
-  #Filtering on valid OlinkID
-  #Exclude assays that have all NA:s
-  # Rename duplicate UniProts
-  check_log <- NULL
-  check_log <- run_check_npx(df = df, check_log = check_log) # uses check_npx
-  df <- clean_npx(df, check_log = check_log, out_df = "tibble",
-                  verbose = FALSE) # uses clean_npx
+  # Check if check_log is correct
+  check_log <- run_check_npx(df = df, check_log = check_log)
+  # Make sure data is a tibble
+  df <- convert_read_npx_output(df = df, out_df = "tibble")
+
+  # Stop if duplicate sample ID's detected
+  if (length(check_log$sample_id_dups) > 0) {
+    cli::cli_abort(
+      "Duplicate SampleID(s) detected:
+      {paste(check_log$sample_id_dups, collapse = ', ')}.
+      Each sample ID must be unique. Please check your data and ensure that
+      each sample has a unique identifier."
+    )
+  }
+
+  # Remove invalid OlinkID, assays with all NA values, and convert non-unique
+  # Uniprot IDs. Note that we do not remove samples with duplicate SampleID,
+  # control samples or assays, or samples/assays with QC warnings, as this
+  # would be the user's decision.
+  df <- clean_npx(
+    df,
+    check_log = check_log,
+    remove_assay_na = TRUE,
+    remove_invalid_oid = TRUE,
+    remove_dup_sample_id = FALSE,
+    remove_control_assay = FALSE,
+    remove_control_sample = FALSE,
+    remove_qc_warning = FALSE,
+    remove_assay_warning = FALSE,
+    convert_nonunique_uniprot = TRUE
+  )
 
   # Validate OSI category column: must contain only 0,1,2,3,4; then convert to factor if not already #nolint
   osi_cat_candidates <- "OSICategory"

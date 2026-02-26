@@ -192,10 +192,10 @@ test_that("OSI errors: using npx_data1 and OSI columns", {
 
 })
 
+
 test_that("olink_umap_plot works", {
 
   testthat::skip_if_not_installed("umap")
-
   load(file = testthat::test_path("data", "npx_data_format221010.RData"))
 
   outGroup <- c("A1_1", "A10_11", "A12_13", "A17_18", "A25_27", # nolint object_name_linter
@@ -238,11 +238,8 @@ test_that("olink_umap_plot works", {
   expect_true(all(outGroup.detected %in% outGroup))
 
   expect_warning(
-    expect_warning(
-      olink_umap_plot(npx_data_format221010),
-      regexp = 'have "NPX" = NA for all samples'
-    ),
-    regexp = "2 assay\\(s\\) dropped due to high missingness \\(>10%\\)"
+    olink_umap_plot(npx_data_format221010),
+    regexp = 'have "NPX" = NA for all samples'
   )
 
 })

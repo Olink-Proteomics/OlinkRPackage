@@ -6,6 +6,7 @@
 \usage{
 olink_umap_plot(
   df,
+  check_log = NULL,
   color_g = "QC_Warning",
   x_val = 1,
   y_val = 2,
@@ -24,50 +25,76 @@ olink_umap_plot(
 )
 }
 \arguments{
-\item{df}{data frame in long format with Sample Id, NPX and column of choice for colors}
+\item{df}{data frame in long format with Sample Id, NPX and column of choice
+for colors}
 
-\item{color_g}{Character value indicating which column to use for colors (default QC_Warning). Continuous color scale for Olink(R) Sample Index (OSI) columns OSITimeToCentrifugation, OSIPreparationTemperature and OSISummary is also supported.}
+\item{color_g}{Character value indicating which column to use for
+colors (default QC_Warning). Continuous color scale for Olink(R)
+Sample Index (OSI) columns OSITimeToCentrifugation,
+OSIPreparationTemperature and OSISummary is also supported.}
 
-\item{x_val}{Integer indicating which UMAP component to plot along the x-axis (default 1)}
+\item{x_val}{Integer indicating which UMAP component to plot along the
+x-axis (default 1)}
 
-\item{y_val}{Integer indicating which UMAP component to plot along the y-axis (default 2)}
+\item{y_val}{Integer indicating which UMAP component to plot along the
+y-axis (default 2)}
 
-\item{config}{object of class umap.config, specifying the parameters for the UMAP algorithm (default umap::umap.defaults)}
+\item{config}{object of class umap.config, specifying the parameters for
+the UMAP algorithm (default umap::umap.defaults)}
 
-\item{label_samples}{Logical. If TRUE, points are replaced with SampleID (default FALSE)}
+\item{label_samples}{Logical. If TRUE, points are replaced with
+SampleID (default FALSE)}
 
-\item{drop_assays}{Logical. All assays with any missing values will be dropped. Takes precedence over sample drop.}
+\item{drop_assays}{Logical. All assays with any missing values will be
+dropped. Takes precedence over sample drop.}
 
-\item{drop_samples}{Logical. All samples with any missing values will be dropped.}
+\item{drop_samples}{Logical. All samples with any missing values will be
+dropped.}
 
 \item{byPanel}{Perform the UMAP per panel (default FALSE)}
 
-\item{outlierDefX}{The number standard deviations along the UMAP dimension plotted on the x-axis that defines an outlier. See also 'Details"}
+\item{outlierDefX}{The number standard deviations along the UMAP dimension
+plotted on the x-axis that defines an outlier. See also 'Details"}
 
-\item{outlierDefY}{The number standard deviations along the UMAP dimension plotted on the y-axis that defines an outlier. See also 'Details"}
+\item{outlierDefY}{The number standard deviations along the UMAP dimension
+plotted on the y-axis that defines an outlier. See also 'Details"}
 
-\item{outlierLines}{Draw dashed lines at +/- outlierDefX and outlierDefY standard deviations from the mean of the plotted PCs (default FALSE)}
+\item{outlierLines}{Draw dashed lines at +/- outlierDefX and outlierDefY
+standard deviations from the mean of the plotted PCs (default FALSE)}
 
-\item{label_outliers}{Use ggrepel to label samples lying outside the limits set by the outlierLines (default TRUE)}
+\item{label_outliers}{Use ggrepel to label samples lying outside the limits
+set by the outlierLines (default TRUE)}
 
 \item{quiet}{Logical. If TRUE, the resulting plot is not printed}
 
-\item{verbose}{Logical. Whether warnings about the number of samples and/or assays dropped or imputed should be printed to the console.}
+\item{verbose}{Logical. Whether warnings about the number of samples and/or
+assays dropped or imputed should be printed to the console.}
 
 \item{...}{coloroption passed to specify color order.}
 }
 \value{
-A list of objects of class "ggplot", each plot contains scatter plot of UMAPs
+A list of objects of class "ggplot", each plot contains scatter
+plot of UMAPs
 }
 \description{
-Computes a manifold approximation and projection using umap::umap and plots the two specified components.
-Unique sample names are required and imputation by the median is done for assays with missingness <10\\% for multi-plate projects and <5\\% for single plate projects.
+Computes a manifold approximation and projection using umap::umap and plots
+the two specified components.
+Unique sample names are required and imputation by the median is done for
+assays with missingness <10\\% for multi-plate projects and <5\\% for single
+plate projects.
 }
 \details{
 The plot is printed, and a list of ggplot objects is returned. \cr\cr
-If byPanel = TRUE, the data processing (imputation of missing values etc) and subsequent UMAP is performed separately per panel. A faceted plot is printed, while the individual ggplot objects are returned. \cr\cr
-The arguments outlierDefX and outlierDefY can be used to identify outliers in the UMAP results. Samples more than +/- outlierDefX and outlierDefY standard deviations from the mean of the plotted UMAP component will be labelled. Both arguments have to be specified.
-NOTE: UMAP is a non-linear data transformation that might not accurately preserve the properties of the data. Distances in the UMAP plane should therefore be interpreted with caution.
+If byPanel = TRUE, the data processing (imputation of missing values etc)
+and subsequent UMAP is performed separately per panel. A faceted plot is
+printed, while the individual ggplot objects are returned. \cr\cr
+The arguments outlierDefX and outlierDefY can be used to identify outliers
+in the UMAP results. Samples more than +/- outlierDefX and outlierDefY
+standard deviations from the mean of the plotted UMAP component will be
+labelled. Both arguments have to be specified.
+NOTE: UMAP is a non-linear data transformation that might not accurately
+preserve the properties of the data. Distances in the UMAP plane should
+therefore be interpreted with caution.
 }
 \examples{
 \donttest{
