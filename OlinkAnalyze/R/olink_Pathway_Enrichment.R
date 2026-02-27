@@ -146,8 +146,8 @@ olink_pathway_enrichment <- function(data,
   rlang::check_installed(pkg = c("clusterProfiler", "msigdbr"),
                          call = rlang::caller_env())
 
-  if (utils::packageVersion("msigdbr") < package_version("9.0.0")) {
-    cli::cli_abort(c(paste("Pathway enrichment requires version >=9.0.0",
+  if (utils::packageVersion("msigdbr") < package_version("24.1.0")) {
+    cli::cli_abort(c(paste("Pathway enrichment requires version >=24.1.0",
                            "of the msigdbr package.",
                            "Please install a supported version of msigdbr",
                            "before continuing."),
@@ -167,10 +167,11 @@ olink_pathway_enrichment <- function(data,
 
 
   df <- data_prep(data = data,
-                  check_log = check_log)
+                  check_log = check_log,
+                  test_results = test_results)
 
 
-  test_results <- test_prep(data = df,
+  test_results <- test_prep(df = df,
                             test_results = test_results)
 
 
@@ -206,24 +207,25 @@ check_pe_inputs <- function(data,
   # Check required columns in test results
 
   if (!all(c("OlinkID",
-             "contrast",
              "estimate",
              "Assay") %in% colnames(test_results))) {
     cli::cli_abort(message = paste("test_results must include the",
                                    "following columns: \n",
                                    "OlinkID,",
                                    "Assay,",
-                                   "contrast,",
                                    "estimate", sep = "\n"))
   }
 
-  if (length(unique(data[["OlinkID"]])) !=
-        length(unique(test_results[["OlinkID"]]))) {
-    cli::cli_warn(paste("The number of Olink IDs in the data does not equal",
-                        "the number of Olink IDs in the test_results."))
+  if (length(c(setdiff(unique(data[["OlinkID"]]),
+                       unique(test_results[["OlinkID"]])),
+               setdiff(unique(test_results[["OlinkID"]]),
+                       unique(data[["OlinkID"]])))) != 0) {
+    cli::cli_warn(paste("The Olink IDs in the data do not all match",
+                        "the Olink IDs in the test_results."))
   }
 
-  if (length(unique(test_results[["contrast"]])) > 1) {
+  if ("contrast" %in% colnames(test_results) &&
+        length(unique(test_results[["contrast"]])) > 1) {
     cli::cli_abort(paste("More than one contrast is specified in test results.",
                          "Filter test_results for desired contrast."))
   }
@@ -251,6 +253,7 @@ check_pe_inputs <- function(data,
 data_prep <- function(data,
                       test_results,
                       check_log) {
+  cli::cli_inform("Removing invalid OlinkIDs, control assays, and NA assays.")
   data <- clean_npx(df = data,
                     check_log = check_log,
                     remove_assay_na = TRUE,
@@ -262,21 +265,27 @@ data_prep <- function(data,
                     remove_assay_warning = FALSE,
                     convert_df_cols = TRUE,
                     convert_nonunique_uniprot = FALSE,
-                    verbose = TRUE)
+                    verbose = FALSE)
 
-  cli::cli_inform(paste0("Filtering data for overlapping OlinkIDs in data ",
-                         "and test_results."))
-  data <- data |>
-    dplyr::filter(.data[["olink_id"]] %in% test_results[["OlinkID"]])
+
+  if (length(c(setdiff(unique(data[["OlinkID"]]),
+                       unique(test_results[["OlinkID"]])),
+               setdiff(unique(test_results[["OlinkID"]]),
+                       unique(data[["OlinkID"]])))) != 0) {
+    cli::cli_inform(paste0("Filtering data for overlapping OlinkIDs in data ",
+                           "and test_results."))
+    data <- data |>
+      dplyr::filter(.data[["OlinkID"]] %in% test_results[["OlinkID"]])
+  }
 
   duplicated_assays <- data |>
-    dplyr::select(dplyr::any_of(c("sample_id", "assay"))) |>
+    dplyr::select(dplyr::any_of(c("SampleID", "Assay"))) |>
     duplicated()
 
 
   if (any(duplicated_assays)) {
     cli::cli_abort(paste("Duplicated assays detected:",
-                         paste(data[["assay"]][duplicated_assays],
+                         paste(data[["Assay"]][duplicated_assays],
                                collapse = ","),
                          "\n",
                          "Filter assay from test_result or data",
@@ -287,8 +296,13 @@ data_prep <- function(data,
 
 test_prep <- function(df,
                       test_results) {
-  test_results <- test_results |>
-    dplyr::filter(test_results[["OlinkID"]] %in% df[["olink_id"]])
+  if (length(c(setdiff(unique(df[["OlinkID"]]),
+                       unique(test_results[["OlinkID"]])),
+               setdiff(unique(test_results[["OlinkID"]]),
+                       unique(df[["OlinkID"]])))) != 0) {
+    test_results <- test_results |>
+      dplyr::filter(test_results[["OlinkID"]] %in% df[["OlinkID"]])
+  }
 
   return(test_results)
 
@@ -336,7 +350,7 @@ select_ont <- function(ontology,
   }
 
   msig_df <- msig_df |>
-    dplyr::select(dplyr::any_of("gs_name", "gene_symbol"))
+    dplyr::select(dplyr::any_of(c("gs_name", "gene_symbol")))
 
   return(msig_df)
 }
