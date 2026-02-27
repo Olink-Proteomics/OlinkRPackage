@@ -1,19 +1,25 @@
 skip_on_cran()
 skip_if_not_installed("clusterProfiler")
 skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
-skip_if_not_installed("msigdbr", minimum_version = "9.0.0")
-skip_if_not_installed("msigdbdf")
+skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
 set.seed(123)
-npx_df <- npx_data1 %>% filter(!grepl('control',SampleID, ignore.case = TRUE))
-ttest_results <- olink_ttest(df=npx_df,
-                             variable = 'Treatment',
-                             alternative = 'two.sided')
+npx_df <- npx_data1 |>
+  dplyr::filter(!grepl("control",
+                       .data[["SampleID"]],
+                       ignore.case = TRUE))
+check_log <- check_npx(npx_df)
+ttest_results <- olink_ttest(df = npx_df,
+                             check_log = check_log,
+                             variable = "Treatment",
+                             alternative = "two.sided")
 
-gsea_results <- olink_pathway_enrichment(data = npx_data1,
+gsea_results <- olink_pathway_enrichment(data = npx_df,
+                                         check_log = check_log,
                                          test_results = ttest_results)
 
-ora_results <- olink_pathway_enrichment(data = npx_data1,
+ora_results <- olink_pathway_enrichment(data = npx_df,
+                                        check_log = check_log,
                                         test_results = ttest_results,
                                         method = "ORA")
 
@@ -25,7 +31,7 @@ test_that("Valid Keyword needed", {
                                      keyword = "asfhdlk"))
 })
 
-test_that("Plot works",{
+test_that("Plot works", {
   gsea_heatmap <- olink_pathway_heatmap(enrich_results = gsea_results,
                                         test_results = ttest_results)
   ora_heatmap <- olink_pathway_heatmap(enrich_results = ora_results,
@@ -39,10 +45,12 @@ test_that("Plot works",{
   set.seed(123)
 
   gsea_heatmap_name <- "GSEA Heatmap"
-  check_snap_exist(test_dir_name = "olink_Pathway_Heatmap", snap_name = gsea_heatmap_name)
+  check_snap_exist(test_dir_name = "olink_Pathway_Heatmap",
+                   snap_name = gsea_heatmap_name)
   vdiffr::expect_doppelganger(gsea_heatmap_name, gsea_heatmap)
 
   ora_heatmap_name <- "ORA Heatmap with Keyword"
-  check_snap_exist(test_dir_name = "olink_Pathway_Heatmap", snap_name = ora_heatmap_name)
+  check_snap_exist(test_dir_name = "olink_Pathway_Heatmap",
+                   snap_name = ora_heatmap_name)
   vdiffr::expect_doppelganger(ora_heatmap_name, ora_heatmap)
 })
