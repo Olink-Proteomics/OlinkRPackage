@@ -1,171 +1,607 @@
-#Load reference results
-reference_results <- get_example_data(filename = "reference_results.rds")
+# Test product_to_platesize ----
 
-#Run olink_plate_randomizer
-randomized_result1 <- olink_plate_randomizer(manifest,
-                                             seed = 12345)
-randomized_result2 <- olink_plate_randomizer(manifest,
-                                             SubjectColumn = "SubjectID",
-                                             available.spots = c(88, 88),
-                                             seed = 12345)
+test_that(
+  "product_to_platesize works",
+  {
+    expect_equal(
+      object = product_to_platesize(product = "Target 96"),
+      expected = 96L
+    )
+    expect_equal(
+      object = product_to_platesize(product = "Target 48"),
+      expected = 48L
+    )
+  }
+)
 
-randomized_result3 <- olink_plate_randomizer({
-  manifest |>
-    dplyr::mutate(study = ifelse(Site == "Site1",
-                                 "study1",
-                                 "study2"))
-},
-SubjectColumn = "SubjectID",
-available.spots = c(88, 88),
-seed = 12345)
+# Test olink_displayPlateLayout ----
 
-randomized_result4 <- olink_plate_randomizer({
-  manifest |>
-    dplyr::mutate(study = ifelse(Site == "Site1",
-                                 "study1",
-                                 "study2"))
-},
-available.spots = c(88, 88),
-seed = 12345)
+test_that(
+  "olink_displayPlateLayout - works",
+  {
+    skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
 
-randomized_result5 <- olink_plate_randomizer(manifest,
-                                             SubjectColumn = "SubjectID",
-                                             num_ctrl = 10,
-                                             rand_ctrl = TRUE,
-                                             seed = 12345)
-randomized_result6 <- olink_plate_randomizer(manifest,
-                                             Product = "Target 96",
-                                             seed = 12345)
+    # Load reference results
+    reference_results <- get_example_data(filename = "reference_results.rds")
 
-# Clean up factors in old R
-if (as.numeric(R.Version()$major) < 4) {
-  cat("We are running on an old R...")
-  randomized_result1$plate <- as.character(randomized_result1$plate)
-  randomized_result2$plate <- as.character(randomized_result2$plate)
-  randomized_result3$plate <- as.character(randomized_result3$plate)
-  randomized_result4$plate <- as.character(randomized_result4$plate)
-  randomized_result5$plate <- as.character(randomized_result5$plate)
-  randomized_result6$plate <- as.character(randomized_result6$plate)
-}
+    # correctness of randomized_result1 is tested here
+    # "olink_plate_randomizer - works - v1"
 
-test_that("olink_plate_randomizer works", {
-  expect_equal(droplevels(randomized_result1),
-               droplevels(reference_results$randomized_samples))
-  expect_equal(droplevels(randomized_result2),
-               droplevels(reference_results$randomized_subjects))
-  expect_equal(droplevels(randomized_result3),
-               droplevels(reference_results$randomized_subjects_spots))
-  expect_equal(droplevels(randomized_result4),
-               droplevels(reference_results$randomized_samples_spots))
-  expect_equal(randomized_result1, randomized_result6)
+    expect_equal(
+      object = olink_displayPlateLayout(
+        data = reference_results$randomized_samples,
+        fill.color = "plate"
+      ),
+      expected = olink_displayPlateLayout(
+        data = reference_results$randomized_samples
+      )
+    )
+  }
+)
 
-  expect_error(olink_plate_randomizer(manifest,
-                                      SubjectColumn = "SubjectID",
-                                      Product = "Olink"))
-  expect_equal(randomized_result5 |>
-                 dplyr::filter(SampleID == "CONTROL_SAMPLE") |>
-                 dplyr::group_by(plate) |>
-                 dplyr::tally() |>
-                 dplyr::select(n) |>
-                 unique() |>
-                 dplyr::pull(), 10)
-  skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
-})
+test_that(
+  "olink_displayPlateLayout - works - vdiffr",
+  {
+    skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
+    skip_if_not_installed("vdiffr")
+    skip_on_cran()
 
-test_that("olink_plate_randomizer works - vdiffr", {
-  skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
-  skip_if_not_installed("vdiffr")
-  skip_on_cran()
+    plate_randomizer_name <- "Randomized_Data"
+    check_snap_exist(test_dir_name = "olink_plate_randomizer",
+                     snap_name = plate_randomizer_name)
 
-  plate_randomizer_name <- "Randomized_Data"
-  check_snap_exist(test_dir_name = "olink_plate_randomizer",
-                   snap_name = plate_randomizer_name)
-  vdiffr::expect_doppelganger(plate_randomizer_name,
-                              olink_displayPlateLayout(randomized_result5,
-                                                       num_ctrl = 10,
-                                                       rand_ctrl = TRUE,
-                                                       fill.color = "Visit"))
-  expect_contains(randomized_result5$SampleID, "CONTROL_SAMPLE")
-  expect_error(olink_plate_randomizer(manifest,
-                                      num_ctrl = "A"),
-               "positive integer")
-  expect_error(olink_plate_randomizer(manifest,
-                                      num_ctrl = 10.6),
-               "positive integer")
+    # Run olink_plate_randomizer
+    randomized_result5 <- olink_plate_randomizer(
+      Manifest = manifest,
+      SubjectColumn = "SubjectID",
+      num_ctrl = 10L,
+      rand_ctrl = TRUE,
+      seed = 12345
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
 
-  expect_error(olink_plate_randomizer(Manifest = {
-    manifest |>
-      rename("sample_id" = "SampleID")
-  },
-  "SampleID not found"))
+    vdiffr::expect_doppelganger(
+      title = plate_randomizer_name,
+      fig = olink_displayPlateLayout(
+        data = randomized_result5,
+        num_ctrl = 10L,
+        rand_ctrl = TRUE,
+        fill.color = "Visit"
+      )
+    )
+  }
+)
 
-  expect_warning(olink_plate_randomizer(Manifest = {
-    manifest |>
-      rbind(manifest[1, ])
-  }),
-  "duplicated")
+test_that(
+  "olink_displayPlateLayout - error - incorrect plate size",
+  {
+    expect_error(
+      object = olink_displayPlateLayout(
+        data = manifest,
+        PlateSize = 15
+      ),
+      regexp = "Plate size needs to be either 48 or 96"
+    )
+  }
+)
 
-  expect_error(olink_plate_randomizer(Manifest = {
-    manifest |>
-      dplyr::mutate(SampleID = ifelse(SampleID = "A 1", NA, SampleID))
-  },
-  "No NA"))
+# Test olink_displayPlateDistributions ----
 
-  expect_error(olink_plate_randomizer(manifest,
-                                      SubjectColumn = "Hi"),
-               "SubjectColumn name was not found")
+test_that(
+  "olink_displayPlateDistributions - works",
+  {
+    skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
 
-  expect_error(olink_displayPlateLayout(randomized_result5,
-                                        num_ctrl = 10,
-                                        rand_ctrl = TRUE,
-                                        fill.color = "Visit",
-                                        PlateSize = 100),
-               "Plate size needs to be either 48 or 96")
+    # Load reference results
+    reference_results <- get_example_data(filename = "reference_results.rds")
 
-})
+    # correctness of randomized_result1 is tested here
+    # "olink_plate_randomizer - works - v1"
 
-test_that("product_to_platesize works", {
-  expect_equal(96, product_to_platesize("Target 96"))
-  expect_equal(48, product_to_platesize("Target 48"))
-})
+    expect_equal(
+      object = olink_displayPlateDistributions(
+        data = reference_results$randomized_samples
+      ),
+      expected = olink_displayPlateDistributions(
+        data = reference_results$randomized_samples,
+        fill.color = "plate"
+      )
+    )
+  }
+)
 
-test_that("olink_displayPlateLayout works", {
-  expect_error(olink_displayPlateLayout(randomized_result1,
-                                        PlateSize = 15),
-               "Plate size needs to be either 48 or 96")
-  expect_equal(olink_displayPlateLayout(randomized_result1,
-                                        fill.color = "plate"),
-               olink_displayPlateLayout(randomized_result1))
-})
+# Test generate_plate_holder ----
 
-test_that("olink_displayPlateDistributions works", {
-  expect_equal(olink_displayPlateDistributions(randomized_result1),
-               olink_displayPlateDistributions(data = randomized_result1,
-                                               fill.color = "plate"))
-})
+test_that(
+  "generate_plate_holder - errors",
+  {
+    expect_error(
+      object = generate_plate_holder(
+        nplates = 2L,
+        nspots = c(22L, 22L, 22L),
+        nsamples = 16L,
+        plate_size = 96L,
+        num_ctrl = 8L,
+        rand_ctrl = FALSE
+      ),
+      regexp = "Vector of available spots must equal number of plates"
+    )
 
-test_that("generate_plate_holder works", {
-  expect_error(generate_plate_holder(nplates = 2,
-                                     nspots = c(22, 22, 22),
-                                     nsamples = 16,
-                                     plate_size = 96,
-                                     num_ctrl = 8,
-                                     rand_ctrl = FALSE),
-               "Vector of available spots must equal number of plates")
+    expect_error(
+      object = generate_plate_holder(
+        nplates = 2L,
+        nspots = c(22L, 100L),
+        nsamples = 16L,
+        plate_size = 96L,
+        num_ctrl = 8L,
+        rand_ctrl = FALSE
+      ),
+      regexp = "Number of samples per plates cannot exceed"
+    )
 
-  expect_error(generate_plate_holder(nplates = 2,
-                                     nspots = c(22, 100),
-                                     nsamples = 16,
-                                     plate_size = 96,
-                                     num_ctrl = 8,
-                                     rand_ctrl = FALSE),
-               "Number of samples per plates cannot exceed")
+    expect_error(
+      object = generate_plate_holder(
+        nplates = 2L,
+        nspots = c(22L, 22L),
+        nsamples = 100L,
+        plate_size = 96L,
+        num_ctrl = 8L,
+        rand_ctrl = FALSE
+      ),
+      regexp = "More samples than available spots"
+    )
+  }
+)
 
-  expect_error(generate_plate_holder(nplates = 2,
-                                     nspots = c(22, 22),
-                                     nsamples = 100,
-                                     plate_size = 96,
-                                     num_ctrl = 8,
-                                     rand_ctrl = FALSE),
-               "More samples than available spots")
-})
+# Test olink_plate_randomizer ----
+
+test_that(
+  "olink_plate_randomizer - works - v1",
+  {
+    # Load reference results
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
+    # Run olink_plate_randomizer
+    expect_message(
+      object = randomized_result1 <- olink_plate_randomizer(
+        Manifest = manifest,
+        seed = 12345
+      ),
+      regexp = "Random assignment of SAMPLES to plates"
+    )
+
+    expect_equal(
+      object = droplevels(randomized_result1),
+      expected = droplevels(reference_results$randomized_samples)
+    )
+
+    # Run olink_plate_randomizer
+    expect_message(
+      object = randomized_result6 <- olink_plate_randomizer(
+        Manifest = manifest,
+        Product = "Target 96",
+        seed = 12345
+      ),
+      regexp = "Random assignment of SAMPLES to plates"
+    )
+
+    expect_equal(
+      object = randomized_result1,
+      expected = randomized_result6
+    )
+  }
+)
+
+test_that(
+  "olink_plate_randomizer - works - v2",
+  {
+    # Load reference results
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
+    msgs <- capture_messages(
+      {
+        randomized_result2 <- olink_plate_randomizer(
+          Manifest = manifest,
+          SubjectColumn = "SubjectID",
+          available.spots = c(88L, 88L),
+          seed = 12345
+        )
+      }
+    ) |>
+      # Drop empty or whitespace-only lines
+      stringr::str_replace_all(
+        pattern = "\n",
+        replacement = ""
+      ) |>
+      stringr::str_replace_all(
+        pattern = "^\\s*[\\u2500-]+\\s*|\\s*[\\u2500-]+\\s*$",
+        replacement = ""
+      ) |>
+      stringr::str_trim(
+        side = "both"
+      ) |>
+      (\(x) x[x != ""])()
+
+    expect_true(
+      object = grepl(
+        pattern = "Random assignment of SUBJECTS to plates",
+        x = msgs,
+        fixed = TRUE
+      ) |>
+        any()
+    )
+
+    expect_equal(
+      object = droplevels(randomized_result2),
+      expected = droplevels(reference_results$randomized_subjects)
+    )
+  }
+)
+
+test_that(
+  "olink_plate_randomizer - works - v3",
+  {
+    # Load reference results
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
+    msgs <- capture_messages(
+      {
+        # Run olink_plate_randomizer
+        randomized_result3 <- olink_plate_randomizer(
+          Manifest = manifest |>
+            dplyr::mutate(
+              study = dplyr::if_else(
+                .data[["Site"]] == "Site1",
+                "study1",
+                "study2"
+              )
+            ),
+          SubjectColumn = "SubjectID",
+          available.spots = c(88L, 88L),
+          seed = 12345
+        )
+      }
+    ) |>
+      # Drop empty or whitespace-only lines
+      stringr::str_replace_all(
+        pattern = "\n",
+        replacement = ""
+      ) |>
+      stringr::str_replace_all(
+        pattern = "^\\s*[\\u2500-]+\\s*|\\s*[\\u2500-]+\\s*$",
+        replacement = ""
+      ) |>
+      stringr::str_trim(
+        side = "both"
+      ) |>
+      (\(x) x[x != ""])()
+
+    expect_true(
+      object = grepl(
+        pattern = "`study` column detected in manifest",
+        x = msgs,
+        fixed = TRUE
+      ) |>
+        any()
+    )
+
+    expect_true(
+      object = grepl(
+        pattern = "Keeping studies together during randomization",
+        x = msgs,
+        fixed = TRUE
+      ) |>
+        any()
+    )
+
+    expect_true(
+      object = grepl(
+        pattern = "study1 successful",
+        x = msgs,
+        fixed = TRUE
+      ) |>
+        any()
+    )
+
+    expect_true(
+      object = grepl(
+        pattern = "study2 successful",
+        x = msgs,
+        fixed = TRUE
+      ) |>
+        any()
+    )
+
+    expect_true(
+      object = grepl(
+        pattern = "Random assignment of SUBJECTS to plates",
+        x = msgs,
+        fixed = TRUE
+      ) |>
+        any()
+    )
+
+    expect_true(
+      object = grepl(
+        pattern = "Included total of 4 empty well(s) in first and/or",
+        x = msgs,
+        fixed = TRUE
+      ) |>
+        any()
+    )
+
+    expect_true(
+      object = grepl(
+        pattern = "Please try another seed or increase the number of iteration",
+        x = msgs,
+        fixed = TRUE
+      ) |>
+        any()
+    )
+
+    expect_equal(
+      object = droplevels(randomized_result3),
+      expected = droplevels(reference_results$randomized_subjects_spots)
+    )
+  }
+)
+
+test_that(
+  "olink_plate_randomizer - works - v4",
+  {
+    # Load reference results
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
+    msgs <- capture_messages(
+      {
+        # Run olink_plate_randomizer
+        randomized_result4 <- olink_plate_randomizer(
+          Manifest = manifest |>
+            dplyr::mutate(
+              study = dplyr::if_else(
+                .data[["Site"]] == "Site1",
+                "study1",
+                "study2"
+              )
+            ),
+          available.spots = c(88L, 88L),
+          seed = 12345
+        )
+      }
+    ) |>
+      # Drop empty or whitespace-only lines
+      stringr::str_replace_all(
+        pattern = "\n",
+        replacement = ""
+      ) |>
+      stringr::str_replace_all(
+        pattern = "^\\s*[\\u2500-]+\\s*|\\s*[\\u2500-]+\\s*$",
+        replacement = ""
+      ) |>
+      stringr::str_trim(
+        side = "both"
+      ) |>
+      (\(x) x[x != ""])()
+
+    expect_true(
+      object = grepl(
+        pattern = "`study` column detected in manifest",
+        x = msgs,
+        fixed = TRUE
+      ) |>
+        any()
+    )
+
+    expect_true(
+      object = grepl(
+        pattern = "Studies will be kept together during randomization",
+        x = msgs,
+        fixed = TRUE
+      ) |>
+        any()
+    )
+
+    expect_true(
+      object = grepl(
+        pattern = "Random assignment of SAMPLES to plates by study",
+        x = msgs,
+        fixed = TRUE
+      ) |>
+        any()
+    )
+
+    expect_equal(
+      object = droplevels(randomized_result4),
+      expected = droplevels(reference_results$randomized_samples_spots)
+    )
+  }
+)
+
+test_that(
+  "olink_plate_randomizer - works - v5",
+  {
+    # Load reference results
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
+    msgs <- capture_messages(
+      {
+        # Run olink_plate_randomizer
+        randomized_result5 <- olink_plate_randomizer(
+          Manifest = manifest,
+          SubjectColumn = "SubjectID",
+          num_ctrl = 10L,
+          rand_ctrl = TRUE,
+          seed = 12345
+        )
+      }
+    ) |>
+      # Drop empty or whitespace-only lines
+      stringr::str_replace_all(
+        pattern = "\n",
+        replacement = ""
+      ) |>
+      stringr::str_replace_all(
+        pattern = "^\\s*[\\u2500-]+\\s*|\\s*[\\u2500-]+\\s*$",
+        replacement = ""
+      ) |>
+      stringr::str_trim(
+        side = "both"
+      ) |>
+      (\(x) x[x != ""])()
+
+    expect_true(
+      object = grepl(
+        pattern = "Random assignment of SUBJECTS to plates",
+        x = msgs,
+        fixed = TRUE
+      ) |>
+        any()
+    )
+
+    expect_equal(
+      object = randomized_result5 |>
+        dplyr::filter(
+          .data[["SampleID"]] == "CONTROL_SAMPLE"
+        ) |>
+        dplyr::group_by(
+          dplyr::pick("plate")
+        ) |>
+        dplyr::tally() |>
+        dplyr::select(
+          dplyr::all_of("n")
+        ) |>
+        dplyr::distinct() |>
+        dplyr::pull(),
+      expected = 10L
+    )
+
+    expect_contains(
+      object = randomized_result5$SampleID,
+      expected = "CONTROL_SAMPLE"
+    )
+  }
+)
+
+test_that(
+  "olink_plate_randomizer - error - incorrect product",
+  {
+    expect_error(
+      object = olink_plate_randomizer(
+        Manifest = manifest,
+        SubjectColumn = "SubjectID",
+        Product = "Olink"
+      ),
+      regexp = paste("Product must be one of the following: Target 96, Target",
+                     "48, Explore 384, Explore 3072, Explore HT, Reveal, Flex,",
+                     "Focus")
+    )
+  }
+)
+
+test_that(
+  "olink_plate_randomizer - error - incorrect num_ctrl",
+  {
+    expect_error(
+      object = olink_plate_randomizer(
+        Manifest = manifest,
+        num_ctrl = "A"
+      ),
+      regexp = "`num_ctrl` must be a positive integer"
+    )
+
+    expect_error(
+      object = olink_plate_randomizer(
+        Manifest = manifest,
+        num_ctrl = 10.6
+        ),
+      regexp = "`num_ctrl` must be a positive integer"
+    )
+  }
+)
+
+test_that(
+  "olink_plate_randomizer - error - incorrect column names",
+  {
+    expect_error(
+      object = olink_plate_randomizer(
+        Manifest = manifest |>
+          dplyr::rename(
+            "sample_id" = "SampleID"
+          )
+      ),
+      regexp = paste("SampleID not found! Be sure the column of samples ID's",
+                     "is named'SampleID'")
+    )
+
+    expect_error(
+      object = olink_plate_randomizer(
+        Manifest = manifest,
+        SubjectColumn = "I_Shall_Not_Pass"
+      ),
+      regexp = paste("The user assigned SubjectColumn name was not found! Make",
+                     "sure the SubjectColumn is present in the dataset.")
+    )
+  }
+)
+
+test_that(
+  "olink_plate_randomizer - error - incorrect sample identifiers",
+  {
+    expect_error(
+      object = olink_plate_randomizer(
+        Manifest = manifest |>
+          dplyr::mutate(
+            SampleID = dplyr::if_else(
+              .data[["SampleID"]] == "A 1",
+              NA_character_,
+              .data[["SampleID"]]
+            )
+          )
+        ),
+      regexp = paste("No NA allowed in the SampleID column. Check that all the",
+                     "samples are named."),
+      fixed = TRUE
+    )
+  }
+)
+
+test_that(
+  "olink_plate_randomizer - error - incorrect plate size",
+  {
+    # Load reference results
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
+    expect_error(
+      object = olink_displayPlateLayout(
+        data = reference_results$randomized_samples,
+        num_ctrl = 10L,
+        rand_ctrl = TRUE,
+        fill.color = "Visit",
+        PlateSize = 100L
+      ),
+      regexp = "Plate size needs to be either 48 or 96.",
+      fixed = TRUE
+    )
+  }
+)
+
+test_that(
+  "olink_plate_randomizer - warning - sample identifiers has NA",
+  {
+    expect_message(
+      object = expect_warning(
+        object = olink_plate_randomizer(
+          Manifest = manifest |>
+            dplyr::bind_rows(
+              manifest |>
+                dplyr::slice_head(n = 1L)
+            )
+        ),
+        regexp = "Following SampleID(s) was/were duplicated: A 1",
+        fixed = TRUE
+      ),
+      regexp = "Random assignment of SAMPLES to plates"
+    )
+  }
+)
