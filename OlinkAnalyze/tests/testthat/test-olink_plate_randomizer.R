@@ -514,7 +514,7 @@ test_that(
       object = olink_plate_randomizer(
         Manifest = manifest,
         num_ctrl = 10.6
-        ),
+      ),
       regexp = "`num_ctrl` must be a positive integer"
     )
   }
@@ -558,7 +558,7 @@ test_that(
               .data[["SampleID"]]
             )
           )
-        ),
+      ),
       regexp = paste("No NA allowed in the SampleID column. Check that all the",
                      "samples are named."),
       fixed = TRUE
