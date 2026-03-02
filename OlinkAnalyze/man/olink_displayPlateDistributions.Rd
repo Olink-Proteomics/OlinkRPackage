@@ -30,11 +30,11 @@ fill.color="Site")}
 \itemize{
 \item{
 \code{
-\link[OlinkAnalyze:olink_plate_randomizer]{olink_plate_randomizer()}}
+\link[OlinkAnalyze::olink_plate_randomizer]{olink_plate_randomizer()}}
 for generating a plating scheme}
 \item{
 \code{
-\link[OlinkAnalyze:olink_displayPlateLayout]{olink_displayPlateLayout()}}
+\link[OlinkAnalyze::olink_displayPlateLayout]{olink_displayPlateLayout()}}
 for visualizing the generated plate layouts}
 }
 }

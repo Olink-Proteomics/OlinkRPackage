@@ -7,8 +7,8 @@
 olink_displayPlateLayout(
   data,
   fill.color,
-  PlateSize = 96,
-  num_ctrl = 8,
+  PlateSize = 96L,
+  num_ctrl = 8L,
   rand_ctrl = FALSE,
   Product,
   include.label = FALSE
@@ -41,8 +41,14 @@ Displays each plate in a facet with cells colored by the given variable
 using ggplot and ggplot2::geom_tile.
 }
 \examples{
-\donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
-\donttest{olink_displayPlateLayout(data = randomized.manifest,
-fill.color="Site")}
+\donttest{
+randomized_manifest <- OlinkAnalyze::olink_plate_randomizer(
+  Manifest = manifest
+)
+OlinkAnalyze::olink_display_plate_layout(
+  data = randomized_manifest,
+  fill.color = "Site"
+)
+}
 
 }
