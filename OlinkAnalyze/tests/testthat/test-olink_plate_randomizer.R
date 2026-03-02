@@ -14,10 +14,10 @@ test_that(
   }
 )
 
-# Test olink_displayPlateLayout ----
+# Test olink_display_plate_layout ----
 
 test_that(
-  "olink_displayPlateLayout - works",
+  "olink_display_plate_layout - works",
   {
     skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
 
@@ -28,11 +28,11 @@ test_that(
     # "olink_plate_randomizer - works - v1"
 
     expect_equal(
-      object = olink_displayPlateLayout(
+      object = olink_display_plate_layout(
         data = reference_results$randomized_samples,
         fill.color = "plate"
       ),
-      expected = olink_displayPlateLayout(
+      expected = olink_display_plate_layout(
         data = reference_results$randomized_samples
       )
     )
@@ -40,7 +40,7 @@ test_that(
 )
 
 test_that(
-  "olink_displayPlateLayout - works - vdiffr",
+  "olink_display_plate_layout - works - vdiffr",
   {
     skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
     skip_if_not_installed("vdiffr")
@@ -63,7 +63,7 @@ test_that(
 
     vdiffr::expect_doppelganger(
       title = plate_randomizer_name,
-      fig = olink_displayPlateLayout(
+      fig = olink_display_plate_layout(
         data = randomized_result5,
         num_ctrl = 10L,
         rand_ctrl = TRUE,
@@ -74,10 +74,10 @@ test_that(
 )
 
 test_that(
-  "olink_displayPlateLayout - error - incorrect plate size",
+  "olink_display_plate_layout - error - incorrect plate size",
   {
     expect_error(
-      object = olink_displayPlateLayout(
+      object = olink_display_plate_layout(
         data = manifest,
         PlateSize = 15
       ),
@@ -86,10 +86,10 @@ test_that(
   }
 )
 
-# Test olink_displayPlateDistributions ----
+# Test olink_display_plate_dist ----
 
 test_that(
-  "olink_displayPlateDistributions - works",
+  "olink_display_plate_dist - works",
   {
     skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
 
@@ -100,13 +100,61 @@ test_that(
     # "olink_plate_randomizer - works - v1"
 
     expect_equal(
-      object = olink_displayPlateDistributions(
+      object = olink_display_plate_dist(
         data = reference_results$randomized_samples
       ),
-      expected = olink_displayPlateDistributions(
+      expected = olink_display_plate_dist(
         data = reference_results$randomized_samples,
         fill.color = "plate"
       )
+    )
+  }
+)
+
+# Test assign_subject2plate ----
+
+test_that(
+  "assign_sample2plate - works",
+  {
+    expect_equal(object = {
+      assign_subject2plate(
+                           plate_map = generate_plate_holder(
+                                                             nplates = 2L,
+                                                             nspots = c(12L,
+                                                                        12L),
+                                                             nsamples = 16L,
+                                                             plate_size = 96L,
+                                                             num_ctrl = 8L,
+                                                             rand_ctrl =
+                                                               FALSE) |>
+                             dplyr::mutate(SampleID = NA_character_),
+                           manifest = manifest |>
+                             head(16) |> 
+                             dplyr::mutate(SubjectID = "A"),
+                           subject_id = "A")
+    },
+    expected = "This Sample does not fit!"
+    )
+    expect_equal(object = {
+      assign_subject2plate(
+        plate_map = generate_plate_holder(
+          nplates = 2L,
+          nspots = c(22L,
+                     22L),
+          nsamples = 16L,
+          plate_size = 96L,
+          num_ctrl = 8L,
+          rand_ctrl =
+            FALSE) |>
+          dplyr::mutate(SampleID = NA_character_),
+        manifest = manifest |>
+          head(16),
+        subject_id = "A") |>
+        dplyr::filter(!is.na(SampleID)) |>
+        dplyr::distinct(plate) |>
+        nrow()
+    },
+    expected = 1L
     )
   }
 )
@@ -157,7 +205,7 @@ test_that(
 # Test olink_plate_randomizer ----
 
 test_that(
-  "olink_plate_randomizer - works - v1",
+  "olink_plate_randomizer - works - total randomization",
   {
     # Load reference results
     reference_results <- get_example_data(filename = "reference_results.rds")
@@ -194,7 +242,7 @@ test_that(
 )
 
 test_that(
-  "olink_plate_randomizer - works - v2",
+  "olink_plate_randomizer - works - by subject",
   {
     # Load reference results
     reference_results <- get_example_data(filename = "reference_results.rds")
@@ -240,7 +288,7 @@ test_that(
 )
 
 test_that(
-  "olink_plate_randomizer - works - v3",
+  "olink_plate_randomizer - works - study and subject",
   {
     # Load reference results
     reference_results <- get_example_data(filename = "reference_results.rds")
@@ -348,7 +396,7 @@ test_that(
 )
 
 test_that(
-  "olink_plate_randomizer - works - v4",
+  "olink_plate_randomizer - works - within study",
   {
     # Load reference results
     reference_results <- get_example_data(filename = "reference_results.rds")
@@ -419,7 +467,7 @@ test_that(
 )
 
 test_that(
-  "olink_plate_randomizer - works - v5",
+  "olink_plate_randomizer - works - by subject with rand controls",
   {
     # Load reference results
     reference_results <- get_example_data(filename = "reference_results.rds")
@@ -492,9 +540,8 @@ test_that(
         SubjectColumn = "SubjectID",
         Product = "Olink"
       ),
-      regexp = paste("Product must be one of the following: Target 96, Target",
-                     "48, Explore 384, Explore 3072, Explore HT, Reveal, Flex,",
-                     "Focus")
+      regexp = paste("Product must be one of the following: Target 48, Flex,",
+                     "Target 96, Explore 3072, Explore HT, Focus, Reveal")
     )
   }
 )
@@ -573,7 +620,7 @@ test_that(
     reference_results <- get_example_data(filename = "reference_results.rds")
 
     expect_error(
-      object = olink_displayPlateLayout(
+      object = olink_display_plate_layout(
         data = reference_results$randomized_samples,
         num_ctrl = 10L,
         rand_ctrl = TRUE,
