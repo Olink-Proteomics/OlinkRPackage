@@ -1,21 +1,25 @@
+#' Check product name and set plate size accordingly
+#' 
+#' If plate size is not provided, function will use
+#' accepted_olink_products tibble to map the product name to the plate size
+#'
+#' @param product (String) Name of product (needs to match one of names in
+#' accepted_olink_platforms$name)
+#'
+#' @returns (Integer) Corresponding plate size per
+#' accepted_olink_platforms$plate_size
+#' @keywords internal
+#'
 product_to_platesize <- function(product) {
-  olink_products <- c("Target 96",
-                      "Target 48",
-                      "Explore 384",
-                      "Explore 3072",
-                      "Explore HT",
-                      "Reveal",
-                      "Flex",
-                      "Focus")
-  if (!(product %in% olink_products)) {
+  if (!(product %in% accepted_olink_platforms[["name"]])) {
     cli::cli_abort(paste0("Product must be one of the following: ",
-                          paste(olink_products,
+                          paste(accepted_olink_platforms[["name"]],
                                 sep = " ",
                                 collapse = ", ")))
   }
-  plate_size <- ifelse(product == "Target 48",
-                       48,
-                       96)
+  plate_size <- accepted_olink_platforms |> 
+    dplyr::filter(product == .data[["name"]]) |> 
+    dplyr::pull(.data[["plate_size"]])
   return(plate_size)
 }
 
@@ -34,12 +38,9 @@ product_to_platesize <- function(product) {
 #' @param rand_ctrl Logical. Whether controls are added to be randomized across
 #' the plate (default = FALSE)
 #' @param include.label Should the variable group be shown in the plot.
-
 #' @return An object of class "ggplot" showing each plate in a facet with the
 #' cells colored by values in column fill.color in input \code{data}.
-
 #' @export
-
 #' @examples
 #' \donttest{
 #' randomized_manifest <- OlinkAnalyze::olink_plate_randomizer(
@@ -50,21 +51,23 @@ product_to_platesize <- function(product) {
 #'   fill.color = "Site"
 #' )
 #' }
-#'
-
-olink_displayPlateLayout <- function(data, # nolint object_name_linter
-                                     fill.color, # nolint object_name_linter
-                                     PlateSize = 96L, # nolint object_name_linter
-                                     num_ctrl = 8L,
-                                     rand_ctrl = FALSE,
-                                     Product, # nolint object_name_linter
-                                     include.label = FALSE) { # nolint object_name_linter
+olink_display_plate_layout <- function(data,
+                                       fill.color, # nolint: object_name_linter
+                                       PlateSize = 96L, # nolint: object_name_linter
+                                       num_ctrl = 8L,
+                                       rand_ctrl = FALSE,
+                                       Product, # nolint: object_name_linter
+                                       include.label = FALSE) { # nolint: object_name_linter
   if (!missing(Product)) {
-    PlateSize <- product_to_platesize(product = Product) # nolint object_name_linter
+    PlateSize <- product_to_platesize(product = Product) # nolint: object_name_linter
   }
 
   if (!(PlateSize %in% unique(accepted_olink_platforms$plate_size))) {
-    cli::cli_abort("Plate size needs to be either {ansi_collapse_quot(x = unique(accepted_olink_platforms$plate_size), sep = "or")}.")
+    cli::cli_abort("Plate size needs to be either {
+      cli::ansi_collapse(x = unique(accepted_olink_platforms$plate_size),
+      sep = \",\",
+      last = \" or \")
+      }.")
   }
 
   ncols_per_plate <- PlateSize / 8
@@ -139,6 +142,10 @@ olink_displayPlateLayout <- function(data, # nolint object_name_linter
 
 }
 
+#' @rdname olink_display_plate_layout
+#' @export
+olink_displayPlateLayout <- olink_display_plate_layout  # nolint: object_name_linter
+
 
 #' Plot distributions of a given variable for all plates
 #'
@@ -159,7 +166,7 @@ olink_displayPlateLayout <- function(data, # nolint object_name_linter
 #' for generating a plating scheme}
 #' \item{
 #' \code{
-#' \link[OlinkAnalyze::olink_displayPlateLayout]{olink_displayPlateLayout()}}
+#' \link[OlinkAnalyze::olink_display_plate_layout]{olink_displayPlateLayout()}}
 #' for visualizing the generated plate layouts}
 #' }
 #'
@@ -168,12 +175,12 @@ olink_displayPlateLayout <- function(data, # nolint object_name_linter
 
 #' @examples
 #' \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
-#' \donttest{olink_displayPlateDistributions(data=randomized.manifest,
+#' \donttest{olink_display_plate_dist(data=randomized.manifest,
 #' fill.color="Site")}
+olink_display_plate_dist <- function(data,
+                                     fill.color = "plate") { # nolint: object_name_linter
 
-olink_displayPlateDistributions <- function(data, # nolint object_length_linter
-                                            fill.color = "plate") { # nolint object_name_linter
-
+  check_columns(data, col_list = list(fill.color))
   data <- data |>
     dplyr::mutate(group.var = data[[fill.color]])
 
@@ -200,10 +207,22 @@ olink_displayPlateDistributions <- function(data, # nolint object_length_linter
     ggplot2::theme(legend.position = "bottom")
 
   return(p1)
-
 }
 
+#' @rdname olink_display_plate_dist
+#' @export
+olink_displayPlateDistributions <- olink_display_plate_dist # nolint: object_name_linter
 
+
+#' assign subject to a plate for longitudinal randomization
+#'
+#' @param plate_map character vector of locations available for samples
+#' including plate, row and columns
+#' @param manifest sample manifest mapping sample IDs and subject IDs
+#' @param subject_id id of subject
+#'
+#' @returns plate_map adding sample IDs to plates keeping samples from the
+#' same subject on the same plate
 assign_subject2plate <- function(plate_map,
                                  manifest,
                                  subject_id) {
@@ -239,6 +258,17 @@ assign_subject2plate <- function(plate_map,
 }
 
 
+#' Create empty plate layout
+#'
+#' @param nplates number of plates
+#' @param nspots number of spots on each plate
+#' @param nsamples number of samples
+#' @param plate_size size of plate
+#' @param num_ctrl number of controls
+#' @param rand_ctrl if controls are randomized
+#'
+#' @keywords internal
+#' @returns plate layout including plates, rows, and columns of available wells
 generate_plate_holder <- function(nplates,
                                   nspots,
                                   nsamples,
@@ -387,16 +417,12 @@ generate_plate_holder <- function(nplates,
 #' olink_displayPlateDistributions(randomized.manifest_a, fill.color = 'Site')
 #' olink_displayPlateDistributions(randomized.manifest_b, fill.color = 'Site')
 #' }
-#'
-#'
-
-#Main randomization function
-olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
+olink_plate_randomizer <- function(Manifest, # nolint: object_name_linter
                                    PlateSize = 96, # nolint object_name_linter
-                                   Product, # nolint object_name_linter
-                                   SubjectColumn, # nolint object_name_linter
+                                   Product, # nolint: object_name_linter
+                                   SubjectColumn, # nolint: object_name_linter
                                    iterations = 500,
-                                   available.spots, # nolint object_name_linter
+                                   available.spots, # nolint: object_name_linter
                                    num_ctrl = 8L,
                                    rand_ctrl = FALSE,
                                    seed,
@@ -414,7 +440,7 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
   }
 
   if (!missing(Product)) {
-    PlateSize <- product_to_platesize(product = Product) # nolint object_name_linter
+    PlateSize <- product_to_platesize(product = Product) # nolint: object_name_linter
   }
 
   if (is.null(study) && ("study" %in% names(Manifest))) {
@@ -461,7 +487,7 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
                             "found! Make sure the SubjectColumn is present in ",
                             "the dataset."))
     }
-    Manifest$SubjectID <- Manifest[[SubjectColumn]] # nolint object_name_linter
+    Manifest$SubjectID <- Manifest[[SubjectColumn]] # nolint: object_name_linter
   }
 
   # Check that the subjectID column does not have any NAs
@@ -720,13 +746,13 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
     out_manifest <- NULL
 
     #Randomize on SubjectID_study in case SubjectID is duplicated over studies
-    Manifest <- Manifest |> # nolint object_name_linter
+    Manifest <- Manifest |> # nolint: object_name_linter
       dplyr::mutate(SubjectID_old = .data[["SubjectID"]],
                     SubjectID = paste0(.data[["SubjectID"]],
                                        "_",
                                        study))
 
-    Manifest <- Manifest |> dplyr::arrange(study) # nolint object_name_linter
+    Manifest <- Manifest |> dplyr::arrange(study) # nolint: object_name_linter
     j_tot <- 0
 
     #Keep every study together
@@ -917,7 +943,7 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
                                 .data[["row"]])) |>
       dplyr::filter(!(.data[["ID"]] %in% ctrl_locations$ID))
 
-    Manifest <- Manifest |> dplyr::arrange(study) # nolint object_name_linter
+    Manifest <- Manifest |> dplyr::arrange(study) # nolint: object_name_linter
     for (studyNo in unique(Manifest[[study]])) {
       study_interval <- which(Manifest[[study]] == studyNo)
 

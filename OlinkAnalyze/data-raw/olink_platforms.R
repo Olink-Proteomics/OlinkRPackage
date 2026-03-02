@@ -98,5 +98,14 @@ accepted_olink_platforms <- dplyr::tibble(
     NA,
     TRUE,
     NA
+  ),
+  plate_size = c(
+    48L,
+    96L,
+    96L,
+    96L,
+    96L,
+    96L,
+    96L
   )
 )
