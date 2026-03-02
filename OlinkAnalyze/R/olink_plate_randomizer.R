@@ -1,5 +1,5 @@
 #' Check product name and set plate size accordingly
-#' 
+#'
 #' If plate size is not provided, function will use
 #' accepted_olink_products tibble to map the product name to the plate size
 #'
@@ -17,8 +17,8 @@ product_to_platesize <- function(product) {
                                 sep = " ",
                                 collapse = ", ")))
   }
-  plate_size <- accepted_olink_platforms |> 
-    dplyr::filter(product == .data[["name"]]) |> 
+  plate_size <- accepted_olink_platforms |>
+    dplyr::filter(product == .data[["name"]]) |>
     dplyr::pull(.data[["plate_size"]])
   return(plate_size)
 }
@@ -63,11 +63,15 @@ olink_display_plate_layout <- function(data,
   }
 
   if (!(PlateSize %in% unique(accepted_olink_platforms$plate_size))) {
-    cli::cli_abort("Plate size needs to be either {
-      cli::ansi_collapse(x = unique(accepted_olink_platforms$plate_size),
-      sep = \",\",
-      last = \" or \")
-      }.")
+    cli::cli_abort(
+                   paste0("Plate size needs to be either ",
+                          cli::ansi_collapse(
+                                             unique(
+                                                    accepted_olink_platforms[[
+                                                      "plate_size"
+                                                    ]]),
+                                             last = ", or "),
+                          "."))
   }
 
   ncols_per_plate <- PlateSize / 8

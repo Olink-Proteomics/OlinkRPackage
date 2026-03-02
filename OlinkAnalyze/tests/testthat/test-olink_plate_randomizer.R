@@ -129,7 +129,7 @@ test_that(
                                                                FALSE) |>
                              dplyr::mutate(SampleID = NA_character_),
                            manifest = manifest |>
-                             head(16) |> 
+                             head(16) |>
                              dplyr::mutate(SubjectID = "A"),
                            subject_id = "A")
     },
@@ -137,19 +137,19 @@ test_that(
     )
     expect_equal(object = {
       assign_subject2plate(
-        plate_map = generate_plate_holder(
-          nplates = 2L,
-          nspots = c(22L,
-                     22L),
-          nsamples = 16L,
-          plate_size = 96L,
-          num_ctrl = 8L,
-          rand_ctrl =
-            FALSE) |>
-          dplyr::mutate(SampleID = NA_character_),
-        manifest = manifest |>
-          head(16),
-        subject_id = "A") |>
+                           plate_map = generate_plate_holder(
+                                                             nplates = 2L,
+                                                             nspots = c(22L,
+                                                                        22L),
+                                                             nsamples = 16L,
+                                                             plate_size = 96L,
+                                                             num_ctrl = 8L,
+                                                             rand_ctrl =
+                                                               FALSE) |>
+                             dplyr::mutate(SampleID = NA_character_),
+                           manifest = manifest |>
+                             head(16),
+                           subject_id = "A") |>
         dplyr::filter(!is.na(SampleID)) |>
         dplyr::distinct(plate) |>
         nrow()
