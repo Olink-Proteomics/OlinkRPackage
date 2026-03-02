@@ -37,20 +37,28 @@ product_to_platesize <- function(product) {
 
 #' @return An object of class "ggplot" showing each plate in a facet with the
 #' cells colored by values in column fill.color in input \code{data}.
+
 #' @export
+
 #' @examples
-#' \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
-#' \donttest{olink_displayPlateLayout(data = randomized.manifest,
-#' fill.color="Site")}
+#' \donttest{
+#' randomized_manifest <- OlinkAnalyze::olink_plate_randomizer(
+#'   Manifest = manifest
+#' )
+#' OlinkAnalyze::olink_display_plate_layout(
+#'   data = randomized_manifest,
+#'   fill.color = "Site"
+#' )
+#' }
 #'
 
 olink_displayPlateLayout <- function(data, # nolint object_name_linter
                                      fill.color, # nolint object_name_linter
-                                     PlateSize = 96, # nolint object_name_linter
-                                     num_ctrl = 8,
+                                     PlateSize = 96L, # nolint object_name_linter
+                                     num_ctrl = 8L,
                                      rand_ctrl = FALSE,
                                      Product, # nolint object_name_linter
-                                     include.label=FALSE){ # nolint object_name_linter
+                                     include.label = FALSE) { # nolint object_name_linter
   if (!missing(Product)) {
     PlateSize <- product_to_platesize(product = Product) # nolint object_name_linter
   }
@@ -75,7 +83,7 @@ olink_displayPlateLayout <- function(data, # nolint object_name_linter
                                                    data[["column"]])) |>
     dplyr::select(-dplyr::any_of("unique.id"))
 
-  if (missing(fill.color)) fill.color <- "plate" # nolint object_name_linter
+  if (missing(fill.color)) { fill.color <- "plate" } # nolint: object_name_linter
 
   data$fill.color <- data[[fill.color]]
   data <- data |>
@@ -87,7 +95,7 @@ olink_displayPlateLayout <- function(data, # nolint object_name_linter
                                   "row",
                                   "column",
                                   "fill.color"))) |>
-    rbind(missing_spots) |>
+    dplyr::bind_rows(missing_spots) |>
     dplyr::mutate(row = factor(.data[["row"]], levels = LETTERS[8:1]),
                   column = factor(.data[["column"]],
                                   levels = paste("Column",
@@ -100,7 +108,7 @@ olink_displayPlateLayout <- function(data, # nolint object_name_linter
     fills <- rep(NA, length(fill_levels))
     fills[-hld] <- olink_pal()(length(fill_levels) - 1)
     fills[hld] <- "#ffffff"
-  }else {
+  } else {
     fills <- OlinkAnalyze::olink_pal()(length(fill_levels))
   }
 
@@ -125,7 +133,7 @@ olink_displayPlateLayout <- function(data, # nolint object_name_linter
     return(p +
              ggplot2::geom_text(ggplot2::aes(label = fill.color),
                                 color = "black"))
-  }else {
+  } else {
     return(p)
   }
 
@@ -137,23 +145,27 @@ olink_displayPlateLayout <- function(data, # nolint object_name_linter
 #' Displays a bar chart for each plate representing the distribution of the
 #' given grouping variable on each plate using ggplot2::ggplot
 #' and ggplot2::geom_bar.
+
 #' @param data tibble/data frame in long format returned from the
 #' olink_plate_randomizer function.
 #' @param fill.color Column name to be used as coloring variable for wells.
+
 #' @export
+
 #' @seealso \itemize{
 #' \item{
 #' \code{
-#' \link[OlinkAnalyze:olink_plate_randomizer]{olink_plate_randomizer()}}
+#' \link[OlinkAnalyze::olink_plate_randomizer]{olink_plate_randomizer()}}
 #' for generating a plating scheme}
 #' \item{
 #' \code{
-#' \link[OlinkAnalyze:olink_displayPlateLayout]{olink_displayPlateLayout()}}
+#' \link[OlinkAnalyze::olink_displayPlateLayout]{olink_displayPlateLayout()}}
 #' for visualizing the generated plate layouts}
 #' }
 #'
 #' @return An object of class "ggplot" showing the percent distribution of
 #' fill.color in each plate (x-axis)
+
 #' @examples
 #' \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
 #' \donttest{olink_displayPlateDistributions(data=randomized.manifest,
@@ -300,6 +312,7 @@ generate_plate_holder <- function(nplates,
 #' samples per subject (e.g. in longitudinal studies), Olink recommends keeping
 #' each subject on the same plate. This can be achieved using the SubjectColumn
 #' argument.
+
 #' @param Manifest tibble/data frame in long format containing all sample ID's.
 #' Sample ID column must be named SampleID.
 #' @param PlateSize Integer. Either 96 or 48. 96 is default.
@@ -322,6 +335,7 @@ generate_plate_holder <- function(nplates,
 #' information. For when multiple studies are being plated and randomizing
 #' within studies. If `study` column is present in manifest, within study
 #' randomization will be performed.
+
 #' @return A "tibble" including SampleID, SubjectID etc. assigned to
 #' well positions.
 #' Columns include same columns as Manifest with additional columns:
@@ -331,7 +345,9 @@ generate_plate_holder <- function(nplates,
 #'    \item{row:} Row on the plate
 #'    \item{well:} Well location on the plate
 #' }
+
 #' @export
+
 #' @seealso \itemize{
 #' \item{
 #' \code{
@@ -714,13 +730,13 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
     j_tot <- 0
 
     #Keep every study together
-    for (studyNo in unique(Manifest[[study]])){
+    for (studyNo in unique(Manifest[[study]])) {
       passed <- FALSE
       rand_subjects <- sample({
         Manifest |>
           dplyr::filter(.data[[study]] == studyNo) |>
           dplyr::select(dplyr::any_of("SubjectID")) |>
-          unique() |>
+          dplyr::distinct() |>
           dplyr::pull()
       })
       study_interval <- which(Manifest[[study]] == studyNo)
@@ -757,7 +773,7 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
                                                     num_ctrl = num_ctrl,
                                                     rand_ctrl = rand_ctrl,
                                                     plate_size = PlateSize)
-          }else {
+          } else {
             nsamples <- length(Manifest$SampleID) + j_tot + j
             all.plates.New <- generate_plate_holder(length(available.spots),
                                                     available.spots,
@@ -768,7 +784,7 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
           }
           all.plates.New$SampleID <- rep(NA, nrow(all.plates.New))
           all.plates <- all.plates.New
-        }else {
+        } else {
           study_total_j <- study_interval + j_tot
           extended_study_interval <- unique(c(study_total_j,
                                               (max(study_total_j):
@@ -902,7 +918,7 @@ olink_plate_randomizer <- function(Manifest, # nolint object_name_linter
       dplyr::filter(!(.data[["ID"]] %in% ctrl_locations$ID))
 
     Manifest <- Manifest |> dplyr::arrange(study) # nolint object_name_linter
-    for (studyNo in unique(Manifest[[study]])){
+    for (studyNo in unique(Manifest[[study]])) {
       study_interval <- which(Manifest[[study]] == studyNo)
 
       manifest_study <- Manifest[study_interval, ]
