@@ -70,6 +70,7 @@ olink_display_plate_layout <- function(data,
                                                     accepted_olink_platforms[[
                                                       "plate_size"
                                                     ]]),
+                                             sep2 = " or ",
                                              last = ", or "),
                           "."))
   }
