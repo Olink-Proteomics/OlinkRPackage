@@ -63,8 +63,8 @@ olink_displayPlateLayout <- function(data, # nolint object_name_linter
     PlateSize <- product_to_platesize(product = Product) # nolint object_name_linter
   }
 
-  if (!PlateSize %in% c(48, 96)) {
-    cli::cli_abort("Plate size needs to be either 48 or 96.")
+  if (!(PlateSize %in% unique(accepted_olink_platforms$plate_size))) {
+    cli::cli_abort("Plate size needs to be either {ansi_collapse_quot(x = unique(accepted_olink_platforms$plate_size), sep = "or")}.")
   }
 
   ncols_per_plate <- PlateSize / 8
