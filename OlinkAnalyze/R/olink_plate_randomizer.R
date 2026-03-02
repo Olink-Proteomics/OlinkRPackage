@@ -34,6 +34,7 @@ product_to_platesize <- function(product) {
 #' @param rand_ctrl Logical. Whether controls are added to be randomized across
 #' the plate (default = FALSE)
 #' @param include.label Should the variable group be shown in the plot.
+
 #' @return An object of class "ggplot" showing each plate in a facet with the
 #' cells colored by values in column fill.color in input \code{data}.
 #' @export
