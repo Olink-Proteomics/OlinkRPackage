@@ -156,20 +156,7 @@ olink_displayPlateLayout <- olink_display_plate_layout  # nolint: object_name_li
 #' @param data tibble/data frame in long format returned from the
 #' olink_plate_randomizer function.
 #' @param fill.color Column name to be used as coloring variable for wells.
-
 #' @export
-
-#' @seealso \itemize{
-#' \item{
-#' \code{
-#' \link[OlinkAnalyze::olink_plate_randomizer]{olink_plate_randomizer()}}
-#' for generating a plating scheme}
-#' \item{
-#' \code{
-#' \link[OlinkAnalyze::olink_display_plate_layout]{olink_displayPlateLayout()}}
-#' for visualizing the generated plate layouts}
-#' }
-#'
 #' @return An object of class "ggplot" showing the percent distribution of
 #' fill.color in each plate (x-axis)
 

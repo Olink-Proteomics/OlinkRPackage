@@ -29,15 +29,3 @@ and ggplot2::geom_bar.
 \donttest{olink_display_plate_dist(data=randomized.manifest,
 fill.color="Site")}
 }
-\seealso{
-\itemize{
-\item{
-\code{
-\link[OlinkAnalyze::olink_plate_randomizer]{olink_plate_randomizer()}}
-for generating a plating scheme}
-\item{
-\code{
-\link[OlinkAnalyze::olink_display_plate_layout]{olink_displayPlateLayout()}}
-for visualizing the generated plate layouts}
-}
-}
