@@ -23,6 +23,7 @@ product_to_platesize <- function(product) {
 #'
 #' Displays each plate in a facet with cells colored by the given variable
 #' using ggplot and ggplot2::geom_tile.
+
 #' @param data tibble/data frame in long format returned from the
 #' olink_plate_randomizer function.
 #' @param fill.color Column name to be used as coloring variable for wells.
