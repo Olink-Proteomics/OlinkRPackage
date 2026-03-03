@@ -768,6 +768,36 @@ olink_norm_input_check_df_cols <- function(lst_df, lst_cols) {
 
   }
 
+  # olink_id and sample_id should be also identical ----
+
+  olink_id_cols <- sapply(lst_cols, function(x) x[["olink_id"]]) # nolint: return_linter
+
+  if (length(unique(olink_id_cols)) != 1L) {
+    cli::cli_abort(
+      c("x" = "Datasets do not have the same OlinkID column.",
+        paste0("*", names(olink_id_cols), " has OlinkID column: ",
+               paste0("\"", olink_id_cols, "\"")),
+        "i" = "Columns should be identical between datasets to be normalized."
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+  }
+
+  sample_id_cols <- sapply(lst_cols, function(x) x[["sample_id"]]) # nolint: return_linter
+
+  if (length(unique(sample_id_cols)) != 1L) {
+    cli::cli_abort(
+      c("x" = "Datasets do not have the same SampleID column.",
+        paste0("*", names(sample_id_cols), " has sample ID column: ",
+               paste0("\"", sample_id_cols, "\"")),
+        "i" = "Columns should be identical between datasets to be normalized."
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+  }
+
   # check that column classes of datasets match ----
 
   # we need to check if classes of columns of the datasets to be normalized

@@ -2723,6 +2723,74 @@ test_that(
 )
 
 test_that(
+  "olink_norm_input_check_df_cols - error - different olink_id cols",
+  {
+    skip_if_not_installed("arrow")
+
+    # 2 df with different olink_id method ----
+
+    lst_df_quant_v1 <- list(
+      "p1" = npx_data1 |>
+        dplyr::rename(
+          "olink_id" = "OlinkID"
+        ),
+      "p2" = npx_data2
+    ) |>
+      lapply(dplyr::mutate, Normalization = "Intensity")
+
+    lst_df_quant_v1_check <- lst_df_quant_v1 |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
+
+    expect_error(
+      object = olink_norm_input_check_df_cols(
+        lst_df = lst_df_quant_v1,
+        lst_cols = lst_df_quant_v1_check
+      ),
+      regexp = "Datasets do not have the same OlinkID column"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_check_df_cols - error - different sample_id cols",
+  {
+    skip_if_not_installed("arrow")
+
+    # 2 df with different sample_id method ----
+
+    lst_df_quant_v1 <- list(
+      "p1" = npx_data1 |>
+        dplyr::rename(
+          "sample_id" = "SampleID"
+        ),
+      "p2" = npx_data2
+    ) |>
+      lapply(dplyr::mutate, Normalization = "Intensity")
+
+    lst_df_quant_v1_check <- lst_df_quant_v1 |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
+
+    expect_error(
+      object = olink_norm_input_check_df_cols(
+        lst_df = lst_df_quant_v1,
+        lst_cols = lst_df_quant_v1_check
+      ),
+      regexp = "Datasets do not have the same SampleID column"
+    )
+  }
+)
+
+test_that(
   "olink_norm_input_check_df_cols - message - missing non-required cols",
   {
     skip_if_not_installed("arrow")
