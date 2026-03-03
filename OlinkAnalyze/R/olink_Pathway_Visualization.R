@@ -72,8 +72,9 @@ olink_pathway_visualization <- function(enrich_results,
                                                      .data[["Description"]],
                                                    width = 50,
                                                    side = "center")) |>
-    dplyr::mutate(Description = forcats::fct_inorder(f =
-                                                       .data[["Description"]]))
+    dplyr::mutate(Description = factor(.data[["Description"]],
+                                       levels = unique(.data[["Description"]]))
+    )
 
   if (method == "ORA") {
     p <- ggplot2::ggplot(data = enrich_results,

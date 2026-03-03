@@ -84,9 +84,11 @@ Imports:
 Suggests: 
     broom,
     car,
+    clusterProfiler,
     emmeans,
     lme4,
     lmerTest,
+    msigdbr (> 24.1.0),
     ordinal,
     readxl,
     scales,

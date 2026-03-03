@@ -10,6 +10,30 @@ npx_df <- npx_data1 |>
 
 check_log <- check_npx(npx_df)
 
+npx_data_format22 <- get_example_data("npx_data_format-Oct-2022.rds")
+
+# example data
+
+check_log_221010 <- check_npx(npx_data_format22) |>
+  suppressWarnings() |>
+  suppressMessages()
+
+ttest_na <- olink_ttest(
+  df = npx_data_format22,
+  check_log = check_log_221010,
+  variable = "treatment1"
+) |>
+  suppressMessages() |>
+  suppressWarnings()
+
+npx_data_format22 <- npx_data_format22 |>
+  dplyr::mutate(OlinkID = ifelse(OlinkID == "OID30646",
+                                 "OID12345",
+                                 OlinkID))
+check_log_221010 <- check_npx(npx_data_format22) |>
+  suppressWarnings() |>
+  suppressMessages()
+
 # statistical tests
 ttest_results <- olink_ttest(
   df = npx_df,
@@ -75,29 +99,6 @@ test_that("T-test GSEA works", {
     expected = 571L
   )
 
-  # example data
-  npx_data_format22 <- get_example_data("npx_data_format-Oct-2022.rds")
-
-  check_log_221010 <- check_npx(npx_data_format22) |>
-    suppressWarnings() |>
-    suppressMessages()
-
-  ttest_na <- olink_ttest(
-    df = npx_data_format22,
-    check_log = check_log_221010,
-    variable = "treatment1"
-  ) |>
-    suppressMessages() |>
-    suppressWarnings()
-
-  npx_data_format22 <- npx_data_format22 |>
-    dplyr::mutate(OlinkID = ifelse(OlinkID == "OID30646",
-                                   "OID12345",
-                                   OlinkID))
-  check_log_221010 <- check_npx(npx_data_format22) |>
-    suppressWarnings() |>
-    suppressMessages()
-
   expect_message(
     object = expect_warning(
       object = olink_pathway_enrichment(
@@ -105,10 +106,11 @@ test_that("T-test GSEA works", {
         test_results = ttest_na,
         check_log = check_log_221010
       ),
-      regexp = "The Olink IDs in the data do not all match"
+      regexp = "The Olink IDs in the data do not all match the Olink IDs"
     ),
     regexp = "Filtering data for overlapping OlinkIDs in data"
   )
+
 })
 
 test_that("Reactome GSEA works", {
@@ -163,16 +165,14 @@ test_that("KEGG GSEA works", {
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
-  expect_no_warning(
-    object = expect_no_error(
-      object = tt_gsea_kegg <- olink_pathway_enrichment(
-        data = npx_df,
-        check_log = check_log,
-        test_results = ttest_results,
-        ontology = "KEGG"
-      ) |>
-        suppressMessages()
-    )
+  expect_no_error(
+    object = tt_gsea_kegg <- olink_pathway_enrichment(data = npx_df,
+      check_log = check_log,
+      test_results = ttest_results,
+      ontology = "KEGG"
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
   )
 
   expect_equal(
@@ -298,10 +298,15 @@ test_that("GO ORA works", {
   )
 })
 
-test_that("Error if more than 1 contrast", {
+test_that("Errors occur", {
   skip_on_cran()
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+  expect_error(
+    object = olink_pathway_enrichment(),
+    regexp = "The data and test_results arguments need to be specified."
+  )
 
   expect_error(
     object = olink_pathway_enrichment(
@@ -311,52 +316,52 @@ test_that("Error if more than 1 contrast", {
     ),
     regexp = "More than one contrast is specified in test results"
   )
-})
-
-test_that("Nonsense method errors", {
-  skip_on_cran()
-  skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
   expect_error(
     object = olink_pathway_enrichment(
       data = npx_df,
       check_log = check_log,
-      test_results = anova_posthoc_results,
+      test_results = ttest_results,
       method = "IRA"
-    )
+    ),
+    regex = "Method must be \"GSEA\" or \"ORA\"."
   )
-})
-
-test_that("Unsupported databases flag", {
-  skip_on_cran()
-  skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
   expect_error(
     object = olink_pathway_enrichment(
       data = npx_df,
       check_log = check_log,
-      test_results = anova_posthoc_results,
+      test_results = ttest_results,
       ontology = "WikiPathways"
-    )
+    ),
+    regex = "Ontology must be one of MSigDb, MSigDb_com"
   )
-})
-
-test_that("Estimate column must be present", {
-  skip_on_cran()
-  skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
   expect_error(
-    object = olink_pathway_enrichment(
-      data = npx_df,
+    object =  olink_pathway_enrichment(data = npx_df,
+                                       check_log = check_log,
+                                       test_results = ttest_results,
+                                       organism = "rat"),
+    regexp = "organism should be"
+  )
+
+  expect_error(
+    object = olink_pathway_enrichment(data = npx_df,
       check_log = check_log,
-      test_results = ttest_results |>
-        dplyr::select(
-          -dplyr::all_of("estimate")
-        )
-    )
+      test_results = {
+        ttest_results |>
+          dplyr::select(-dplyr::all_of("estimate"))
+      }
+    ),
+    regex =  paste("test_results must include the following columns:")
+  )
+
+  expect_message(
+    object = expect_message(object = data_prep(data = npx_data_format22,
+                                               test_results = ttest_na,
+                                               check_log = check_log_221010),
+                            regex = "Removing invalid OlinkIDs"),
+    regex = "Filtering data for overlapping OlinkIDs in data"
   )
 })
 
@@ -400,4 +405,37 @@ test_that("gsea warns assays not found in database", {
       x = paste(messages, collapse = "")
     )
   )
+})
+
+test_that("mouse works", {
+  skip_on_cran()
+  skip_if_not_installed("clusterProfiler")
+  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+  expect_equal(
+    object = select_ont("Reactome", "mouse"),
+    expected = {
+      msigdbr::msigdbr(species = "Mus musculus", collection = "C2") |>
+        dplyr::bind_rows(msigdbr::msigdbr(species = "Mus musculus",
+                                          collection = "C5")) |>
+        dplyr::filter(.data[["gs_subcollection"]] == "CP:REACTOME")  |>
+        dplyr::select(dplyr::any_of(c("gs_name", "gene_symbol")))
+    }
+  )
+})
+
+test_that("test_prep works", {
+  skip_on_cran()
+  skip_if_not_installed("clusterProfiler")
+  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+  expect_equal(object = test_prep(df = npx_data_format22,
+                                  test_results = ttest_na) |>
+                 dplyr::select(any_of("OlinkID")) |>
+                 dplyr::distinct() |>
+                 dplyr::pull() |>
+                 sort(),
+               expected = intersect(npx_data_format22$OlinkID,
+                                    ttest_na$OlinkID) |>
+                 sort())
 })

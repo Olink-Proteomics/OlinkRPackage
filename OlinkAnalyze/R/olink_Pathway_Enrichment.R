@@ -313,10 +313,12 @@ select_ont <- function(ontology,
                        organism) {
   if (organism == "human") {
     msig_df <- msigdbr::msigdbr(species = "Homo sapiens", collection = "C2") |>
-      rbind(msigdbr::msigdbr(species = "Homo sapiens", collection = "C5"))
+      dplyr::bind_rows(msigdbr::msigdbr(species = "Homo sapiens",
+                                        collection = "C5"))
   } else if (organism == "mouse") {
     msig_df <- msigdbr::msigdbr(species = "Mus musculus", collection = "C2") |>
-      rbind(msigdbr::msigdbr(species = "Mus musculus", collection = "C5"))
+      dplyr::bind_rows(msigdbr::msigdbr(species = "Mus musculus",
+                                        collection = "C5"))
   }
 
   if (ontology == "Reactome") {
