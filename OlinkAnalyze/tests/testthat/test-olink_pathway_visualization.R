@@ -6,10 +6,10 @@ skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
 set.seed(123)
 
-npx_df <- npx_data1 %>%
-  dplyr::filter(!stringr::str_detect(.data[["SampleID"]], "CONTROL")) %>%
-  dplyr::filter(Site %in% c("Site_C", "Site_E")) %>%
-  dplyr::filter(Time %in% c("Baseline", "Week.12")) %>%
+npx_df <- npx_data1 |>
+  dplyr::filter(!stringr::str_detect(.data[["SampleID"]], "CONTROL")) |>
+  dplyr::filter(Site %in% c("Site_C", "Site_E")) |>
+  dplyr::filter(Time %in% c("Baseline", "Week.12")) |>
   dplyr::filter(PlateID == "Example_Data_1_CAM.csv")
 
 check_log <- check_npx(npx_df)
@@ -56,22 +56,22 @@ test_that("Plot works", {
   set.seed(123)
 
   gsea_vis_name <- "GSEA Visualization"
-  check_snap_exist(test_dir_name = "olink_Pathway_Visualization",
+  check_snap_exist(test_dir_name = "olink_pathway_visualization",
                    snap_name = gsea_vis_name)
   vdiffr::expect_doppelganger(gsea_vis_name, gsea_vis)
 
   gsea_vis_keyword_name <- "GSEA Vis with Keyword"
-  check_snap_exist(test_dir_name = "olink_Pathway_Visualization",
+  check_snap_exist(test_dir_name = "olink_pathway_visualization",
                    snap_name = gsea_vis_keyword_name)
   vdiffr::expect_doppelganger(gsea_vis_keyword_name, gsea_vis_keyword)
 
   ora_vis_terms_name <- "ORA Vis with Terms"
-  check_snap_exist(test_dir_name = "olink_Pathway_Visualization",
+  check_snap_exist(test_dir_name = "olink_pathway_visualization",
                    snap_name = ora_vis_terms_name)
   vdiffr::expect_doppelganger(ora_vis_terms_name, ora_vis_terms)
 
   ora_vis_keyword_name <- "ORA Vis with keyword"
-  check_snap_exist(test_dir_name = "olink_Pathway_Visualization",
+  check_snap_exist(test_dir_name = "olink_pathway_visualization",
                    snap_name = ora_vis_keyword_name)
   vdiffr::expect_doppelganger(ora_vis_keyword_name, ora_vis_keyword)
 })

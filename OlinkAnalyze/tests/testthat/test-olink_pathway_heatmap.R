@@ -45,12 +45,12 @@ test_that("Plot works", {
   set.seed(123)
 
   gsea_heatmap_name <- "GSEA Heatmap"
-  check_snap_exist(test_dir_name = "olink_Pathway_Heatmap",
+  check_snap_exist(test_dir_name = "olink_pathway_heatmap",
                    snap_name = gsea_heatmap_name)
   vdiffr::expect_doppelganger(gsea_heatmap_name, gsea_heatmap)
 
   ora_heatmap_name <- "ORA Heatmap with Keyword"
-  check_snap_exist(test_dir_name = "olink_Pathway_Heatmap",
+  check_snap_exist(test_dir_name = "olink_pathway_heatmap",
                    snap_name = ora_heatmap_name)
   vdiffr::expect_doppelganger(ora_heatmap_name, ora_heatmap)
 })
