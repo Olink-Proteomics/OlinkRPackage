@@ -1007,6 +1007,20 @@ olink_norm_input_cross_product <- function(lst_df,
         call = rlang::caller_env(),
         wrap = FALSE
       )
+    } else if (length(unique(check_cnt)) != 1L) {
+      # if both datasets contain count column, check that they have same name
+      cli::cli_abort(
+        c(
+          "x" = "{cli::qty(names(check_cnt))} Dataset{?s}
+            {.val {names(check_cnt)}} {?contains/contain} a column matching
+            {ansi_collapse_quot(get_alt_colnames(\"count\"), \"or\")} but with
+            different names!",
+          "i" = "When performing cross-product normalization, count column
+            should be named the same across datasets!"
+        ),
+        call = rlang::caller_env(),
+        wrap = FALSE
+      )
     }
 
   }

@@ -3554,6 +3554,65 @@ test_that(
   }
 )
 
+test_that(
+  "olink_norm_input_cross_product - error - not same count col",
+  {
+    skip_if_not_installed("arrow")
+
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
+
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
+
+    expect_error(
+      object = olink_norm_input_cross_product(
+        lst_df = list(
+          "p1" = data_3k |>
+            dplyr::rename("count" = "Count"),
+          "p2" = data_ht
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel",
+                      olink_id = "OlinkID",
+                      count = "count"),
+          "p2" = list(panel = "Panel",
+                      olink_id = "OlinkID",
+                      count = "Count")
+        ),
+        reference_project = "p2",
+        product_ids = c("p1" = "E3072", "p2" = "HT"),
+        ref_ids = c("p1" = "not_ref", "p2" = "ref")
+      ),
+      regexp = paste("Datasets \"p1\" and \"p2\" contain a column matching",
+                     "\"Count\" or \"count\" but with different names!")
+    )
+
+    expect_error(
+      object = olink_norm_input_cross_product(
+        lst_df = list(
+          "p1" = data_3k,
+          "p2" = data_ht |>
+            dplyr::rename("count" = "Count")
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel",
+                      olink_id = "OlinkID",
+                      count = "Count"),
+          "p2" = list(panel = "Panel",
+                      olink_id = "OlinkID",
+                      count = "count")
+        ),
+        reference_project = "p2",
+        product_ids = c("p1" = "E3072", "p2" = "HT"),
+        ref_ids = c("p1" = "not_ref", "p2" = "ref")
+      ),
+      regexp = paste("Datasets \"p1\" and \"p2\" contain a column matching",
+                     "\"Count\" or \"count\" but with different names!")
+    )
+  }
+)
+
 # Test olink_norm_input_check_samples ----
 
 test_that(
