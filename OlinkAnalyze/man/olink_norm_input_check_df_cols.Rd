@@ -12,8 +12,7 @@ olink_norm_input_check_df_cols(lst_df, lst_cols)
 \item{lst_cols}{Named list of check logs returned by \code{\link{check_npx}}.}
 }
 \value{
-Named list of vectors with the required column names for each dataset
-in \var{lst_df} if no error.
+\code{NULL} unless there is an error.
 }
 \description{
 This function takes as input a named list of datasets and checks if their
