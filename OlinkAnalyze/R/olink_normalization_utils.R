@@ -954,11 +954,11 @@ olink_norm_input_cross_product <- function(lst_df,
   if (length(prod_uniq) == 1L && all(prod_uniq %in% accepted_prods)) {
     norm_mode <- olink_norm_modes$bridge
   } else if (olink_norm_product_n_samples |>
-             dplyr::filter((.data[["product_1"]] == prod_uniq[1L]
-                            & .data[["product_2"]] == prod_uniq[2L])
-                           | (.data[["product_1"]] == prod_uniq[2L]
-                              & .data[["product_2"]] == prod_uniq[1L])) |>
-             nrow() > 1L) {
+               dplyr::filter((.data[["product_1"]] == prod_uniq[1L]
+                              & .data[["product_2"]] == prod_uniq[2L])
+                             | (.data[["product_1"]] == prod_uniq[2L]
+                                & .data[["product_2"]] == prod_uniq[1L])) |>
+               nrow() > 1L) {
     # E3072 to HT or Reveal where HT or Reveal is reference
     # HT and Reveal bidirectionally
     norm_mode <- olink_norm_modes$norm_cross_product
@@ -978,8 +978,8 @@ olink_norm_input_cross_product <- function(lst_df,
   # check if reference dataset is HT/Reveal if cross-product normalization ----
 
   if (norm_mode == olink_norm_modes$norm_cross_product
-      && (!(product_ids[ref_ids == "ref"] %in%
-            unique(unlist(olink_norm_product_n_samples$ref)))))  {
+      && (!(product_ids[ref_ids == "ref"]
+            %in% unique(unlist(olink_norm_product_n_samples$ref)))))  {
 
     cli::cli_abort(
       c(
