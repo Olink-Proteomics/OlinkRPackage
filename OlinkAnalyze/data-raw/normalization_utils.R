@@ -14,9 +14,15 @@ olink_norm_ref_median_cols <- dplyr::tibble(
   name = c("olink_id", "ref_med")
 )
 
-# columns tha should be re-calculated post-normalization
+# columns that should be re-calculated post-normalization
 olink_norm_recalc <- list(
   max_lod = c("Max LOD", "Max_LOD", "MaxLOD")
+)
+
+olink_norm_product_n_samples <- dplyr::tibble(
+  product_1 = c("E3072", "HT", "E3072", "Reveal", "HT", "Reveal"),
+  product_2 = c("HT", "E3072", "Reveal", "E3072", "Reveal", "HT"),
+  num_samples = c(40L, 40L, 32L, 32L, 24L, 24L)
 )
 
 # dataset with all possible combinations of inputs that olink_normalization may

@@ -459,13 +459,16 @@ olink_normalization_qs <- function(lst_df,
                                    bridge_samples,
                                    prod_uniq) {
 
-  if (identical(prod_uniq, c("E3072", "HT"))) {
-    num_samples <- 40L
-  } else if (identical(prod_uniq, c("E3072", "Reveal"))) {
-    num_samples <- 32L
-  } else if (all(prod_uniq %in% c("HT", "Reveal"))) {
-    num_samples <- 24L
-  } else {
+  num_samples <- olink_norm_product_n_samples |>
+    dplyr::filter(
+      .data[["product_1"]] == prod_uniq[1L]
+      & .data[["product_2"]] == prod_uniq[2L]
+    ) |>
+    dplyr::pull(
+      .data[["num_samples"]]
+    )
+
+  if (length(num_samples) == 0L) {
     cli::cli_abort(
       c("i" = "Cross product bridging is only supported in the
       following cases:",
@@ -730,7 +733,9 @@ olink_normalization_qs <- function(lst_df,
     ) |>
     dplyr::select(
       dplyr::all_of(
-        c(ref_cols$sample_id, ref_cols$olink_id, "QSNormalizedNPX" = "NPX")
+        c(ref_cols$sample_id,
+          ref_cols$olink_id,
+          "QSNormalizedNPX" = ref_cols$quant)
       )
     ) |>
     dplyr::mutate(
