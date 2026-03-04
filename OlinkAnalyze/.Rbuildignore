@@ -15,6 +15,7 @@
 ^tests/testthat/data/.*[.]R
 ^tests/testthat/data/.*[.]RData
 ^tests/testthat/.*/.*[.]svg
+^tests/testthat/_snaps$
 ^inst/WORDLIST
 ^inst/extdata/.*[.]zip
 ^inst/extdata/.*_csv[.]csv
