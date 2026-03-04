@@ -251,85 +251,116 @@ test_that(
 skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
 skip_on_cran()
 
-# Skip in newer versions of R
-skip_if(
-  R.version$major > 4 ||
-    (R.version$major == 4 && as.numeric(R.version$minor) > 2.3)
+set.seed(10)
+
+# Load reference results & data ----
+ref_results <- get_example_data(filename = "reference_results.rds")
+npx_data_format <- get_example_data(filename = "npx_data_format-Oct-2022.rds")
+
+# PCA plot with treatment ----
+data_treatCol <- OlinkAnalyze::npx_data1 |> # nolint object_name_linter
+  dplyr::mutate(
+    SampleID = paste(SampleID, "_", Index, sep = "")
+  ) |>
+  dplyr::filter(!is.na(Treatment))
+check_log <- check_npx(data_treatCol)
+
+pca_plot_treatCol <- olink_pca_plot(  # nolint object_name_linter
+  df = data_treatCol,
+  check_log = check_log,
+  color_g = "Treatment",
+  quiet = TRUE
 )
 
-set.seed(10)
-#Load reference results
-refRes_file <- testthat::test_path('data','refResults.RData') # nolint object_name_linter
-load(refRes_file)
+pca_plot_treatCol_topLoadings <- olink_pca_plot(  # nolint object_name_linter
+  df = data_treatCol,
+  check_log = check_log,
+  color_g = "Treatment",
+  quiet = TRUE,
+  loadings_list = {
+    ref_results$t_test |>
+      head(5) |>
+      dplyr::pull(OlinkID)
+  }
+)
 
-#Load data with hidden/excluded assays (all NPX=NA)
-load(file = testthat::test_path("data", "npx_data_format221010.RData"))
-load(file = testthat::test_path("data", "npx_data_format221121.RData"))
-
-# Prepare test data from npx_data1
-# - rename SampleID to avoide duplicate
-# - run check_npx to generate check_log
-test_data <- npx_data1 |>
+# PCA plot in default ----
+data1 <- OlinkAnalyze::npx_data1 |>
   dplyr::mutate(
-    SampleID = paste(SampleID, "_", Index, sep = "") # nolint object_name_linter
-    )
-check_log <- check_npx(test_data)
-
-# pca_plot <- npx_data1 |>
-#   dplyr::mutate(SampleID = paste(SampleID, "_", Index, sep = "")) |> # nolint object_name_linter
-#   olink_pca_plot(
-#     check_log = check_npx(npx_data1),
-#     quiet = TRUE
-#   )
-pca_plot <- test_data |>
-  olink_pca_plot(
-    check_log = check_log,
-    quiet = TRUE
+    SampleID = paste(SampleID, "_", Index, sep = "")
   )
+check_log <- check_npx(data1)
 
-pca_plot_treatCol <- npx_data1 %>%
-  mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
-  filter(!is.na(Treatment)) %>% #Or else, a warning shows up in the test results
-  olink_pca_plot(color_g = 'Treatment', quiet = TRUE)
+pca_plot <- olink_pca_plot(
+  df = data1,
+  check_log = check_log,
+  quiet = TRUE
+)
 
-pca_plot_treatCol_topLoadings <- npx_data1 %>%
-  mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
-  filter(!is.na(Treatment)) %>% #Or else, a warning shows up in the test results
-  olink_pca_plot(color_g = 'Treatment',
-                 loadings_list = {ref_results$t.test_results %>%
-                     head(5) %>%
-                     pull(OlinkID)},
-                 quiet = TRUE)
+# PCA plot by panel ----
+pca_plot_byPanel <- olink_pca_plot( # nolint object_name_linter
+  df = data1,
+  check_log = check_log,
+  byPanel = TRUE,
+  quiet = TRUE
+)
 
-#PCA by panel
-pca_plot_byPanel <- npx_data1 %>%
-  mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
-  olink_pca_plot(byPanel = TRUE, quiet = TRUE)
-
-#Label outliers
-pca_plot_byPanel_outliers <- npx_data1 %>%
-  mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
-  olink_pca_plot(byPanel = TRUE, outlierDefX = 4, outlierDefY = 2.5, quiet = TRUE)
-outliers <- lapply(pca_plot_byPanel_outliers, function(x){x$data}) %>%
-  bind_rows() %>%
-  filter(Outlier == 1)
+# Label outliers
+pca_plot_byPanel_outliers <- olink_pca_plot( # nolint object_name_linter
+  df = data1,
+  check_log = check_log,
+  byPanel = TRUE,
+  outlierDefX = 4,
+  outlierDefY = 2.5,
+  quiet = TRUE
+)
+outliers <- lapply(
+  pca_plot_byPanel_outliers,
+  function(x) {
+    return(x$data)
+  }
+) |>
+  dplyr::bind_rows() |>
+  dplyr::filter(Outlier == 1)
 
 
 test_that("olink_pca_plot works", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
 
+  data1 <- OlinkAnalyze::npx_data1 |>
+    dplyr::mutate(
+      SampleID = paste(SampleID, "_", Index, sep = "")
+    )
+  check_log <- check_npx(data1)
+
   # Two Warnings thrown: for dropped assays and dropped samples
   expect_warning(
     expect_warning(
-      pca_plot_drop <- npx_data1 %>%
-      mutate(SampleID = paste(SampleID, "_", Index, sep = "")) %>%
-      olink_pca_plot(drop_assays = TRUE, drop_samples = TRUE, quiet = TRUE)
+      pca_plot_drop <- olink_pca_plot(
+        df = data1,
+        check_log = check_log,
+        drop_assays = TRUE,
+        drop_samples = TRUE,
+        quiet = TRUE
+      )
     )
   )
 
-  expect_equal(outliers$SampleID, c("B4_83", "A14_15", "A15_16", "A19_21"))
-  expect_equal(outliers$Panel, c("Cardiometabolic", "Inflammation", "Inflammation", "Inflammation"))
+  expect_equal(
+    object = outliers$SampleID,
+    expected = c("B4_83", "A14_15", "A15_16", "A19_21")
+  )
+
+  expect_equal(
+    object = outliers$Panel,
+    expected = c(
+      "Cardiometabolic",
+      "Inflammation",
+      "Inflammation",
+      "Inflammation"
+    )
+  )
 
   # data with all NPX=NA for some assays
   expect_warning(
@@ -341,6 +372,7 @@ test_that("olink_pca_plot works", {
   expect_warning(
     olink_pca_plot(npx_data_extended_format221121, quiet = TRUE),
     "have NPX = NA for all samples")
+
 
   pca_plot_name <- "PCA plot"
   check_snap_exist(test_dir_name = "pca_plot", snap_name = pca_plot_name)
