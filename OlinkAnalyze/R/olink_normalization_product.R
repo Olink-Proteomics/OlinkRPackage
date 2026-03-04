@@ -103,9 +103,9 @@ olink_normalization_bridgeable <- function(lst_df,
   set.seed(seed = seed)
 
   # variables to mark outliers, filter counts and calculate outlier limits
-  iqr_sd <- 3L # nolint object_usage_linter
-  min_datapoint_cnt <- 10L # nolint object_usage_linter
-  med_cnt <- 150L # nolint object_usage_linter
+  iqr_sd <- 3L # nolint: object_usage_linter
+  min_datapoint_cnt <- 10L # nolint: object_usage_linter
+  med_cnt <- 150L # nolint: object_usage_linter
 
   # column names from each product quantification to allow computations
   quant_names <- paste(ref_cols$quant, names(lst_df), sep = "_")
@@ -115,7 +115,7 @@ olink_normalization_bridgeable <- function(lst_df,
   lst_df_clean <- lapply(
     lst_df,
     function(l_df) {
-      l_df |> # nolint return_linter
+      l_df |> # nolint: return_linter
         dplyr::filter(
           # only customer samples
           dplyr::if_any(
@@ -492,7 +492,7 @@ olink_normalization_qs <- function(lst_df,
         stats::ecdf()
     )
     # the inverse if the ECDF are the quantiles
-    notref_map_quantiles <- model_data_joined |> # nolint object_usage_linter
+    notref_map_quantiles <- model_data_joined |> # nolint: object_usage_linter
       dplyr::pull(
         .data[[quant_col$ref]]
       ) |>
@@ -516,7 +516,7 @@ olink_normalization_qs <- function(lst_df,
       sort()
 
     # quantile points used for adapting the non linear spline
-    notref_knots <- stats::quantile( # nolint object_usage_linter
+    notref_knots <- stats::quantile( # nolint: object_usage_linter
       x = notref_quant,
       probs = c(0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95),
       names = FALSE
@@ -552,7 +552,7 @@ olink_normalization_qs <- function(lst_df,
   lst_df_clean <- lapply(
     lst_df,
     function(l_df) {
-      l_df |> # nolint return_linter
+      l_df |> # nolint: return_linter
         dplyr::filter(
           # only customer samples
           dplyr::if_any(
