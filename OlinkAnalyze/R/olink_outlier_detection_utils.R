@@ -20,8 +20,8 @@ olink_iqr <- function(df,
       )
     ) |>
     dplyr::mutate(
-      iqr = IQR(x = .data[[quant_col]],
-                na.rm = TRUE)
+      iqr = stats::IQR(x = .data[[quant_col]],
+                       na.rm = TRUE)
     ) |>
     dplyr::ungroup() |>
     dplyr::mutate(
@@ -50,8 +50,8 @@ olink_median <- function(df,
       )
     ) |>
     dplyr::mutate(
-      median = median(x = .data[[quant_col]],
-                      na.rm = TRUE)
+      median = stats::median(x = .data[[quant_col]],
+                             na.rm = TRUE)
     ) |>
     dplyr::ungroup()
   return(df_med)

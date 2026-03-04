@@ -23,47 +23,80 @@ columns allow the normalization to be performed. The input may contain
 \examples{
 \donttest{
 # One dataset
+lst_df_v1 <- list(
+  "p1" = npx_data1
+) |>
+  lapply(function(l_df) {
+    l_df |>
+      dplyr::select(
+        -dplyr::any_of(c("Normalization"))
+      )
+  })
+
+lst_df_v1_check <- lst_df_v1 |>
+  lapply(function(.x) {
+    check_npx(df = .x) |>
+      suppressWarnings() |>
+      suppressMessages() |>
+      (\(.) .$col_names)()
+  })
+
 OlinkAnalyze:::olink_norm_input_check_df_cols(
-  lst_df = list(
-    "p1" = npx_data1
-  ) |>
-    lapply(function(l_df) {
-      l_df |>
-        dplyr::select(
-          -dplyr::any_of(c("Normalization"))
-        )
-     })
-  )
+  lst_df = lst_df_v1,
+  lst_cols = lst_df_v1_check
+)
 
 # Two datasets
+lst_df_v2 <- list(
+  "p1" = npx_data1,
+  "p2" = npx_data2
+) |>
+  lapply(function(l_df) {
+    l_df |>
+      dplyr::select(
+        -dplyr::any_of(c("Normalization"))
+      )
+  })
+
+lst_df_v2_check <- lst_df_v2 |>
+  lapply(function(.x) {
+    check_npx(df = .x) |>
+      suppressWarnings() |>
+      suppressMessages() |>
+      (\(.) .$col_names)()
+  })
+
 OlinkAnalyze:::olink_norm_input_check_df_cols(
-  lst_df = list(
-    "p1" = npx_data1,
-    "p2" = npx_data2
-  ) |>
-    lapply(function(l_df) {
-      l_df |>
-        dplyr::select(
-          -dplyr::any_of(c("Normalization"))
-        )
-     })
-  )
+  lst_df = lst_df_v2,
+  lst_cols = lst_df_v2_check
+)
 
 # Multiple datasets
+lst_df_v3 <- list(
+  "p1" = npx_data1,
+  "p2" = npx_data2,
+  "p3" = npx_data1,
+  "p4" = npx_data2
+) |>
+  lapply(function(l_df) {
+    l_df |>
+      dplyr::select(
+        -dplyr::any_of(c("Normalization"))
+      )
+  })
+
+lst_df_v3_check <- lst_df_v3 |>
+  lapply(function(.x) {
+    check_npx(df = .x) |>
+      suppressWarnings() |>
+      suppressMessages() |>
+      (\(.) .$col_names)()
+  })
+
 OlinkAnalyze:::olink_norm_input_check_df_cols(
-  lst_df = list(
-    "p1" = npx_data1,
-    "p2" = npx_data2,
-    "p3" = npx_data1,
-    "p4" = npx_data2
-  ) |>
-    lapply(function(l_df) {
-      l_df |>
-        dplyr::select(
-          -dplyr::any_of(c("Normalization"))
-        )
-     })
-  )
+  lst_df = lst_df_v3,
+  lst_cols = lst_df_v3_check
+)
 }
 
 }

@@ -59,10 +59,21 @@ all column names should match.
 }
 \examples{
 \donttest{
+# check_npx
+data_ht_small_check <- OlinkAnalyze::check_npx(
+  df = OlinkAnalyze:::data_ht_small
+)
+
+data_3k_small_check <- OlinkAnalyze::check_npx(
+  df = OlinkAnalyze:::data_3k_small
+)
+
 # check input datasets
 data_explore_check <- OlinkAnalyze:::olink_norm_input_check(
   df1 = OlinkAnalyze:::data_3k_small,
+  df1_check_log = data_3k_small_check,
   df2 = OlinkAnalyze:::data_ht_small,
+  df2_check_log = data_ht_small_check,
   overlapping_samples_df1 = intersect(
     x = unique(OlinkAnalyze:::data_3k_small$SampleID),
     y = unique(OlinkAnalyze:::data_ht_small$SampleID)
@@ -85,8 +96,8 @@ names(lst_df) <- c(data_explore_check$ref_name,
                    data_explore_check$not_ref_name)
 
 # create ref_cols
-ref_cols <- data_explore_check$ref_cols
-not_ref_cols <- data_explore_check$not_ref_cols
+ref_cols <- data_explore_check$ref_check_log$col_names
+not_ref_cols <- data_explore_check$not_ref_check_log$col_names
 
 # run olink_normalization_bridgeable
 is_bridgeable_result <- OlinkAnalyze:::olink_normalization_bridgeable(

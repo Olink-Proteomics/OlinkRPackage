@@ -95,7 +95,6 @@
 #'
 #' @examples
 #' \donttest{
-#'
 #' # prepare datasets
 #' npx_df1 <- npx_data1 |>
 #'   dplyr::mutate(
@@ -105,6 +104,11 @@
 #'   dplyr::mutate(
 #'     Normalization = "Intensity"
 #'   )
+#'
+#' # check datasets
+#'
+#' npx_df1_check <- check_npx(df = npx_df1)
+#' npx_df2_check <- check_npx(df = npx_df2)
 #'
 #' # bridge normalization
 #'
@@ -120,7 +124,9 @@
 #'   overlapping_samples_df1 = overlap_samples,
 #'   df1_project_nr = "P1",
 #'   df2_project_nr = "P2",
-#'   reference_project = "P1"
+#'   reference_project = "P1",
+#'   df1_check_log = npx_df1_check,
+#'   df2_check_log = npx_df2_check
 #' )
 #'
 #' # subset normalization
@@ -175,7 +181,9 @@
 #'   overlapping_samples_df2 = df2_subset,
 #'   df1_project_nr = "P1",
 #'   df2_project_nr = "P2",
-#'   reference_project = "P1"
+#'   reference_project = "P1",
+#'   df1_check_log = npx_df1_check,
+#'   df2_check_log = npx_df2_check
 #' )
 #'
 #' # special case of subset normalization using all samples
@@ -186,7 +194,9 @@
 #'   overlapping_samples_df2 = df2_samples,
 #'   df1_project_nr = "P1",
 #'   df2_project_nr = "P2",
-#'   reference_project = "P1"
+#'   reference_project = "P1",
+#'   df1_check_log = npx_df1_check,
+#'   df2_check_log = npx_df2_check
 #' )
 #'
 #' # reference median normalization
@@ -209,7 +219,8 @@
 #' olink_normalization(
 #'   df1 = npx_df1,
 #'   overlapping_samples_df1 = df1_subset,
-#'   reference_medians = ref_med_df
+#'   reference_medians = ref_med_df,
+#'   df1_check_log = npx_df1_check
 #' )
 #'
 #' # cross-product normalization
@@ -221,6 +232,11 @@
 #' ) |>
 #'   (\(.) .[!grepl("CONTROL", .)])()
 #'
+#' # check datasets
+#'
+#' npx_ht_check <- check_npx(df = OlinkAnalyze:::data_ht_small)
+#' npx_3k_check <- check_npx(df = OlinkAnalyze:::data_3k_small)
+#'
 #' # normalize
 #' olink_normalization(
 #'   df1 = OlinkAnalyze:::data_ht_small,
@@ -229,7 +245,9 @@
 #'   df1_project_nr = "proj_ht",
 #'   df2_project_nr = "proj_3k",
 #'   reference_project = "proj_ht",
-#'   format = FALSE
+#'   format = FALSE,
+#'   df1_check_log = npx_ht_check,
+#'   df2_check_log = npx_3k_check
 #' )
 #' }
 #'
@@ -484,7 +502,7 @@ norm_internal_assay_median <- function(df,
       )
     ) |>
     dplyr::summarise(
-      assay_med = median(x = .data[[cols$quant]], na.rm = TRUE),
+      assay_med = stats::median(x = .data[[cols$quant]], na.rm = TRUE),
       .groups = "drop"
     )
 
@@ -623,7 +641,7 @@ norm_internal_bridge <- function(ref_df,
       )
     ) |>
     dplyr::summarise(
-      Adj_factor = median(x = .data[["quant_diff"]], na.rm = TRUE),
+      Adj_factor = stats::median(x = .data[["quant_diff"]], na.rm = TRUE),
       .groups = "drop"
     ) |>
     dplyr::mutate(
