@@ -117,12 +117,13 @@
 #' library(dplyr)
 #' npx_df <- npx_data1 |> filter(!grepl("control", SampleID,
 #'   ignore.case = TRUE))
+#'  try({ 
 #' ttest_results <- olink_ttest(
 #'   df = npx_df,
 #'   variable = "Treatment",
 #'   alternative = "two.sided"
 #' )
-#' try({ # This expression might fail if dependencies are not installed
+#' # This expression might fail if dependencies are not installed
 #' gsea_results <- olink_pathway_enrichment(data = npx_data1,
 #'   test_results = ttest_results)
 #' ora_results <- olink_pathway_enrichment(

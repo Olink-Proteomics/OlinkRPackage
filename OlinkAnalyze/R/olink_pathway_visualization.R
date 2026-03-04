@@ -17,12 +17,12 @@
 #'# Run olink_ttest or other stats test (see documentation )
 #'npx_df <- npx_data1 |> filter(!grepl('control',SampleID, ignore.case = TRUE))
 #'check_log <- check_npx(npx_df)
+#' try({ # This expression might fail if dependencies are not installed
 #'ttest_results <- olink_ttest(df = npx_df,
 #'                             check_log = check_log,
 #'                             variable = 'Treatment',
 #'                              alternative = 'two.sided')
 #'
-#' try({ # This expression might fail if dependencies are not installed
 #'# Run olink_pathway_enrichment (see documentation)
 #' gsea_results <- olink_pathway_enrichment(data = npx_df,
 #'                                          check_log = check_log,

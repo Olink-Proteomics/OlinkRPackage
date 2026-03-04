@@ -1,6 +1,8 @@
 skip_on_cran()
 skip_if_not_installed("clusterProfiler")
 skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+skip_if_not_installed("broom")
+skip_if_not_installed("car")
 
 # clean up npa_data1
 npx_df <- npx_data1 |>
