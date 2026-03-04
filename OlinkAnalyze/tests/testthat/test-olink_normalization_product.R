@@ -245,7 +245,7 @@ test_that(
       norm_input_check$not_ref_df
     ) |>
       lapply(function(l_df) {
-        l_df |> # nolint return_linter
+        l_df |> # nolint: return_linter
           dplyr::filter(
             .data[[norm_input_check$ref_check_log$col_names$sample_id]] %in%
               .env[["bridge_samples"]]
@@ -260,7 +260,7 @@ test_that(
       norm_input_check_reveal$not_ref_df
     ) |>
       lapply(function(l_df) {
-        l_df |> # nolint return_linter
+        l_df |> # nolint: return_linter
           dplyr::filter(
             .data[[norm_input_check$ref_check_log$col_names$sample_id]] %in%
               .env[["bridge_samples"]]
