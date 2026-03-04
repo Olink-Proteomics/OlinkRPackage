@@ -76,10 +76,12 @@ Imports:
     dbplyr,
     dplyr (>= 1.2.0),
     duckdb,
+    forcats,
     ggplot2,
     grDevices,
     rlang,
     stringr,
+    tibble,
     tidyr
 Suggests: 
     broom,
