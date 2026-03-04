@@ -410,7 +410,13 @@ norm_internal_rename_cols <- function(ref_cols,
                                       not_ref_df) {
 
   # only these columns can be updated to the reference df
-  cols_to_update <- c("panel_version", "qc_warning", "assay_warn")
+  cols_to_update <- column_name_dict |>
+    dplyr::filter(
+      .data[["is_updatable"]] == TRUE
+    ) |>
+    dplyr::pull(
+      .data[["col_key"]]
+    )
 
   # tibble with 2 columns, one from reference and the other one from the
   # non-reference df. Used next to rename all columns of non-reference df

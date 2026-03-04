@@ -223,5 +223,24 @@ column_name_dict <- dplyr::tibble(
     FALSE, # qc_warning
     FALSE, # assay_warn
     FALSE # normalization
+  ),
+  is_updatable = c(
+    FALSE, # sample_id
+    FALSE, # sample_type
+    FALSE, # assay_type
+    FALSE, # olink_id
+    FALSE, # uniprot
+    FALSE, # assay
+    FALSE, # panel
+    FALSE, # block
+    FALSE, # plate_id
+    TRUE, # panel_version
+    FALSE, # lod
+    FALSE, # quant
+    FALSE, # ext_npx
+    FALSE, # count
+    TRUE, # qc_warning
+    TRUE, # assay_warn
+    FALSE # normalization
   )
 )
