@@ -11,7 +11,7 @@ olink_iqr <- function(df,
                       quant_col,
                       iqr_group,
                       iqr_sd) {
-  df |>
+  df_iqr <- df |>
     dplyr::group_by(
       dplyr::pick(
         dplyr::all_of(
@@ -27,6 +27,7 @@ olink_iqr <- function(df,
     dplyr::mutate(
       iqr_sd = .data[["iqr"]] * .env[["iqr_sd"]]
     )
+  return(df_iqr)
 }
 
 #' Compute median of quantified value
@@ -40,7 +41,7 @@ olink_iqr <- function(df,
 olink_median <- function(df,
                          quant_col,
                          median_group) {
-  df |>
+  df_med <- df |>
     dplyr::group_by(
       dplyr::pick(
         dplyr::all_of(
@@ -53,6 +54,7 @@ olink_median <- function(df,
                       na.rm = TRUE)
     ) |>
     dplyr::ungroup()
+  return(df_med)
 }
 
 #' Compute outliers based on median +/- iqr_sd * IQR
@@ -69,7 +71,7 @@ olink_median_iqr_outlier <- function(df,
                                      quant_col,
                                      group,
                                      iqr_sd) {
-  df |>
+  df_outlier <- df |>
     olink_iqr(
       quant_col = quant_col,
       iqr_group = group,
@@ -90,4 +92,5 @@ olink_median_iqr_outlier <- function(df,
     dplyr::pull(
       .data[["is_outlier"]]
     )
+  return(df_outlier)
 }
