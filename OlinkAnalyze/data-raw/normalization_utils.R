@@ -22,7 +22,15 @@ olink_norm_recalc <- list(
 olink_norm_product_n_samples <- dplyr::tibble(
   product_1 = c("E3072", "HT", "E3072", "Reveal", "HT", "Reveal"),
   product_2 = c("HT", "E3072", "Reveal", "E3072", "Reveal", "HT"),
-  num_samples = c(40L, 40L, 32L, 32L, 24L, 24L)
+  num_samples = c(40L, 40L, 32L, 32L, 24L, 24L),
+  ref = list(
+    list("HT"),
+    list("HT"),
+    list("Reveal"),
+    list("Reveal"),
+    list("HT", "Reveal"),
+    list("HT", "Reveal")
+  )
 )
 
 # dataset with all possible combinations of inputs that olink_normalization may

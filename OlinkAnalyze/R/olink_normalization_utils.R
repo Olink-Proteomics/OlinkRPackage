@@ -937,16 +937,28 @@ olink_norm_input_cross_product <- function(lst_df,
   # only "E3072" as element. For other olink products, all elements should be
   # NA_character.
   # If more than one products are in the vector, then it should be exclusively
-  # E3072 and HT or E3072 and Reveal.
+  # E3072 and HT, E3072 and Reveal, or HT and Reveal.
   # In any other case (e.g. E3072 and NA_character) means that one df is E3072,
   # but the other one probably T96, T48, which we do not normalize.
   prod_uniq <- product_ids |> unique() |> sort()
-  if (length(prod_uniq) == 1L
-      && all(prod_uniq %in% c("E3072", "HT", "Reveal", "other"))) {
+  accepted_prods <- olink_norm_product_n_samples |>
+    dplyr::select(
+      dplyr::all_of(
+        c("product_1", "product_2")
+      )
+    ) |>
+    unlist() |>
+    unique()
+  accepted_prods <- c(accepted_prods, "other")
+
+  if (length(prod_uniq) == 1L && all(prod_uniq %in% accepted_prods)) {
     norm_mode <- olink_norm_modes$bridge
-  } else if (identical(x = prod_uniq, y = c("E3072", "HT"))
-             || identical(x = prod_uniq, y = c("E3072", "Reveal"))
-             || all(prod_uniq %in% c("HT", "Reveal"))) {
+  } else if (olink_norm_product_n_samples |>
+             dplyr::filter((.data[["product_1"]] == prod_uniq[1L]
+                            & .data[["product_2"]] == prod_uniq[2L])
+                           | (.data[["product_1"]] == prod_uniq[2L]
+                              & .data[["product_2"]] == prod_uniq[1L])) |>
+             nrow() > 1L) {
     # E3072 to HT or Reveal where HT or Reveal is reference
     # HT and Reveal bidirectionally
     norm_mode <- olink_norm_modes$norm_cross_product
@@ -966,7 +978,8 @@ olink_norm_input_cross_product <- function(lst_df,
   # check if reference dataset is HT/Reveal if cross-product normalization ----
 
   if (norm_mode == olink_norm_modes$norm_cross_product
-      && (!(product_ids[ref_ids == "ref"] %in% c("Reveal", "HT"))))  {
+      && (!(product_ids[ref_ids == "ref"] %in%
+            unique(unlist(olink_norm_product_n_samples$ref)))))  {
 
     cli::cli_abort(
       c(
