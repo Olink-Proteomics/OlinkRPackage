@@ -193,7 +193,7 @@ olink_pca_plot <- function(
   osi_cat_candidates <- "OSICategory"
   osi_cat_found <- intersect(osi_cat_candidates, colnames(df))
 
-  if (length(osi_cat_found) > 0) {
+  if (length(osi_cat_found) > 0  && color_g %in% osi_cat_found) {
     cat_col <- osi_cat_found[1]
 
     v_raw <- df[[cat_col]]
@@ -219,7 +219,7 @@ olink_pca_plot <- function(
   osi_cat_candidates <- "OSICategory"
   osi_cat_found <- intersect(osi_cat_candidates, colnames(df))
 
-  if (length(osi_cat_found) > 0) {
+  if (length(osi_cat_found) > 0 && color_g %in% osi_cat_found) {
     cat_col <- osi_cat_found[1]
 
     v_raw <- df[[cat_col]]
@@ -257,7 +257,7 @@ olink_pca_plot <- function(
   )
   osi_cont_found <- intersect(osi_cont_cols, colnames(df))
 
-  if (length(osi_cont_found) > 0) {
+  if (length(osi_cont_found) > 0 && color_g %in% osi_cont_found) {
     for (cc in osi_cont_found) {
       v_raw <- df[[cc]]
 
