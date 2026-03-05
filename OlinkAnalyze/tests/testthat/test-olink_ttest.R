@@ -9,7 +9,8 @@ test_that(
     skip_on_cran()
 
     check_log <- check_npx(df = npx_data1) |>
-      suppressMessages()
+      suppressMessages() |>
+      suppressWarnings()
 
     # run olink_ttest
     expect_message(
