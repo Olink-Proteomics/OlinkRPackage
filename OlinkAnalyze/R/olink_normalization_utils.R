@@ -350,9 +350,16 @@ olink_norm_input_check <- function(df1,
         software_cols[[i]] <- lst_cols[[i]][["software_version"]] # nolint return_linter
       })
 
-    # if no software versions are present, skip
+    # if no software versions are present, assign not-ref project as the new format
     if (length(unlist(software_cols)) == 0L) {
-
+      
+      not_ref_proj_name <- lst_out$not_ref_name
+      
+      new_format_df_index <- which(
+        match(names(lst_cols),
+              not_ref_proj_name) == 1
+        )
+      
       # if software versions are present, assign index of newer format
     } else {
 
