@@ -96,9 +96,6 @@ log <- check_npx(df = df) |>
 test_that(
   "clean_assay_na - works - 1 assay with only NA values",
   {
-
-    skip()
-
     expected_result <- df |>
       dplyr::filter(
         .data[["SampleID"]] != "AllNA"
