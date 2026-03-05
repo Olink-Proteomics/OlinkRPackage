@@ -33,8 +33,16 @@ jobs:
           prog_rep <- testthat::ProgressReporter$new()
           reporter <- testthat::MultiReporter$new(list(list_rep, prog_rep))
           
-          # 2. Run Tests
-          testthat::test_local(path = "OlinkAnalyze", reporter = reporter)
+          # 2. Run Tests with tryCatch
+          # This prevents the script from crashing before we can process the results
+          tryCatch({
+            testthat::test_local(
+              path = "OlinkAnalyze", 
+              reporter = reporter
+            )
+          }, error = function(e) {
+            cli::cli_alert_danger("Tests failed, but proceeding to generate summary...")
+          })
           
           # 3. Analyze Results
           results <- as.data.frame(list_rep$get_results())
