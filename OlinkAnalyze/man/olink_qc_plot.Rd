@@ -20,7 +20,7 @@ olink_qc_plot(
 \arguments{
 \item{df}{NPX data frame in long format. Must have columns SampleID, NPX and Panel}
 
-\item{color_g}{Character value indicating which column to use as fill color (default QC_Warning)}
+\item{color_g}{Character value indicating which column to use as fill color (default QC_Warning). Continuous color scale for Olink(R) Sample Index (OSI) columns OSITimeToCentrifugation, OSIPreparationTemperature and OSISummary is also supported.}
 
 \item{plot_index}{Boolean. If FALSE (default), a point will be plotted for a sample. If TRUE,
 a sample's unique index number is displayed.}
@@ -58,7 +58,7 @@ olink_qc_plot(npx_data1, color_g = "QC_Warning", IQR_outlierDef = 4, median_outl
 
 #Identify the outliers
 qc <- olink_qc_plot(npx_data1, color_g = "QC_Warning", IQR_outlierDef = 4, median_outlierDef = 4)
-outliers <- qc$data \%>\% filter(Outlier == 1)
+outliers <- qc$data |> filter(Outlier == 1)
 }
 }
 \keyword{NPX}
