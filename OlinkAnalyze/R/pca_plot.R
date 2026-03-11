@@ -117,26 +117,24 @@
 #' @importFrom utils head
 #' @importFrom grid unit
 
-olink_pca_plot <- function(
-  df,
-  check_log = NULL,
-  color_g = "QC_Warning",
-  x_val = 1,
-  y_val = 2,
-  label_samples = FALSE,
-  drop_assays = FALSE,
-  drop_samples = FALSE,
-  n_loadings = 0,
-  loadings_list = NULL,
-  byPanel = FALSE, # nolint object_name_linter
-  outlierDefX = NA, # nolint object_name_linter
-  outlierDefY = NA, # nolint object_name_linter
-  outlierLines = FALSE, # nolint object_name_linter
-  label_outliers = TRUE,
-  quiet = FALSE,
-  verbose = TRUE,
-  ...
-) {
+olink_pca_plot <- function(df,
+                           check_log = NULL,
+                           color_g = "QC_Warning",
+                           x_val = 1,
+                           y_val = 2,
+                           label_samples = FALSE,
+                           drop_assays = FALSE,
+                           drop_samples = FALSE,
+                           n_loadings = 0,
+                           loadings_list = NULL,
+                           byPanel = FALSE, # nolint object_name_linter
+                           outlierDefX = NA, # nolint object_name_linter
+                           outlierDefY = NA, # nolint object_name_linter
+                           outlierLines = FALSE, # nolint object_name_linter
+                           label_outliers = TRUE,
+                           quiet = FALSE,
+                           verbose = TRUE,
+                           ...) {
   # checking ellipsis
   if (length(list(...)) > 0) {
     ellipsis_variables <- names(list(...))
@@ -158,8 +156,6 @@ olink_pca_plot <- function(
 
   # Check if check_log is correct
   check_log <- run_check_npx(df = df, check_log = check_log)
-  # Make sure data is a tibble
-  df <- convert_read_npx_output(df = df, out_df = "tibble")
 
   # Stop if duplicate sample ID's detected
   if (length(check_log$sample_id_dups) > 0) {
@@ -185,115 +181,88 @@ olink_pca_plot <- function(
     remove_control_sample = FALSE,
     remove_qc_warning = FALSE,
     remove_assay_warning = FALSE,
-    convert_nonunique_uniprot = TRUE
-  )
+    convert_nonunique_uniprot = TRUE,
+    out_df = "tibble",
+    verbose = FALSE
+  ) |>
+    suppressMessages()
 
-  # Validate OSI category column: must contain only 0,1,2,3,4; then convert to
-  # factor if not already
-  osi_cat_candidates <- "OSICategory"
-  osi_cat_found <- intersect(osi_cat_candidates, colnames(df))
+  # OSI checks - ran only if OSI columns selected to color
+  osi_cat_cols <- c("OSICategory")
+  osi_cont_cols <- c("OSITimeToCentrifugation",
+                     "OSIPreparationTemperature",
+                     "OSISummary")
 
-  if (length(osi_cat_found) > 0) {
-    cat_col <- osi_cat_found[1]
+  if (color_g %in% c(osi_cat_cols, osi_cont_cols)) {
 
-    v_raw <- df[[cat_col]]
-    v_chr <- if (is.factor(v_raw)) as.character(v_raw) else as.character(v_raw)
-
-    allowed <- as.character(0:4)
-
-    invalid_vals <- unique(v_chr[!is.na(v_chr) & !(v_chr %in% allowed)])
-    if (length(invalid_vals) > 0) {
-      cli::cli_abort(
-        "Invalid values detected in {cat_col}. Expected only 0, 1, 2, 3, or 4.
-        Found: {paste(invalid_vals, collapse = ', ')}."
-      )
-    }
-
-    if (!is.factor(df[[cat_col]])) {
-      df[[cat_col]] <- factor(v_chr, levels = allowed)
-    }
-  }
-
-  # Validate OSI category column: must contain only 0,1,2,3,4; then convert to
-  # factor if not already
-  osi_cat_candidates <- "OSICategory"
-  osi_cat_found <- intersect(osi_cat_candidates, colnames(df))
-
-  if (length(osi_cat_found) > 0 && color_g %in% osi_cat_found) {
-    cat_col <- osi_cat_found[1]
-
-    v_raw <- df[[cat_col]]
+    # Check for invalid values
+    v_chr <- df |>
+      dplyr::select(dplyr::all_of(color_g)) |>
+      dplyr::pull() |>
+      as.character()
 
     # ERROR if column exists but is entirely NA
-    if (all(is.na(v_raw))) {
+    if (all(is.na(v_chr))) {
       cli::cli_abort(
-        "All values are NA in {cat_col}. Please provide at least one
+        "All values are NA in {color_g}. Please provide at least one
         non-missing value."
       )
     }
 
-    v_chr <- if (is.factor(v_raw)) as.character(v_raw) else as.character(v_raw)
+    # Categorical
+    if (color_g %in% osi_cat_cols) {
 
-    allowed <- as.character(0:4)
+      # Check that values are in allowed range
+      allowed <- as.character(0:4)
+      invalid_vals <- unique(v_chr[!is.na(v_chr) & !(v_chr %in% allowed)])
 
-    invalid_vals <- unique(v_chr[!is.na(v_chr) & !(v_chr %in% allowed)])
-    if (length(invalid_vals) > 0) {
-      cli::cli_abort(
-        "Invalid values detected in {cat_col}. Expected only 0, 1, 2, 3, or 4.
-        Found: {paste(invalid_vals, collapse = ', ')}."
-      )
-    }
-
-    if (!is.factor(df[[cat_col]])) {
-      df[[cat_col]] <- factor(v_chr, levels = allowed)
-    }
-  }
-
-  # Validate OSI continuous columns: must be numeric and within [0, 1]
-  osi_cont_cols <- c(
-    "OSITimeToCentrifugation",
-    "OSIPreparationTemperature",
-    "OSISummary"
-  )
-  osi_cont_found <- intersect(osi_cont_cols, colnames(df))
-
-  if (length(osi_cont_found) > 0 && color_g %in% osi_cont_found) {
-    for (cc in osi_cont_found) {
-      v_raw <- df[[cc]]
-
-      # ERROR if column exists but is entirely NA
-      if (all(is.na(v_raw))) {
+      if (length(invalid_vals) > 0L) {
         cli::cli_abort(
-          "All values are NA in {cc}. Please provide at least one
-          non-missing value."
+          "Invalid values detected in {color_g} Expected only 0, 1, 2, 3, or 4.
+          Found: {.val {invalid_vals}}."
         )
       }
 
-      v_chr <- if (is.factor(v_raw)) {
-        as.character(v_raw)
-      } else {
-        as.character(v_raw)
+      # Convert to factor if needed
+      if (!is.factor(df[[color_g]])) {
+        df[[color_g]] <- factor(as.character(df[[color_g]]), levels = allowed)
+
+        df <- df |>
+          dplyr::mutate(
+            !!color_g := as.character(factor(df[[color_g]], levels = allowed))
+          )
       }
+    }
 
-      v_num <- suppressWarnings(as.numeric(v_chr))
+    if (color_g %in% osi_cont_cols) {
 
-      # Detect non-numeric entries (introduced NA after coercion)
-      non_numeric_idx <- which(!is.na(v_chr) & is.na(v_num))
-      if (length(non_numeric_idx) > 0) {
+      # Check if numeric
+      if (!all(is.numeric(df[[color_g]]))) {
+
+        # Detect non-numeric entries (introduced NA after coercion)
+        v_num <- suppressWarnings(as.numeric(df[[color_g]]))
+
+        non_numeric_idx <- which(
+          !is.na(df[[color_g]]) & is.na(v_num)
+        )
+        bad_vals <- unique(df[[color_g]][non_numeric_idx]) #nolint object_name_linter
         cli::cli_abort(
-          "Non-numeric values detected in {cc}. Expected continuous numeric
+          "Invalid values detected in {color_g}. Expected continuous numeric
           values between 0 and 1. Found non-numeric value(s):
-          {paste(unique(v_chr[non_numeric_idx]), collapse = ', ')}."
+          {.val {bad_vals}}."
         )
       }
 
       # Detect out-of-range values
-      out_of_range_idx <- which(!is.na(v_num) & (v_num < 0 | v_num > 1))
-      if (length(out_of_range_idx) > 0) {
+      out_of_range_idx <- which(
+        !is.na(df[[color_g]]) & (df[[color_g]] < 0 | df[[color_g]] > 1)
+      )
+      if (length(out_of_range_idx) > 0L) {
+        bad_vals <- unique(df[[color_g]][out_of_range_idx]) #nolint object_name_linter
         cli::cli_abort(
-          "Invalid values detected in {cc}. Expected continuous numeric values
-          between 0 and 1. Found out-of-range value(s):
-          {paste(unique(v_num[out_of_range_idx]), collapse = ', ')}."
+          "Invalid values detected in {.field {color_g}}. Expected continuous
+          numeric values between 0 and 1. Found out-of-range value(s):
+          {.val {bad_vals}}."
         )
       }
     }
