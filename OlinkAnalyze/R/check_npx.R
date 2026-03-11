@@ -1278,9 +1278,8 @@ check_darid <- function(df, col_names) {
   # Return empty string and no warning when no qc_version is present
   if (!("qc_version" %in% names(col_names))) {
     return(
-      stats::setNames(
-        dplyr::tibble(character(0L)),
-        col_names$panel_version
+      dplyr::tibble(
+        !!col_names$panel_version := character(0L)
       )
     )
   }
