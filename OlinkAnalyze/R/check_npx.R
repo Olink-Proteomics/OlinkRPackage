@@ -1342,12 +1342,9 @@ check_darid <- function(df, col_names) {
   } else {
 
     return(
-      tidyr::as_tibble(
-        stats::setNames(
-          list(character(0L), character(0L)),
-          c(col_names$panel_version,
-            col_names$qc_version)
-        )
+      dplyr::tibble(
+        !!col_names$panel_version := character(0L),
+        !!col_names$qc_version := character(0L)
       )
     )
 
