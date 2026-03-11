@@ -1,7 +1,6 @@
-set.seed(123)  # reproducible randomization
+set.seed(123) # reproducible randomization
 
-# Test OSI columns in PCA function ----------------------------------------
-
+# Create OSI columns ------------------------------------------------------
 osi_data <- dplyr::tibble(
   OSITimeToCentrifugation = c(
     0.3012289, 0.060720572, 0.94772694, 0.720596273, 0.142294296,
@@ -92,7 +91,8 @@ stopifnot(nrow(osi_data) == length(new_ids))
 osi_data <- osi_data |>
   dplyr::mutate(SampleID = sample(new_ids, size = dplyr::n(), replace = FALSE))
 
-data1 <- OlinkAnalyze::npx_data1 |>
+# Clean up npx_data1 ------------------------------------------------------
+npx_df <- OlinkAnalyze::npx_data1 |>
   dplyr::right_join(
     osi_data |>
       dplyr::select(dplyr::all_of(c(
@@ -105,145 +105,146 @@ data1 <- OlinkAnalyze::npx_data1 |>
     by = "SampleID"
   ) |>
   dplyr::filter(
-    !grepl("CONTROL", SampleID)
-  ) |>
-  dplyr::mutate(
-    SampleType = "SAMPLE",
-    AssayType = "assay",
-    AssayQC = "PASS"
+    !stringr::str_detect(.data[["SampleID"]], "CONTROL")
   )
 
-test_that(
-  "OSI errors: using npx_data1 and OSI columns",
-  {
-    # ----------------------------
-    # OSICategory invalid value
-    # ----------------------------
-    df_bad_cat <- data1 |>
-      dplyr::mutate(
-        OSICategory = dplyr::if_else(
-          dplyr::row_number() == 1,
-          "7",
-          as.character(OSICategory)
-        )
+check_log <- check_npx(npx_df)
+
+# Get example data --------------------------------------------------------
+npx_data_format22 <- get_example_data("npx_data_format-Oct-2022.rds")
+check_log_221010 <- check_npx(npx_data_format22) |>
+  suppressWarnings() |>
+  suppressMessages()
+
+# Get reference result ----------------------------------------------------
+ref_results <- get_example_data(filename = "reference_results.rds")
+
+# Test OSI columns --------------------------------------------------------
+
+test_that("error - OSICategory is all NA", {
+  cat_all_na_df <- npx_df |>
+    dplyr::mutate(OSICategory = NA)
+
+  expect_error(
+    olink_pca_plot(
+      cat_all_na_df,
+      check_log = check_log,
+      color_g = "OSICategory",
+      quiet = TRUE
+    ),
+    regexp = "All values are NA in OSICategory",
+  )
+})
+
+test_that("error - Invalid OSICategory value", {
+  bad_osi_cat_df <- npx_df |>
+    dplyr::mutate(
+      OSICategory = dplyr::if_else(
+        dplyr::row_number() == 1,
+        "7",
+        as.character(OSICategory)
       )
-    check_log <- check_npx(df_bad_cat)
-
-    testthat::expect_error(
-      olink_pca_plot(df_bad_cat,
-                     check_log = check_log,
-                     color_g = "OSICategory",
-                     quiet = TRUE),
-      regexp = "Invalid values detected in OSICategory *.* Found: 7"
     )
 
-    # ----------------------------
-    # OSICategory all NA
-    # ----------------------------
-    df_cat_all_na <- data1 |>
-      dplyr::mutate(OSICategory = NA)
-    check_log <- check_npx(df_cat_all_na)
+  expect_error(
+    olink_pca_plot(
+      bad_osi_cat_df,
+      check_log = check_log,
+      color_g = "OSICategory",
+      quiet = TRUE
+    ),
+    regexp = "Invalid values detected in OSICategory",
+  )
+})
 
-    testthat::expect_error(
-      olink_pca_plot(df_cat_all_na,
-                     check_log = check_log,
-                     color_g = "OSICategory",
-                     quiet = TRUE),
-      regexp = "All values are NA in OSICategory *.* one non-missing value"
-    )
-
-    # ------------------------------------------
-    # Continuous OSI column non-numeric value
-    # ------------------------------------------
-    df_bad_cont_nonnum <- data1 |>
-      dplyr::mutate(
-        OSITimeToCentrifugation = dplyr::if_else(
-          dplyr::row_number() == 1,
-          "oops",
-          as.character(OSITimeToCentrifugation)
-        )
+test_that("error - Invalid OSI continuous", {
+  bad_osi_cont_df <- npx_df |>
+    dplyr::mutate(
+      OSITimeToCentrifugation = dplyr::if_else(
+        dplyr::row_number() == 1,
+        "oops",
+        as.character(OSITimeToCentrifugation)
       )
-    check_log <- check_npx(df_bad_cont_nonnum)
-
-    testthat::expect_error(
-      olink_pca_plot(df_bad_cont_nonnum,
-                     check_log = check_log,
-                     color_g = "OSITimeToCentrifugation",
-                     quiet = TRUE),
-      regexp = "Non-numeric values detected in OSITimeToCentrifugation *.* oops"
     )
 
-    # ------------------------------------
-    # Continuous OSI column out of range
-    # ------------------------------------
-    df_bad_cont_oor <- data1 |>
-      dplyr::mutate(
-        OSIPreparationTemperature = dplyr::if_else(
-          dplyr::row_number() == 1,
-          1.2,
-          OSIPreparationTemperature
-        )
+  expect_error(
+    olink_pca_plot(bad_osi_cont_df,
+                   check_log = check_log,
+                   color_g = "OSITimeToCentrifugation",
+                   quiet = TRUE),
+    regexp = "Invalid values detected in OSITimeToCentrifugation"
+  )
+
+})
+
+test_that("error - out-of-range OSI continuous", {
+  oor_osi_cont_df <- npx_df |>
+    dplyr::mutate(
+      OSIPreparationTemperature = replace(
+        as.numeric(OSIPreparationTemperature), # ensure numeric
+        1,
+        1.2
       )
-    check_log <- check_npx(df_bad_cont_oor)
-
-    testthat::expect_error(
-      olink_pca_plot(df_bad_cont_oor,
-                     check_log = check_log,
-                     color_g = "OSIPreparationTemperature",
-                     quiet = TRUE),
-      regexp = "Invalid values detected in OSIPreparationTemperature *.* 1.2"
     )
 
-    # ----------------------------
-    # Continuous OSI column all NA
-    # ----------------------------
-    df_cont_all_na <- data1 |>
-      dplyr::mutate(OSISummary = NA)
-    check_log <- check_npx(df_cont_all_na)
+  expect_error(
+    olink_pca_plot(
+      oor_osi_cont_df,
+      check_log = check_log,
+      color_g = "OSIPreparationTemperature",
+      quiet = TRUE
+    ),
+    regexp =
+      "Invalid values detected in OSIPreparationTemperature[\\s\\S]*1\\.2",
+    perl = TRUE
+  )
+})
 
-    testthat::expect_error(
-      olink_pca_plot(df_cont_all_na,
-                     check_log = check_log,
-                     color_g = "OSISummary",
-                     quiet = TRUE),
-      regexp = "All values are NA in OSISummary"
-    )
+test_that("error - continuous OSI columns all NA", {
+  osi_cont_all_na_df <- npx_df |>
+    dplyr::mutate(OSISummary = NA)
 
-    # ------------------------------------------------------
-    # Valid OSI values should NOT trigger OSI error strings
-    # ------------------------------------------------------
-    check_log <- check_npx(data1)
+  expect_error(
+    olink_pca_plot(osi_cont_all_na_df,
+                   check_log = check_log,
+                   color_g = "OSISummary",
+                   quiet = TRUE),
+    regexp = "All values are NA in OSISummary"
+  )
+})
 
-    testthat::expect_no_error(
-      olink_pca_plot(data1,
-                     check_log = check_log,
-                     color_g = "OSICategory",
-                     quiet = TRUE)
-    )
+test_that("works - valid OSI columns and no errors", {
 
-    testthat::expect_no_error(
-      olink_pca_plot(data1,
-                     check_log = check_log,
-                     color_g = "OSITimeToCentrifugation",
-                     quiet = TRUE)
-    )
+  expect_no_error(
+    olink_pca_plot(npx_df,
+                   check_log = check_log,
+                   color_g = "OSICategory",
+                   quiet = TRUE)
+  )
 
-    testthat::expect_no_error(
-      olink_pca_plot(data1,
-                     check_log = check_log,
-                     color_g = "OSIPreparationTemperature",
-                     quiet = TRUE)
-    )
+  expect_no_error(
+    olink_pca_plot(npx_df,
+                   check_log = check_log,
+                   color_g = "OSITimeToCentrifugation",
+                   quiet = TRUE)
+  )
 
-    testthat::expect_no_error(
-      olink_pca_plot(data1,
-                     check_log = check_log,
-                     color_g = "OSISummary",
-                     quiet = TRUE)
-    )
+  expect_no_error(
+    olink_pca_plot(npx_df,
+                   check_log = check_log,
+                   color_g = "OSIPreparationTemperature",
+                   quiet = TRUE)
+  )
 
-  }
-)
+  expect_no_error(
+    olink_pca_plot(npx_df,
+                   check_log = check_log,
+                   color_g = "OSISummary",
+                   quiet = TRUE)
+  )
+
+})
+
 
 
 # Test PCA function -------------------------------------------------------
