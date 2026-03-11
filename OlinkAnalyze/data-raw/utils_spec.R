@@ -92,5 +92,5 @@ outdated_darid_panel_archive <- dplyr::tibble(
     "D10014", "D20014", "D30014", "D40014",
     "D50014", "D60014", "D70014", "D80014"
   ),
-  min_version = "1.5.0"
+  min_version = rep(x = c("1.5.0"), each = 32L)
 )
