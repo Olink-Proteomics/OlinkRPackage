@@ -218,7 +218,7 @@ olink_pca_plot <- function(df,
 
       if (length(invalid_vals) > 0L) {
         cli::cli_abort(
-          "Invalid values detected in {color_g} Expected only 0, 1, 2, 3, or 4.
+          "Invalid values detected in {color_g}. Expected only 0, 1, 2, 3, or 4.
           Found: {.val {invalid_vals}}."
         )
       }
@@ -289,15 +289,11 @@ olink_pca_plot <- function(df,
   }
 
   if (byPanel) {
-    # Convert color_g variable to factor (but keep OSI columns continuous)
-    osi_cols <- c(
-      "OSITimeToCentrifugation",
-      "OSIPreparationTemperature",
-      "OSISummary"
-    )
-    if (!(color_g %in% osi_cols)) {
-      if (!is.factor(df[[paste(color_g)]])) {
-        df[[paste(color_g)]] <- as.factor(df[[paste(color_g)]])
+
+    # Keep continuous OSI cols unchanged; only convert other color_g to factor
+    if (!color_g %in% osi_cont_cols) {
+      if (!is.factor(df[[color_g]])) {
+        df[[color_g]] <- as.factor(df[[color_g]])
       }
     }
 
