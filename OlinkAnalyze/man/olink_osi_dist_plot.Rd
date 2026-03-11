@@ -22,6 +22,15 @@ osi values for corresponding osi_score column
 Title
 }
 \examples{
-npx_data1$OSISummary <- as.numeric(Site)
+# Creating fake OSI data from Site data
+df1 <-npx_data1 |>
+  dplyr::mutate(OSISummary = as.numeric(as.factor(Site))) |>
+  dplyr::mutate(OSISummary = OSISummary - min(OSISummary, na.rm = TRUE)) |>
+  dplyr::mutate(OSISummary = OSISummary/max(OSISummary, na.rm = TRUE))
 
+check_log <- check_npx(df1)
+# Generate figure
+olink_osi_dist_plot(df1,
+                    check_log = check_log,
+                    osi_score = "OSISummary")
 }
