@@ -10,6 +10,8 @@
 #' @export
 #'
 #' @examples 
+#' npx_data1$OSISummary <- as.numeric(Site)
+#' 
 olink_osi_dist_plot <- function(df,
                                 check_log = NULL,
                                 osi_score = NULL){
@@ -35,8 +37,9 @@ olink_osi_dist_plot <- function(df,
                         "Filtering out NA data."))
   }
   df1 <- df |> 
-    dplyr::filter(!is.na(.data[[osi_score]]))
-  
+    dplyr::filter(!is.na(.data[[osi_score]])) |> 
+    dplyr::select(dplyr::any_of(c("SampleID", osi_score))) |> 
+    dplyr::distinct()
   
   p <- ggplot2::ggplot(df1, ggplot2::aes(x = .data[[osi_score]])) +
     ggplot2::geom_histogram(ggplot2::aes(y = ggplot2::after_stat(density)))+
