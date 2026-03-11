@@ -21,3 +21,7 @@ osi values for corresponding osi_score column
 \description{
 Title
 }
+\examples{
+npx_data1$OSISummary <- as.numeric(Site)
+
+}
