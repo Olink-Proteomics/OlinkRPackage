@@ -25,11 +25,13 @@
 #'
 #' npx_df <- npx_data1 |> filter(!grepl("control",SampleID, ignore.case = TRUE))
 #' check_log <- check_npx(npx_df)
-#' ttest_results <- olink_ttest(df=npx_df,
+#' if (rlang::is_installed(pkg = c("broom"))){
+#'   ttest_results <- olink_ttest(df=npx_df,
 #'                              check_log = check_log,
 #'                              variable = "Treatment",
 #'                              alternative = "two.sided")
 #' olink_volcano_plot(ttest_results)}
+#' }
 
 
 

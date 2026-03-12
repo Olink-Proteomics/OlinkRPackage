@@ -1,5 +1,5 @@
 #Load reference results
-
+skip_if_not_installed("broom")
 ref_results <- get_example_data("reference_results.rds")
 # There's some randomness to how the labels are placed on the plot.
 # Setting the seed should avoid this
