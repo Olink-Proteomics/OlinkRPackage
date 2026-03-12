@@ -66,20 +66,23 @@ olink_volcano_plot <- function(p.val_tbl, # nolint: object_name_linter
   if (is.null(olinkid_list)) {
 
     olinkid_list <- p.val_tbl |>
-      dplyr::filter(Threshold == "Significant") |>
-      dplyr::pull(OlinkID)
+      dplyr::filter(.data[["Threshold"]] == "Significant") |>
+      dplyr::pull(dplyr::all_of("OlinkID"))
 
   }
 
 
   volcano_plot <- p.val_tbl |>
-    ggplot2::ggplot(ggplot2::aes(x = estimate, y = -log10(p.value),
-                                 color = Threshold)) +
+    ggplot2::ggplot(ggplot2::aes(x = .data[["estimate"]],
+                                 y = -log10(.data[["p.value"]]),
+                                 color = .data[["Threshold"]])) +
     ggplot2::geom_point() +
     ggplot2::labs(x = x_lab, y = "-log10(p-value)") +
     ggrepel::geom_label_repel(data = subset(p.val_tbl,
-                                            OlinkID %in% olinkid_list),
-                              ggplot2::aes(label = Assay), box.padding = 1,
+                                            p.val_tbl[["OlinkID"]] %in%
+                                              olinkid_list),
+                              ggplot2::aes(label = .data[["Assay"]]),
+                              box.padding = 1,
                               show.legend = FALSE) +
     ggplot2::geom_hline(yintercept = -log10(0.05), linetype = "dotted") +
     OlinkAnalyze::set_plot_theme() +
