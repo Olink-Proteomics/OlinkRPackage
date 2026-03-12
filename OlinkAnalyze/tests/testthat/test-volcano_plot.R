@@ -28,7 +28,7 @@ test_that("olink_volcano_plot works", {
   check_snap_exist(test_dir_name = "volcano_plot",
                    snap_name = volcano_plot2_name)
   vdiffr::expect_doppelganger(volcano_plot2_name, volcano_plot2)
-  
+
   volcano_plot3_name <- "volcano plot with labels"
   check_snap_exist(test_dir_name = "volcano_plot",
                    snap_name = volcano_plot3_name)
