@@ -47,10 +47,10 @@
 #'   assays are related to keywords of interest.
 #'
 #'
-#' @param data NPX data frame in long format with at least protein name (Assay),
+#' @param df NPX data frame in long format with at least protein name (Assay),
 #' OlinkID, UniProt,SampleID, QC_Warning, NPX, and LOD
 #' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `data`.
+#' [`check_npx()`] will be run internally using `df`.
 #' @param test_results a dataframe of statistical test results including
 #' Adjusted_pval and estimate columns.
 #' @param method Either "GSEA" (default) or "ORA"
@@ -123,10 +123,10 @@
 #'   variable = "Treatment",
 #'   alternative = "two.sided"
 #' )
-#' gsea_results <- olink_pathway_enrichment(data = npx_data1,
+#' gsea_results <- olink_pathway_enrichment(df = npx_data1,
 #'   test_results = ttest_results)
 #' ora_results <- olink_pathway_enrichment(
-#'   data = npx_data1,
+#'   df = npx_data1,
 #'   test_results = ttest_results, method = "ORA"
 #' )
 #' }, silent = TRUE)
@@ -134,7 +134,7 @@
 #'
 #' @export
 
-olink_pathway_enrichment <- function(data,
+olink_pathway_enrichment <- function(df,
                                      check_log = NULL,
                                      test_results,
                                      method = "GSEA",
@@ -143,8 +143,17 @@ olink_pathway_enrichment <- function(data,
                                      pvalue_cutoff = 0.05,
                                      estimate_cutoff = 0) {
   # Is Package installed
-  rlang::check_installed(pkg = c("clusterProfiler", "msigdbr"),
+  rlang::check_installed(pkg = c("msigdbr"),
                          call = rlang::caller_env())
+
+  if (!rlang::is_installed("clusterProfiler")) {
+    cli::cli_abort(
+                   c("x" = "The package \"clusterProfiler\" is required.",
+                     "!" = "Install package from Bioconductor.",
+                     " " = "if (!require(\"BiocManager\", quietly = TRUE))",
+                     " " = "install.packages(\"BiocManager\")",
+                     " " = "BiocManager::install(\"clusterProfiler\")"))
+  }
 
   if (utils::packageVersion("msigdbr") < package_version("24.1.0")) {
     cli::cli_abort(c(paste("Pathway enrichment requires version >=24.1.0",
@@ -154,11 +163,11 @@ olink_pathway_enrichment <- function(data,
                      " " = "install.packages(\"msigdbr\")"))
   }
 
-  if (missing(data) || missing(test_results)) {
-    cli::cli_abort("The data and test_results arguments need to be specified.")
+  if (missing(df) || missing(test_results)) {
+    cli::cli_abort("The df and test_results arguments need to be specified.")
   }
 
-  check_log <- check_pe_inputs(data = data,
+  check_log <- check_pe_inputs(df = df,
                                check_log = check_log,
                                test_results = test_results,
                                method = method,
@@ -166,7 +175,7 @@ olink_pathway_enrichment <- function(data,
                                organism = organism)
 
 
-  df <- data_prep(data = data,
+  df <- data_prep(df = df,
                   check_log = check_log,
                   test_results = test_results)
 
@@ -195,14 +204,14 @@ olink_pathway_enrichment <- function(data,
 }
 
 
-check_pe_inputs <- function(data,
+check_pe_inputs <- function(df,
                             check_log = check_log,
                             test_results,
                             method,
                             ontology,
                             organism) {
 
-  check_log <- run_check_npx(df = data, check_log = check_log)
+  check_log <- run_check_npx(df = df, check_log = check_log)
 
   # Check required columns in test results
 
@@ -216,11 +225,11 @@ check_pe_inputs <- function(data,
                                    "estimate", sep = "\n"))
   }
 
-  if (length(c(setdiff(unique(data[["OlinkID"]]),
+  if (length(c(setdiff(unique(df[[check_log$col_names$olink_id]]),
                        unique(test_results[["OlinkID"]])),
                setdiff(unique(test_results[["OlinkID"]]),
-                       unique(data[["OlinkID"]])))) != 0) {
-    cli::cli_warn(paste("The Olink IDs in the data do not all match",
+                       unique(df[[check_log$col_names$olink_id]])))) != 0) {
+    cli::cli_warn(paste("The Olink IDs in the df do not all match",
                         "the Olink IDs in the test_results."))
   }
 
@@ -250,48 +259,50 @@ check_pe_inputs <- function(data,
   return(check_log)
 }
 
-data_prep <- function(data,
+data_prep <- function(df,
                       test_results,
                       check_log) {
   cli::cli_inform("Removing invalid OlinkIDs, control assays, and NA assays.")
-  data <- clean_npx(df = data,
-                    check_log = check_log,
-                    remove_assay_na = TRUE,
-                    remove_invalid_oid = TRUE,
-                    remove_dup_sample_id = FALSE,
-                    remove_control_assay = TRUE,
-                    remove_control_sample = FALSE,
-                    remove_qc_warning = FALSE,
-                    remove_assay_warning = FALSE,
-                    convert_df_cols = TRUE,
-                    convert_nonunique_uniprot = FALSE,
-                    verbose = FALSE)
+  df <- clean_npx(df = df,
+                  check_log = check_log,
+                  remove_assay_na = TRUE,
+                  remove_invalid_oid = TRUE,
+                  remove_dup_sample_id = FALSE,
+                  remove_control_assay = TRUE,
+                  remove_control_sample = FALSE,
+                  remove_qc_warning = FALSE,
+                  remove_assay_warning = FALSE,
+                  convert_df_cols = TRUE,
+                  convert_nonunique_uniprot = FALSE,
+                  verbose = FALSE)
 
-
-  if (length(c(setdiff(unique(data[["OlinkID"]]),
+  if (length(c(setdiff(unique(df[[check_log$col_names$olink_id]]),
                        unique(test_results[["OlinkID"]])),
-               setdiff(unique(test_results[["OlinkID"]]),
-                       unique(data[["OlinkID"]])))) != 0) {
-    cli::cli_inform(paste0("Filtering data for overlapping OlinkIDs in data ",
+               setdiff(unique(test_results[[check_log$col_names$olink_id]]),
+                       unique(df[["OlinkID"]])))) != 0) {
+    cli::cli_inform(paste0("Filtering df for overlapping OlinkIDs in df ",
                            "and test_results."))
-    data <- data |>
-      dplyr::filter(.data[["OlinkID"]] %in% test_results[["OlinkID"]])
+    df <- df |>
+      dplyr::filter(.data[[check_log$col_names$olink_id]] %in%
+                      test_results[["OlinkID"]])
   }
 
-  duplicated_assays <- data |>
-    dplyr::select(dplyr::any_of(c("SampleID", "Assay"))) |>
+  duplicated_assays <- df |>
+    dplyr::select(dplyr::any_of(c(check_log$col_names$sample_id,
+                                  check_log$col_names$assay))) |>
     duplicated()
 
 
   if (any(duplicated_assays)) {
     cli::cli_abort(paste("Duplicated assays detected:",
-                         paste(data[["Assay"]][duplicated_assays],
+                         paste(df[[check_log$col_names$assay]]
+                               [duplicated_assays],
                                collapse = ","),
                          "\n",
-                         "Filter assay from test_result or data",
+                         "Filter assay from test_result or df",
                          sep = "\n"))
   }
-  return(data)
+  return(df)
 }
 
 test_prep <- function(df,

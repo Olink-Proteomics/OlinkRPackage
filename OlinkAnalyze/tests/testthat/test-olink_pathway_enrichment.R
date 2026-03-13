@@ -73,7 +73,7 @@ test_that("Error with duplicated assays", {
   # error with duplicate assays
   duplicated_assay_data <- npx_data1 |>
     dplyr::bind_rows(duplicate_assay_data)
-  expect_error(object = data_prep(data = duplicated_assay_data,
+  expect_error(object = data_prep(df = duplicated_assay_data,
                                   test_results = ttest_results,
                                   check_log = check_log),
                regexp = "Duplicated assays detected:")
@@ -87,7 +87,7 @@ test_that("T-test GSEA works", {
   expect_no_warning(
     object = expect_no_error(
       object = tt_gsea <- olink_pathway_enrichment(
-        data = npx_df,
+        df = npx_df,
         check_log = check_log,
         test_results = ttest_results
       ) |>
@@ -98,19 +98,19 @@ test_that("T-test GSEA works", {
 
   expect_equal(
     object = nrow(tt_gsea),
-    expected = 571L
+    expected = 573L
   )
 
   expect_message(
     object = expect_warning(
       object = olink_pathway_enrichment(
-        data = npx_data_format22,
+        df = npx_data_format22,
         test_results = ttest_na,
         check_log = check_log_221010
       ),
-      regexp = "The Olink IDs in the data do not all match the Olink IDs"
+      regexp = "The Olink IDs in the df do not all match the Olink IDs"
     ),
-    regexp = "Filtering data for overlapping OlinkIDs in data"
+    regexp = "Filtering df for overlapping OlinkIDs in df"
   )
 
 })
@@ -123,7 +123,7 @@ test_that("Reactome GSEA works", {
   expect_no_warning(
     expect_no_error(
       object = tt_gsea_reactome <- olink_pathway_enrichment(
-        data = npx_df,
+        df = npx_df,
         check_log = check_log,
         test_results = ttest_results,
         ontology = "Reactome"
@@ -146,7 +146,7 @@ test_that("MSigDB_com GSEA works", {
   expect_no_warning(
     object = expect_no_error(
       object = tt_gsea_msigdb_com <- olink_pathway_enrichment(
-        data = npx_df,
+        df = npx_df,
         check_log = check_log,
         test_results = ttest_results,
         ontology = "MSigDb_com"
@@ -157,7 +157,7 @@ test_that("MSigDB_com GSEA works", {
 
   expect_equal(
     object = nrow(tt_gsea_msigdb_com),
-    expected = 566L
+    expected = 568L
   )
 })
 
@@ -168,7 +168,7 @@ test_that("KEGG GSEA works", {
   skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
   expect_no_error(
-    object = tt_gsea_kegg <- olink_pathway_enrichment(data = npx_df,
+    object = tt_gsea_kegg <- olink_pathway_enrichment(df = npx_df,
       check_log = check_log,
       test_results = ttest_results,
       ontology = "KEGG"
@@ -191,7 +191,7 @@ test_that("GO GSEA works", {
   expect_no_warning(
     object = expect_no_error(
       object = tt_gsea_go <- olink_pathway_enrichment(
-        data = npx_df,
+        df = npx_df,
         check_log = check_log,
         test_results = ttest_results,
         ontology = "GO"
@@ -202,7 +202,7 @@ test_that("GO GSEA works", {
 
   expect_equal(
     object = nrow(tt_gsea_go),
-    expected = 355L
+    expected = 356L
   )
 })
 
@@ -214,7 +214,7 @@ test_that("T-test ORA works", {
   expect_no_warning(
     object = expect_no_error(
       object = tt_ora <- olink_pathway_enrichment(
-        data = npx_df,
+        df = npx_df,
         check_log = check_log,
         test_results = ttest_results,
         method = "ORA",
@@ -226,7 +226,7 @@ test_that("T-test ORA works", {
 
   expect_equal(
     object = nrow(tt_ora),
-    expected = 352L
+    expected = 345L
   )
 })
 
@@ -238,7 +238,7 @@ test_that("Reactome ORA works", {
   expect_no_warning(
     object = expect_no_error(
       object = tt_ora_reactome <- olink_pathway_enrichment(
-        data = npx_df,
+        df = npx_df,
         check_log = check_log,
         test_results = ttest_results,
         method = "ORA",
@@ -261,7 +261,7 @@ test_that("KEGG ORA works", {
 
   expect_warning(
     object = tt_ora_kegg <- olink_pathway_enrichment(
-      data = npx_df,
+      df = npx_df,
       check_log = check_log,
       test_results = ttest_results,
       method = "ORA",
@@ -284,7 +284,7 @@ test_that("GO ORA works", {
   expect_no_warning(
     object = expect_no_error(
       object = tt_ora_go <- olink_pathway_enrichment(
-        data = npx_df,
+        df = npx_df,
         check_log = check_log,
         test_results = ttest_results,
         method = "ORA",
@@ -296,7 +296,7 @@ test_that("GO ORA works", {
 
   expect_equal(
     object = nrow(tt_ora_go),
-    expected = 217L
+    expected = 212L
   )
 })
 
@@ -307,12 +307,12 @@ test_that("Errors occur", {
 
   expect_error(
     object = olink_pathway_enrichment(),
-    regexp = "The data and test_results arguments need to be specified."
+    regexp = "The df and test_results arguments need to be specified."
   )
 
   expect_error(
     object = olink_pathway_enrichment(
-      data = npx_df,
+      df = npx_df,
       check_log = check_log,
       test_results = anova_posthoc_results
     ),
@@ -321,7 +321,7 @@ test_that("Errors occur", {
 
   expect_error(
     object = olink_pathway_enrichment(
-      data = npx_df,
+      df = npx_df,
       check_log = check_log,
       test_results = ttest_results,
       method = "IRA"
@@ -331,7 +331,7 @@ test_that("Errors occur", {
 
   expect_error(
     object = olink_pathway_enrichment(
-      data = npx_df,
+      df = npx_df,
       check_log = check_log,
       test_results = ttest_results,
       ontology = "WikiPathways"
@@ -340,7 +340,7 @@ test_that("Errors occur", {
   )
 
   expect_error(
-    object =  olink_pathway_enrichment(data = npx_df,
+    object =  olink_pathway_enrichment(df = npx_df,
                                        check_log = check_log,
                                        test_results = ttest_results,
                                        organism = "rat"),
@@ -348,7 +348,7 @@ test_that("Errors occur", {
   )
 
   expect_error(
-    object = olink_pathway_enrichment(data = npx_df,
+    object = olink_pathway_enrichment(df = npx_df,
       check_log = check_log,
       test_results = {
         ttest_results |>
@@ -359,11 +359,11 @@ test_that("Errors occur", {
   )
 
   expect_message(
-    object = expect_message(object = data_prep(data = npx_data_format22,
+    object = expect_message(object = data_prep(df = npx_data_format22,
                                                test_results = ttest_na,
                                                check_log = check_log_221010),
                             regex = "Removing invalid OlinkIDs"),
-    regex = "Filtering data for overlapping OlinkIDs in data"
+    regex = "Filtering df for overlapping OlinkIDs in df"
   )
 })
 
@@ -374,7 +374,7 @@ test_that("ORA warns assays not found in database", {
 
   messages <- capture_messages(
     code = olink_pathway_enrichment(
-      data = npx_df,
+      df = npx_df,
       check_log = check_log,
       test_results = ttest_results,
       method = "ORA",
@@ -396,7 +396,7 @@ test_that("gsea warns assays not found in database", {
 
   messages <- capture_messages(
     code = olink_pathway_enrichment(
-      data = npx_df,
+      df = npx_df,
       check_log = check_log,
       test_results = ttest_results
     )
