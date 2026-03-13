@@ -26,46 +26,48 @@
 #'
 #' @examples
 #' \donttest{
-#' npx_ht <- OlinkAnalyze:::data_ht_small |>
-#'   dplyr::filter(
-#'     .data[["SampleType"]] == "SAMPLE"
+#' if (rlang::is_installed(pkg = c("ggpubr"))) {
+#'   npx_ht <- OlinkAnalyze:::data_ht_small |>
+#'     dplyr::filter(
+#'       .data[["SampleType"]] == "SAMPLE"
+#'     )
+#'
+#'   npx_3072 <- OlinkAnalyze:::data_3k_small |>
+#'     dplyr::filter(
+#'       .data[["SampleType"]] == "SAMPLE"
+#'     )
+#'
+#'   overlapping_samples <- intersect(
+#'     x = npx_ht$SampleID,
+#'     y = npx_3072$SampleID
 #'   )
 #'
-#' npx_3072 <- OlinkAnalyze:::data_3k_small |>
-#'   dplyr::filter(
-#'     .data[["SampleType"]] == "SAMPLE"
+#'   data_norm <- OlinkAnalyze::olink_normalization(
+#'     df1 = npx_ht,
+#'     df2 = npx_3072,
+#'     overlapping_samples_df1 = overlapping_samples,
+#'     df1_project_nr = "Explore HT",
+#'     df2_project_nr = "Explore 3072",
+#'     reference_project = "Explore HT",
+#'     df1_check_log = check_npx(df = npx_ht) |>
+#'       suppressMessages() |>
+#'       suppressWarnings(),
+#'     df2_check_log = check_npx(df = npx_3072) |>
+#'       suppressMessages() |>
+#'       suppressWarnings()
 #'   )
 #'
-#' overlapping_samples <- intersect(
-#'   x = npx_ht$SampleID,
-#'   y = npx_3072$SampleID
-#' )
-#'
-#' data_norm <- OlinkAnalyze::olink_normalization(
-#'   df1 = npx_ht,
-#'   df2 = npx_3072,
-#'   overlapping_samples_df1 = overlapping_samples,
-#'   df1_project_nr = "Explore HT",
-#'   df2_project_nr = "Explore 3072",
-#'   reference_project = "Explore HT",
-#'   df1_check_log = check_npx(df = npx_ht) |>
-#'     suppressMessages() |>
-#'     suppressWarnings(),
-#'   df2_check_log = check_npx(df = npx_3072) |>
-#'     suppressMessages() |>
-#'     suppressWarnings()
-#' )
-#'
-#' data_norm_bridge_p <- OlinkAnalyze::olink_bridgeability_plot(
-#'   df = data_norm,
-#'   check_log = check_npx(df = data_norm) |>
-#'     suppressMessages() |>
-#'     suppressWarnings(),
-#'   olink_id = c("OID40770", "OID40835"),
-#'   median_counts_threshold = 150L,
-#'   min_count = 10L
-#' )
-#'}
+#'   data_norm_bridge_p <- OlinkAnalyze::olink_bridgeability_plot(
+#'     df = data_norm,
+#'     check_log = check_npx(df = data_norm) |>
+#'       suppressMessages() |>
+#'       suppressWarnings(),
+#'     olink_id = c("OID40770", "OID40835"),
+#'     median_counts_threshold = 150L,
+#'     min_count = 10L
+#'   )
+#' }
+#' }
 #'
 olink_bridgeability_plot <- function(df,
                                      check_log = NULL,
