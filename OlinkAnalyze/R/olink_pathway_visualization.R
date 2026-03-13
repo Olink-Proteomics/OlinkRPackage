@@ -24,10 +24,10 @@
 #'                              alternative = 'two.sided')
 #'
 #'# Run olink_pathway_enrichment (see documentation)
-#' gsea_results <- olink_pathway_enrichment(data = npx_df,
+#' gsea_results <- olink_pathway_enrichment(df = npx_df,
 #'                                          check_log = check_log,
 #'                                          test_results = ttest_results)
-#' ora_results <- olink_pathway_enrichment(data = npx_df,
+#' ora_results <- olink_pathway_enrichment(df = npx_df,
 #'                                         check_log = check_log,
 #'                                         test_results = ttest_results,
 #'                                         method = "ORA")

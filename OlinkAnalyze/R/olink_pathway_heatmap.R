@@ -21,16 +21,16 @@
 #'                                ignore.case = TRUE))
 #' check_log <- check_npx(npx_df)
 #' try({ # This expression might fail if dependencies are not installed
-#' ttest_results <- olink_ttest(df=npx_df,
+#' ttest_results <- olink_ttest(df = npx_df,
 #'                              check_log = check_log,
 #'                              variable = 'Treatment',
 #'                              alternative = 'two.sided')
 #'
 #' #  Run olink_pathway_enrichment (see documentation)
-#' gsea_results <- olink_pathway_enrichment(data = npx_data1,
+#' gsea_results <- olink_pathway_enrichment(df = npx_data1,
 #'                                          check_log = check_log,
 #'                                         test_results = ttest_results)
-#' ora_results <- olink_pathway_enrichment(data = npx_data1,
+#' ora_results <- olink_pathway_enrichment(df = npx_data1,
 #'                                         check_log = check_log,
 #'                                         test_results = ttest_results,
 #'                                         method = "ORA")
