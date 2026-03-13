@@ -36,7 +36,7 @@ olink_osi_dist_plot <- function(df,
     dplyr::distinct()
 
   # Check for duplicate sampleIDS
-  if (any(duplicated(df1[["SampleID"]]))) {
+  if (any(duplicated(df1[[check_log$col_names$sample_id]]))) {
     cli::cli_abort("Multiple OSI values detected for same Sample ID.")
   }
 
