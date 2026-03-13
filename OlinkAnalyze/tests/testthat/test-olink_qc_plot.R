@@ -91,13 +91,16 @@ new_ids <- c(paste0("A", 1:77), paste0("B", 1:23))
 stopifnot(nrow(osi_data) == length(new_ids))
 
 osi_data <- osi_data |>
-  dplyr::mutate(SampleID = sample(new_ids, size = n(), replace = FALSE))
+  dplyr::mutate(SampleID = sample(new_ids, size = dplyr::n(), replace = FALSE))
 
 data1 <- OlinkAnalyze::npx_data1 |>
   dplyr::right_join(
     osi_data |>
-      select(SampleID, OSITimeToCentrifugation, OSIPreparationTemperature,
-             OSISummary, OSICategory),
+      dplyr::select(SampleID,
+                    OSITimeToCentrifugation,
+                    OSIPreparationTemperature,
+                    OSISummary,
+                    OSICategory),
     by = "SampleID"
   ) |>
   dplyr::filter(!grepl("CONTROL", SampleID))
@@ -107,17 +110,26 @@ test_that("OSI errors: using npx_data1 and OSI columns", {
   # OSICategory invalid value
   # ----------------------------
   df_bad_cat <- data1 |>
-    dplyr::mutate(OSICategory = if_else(dplyr::row_number() == 1, "7",
-                                 as.character(OSICategory)))
+    dplyr::mutate(OSICategory = ifelse(dplyr::row_number() == 1, "7",
+                                       as.character(OSICategory)))
 
   # No error when not using OSI column
   testthat::expect_no_error(
-    olink_qc_plot(df_bad_cat, color_g = "QC_Warning")
+    testthat::expect_message(
+      olink_qc_plot(df_bad_cat, color_g = "QC_Warning"),
+      regexp = "`check_log` not provided. Running `check_npx()`.",
+      fixed = TRUE
+    )
   )
 
   testthat::expect_error(
-    olink_qc_plot(df_bad_cat, color_g = "OSICategory"),
-    regexp = 'Invalid values detected in OSICategory\\. Expected only 0, 1, 2, 3, or 4\\. Found: "7".'
+    testthat::expect_message(
+      olink_qc_plot(df_bad_cat, color_g = "OSICategory"),
+      regexp = "`check_log` not provided. Running `check_npx()`.",
+      fixed = TRUE)
+    ,
+    regexp = paste0('Invalid values detected in OSICategory\\.',
+                    ' Expected only 0, 1, 2, 3, or 4\\. Found: "7".')
   )
 
   # ----------------------------
@@ -127,8 +139,12 @@ test_that("OSI errors: using npx_data1 and OSI columns", {
     dplyr::mutate(OSICategory = NA)
 
   testthat::expect_error(
-    olink_qc_plot(df_cat_all_na, color_g = "OSICategory"),
-    regexp = "All values are NA in OSICategory\\. Please provide at least one non-missing value\\."
+    testthat::expect_message(
+      olink_qc_plot(df_cat_all_na, color_g = "OSICategory"),
+      regexp = "`check_log` not provided. Running `check_npx()`.",
+      fixed = TRUE),
+    regexp = paste0("All values are NA in OSICategory\\. ",
+                    "Please provide at least one non-missing value\\.")
   )
 
   # ------------------------------------------
@@ -136,12 +152,15 @@ test_that("OSI errors: using npx_data1 and OSI columns", {
   # ------------------------------------------
   df_bad_cont_nonnum <- data1 |>
     dplyr::mutate(
-      OSITimeToCentrifugation = if_else(dplyr::row_number() == 1,
-                                        "oops",
-                                        as.character(OSITimeToCentrifugation)))
+      OSITimeToCentrifugation = ifelse(dplyr::row_number() == 1,
+                                       "oops",
+                                       as.character(OSITimeToCentrifugation)))
 
   testthat::expect_error(
-    olink_qc_plot(df_bad_cont_nonnum, color_g = "OSITimeToCentrifugation"),
+    testthat::expect_message(
+      olink_qc_plot(df_bad_cont_nonnum, color_g = "OSITimeToCentrifugation"),
+      regexp = "`check_log` not provided. Running `check_npx()`.",
+      fixed = TRUE),
     regexp = paste0(
       'Invalid values detected in OSITimeToCentrifugation\\.',
       ' Expected continuous numeric values between 0 and 1\\.',
@@ -153,11 +172,14 @@ test_that("OSI errors: using npx_data1 and OSI columns", {
   # Continuous OSI column out of range
   # ------------------------------------
   df_bad_cont_oor <- data1 |>
-    dplyr::mutate(OSIPreparationTemperature = if_else(dplyr::row_number() == 1, 1.2,
-                                               OSIPreparationTemperature))
+    dplyr::mutate(OSIPreparationTemperature = ifelse(
+      dplyr::row_number() == 1, 1.2, OSIPreparationTemperature))
 
   testthat::expect_error(
-    olink_qc_plot(df_bad_cont_oor, color_g = "OSIPreparationTemperature"),
+    testthat::expect_message(
+      olink_qc_plot(df_bad_cont_oor, color_g = "OSIPreparationTemperature"),
+      regexp = "`check_log` not provided. Running `check_npx()`.",
+      fixed = TRUE),
     regexp = paste0(
       "Invalid values detected in OSIPreparationTemperature\\.",
       " Expected continuous numeric values between 0 and 1\\.",
@@ -172,27 +194,43 @@ test_that("OSI errors: using npx_data1 and OSI columns", {
     dplyr::mutate(OSISummary = NA)
 
   testthat::expect_error(
-    olink_qc_plot(df_cont_all_na, color_g = "OSISummary"),
-    regexp = "All values are NA in OSISummary\\. Please provide at least one non-missing value\\."
+    testthat::expect_message(
+      olink_qc_plot(df_cont_all_na, color_g = "OSISummary"),
+      regexp = "`check_log` not provided. Running `check_npx()`.",
+      fixed = TRUE),
+    regexp = paste0("All values are NA in OSISummary\\.",
+                    " Please provide at least one non-missing value\\.")
   )
 
   # ------------------------------------------------------
   # Valid OSI values should NOT trigger OSI error strings
   # ------------------------------------------------------
   testthat::expect_no_error(
-    olink_qc_plot(data1, color_g = "OSICategory")
+    testthat::expect_message(
+      olink_qc_plot(data1, color_g = "OSICategory"),
+      regexp = "`check_log` not provided. Running `check_npx()`.",
+      fixed = TRUE)
   )
 
   testthat::expect_no_error(
-    olink_qc_plot(data1, color_g = "OSISummary")
+    testthat::expect_message(
+      olink_qc_plot(data1, color_g = "OSISummary"),
+      regexp = "`check_log` not provided. Running `check_npx()`.",
+      fixed = TRUE)
   )
 
   testthat::expect_no_error(
-    olink_qc_plot(data1, color_g = "OSIPreparationTemperature")
+    testthat::expect_message(
+      olink_qc_plot(data1, color_g = "OSIPreparationTemperature"),
+      regexp = "`check_log` not provided. Running `check_npx()`.",
+      fixed = TRUE)
   )
 
   testthat::expect_no_error(
-    olink_qc_plot(data1, color_g = "OSITimeToCentrifugation")
+    testthat::expect_message(
+      olink_qc_plot(data1, color_g = "OSITimeToCentrifugation"),
+      regexp = "`check_log` not provided. Running `check_npx()`.",
+      fixed = TRUE)
   )
 
 })
@@ -205,28 +243,79 @@ load(file = test_path('data','npx_data_format221121.RData'))
 
 
 qc_plot <- npx_data1 |>
-  mutate(SampleID = paste(SampleID, "_", Index, sep = "")) |>
-  olink_qc_plot(label_outliers = FALSE)
+  dplyr::mutate(SampleID = paste(SampleID, "_", Index, sep = "")) |>
+  olink_qc_plot(label_outliers = FALSE) |>
+  suppressMessages()
 
 qc_plot2 <- npx_data1 |>
-  mutate(SampleID = paste(SampleID, "_", Index, sep = "")) |>
-  olink_qc_plot(coloroption =  c('teal', 'pink'), label_outliers = FALSE)
+  dplyr::mutate(SampleID = paste(SampleID, "_", Index, sep = "")) |>
+  olink_qc_plot(coloroption =  c('teal', 'pink'), label_outliers = FALSE) |>
+  suppressMessages()
 
 test_that("olink_qc_plot works", {
-  expect_warning(olink_qc_plot(npx_data_format221010)) # data with all NPX=NA for some assays
-  expect_warning(olink_qc_plot(npx_data_format221121)) # data with all NPX=NA for some assays
-  expect_warning(olink_qc_plot(npx_data_extended_format221121)) # data with all NPX=NA for some assays
+
+  testthat::expect_message(
+    testthat::expect_message(
+      testthat::expect_warning(olink_qc_plot(npx_data_format221010),
+                               regex = paste0('"OID31309", and "OID31325" have',
+                                              ' "NPX" = NA for all samples.')
+      ),
+      ,
+      regexp = "`check_log` not provided. Running `check_npx()`.",
+      fixed = TRUE
+    ),
+    regexp = paste0("8 assays exhibited assay QC warnings in column ",
+                    "`Assay_Warning` of the dataset"),
+    fixed = TRUE
+  ) # data with all NPX=NA for some assays
+
+  testthat::expect_message(
+    testthat::expect_message(
+      testthat::expect_warning(olink_qc_plot(npx_data_format221121),
+                               regex = paste0('"OID21069", and "OID21125" have',
+                                              ' "NPX" = NA for all samples.')
+      ),
+      regexp = "`check_log` not provided. Running `check_npx()`.",
+      fixed = TRUE
+    ),
+    regexp = paste0("326 assays exhibited assay QC warnings in column ",
+                    "`Assay_Warning` of the dataset"),
+    fixed = TRUE
+  ) # data with all NPX=NA for some assays
+
+  testthat::expect_message(
+    testthat::expect_message(
+      testthat::expect_warning(olink_qc_plot(npx_data_extended_format221121),
+                               regex = paste0('"OID21069", and "OID21125" have',
+                                              ' "NPX" = NA for all samples.')
+      ),
+      regexp = "`check_log` not provided. Running `check_npx()`.",
+      fixed = TRUE
+    ),
+    regexp = paste0("326 assays exhibited assay QC warnings in column ",
+                    "`Assay_Warning` of the dataset"),
+    fixed = TRUE
+  ) # data with all NPX=NA for some assays
+
 })
 
 test_that("olink_qc_plot works - vdiffr", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
 
-  qc_plot_name <- "QC plot"
-  check_snap_exist(test_dir_name = "olink_qc_plot", snap_name = qc_plot_name)
+  qc_plot_name <- "qc-plot.new.svg"
+  qc_plot2_name <- "qc-plot-with-coloroption.new.svg"
+
+  test_dir_name = "olink_qc_plot"
+
+  snap_path_1 <- test_path("_snaps", test_dir_name, qc_plot_name)
+  snap_path_2 <- test_path("_snaps", test_dir_name, qc_plot2_name)
+
+  skip_if_not(file.exists(snap_path_1))
+  skip_if_not(file.exists(snap_path_2))
+
   vdiffr::expect_doppelganger(qc_plot_name, qc_plot)
 
-  qc_plot2_name <- "QC plot with coloroption"
-  check_snap_exist(test_dir_name = "olink_qc_plot", snap_name = qc_plot2_name)
   vdiffr::expect_doppelganger(qc_plot2_name, qc_plot2)
+
 })

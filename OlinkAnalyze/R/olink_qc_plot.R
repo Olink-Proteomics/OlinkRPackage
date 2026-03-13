@@ -5,6 +5,7 @@
 #' Vertical dashed lines indicate +/-median_outlierDef standard deviations from the mean sample median (default 3).
 #'
 #' @param df NPX data frame in long format. Must have columns SampleID, NPX and Panel
+#' @param check_log A named list returned by [`check_npx()`]. If `NULL`, [`check_npx()`] will be run internally using `df`.
 #' @param color_g Character value indicating which column to use as fill color (default QC_Warning). Continuous color scale for Olink(R) Sample Index (OSI) columns OSITimeToCentrifugation, OSIPreparationTemperature and OSISummary is also supported.
 #' @param plot_index Boolean. If FALSE (default), a point will be plotted for a sample. If TRUE,
 #' a sample's unique index number is displayed.
@@ -38,6 +39,7 @@
 #' @importFrom stringr str_detect str_replace
 
 olink_qc_plot <- function(df,
+                          check_log = NULL,
                           color_g = "QC_Warning",
                           plot_index = FALSE,
                           label_outliers = TRUE,
@@ -73,11 +75,28 @@ olink_qc_plot <- function(df,
     }
   }
 
-  #Check data format
-  npxCheck <- npxCheck(df)
+  # Check if check_log is correct
+  check_log <- run_check_npx(df = df, check_log = check_log)
 
-  # Rename duplicate UniProts
-  df <- uniprot_replace(df, npxCheck)
+  # Remove invalid OlinkID, assays with all NA values, and convert non-unique
+  # Uniprot IDs. Note that we do not remove samples with duplicate SampleID,
+  # control samples or assays, or samples/assays with QC warnings, as this
+  # would be the user's decision.
+  df <- clean_npx(
+    df,
+    check_log = check_log,
+    remove_assay_na = TRUE,
+    remove_invalid_oid = TRUE,
+    remove_dup_sample_id = FALSE,
+    remove_control_assay = FALSE,
+    remove_control_sample = FALSE,
+    remove_qc_warning = FALSE,
+    remove_assay_warning = FALSE,
+    convert_nonunique_uniprot = TRUE,
+    out_df = "tibble",
+    verbose = FALSE
+  ) |>
+    suppressMessages()
 
   #Check that IQR_outlierDef and median_outlierDef are both numeric
   if(!all(is.numeric(IQR_outlierDef), is.numeric(median_outlierDef))){
@@ -172,14 +191,13 @@ olink_qc_plot <- function(df,
 
   if ("QC_Warning" %in% names(df)) {
     df_qr <- df |>
-      dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) |> #Exclude assays that have all NA:s
       dplyr::group_by(Panel, SampleID) |>
-      dplyr::mutate(QC_Warning = dplyr::if_else(all(toupper(QC_Warning) == 'PASS'),
-                                                'Pass',
-                                                'Warning'))
+      dplyr::mutate(QC_Warning = dplyr::if_else(
+        all(toupper(QC_Warning) == 'PASS'),
+        'Pass',
+        'Warning'))
   } else {
     df_qr <- df |>
-      dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) |> #Exclude assays that have all NA:s
       dplyr::group_by(Panel, SampleID)
   }
 
