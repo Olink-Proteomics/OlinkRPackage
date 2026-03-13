@@ -117,7 +117,7 @@ test_that("OSI errors: using npx_data1 and OSI columns", {
 
   testthat::expect_error(
     olink_qc_plot(df_bad_cat, color_g = "OSICategory"),
-    regexp = "Invalid values detected in OSICategory\\. Expected only 0, 1, 2, 3, or 4\\. Found: 7"
+    regexp = 'Invalid values detected in OSICategory\\. Expected only 0, 1, 2, 3, or 4\\. Found: "7".'
   )
 
   # ----------------------------
@@ -143,9 +143,9 @@ test_that("OSI errors: using npx_data1 and OSI columns", {
   testthat::expect_error(
     olink_qc_plot(df_bad_cont_nonnum, color_g = "OSITimeToCentrifugation"),
     regexp = paste0(
-      "Invalid values detected in OSITimeToCentrifugation\\.",
-      " Expected continuous numeric values between 0 and 1\\.",
-      " Found non-numeric value\\(s\\): oops"
+      'Invalid values detected in OSITimeToCentrifugation\\.',
+      ' Expected continuous numeric values between 0 and 1\\.',
+      ' Found non-numeric value\\(s\\): "oops".'
     )
   )
 
