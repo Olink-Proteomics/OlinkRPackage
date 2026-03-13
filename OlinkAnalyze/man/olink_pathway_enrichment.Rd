@@ -6,7 +6,7 @@
 gene set enrichment analysis (GSEA)}
 \usage{
 olink_pathway_enrichment(
-  data,
+  df,
   check_log = NULL,
   test_results,
   method = "GSEA",
@@ -17,11 +17,11 @@ olink_pathway_enrichment(
 )
 }
 \arguments{
-\item{data}{NPX data frame in long format with at least protein name (Assay),
+\item{df}{NPX data frame in long format with at least protein name (Assay),
 OlinkID, UniProt,SampleID, QC_Warning, NPX, and LOD}
 
 \item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{data}.}
+\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
 
 \item{test_results}{a dataframe of statistical test results including
 Adjusted_pval and estimate columns.}
@@ -148,10 +148,10 @@ ttest_results <- olink_ttest(
   variable = "Treatment",
   alternative = "two.sided"
 )
-gsea_results <- olink_pathway_enrichment(data = npx_data1,
+gsea_results <- olink_pathway_enrichment(df = npx_data1,
   test_results = ttest_results)
 ora_results <- olink_pathway_enrichment(
-  data = npx_data1,
+  df = npx_data1,
   test_results = ttest_results, method = "ORA"
 )
 }, silent = TRUE)
