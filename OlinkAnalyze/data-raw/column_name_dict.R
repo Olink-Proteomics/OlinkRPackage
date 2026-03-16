@@ -241,6 +241,6 @@ column_name_dict <- dplyr::tibble(
     FALSE, # count
     TRUE, # qc_warning
     TRUE, # assay_warn
-    FALSE # normalization
+    TRUE # normalization
   )
 )
