@@ -38,58 +38,182 @@ olink_norm_mode_combos <- expand.grid(df1 = c(FALSE, TRUE),
                                       reference_medians = c(FALSE, TRUE)) |>
   dplyr::mutate(
     error_msg = dplyr::case_when(
-      df1 == FALSE ~ "Required {.var df1} is missing!",
-      df1 == TRUE & df2 == FALSE & reference_medians == FALSE ~ "When {.var df1} is provided, either {.var df2} or {.var reference_medians} is required!", # nolint: line_length_linter
-      df1 == TRUE & df2 == FALSE & reference_medians == TRUE & overlapping_samples_df1 == FALSE ~ "When {.var df1} and {.var reference_medians} are provided, {.var overlapping_samples_df1} is required!", # nolint: line_length_linter
-      df1 == TRUE & df2 == FALSE & reference_medians == TRUE & overlapping_samples_df1 == TRUE & overlapping_samples_df2 == FALSE ~ NA_character_, # nolint: line_length_linter
-      df1 == TRUE & df2 == FALSE & reference_medians == TRUE & overlapping_samples_df1 == TRUE & overlapping_samples_df2 == TRUE ~ NA_character_, # nolint: line_length_linter
-      df1 == TRUE & df2 == TRUE & overlapping_samples_df1 == FALSE ~ "When {.var df1} and {.var df2} are provided, at least {.var overlapping_samples_df1} is required!", # nolint: line_length_linter
-      df1 == TRUE & df2 == TRUE & overlapping_samples_df1 == TRUE & overlapping_samples_df2 == FALSE & reference_medians == FALSE ~ NA_character_, # nolint: line_length_linter
-      df1 == TRUE & df2 == TRUE & overlapping_samples_df1 == TRUE & overlapping_samples_df2 == FALSE & reference_medians == TRUE ~ NA_character_, # nolint: line_length_linter
-      df1 == TRUE & df2 == TRUE & overlapping_samples_df1 == TRUE & overlapping_samples_df2 == TRUE & reference_medians == FALSE ~ NA_character_, # nolint: line_length_linter
-      df1 == TRUE & df2 == TRUE & overlapping_samples_df1 == TRUE & overlapping_samples_df2 == TRUE & reference_medians == TRUE ~ NA_character_, # nolint: line_length_linter
+      .data[["df1"]] == FALSE ~ "Required {.var df1} is missing!",
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == FALSE &
+        .data[["reference_medians"]] == FALSE ~ "When {.var df1} is provided, either {.var df2} or {.var reference_medians} is required!", # nolint: line_length_linter
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == FALSE &
+        .data[["reference_medians"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == FALSE ~ "When {.var df1} and {.var reference_medians} are provided, {.var overlapping_samples_df1} is required!", # nolint: line_length_linter
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == FALSE &
+        .data[["reference_medians"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == TRUE &
+        .data[["overlapping_samples_df2"]] == FALSE ~ NA_character_,
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == FALSE &
+        .data[["reference_medians"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == TRUE &
+        .data[["overlapping_samples_df2"]] == TRUE ~ NA_character_,
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == FALSE ~ "When {.var df1} and {.var df2} are provided, at least {.var overlapping_samples_df1} is required!", # nolint: line_length_linter
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == TRUE &
+        .data[["overlapping_samples_df2"]] == FALSE &
+        .data[["reference_medians"]] == FALSE ~ NA_character_,
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == TRUE &
+        .data[["overlapping_samples_df2"]] == FALSE &
+        .data[["reference_medians"]] == TRUE ~ NA_character_,
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == TRUE &
+        .data[["overlapping_samples_df2"]] == TRUE &
+        .data[["reference_medians"]] == FALSE ~ NA_character_,
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == TRUE &
+        .data[["overlapping_samples_df2"]] == TRUE &
+        .data[["reference_medians"]] == TRUE ~ NA_character_,
       TRUE ~ NA_character_,
       .default = NA_character_
     ),
     warning_msg = dplyr::case_when(
-      df1 == FALSE ~ NA_character_,
-      df1 == TRUE & df2 == FALSE & reference_medians == FALSE ~ NA_character_,
-      df1 == TRUE & df2 == FALSE & reference_medians == TRUE & overlapping_samples_df1 == FALSE ~ NA_character_, # nolint: line_length_linter
-      df1 == TRUE & df2 == FALSE & reference_medians == TRUE & overlapping_samples_df1 == TRUE & overlapping_samples_df2 == FALSE ~ NA_character_, # nolint: line_length_linter
-      df1 == TRUE & df2 == FALSE & reference_medians == TRUE & overlapping_samples_df1 == TRUE & overlapping_samples_df2 == TRUE ~ "{.var overlapping_samples_df2} will be ignored", # nolint: line_length_linter
-      df1 == TRUE & df2 == TRUE & overlapping_samples_df1 == FALSE ~ NA_character_, # nolint: line_length_linter
-      df1 == TRUE & df2 == TRUE & overlapping_samples_df1 == TRUE & overlapping_samples_df2 == FALSE & reference_medians == FALSE ~ NA_character_, # nolint: line_length_linter
-      df1 == TRUE & df2 == TRUE & overlapping_samples_df1 == TRUE & overlapping_samples_df2 == FALSE & reference_medians == TRUE ~ "{.var reference_medians} will be ignored", # nolint: line_length_linter
-      df1 == TRUE & df2 == TRUE & overlapping_samples_df1 == TRUE & overlapping_samples_df2 == TRUE & reference_medians == FALSE ~ NA_character_, # nolint: line_length_linter
-      df1 == TRUE & df2 == TRUE & overlapping_samples_df1 == TRUE & overlapping_samples_df2 == TRUE & reference_medians == TRUE ~ "{.var reference_medians} will be ignored", # nolint: line_length_linter
+      .data[["df1"]] == FALSE ~ NA_character_,
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == FALSE &
+        .data[["reference_medians"]] == FALSE ~ NA_character_,
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == FALSE &
+        .data[["reference_medians"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == FALSE ~ NA_character_,
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == FALSE &
+        .data[["reference_medians"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == TRUE &
+        .data[["overlapping_samples_df2"]] == FALSE ~ NA_character_,
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == FALSE &
+        .data[["reference_medians"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == TRUE &
+        .data[["overlapping_samples_df2"]] == TRUE ~ "{.var overlapping_samples_df2} will be ignored", # nolint: line_length_linter
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == FALSE ~ NA_character_,
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == TRUE &
+        .data[["overlapping_samples_df2"]] == FALSE &
+        .data[["reference_medians"]] == FALSE ~ NA_character_,
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == TRUE &
+        .data[["overlapping_samples_df2"]] == FALSE &
+        .data[["reference_medians"]] == TRUE ~ "{.var reference_medians} will be ignored", # nolint: line_length_linter
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == TRUE &
+        .data[["overlapping_samples_df2"]] == TRUE &
+        .data[["reference_medians"]] == FALSE ~ NA_character_,
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == TRUE &
+        .data[["overlapping_samples_df2"]] == TRUE &
+        .data[["reference_medians"]] == TRUE ~ "{.var reference_medians} will be ignored", # nolint: line_length_linter
       TRUE ~ NA_character_,
       .default = NA_character_
     ),
     inform_msg = dplyr::case_when(
-      df1 == FALSE ~ NA_character_,
-      df1 == TRUE & df2 == FALSE & reference_medians == FALSE ~ NA_character_,
-      df1 == TRUE & df2 == FALSE & reference_medians == TRUE & overlapping_samples_df1 == FALSE ~ NA_character_, # nolint: line_length_linter
-      df1 == TRUE & df2 == FALSE & reference_medians == TRUE & overlapping_samples_df1 == TRUE & overlapping_samples_df2 == FALSE ~ "Reference median normalization will be performed!", # nolint: line_length_linter
-      df1 == TRUE & df2 == FALSE & reference_medians == TRUE & overlapping_samples_df1 == TRUE & overlapping_samples_df2 == TRUE ~ "Reference median normalization will be performed!", # nolint: line_length_linter
-      df1 == TRUE & df2 == TRUE & overlapping_samples_df1 == FALSE ~ NA_character_, # nolint: line_length_linter
-      df1 == TRUE & df2 == TRUE & overlapping_samples_df1 == TRUE & overlapping_samples_df2 == FALSE & reference_medians == FALSE ~ "Bridge normalization will be performed!", # nolint: line_length_linter
-      df1 == TRUE & df2 == TRUE & overlapping_samples_df1 == TRUE & overlapping_samples_df2 == FALSE & reference_medians == TRUE ~ "Bridge normalization will be performed!", # nolint: line_length_linter
-      df1 == TRUE & df2 == TRUE & overlapping_samples_df1 == TRUE & overlapping_samples_df2 == TRUE & reference_medians == FALSE ~ "Subset normalization will be performed!", # nolint: line_length_linter
-      df1 == TRUE & df2 == TRUE & overlapping_samples_df1 == TRUE & overlapping_samples_df2 == TRUE & reference_medians == TRUE ~ "Subset normalization will be performed!", # nolint: line_length_linter
+      .data[["df1"]] == FALSE ~ NA_character_,
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == FALSE &
+        .data[["reference_medians"]] == FALSE ~ NA_character_,
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == FALSE &
+        .data[["reference_medians"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == FALSE ~ NA_character_,
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == FALSE &
+        .data[["reference_medians"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == TRUE &
+        .data[["overlapping_samples_df2"]] == FALSE ~ "Reference median normalization will be performed!", # nolint: line_length_linter
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == FALSE &
+        .data[["reference_medians"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == TRUE &
+        .data[["overlapping_samples_df2"]] == TRUE ~ "Reference median normalization will be performed!", # nolint: line_length_linter
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == FALSE ~ NA_character_,
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == TRUE &
+        .data[["overlapping_samples_df2"]] == FALSE &
+        .data[["reference_medians"]] == FALSE ~ "Bridge normalization will be performed!", # nolint: line_length_linter
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == TRUE &
+        .data[["overlapping_samples_df2"]] == FALSE &
+        .data[["reference_medians"]] == TRUE ~ "Bridge normalization will be performed!", # nolint: line_length_linter
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == TRUE &
+        .data[["overlapping_samples_df2"]] == TRUE &
+        .data[["reference_medians"]] == FALSE ~ "Subset normalization will be performed!", # nolint: line_length_linter
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == TRUE &
+        .data[["overlapping_samples_df2"]] == TRUE &
+        .data[["reference_medians"]] == TRUE ~ "Subset normalization will be performed!", # nolint: line_length_linter
       TRUE ~ NA_character_,
       .default = NA_character_
     ),
     norm_mode = dplyr::case_when(
-      df1 == FALSE ~ NA_character_,
-      df1 == TRUE & df2 == FALSE & reference_medians == FALSE ~ NA_character_,
-      df1 == TRUE & df2 == FALSE & reference_medians == TRUE & overlapping_samples_df1 == FALSE ~ NA_character_, # nolint: line_length_linter
-      df1 == TRUE & df2 == FALSE & reference_medians == TRUE & overlapping_samples_df1 == TRUE & overlapping_samples_df2 == FALSE ~ olink_norm_modes$ref_median, # nolint: line_length_linter
-      df1 == TRUE & df2 == FALSE & reference_medians == TRUE & overlapping_samples_df1 == TRUE & overlapping_samples_df2 == TRUE ~ olink_norm_modes$ref_median, # nolint: line_length_linter
-      df1 == TRUE & df2 == TRUE & overlapping_samples_df1 == FALSE ~ NA_character_, # nolint: line_length_linter
-      df1 == TRUE & df2 == TRUE & overlapping_samples_df1 == TRUE & overlapping_samples_df2 == FALSE & reference_medians == FALSE ~ olink_norm_modes$bridge, # nolint: line_length_linter
-      df1 == TRUE & df2 == TRUE & overlapping_samples_df1 == TRUE & overlapping_samples_df2 == FALSE & reference_medians == TRUE ~ olink_norm_modes$bridge, # nolint: line_length_linter
-      df1 == TRUE & df2 == TRUE & overlapping_samples_df1 == TRUE & overlapping_samples_df2 == TRUE & reference_medians == FALSE ~ olink_norm_modes$subset, # nolint: line_length_linter
-      df1 == TRUE & df2 == TRUE & overlapping_samples_df1 == TRUE & overlapping_samples_df2 == TRUE & reference_medians == TRUE ~ olink_norm_modes$subset, # nolint: line_length_linter
+      .data[["df1"]] == FALSE ~ NA_character_,
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == FALSE &
+        .data[["reference_medians"]] == FALSE ~ NA_character_,
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == FALSE &
+        .data[["reference_medians"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == FALSE ~ NA_character_,
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == FALSE &
+        .data[["reference_medians"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == TRUE &
+        .data[["overlapping_samples_df2"]] == FALSE ~ olink_norm_modes$ref_median, # nolint: line_length_linter
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == FALSE &
+        .data[["reference_medians"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == TRUE &
+        .data[["overlapping_samples_df2"]] == TRUE ~ olink_norm_modes$ref_median, # nolint: line_length_linter
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == FALSE ~ NA_character_,
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == TRUE &
+        .data[["overlapping_samples_df2"]] == FALSE &
+        .data[["reference_medians"]] == FALSE ~ olink_norm_modes$bridge,
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == TRUE &
+        .data[["overlapping_samples_df2"]] == FALSE &
+        .data[["reference_medians"]] == TRUE ~ olink_norm_modes$bridge,
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == TRUE &
+        .data[["overlapping_samples_df2"]] == TRUE &
+        .data[["reference_medians"]] == FALSE ~ olink_norm_modes$subset,
+      .data[["df1"]] == TRUE &
+        .data[["df2"]] == TRUE &
+        .data[["overlapping_samples_df1"]] == TRUE &
+        .data[["overlapping_samples_df2"]] == TRUE &
+        .data[["reference_medians"]] == TRUE ~ olink_norm_modes$subset,
       TRUE ~ NA_character_,
       .default = NA_character_
     )
