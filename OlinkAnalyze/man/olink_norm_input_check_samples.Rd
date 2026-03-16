@@ -4,7 +4,12 @@
 \alias{olink_norm_input_check_samples}
 \title{Check reference samples to be used for normalization}
 \usage{
-olink_norm_input_check_samples(lst_df_samples, lst_ref_samples, norm_mode)
+olink_norm_input_check_samples(
+  lst_df_samples,
+  lst_ref_samples,
+  lst_dup_samples,
+  norm_mode
+)
 }
 \arguments{
 \item{lst_df_samples}{Named list of all sample identifiers from datasets to
@@ -12,6 +17,9 @@ be normalized.}
 
 \item{lst_ref_samples}{Named list of reference sample identifiers to be used
 for normalization.}
+
+\item{lst_dup_samples}{Named list of duplicate sample identifiers identified
+by \code{check_npx}.}
 
 \item{norm_mode}{Character string indicating the type of normalization to be
 performed. Expecting one of
@@ -45,6 +53,9 @@ OlinkAnalyze:::olink_norm_input_check_samples(
       sort() |>
       head(n = 6L)
   ),
+  lst_dup_samples = list(
+    "p1" = character(0L)
+  ),
   norm_mode = "ref_median"
 )
 
@@ -61,6 +72,10 @@ OlinkAnalyze:::olink_norm_input_check_samples(
   lst_ref_samples = list(
     "p1" = ref_samples_bridge,
     "p2" = ref_samples_bridge
+  ),
+  lst_dup_samples = list(
+    "p1" = character(0L),
+    "p2" = character(0L)
   ),
   norm_mode = "bridge"
 )
@@ -97,6 +112,10 @@ OlinkAnalyze:::olink_norm_input_check_samples(
   lst_ref_samples = list(
     "p1" = ref_samples_subset_1,
     "p2" = ref_samples_subset_2
+  ),
+  lst_dup_samples = list(
+    "p1" = character(0L),
+    "p2" = character(0L)
   ),
   norm_mode = "subset"
 )

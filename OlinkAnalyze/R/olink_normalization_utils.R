@@ -154,6 +154,10 @@ olink_norm_input_check <- function(df1,
     lst_ref_samples <- list(overlapping_samples_df1)
     names(lst_ref_samples) <- df1_project_nr
 
+    # list of duplicate samples
+    lst_dup_samples <- list(df1_check_log$sample_id_dups)
+    names(lst_dup_samples) <- df1_project_nr
+
     # check reference_medians
     olink_norm_input_ref_medians(reference_medians = reference_medians)
 
@@ -197,6 +201,11 @@ olink_norm_input_check <- function(df1,
     }
     names(lst_ref_samples) <- c(df1_project_nr, df2_project_nr)
 
+    # list of duplicate samples
+    lst_dup_samples <- list(df1_check_log$sample_id_dups,
+                            df2_check_log$sample_id_dups)
+    names(lst_dup_samples) <- c(df1_project_nr, df2_project_nr)
+
   }
 
   # Update normalization message ----
@@ -231,6 +240,7 @@ olink_norm_input_check <- function(df1,
   olink_norm_input_check_samples(
     lst_df_samples = lst_df_samples,
     lst_ref_samples = lst_ref_samples,
+    lst_dup_samples = lst_dup_samples,
     norm_mode = norm_mode
   )
 
@@ -453,7 +463,7 @@ olink_norm_input_validate <- function(df1,
   # if there is an error, throw it and exit
   if (!is.na(error_msg_row)) {
 
-    cli::cli_abort(
+    cli::cli_abort( # nolint: return_linter
       message = c(
         "x" = error_msg_row,
         "i" = "Check function help for examples."
@@ -478,8 +488,6 @@ olink_norm_input_validate <- function(df1,
     )
 
   }
-
-  return(NULL)
 
 }
 
@@ -1126,6 +1134,8 @@ olink_norm_input_cross_product <- function(lst_df,
 #' be normalized.
 #' @param lst_ref_samples Named list of reference sample identifiers to be used
 #' for normalization.
+#' @param lst_dup_samples Named list of duplicate sample identifiers identified
+#' by `check_npx`.
 #' @param norm_mode Character string indicating the type of normalization to be
 #' performed. Expecting one of
 #' `r cli::ansi_collapse(x = OlinkAnalyze:::olink_norm_modes, sep2 = " or ", last = " or ")`. # nolint: line_length_linter
@@ -1151,6 +1161,9 @@ olink_norm_input_cross_product <- function(lst_df,
 #'       sort() |>
 #'       head(n = 6L)
 #'   ),
+#'   lst_dup_samples = list(
+#'     "p1" = character(0L)
+#'   ),
 #'   norm_mode = "ref_median"
 #' )
 #'
@@ -1167,6 +1180,10 @@ olink_norm_input_cross_product <- function(lst_df,
 #'   lst_ref_samples = list(
 #'     "p1" = ref_samples_bridge,
 #'     "p2" = ref_samples_bridge
+#'   ),
+#'   lst_dup_samples = list(
+#'     "p1" = character(0L),
+#'     "p2" = character(0L)
 #'   ),
 #'   norm_mode = "bridge"
 #' )
@@ -1204,12 +1221,17 @@ olink_norm_input_cross_product <- function(lst_df,
 #'     "p1" = ref_samples_subset_1,
 #'     "p2" = ref_samples_subset_2
 #'   ),
+#'   lst_dup_samples = list(
+#'     "p1" = character(0L),
+#'     "p2" = character(0L)
+#'   ),
 #'   norm_mode = "subset"
 #' )
 #' }
 #'
 olink_norm_input_check_samples <- function(lst_df_samples,
                                            lst_ref_samples,
+                                           lst_dup_samples,
                                            norm_mode) {
 
   if (!(length(lst_df_samples) %in% c(1L, 2L))) {
@@ -1232,6 +1254,33 @@ olink_norm_input_check_samples <- function(lst_df_samples,
         "x" = "{cli::qty(lst_ref_samples)} {?No/One/More than 2} set{?s} of
         samples provided in {.var lst_ref_samples}!",
         "i" = "Expected 1 or 2 sets."
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+  }
+
+  ## reference/overlap sample is a duplicate sample ----
+
+  # if any of the reference samples is also a duplicate sample, throw an error
+  dup_ref_overlap <- lapply(names(lst_ref_samples), function(n_df) {
+    intersect( # nolint: return_linter
+      lst_ref_samples[[n_df]],
+      lst_dup_samples[[n_df]]
+    ) |>
+      cli::ansi_collapse()
+  })
+  names(dup_ref_overlap) <- names(lst_ref_samples)
+  dup_ref_overlap <- dup_ref_overlap[nchar(dup_ref_overlap) > 0L]
+
+  if (length(dup_ref_overlap) > 0L) {
+    cli::cli_abort(
+      c(
+        "x" = "Reference samples also identified as duplicate samples in
+        datasets:",
+        paste0("* ", names(dup_ref_overlap), ": ", unlist(dup_ref_overlap)),
+        "i" = "Duplicate samples are not advised. More importantly, reference
+        samples should not be among duplicate samples!"
       ),
       call = rlang::caller_env(),
       wrap = FALSE

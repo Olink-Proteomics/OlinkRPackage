@@ -171,7 +171,8 @@ test_that(
       object = lst_check_out_noid,
       expected = list(
         ref_df = npx_data2_noid |>
-          dplyr::filter(!(.data[["OlinkID"]] == "OID01216")), # rm changed assay
+          # rm changed assay
+          dplyr::filter(!(.data[["OlinkID"]] == "OID01216")),
         ref_original_df = npx_data2_noid,
         ref_check_log = df2_noid_check_log,
         ref_samples = bridge_samples,
@@ -822,23 +823,33 @@ test_that(
 
     # no normalization column ----
 
-    df1_check_log <- check_npx(df = npx_data1) |>
+    df1_npx <- npx_data1 |>
+      dplyr::filter(
+        !grepl(pattern = "CONTROL_SAMPLE", x = .data[["SampleID"]])
+      )
+
+    df2_npx <- npx_data2 |>
+      dplyr::filter(
+        !grepl(pattern = "CONTROL_SAMPLE", x = .data[["SampleID"]])
+      )
+
+    df1_check_log <- check_npx(df = df1_npx) |>
       suppressMessages() |>
       suppressWarnings()
 
-    df2_check_log <- check_npx(df = npx_data2) |>
+    df2_check_log <- check_npx(df = df2_npx) |>
       suppressMessages() |>
       suppressWarnings()
 
     expect_warning(
       object = expect_message(
         object = lst_check_out <- olink_norm_input_check(
-          df1 = npx_data1,
+          df1 = df1_npx,
           df1_check_log = df1_check_log,
-          df2 = npx_data2,
+          df2 = df2_npx,
           df2_check_log = df2_check_log,
-          overlapping_samples_df1 = unique(npx_data1$SampleID),
-          overlapping_samples_df2 = unique(npx_data2$SampleID),
+          overlapping_samples_df1 = unique(df1_npx$SampleID),
+          overlapping_samples_df2 = unique(df2_npx$SampleID),
           df1_project_nr = "20200001",
           df2_project_nr = "20200002",
           reference_project = "20200001",
@@ -853,16 +864,16 @@ test_that(
     expect_identical(
       object = lst_check_out,
       expected = list(
-        ref_df = npx_data1,
-        ref_original_df = npx_data1,
+        ref_df = df1_npx,
+        ref_original_df = df1_npx,
         ref_check_log = df1_check_log,
-        ref_samples = unique(npx_data1$SampleID),
+        ref_samples = unique(df1_npx$SampleID),
         ref_name = "20200001",
         ref_product = NULL,
-        not_ref_df = npx_data2,
-        not_ref_original_df = npx_data2,
+        not_ref_df = df2_npx,
+        not_ref_original_df = df2_npx,
         not_ref_check_log = df2_check_log,
-        not_ref_samples = unique(npx_data2$SampleID),
+        not_ref_samples = unique(df2_npx$SampleID),
         not_ref_name = "20200002",
         not_ref_product = NULL,
         reference_medians = NULL,
@@ -874,11 +885,17 @@ test_that(
     # with normalization column ----
 
     npx_data1_norm <- npx_data1 |>
+      dplyr::filter(
+        !grepl(pattern = "CONTROL_SAMPLE", x = .data[["SampleID"]])
+      ) |>
       dplyr::mutate(
         Normalization = "Intensity"
       )
 
     npx_data2_norm <- npx_data2 |>
+      dplyr::filter(
+        !grepl(pattern = "CONTROL_SAMPLE", x = .data[["SampleID"]])
+      ) |>
       dplyr::mutate(
         Normalization = "Intensity"
       )
@@ -897,8 +914,8 @@ test_that(
         df1_check_log = df1_norm_check_log,
         df2 = npx_data2_norm,
         df2_check_log = df2_norm_check_log,
-        overlapping_samples_df1 = unique(npx_data1$SampleID),
-        overlapping_samples_df2 = unique(npx_data2$SampleID),
+        overlapping_samples_df1 = unique(npx_data1_norm$SampleID),
+        overlapping_samples_df2 = unique(npx_data2_norm$SampleID),
         df1_project_nr = "20200001",
         df2_project_nr = "20200002",
         reference_project = "20200002",
@@ -913,13 +930,13 @@ test_that(
         ref_df = npx_data2_norm,
         ref_original_df = npx_data2_norm,
         ref_check_log = df2_norm_check_log,
-        ref_samples = unique(npx_data2$SampleID),
+        ref_samples = unique(npx_data2_norm$SampleID),
         ref_name = "20200002",
         ref_product = NULL,
         not_ref_df = npx_data1_norm,
         not_ref_original_df = npx_data1_norm,
         not_ref_check_log = df1_norm_check_log,
-        not_ref_samples = unique(npx_data1$SampleID),
+        not_ref_samples = unique(npx_data1_norm$SampleID),
         not_ref_name = "20200001",
         not_ref_product = NULL,
         reference_medians = NULL,
@@ -942,22 +959,32 @@ test_that(
 
     # no normalization column ----
 
-    df1_check_log <- check_npx(df = npx_data1) |>
+    df1_npx <- npx_data1 |>
+      dplyr::filter(
+        !grepl(pattern = "CONTROL_SAMPLE", x = .data[["SampleID"]])
+      )
+
+    df2_npx <- npx_data2 |>
+      dplyr::filter(
+        !grepl(pattern = "CONTROL_SAMPLE", x = .data[["SampleID"]])
+      )
+
+    df1_check_log <- check_npx(df = df1_npx) |>
       suppressMessages() |>
       suppressWarnings()
 
-    df2_check_log <- check_npx(df = npx_data2) |>
+    df2_check_log <- check_npx(df = df2_npx) |>
       suppressMessages() |>
       suppressWarnings()
 
     expect_warning(
       object = expect_message(
         object = lst_check_out <- olink_norm_input_check(
-          df1 = npx_data1,
+          df1 = df1_npx,
           df1_check_log = df1_check_log,
-          df2 = npx_data2,
+          df2 = df2_npx,
           df2_check_log = df2_check_log,
-          overlapping_samples_df1 = unique(npx_data1$SampleID),
+          overlapping_samples_df1 = unique(df1_npx$SampleID),
           overlapping_samples_df2 = npx_df2_samples,
           df1_project_nr = "20200001",
           df2_project_nr = "20200002",
@@ -973,14 +1000,14 @@ test_that(
     expect_identical(
       object = lst_check_out,
       expected = list(
-        ref_df = npx_data1,
-        ref_original_df = npx_data1,
+        ref_df = df1_npx,
+        ref_original_df = df1_npx,
         ref_check_log = df1_check_log,
-        ref_samples = unique(npx_data1$SampleID),
+        ref_samples = unique(df1_npx$SampleID),
         ref_name = "20200001",
         ref_product = NULL,
-        not_ref_df = npx_data2,
-        not_ref_original_df = npx_data2,
+        not_ref_df = df2_npx,
+        not_ref_original_df = df2_npx,
         not_ref_check_log = df2_check_log,
         not_ref_samples = npx_df2_samples,
         not_ref_name = "20200002",
@@ -994,11 +1021,17 @@ test_that(
     # with normalization column ----
 
     npx_data1_norm <- npx_data1 |>
+      dplyr::filter(
+        !grepl(pattern = "CONTROL_SAMPLE", x = .data[["SampleID"]])
+      ) |>
       dplyr::mutate(
         Normalization = "Intensity"
       )
 
     npx_data2_norm <- npx_data2 |>
+      dplyr::filter(
+        !grepl(pattern = "CONTROL_SAMPLE", x = .data[["SampleID"]])
+      ) |>
       dplyr::mutate(
         Normalization = "Intensity"
       )
@@ -1017,7 +1050,7 @@ test_that(
         df1_check_log = df1_norm_check_log,
         df2 = npx_data2_norm,
         df2_check_log = df2_norm_check_log,
-        overlapping_samples_df1 = unique(npx_data1$SampleID),
+        overlapping_samples_df1 = unique(npx_data1_norm$SampleID),
         overlapping_samples_df2 = npx_df2_samples,
         df1_project_nr = "20200001",
         df2_project_nr = "20200002",
@@ -1039,7 +1072,7 @@ test_that(
         not_ref_df = npx_data1_norm,
         not_ref_original_df = npx_data1_norm,
         not_ref_check_log = df1_norm_check_log,
-        not_ref_samples = unique(npx_data1$SampleID),
+        not_ref_samples = unique(npx_data1_norm$SampleID),
         not_ref_name = "20200001",
         not_ref_product = NULL,
         reference_medians = NULL,
@@ -3709,6 +3742,9 @@ test_that(
                 sort() |>
                 head(n = 6L)
             ),
+            lst_dup_samples = list(
+              "p1" = character(0L)
+            ),
             norm_mode = "ref_median"
           )
         )
@@ -3734,6 +3770,9 @@ test_that(
                 dplyr::pull(.data[["SampleID"]]) |>
                 unique() |>
                 sort()
+            ),
+            lst_dup_samples = list(
+              "p1" = character(0L)
             ),
             norm_mode = "ref_median"
           )
@@ -3769,6 +3808,10 @@ test_that(
               "p1" = ref_samples_bridge,
               "p2" = ref_samples_bridge
             ),
+            lst_dup_samples = list(
+              "p1" = character(0L),
+              "p2" = character(0L)
+            ),
             norm_mode = "bridge"
           )
         )
@@ -3803,6 +3846,10 @@ test_that(
             lst_ref_samples = list(
               "p1" = ref_samples_bridge_3k_ht,
               "p2" = ref_samples_bridge_3k_ht
+            ),
+            lst_dup_samples = list(
+              "p1" = character(0L),
+              "p2" = character(0L)
             ),
             norm_mode = "norm_cross_product"
           )
@@ -3850,6 +3897,10 @@ test_that(
               "p1" = ref_samples_subset_1,
               "p2" = ref_samples_subset_2
             ),
+            lst_dup_samples = list(
+              "p1" = character(0L),
+              "p2" = character(0L)
+            ),
             norm_mode = "subset"
           )
         )
@@ -3886,6 +3937,10 @@ test_that(
                    paste0(ref_samples_bridge[13L:16L], "_not_here")),
           "p2" = ref_samples_bridge
         ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
+        ),
         norm_mode = "bridge"
       ),
       regexp = "B37_not_here, B45_not_here, B63_not_here, and B75_not_here"
@@ -3908,6 +3963,10 @@ test_that(
           "p2" = c(paste0(ref_samples_bridge[1L:2L], "_not_here"),
                    ref_samples_bridge[3L:12L])
         ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
+        ),
         norm_mode = "bridge"
       ),
       regexp = "A13_not_here and A29_not_here"
@@ -3928,6 +3987,10 @@ test_that(
           "p1" = ref_samples_bridge,
           "p2" = c(paste0(ref_samples_bridge[1L:2L], "_not_here"),
                    ref_samples_bridge[3L:12L])
+        ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
         ),
         norm_mode = "bridge"
       ),
@@ -3976,6 +4039,10 @@ test_that(
                    ref_samples_subset_1[61L:156L]),
           "p2" = ref_samples_subset_2
         ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
+        ),
         norm_mode = "subset"
       ),
       regexp = "A52_not_here, A53_not_here, A54_not_here, A55_not_here, A56_not"
@@ -3999,6 +4066,10 @@ test_that(
           "p2" = c(paste0(ref_samples_subset_2[1L:50L], "_not_here"),
                    ref_samples_subset_2)
         ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
+        ),
         norm_mode = "subset"
       ),
       regexp = "A52_not_here, A53_not_here, A54_not_here, A55_not_here, A56_not"
@@ -4019,6 +4090,10 @@ test_that(
           "p1" = ref_samples_subset_1,
           "p2" = c(paste0(ref_samples_subset_2[1L:50L], "_not_here"),
                    ref_samples_subset_2)
+        ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
         ),
         norm_mode = "subset"
       ),
@@ -4055,6 +4130,10 @@ test_that(
                    ref_samples_bridge),
           "p2" = ref_samples_bridge
         ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
+        ),
         norm_mode = "bridge"
       ),
       regexp = "* p1: A13 and A29"
@@ -4075,6 +4154,10 @@ test_that(
           "p1" = ref_samples_bridge,
           "p2" = c(ref_samples_bridge[1L:2L],
                    ref_samples_bridge)
+        ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
         ),
         norm_mode = "bridge"
       ),
@@ -4122,6 +4205,10 @@ test_that(
                    ref_samples_subset_1),
           "p2" = ref_samples_subset_2
         ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
+        ),
         norm_mode = "subset"
       ),
       regexp = "* p1: A1, A2, A3, A4, A5, A6, A7, A8, A9, A10,"
@@ -4143,6 +4230,10 @@ test_that(
                    ref_samples_subset_1),
           "p2" = c(ref_samples_subset_2[1L:50L],
                    ref_samples_subset_2)
+        ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
         ),
         norm_mode = "subset"
       ),
@@ -4178,6 +4269,10 @@ test_that(
           "p1" = head(x = ref_samples_bridge, 10L),
           "p2" = ref_samples_bridge
         ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
+        ),
         norm_mode = "bridge"
       ),
       regexp = "There are 10 bridge samples for dataset `p1` and 16 bridge samp"
@@ -4197,6 +4292,10 @@ test_that(
         lst_ref_samples = list(
           "p1" = ref_samples_bridge,
           "p2" = head(x = ref_samples_bridge, -5L)
+        ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
         ),
         norm_mode = "bridge"
       ),
@@ -4232,6 +4331,11 @@ test_that(
           "p3" = unique(npx_data1$SampleID)
         ),
         lst_ref_samples = list(),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L),
+          "p3" = character(0L)
+        ),
         norm_mode = "ref_median"
       ),
       regexp = "More than 2 sets of samples provided in `lst_df_samples`!"
@@ -4254,6 +4358,10 @@ test_that(
           "p2" = unique(npx_data2$SampleID)
         ),
         lst_ref_samples = list(),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
+        ),
         norm_mode = "ref_median"
       ),
       regexp = "No sets of samples provided in `lst_ref_samples`!"
@@ -4271,6 +4379,11 @@ test_that(
           "p1" = c("A", "B"),
           "p2" = c("A", "B"),
           "p3" = c("A", "B")
+        ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L),
+          "p3" = character(0L)
         ),
         norm_mode = "ref_median"
       ),
@@ -4298,6 +4411,10 @@ test_that(
                            y = npx_data2$SampleID) |>
             (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x, fixed = TRUE)])()
         ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
+        ),
         norm_mode = "bridge"
       ),
       regexp = "Number of sample vectors in `lst_df_samples` differs from the n"
@@ -4316,11 +4433,107 @@ test_that(
             (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x, fixed = TRUE)])(),
           "p2" = c("A", "B", "C")
         ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
+        ),
         norm_mode = "bridge"
       ),
       regexp = "Number of sample vectors in `lst_df_samples` differs from the n"
     )
 
+  }
+)
+
+test_that(
+  "olink_norm_input_check_samples - error - ref samples are duplicated in df",
+  {
+    skip_if_not_installed("arrow")
+
+    # duplicate ref samples in df - 1 dataset ----
+
+    expect_error(
+      object = olink_norm_input_check_samples(
+        lst_df_samples = list(
+          "p1" = c("A", "B", "C", "D", "A")
+        ),
+        lst_ref_samples = list(
+          "p1" = c("A", "B")
+        ),
+        lst_dup_samples = list(
+          "p1" = c("A")
+        ),
+        norm_mode = "ref_median"
+      ),
+      regexp = "* p1: A",
+      fixed = TRUE
+    )
+
+    # duplicate ref samples in df - 2 datasets ----
+
+    expect_error(
+      object = olink_norm_input_check_samples(
+        lst_df_samples = list(
+          "p1" = c("A", "B", "C", "D", "A"),
+          "p2" = c("E", "F", "G", "H", "E")
+        ),
+        lst_ref_samples = list(
+          "p1" = c("A", "B"),
+          "p2" = c("E", "F")
+        ),
+        lst_dup_samples = list(
+          "p1" = c("A"),
+          "p2" = c("E")
+        ),
+        norm_mode = "bridge"
+      ),
+      regexp = "* p1: A\n* p2: E",
+      fixed = TRUE
+    )
+
+    # duplicate ref samples in df - 2 datasets and multiple replicates ----
+
+    expect_error(
+      object = olink_norm_input_check_samples(
+        lst_df_samples = list(
+          "p1" = c("A", "B", "C", "D", "A", "A"),
+          "p2" = c("E", "F", "G", "H", "E", "E")
+        ),
+        lst_ref_samples = list(
+          "p1" = c("A", "B"),
+          "p2" = c("E", "F")
+        ),
+        lst_dup_samples = list(
+          "p1" = c("A"),
+          "p2" = c("E")
+        ),
+        norm_mode = "bridge"
+      ),
+      regexp = "* p1: A\n* p2: E",
+      fixed = TRUE
+    )
+
+    # duplicate ref samples in df - 2 datasets and multiple replicates v2 ----
+
+    expect_error(
+      object = olink_norm_input_check_samples(
+        lst_df_samples = list(
+          "p1" = c("A", "A", "B", "B", "D", "D", "E", "E", "C", "F", "G", "H"),
+          "p2" = c("A", "A", "B", "C", "D", "E", "E", "G", "H", "I", "J", "K")
+        ),
+        lst_ref_samples = list(
+          "p1" = c("A", "B", "C", "D"),
+          "p2" = c("A", "B", "C", "D")
+        ),
+        lst_dup_samples = list(
+          "p1" = c("A", "B", "D", "E"),
+          "p2" = c("A", "E")
+        ),
+        norm_mode = "bridge"
+      ),
+      regexp = "* p1: A, B, and D\n* p2: A",
+      fixed = TRUE
+    )
   }
 )
 
