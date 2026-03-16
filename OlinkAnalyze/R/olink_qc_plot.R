@@ -38,20 +38,28 @@
 #' \donttest{
 #' library(dplyr)
 #'
-#' olink_qc_plot(npx_data1, color_g = "QC_Warning")
+#'if (rlang::is_installed(pkg = c("ggrepel"))) {
+#'
+#' olink_qc_plot(npx_data1,
+#' color_g = "QC_Warning",
+#' label_outliers = TRUE)
 #'
 #' #Change the outlier threshold to +-4SD
 #' olink_qc_plot(npx_data1,
 #' color_g = "QC_Warning",
 #'  IQR_outlierDef = 4,
-#'  median_outlierDef = 4)
+#'  median_outlierDef = 4,
+#'  label_outliers = TRUE)
 #'
 #' #Identify the outliers
 #' qc <- olink_qc_plot(npx_data1,
 #' color_g = "QC_Warning",
 #' IQR_outlierDef = 4,
-#' median_outlierDef = 4)
+#' median_outlierDef = 4,
+#' label_outliers = TRUE)
+#'
 #' outliers <- qc$data |> filter(Outlier == 1)
+#' }
 #' }
 #' @importFrom dplyr group_by mutate ungroup select distinct if_else filter case_when
 #' @importFrom rlang ensym
@@ -63,20 +71,20 @@ olink_qc_plot <- function(df,
                           check_log = NULL,
                           color_g = "QC_Warning",
                           plot_index = FALSE,
-                          label_outliers = TRUE,
-                          IQR_outlierDef = 3, #nolint object_name_linter
-                          median_outlierDef = 3, #nolint object_name_linter
+                          label_outliers = FALSE,
+                          IQR_outlierDef = 3L, #nolint object_name_linter
+                          median_outlierDef = 3L, #nolint object_name_linter
                           outlierLines = TRUE, #nolint object_name_linter
                           facetNrow = NULL, #nolint object_name_linter
                           facetNcol = NULL, #nolint object_name_linter
                           ...) {
 
   #checking ellipsis
-  if (length(list(...)) > 0) {
+  if (length(list(...)) > 0L) {
 
     ellipsis_variables <- names(list(...))
 
-    if (length(ellipsis_variables) == 1) {
+    if (length(ellipsis_variables) == 1L) {
 
       if (!(ellipsis_variables == "coloroption")) {
 
@@ -155,7 +163,7 @@ olink_qc_plot <- function(df,
     if (color_g %in% osi_cat_cols) {
 
       # Check that values are in allowed range
-      allowed <- as.character(0:4)
+      allowed <- as.character(0L:4L)
       invalid_vals <- unique(v_chr[!is.na(v_chr) & !(v_chr %in% allowed)])
 
       if (length(invalid_vals) > 0L) {
@@ -197,7 +205,7 @@ olink_qc_plot <- function(df,
 
       # Detect out-of-range values
       out_of_range_idx <- which(
-        !is.na(df[[color_g]]) & (df[[color_g]] < 0 | df[[color_g]] > 1)
+        !is.na(df[[color_g]]) & (df[[color_g]] < 0L | df[[color_g]] > 1L)
       )
       if (length(out_of_range_idx) > 0L) {
         bad_vals <- unique(df[[color_g]][out_of_range_idx]) #nolint object_name_linter
@@ -250,7 +258,7 @@ olink_qc_plot <- function(df,
                                              .data[["sample_median"]] > .data[["median_low"]] & #nolint line_length_linter
                                              .data[["IQR"]] > .data[["iqr_low"]] & #nolint line_length_linter
                                              .data[["IQR"]] < .data[["iqr_high"]], #nolint line_length_linter
-                                           0, 1))
+                                           0L, 1L))
 
 
   qc_plot <- df_qr |>
@@ -302,7 +310,7 @@ olink_qc_plot <- function(df,
     qc_plot <- qc_plot +
       ggplot2::geom_text(ggplot2::aes(color = !!rlang::ensym(color_g),
                                       label = .data[["Index"]]),
-                         size = 3)
+                         size = 3L)
   } else {
     qc_plot <- qc_plot +
       ggplot2::geom_point(ggplot2::aes(color = !!rlang::ensym(color_g)),
@@ -310,6 +318,11 @@ olink_qc_plot <- function(df,
   }
 
   if (label_outliers) {
+
+    rlang::check_installed(
+      pkg = c("lme4", "lmerTest", "broom"),
+      call = rlang::caller_env()
+    )
 
     outlier_labels <- qc_plot@data |>
       dplyr::mutate(SampleIDPlot = dplyr::case_when(Outlier == 1 ~ SampleID,
@@ -320,7 +333,7 @@ olink_qc_plot <- function(df,
                                 box.padding = 0.5,
                                 min.segment.length = 0.1,
                                 show.legend = FALSE,
-                                size = 3)
+                                size = 3L)
 
   }
 

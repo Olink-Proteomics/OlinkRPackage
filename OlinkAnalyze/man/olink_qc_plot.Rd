@@ -9,9 +9,9 @@ olink_qc_plot(
   check_log = NULL,
   color_g = "QC_Warning",
   plot_index = FALSE,
-  label_outliers = TRUE,
-  IQR_outlierDef = 3,
-  median_outlierDef = 3,
+  label_outliers = FALSE,
+  IQR_outlierDef = 3L,
+  median_outlierDef = 3L,
   outlierLines = TRUE,
   facetNrow = NULL,
   facetNcol = NULL,
@@ -69,20 +69,28 @@ the mean sample median (default 3).
 \donttest{
 library(dplyr)
 
-olink_qc_plot(npx_data1, color_g = "QC_Warning")
+if (rlang::is_installed(pkg = c("ggrepel"))) {
+
+olink_qc_plot(npx_data1,
+color_g = "QC_Warning",
+label_outliers = TRUE)
 
 #Change the outlier threshold to +-4SD
 olink_qc_plot(npx_data1,
 color_g = "QC_Warning",
  IQR_outlierDef = 4,
- median_outlierDef = 4)
+ median_outlierDef = 4,
+ label_outliers = TRUE)
 
 #Identify the outliers
 qc <- olink_qc_plot(npx_data1,
 color_g = "QC_Warning",
 IQR_outlierDef = 4,
-median_outlierDef = 4)
+median_outlierDef = 4,
+label_outliers = TRUE)
+
 outliers <- qc$data |> filter(Outlier == 1)
+}
 }
 }
 \keyword{NPX}
