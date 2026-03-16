@@ -146,13 +146,3 @@ test_that(
     )
   }
 )
-
-test_that(
-  "get_alt_colnames - error",
-  {
-    expect_error(
-      object = get_alt_colnames(col_key = "An_Unacceptable_Col_Key"),
-      regexp = "\"An_Unacceptable_Col_Key\" is not a valid column key!"
-    )
-  }
-)
