@@ -87,6 +87,15 @@ olink_bridgeability_plot <- function(df,
   # Check data format
   check_log <- run_check_npx(df = df, check_log = check_log)
 
+  # check that check_log$col_names$count exists
+  check_log_colname(check_log = check_log, col_key = "count")
+
+  # check that columns not pre-cleared by check_log are present
+  check_columns(
+    df = df,
+    col_list = list("Project", "BridgingRecommendation")
+  )
+
   # check OlinkID ----
 
   olink_id_set <- df |>
@@ -123,12 +132,58 @@ olink_bridgeability_plot <- function(df,
     min_count = min_count
   )
 
-  # Adjusting the platform and add color green for bridgeable assays
+  # Check there are exactly 2 projects in the dataset for bridging comparison
   if (length(unique(df[["Project"]])) != 2L) {
     cli::cli_abort(
       c(
         "x" = "Identified {length(unique(df[[\"Project\"]]))} project{?s}.",
         "i" = "Expected 2!"
+      )
+    )
+  }
+
+  # check that all BridgingRecommendation are either "MedianCentering",
+  # "QuantileSmoothing" or "NotBridgeable"
+  bridge_recommend_all <- unique(df[["BridgingRecommendation"]])
+  expected_recommendations <- c("MedianCentering",
+                                "QuantileSmoothing",
+                                "NotBridgeable")
+  if (!all(bridge_recommend_all %in% expected_recommendations)) {
+    invalid_recommendation <- setdiff(x = bridge_recommend_all, # nolint: object_usage_linter
+                                      y = expected_recommendations)
+
+    cli::cli_abort(
+      c(
+        "x" = "{cli::qty(invalid_recommendation)}Identified invalid bridging
+        recommendation{?s} in column {.arg {\"BridgingRecommendation\"}}:
+        {.val {invalid_recommendation}}.",
+        "i" = "Expected values are {.val {expected_recommendations}}."
+      )
+    )
+  }
+
+  # check that there are not duplicate samples, to ensure that the pivot
+  # functions do not fail.
+  df_dups <- df |>
+    dplyr::count(
+      .data[[check_log$col_names$sample_id]],
+      .data[[check_log$col_names$olink_id]],
+      .data[["Project"]]
+    ) |>
+    dplyr::filter(
+      .data[["n"]] > 1L
+    ) |>
+    dplyr::pull(
+      .data[[check_log$col_names$sample_id]]
+    ) |>
+    unique()
+  if (length(df_dups) > 0L) {
+    cli::cli_abort(
+      c(
+        "x" = "{cli::qty(df_dups)}Identified {.val {length(df_dups)}} duplicate
+        sample{?s} in dataset {.arg df}: {.val {df_dups}}.",
+        "i" = "There should be entry one sample per combination of sample
+        identifier, Olink assay identifier and project!"
       )
     )
   }
