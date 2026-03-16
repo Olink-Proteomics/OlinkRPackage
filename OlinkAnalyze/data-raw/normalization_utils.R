@@ -38,14 +38,14 @@ olink_norm_mode_combos <- expand.grid(df1 = c(FALSE, TRUE),
                                       reference_medians = c(FALSE, TRUE)) |>
   dplyr::mutate(
     error_msg = dplyr::case_when(
-      .data[["df1"]] == FALSE ~ "Required {.var df1} is missing!",
+      .data[["df1"]] == FALSE ~ "Required {.arg df1} is missing!",
       .data[["df1"]] == TRUE &
         .data[["df2"]] == FALSE &
-        .data[["reference_medians"]] == FALSE ~ "When {.var df1} is provided, either {.var df2} or {.var reference_medians} is required!", # nolint: line_length_linter
+        .data[["reference_medians"]] == FALSE ~ "When {.arg df1} is provided, either {.arg df2} or {.arg reference_medians} is required!", # nolint: line_length_linter
       .data[["df1"]] == TRUE &
         .data[["df2"]] == FALSE &
         .data[["reference_medians"]] == TRUE &
-        .data[["overlapping_samples_df1"]] == FALSE ~ "When {.var df1} and {.var reference_medians} are provided, {.var overlapping_samples_df1} is required!", # nolint: line_length_linter
+        .data[["overlapping_samples_df1"]] == FALSE ~ "When {.arg df1} and {.arg reference_medians} are provided, {.arg overlapping_samples_df1} is required!", # nolint: line_length_linter
       .data[["df1"]] == TRUE &
         .data[["df2"]] == FALSE &
         .data[["reference_medians"]] == TRUE &
@@ -58,7 +58,7 @@ olink_norm_mode_combos <- expand.grid(df1 = c(FALSE, TRUE),
         .data[["overlapping_samples_df2"]] == TRUE ~ NA_character_,
       .data[["df1"]] == TRUE &
         .data[["df2"]] == TRUE &
-        .data[["overlapping_samples_df1"]] == FALSE ~ "When {.var df1} and {.var df2} are provided, at least {.var overlapping_samples_df1} is required!", # nolint: line_length_linter
+        .data[["overlapping_samples_df1"]] == FALSE ~ "When {.arg df1} and {.arg df2} are provided, at least {.arg overlapping_samples_df1} is required!", # nolint: line_length_linter
       .data[["df1"]] == TRUE &
         .data[["df2"]] == TRUE &
         .data[["overlapping_samples_df1"]] == TRUE &
@@ -100,7 +100,7 @@ olink_norm_mode_combos <- expand.grid(df1 = c(FALSE, TRUE),
         .data[["df2"]] == FALSE &
         .data[["reference_medians"]] == TRUE &
         .data[["overlapping_samples_df1"]] == TRUE &
-        .data[["overlapping_samples_df2"]] == TRUE ~ "{.var overlapping_samples_df2} will be ignored", # nolint: line_length_linter
+        .data[["overlapping_samples_df2"]] == TRUE ~ "{.arg overlapping_samples_df2} will be ignored", # nolint: line_length_linter
       .data[["df1"]] == TRUE &
         .data[["df2"]] == TRUE &
         .data[["overlapping_samples_df1"]] == FALSE ~ NA_character_,
@@ -113,7 +113,7 @@ olink_norm_mode_combos <- expand.grid(df1 = c(FALSE, TRUE),
         .data[["df2"]] == TRUE &
         .data[["overlapping_samples_df1"]] == TRUE &
         .data[["overlapping_samples_df2"]] == FALSE &
-        .data[["reference_medians"]] == TRUE ~ "{.var reference_medians} will be ignored", # nolint: line_length_linter
+        .data[["reference_medians"]] == TRUE ~ "{.arg reference_medians} will be ignored", # nolint: line_length_linter
       .data[["df1"]] == TRUE &
         .data[["df2"]] == TRUE &
         .data[["overlapping_samples_df1"]] == TRUE &
@@ -123,7 +123,7 @@ olink_norm_mode_combos <- expand.grid(df1 = c(FALSE, TRUE),
         .data[["df2"]] == TRUE &
         .data[["overlapping_samples_df1"]] == TRUE &
         .data[["overlapping_samples_df2"]] == TRUE &
-        .data[["reference_medians"]] == TRUE ~ "{.var reference_medians} will be ignored", # nolint: line_length_linter
+        .data[["reference_medians"]] == TRUE ~ "{.arg reference_medians} will be ignored", # nolint: line_length_linter
       TRUE ~ NA_character_,
       .default = NA_character_
     ),
