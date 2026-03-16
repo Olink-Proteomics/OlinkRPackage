@@ -86,7 +86,9 @@ Imports:
 Suggests: 
     broom,
     car,
+    curl,
     emmeans,
+    ggpubr,
     lme4,
     lmerTest,
     ordinal,

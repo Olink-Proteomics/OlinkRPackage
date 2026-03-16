@@ -107,8 +107,7 @@ get_file_ext <- function(name_sub = NULL) {
 
 #' Gets alternative column names for a given column key.
 #'
-#' @param col_key Column key for which to retrieve alternative column names. One
-#' of `r ansi_collapse_quot(unique(column_name_dict[["col_key"]]))`.
+#' @inherit check_col_key params
 #'
 #' @keywords internal
 #'
@@ -121,29 +120,18 @@ get_file_ext <- function(name_sub = NULL) {
 #' }
 get_alt_colnames <- function(col_key) {
 
-  check_is_scalar_character(x = col_key,
-                            error = TRUE)
+  check_col_key(col_key = col_key)
 
-  if (!(col_key %in% column_name_dict$col_key)) {
-    cli::cli_abort(
-      c(
-        "x" = "{.val {col_key}} is not a valid column key!",
-        "i" = "Expected one of: {.val {unique(column_name_dict[['col_key']])}}"
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-  } else {
-    alt_colnames <- column_name_dict |>
-      dplyr::filter(
-        .data[["col_key"]] == .env[["col_key"]]
-      ) |>
-      dplyr::pull(
-        .data[["col_names"]]
-      ) |>
-      unlist() |>
-      unname() |>
-      unique()
-  }
+  alt_colnames <- column_name_dict |>
+    dplyr::filter(
+      .data[["col_key"]] == .env[["col_key"]]
+    ) |>
+    dplyr::pull(
+      .data[["col_names"]]
+    ) |>
+    unlist() |>
+    unname() |>
+    unique()
+
   return(alt_colnames)
 }
