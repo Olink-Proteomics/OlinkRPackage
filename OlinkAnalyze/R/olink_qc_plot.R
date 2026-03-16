@@ -64,7 +64,6 @@
 #' @importFrom dplyr group_by mutate ungroup select distinct if_else filter case_when
 #' @importFrom rlang ensym
 #' @importFrom ggplot2 ggplot geom_hline geom_vline xlab facet_wrap geom_text geom_point
-#' @importFrom ggrepel geom_label_repel
 #' @importFrom stringr str_detect str_replace
 
 olink_qc_plot <- function(df,
