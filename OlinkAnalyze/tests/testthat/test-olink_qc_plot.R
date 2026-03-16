@@ -1,5 +1,6 @@
-skip_if_not_installed("dplyr")
-skip_if_not_installed("tibble")
+testthat::skip_if_not_installed(pkg = "dplyr")
+testthat::skip_if_not_installed(pkg = "tibble")
+testthat::skip_if_not_installed(pkg = "ggrepel")
 
 set.seed(123)  # reproducible randomization
 
@@ -106,8 +107,6 @@ data1 <- OlinkAnalyze::npx_data1 |>
   dplyr::filter(!grepl("CONTROL", SampleID))
 
 test_that("OSI errors: using npx_data1 and OSI columns", {
-
-  skip_if_not_installed(pkg = "ggrepel")
 
   # ----------------------------
   # OSICategory invalid value
@@ -259,8 +258,6 @@ qc_plot2 <- npx_data1 |>
 
 test_that("olink_qc_plot works", {
 
-  skip_if_not_installed(pkg = "ggrepel")
-
   testthat::expect_message(
     testthat::expect_message(
       testthat::expect_warning(olink_qc_plot(npx_data_format221010),
@@ -306,8 +303,6 @@ test_that("olink_qc_plot works", {
 })
 
 test_that("olink_qc_plot works - vdiffr", {
-
-  skip_if_not_installed(pkg = "ggrepel")
 
   skip_on_cran()
   skip_if_not_installed("vdiffr")

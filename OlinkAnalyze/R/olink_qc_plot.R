@@ -319,7 +319,7 @@ olink_qc_plot <- function(df,
   if (label_outliers) {
 
     rlang::check_installed(
-      pkg = c("lme4", "lmerTest", "broom"),
+      pkg = c("ggrepel"),
       call = rlang::caller_env()
     )
 
