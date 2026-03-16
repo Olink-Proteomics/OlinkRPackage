@@ -576,7 +576,7 @@ olink_normalization_qs <- function(lst_df,
     function(l_df) {
       l_df |> # nolint: return_linter
         dplyr::filter(
-          # only customer samples
+          # only user samples
           dplyr::if_any(
             dplyr::any_of(
               c(ref_cols$sample_type, not_ref_cols$sample_type)
