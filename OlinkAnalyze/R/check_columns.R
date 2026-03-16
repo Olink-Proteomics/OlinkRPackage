@@ -160,3 +160,58 @@ check_columns <- function(df,
 
   return(invisible(NULL))
 }
+
+#' Check if check_log has identified required column in the dataset.
+#'
+#' @inherit .downstream_fun_args params
+#' @inherit check_col_key params
+#'
+#' @returns Nothing or an error message if the required column is missing.
+#'
+#' @keywords internal
+#'
+check_log_colname <- function(check_log, col_key) {
+  check_col_key(col_key = col_key)
+
+  if (!(col_key %in% names(check_log$col_names))) {
+    cli::cli_abort(
+      c(
+        "x" = "Input dataset lacks a column matching to the key
+        {.val {col_key}}!",
+        "i" = "Please make sure that the it contains a column named:
+        {.or {.val {get_alt_colnames(col_key = col_key)}}}."
+
+      ),
+      call = rlang::caller_env(),
+      wrap = TRUE
+    )
+  }
+  return(invisible(NULL))
+}
+
+#' Check if col_key is valid.
+#'
+#' @param col_key Column key for which to retrieve alternative column names. One
+#' of `r ansi_collapse_quot(unique(column_name_dict[["col_key"]]))`.
+#'
+#' @returns Nothing or an error message if col_key is not valid.
+#'
+#' @keywords internal
+#'
+check_col_key <- function(col_key) {
+  check_is_scalar_character(x = col_key,
+                            error = TRUE)
+
+  if (!(col_key %in% column_name_dict$col_key)) {
+    cli::cli_abort(
+      c(
+        "x" = "{.val {col_key}} is not a valid column key!",
+        "i" = "Expected one of: {.val {unique(column_name_dict[['col_key']])}}"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+  }
+
+  return(invisible(NULL))
+}
