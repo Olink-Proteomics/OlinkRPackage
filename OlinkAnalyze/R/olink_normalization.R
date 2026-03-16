@@ -1041,8 +1041,11 @@ norm_internal_adjust_not_ref <- function(df,
 norm_internal_update_maxlod <- function(df,
                                         cols) {
 
+  maxlod_cols <- get_alt_colnames(col_key = "lod") |>
+    (\(.) .[grepl(pattern = "max", x = ., ignore.case = TRUE)])()
+
   # check if MaxLOD is present in the column names
-  if (any(names(df) %in% olink_norm_recalc$max_lod)) {
+  if (any(names(df) %in% maxlod_cols)) {
 
     # update MaxLOD to the maximum of the MaxLODs for each assay
     df_update_maxlod <- df |>
@@ -1051,7 +1054,7 @@ norm_internal_update_maxlod <- function(df,
       ) |>
       dplyr::mutate(
         dplyr::across(
-          dplyr::any_of(olink_norm_recalc$max_lod),
+          dplyr::any_of(maxlod_cols),
           ~ max(.x, na.rm = TRUE)
         )
       ) |>
