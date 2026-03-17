@@ -786,3 +786,303 @@ test_that(
     )
   }
 )
+
+# Test select_ont ----
+
+test_that(
+  "test_prep works",
+  {
+    skip_on_cran()
+    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    # human & MSigDb ----
+
+    expect_message(
+      object = ont_hs_msigdb <- select_ont(
+        ontology = "MSigDb",
+        organism = "human",
+        only_relevant = FALSE
+      ),
+      regexp = "Using MSigDB..."
+    )
+
+    expect_identical(
+      object = ont_hs_msigdb[["gs_collection"]] |> unique() |> sort(),
+      expected = c("C2", "C5")
+    )
+
+    expect_identical(
+      object = ont_hs_msigdb[["gs_subcollection"]] |> unique() |> sort(),
+      expected = c("CGP", "CP", "CP:BIOCARTA", "CP:KEGG_LEGACY",
+                   "CP:KEGG_MEDICUS", "CP:PID", "CP:REACTOME",
+                   "CP:WIKIPATHWAYS", "GO:BP", "GO:CC", "GO:MF", "HPO")
+    )
+
+    expect_identical(
+      object = ont_hs_msigdb[["db_target_species"]] |> unique() |> sort(),
+      expected = "HS"
+    )
+
+    # human & MSigDb_com ----
+
+    expect_message(
+      object = ont_hs_msigdbcom <- select_ont(
+        ontology = "MSigDb_com",
+        organism = "human",
+        only_relevant = FALSE
+      ),
+      regexp = "Using MSigDB without KEGG subcollections..."
+    )
+
+    expect_identical(
+      object = ont_hs_msigdbcom[["gs_collection"]] |> unique() |> sort(),
+      expected = c("C2", "C5")
+    )
+
+    expect_identical(
+      object = ont_hs_msigdbcom[["gs_subcollection"]] |> unique() |> sort(),
+      expected = c("CGP", "CP", "CP:BIOCARTA", "CP:PID", "CP:REACTOME",
+                   "CP:WIKIPATHWAYS", "GO:BP", "GO:CC", "GO:MF", "HPO")
+    )
+
+    expect_identical(
+      object = ont_hs_msigdbcom[["db_target_species"]] |> unique() |> sort(),
+      expected = "HS"
+    )
+
+    # human & KEGG ----
+
+    expect_message(
+      object = expect_message(
+        object = ont_hs_kegg <- select_ont(
+          ontology = "KEGG",
+          organism = "human",
+          only_relevant = FALSE
+        ),
+        regexp = "Extracting KEGG Database from MSigDB..."
+      ),
+      regexp = "KEGG is not approved for commercial use!"
+    )
+
+    expect_identical(
+      object = ont_hs_kegg[["gs_collection"]] |> unique() |> sort(),
+      expected = "C2"
+    )
+
+    expect_identical(
+      object = ont_hs_kegg[["gs_subcollection"]] |> unique() |> sort(),
+      expected = "CP:KEGG_MEDICUS"
+    )
+
+    expect_identical(
+      object = ont_hs_kegg[["db_target_species"]] |> unique() |> sort(),
+      expected = "HS"
+    )
+
+    # human & GO ----
+
+    expect_message(
+      object = ont_hs_go <- select_ont(
+        ontology = "GO",
+        organism = "human",
+        only_relevant = FALSE
+      ),
+      regexp = "Extracting GO Database from MSigDB..."
+    )
+
+    expect_identical(
+      object = ont_hs_go[["gs_collection"]] |> unique() |> sort(),
+      expected = "C5"
+    )
+
+    expect_identical(
+      object = ont_hs_go[["gs_subcollection"]] |> unique() |> sort(),
+      expected = c("GO:BP", "GO:CC", "GO:MF")
+    )
+
+    expect_identical(
+      object = ont_hs_go[["db_target_species"]] |> unique() |> sort(),
+      expected = "HS"
+    )
+
+    # human & Reactome ----
+
+    expect_message(
+      object = ont_hs_reactome <- select_ont(
+        ontology = "Reactome",
+        organism = "human",
+        only_relevant = FALSE
+      ),
+      regexp = "Extracting Reactome Database from MSigDB..."
+    )
+
+    expect_identical(
+      object = ont_hs_reactome[["gs_collection"]] |> unique() |> sort(),
+      expected = "C2"
+    )
+
+    expect_identical(
+      object = ont_hs_reactome[["gs_subcollection"]] |> unique() |> sort(),
+      expected = "CP:REACTOME"
+    )
+
+    expect_identical(
+      object = ont_hs_reactome[["db_target_species"]] |> unique() |> sort(),
+      expected = "HS"
+    )
+
+    # mouse warmup ----
+
+    # we run this because "msigdbr::msigdbr" prints a startup message when run
+    # with the current setting for mouse. We want to ensure that this message is
+    # printed when we call select_ont with mouse and not when we call
+    # msigdbr::msigdbr directly, so we run it here to "use up" the startup
+    # message for mouse before we run the tests for select_ont.
+
+    expect_no_condition(
+      object = msigdbr::msigdbr(
+        species = "Mus musculus",
+        collection = "C2"
+      ) |>
+        suppressMessages() |>
+        suppressWarnings() |>
+        suppressPackageStartupMessages()
+    )
+
+    # mouse & MSigDb ----
+
+    expect_message(
+      object = ont_mm_msigdb <- select_ont(
+        ontology = "MSigDb",
+        organism = "mouse",
+        only_relevant = FALSE
+      ),
+      regexp = "Using MSigDB..."
+    )
+
+    expect_identical(
+      object = ont_mm_msigdb[["gs_collection"]] |> unique() |> sort(),
+      expected = c("C2", "C5")
+    )
+
+    expect_identical(
+      object = ont_mm_msigdb[["gs_subcollection"]] |> unique() |> sort(),
+      expected = c("CGP", "CP", "CP:BIOCARTA", "CP:KEGG_LEGACY",
+                   "CP:KEGG_MEDICUS", "CP:PID", "CP:REACTOME",
+                   "CP:WIKIPATHWAYS", "GO:BP", "GO:CC", "GO:MF", "HPO")
+    )
+
+    expect_identical(
+      object = ont_mm_msigdb[["db_target_species"]] |> unique() |> sort(),
+      expected = "HS"
+    )
+
+    # mouse & MSigDb_com ----
+
+    expect_message(
+      object = ont_mm_msigdbcom <- select_ont(
+        ontology = "MSigDb_com",
+        organism = "mouse",
+        only_relevant = FALSE
+      ),
+      regexp = "Using MSigDB without KEGG subcollections..."
+    )
+
+    expect_identical(
+      object = ont_mm_msigdbcom[["gs_collection"]] |> unique() |> sort(),
+      expected = c("C2", "C5")
+    )
+
+    expect_identical(
+      object = ont_mm_msigdbcom[["gs_subcollection"]] |> unique() |> sort(),
+      expected = c("CGP", "CP", "CP:BIOCARTA", "CP:PID", "CP:REACTOME",
+                   "CP:WIKIPATHWAYS", "GO:BP", "GO:CC", "GO:MF", "HPO")
+    )
+
+    expect_identical(
+      object = ont_mm_msigdbcom[["db_target_species"]] |> unique() |> sort(),
+      expected = "HS"
+    )
+
+    # mouse & KEGG ----
+
+    expect_message(
+      object = expect_message(
+        object = ont_mm_kegg <- select_ont(
+          ontology = "KEGG",
+          organism = "mouse",
+          only_relevant = FALSE
+        ),
+        regexp = "Extracting KEGG Database from MSigDB..."
+      ),
+      regexp = "KEGG is not approved for commercial use!"
+    )
+
+    expect_identical(
+      object = ont_mm_kegg[["gs_collection"]] |> unique() |> sort(),
+      expected = "C2"
+    )
+
+    expect_identical(
+      object = ont_mm_kegg[["gs_subcollection"]] |> unique() |> sort(),
+      expected = "CP:KEGG_MEDICUS"
+    )
+
+    expect_identical(
+      object = ont_mm_kegg[["db_target_species"]] |> unique() |> sort(),
+      expected = "HS"
+    )
+
+    # mouse & GO ----
+
+    expect_message(
+      object = ont_mm_go <- select_ont(
+        ontology = "GO",
+        organism = "mouse",
+        only_relevant = FALSE
+      ),
+      regexp = "Extracting GO Database from MSigDB..."
+    )
+
+    expect_identical(
+      object = ont_mm_go[["gs_collection"]] |> unique() |> sort(),
+      expected = "C5"
+    )
+
+    expect_identical(
+      object = ont_mm_go[["gs_subcollection"]] |> unique() |> sort(),
+      expected = c("GO:BP", "GO:CC", "GO:MF")
+    )
+
+    expect_identical(
+      object = ont_mm_go[["db_target_species"]] |> unique() |> sort(),
+      expected = "HS"
+    )
+
+    # mouse & Reactome ----
+
+    expect_message(
+      object = ont_mm_reactome <- select_ont(
+        ontology = "Reactome",
+        organism = "mouse",
+        only_relevant = FALSE
+      ),
+      regexp = "Extracting Reactome Database from MSigDB..."
+    )
+
+    expect_identical(
+      object = ont_mm_reactome[["gs_collection"]] |> unique() |> sort(),
+      expected = "C2"
+    )
+
+    expect_identical(
+      object = ont_mm_reactome[["gs_subcollection"]] |> unique() |> sort(),
+      expected = "CP:REACTOME"
+    )
+
+    expect_identical(
+      object = ont_mm_reactome[["db_target_species"]] |> unique() |> sort(),
+      expected = "HS"
+    )
+  }
+)
