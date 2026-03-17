@@ -471,7 +471,8 @@ test_prep <- function(df,
 }
 
 select_ont <- function(ontology,
-                       organism) {
+                       organism,
+                       only_relevant = TRUE) {
   # Is Package installed
   rlang::check_installed(pkg = c("msigdbr"),
                          version = "24.1.0",
@@ -541,17 +542,19 @@ select_ont <- function(ontology,
 
   cli::cli_inform(ontology_msg)
   if (ontology == "KEGG") {
-    cli::cli_alert_warning("KEGG is not approved for commercial use.")
+    cli::cli_alert_warning("KEGG is not approved for commercial use!")
   }
 
   # final cleanup ----
 
-  msig_df <- msig_df |>
-    dplyr::select(
-      dplyr::any_of(
-        c("gs_name", "gene_symbol")
+  if (only_relevant == TRUE) {
+    msig_df <- msig_df |>
+      dplyr::select(
+        dplyr::any_of(
+          c("gs_name", "gene_symbol")
+        )
       )
-    )
+  }
 
   return(msig_df)
 }
