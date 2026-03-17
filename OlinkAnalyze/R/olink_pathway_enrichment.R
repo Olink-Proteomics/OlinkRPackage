@@ -225,15 +225,8 @@ check_pe_inputs <- function(df,
 
   # Check required columns in test results
 
-  if (!all(c("OlinkID",
-             "estimate",
-             "Assay") %in% colnames(test_results))) {
-    cli::cli_abort(message = paste("test_results must include the",
-                                   "following columns: \n",
-                                   "OlinkID,",
-                                   "Assay,",
-                                   "estimate", sep = "\n"))
-  }
+  check_columns(df = test_results,
+                col_list = list("OlinkID", "estimate", "Assay"))
 
   if (length(c(setdiff(unique(df[[check_log$col_names$olink_id]]),
                        unique(test_results[["OlinkID"]])),

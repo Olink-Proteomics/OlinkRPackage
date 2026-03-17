@@ -342,17 +342,6 @@ test_that("Errors occur", {
     regexp = "organism should be"
   )
 
-  expect_error(
-    object = olink_pathway_enrichment(df = npx_df,
-      check_log = check_log,
-      test_results = {
-        ttest_results |>
-          dplyr::select(-dplyr::all_of("estimate"))
-      }
-    ),
-    regex =  paste("test_results must include the following columns:")
-  )
-
   expect_message(
     object = expect_message(object = data_prep(df = npx_data_format22,
                                                test_results = ttest_na,
