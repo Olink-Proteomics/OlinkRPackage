@@ -472,48 +472,81 @@ test_prep <- function(df,
 
 select_ont <- function(ontology,
                        organism) {
+  # select MSigDB collection based on organism ----
+
   if (organism == "human") {
-    msig_df <- msigdbr::msigdbr(species = "Homo sapiens", collection = "C2") |>
-      dplyr::bind_rows(msigdbr::msigdbr(species = "Homo sapiens",
-                                        collection = "C5"))
+    msig_df <- msigdbr::msigdbr(
+      species = "Homo sapiens",
+      collection = "C2"
+    ) |>
+      dplyr::bind_rows(
+        msigdbr::msigdbr(
+          species = "Homo sapiens",
+          collection = "C5"
+        )
+      )
   } else if (organism == "mouse") {
-    msig_df <- msigdbr::msigdbr(species = "Mus musculus", collection = "C2") |>
-      dplyr::bind_rows(msigdbr::msigdbr(species = "Mus musculus",
-                                        collection = "C5"))
+    msig_df <- msigdbr::msigdbr(
+      species = "Mus musculus",
+      collection = "C2"
+    ) |>
+      dplyr::bind_rows(
+        msigdbr::msigdbr(
+          species = "Mus musculus",
+          collection = "C5"
+        )
+      )
   }
+
+  # select annotation based on ontology ----
+
+  ontology_msg <- ""
 
   if (ontology == "Reactome") {
-    cli::cli_inform("Extracting Reactome Database from MSigDB...")
     msig_df <- msig_df |>
-      dplyr::filter(.data[["gs_subcollection"]] == "CP:REACTOME")
-
+      dplyr::filter(
+        .data[["gs_subcollection"]] == "CP:REACTOME"
+      )
+    ontology_msg <- "Extracting Reactome Database from MSigDB..."
   } else if (ontology == "KEGG") {
-    cli::cli_alert_warning("KEGG is not approved for commercial use.")
-    cli::cli_inform("Extracting KEGG Database from MSigDB...")
     msig_df <- msig_df |>
-      dplyr::filter(.data[["gs_subcollection"]] == "CP:KEGG_MEDICUS")
-
+      dplyr::filter(
+        .data[["gs_subcollection"]] == "CP:KEGG_MEDICUS"
+      )
+    ontology_msg <- "Extracting KEGG Database from MSigDB..."
   } else if (ontology == "GO") {
-    cli::cli_inform("Extracting GO Database from MSigDB...")
     msig_df <- msig_df |>
-      dplyr::filter(.data[["gs_subcollection"]] %in% c("GO:BP",
-                                                       "GO:CC",
-                                                       "GO:MF"))
-
+      dplyr::filter(
+        .data[["gs_subcollection"]] %in% c("GO:BP", "GO:CC", "GO:MF")
+      )
+    ontology_msg <- "Extracting GO Database from MSigDB..."
   } else if (ontology == "MSigDb_com") {
     msig_df <- msig_df |>
-      dplyr::filter(stringr::str_detect(.data[["gs_subcollection"]],
-                                        "KEGG",
-                                        negate = TRUE))
-
-    cli::cli_inform("Using MSigDB without KEGG subcollections...")
-
+      dplyr::filter(
+        stringr::str_detect(
+          string = .data[["gs_subcollection"]],
+          pattern = "KEGG",
+          negate = TRUE
+        )
+      )
+    ontology_msg <- "Using MSigDB without KEGG subcollections..."
   } else {
-    cli::cli_inform("Using MSigDB...")
+    ontology_msg <- "Using MSigDB..."
   }
 
+  cli::cli_inform(ontology_msg)
+  if (ontology == "KEGG") {
+    cli::cli_alert_warning("KEGG is not approved for commercial use.")
+  }
+
+  # final cleanup ----
+
   msig_df <- msig_df |>
-    dplyr::select(dplyr::any_of(c("gs_name", "gene_symbol")))
+    dplyr::select(
+      dplyr::any_of(
+        c("gs_name", "gene_symbol")
+      )
+    )
 
   return(msig_df)
 }
