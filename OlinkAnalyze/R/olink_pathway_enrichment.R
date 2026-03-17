@@ -258,8 +258,19 @@ check_pe_inputs <- function(df,
     )
   }
 
-  if (!(method %in% c("GSEA", "ORA"))) {
-    cli::cli_abort("Method must be \"GSEA\" or \"ORA\".")
+  # check enrichment method ----
+
+  expected_methods <- c("GSEA", "ORA")
+
+  if (!(method %in% expected_methods)) {
+    cli::cli_abort(
+      c(
+        "x" = "{.val {method}} is not a valid method for pathway enrichment!",
+        "i" = "Expected one of {.val {expected_methods}}."
+      ),
+      call = rlang::caller_env(),
+      wrap = TRUE
+    )
   }
 
   if (!(ontology %in% c("MSigDb",

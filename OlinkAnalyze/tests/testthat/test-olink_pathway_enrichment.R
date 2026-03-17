@@ -310,16 +310,6 @@ test_that("Errors occur", {
       df = npx_df,
       check_log = check_log,
       test_results = ttest_results,
-      method = "IRA"
-    ),
-    regex = "Method must be \"GSEA\" or \"ORA\"."
-  )
-
-  expect_error(
-    object = olink_pathway_enrichment(
-      df = npx_df,
-      check_log = check_log,
-      test_results = ttest_results,
       ontology = "WikiPathways"
     ),
     regex = "Ontology must be one of MSigDb, MSigDb_com"
@@ -379,11 +369,30 @@ test_that(
 
     expect_error(
       object = olink_pathway_enrichment(
-        df = npx_df,
+        df = npx_data1,
         check_log = check_log,
         test_results = anova_posthoc_results
       ),
       regexp = "10 contrasts present in `test_results`!"
+    )
+  }
+)
+
+test_that(
+  "check_pe_inputs - error - invalid method",
+  {
+    skip_on_cran()
+    skip_if_not_installed("clusterProfiler")
+    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    expect_error(
+      object = olink_pathway_enrichment(
+        df = npx_data1,
+        check_log = check_log,
+        test_results = ttest_results,
+        method = "IRA"
+      ),
+      regex = "\"IRA\" is not a valid method for pathway enrichment!"
     )
   }
 )
