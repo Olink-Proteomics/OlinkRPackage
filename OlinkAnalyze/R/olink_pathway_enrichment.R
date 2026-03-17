@@ -165,6 +165,7 @@ olink_pathway_enrichment <- function(df,
                                      estimate_cutoff = 0) {
   # Is Package installed
   rlang::check_installed(pkg = c("msigdbr"),
+                         version = "24.1.0",
                          call = rlang::caller_env())
 
   if (!rlang::is_installed("clusterProfiler")) {
@@ -174,14 +175,6 @@ olink_pathway_enrichment <- function(df,
                      " " = "if (!require(\"BiocManager\", quietly = TRUE))",
                      " " = "install.packages(\"BiocManager\")",
                      " " = "BiocManager::install(\"clusterProfiler\")"))
-  }
-
-  if (utils::packageVersion("msigdbr") < package_version("24.1.0")) {
-    cli::cli_abort(c(paste("Pathway enrichment requires version >=24.1.0",
-                           "of the msigdbr package.",
-                           "Please install a supported version of msigdbr",
-                           "before continuing."),
-                     " " = "install.packages(\"msigdbr\")"))
   }
 
   if (missing(df) || missing(test_results)) {
