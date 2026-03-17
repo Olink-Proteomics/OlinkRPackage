@@ -315,6 +315,31 @@ check_pe_inputs <- function(df,
   return(check_log)
 }
 
+helper_non_overlap_assays <- function(df,
+                                      test_results,
+                                      which = "both") {
+  no_overlap_in_df <- setdiff(
+    x = unique(df[[check_log$col_names$olink_id]]),
+    y = unique(test_results[["OlinkID"]])
+  )
+
+  no_overlap_in_res <- setdiff(
+    x = unique(test_results[["OlinkID"]]),
+    y = unique(df[[check_log$col_names$olink_id]])
+  )
+
+  if (which == "both") {
+    no_overlap_assays <- c(no_overlap_in_df,
+                           no_overlap_in_res)
+  } else if (which == "df") {
+    no_overlap_assays <- no_overlap_in_df
+  } else if (which == "res") {
+    no_overlap_assays <- no_overlap_in_res
+  }
+
+  return(no_overlap_assays)
+}
+
 data_prep <- function(df,
                       test_results,
                       check_log) {
@@ -340,15 +365,26 @@ data_prep <- function(df,
                     {.arg df} containing invalid assay identifiers, control
                     assays, and 'NA' assays.")
   }
-  if (length(c(setdiff(unique(df[[check_log$col_names$olink_id]]),
-                       unique(test_results[["OlinkID"]])),
-               setdiff(unique(test_results[[check_log$col_names$olink_id]]),
-                       unique(df[["OlinkID"]])))) != 0) {
-    cli::cli_inform(paste0("Filtering df for overlapping OlinkIDs in df ",
-                           "and test_results."))
+
+  # remove non-overlapping assays between df and test_results ----
+
+  no_overlap_assays <- helper_non_overlap_assays(
+    df = df,
+    test_results = test_results,
+    which = "df"
+  )
+
+  if (length(no_overlap_assays) != 0L) {
+    cli::cli_inform(
+      "{.val {length(no_overlap_assays)}} assays in {.arg df} are not
+      represented in {.arg test_results} and will be removed from {.arg df}:
+      {.val {no_overlap_assays}}"
+    )
+
     df <- df |>
-      dplyr::filter(.data[[check_log$col_names$olink_id]] %in%
-                      test_results[["OlinkID"]])
+      dplyr::filter(
+        .data[[check_log$col_names$olink_id]] %in% .env[["no_overlap_assays"]]
+      )
   }
 
   duplicated_assays <- df |>
@@ -382,7 +418,6 @@ test_prep <- function(df,
   return(test_results)
 
 }
-
 
 select_ont <- function(ontology,
                        organism) {
