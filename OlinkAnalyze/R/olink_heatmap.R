@@ -38,8 +38,8 @@
 #' @examples
 #' \donttest{
 #' npx_data <- npx_data1 |>
-#'   dplyr::filter(!stringr::str_detect(SampleID,'CONT'))
-#'   check_log <- check_npx(npx_data) 
+#'   dplyr::filter(!stringr::str_detect(SampleID,"CONT"))
+#'   check_log <- check_npx(npx_data)
 #' try({ # This will fail if ggplotify is not installed
 #'   #Heatmap
 #'   olink_heatmap_plot(df = npx_data,
@@ -47,7 +47,7 @@
 #'   #Heatmap with annotation
 #'   olink_heatmap_plot(df = npx_data,
 #'                      check_log = check_log,
-#'                      variable_row_list = c('Time','Site'))
+#'                      variable_row_list = c("Time", "Site"))
 #'   #Heatmap with calls from pheatmap
 #'   olink_heatmap_plot(df = npx_data,
 #'                      check_log = check_log,
@@ -80,7 +80,7 @@ olink_heatmap_plot <- function(df,
   df <- clean_heatmap_df(df = df,
                          check_log = check_log,
                          colnames = colnames)
-  
+
   df_wide <- df_to_wide(df = df,
                         check_log = check_log,
                         colnames = colnames)

@@ -65,7 +65,8 @@ clean_heatmap_df <- function(df, check_log, colnames) {
   #Remove assays with no variance
   df <- df |>
     dplyr::group_by(.data[[check_log$col_names$olink_id]]) |>
-    dplyr::mutate(assay_var = var(.data[[check_log$col_names$quant]], na.rm = TRUE)) |>
+    dplyr::mutate(assay_var = var(.data[[check_log$col_names$quant]],
+                                  na.rm = TRUE)) |>
     dplyr::ungroup() |>
     dplyr::filter(!(.data[["assay_var"]] == 0 | is.na(.data[["assay_var"]]))) |>
     dplyr::select(-dplyr::all_of("assay_var"))
@@ -85,11 +86,12 @@ clean_heatmap_df <- function(df, check_log, colnames) {
 
 df_to_wide <- function(df,
                        check_log,
-                       colnames){
-  df_wide<- df |>
+                       colnames) {
+  df_wide <- df |>
     tidyr::pivot_wider(id_cols = dplyr::all_of(check_log$col_names$sample_id),
                        names_from = dplyr::all_of(colnames),
-                       values_from = dplyr::all_of(check_log$col_names$quant)) |>
+                       values_from =
+                         dplyr::all_of(check_log$col_names$quant)) |>
     tibble::column_to_rownames(check_log$col_names$sample_id)
   return(df_wide)
 }
