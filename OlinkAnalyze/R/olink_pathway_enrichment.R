@@ -567,7 +567,8 @@ results_to_genelist <- function(test_results) {
   return(gene_list)
 }
 
-gsea_pathwayenrichment <- function(gene_list, msig_df) {
+gsea_pathwayenrichment <- function(gene_list,
+                                   msig_df) {
 
   non_ovelapping_assays <- setdiff(
     x = names(gene_list),
