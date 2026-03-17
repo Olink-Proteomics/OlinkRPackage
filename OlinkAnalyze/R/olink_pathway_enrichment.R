@@ -568,14 +568,18 @@ results_to_genelist <- function(test_results) {
 }
 
 gsea_pathwayenrichment <- function(gene_list, msig_df) {
-  if (length(setdiff(names(gene_list), msig_df[["gene_symbol"]]) != 0)) {
-    cli::cli_inform(paste0(length(setdiff(names(gene_list),
-                                          msig_df[["gene_symbol"]])),
-                           " assays are not found in the database. ",
-                           "Please check the Assay names for the following",
-                           " assays:\n ",
-                           toString(setdiff(names(gene_list),
-                                            msig_df[["gene_symbol"]]))))
+
+  non_ovelapping_assays <- setdiff(
+    x = names(gene_list),
+    y = msig_df[["gene_symbol"]]
+  )
+
+  if (length(non_ovelapping_assays) != 0L) {
+    cli::cli_inform(
+      "{.val {non_ovelapping_assays}} assays are not found in the database.
+      Please check the names for the following assays in {.arg test_results}
+      and {.arg df}: {.val {non_ovelapping_assays}}."
+    )
   }
 
   gsea <- clusterProfiler::GSEA(geneList = gene_list,
