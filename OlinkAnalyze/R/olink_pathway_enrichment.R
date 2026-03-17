@@ -564,8 +564,6 @@ results_to_genelist <- function(test_results) {
   names(estimate) <- test_results[["Assay"]]
   gene_list <- sort(estimate, decreasing = TRUE)
 
-  cli::cli_inform("Test results converted to gene list")
-
   return(gene_list)
 }
 
