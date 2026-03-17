@@ -1086,3 +1086,52 @@ test_that(
     )
   }
 )
+
+# Test results_to_genelist ----
+
+test_that(
+  "results_to_genelist - works",
+  {
+    # try with ttest_results ----
+
+    expect_identical(
+      object = results_to_genelist(test_results = ttest_results),
+      expected = setNames(
+        object = ttest_results |>
+          dplyr::arrange(
+            dplyr::desc(.data[["estimate"]])
+          ) |>
+          dplyr::pull(.data[["estimate"]]),
+        nm = ttest_results |>
+          dplyr::arrange(
+            dplyr::desc(.data[["estimate"]])
+          ) |>
+          dplyr::pull(.data[["Assay"]])
+      )
+    )
+
+    # try with a custom randomly generated test_results ----
+
+    custom_test_results <- dplyr::tibble(
+      Assay = paste0("OID", sprintf("%05d", 1:100)),
+      estimate = rnorm(100)
+    )
+
+    expect_identical(
+      object = results_to_genelist(test_results = custom_test_results),
+      expected = setNames(
+        object = custom_test_results |>
+          dplyr::arrange(
+            dplyr::desc(.data[["estimate"]])
+          ) |>
+          dplyr::pull(.data[["estimate"]]),
+        nm = custom_test_results |>
+          dplyr::arrange(
+            dplyr::desc(.data[["estimate"]])
+          ) |>
+          dplyr::pull(.data[["Assay"]])
+      )
+    )
+
+  }
+)
