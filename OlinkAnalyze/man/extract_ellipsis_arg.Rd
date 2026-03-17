@@ -2,16 +2,19 @@
 % Please edit documentation in R/heatmap_helper.R
 \name{extract_ellipsis_arg}
 \alias{extract_ellipsis_arg}
-\title{Title}
+\title{extract ellipsis arguments and add to pheatmap arguments}
 \usage{
 extract_ellipsis_arg(pheatmap_args, ...)
 }
 \arguments{
-\item{pheatmap_args}{}
+\item{pheatmap_args}{pheatmap argument list}
 
-\item{...}{}
+\item{...}{additional arguments to be passed to pheatmap function}
+}
+\value{
+updated pheatmap arguments list with ellipsis variables
 }
 \description{
-Title
+extract ellipsis arguments and add to pheatmap arguments
 }
 \keyword{internal}

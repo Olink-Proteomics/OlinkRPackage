@@ -2,16 +2,20 @@
 % Please edit documentation in R/heatmap_helper.R
 \name{check_heatmap_inputs}
 \alias{check_heatmap_inputs}
-\title{Title}
+\title{Checking for needed packages and valid inputs}
 \usage{
 check_heatmap_inputs(colnames, ...)
 }
 \arguments{
-\item{colnames}{}
+\item{colnames}{Character. Determines how to label the columns.
+Must be 'assay', 'oid', or 'both' (default 'both').}
 
-\item{...}{}
+\item{...}{Additional arguments used in \code{pheatmap::pheatmap}}
+}
+\value{
+Null or error/warnings
 }
 \description{
-Title
+Checking for needed packages and valid inputs
 }
 \keyword{internal}

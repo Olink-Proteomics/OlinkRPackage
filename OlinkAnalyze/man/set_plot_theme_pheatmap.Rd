@@ -2,7 +2,7 @@
 % Please edit documentation in R/heatmap_helper.R
 \name{set_plot_theme_pheatmap}
 \alias{set_plot_theme_pheatmap}
-\title{Title}
+\title{Add theme to pheatmap}
 \usage{
 set_plot_theme_pheatmap(
   x,
@@ -13,17 +13,20 @@ set_plot_theme_pheatmap(
 )
 }
 \arguments{
-\item{x}{}
+\item{x}{pheatmap plot}
 
-\item{fontsize}{}
+\item{fontsize}{size of font}
 
-\item{col}{}
+\item{col}{color}
 
-\item{font1}{}
+\item{font1}{font to use as default}
 
-\item{font2}{}
+\item{font2}{secondary font to use}
+}
+\value{
+pheatmap with updated theme
 }
 \description{
-Title
+Add theme to pheatmap
 }
 \keyword{internal}

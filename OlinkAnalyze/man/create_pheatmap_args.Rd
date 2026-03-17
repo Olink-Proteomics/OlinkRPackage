@@ -2,7 +2,7 @@
 % Please edit documentation in R/heatmap_helper.R
 \name{create_pheatmap_args}
 \alias{create_pheatmap_args}
-\title{Title}
+\title{create list of arguments to pass to pheatmap function}
 \usage{
 create_pheatmap_args(
   df_wide,
@@ -23,37 +23,50 @@ create_pheatmap_args(
 )
 }
 \arguments{
-\item{df_wide}{}
+\item{df_wide}{wide version of df}
 
-\item{df}{}
+\item{df}{Data frame in long format with SampleID, NPX, OlinkID, Assay and
+columns of choice for annotations.}
 
-\item{check_log}{}
+\item{check_log}{output from check_npx on \code{df}}
 
-\item{center_scale}{}
+\item{center_scale}{Logical. If data should be centered and scaled across
+assays (default \code{TRUE}).}
 
-\item{cluster_rows}{}
+\item{cluster_rows}{Logical. Determining if rows should be clustered
+(default \code{TRUE}).}
 
-\item{cluster_cols}{}
+\item{cluster_cols}{Logical. Determining if columns should be clustered
+(default \code{TRUE}).}
 
-\item{na_col}{}
+\item{na_col}{Color of cells with \code{NA} (default black)}
 
-\item{show_rownames}{}
+\item{show_rownames}{Logical. Determining if row names are shown
+(default \code{TRUE}).}
 
-\item{show_colnames}{}
+\item{show_colnames}{Logical. Determining if column names are shown
+(default \code{TRUE}).}
 
-\item{annotation_legend}{}
+\item{annotation_legend}{Logical. Determining if legend for annotations
+should be shown (default \code{TRUE}).}
 
-\item{fontsize}{}
+\item{fontsize}{Fontsize (default 10)}
 
-\item{variable_row_list}{}
+\item{variable_row_list}{Columns in \code{df} to be annotated for rows in
+the heatmap.}
 
-\item{variable_col_list}{}
+\item{variable_col_list}{Columns in \code{df} to be annotated for columns in
+the heatmap.}
 
-\item{colnames}{}
+\item{colnames}{Character. Determines how to label the columns.
+Must be 'assay', 'oid', or 'both' (default 'both').}
 
-\item{...}{}
+\item{...}{Additional arguments used in \code{pheatmap::pheatmap}}
+}
+\value{
+list of arguments for pheatmap
 }
 \description{
-Title
+create list of arguments to pass to pheatmap function
 }
 \keyword{internal}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/heatmap_helper.R
 \name{color_heatmap}
 \alias{color_heatmap}
-\title{Title}
+\title{add colors to pheatmap arguments}
 \usage{
 color_heatmap(
   df,
@@ -13,17 +13,21 @@ color_heatmap(
 )
 }
 \arguments{
-\item{df}{}
+\item{df}{Data frame in long format with SampleID, NPX, OlinkID, Assay and
+columns of choice for annotations.}
 
-\item{check_log}{}
+\item{check_log}{output from check_npx on \code{df}}
 
-\item{pheatmap_args}{}
+\item{variable_row_list}{Columns in \code{df} to be annotated for rows in
+the heatmap.}
 
-\item{variable_row_list}{}
-
-\item{variable_col_list}{}
+\item{variable_col_list}{Columns in \code{df} to be annotated for columns in
+the heatmap.}
+}
+\value{
+updated pheatmap_args
 }
 \description{
-Title
+add colors to pheatmap arguments
 }
 \keyword{internal}

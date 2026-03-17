@@ -2,20 +2,23 @@
 % Please edit documentation in R/heatmap_helper.R
 \name{lst_styling}
 \alias{lst_styling}
-\title{Title}
+\title{Function to edit grob}
 \usage{
 lst_styling(i, x, styling_location, styling)
 }
 \arguments{
-\item{i}{}
+\item{i}{index of attribute}
 
-\item{x}{}
+\item{x}{plot}
 
-\item{styling_location}{}
+\item{styling_location}{list of locations for different attributes}
 
-\item{styling}{}
+\item{styling}{grob altered parameters for theme}
+}
+\value{
+updated plot with updated grob
 }
 \description{
-Title
+Function to edit grob
 }
 \keyword{internal}
