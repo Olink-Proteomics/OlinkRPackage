@@ -673,3 +673,57 @@ test_that(
     )
   }
 )
+
+# Test data_prep ----
+
+test_that(
+  "data_prep - works - remove invalid entries",
+  {
+    skip_on_cran()
+    skip_if_not_installed("clusterProfiler")
+    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    npx_data_invalid <- npx_data1 |>
+      dplyr::filter(
+        !grepl(
+          pattern = "control",
+          x = .data[["SampleID"]],
+          ignore.case = TRUE
+        )
+      ) |>
+      dplyr::mutate(
+        AssayType = dplyr::if_else(
+          .data[["OlinkID"]] == "OID01216",
+          "ext_ctrl",
+          "assay"
+        ),
+        NPX = dplyr::if_else(
+          .data[["OlinkID"]] == "OID01217",
+          NA_real_,
+          .data[["NPX"]]
+        ),
+        OlinkID = dplyr::if_else(
+          .data[["OlinkID"]] == "OID01218",
+          "OID01218A",
+          .data[["OlinkID"]]
+        )
+      )
+
+    npx_data_invalid_check <- check_npx(df = npx_data_invalid) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_message(
+      object = data_prep(
+        df = npx_data_invalid,
+        test_results = ttest_results,
+        check_log = npx_data_invalid_check
+      ),
+      regexp = paste("Removed 468 entries from `df` containing invalid assay",
+                     "identifiers, control assays, and/or 'NA' assays. Run",
+                     "function `clean_npx()` to get details on removed",
+                     "entries."),
+      fixed = TRUE
+    )
+  }
+)
