@@ -130,8 +130,8 @@ olink_bridge_selector <- function(df, sample_missing_freq, n) {
   if (nrow(df_2) < n) {
     stop(paste0("With the current settings only ",
                 nrow(df_2),
-                " samples can be selected. Please increase sample_missing_freq",
-                " and/or decrease n."))
+                " samples can be selected. Please increase sample_missing_freq
+                and/or decrease n."))
   } else if (nrow(df_2) == n) {
     # if samples satisfying the criteria equal the number of requested samples
     # return all of them
