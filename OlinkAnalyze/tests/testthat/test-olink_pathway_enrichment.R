@@ -304,14 +304,6 @@ test_that("Errors occur", {
   skip_if_not_installed("clusterProfiler")
   skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
-  expect_error(
-    object =  olink_pathway_enrichment(df = npx_df,
-                                       check_log = check_log,
-                                       test_results = ttest_results,
-                                       organism = "rat"),
-    regexp = "organism should be"
-  )
-
   expect_message(
     object = expect_message(object = data_prep(df = npx_data_format22,
                                                test_results = ttest_na,
@@ -401,6 +393,25 @@ test_that(
         ontology = "WikiPathways"
       ),
       regex = "\"WikiPathways\" is not a valid ontology for pathway enrichment!"
+    )
+  }
+)
+
+test_that(
+  "check_pe_inputs - error - invalid organism",
+  {
+    skip_on_cran()
+    skip_if_not_installed("clusterProfiler")
+    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    expect_error(
+      object =  olink_pathway_enrichment(
+        df = npx_data1,
+        check_log = check_log,
+        test_results = ttest_results,
+        organism = "rat"
+      ),
+      regexp = "\"rat\" is not a valid organism for pathway enrichment!"
     )
   }
 )

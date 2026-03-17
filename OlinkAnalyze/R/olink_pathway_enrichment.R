@@ -289,8 +289,20 @@ check_pe_inputs <- function(df,
     )
   }
 
-  if (!(organism %in% c("human", "mouse"))) {
-    cli::cli_abort(print("organism should be \"human\" or \"mouse\""))
+  # check organism  ----
+
+  expected_organisms <- c("human", "mouse")
+
+  if (!(organism %in% expected_organisms)) {
+    cli::cli_abort(
+      c(
+        "x" = "{.val {organism}} is not a valid organism for pathway
+        enrichment!",
+        "i" = "Expected one of {.val {expected_organisms}}."
+      ),
+      call = rlang::caller_env(),
+      wrap = TRUE
+    )
   }
 
   return(check_log)
