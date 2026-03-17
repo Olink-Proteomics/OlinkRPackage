@@ -6,6 +6,13 @@ npx_data_format <- clean_npx(npx_data_format_oct,
                              check_log_oct,
                              verbose = FALSE)
 
+df <- clean_heatmap_df(df = npx_data_format,
+                       check_log = check_log_oct,
+                       colnames = "assay")
+df_wide <- df_to_wide(df = df,
+                      check_log = check_log_oct,
+                      colnames = "assay")
+
 test_that("check_heatmap_inputs - works", {
   expect_error(check_heatmap_inputs(colnames = "wrong_answer"),
                "colnames has to be")
@@ -48,12 +55,7 @@ test_that("df_to_wide - works", {
 })
 
 test_that("create_pheatmap_args - works", {
-  df <- clean_heatmap_df(df = npx_data_format,
-                         check_log = check_log_oct,
-                         colnames = "assay")
-  df_wide <- df_to_wide(df = df,
-                        check_log = check_log_oct,
-                        colnames = "assay")
+
   expect_equal(create_pheatmap_args(df_wide = df_wide,
                                     df = df,
                                     check_log = check_log_oct,
