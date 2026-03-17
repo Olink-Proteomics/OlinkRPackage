@@ -41,8 +41,8 @@ test_that("olink_osi_dist_plot - works", {
   data1 <- data1 |>
     dplyr::filter(!is.na(OSISummary))
   vdiffr::expect_doppelganger("OSISummary Plot",
-                              olink_osi_dist_plot(df = data1,
-                                                  check_log = check_log_1,
-                                                  osi_score = "OSISummary")
-                              )
+    olink_osi_dist_plot(df = data1,
+                        check_log = check_log_1,
+                        osi_score = "OSISummary")
+  )
 })
