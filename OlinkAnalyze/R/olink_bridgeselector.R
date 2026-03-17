@@ -27,7 +27,6 @@
 #' @examples
 #' \donttest{bridge_samples <- olink_bridgeselector(npx_data1,
 #' sample_missing_freq = 0.1, n = 20)}
-#' @importFrom magrittr |>
 #' @importFrom dplyr n select distinct arrange group_by mutate ungroup
 #' left_join filter if_else
 #' @importFrom stringr str_detect
