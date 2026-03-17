@@ -147,7 +147,7 @@ test_that("OSI errors: using npx_data1 and OSI columns", {
                                              "Running `check_npx()`."),
                              fixed = TRUE),
     regexp = paste0("All values are NA in OSICategory\\. ",
-                    "Please provide at least one non-missing value\\.")
+                    "Please check your data to confirm OSI data is present\\.")
   )
 
   # ------------------------------------------
@@ -203,7 +203,7 @@ test_that("OSI errors: using npx_data1 and OSI columns", {
                                              "Running `check_npx()`."),
                              fixed = TRUE),
     regexp = paste0("All values are NA in OSISummary\\.",
-                    " Please provide at least one non-missing value\\.")
+                    " Please check your data to confirm OSI data is present\\.")
   )
 
   # ------------------------------------------------------
