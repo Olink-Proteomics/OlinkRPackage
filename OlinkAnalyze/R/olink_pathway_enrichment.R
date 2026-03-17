@@ -230,12 +230,17 @@ check_pe_inputs <- function(df,
 
   # check that the assays in test_results match those in df ----
 
-  if (length(c(setdiff(unique(df[[check_log$col_names$olink_id]]),
-                       unique(test_results[["OlinkID"]])),
-               setdiff(unique(test_results[["OlinkID"]]),
-                       unique(df[[check_log$col_names$olink_id]])))) != 0) {
-    cli::cli_warn(paste("The Olink IDs in the df do not all match",
-                        "the Olink IDs in the test_results."))
+  if (setequal(unique(df[[check_log$col_names$assay]]),
+               unique(test_results[["Assay"]])) == FALSE) {
+    cli::cli_warn(
+      c(
+        "The sets of assays in {.arg df} and {.arg test_results} do not
+        match!",
+        "i" = "The sets are expected to be identical for pathway enrichment."
+      ),
+      call = rlang::caller_env(),
+      wrap = TRUE
+    )
   }
 
   # check for contrasts ----

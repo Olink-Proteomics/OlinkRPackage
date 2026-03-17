@@ -342,6 +342,30 @@ test_that(
 )
 
 test_that(
+  "check_pe_inputs - warning - non-overlapping OID df and test_results",
+  {
+    skip_on_cran()
+    skip_if_not_installed("clusterProfiler")
+    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    expect_warning(
+      object = check_pe_inputs(
+        df = npx_data1,
+        check_log = check_log,
+        test_results = ttest_results |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% head(x = npx_data1[["OlinkID"]], n = 1L))
+          ),
+        method = "GSEA",
+        ontology = "MSigDb",
+        organism = "human"
+      ),
+      regexp = "The sets of assays in `df` and `test_results` do not match!"
+    )
+  }
+)
+
+test_that(
   "check_pe_inputs - error - too many contrasts",
   {
     skip_on_cran()
