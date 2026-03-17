@@ -168,14 +168,10 @@ olink_pathway_enrichment <- function(df,
                          version = "24.1.0",
                          call = rlang::caller_env())
 
-  if (!rlang::is_installed("clusterProfiler")) {
-    cli::cli_abort(
-                   c("x" = "The package \"clusterProfiler\" is required.",
-                     "!" = "Install package from Bioconductor.",
-                     " " = "if (!require(\"BiocManager\", quietly = TRUE))",
-                     " " = "install.packages(\"BiocManager\")",
-                     " " = "BiocManager::install(\"clusterProfiler\")"))
-  }
+  # custom check for "clusterProfiler" as it is a bioconductor package and not
+  # on CRAN, which is not supported by rlang::check_installed()
+  check_library_installed(x = "clusterProfiler",
+                          error = TRUE)
 
   if (missing(df) || missing(test_results)) {
     cli::cli_abort("The df and test_results arguments need to be specified.")
