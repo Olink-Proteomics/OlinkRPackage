@@ -1,15 +1,15 @@
 #' Bridge selection function
 #'
 #' The bridge selection function will select a number of bridge samples based
-#' on the input data. It selects samples with 'good detection, which passes QC
+#' on the input data. It selects samples with good detection that pass QC
 #' and cover a good range of the data. If possible, Olink recommends 8-16
-#' bridge samples. 'When running the selector, Olink recommends starting at
+#' bridge samples. When running the selector, Olink recommends starting at
 #' sample_missing_freq = 0.10 which represents a maximum of 10\% data below LOD
 #' per sample. If there are not enough samples output, increase to 20\%. \cr\cr
 #' The function accepts NPX Excel files with data < LOD replaced.
 #'
 #' @param df Tibble/data frame in long format such as produced by the
-#' Olink Analyze read_NPX function.
+#' Olink Analyze read_npx function.
 #' @param sample_missing_freq The threshold for sample wise missingness.
 #' @param n Number of bridge samples to be selected.
 #'
