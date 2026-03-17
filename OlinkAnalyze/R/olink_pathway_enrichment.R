@@ -216,7 +216,6 @@ olink_pathway_enrichment <- function(df,
   return(results)
 }
 
-
 check_pe_inputs <- function(df,
                             check_log = check_log,
                             test_results,
@@ -319,7 +318,10 @@ check_pe_inputs <- function(df,
 data_prep <- function(df,
                       test_results,
                       check_log) {
-  cli::cli_inform("Removing invalid OlinkIDs, control assays, and NA assays.")
+  # clean up data from invalid entries ----
+
+  nrow_df_original <- nrow(df)
+
   df <- clean_npx(df = df,
                   check_log = check_log,
                   remove_assay_na = TRUE,
@@ -333,6 +335,11 @@ data_prep <- function(df,
                   convert_nonunique_uniprot = FALSE,
                   verbose = FALSE)
 
+  if (nrow(df) != nrow_df_original) {
+    cli::cli_inform("Removed {.val {nrow_df_original - nrow(df)}} entries from
+                    {.arg df} containing invalid assay identifiers, control
+                    assays, and 'NA' assays.")
+  }
   if (length(c(setdiff(unique(df[[check_log$col_names$olink_id]]),
                        unique(test_results[["OlinkID"]])),
                setdiff(unique(test_results[[check_log$col_names$olink_id]]),
