@@ -341,6 +341,81 @@ test_that(
   }
 )
 
+test_that("ORA warns assays not found in database", {
+  skip_on_cran()
+  skip_if_not_installed("clusterProfiler")
+  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+  messages <- capture_messages(
+    code = olink_pathway_enrichment(
+      df = npx_df,
+      check_log = check_log,
+      test_results = ttest_results,
+      method = "ORA",
+      ontology = "MSigDb"
+    )
+  )
+  expect_true(
+    object = grepl(
+      pattern = "assays are not found in the database.",
+      x = paste(messages, collapse = "")
+    )
+  )
+})
+
+test_that("gsea warns assays not found in database", {
+  skip_on_cran()
+  skip_if_not_installed("clusterProfiler")
+  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+  messages <- capture_messages(
+    code = olink_pathway_enrichment(
+      df = npx_df,
+      check_log = check_log,
+      test_results = ttest_results
+    )
+  )
+  expect_true(
+    object = grepl(
+      pattern = "assays are not found in the database.",
+      x = paste(messages, collapse = "")
+    )
+  )
+})
+
+test_that("mouse works", {
+  skip_on_cran()
+  skip_if_not_installed("clusterProfiler")
+  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+  expect_equal(
+    object = select_ont("Reactome", "mouse"),
+    expected = {
+      msigdbr::msigdbr(species = "Mus musculus", collection = "C2") |>
+        dplyr::bind_rows(msigdbr::msigdbr(species = "Mus musculus",
+                                          collection = "C5")) |>
+        dplyr::filter(.data[["gs_subcollection"]] == "CP:REACTOME")  |>
+        dplyr::select(dplyr::any_of(c("gs_name", "gene_symbol")))
+    }
+  )
+})
+
+test_that("test_prep works", {
+  skip_on_cran()
+  skip_if_not_installed("clusterProfiler")
+  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+  expect_equal(object = test_prep(df = npx_data_format22,
+                                  test_results = ttest_na) |>
+                 dplyr::select(any_of("OlinkID")) |>
+                 dplyr::distinct() |>
+                 dplyr::pull() |>
+                 sort(),
+               expected = intersect(npx_data_format22$OlinkID,
+                                    ttest_na$OlinkID) |>
+                 sort())
+})
+
 # Test check_pe_inputs ----
 
 test_that(
@@ -598,78 +673,3 @@ test_that(
     )
   }
 )
-
-test_that("ORA warns assays not found in database", {
-  skip_on_cran()
-  skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
-  messages <- capture_messages(
-    code = olink_pathway_enrichment(
-      df = npx_df,
-      check_log = check_log,
-      test_results = ttest_results,
-      method = "ORA",
-      ontology = "MSigDb"
-    )
-  )
-  expect_true(
-    object = grepl(
-      pattern = "assays are not found in the database.",
-      x = paste(messages, collapse = "")
-    )
-  )
-})
-
-test_that("gsea warns assays not found in database", {
-  skip_on_cran()
-  skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
-  messages <- capture_messages(
-    code = olink_pathway_enrichment(
-      df = npx_df,
-      check_log = check_log,
-      test_results = ttest_results
-    )
-  )
-  expect_true(
-    object = grepl(
-      pattern = "assays are not found in the database.",
-      x = paste(messages, collapse = "")
-    )
-  )
-})
-
-test_that("mouse works", {
-  skip_on_cran()
-  skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
-  expect_equal(
-    object = select_ont("Reactome", "mouse"),
-    expected = {
-      msigdbr::msigdbr(species = "Mus musculus", collection = "C2") |>
-        dplyr::bind_rows(msigdbr::msigdbr(species = "Mus musculus",
-                                          collection = "C5")) |>
-        dplyr::filter(.data[["gs_subcollection"]] == "CP:REACTOME")  |>
-        dplyr::select(dplyr::any_of(c("gs_name", "gene_symbol")))
-    }
-  )
-})
-
-test_that("test_prep works", {
-  skip_on_cran()
-  skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
-  expect_equal(object = test_prep(df = npx_data_format22,
-                                  test_results = ttest_na) |>
-                 dplyr::select(any_of("OlinkID")) |>
-                 dplyr::distinct() |>
-                 dplyr::pull() |>
-                 sort(),
-               expected = intersect(npx_data_format22$OlinkID,
-                                    ttest_na$OlinkID) |>
-                 sort())
-})
