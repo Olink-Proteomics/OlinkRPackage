@@ -306,11 +306,6 @@ test_that("Errors occur", {
   skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
   expect_error(
-    object = olink_pathway_enrichment(),
-    regexp = "The df and test_results arguments need to be specified."
-  )
-
-  expect_error(
     object = olink_pathway_enrichment(
       df = npx_df,
       check_log = check_log,
@@ -366,6 +361,34 @@ test_that("Errors occur", {
     regex = "Filtering df for overlapping OlinkIDs in df"
   )
 })
+
+test_that(
+  "olink_pathway_enrichment - error - missing args",
+  {
+    skip_on_cran()
+    skip_if_not_installed("clusterProfiler")
+    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    expect_error(
+      object = olink_pathway_enrichment(),
+      regexp = "Arguments `df` and `test_results` are required!"
+    )
+
+    expect_error(
+      object = olink_pathway_enrichment(
+        df = npx_data1
+      ),
+      regexp = "Arguments `df` and `test_results` are required!"
+    )
+
+    expect_error(
+      object = olink_pathway_enrichment(
+        test_results = ttest_results
+      ),
+      regexp = "Arguments `df` and `test_results` are required!"
+    )
+  }
+)
 
 test_that("ORA warns assays not found in database", {
   skip_on_cran()

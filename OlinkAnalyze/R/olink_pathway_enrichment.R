@@ -174,7 +174,7 @@ olink_pathway_enrichment <- function(df,
                           error = TRUE)
 
   if (missing(df) || missing(test_results)) {
-    cli::cli_abort("The df and test_results arguments need to be specified.")
+    cli::cli_abort("Arguments {.arg df} and {.arg test_results} are required!")
   }
 
   check_log <- check_pe_inputs(df = df,
