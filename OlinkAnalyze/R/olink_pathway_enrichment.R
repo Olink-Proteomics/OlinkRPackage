@@ -472,6 +472,11 @@ test_prep <- function(df,
 
 select_ont <- function(ontology,
                        organism) {
+  # Is Package installed
+  rlang::check_installed(pkg = c("msigdbr"),
+                         version = "24.1.0",
+                         call = rlang::caller_env())
+
   # select MSigDB collection based on organism ----
 
   if (organism == "human") {
