@@ -1,139 +1,160 @@
 #' Performs pathway enrichment using over-representation analysis (ORA) or
 #' gene set enrichment analysis (GSEA)
 #'
+#' @author
+#'   Kathleen Nevola;
+#'   Klev Diamanti
+#'
+#' @description
 #' This function performs enrichment analysis based on statistical test results
-#' and full data using clusterProfiler's gsea and enrich functions for MSigDB.
+#' and full data using `clusterProfiler`'s functions `gsea` and `enrich` for
+#' MSigDB.
 #'
 #' @details
-#' MSigDB is subset if the  ontology argument is KEGG, GO, or Reactome.
-#' test_results must contain estimates for all assays.
-#' Posthoc results can be used but should be filtered for one contrast to
-#' improve interpretability.
-#' Alternative statistical results can be used as input as long as they include
-#' the columns "OlinkID", "Assay", and "estimate". A column named
-#' "Adjusted_pal" is also needed for ORA. Any statistical results that contains
-#' one estimate per protein will work as long as the estimates are comparable
-#' to each other.
+#' MSigDB is subset if the ontology argument is "KEGG", "GO", or "Reactome". The
+#' argument `test_results` must contain estimates for all assays, otherwise an
+#' error will be thrown. Results from a post-hoc statistical test can be used as
+#' argument for `test_results`, but the user needs to select and filter one
+#' contrast to improve interpretability of the results. Alternative statistical
+#' results can be used as input as long as they include the columns "OlinkID",
+#' "Assay", and "estimate". A column named "Adjusted_pval" is also required for
+#' ORA. Any statistical result that contains exactly one estimate per protein
+#' will work as long as the estimates are comparable to each other.
 #'
-#' clusterProfiler is originally developed by Guangchuang Yu at the School of
-#' Basic Medical Sciences at Southern Medical University.
-#'
-#' T Wu, E Hu, S Xu, M Chen, P Guo, Z Dai, T Feng, L Zhou, W Tang, L Zhan,
-#' X Fu, S Liu, X Bo, and G Yu.
-#' clusterProfiler 4.0: A universal enrichment tool for interpreting omics data.
-#' The Innovation. 2021, 2(3):100141.
-#' doi: 10.1016/j.xinn.2021.100141
+#' The R library `clusterProfiler` is originally developed by Guangchuang Yu at
+#' the School of Basic Medical Sciences at Southern Medical University.
 #'
 #' \strong{NB:} We strongly recommend to set a seed prior to running this
 #' function to ensure reproducibility of the results.
 #'
-#' \strong{A few notes on Pathway Enrichment with Olink Data}
+#' \strong{An important note regarding Pathway Enrichment with Olink Data}
 #'
-#' It is important to note that sometimes the proteins that are assayed in
-#' Olink Panels are related to specific biological areas and therefore do not
-#' represent an unbiased overview of the proteome as a whole.
-#' Pathways can only interpreted based on the background/context they came from.
-#' For this reason, an estimate for all assays measured must
-#'  be provided. Furthermore, certain pathways cannot come up based on Olink's
-#'  coverage in this area.  Additionally, if only the Inflammation panel was
-#'  run, then the available pathways would be given based on a background
-#'   of proteins related to inflammation. Both ORA and GSEA can provide
-#'   mechanistic and disease related insight and are best to use when
-#'   trying to uncover pathways/annotations of interest. It is recommended to
-#'   only use pathway enrichment for hypothesis generating data, which is more
-#'   well suited for data on the Explore platform or on multiple Target 96
-#'   panels. For smaller lists of proteins it may be more informative to use
-#'   biological annotation in directed research, to discover which significant
-#'   assays are related to keywords of interest.
+#' It is important to note that sometimes the proteins that are assayed in Olink
+#' Panels are related to specific biological areas and therefore do not
+#' represent an unbiased overview of the proteome as a whole, which is an
+#' assumption for pathway enrichment. Pathways can only interpreted based on the
+#' background/context they came from. For this reason, an estimate for all
+#' assays measured must be provided. Furthermore, certain pathways cannot come
+#' up based on Olink's coverage in this area. Additionally, if only the
+#' Inflammation panel was run, then the available pathways would be given based
+#' on a background of proteins related to inflammation. Both ORA and GSEA can
+#' provide mechanistic and disease related insight and are best to use when
+#' trying to uncover pathways/annotations of interest. It is recommended to only
+#' use pathway enrichment for hypothesis generating data, which is better suited
+#' for data originating from Olink's NGS platforms
+#' `r ansi_collapse_quot(get_olink_platforms(broad_platform = "NGS"))` or on
+#' multiple Target 96 panels from Olink's qPCR platform. For smaller lists of
+#' proteins it may be more informative to use biological annotation in directed
+#' research, to discover which significant assays are related to keywords of
+#' interest.
 #'
+#' @references
+#' Wu, T. et al. (2021). *clusterProfiler 4.0: A universal enrichment tool for*
+#' *interpreting omics data*. The Innovation, 2(3):100141.
+#' doi: 10.1016/j.xinn.2021.100141.
 #'
-#' @param df NPX data frame in long format with at least protein name (Assay),
-#' OlinkID, UniProt,SampleID, QC_Warning, NPX, and LOD
+#' @param df NPX data frame in long format with at least protein name ("Assay"),
+#' "OlinkID", "UniProt", "SampleID", QC warning ("QC_Warning" or "SampleQC"),
+#' quantification column ("NPX", "Ct" or "Quantified_value"), and one or more
+#' columns representing limit of detection ("LOD", "PlateLOD" or "MaxLOD").
 #' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
 #' [`check_npx()`] will be run internally using `df`.
-#' @param test_results a dataframe of statistical test results including
-#' Adjusted_pval and estimate columns.
-#' @param method Either "GSEA" (default) or "ORA"
-#' @param ontology Supports "MSigDb" (default), "MSigDb_com",
-#' "KEGG", "GO", and "Reactome" as arguments.
-#' MSigDb contains C2 and C5 genesets. C2 and C5 encompass KEGG, GO,
-#' and Reactome. MSigDb_com consists of C2 and C5 genesets without KEGG
-#' genesets as KEGG is not permitted for commercial use.
-#' @param organism Either "human" (default) or "mouse"
-#' @param pvalue_cutoff (numeric) maximum Adjusted p-value cutoff for ORA
+#' @param test_results a data frame of statistical test results including the
+#' columns "Adjusted_pval" and "estimate".
+#' @param method One of "GSEA" (default) or "ORA".
+#' @param ontology One of "MSigDb" (default), "MSigDb_com", "KEGG", "GO", and
+#' "Reactome". "MSigDb" contains "C2" and "C5" gene sets which encompass "KEGG",
+#' "GO", and "Reactome". "MSigDb_com" consists of "C2" and "C5" gene sets
+#' without "KEGG", as the latter not permitted for commercial use.
+#' @param organism One of "human" (default) or "mouse".
+#' @param pvalue_cutoff (numeric) maximum adjusted p-value cutoff for ORA
 #' filtering of foreground set (default = 0.05). This argument is not used for
 #' GSEA.
 #' @param estimate_cutoff (numeric) minimum estimate cutoff for ORA filtering
-#' of foreground set (default = 0) This argument is not used for GSEA.
+#' of foreground set (default = 0). This argument is not used for GSEA.
+#'
 #' @return A data frame of enrichment results.
+#'
 #' Columns for ORA include:
 #' \itemize{
-#'  \item{ID:} "character" Pathway ID from MSigDB
-#'  \item{Description:} "character" Description of Pathway from MSigDB
-#'  \item{GeneRatio:} "character" ratio of input proteins that are annotated in
-#'  a term
-#'  \item{BgRatio:} "character" ratio of all genes that are annotated in this
-#'  term
-#'  \item{pvalue:} "numeric" p-value of enrichment
-#'  \item{p.adjust:} "numeric" Adjusted p-value (Benjamini-Hochberg)
-#'  \item{qvalue:} "numeric" false discovery rate, the estimated probability
-#'  that the normalized enrichment score represents
-#'  a false positive finding
-#'  \item{geneID:} "character" list of input proteins (Gene Symbols) annotated
-#'  in a term delimited by "/"
-#'  \item{Count:} "integer" Number of input proteins that are annotated in a
-#'  term
+#'  \item{ID:} Pathway ID from MSigDB.
+#'  \item{Description:} Description of Pathway from MSigDB.
+#'  \item{GeneRatio:} Ratio of input proteins that are annotated in a term.
+#'  \item{BgRatio:} Ratio of all genes that are annotated in this term.
+#'  \item{pvalue:} P-value of enrichment.
+#'  \item{p.adjust:} Benjamini-Hochberg adjusted p-value.
+#'  \item{qvalue:} False discovery rate (FDR), the estimated probability that
+#'  the normalized enrichment score represents a false positive finding.
+#'  \item{geneID:} List of input proteins (Gene Symbols) annotated in a term,
+#'  delimited by "/".
+#'  \item{Count:} Number of input proteins that are annotated in a term.
 #' }
 #'
 #' Columns for GSEA:
 #' \itemize{
-#'  \item{ID:} "character" Pathway ID from MSigDB
-#'  \item{Description:} "character" Description of Pathway from MSigDB
-#'  \item{setSize:} "integer" ratio of input proteins that are annotated in a
-#'  term
-#'  \item{enrichmentScore:} "numeric" Enrichment score, degree to which a gene
-#'  set is over-represented at the top or bottom of the ranked list of genes
-#'  \item{NES:} "numeric" Normalized Enrichment Score, normalized to account
-#'  for differences in gene set size and in correlations between gene sets and
+#'  \item{ID:} Pathway ID from MSigDB.
+#'  \item{Description:} Description of Pathway from MSigDB.
+#'  \item{setSize:} Ratio of input proteins that are annotated in a term.
+#'  \item{enrichmentScore:} Enrichment score (ES), degree to which a gene set is
+#'  over-represented at the top or bottom of the ranked list of genes.
+#'  \item{NES:} Normalized Enrichment Score (NES), normalized to account for
+#'  differences in gene set size and in correlations between gene sets and
 #'  expression data sets. NES can be used to compare analysis results across
 #'  gene sets.
-#'  \item{pvalue:} "numeric" p-value of enrichment
-#'  \item{p.adjust:} "numeric" Adjusted p-value (Benjamini-Hochberg)
-#'  \item{qvalue:} "numeric" false discovery rate, the estimated probability
-#'  that the normalized enrichment score represents a false positive finding
-#'  \item{rank:} "numeric" the position in the ranked list where the
-#'  maximum enrichment score occurred
-#'  \item{leading_edge:} "character" contains tags, list, and signal. Tags
-#'  gives an indication of the percentage of genes contributing to the
-#'  enrichment score. List gives an indication of where in the list
-#'  the enrichment score is obtained. Signal represents the enrichment signal
-#'  strength and combines the tag and list.
-#'  \item{core_enrichment:} "character" list of input proteins (Gene Symbols)
-#'  annotated in a term delimited by "/"
-#' }
-#'
-#' @examples
-#' \donttest{
-#' library(dplyr)
-#' npx_df <- npx_data1 |> filter(!grepl("control", SampleID,
-#'   ignore.case = TRUE))
-#' try({  # This expression might fail if dependencies are not installed
-#' ttest_results <- olink_ttest(
-#'   df = npx_df,
-#'   variable = "Treatment",
-#'   alternative = "two.sided"
-#' )
-#' gsea_results <- olink_pathway_enrichment(df = npx_data1,
-#'   test_results = ttest_results)
-#' ora_results <- olink_pathway_enrichment(
-#'   df = npx_data1,
-#'   test_results = ttest_results, method = "ORA"
-#' )
-#' }, silent = TRUE)
+#'  \item{pvalue:} P-value of enrichment.
+#'  \item{p.adjust:} Benjamini-Hochberg adjusted p-value.
+#'  \item{qvalue:} False discovery rate (FDR), the estimated probability that
+#'  the normalized enrichment score represents a false positive finding.
+#'  \item{rank:} The position in the ranked list where the maximum enrichment
+#'  score occurred.
+#'  \item{leading_edge:} Contains tags, list, and signal. Tags provide an
+#'  indication of the percentage of genes contributing to the ES. List gives an
+#'  indication of where in the list the ES is obtained. Signal represents the
+#'  enrichment signal strength and combines the tag and list.
+#'  \item{core_enrichment:} List of input proteins (Gene Symbols) annotated in a
+#'  term, delimited by "/".
 #' }
 #'
 #' @export
-
+#'
+#' @examples
+#' \donttest{
+#' if (rlang::is_installed(pkg = c("msigdbr", "clusterProfiler"))) {
+#'   npx_df <- npx_data1 |>
+#'     dplyr::filter(
+#'       !grepl(
+#'         pattern = "control",
+#'         x = .data[["SampleID"]],
+#'         ignore.case = TRUE
+#'       )
+#'     )
+#'
+#'   check_log <- check_npx(df = npx_df)
+#'
+#'   ttest_results <- OlinkAnalyze::olink_ttest(
+#'     df = npx_df,
+#'     variable = "Treatment",
+#'     alternative = "two.sided",
+#'     check_log = check_log
+#'   )
+#'
+#'   # GSEA
+#'   gsea_results <- OlinkAnalyze::olink_pathway_enrichment(
+#'     df = npx_df,
+#'     test_results = ttest_results,
+#'     check_log = check_log
+#'   )
+#'
+#'   # ORA
+#'   ora_results <- olink_pathway_enrichment(
+#'     df = npx_df,
+#'     test_results = ttest_results,
+#'     method = "ORA",
+#'     check_log = check_log
+#'   )
+#' }
+#' }
+#'
 olink_pathway_enrichment <- function(df,
                                      check_log = NULL,
                                      test_results,
