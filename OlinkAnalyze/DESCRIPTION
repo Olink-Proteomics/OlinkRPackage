@@ -85,6 +85,7 @@ Suggests:
     broom,
     car,
     emmeans,
+    ggpubr,
     ggrepel,
     lme4,
     lmerTest,
