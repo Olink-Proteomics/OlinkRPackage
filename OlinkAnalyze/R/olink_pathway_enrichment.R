@@ -194,22 +194,29 @@ olink_pathway_enrichment <- function(df,
 
 
   test_results <- test_prep(df = df,
-                            test_results = test_results)
-
+                            test_results = test_results,
+                            check_log = check_log)
 
   msig_df <- select_ont(ontology = ontology,
                         organism = organism)
 
+  # perform pathway enrichment ----
+
   if (method == "ORA") {
-    results <- ora_pathwayenrichment(test_results = test_results,
-                                     msig_df = msig_df,
-                                     pvalue_cutoff = pvalue_cutoff,
-                                     estimate_cutoff = estimate_cutoff)
-    cli::cli_inform("Over-representation Analysis performed")
+    results <- ora_pathwayenrichment(
+      test_results = test_results,
+      msig_df = msig_df,
+      pvalue_cutoff = pvalue_cutoff,
+      estimate_cutoff = estimate_cutoff
+    )
+    cli::cli_inform("Over-representation analysis performed")
   } else {
-    gene_list <- results_to_genelist(test_results = test_results)
-    results <- gsea_pathwayenrichment(gene_list = gene_list,
-                                      msig_df = msig_df)
+    results <- gsea_pathwayenrichment(
+      gene_list = results_to_genelist(
+        test_results = test_results
+      ),
+      msig_df = msig_df
+    )
     cli::cli_inform("Gene set enrichment analysis used by default.")
   }
 
