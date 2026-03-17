@@ -421,10 +421,6 @@ test_that("test_prep works", {
 test_that(
   "check_pe_inputs - warning - non-overlapping OID df and test_results",
   {
-    skip_on_cran()
-    skip_if_not_installed("clusterProfiler")
-    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
     expect_warning(
       object = check_pe_inputs(
         df = npx_data1,
@@ -445,10 +441,6 @@ test_that(
 test_that(
   "check_pe_inputs - error - too many contrasts",
   {
-    skip_on_cran()
-    skip_if_not_installed("clusterProfiler")
-    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
     expect_error(
       object = check_pe_inputs(
         df = npx_data1,
@@ -466,10 +458,6 @@ test_that(
 test_that(
   "check_pe_inputs - error - invalid method",
   {
-    skip_on_cran()
-    skip_if_not_installed("clusterProfiler")
-    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
     expect_error(
       object = check_pe_inputs(
         df = npx_data1,
@@ -487,10 +475,6 @@ test_that(
 test_that(
   "check_pe_inputs - error - invalid ontology",
   {
-    skip_on_cran()
-    skip_if_not_installed("clusterProfiler")
-    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
     expect_error(
       object = check_pe_inputs(
         df = npx_data1,
@@ -508,10 +492,6 @@ test_that(
 test_that(
   "check_pe_inputs - error - invalid organism",
   {
-    skip_on_cran()
-    skip_if_not_installed("clusterProfiler")
-    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
     expect_error(
       object =  olink_pathway_enrichment(
         df = npx_data1,
@@ -531,10 +511,6 @@ test_that(
 test_that(
   "helper_non_overlap_assays - works",
   {
-    skip_on_cran()
-    skip_if_not_installed("clusterProfiler")
-    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
     all_assays <- npx_data1[["OlinkID"]] |> unique() |> sort()
 
     # all assays overlap - both ----
@@ -679,10 +655,6 @@ test_that(
 test_that(
   "data_prep - works - remove invalid entries",
   {
-    skip_on_cran()
-    skip_if_not_installed("clusterProfiler")
-    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
     npx_data_invalid <- npx_data1 |>
       dplyr::filter(
         !grepl(
@@ -736,10 +708,6 @@ test_that(
 test_that(
   "data_prep - works - remove non-overlapping assays",
   {
-    skip_on_cran()
-    skip_if_not_installed("clusterProfiler")
-    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
     exclude_assays <- npx_data1[["OlinkID"]] |> unique() |> head(n = 5L)
 
     expect_message(
@@ -773,10 +741,6 @@ test_that(
 test_that(
   "data_prep - error - duplicates assays for same sample",
   {
-    skip_on_cran()
-    skip_if_not_installed("clusterProfiler")
-    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
     expect_error(
       object = data_prep(
         df = npx_data1,
@@ -793,10 +757,6 @@ test_that(
 test_that(
   "test_prep - works - remove non-overlapping assays",
   {
-    skip_on_cran()
-    skip_if_not_installed("clusterProfiler")
-    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
     exclude_assays <- npx_data1[["OlinkID"]] |> unique() |> head(n = 5L)
 
     expect_message(
