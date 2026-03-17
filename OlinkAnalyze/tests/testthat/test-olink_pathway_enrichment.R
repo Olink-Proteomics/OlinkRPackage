@@ -373,10 +373,13 @@ test_that(
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
     expect_error(
-      object = olink_pathway_enrichment(
+      object = check_pe_inputs(
         df = npx_data1,
         check_log = check_log,
-        test_results = anova_posthoc_results
+        test_results = anova_posthoc_results,
+        method = "GSEA",
+        ontology = "MSigDb",
+        organism = "human"
       ),
       regexp = "10 contrasts present in `test_results`!"
     )
@@ -391,11 +394,13 @@ test_that(
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
     expect_error(
-      object = olink_pathway_enrichment(
+      object = check_pe_inputs(
         df = npx_data1,
         check_log = check_log,
         test_results = ttest_results,
-        method = "IRA"
+        method = "IRA",
+        ontology = "MSigDb",
+        organism = "human"
       ),
       regex = "\"IRA\" is not a valid method for pathway enrichment!"
     )
@@ -410,11 +415,13 @@ test_that(
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
     expect_error(
-      object = olink_pathway_enrichment(
+      object = check_pe_inputs(
         df = npx_data1,
         check_log = check_log,
         test_results = ttest_results,
-        ontology = "WikiPathways"
+        method = "GSEA",
+        ontology = "WikiPathways",
+        organism = "human"
       ),
       regex = "\"WikiPathways\" is not a valid ontology for pathway enrichment!"
     )
@@ -433,6 +440,8 @@ test_that(
         df = npx_data1,
         check_log = check_log,
         test_results = ttest_results,
+        method = "GSEA",
+        ontology = "MSigDb",
         organism = "rat"
       ),
       regexp = "\"rat\" is not a valid organism for pathway enrichment!"
