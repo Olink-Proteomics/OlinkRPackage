@@ -232,8 +232,13 @@ check_pe_inputs <- function(df,
 
   # check that the assays in test_results match those in df ----
 
-  if (setequal(unique(df[[check_log$col_names$assay]]),
-               unique(test_results[["Assay"]])) == FALSE) {
+  non_overlap_assays <- helper_non_overlap_assays(
+    df = df,
+    test_results = test_results,
+    which = "both"
+  )
+
+  if (length(non_overlap_assays) != 0L) {
     cli::cli_warn(
       c(
         "The sets of assays in {.arg df} and {.arg test_results} do not
