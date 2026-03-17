@@ -57,28 +57,6 @@ anova_posthoc_results <- olink_anova_posthoc(
 # set seed
 set.seed(123)
 
-test_that("Error with duplicated assays", {
-  duplicate_assay_data <- npx_data1 |>
-    dplyr::filter(
-      .data[["Assay"]] == "MET"
-    ) |>
-    dplyr::mutate(
-      OlinkID = "OID01254"
-    ) |>
-    dplyr::mutate(
-      LOD = .data[["LOD"]] + 1L
-    )
-
-
-  # error with duplicate assays
-  duplicated_assay_data <- npx_data1 |>
-    dplyr::bind_rows(duplicate_assay_data)
-  expect_error(object = data_prep(df = duplicated_assay_data,
-                                  test_results = ttest_results,
-                                  check_log = check_log),
-               regexp = "Duplicated assays detected:")
-})
-
 test_that("T-test GSEA works", {
   skip_on_cran()
   skip_if_not_installed("clusterProfiler")
@@ -748,6 +726,48 @@ test_that(
         check_log = check_log
       ),
       regexp = "Detected 184 duplicated assays in `df`: \"CHL1\", \"NRP1\"",
+    )
+  }
+)
+
+test_that(
+  "data_prep - error - duplicates assays for same sample v2",
+  {
+    duplicate_assay_data <- npx_data1 |>
+      dplyr::filter(
+        !grepl(
+          pattern = "control",
+          x = .data[["SampleID"]],
+          ignore.case = TRUE
+        )
+      ) |>
+      dplyr::filter(
+        .data[["Assay"]] == "MET"
+      ) |>
+      dplyr::mutate(
+        OlinkID = "OID01254",
+        LOD = .data[["LOD"]] + 1L
+      )
+
+    duplicated_assay_data <- npx_data1 |>
+      dplyr::filter(
+        !grepl(
+          pattern = "control",
+          x = .data[["SampleID"]],
+          ignore.case = TRUE
+        )
+      ) |>
+      dplyr::bind_rows(
+        duplicate_assay_data
+      )
+
+    expect_error(
+      object = data_prep(
+        df = duplicated_assay_data,
+        test_results = ttest_results,
+        check_log = check_log
+      ),
+      regexp = "Detected 1 duplicated assay in `df`: \"MET\"!"
     )
   }
 )
