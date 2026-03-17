@@ -61,9 +61,9 @@
 #' outliers <- qc$data |> filter(Outlier == 1)
 #' }
 #' }
-#' @importFrom dplyr group_by mutate ungroup select distinct if_else filter case_when
+#' @importFrom dplyr group_by mutate ungroup select distinct if_else filter case_when #nolint line_length_linter
 #' @importFrom rlang ensym
-#' @importFrom ggplot2 ggplot geom_hline geom_vline xlab facet_wrap geom_text geom_point
+#' @importFrom ggplot2 ggplot geom_hline geom_vline xlab facet_wrap geom_text geom_point #nolint line_length_linter
 #' @importFrom stringr str_detect str_replace
 
 olink_qc_plot <- function(df,
@@ -165,11 +165,11 @@ olink_qc_plot <- function(df,
     dplyr::mutate(IQR = IQR(.data[["NPX"]], na.rm = TRUE),
                   sample_median = median(.data[["NPX"]], na.rm = TRUE)) |>
     dplyr::ungroup() |>
-    dplyr::select(.data[["SampleID"]],
-                  .data[["Panel"]],
-                  .data[["IQR"]],
-                  .data[["sample_median"]],
-                  !!rlang::ensym(color_g)) |>
+    dplyr::select(all_of(c("SampleID",
+                  "Panel",
+                  "IQR",
+                  "sample_median",
+                  color_g))) |>
     dplyr::distinct() |>
     dplyr::group_by(.data[["Panel"]]) |>
     dplyr::mutate(median_low = mean(.data[["sample_median"]],
