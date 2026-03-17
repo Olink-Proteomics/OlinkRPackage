@@ -598,25 +598,41 @@ gsea_pathwayenrichment <- function(gene_list, msig_df) {
 
 ora_pathwayenrichment <- function(test_results,
                                   msig_df,
-                                  pvalue_cutoff = pvalue_cutoff,
-                                  estimate_cutoff = estimate_cutoff) {
+                                  pvalue_cutoff,
+                                  estimate_cutoff) {
   sig_genes <- test_results |>
-    dplyr::filter(.data[["Adjusted_pval"]] < pvalue_cutoff) |>
-    dplyr::filter(abs(.data[["estimate"]]) > estimate_cutoff) |>
-    dplyr::distinct(.data[["Assay"]]) |>
-    dplyr::pull(.data[["Assay"]])
+    dplyr::filter(
+      .data[["Adjusted_pval"]] < .env[["pvalue_cutoff"]]
+    ) |>
+    dplyr::filter(
+      abs(.data[["estimate"]]) > .env[["estimate_cutoff"]]
+    ) |>
+    dplyr::distinct(
+      .data[["Assay"]]
+    ) |>
+    dplyr::pull(
+      .data[["Assay"]]
+    )
 
   universe <- test_results |>
-    dplyr::distinct(.data[["Assay"]]) |>
-    dplyr::pull(.data[["Assay"]])
+    dplyr::distinct(
+      .data[["Assay"]]
+    ) |>
+    dplyr::pull(
+      .data[["Assay"]]
+    )
 
-  if (length(setdiff(universe, msig_df[["gene_symbol"]]) != 0)) {
-    cli::cli_inform(paste0(length(setdiff(universe, msig_df[["gene_symbol"]])),
-                           " assays are not found in the database. ",
-                           "Please check the Assay names for the following",
-                           " assays:\n ",
-                           toString(setdiff(universe,
-                                            msig_df[["gene_symbol"]]))))
+  non_ovelapping_assays <- setdiff(
+    x = universe,
+    y = msig_df[["gene_symbol"]]
+  )
+
+  if (length(non_ovelapping_assays) != 0L) {
+    cli::cli_inform(
+      "{.val {non_ovelapping_assays}} assays are not found in the database.
+      Please check the names for the following assays in {.arg test_results}
+      and {.arg df}: {.val {non_ovelapping_assays}}."
+    )
   }
 
   ora <- clusterProfiler::enricher(gene = sig_genes,
