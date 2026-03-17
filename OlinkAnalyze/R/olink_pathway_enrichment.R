@@ -223,10 +223,12 @@ check_pe_inputs <- function(df,
 
   check_log <- run_check_npx(df = df, check_log = check_log)
 
-  # Check required columns in test results
+  # check required columns in test_results ----
 
   check_columns(df = test_results,
                 col_list = list("OlinkID", "estimate", "Assay"))
+
+  # check that the assays in test_results match those in df ----
 
   if (length(c(setdiff(unique(df[[check_log$col_names$olink_id]]),
                        unique(test_results[["OlinkID"]])),
@@ -236,10 +238,24 @@ check_pe_inputs <- function(df,
                         "the Olink IDs in the test_results."))
   }
 
+  # check for contrasts ----
+
+  # if contrasts is present in the test_results, check that there is only one
+  # contrast. If there are multiple contrasts, throw an error and ask the user
+  # to filter for the desired contrast. This is because the results can be
+  # difficult, or impossible, to interpret if there are multiple contrasts.
   if ("contrast" %in% colnames(test_results) &&
-        length(unique(test_results[["contrast"]])) > 1) {
-    cli::cli_abort(paste("More than one contrast is specified in test results.",
-                         "Filter test_results for desired contrast."))
+        length(unique(test_results[["contrast"]])) > 1L) {
+    cli::cli_abort(
+      c(
+        "x" = "{.val {length(unique(test_results[['contrast']]))}} contrast{?s}
+        present in {.arg test_results}!",
+        "i" = "Filter {.arg test_results} for desired contrast prior to running
+        pathway enrichment."
+      ),
+      call = rlang::caller_env(),
+      wrap = TRUE
+    )
   }
 
   if (!(method %in% c("GSEA", "ORA"))) {

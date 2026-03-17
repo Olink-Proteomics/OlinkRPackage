@@ -309,15 +309,6 @@ test_that("Errors occur", {
     object = olink_pathway_enrichment(
       df = npx_df,
       check_log = check_log,
-      test_results = anova_posthoc_results
-    ),
-    regexp = "More than one contrast is specified in test results"
-  )
-
-  expect_error(
-    object = olink_pathway_enrichment(
-      df = npx_df,
-      check_log = check_log,
       test_results = ttest_results,
       method = "IRA"
     ),
@@ -375,6 +366,24 @@ test_that(
         test_results = ttest_results
       ),
       regexp = "Arguments `df` and `test_results` are required!"
+    )
+  }
+)
+
+test_that(
+  "check_pe_inputs - error - too many contrasts",
+  {
+    skip_on_cran()
+    skip_if_not_installed("clusterProfiler")
+    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    expect_error(
+      object = olink_pathway_enrichment(
+        df = npx_df,
+        check_log = check_log,
+        test_results = anova_posthoc_results
+      ),
+      regexp = "10 contrasts present in `test_results`!"
     )
   }
 )
