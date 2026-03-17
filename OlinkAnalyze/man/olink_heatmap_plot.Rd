@@ -22,27 +22,37 @@ olink_heatmap_plot(
 )
 }
 \arguments{
-\item{df}{Data frame in long format with SampleID, NPX, OlinkID, Assay and columns of choice for annotations.}
+\item{df}{Data frame in long format with SampleID, NPX, OlinkID, Assay and
+columns of choice for annotations.}
 
 \item{check_log}{output from check_npx on \code{df}}
 
-\item{variable_row_list}{Columns in \code{df} to be annotated for rows in the heatmap.}
+\item{variable_row_list}{Columns in \code{df} to be annotated for rows in
+the heatmap.}
 
-\item{variable_col_list}{Columns in \code{df} to be annotated for columns in the heatmap.}
+\item{variable_col_list}{Columns in \code{df} to be annotated for columns in
+the heatmap.}
 
-\item{center_scale}{Logical. If data should be centered and scaled across assays (default \code{TRUE}).}
+\item{center_scale}{Logical. If data should be centered and scaled across
+assays (default \code{TRUE}).}
 
-\item{cluster_rows}{Logical. Determining if rows should be clustered (default \code{TRUE}).}
+\item{cluster_rows}{Logical. Determining if rows should be clustered
+(default \code{TRUE}).}
 
-\item{cluster_cols}{Logical. Determining if columns should be clustered (default \code{TRUE}).}
+\item{cluster_cols}{Logical. Determining if columns should be clustered
+(default \code{TRUE}).}
 
-\item{show_rownames}{Logical. Determining if row names are shown (default \code{TRUE}).}
+\item{show_rownames}{Logical. Determining if row names are shown
+(default \code{TRUE}).}
 
-\item{show_colnames}{Logical. Determining if column names are shown (default \code{TRUE}).}
+\item{show_colnames}{Logical. Determining if column names are shown
+(default \code{TRUE}).}
 
-\item{colnames}{Character. Determines how to label the columns. Must be 'assay', 'oid', or 'both' (default 'both').}
+\item{colnames}{Character. Determines how to label the columns.
+Must be 'assay', 'oid', or 'both' (default 'both').}
 
-\item{annotation_legend}{Logical. Determining if legend for annotations should be shown (default \code{TRUE}).}
+\item{annotation_legend}{Logical. Determining if legend for annotations
+should be shown (default \code{TRUE}).}
 
 \item{fontsize}{Fontsize (default 10)}
 
@@ -51,10 +61,12 @@ olink_heatmap_plot(
 \item{...}{Additional arguments used in \code{pheatmap::pheatmap}}
 }
 \value{
-An object of class \code{ggplot}, generated from the \code{gtable} returned by \code{pheatmap::pheatmap}.
+An object of class \code{ggplot}, generated from the \code{gtable}
+returned by \code{pheatmap::pheatmap}.
 }
 \description{
-Generates a heatmap using \code{pheatmap::pheatmap} of all samples from NPX data.
+Generates a heatmap using \code{pheatmap::pheatmap} of all samples from NPX
+data.
 }
 \details{
 The values are by default scaled across and centered in the heatmap. Columns
@@ -66,7 +78,7 @@ Unique sample names are required.
 library(dplyr)
 npx_data <- npx_data1 |>
       dplyr::filter(!stringr::str_detect(SampleID,'CONT'))
-check_log <- check_npx(npx_data)    
+check_log <- check_npx(npx_data)  
 try({ # This will fail if ggplotify is not installed
 #Heatmap
   olink_heatmap_plot(df=npx_data)
