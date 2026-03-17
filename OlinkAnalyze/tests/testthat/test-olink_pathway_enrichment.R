@@ -161,7 +161,6 @@ test_that("MSigDB_com GSEA works", {
   )
 })
 
-
 test_that("KEGG GSEA works", {
   skip_on_cran()
   skip_if_not_installed("clusterProfiler")
@@ -306,16 +305,6 @@ test_that("Errors occur", {
   skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
   expect_error(
-    object = olink_pathway_enrichment(
-      df = npx_df,
-      check_log = check_log,
-      test_results = ttest_results,
-      ontology = "WikiPathways"
-    ),
-    regex = "Ontology must be one of MSigDb, MSigDb_com"
-  )
-
-  expect_error(
     object =  olink_pathway_enrichment(df = npx_df,
                                        check_log = check_log,
                                        test_results = ttest_results,
@@ -393,6 +382,25 @@ test_that(
         method = "IRA"
       ),
       regex = "\"IRA\" is not a valid method for pathway enrichment!"
+    )
+  }
+)
+
+test_that(
+  "check_pe_inputs - error - invalid ontology",
+  {
+    skip_on_cran()
+    skip_if_not_installed("clusterProfiler")
+    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    expect_error(
+      object = olink_pathway_enrichment(
+        df = npx_data1,
+        check_log = check_log,
+        test_results = ttest_results,
+        ontology = "WikiPathways"
+      ),
+      regex = "\"WikiPathways\" is not a valid ontology for pathway enrichment!"
     )
   }
 )

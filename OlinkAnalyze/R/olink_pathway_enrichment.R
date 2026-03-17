@@ -273,13 +273,20 @@ check_pe_inputs <- function(df,
     )
   }
 
-  if (!(ontology %in% c("MSigDb",
-                        "Reactome",
-                        "KEGG",
-                        "GO",
-                        "MSigDb_com"))) {
-    cli::cli_abort(paste("Ontology must be one of MSigDb, MSigDb_com,",
-                         "Reactome, KEGG, or GO."))
+  # check ontology  ----
+
+  expected_ontologies <- c("MSigDb", "MSigDb_com", "Reactome", "KEGG", "GO")
+
+  if (!(ontology %in% expected_ontologies)) {
+    cli::cli_abort(
+      c(
+        "x" = "{.val {ontology}} is not a valid ontology for pathway
+        enrichment!",
+        "i" = "Expected one of {.val {expected_ontologies}}."
+      ),
+      call = rlang::caller_env(),
+      wrap = TRUE
+    )
   }
 
   if (!(organism %in% c("human", "mouse"))) {
