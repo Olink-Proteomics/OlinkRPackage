@@ -365,12 +365,17 @@ data_prep <- function(df,
                   remove_assay_warning = FALSE,
                   convert_df_cols = TRUE,
                   convert_nonunique_uniprot = FALSE,
-                  verbose = FALSE)
+                  verbose = FALSE) |>
+    suppressMessages() |>
+    suppressWarnings()
 
   if (nrow(df) != nrow_df_original) {
-    cli::cli_inform("Removed {.val {nrow_df_original - nrow(df)}} entries from
-                    {.arg df} containing invalid assay identifiers, control
-                    assays, and 'NA' assays.")
+    cli::cli_inform(
+      "{cli::qty(nrow_df_original - nrow(df))} Removed
+      {.val {nrow_df_original - nrow(df)}} entr{?y/ies} from {.arg df}
+      containing invalid assay identifiers, control assays, and/or 'NA'
+      assays. Run function {.fun clean_npx} to get details on removed entries."
+    )
   }
 
   # remove non-overlapping assays between df and test_results ----
@@ -384,7 +389,7 @@ data_prep <- function(df,
 
   if (length(no_overlap_assays) != 0L) {
     cli::cli_inform(
-      "{.val {length(no_overlap_assays)}} assays in {.arg df} are not
+      "{.val {length(no_overlap_assays)}} assay{?s} in {.arg df} {?is/are} not
       represented in {.arg test_results} and will be removed from {.arg df}:
       {.val {no_overlap_assays}}"
     )
@@ -420,9 +425,11 @@ data_prep <- function(df,
 
     cli::cli_abort(
       c(
-        "x" = "Detected {.val {length(duplicated_assays)}} duplicated assay{?s}
-        in {.arg df}: {.val {duplicated_assays}}!",
-        "i" = "Filter {?it/them} out from {.arg df} and {.arg test_results}."
+        "x" = "{cli::qty(duplicated_assays)} Detected
+        {.val {length(duplicated_assays)}} duplicated assay{?s} in {.arg df}:
+        {.val {duplicated_assays}}!",
+        "i" = "{cli::qty(duplicated_assays)} Filter {?it/them} out from
+        {.arg df} and {.arg test_results}."
       ),
       call = rlang::caller_env(),
       wrap = TRUE
