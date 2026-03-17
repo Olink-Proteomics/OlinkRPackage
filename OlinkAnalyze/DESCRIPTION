@@ -80,6 +80,7 @@ Imports:
     grDevices,
     rlang,
     stringr,
+    tibble,
     tidyr
 Suggests: 
     broom,
