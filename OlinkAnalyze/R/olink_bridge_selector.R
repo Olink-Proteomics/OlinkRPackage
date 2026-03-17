@@ -8,6 +8,8 @@
 #' per sample. If there are not enough samples output, increase to 20\%. \cr\cr
 #' The function accepts NPX Excel files with data < LOD replaced.
 #'
+#' `olink_bridgeselector()` is a synonym of `olink_bridge_selector()` .
+#'
 #' @param df Tibble/data frame in long format such as produced by the
 #' Olink Analyze read_npx function.
 #' @param sample_missing_freq The threshold for sample wise missingness.
@@ -16,6 +18,9 @@
 #' @return A "tibble" with sample IDs and mean NPX for a defined number of
 #' bridging samples. Columns include:
 #'
+#' @aliases
+#' olink_bridgeselector
+#'
 #' \itemize{
 #'   \item{SampleID:} Sample ID
 #'   \item{perc_assays_below_lod:} Percent of Assays that are below LOD for
@@ -23,15 +28,18 @@
 #'   \item{MeanNPX:} Mean NPX for the sample
 #' }
 #' @export
+olink_bridge_selector
+#' @export
+olink_bridgeselector
 #'
 #' @examples
-#' \donttest{bridge_samples <- olink_bridgeselector(npx_data1,
+#' \donttest{bridge_samples <- olink_bridge_selector(npx_data1,
 #' sample_missing_freq = 0.1, n = 20)}
 #' @importFrom dplyr n select distinct arrange group_by mutate ungroup
 #' left_join filter if_else
 #' @importFrom stringr str_detect
 
-olink_bridgeselector <- function(df, sample_missing_freq, n) {
+olink_bridge_selector <- function(df, sample_missing_freq, n) {
   # Check NPX data
   check_log <- OlinkAnalyze::check_npx(df = df)
   # Clean NPX data
@@ -141,3 +149,9 @@ olink_bridgeselector <- function(df, sample_missing_freq, n) {
   }
   return(selected_bridges)
 }
+
+
+olink_bridgeselector <- function(...) {
+  olink_bridge_selector(...)
+}
+
