@@ -77,9 +77,13 @@ olink_heatmap_plot <- function(df,
   check_log <- run_check_npx(df = df,
                              check_log = check_log)
 
-  df_wide <- clean_heatmap_df(df = df,
-                              check_log = check_log,
-                              colnames = colnames)
+  df <- clean_heatmap_df(df = df,
+                         check_log = check_log,
+                         colnames = colnames)
+  
+  df_wide <- df_to_wide(df = df,
+                        check_log = check_log,
+                        colnames = colnames)
 
   # remove dup uniprot
 

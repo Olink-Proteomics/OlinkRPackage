@@ -38,7 +38,7 @@ check_heatmap_inputs <- function(colnames, ...) {
   return(NULL)
 }
 
-#' convert df from long to wide
+#' remove low var assays and add colnames
 #'
 #' @param df Data frame in long format with SampleID, NPX, OlinkID, Assay and
 #' columns of choice for annotations.
@@ -46,7 +46,7 @@ check_heatmap_inputs <- function(colnames, ...) {
 #' @param colnames Character. Determines how to label the columns.
 #' Must be 'assay', 'oid', or 'both' (default 'both').
 #'
-#' @return wide version of df
+#' @return df w/o low var assays with added colnames
 #' @keywords internal
 clean_heatmap_df <- function(df, check_log, colnames) {
   df <- clean_npx(df = df,
@@ -64,24 +64,34 @@ clean_heatmap_df <- function(df, check_log, colnames) {
                   verbose = FALSE)
   #Remove assays with no variance
   df <- df |>
-    dplyr::group_by(all(check_log$col_names$OlinkID)) |>
-    dplyr::mutate(assay_var = var(.data[["NPX"]], na.rm = TRUE)) |>
+    dplyr::group_by(.data[[check_log$col_names$olink_id]]) |>
+    dplyr::mutate(assay_var = var(.data[[check_log$col_names$quant]], na.rm = TRUE)) |>
     dplyr::ungroup() |>
     dplyr::filter(!(.data[["assay_var"]] == 0 | is.na(.data[["assay_var"]]))) |>
     dplyr::select(-dplyr::all_of("assay_var"))
 
   df <- df |>
-    dplyr::mutate(both = paste0(.data[["Assay"]],
+    dplyr::mutate(both = paste0(.data[[check_log$col_names$assay]],
                                 "_",
-                                .data[["OlinkID"]])) |>
-    dplyr::rename("oid" = "OlinkID",
-                  "assay" = "Assay") |>
-    tidyr::pivot_wider(id_cols = .data[["SampleID"]],
-                       names_from = .data[[colnames]],
-                       values_from = .data[["NPX"]]) |>
-    tibble::column_to_rownames("SampleID")
-
+                                .data[[check_log$col_names$olink_id]])) |>
+    dplyr::rename("oid" = check_log$col_names$olink_id,
+                  "assay" = check_log$col_names$assay)
   return(df)
+}
+
+#' Title
+#' @inheritParams olink_heatmap_plot
+#' @keywords internal
+
+df_to_wide <- function(df,
+                       check_log,
+                       colnames){
+  df_wide<- df |>
+    tidyr::pivot_wider(id_cols = dplyr::all_of(check_log$col_names$sample_id),
+                       names_from = dplyr::all_of(colnames),
+                       values_from = dplyr::all_of(check_log$col_names$quant)) |>
+    tibble::column_to_rownames(check_log$col_names$sample_id)
+  return(df_wide)
 }
 
 #' create list of arguments to pass to pheatmap function
