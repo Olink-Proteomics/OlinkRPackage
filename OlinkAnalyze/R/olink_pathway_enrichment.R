@@ -235,6 +235,7 @@ check_pe_inputs <- function(df,
   non_overlap_assays <- helper_non_overlap_assays(
     df = df,
     test_results = test_results,
+    check_log = check_log,
     which = "both"
   )
 
@@ -322,6 +323,7 @@ check_pe_inputs <- function(df,
 
 helper_non_overlap_assays <- function(df,
                                       test_results,
+                                      check_log,
                                       which = "both") {
   no_overlap_in_df <- setdiff(
     x = unique(df[[check_log$col_names$olink_id]]),
@@ -376,6 +378,7 @@ data_prep <- function(df,
   no_overlap_assays <- helper_non_overlap_assays(
     df = df,
     test_results = test_results,
+    check_log = check_log,
     which = "df"
   )
 
