@@ -395,21 +395,40 @@ data_prep <- function(df,
       )
   }
 
+  # check for duplicated assays in df ----
+
+  # this is used because all pathway annotations work with assay names, and not
+  # olink assay identifiers.
+
   duplicated_assays <- df |>
-    dplyr::select(dplyr::any_of(c(check_log$col_names$sample_id,
-                                  check_log$col_names$assay))) |>
-    duplicated()
+    dplyr::select(
+      dplyr::all_of(
+        c(check_log$col_names$sample_id,
+          check_log$col_names$assay)
+      )
+    )
 
+  if (any(duplicated(duplicated_assays))) {
+    duplicated_assays <- duplicated_assays |>
+      dplyr::filter(
+        duplicated(.env[["duplicated_assays"]])
+      ) |>
+      dplyr::pull(
+        check_log$col_names$assay
+      ) |>
+      unique()
 
-  if (any(duplicated_assays)) {
-    cli::cli_abort(paste("Duplicated assays detected:",
-                         paste(df[[check_log$col_names$assay]]
-                               [duplicated_assays],
-                               collapse = ","),
-                         "\n",
-                         "Filter assay from test_result or df",
-                         sep = "\n"))
+    cli::cli_abort(
+      c(
+        "x" = "Detected {.val {length(duplicated_assays)}} duplicated assay{?s}
+        in {.arg df}: {.val {duplicated_assays}}!",
+        "i" = "Filter {?it/them} out from {.arg df} and {.arg test_results}."
+      ),
+      call = rlang::caller_env(),
+      wrap = TRUE
+    )
   }
+
   return(df)
 }
 
