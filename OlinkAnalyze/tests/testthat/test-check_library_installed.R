@@ -1,17 +1,18 @@
-# Test that the function returns TRUE when the packages are present
+# Test check_library_installed ----
+
 test_that(
-  "check library installed works - TRUE", {
+  "check_library_installed - works - TRUE", {
 
     expect_no_condition(
       object = check_library_installed(
-        libraries = c("tools", "base"),
+        x = c("tools", "base"),
         error = FALSE
       )
     )
 
     expect_no_condition(
       object = check_library_installed(
-        libraries = c("tools", "base"),
+        x = c("tools", "base"),
         error = TRUE
       )
     )
@@ -21,29 +22,29 @@ test_that(
 
 # Test that FALSE returns when library is missing
 test_that(
-  "check library installed works - FALSE",
+  "check_library_installed - works - FALSE",
   {
 
     expect_false(
       object = check_library_installed(
-        libraries = c("MissingLibraryOne"),
+        x = c("MissingLibraryOne"),
         error = FALSE
       )
     )
 
     expect_false(
       object = check_library_installed(
-        libraries = c("MissingLibraryOne",
-                      "MissingLibraryTwo",
-                      "MissingLibraryThree"),
+        x = c("MissingLibraryOne",
+              "MissingLibraryTwo",
+              "MissingLibraryThree"),
         error = FALSE
       )
     )
 
     expect_false(
       object = check_library_installed(
-        libraries = c("MissingLibraryOne",
-                      "tools"),
+        x = c("MissingLibraryOne",
+              "tools"),
         error = FALSE
       )
     )
@@ -53,12 +54,12 @@ test_that(
 
 # Test that relevant error is thrown when library is missing
 test_that(
-  "check library installed works - library missing",
+  "check_library_installed - works - library missing",
   {
 
     expect_error(
       object = check_library_installed(
-        libraries = c("MissingLibraryOne"),
+        x = c("MissingLibraryOne"),
         error = TRUE
       ),
       regexp = "Missing library:"
@@ -66,9 +67,9 @@ test_that(
 
     expect_error(
       object = check_library_installed(
-        libraries = c("MissingLibraryOne",
-                      "MissingLibraryTwo",
-                      "MissingLibraryThree"),
+        x = c("MissingLibraryOne",
+              "MissingLibraryTwo",
+              "MissingLibraryThree"),
         error = TRUE
       ),
       regexp = "Missing libraries:"
@@ -76,8 +77,8 @@ test_that(
 
     expect_error(
       object = check_library_installed(
-        libraries = c("MissingLibraryOne",
-                      "tools"),
+        x = c("MissingLibraryOne",
+              "tools"),
         error = TRUE
       ),
       regexp = "Missing library:"

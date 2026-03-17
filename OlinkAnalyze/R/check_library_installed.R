@@ -2,25 +2,25 @@
 #'
 #' @author Klev Diamanti
 #'
-#' @param libraries A character vector of R libraries.
+#' @param x A character vector of R libraries.
 #' @param error Boolean to return error or a boolean (default).
 #'
 #' @return Boolean if the library is installed or not, and an error if
 #' `error = TRUE`.
 #'
-check_library_installed <- function(libraries,
+check_library_installed <- function(x,
                                     error = FALSE) {
 
   # check that the input is a character vector
-  check_is_character(string = libraries,
+  check_is_character(x = x,
                      error = TRUE)
 
   # check if input error is boolean vector of length 1
-  check_is_scalar_boolean(bool = error,
+  check_is_scalar_boolean(x = error,
                           error = TRUE)
 
   # check for missing libraries
-  missing_libraries <- sapply(libraries, rlang::is_installed) |>
+  missing_libraries <- sapply(x, rlang::is_installed) |>
     (\(x) x[x == FALSE])() |>
     names()
 
