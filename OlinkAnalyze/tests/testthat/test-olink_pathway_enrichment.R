@@ -734,7 +734,7 @@ test_that(
 )
 
 test_that(
-  "data_prep - works - remove invalid entries",
+  "data_prep - works - remove non-overlapping assays",
   {
     skip_on_cran()
     skip_if_not_installed("clusterProfiler")
@@ -784,6 +784,45 @@ test_that(
         check_log = check_log
       ),
       regexp = "Detected 184 duplicated assays in `df`: \"CHL1\", \"NRP1\"",
+    )
+  }
+)
+
+# Test test_prep ----
+
+test_that(
+  "test_prep - works - remove non-overlapping assays",
+  {
+    skip_on_cran()
+    skip_if_not_installed("clusterProfiler")
+    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    exclude_assays <- npx_data1[["OlinkID"]] |> unique() |> head(n = 5L)
+
+    expect_message(
+      object = test_prep_out <- test_prep(
+        df = npx_data1 |>
+          dplyr::filter(
+            !grepl(pattern = "control",
+                   x = .data[["SampleID"]],
+                   ignore.case = TRUE)
+          ) |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% .env[["exclude_assays"]])
+          ),
+        test_results = ttest_results,
+        check_log = check_log
+      ),
+      regexp = paste("5 assays in `test_results` are not represented in `df`",
+                     "and will be removed from `test_results`: \"OID01220\",",
+                     "\"OID01217\", \"OID01216\", \"OID01219\", and",
+                     "\"OID01218\""),
+      fixed = TRUE
+    )
+
+    expect_identical(
+      object = dim(test_prep_out),
+      expected = c(179L, 16L)
     )
   }
 )

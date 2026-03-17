@@ -441,13 +441,29 @@ data_prep <- function(df,
 }
 
 test_prep <- function(df,
-                      test_results) {
-  if (length(c(setdiff(unique(df[["OlinkID"]]),
-                       unique(test_results[["OlinkID"]])),
-               setdiff(unique(test_results[["OlinkID"]]),
-                       unique(df[["OlinkID"]])))) != 0) {
+                      test_results,
+                      check_log) {
+
+  # remove non-overlapping assays between test_results and df ----
+
+  no_overlap_assays <- helper_non_overlap_assays(
+    df = df,
+    test_results = test_results,
+    check_log = check_log,
+    which = "res"
+  )
+
+  if (length(no_overlap_assays) != 0L) {
+    cli::cli_inform(
+      "{.val {length(no_overlap_assays)}} assay{?s} in {.arg test_results}
+      {?is/are} not represented in {.arg df} and will be removed from
+      {.arg test_results}: {.val {no_overlap_assays}}"
+    )
+
     test_results <- test_results |>
-      dplyr::filter(test_results[["OlinkID"]] %in% df[["OlinkID"]])
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% .env[["no_overlap_assays"]])
+      )
   }
 
   return(test_results)
