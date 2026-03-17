@@ -221,7 +221,7 @@ olink_qc_plot <- function(df,
       OlinkAnalyze::olink_color_discrete(...)
   }
 
-  #Ad d outlier lines
+  # Add outlier lines
   if (outlierLines) {
     qc_plot <- qc_plot +
       ggplot2::geom_hline(ggplot2::aes(yintercept = .data[["iqr_low"]]),
