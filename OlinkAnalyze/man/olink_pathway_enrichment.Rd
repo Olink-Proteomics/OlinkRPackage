@@ -7,8 +7,8 @@ gene set enrichment analysis (GSEA)}
 \usage{
 olink_pathway_enrichment(
   df,
-  check_log = NULL,
   test_results,
+  check_log = NULL,
   method = "GSEA",
   ontology = "MSigDb",
   organism = "human",
@@ -22,11 +22,11 @@ olink_pathway_enrichment(
 quantification column ("NPX", "Ct" or "Quantified_value"), and one or more
 columns representing limit of detection ("LOD", "PlateLOD" or "MaxLOD").}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
-
 \item{test_results}{a data frame of statistical test results including the
 columns "Adjusted_pval" and "estimate".}
+
+\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
 
 \item{method}{One of "GSEA" (default) or "ORA".}
 
@@ -162,8 +162,8 @@ if (rlang::is_installed(pkg = c("msigdbr", "clusterProfiler"))) {
   ora_results <- olink_pathway_enrichment(
     df = npx_df,
     test_results = ttest_results,
-    method = "ORA",
-    check_log = check_log
+    check_log = check_log,
+    method = "ORA"
   )
 }
 }

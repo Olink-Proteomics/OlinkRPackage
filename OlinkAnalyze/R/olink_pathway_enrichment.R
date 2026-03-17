@@ -57,10 +57,10 @@
 #' "OlinkID", "UniProt", "SampleID", QC warning ("QC_Warning" or "SampleQC"),
 #' quantification column ("NPX", "Ct" or "Quantified_value"), and one or more
 #' columns representing limit of detection ("LOD", "PlateLOD" or "MaxLOD").
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
 #' @param test_results a data frame of statistical test results including the
 #' columns "Adjusted_pval" and "estimate".
+#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
+#' [`check_npx()`] will be run internally using `df`.
 #' @param method One of "GSEA" (default) or "ORA".
 #' @param ontology One of "MSigDb" (default), "MSigDb_com", "KEGG", "GO", and
 #' "Reactome". "MSigDb" contains "C2" and "C5" gene sets which encompass "KEGG",
@@ -149,15 +149,15 @@
 #'   ora_results <- olink_pathway_enrichment(
 #'     df = npx_df,
 #'     test_results = ttest_results,
-#'     method = "ORA",
-#'     check_log = check_log
+#'     check_log = check_log,
+#'     method = "ORA"
 #'   )
 #' }
 #' }
 #'
 olink_pathway_enrichment <- function(df,
-                                     check_log = NULL,
                                      test_results,
+                                     check_log = NULL,
                                      method = "GSEA",
                                      ontology = "MSigDb",
                                      organism = "human",
