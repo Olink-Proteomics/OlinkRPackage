@@ -196,7 +196,7 @@ test_that(
   }
 )
 
-# Test that no errors are thrown when csv file is read by arrow
+# Test that no errors are thrown when parquet file is read by arrow
 test_that(
   "check is arrow object - parquet - TRUE",
   {
@@ -274,6 +274,20 @@ test_that(
     # check if check_is_arrow_object returns TRUE
     expect_true(
       object = check_is_arrow_object(x = df,
+                                     error = TRUE)
+    )
+
+    # check if check_is_arrow_object returns TRUE
+    expect_true(
+      object = check_is_arrow_object(x = df |>
+                                       dplyr::mutate(M = .data[["A"]] + 1L),
+                                     error = FALSE)
+    )
+
+    # check if check_is_arrow_object returns TRUE
+    expect_true(
+      object = check_is_arrow_object(x = df |>
+                                       dplyr::mutate(M = .data[["A"]] + 1L),
                                      error = TRUE)
     )
   }

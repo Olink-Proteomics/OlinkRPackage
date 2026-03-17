@@ -11,33 +11,36 @@
 #'
 #' @examples
 #' \donttest{
-#' ggplot2::ggplot(
-#'   data = datasets::mtcars,
-#'   mapping = ggplot2::aes(
-#'     x = .data[["wt"]],
-#'     y = .data[["mpg"]],
-#'     color = as.factor(x = .data[["cyl"]])
-#'   )
-#' ) +
-#'   ggplot2::geom_point(
-#'     size = 4L
+#' if (rlang::is_installed(pkg = c("showtext", "systemfonts",
+#'                                 "sysfonts", "curl"))) {
+#'   ggplot2::ggplot(
+#'     data = datasets::mtcars,
+#'     mapping = ggplot2::aes(
+#'       x = .data[["wt"]],
+#'       y = .data[["mpg"]],
+#'       color = as.factor(x = .data[["cyl"]])
+#'     )
 #'   ) +
-#'   OlinkAnalyze::set_plot_theme()
+#'     ggplot2::geom_point(
+#'       size = 4L
+#'     ) +
+#'     OlinkAnalyze::set_plot_theme()
 #'
-#' ggplot2::ggplot(
-#'   data = datasets::mtcars,
-#'   mapping = ggplot2::aes(
-#'     x = .data[["wt"]],
-#'     y = .data[["mpg"]],
-#'     color = as.factor(x = .data[["cyl"]])
-#'   )
-#' ) +
-#'   ggplot2::geom_point(
-#'     size = 4L
+#'   ggplot2::ggplot(
+#'     data = datasets::mtcars,
+#'     mapping = ggplot2::aes(
+#'       x = .data[["wt"]],
+#'       y = .data[["mpg"]],
+#'      color = as.factor(x = .data[["cyl"]])
+#'     )
 #'   ) +
-#'   OlinkAnalyze::set_plot_theme(
-#'     font = ""
-#'   )
+#'     ggplot2::geom_point(
+#'       size = 4L
+#'     ) +
+#'     OlinkAnalyze::set_plot_theme(
+#'       font = ""
+#'     )
+#' }
 #' }
 set_plot_theme <- function(font = "Arial") {
 
@@ -153,6 +156,12 @@ register_font <- function(family, in_test = FALSE) {
   # If already known to sysfonts, skip
   if (!(family %in% sysfonts::font_families())) {
     if (in_test == TRUE) {
+      # Check if all required libraries for this function are installed
+      rlang::check_installed(
+        pkg = c("curl"),
+        call = rlang::caller_env()
+      )
+
       sysfonts::font_add_google(name = stringr::str_to_title(family),
                                 family = family)
     } else {
