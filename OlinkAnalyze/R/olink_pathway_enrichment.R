@@ -163,6 +163,8 @@ olink_pathway_enrichment <- function(df,
                                      organism = "human",
                                      pvalue_cutoff = 0.05,
                                      estimate_cutoff = 0) {
+  # check input ----
+
   # Is Package installed
   rlang::check_installed(pkg = c("msigdbr"),
                          version = "24.1.0",
@@ -184,6 +186,7 @@ olink_pathway_enrichment <- function(df,
                                ontology = ontology,
                                organism = organism)
 
+  # prepare data ----
 
   df <- data_prep(df = df,
                   check_log = check_log,
