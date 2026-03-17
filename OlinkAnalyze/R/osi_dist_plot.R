@@ -24,11 +24,29 @@
 olink_osi_dist_plot <- function(df,
                                 check_log = NULL,
                                 osi_score = NULL) {
-  check_osi(df, check_log, osi_score)
-
   check_log <- run_check_npx(df, check_log = check_log)
 
+
+  # Check specific to osi_dist_plot, OSI value must be continuous
+  if (is.null(osi_score) || !(osi_score %in% c("OSITimeToCentrifugation",
+                                               "OSIPreparationTemperature",
+                                               "OSISummary"))) {
+
+    cli::cli_abort(paste0("`osi_score` must be one of",
+                          " OSISummary, OSITimeToCentrifugation, ",
+                          "or OSIPreparationTemperature."))
+  }
+
+  # General OSI checks
+  df <- check_osi(df, check_log, osi_score)
+
   # Filter for distinct sampleID and osi_score
+  if (any(is.na(df[[osi_score]]))) {
+    cli::cli_warn(paste("NA data detected in",
+                        osi_score,
+                        "Filtering out NA data."))
+  }
+
   df1 <- df |>
     dplyr::filter(!is.na(.data[[osi_score]])) |>
     dplyr::select(dplyr::any_of(c(column_name_dict$col_names$sample_id,
@@ -68,6 +86,7 @@ olink_osi_dist_plot <- function(df,
       y = "Density"
     ) +
     OlinkAnalyze::olink_fill_discrete() +
+    OlinkAnalyze::set_plot_theme() +
     ggplot2::theme(
       axis.title = ggplot2::element_text(size = 15L),
       axis.text = ggplot2::element_text(size = 13L),
@@ -76,29 +95,4 @@ olink_osi_dist_plot <- function(df,
     )
 
   return(p)
-}
-
-check_osi <- function(df,
-                      check_log,
-                      osi_score) {
-
-  if (is.null(osi_score) || !(osi_score %in% c("OSISummary",
-                                               "OSITimeToCentrifugation",
-                                               "OSIPreparationTemperature"))) {
-    cli::cli_abort(paste0("`osi_score` must be one of OSISummary,",
-                          " OSITimeToCentrifugation, ",
-                          "or OSIPreparationTemperature."))
-  }
-
-  if (all(is.na(df[[osi_score]]))) {
-    cli::cli_abort(paste0(osi_score, " are all NA. ",
-                          "Please check your data to confirm ",
-                          "OSI data is present."))
-  }
-  if (any(is.na(df[[osi_score]]))) {
-    cli::cli_warn(paste("NA data detected in",
-                        osi_score,
-                        "Filtering out NA data."))
-  }
-  return(NULL)
 }

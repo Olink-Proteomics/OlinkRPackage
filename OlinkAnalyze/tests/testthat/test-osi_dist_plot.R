@@ -15,12 +15,13 @@ test_that("osi_distibution plots works - errors", {
   expect_error(olink_osi_dist_plot(df = data1,
                                    check_log = check_log_1,
                                    osi_score = "OSICategory"),
-               regexp = "`osi_score` must be one of OSISummary,")
+               regexp = "`osi_score` must be one of OSISummary,") # fix
   data1$OSIPreparationTemperature <- NA
   expect_error(olink_osi_dist_plot(df = data1,
                                    check_log = check_log_1,
                                    osi_score = "OSIPreparationTemperature"),
-               regexp = paste0("OSIPreparationTemperature are all NA. ",
+               regexp = paste0("All values are NA ",
+                               "in OSIPreparationTemperature. ",
                                "Please check your data to confirm OSI "))
 
   data1$OSIPreparationTemperature <- 0.5
@@ -42,5 +43,6 @@ test_that("olink_osi_dist_plot - works", {
   vdiffr::expect_doppelganger("OSISummary Plot",
                               olink_osi_dist_plot(df = data1,
                                                   check_log = check_log_1,
-                                                  osi_score = "OSISummary"))
+                                                  osi_score = "OSISummary")
+                              )
 })
