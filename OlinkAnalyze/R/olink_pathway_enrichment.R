@@ -217,7 +217,7 @@ olink_pathway_enrichment <- function(df,
 }
 
 check_pe_inputs <- function(df,
-                            check_log = check_log,
+                            check_log,
                             test_results,
                             method,
                             ontology,
@@ -396,7 +396,8 @@ data_prep <- function(df,
 
     df <- df |>
       dplyr::filter(
-        .data[[check_log$col_names$olink_id]] %in% .env[["no_overlap_assays"]]
+        !(.data[[check_log$col_names$olink_id]] %in%
+            .env[["no_overlap_assays"]])
       )
   }
 

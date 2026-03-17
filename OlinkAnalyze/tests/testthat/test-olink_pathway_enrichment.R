@@ -714,7 +714,7 @@ test_that(
       suppressMessages()
 
     expect_message(
-      object = data_prep(
+      object = data_prep_out <- data_prep(
         df = npx_data_invalid,
         test_results = ttest_results,
         check_log = npx_data_invalid_check
@@ -724,6 +724,66 @@ test_that(
                      "function `clean_npx()` to get details on removed",
                      "entries."),
       fixed = TRUE
+    )
+
+    expect_identical(
+      object = dim(data_prep_out),
+      expected = c(28236L, 18L)
+    )
+  }
+)
+
+test_that(
+  "data_prep - works - remove invalid entries",
+  {
+    skip_on_cran()
+    skip_if_not_installed("clusterProfiler")
+    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    exclude_assays <- npx_data1[["OlinkID"]] |> unique() |> head(n = 5L)
+
+    expect_message(
+      object = data_prep_out <- data_prep(
+        df = npx_data1 |>
+          dplyr::filter(
+            !grepl(pattern = "control",
+                   x = .data[["SampleID"]],
+                   ignore.case = TRUE)
+          ),
+        test_results = ttest_results |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% .env[["exclude_assays"]])
+          ),
+        check_log = check_log
+      ),
+      regexp = paste("5 assays in `df` are not represented in `test_results`",
+                     "and will be removed from `df`: \"OID01216\",",
+                     "\"OID01217\", \"OID01218\", \"OID01219\", and",
+                     "\"OID01220\""),
+      fixed = TRUE
+    )
+
+    expect_identical(
+      object = dim(data_prep_out),
+      expected = c(27924L, 17L)
+    )
+  }
+)
+
+test_that(
+  "data_prep - error - duplicates assays for same sample",
+  {
+    skip_on_cran()
+    skip_if_not_installed("clusterProfiler")
+    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    expect_error(
+      object = data_prep(
+        df = npx_data1,
+        test_results = ttest_results,
+        check_log = check_log
+      ),
+      regexp = "Detected 184 duplicated assays in `df`: \"CHL1\", \"NRP1\"",
     )
   }
 )
