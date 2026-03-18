@@ -1,11 +1,8 @@
 test_that(
   "olink_pathway_visualization - valid Keyword needed",
   {
-    # Load reference results - skipped if files are absent
-    reference_results <- get_example_data(filename = "reference_results.rds")
-
     skip_on_cran()
-    skip_if_not_installed("clusterProfiler")
+    suppressMessages(skip_if_not_installed("clusterProfiler"))
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
     skip_if_not_installed("vdiffr")
 

@@ -8,7 +8,7 @@ test_that(
   "olink_pathway_enrichment - error - missing args",
   {
     skip_on_cran()
-    skip_if_not_installed("clusterProfiler")
+    suppressMessages(skip_if_not_installed("clusterProfiler"))
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
     expect_error(
@@ -41,7 +41,7 @@ test_that(
     reference_results <- get_example_data(filename = "reference_results.rds")
 
     skip_on_cran()
-    skip_if_not_installed("clusterProfiler")
+    suppressMessages(skip_if_not_installed("clusterProfiler"))
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
     expect_message(
@@ -79,7 +79,7 @@ test_that(
     npx_data_format22 <- get_example_data("npx_data_format-Oct-2022.rds")
 
     skip_on_cran()
-    skip_if_not_installed("clusterProfiler")
+    suppressMessages(skip_if_not_installed("clusterProfiler"))
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
     # prepare data
@@ -159,7 +159,7 @@ test_that(
     reference_results <- get_example_data(filename = "reference_results.rds")
 
     skip_on_cran()
-    skip_if_not_installed("clusterProfiler")
+    suppressMessages(skip_if_not_installed("clusterProfiler"))
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
     expect_message(
@@ -199,7 +199,7 @@ test_that(
     reference_results <- get_example_data(filename = "reference_results.rds")
 
     skip_on_cran()
-    skip_if_not_installed("clusterProfiler")
+    suppressMessages(skip_if_not_installed("clusterProfiler"))
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
     expect_message(
@@ -239,7 +239,7 @@ test_that(
     reference_results <- get_example_data(filename = "reference_results.rds")
 
     skip_on_cran()
-    skip_if_not_installed("clusterProfiler")
+    suppressMessages(skip_if_not_installed("clusterProfiler"))
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
     expect_message(
@@ -282,7 +282,7 @@ test_that(
     reference_results <- get_example_data(filename = "reference_results.rds")
 
     skip_on_cran()
-    skip_if_not_installed("clusterProfiler")
+    suppressMessages(skip_if_not_installed("clusterProfiler"))
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
     expect_message(
@@ -324,7 +324,7 @@ test_that(
     reference_results <- get_example_data(filename = "reference_results.rds")
 
     skip_on_cran()
-    skip_if_not_installed("clusterProfiler")
+    suppressMessages(skip_if_not_installed("clusterProfiler"))
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
     expect_message(
@@ -365,7 +365,7 @@ test_that(
     reference_results <- get_example_data(filename = "reference_results.rds")
 
     skip_on_cran()
-    skip_if_not_installed("clusterProfiler")
+    suppressMessages(skip_if_not_installed("clusterProfiler"))
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
     expect_message(
@@ -406,7 +406,7 @@ test_that(
     reference_results <- get_example_data(filename = "reference_results.rds")
 
     skip_on_cran()
-    skip_if_not_installed("clusterProfiler")
+    suppressMessages(skip_if_not_installed("clusterProfiler"))
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
     expect_warning(
@@ -452,7 +452,7 @@ test_that(
     reference_results <- get_example_data(filename = "reference_results.rds")
 
     skip_on_cran()
-    skip_if_not_installed("clusterProfiler")
+    suppressMessages(skip_if_not_installed("clusterProfiler"))
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
     expect_message(

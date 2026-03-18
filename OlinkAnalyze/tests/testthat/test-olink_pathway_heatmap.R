@@ -2,7 +2,7 @@ test_that(
   "olink_pathway_visualization - valid Keyword needed",
   {
     skip_on_cran()
-    skip_if_not_installed("clusterProfiler")
+    suppressMessages(skip_if_not_installed("clusterProfiler"))
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
     skip_if_not_installed("vdiffr")
 
