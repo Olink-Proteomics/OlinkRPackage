@@ -9,7 +9,7 @@ olink_pathway_visualization(
   enrich_results,
   method = "GSEA",
   keyword = NULL,
-  number_of_terms = 20
+  number_of_terms = 20L
 )
 }
 \arguments{

@@ -78,64 +78,125 @@
 olink_pathway_visualization <- function(enrich_results,
                                         method = "GSEA",
                                         keyword = NULL,
-                                        number_of_terms = 20) {
+                                        number_of_terms = 20L) {
 
-  if (!(method %in% c("ORA", "GSEA"))) {
-    cli::cli_abort("Method must be \"GSEA\" or \"ORA\".")
+  # check inputs ----
+
+  ## check enrichment method ----
+
+  expected_methods <- c("GSEA", "ORA")
+
+  if (!(method %in% expected_methods)) {
+    cli::cli_abort(
+      c(
+        "x" = "{.val {method}} is not a valid method for pathway enrichment!",
+        "i" = "Expected one of {.val {expected_methods}}."
+      ),
+      call = rlang::caller_env(),
+      wrap = TRUE
+    )
   }
+
+  ## check keywords ----
 
   if (!is.null(keyword)) {
     enrich_results <- enrich_results |>
-      dplyr::filter(grepl(pattern = toupper(keyword),
-                          x = .data[["Description"]]))
+      dplyr::filter(
+        grepl(pattern = .env[["keyword"]],
+              x = .data[["Description"]],
+              ignore.case = TRUE),
+      )
 
-    if (nrow(enrich_results) == 0) {
-      cli::cli_abort(paste0("Keyword not found. ",
-                            "Please choose a different keyword or ",
-                            "use a set number of terms."))
+    if (nrow(enrich_results) == 0L) {
+      cli::cli_abort(
+        c(
+          "x" = "Filtering {.arg enrich_results} for {.arg enrich_results} =
+          {.val {keyword}} did not return any results.",
+          "i" = "Ensure that the keyword is spelled correctly and is present in
+          the enrichment results."
+        ),
+        call = rlang::caller_env(),
+        wrap = TRUE
+      )
     }
   }
 
+  ## check number of terms ----
+
+  check_is_scalar_integer(x = number_of_terms, error = TRUE)
+
+  # plot ----
+
   enrich_results <- enrich_results |>
-    dplyr::arrange(.data[["pvalue"]]) |>
-    dplyr::slice_head(n = number_of_terms) |>
-    dplyr::arrange(dplyr::desc(x = .data[["pvalue"]])) |>
-    dplyr::mutate(Description = stringr::str_trunc(string =
-                                                     .data[["Description"]],
-                                                   width = 50,
-                                                   side = "center")) |>
-    dplyr::mutate(Description = factor(.data[["Description"]],
-                                       levels = unique(.data[["Description"]]))
+    dplyr::arrange(
+      .data[["pvalue"]]
+    ) |>
+    dplyr::slice_head(
+      n = .env[["number_of_terms"]]
+    ) |>
+    dplyr::arrange(
+      dplyr::desc(x = .data[["pvalue"]])
+    ) |>
+    dplyr::mutate(
+      Description = stringr::str_trunc(
+        string = .data[["Description"]],
+        width = 50L,
+        side = "center"
+      ),
+      Description = factor(
+        x = .data[["Description"]],
+        levels = unique(.data[["Description"]])
+      )
     )
 
   if (method == "ORA") {
-    p <- ggplot2::ggplot(data = enrich_results,
-                         ggplot2::aes(x = .data[["Description"]],
-                                      y = .data[["Count"]]))
+    p <- ggplot2::ggplot(
+      data = enrich_results,
+      mapping = ggplot2::aes(
+        x = .data[["Description"]],
+        y = .data[["Count"]]
+      )
+    )
   } else if (method == "GSEA") {
-    p <- ggplot2::ggplot(data = enrich_results,
-                         ggplot2::aes(x = .data[["Description"]],
-                                      y = .data[["NES"]]))
+    p <- ggplot2::ggplot(
+      data = enrich_results,
+      mapping = ggplot2::aes(
+        x = .data[["Description"]],
+        y = .data[["NES"]]
+      )
+    )
   }
 
   p <- p +
-    ggplot2::geom_bar(stat = "identity",
-                      ggplot2::aes(fill = .data[["p.adjust"]])) +
-    OlinkAnalyze::olink_fill_gradient(coloroption = c("teal", "red")) +
+    ggplot2::geom_bar(
+      stat = "identity",
+      mapping = ggplot2::aes(
+        fill = .data[["p.adjust"]]
+      )
+    ) +
+    OlinkAnalyze::olink_fill_gradient(
+      coloroption = c("teal", "red")
+    ) +
     ggplot2::coord_flip() +
-    ggplot2::xlab("Description")
+    ggplot2::xlab(
+      label = "Description"
+    )
 
   if (method == "ORA") {
     p <- p +
-      ggplot2::geom_text(ggplot2::aes(label = paste(gsub(x =
-                                                           .data[["GeneRatio"]],
-                                                         pattern = "/.*",
-                                                         replacement = ""),
-                                                    gsub(x = .data[["BgRatio"]],
-                                                         pattern = "/.*",
-                                                         replacement = ""),
-                                                    sep = "/")),
-                         hjust = -0.1, color = "black", size = 3.5)
+      ggplot2::geom_text(
+        mapping = ggplot2::aes(
+          label = paste(gsub(x = .data[["GeneRatio"]],
+                             pattern = "/.*",
+                             replacement = ""),
+                        gsub(x = .data[["BgRatio"]],
+                             pattern = "/.*",
+                             replacement = ""),
+                        sep = "/")),
+        hjust = -0.1,
+        color = "black",
+        size = 3.5
+      )
   }
 
   return(p)
