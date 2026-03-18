@@ -1,4 +1,4 @@
-load(file = test_path("data", "npx_data_format221010.RData"))
+load(file = testthat::test_path("data", "npx_data_format221010.RData"))
 
 bridgeSamples <- olink_bridgeselector(df = npx_data1, # nolint: object_name_linter
                                       sampleMissingFreq = .1, # nolint: object_name_linter
@@ -10,11 +10,11 @@ testthat::test_that("olink_bridgeselector works", {
   expect_equal(bridgeSamples[order(bridgeSamples$MeanNPX, decreasing = TRUE), ]
                $SampleID[3], "A70")
   expect_equal(round(bridgeSamples[order(bridgeSamples$MeanNPX,
-                                         decreasing = TRUE),]$MeanNPX[5],
+                                         decreasing = TRUE), ]$MeanNPX[5],
                      digits = 2), 6.21)
   expect_error(olink_bridgeselector(df = npx_data1,
                                     n = 8))
-  expect_warning(olink_bridgeselector(npx_data_format221010, 
+  expect_warning(olink_bridgeselector(npx_data_format221010,
                                       sampleMissingFreq = 0.1, n = 2))
   ref_data <- npx_data1 |> olink_bridgeselector(sampleMissingFreq = 0.1, n = 8)
   ml_data <- npx_data1 |>
@@ -45,17 +45,14 @@ testthat::test_that("olink_bridgeselector works", {
                   setdiff(p_l_data$SampleID, ref_data$SampleID)), 0)
   expect_length(c(setdiff(ref_data$SampleID, sampleqc_data$SampleID),
                   setdiff(sampleqc_data$SampleID, ref_data$SampleID)), 0)
-  expect_length(c(setdiff(ref_data$SampleID,lodnpx_data$SampleID),
+  expect_length(c(setdiff(ref_data$SampleID, lodnpx_data$SampleID),
                   setdiff(lodnpx_data$SampleID, ref_data$SampleID)), 0)
 })
 
 test_that("olink_bridgeselector max num of samples works", {
-  expect_equal(
-    {
+  expect_equal({
       olink_bridgeselector(df = npx_data1,
                            sampleMissingFreq = 0.1,
                            n = 150) |>
-        nrow()
-    },
-    150)
+        nrow()}, 150)
 })
