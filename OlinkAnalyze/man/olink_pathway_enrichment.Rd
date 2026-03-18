@@ -159,7 +159,7 @@ if (rlang::is_installed(pkg = c("msigdbr", "clusterProfiler"))) {
   )
 
   # ORA
-  ora_results <- olink_pathway_enrichment(
+  ora_results <- OlinkAnalyze::olink_pathway_enrichment(
     df = npx_df,
     test_results = ttest_results,
     check_log = check_log,
