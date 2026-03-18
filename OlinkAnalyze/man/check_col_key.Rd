@@ -8,7 +8,7 @@ check_col_key(col_key)
 }
 \arguments{
 \item{col_key}{Column key for which to retrieve alternative column names. One
-of "sample_id", "sample_type", "assay_type", "olink_id", "uniprot", "assay", "panel", "block", "plate_id", "panel_version", "lod", "quant", "ext_npx", "count", "qc_warning", "assay_warn", and "normalization".}
+of "sample_id", "sample_type", "assay_type", "olink_id", "uniprot", "assay", "panel", "block", "plate_id", "panel_version", "lod", "quant", "ext_npx", "count", "qc_warning", "assay_warn", "normalization", and "qc_version".}
 }
 \value{
 Nothing or an error message if col_key is not valid.
