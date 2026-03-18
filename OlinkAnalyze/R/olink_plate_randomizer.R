@@ -10,7 +10,7 @@
 #' accepted_olink_platforms$plate_size
 #' @keywords internal
 #'
-product_to_platesize <- function(product) {
+product_to_plate_size <- function(product) {
   if (!(product %in% accepted_olink_platforms[["name"]])) {
     cli::cli_abort(paste0("Product must be one of the following: ",
                           paste(accepted_olink_platforms[["name"]],
@@ -31,8 +31,8 @@ product_to_platesize <- function(product) {
 #' @param data tibble/data frame in long format returned from the
 #' olink_plate_randomizer function.
 #' @param fill.color Column name to be used as coloring variable for wells.
-#' @param PlateSize Integer. Either 96 or 48. 96 is default.
-#' @param Product String. Name of Olink product used to set PlateSize if not
+#' @param plate_size Integer. Either 96 or 48. 96 is default.
+#' @param Product String. Name of Olink product used to set plate_size if not
 #' provided. Optional.
 #' @param num_ctrl Numeric. Number of controls on each plate (default = 8)
 #' @param rand_ctrl Logical. Whether controls are added to be randomized across
@@ -53,16 +53,16 @@ product_to_platesize <- function(product) {
 #' }
 olink_display_plate_layout <- function(data,
                                        fill.color, # nolint: object_name_linter
-                                       PlateSize = 96L, # nolint: object_name_linter
+                                       plate_size = 96L, # nolint: object_name_linter
                                        num_ctrl = 8L,
                                        rand_ctrl = FALSE,
                                        Product, # nolint: object_name_linter
                                        include.label = FALSE) { # nolint: object_name_linter
   if (!missing(Product)) {
-    PlateSize <- product_to_platesize(product = Product) # nolint: object_name_linter
+    plate_size <- product_to_plate_size(product = Product) # nolint: object_name_linter
   }
 
-  if (!(PlateSize %in% unique(accepted_olink_platforms$plate_size))) {
+  if (!(plate_size %in% unique(accepted_olink_platforms$plate_size))) {
     cli::cli_abort(
                    paste0("Plate size needs to be either ",
                           cli::ansi_collapse(
@@ -75,7 +75,7 @@ olink_display_plate_layout <- function(data,
                           "."))
   }
 
-  ncols_per_plate <- PlateSize / 8
+  ncols_per_plate <- plate_size / 8
 
   missing_spots <- expand.grid(plate = unique(data$plate),
                                row = LETTERS[1:8],
@@ -337,8 +337,8 @@ generate_plate_holder <- function(nplates,
 
 #' @param Manifest tibble/data frame in long format containing all sample ID's.
 #' Sample ID column must be named SampleID.
-#' @param PlateSize Integer. Either 96 or 48. 96 is default.
-#' @param Product String. Name of Olink product used to set PlateSize if not
+#' @param plate_size Integer. Either 96 or 48. 96 is default.
+#' @param Product String. Name of Olink product used to set plate_size if not
 #' provided. Optional.
 #' @param SubjectColumn (Optional) Column name of the subject ID column. Cannot
 #' contain missing values. If provided, subjects are kept on the same plate.
@@ -410,7 +410,7 @@ generate_plate_holder <- function(nplates,
 #' olink_displayPlateDistributions(randomized.manifest_b, fill.color = 'Site')
 #' }
 olink_plate_randomizer <- function(Manifest, # nolint: object_name_linter
-                                   PlateSize = 96, # nolint object_name_linter
+                                   plate_size = 96, # nolint object_name_linter
                                    Product, # nolint: object_name_linter
                                    SubjectColumn, # nolint: object_name_linter
                                    iterations = 500,
@@ -432,7 +432,7 @@ olink_plate_randomizer <- function(Manifest, # nolint: object_name_linter
   }
 
   if (!missing(Product)) {
-    PlateSize <- product_to_platesize(product = Product) # nolint: object_name_linter
+    plate_size <- product_to_plate_size(product = Product) # nolint: object_name_linter
   }
 
   if (is.null(study) && ("study" %in% names(Manifest))) {
@@ -456,16 +456,16 @@ olink_plate_randomizer <- function(Manifest, # nolint: object_name_linter
   }
 
   # Check plate size is acceptable
-  if (!PlateSize %in% c(48, 96)) {
+  if (!plate_size %in% c(48, 96)) {
     cli::cli_abort("Plate size needs to be either 48 or 96.")
   }
 
   # do we use this if available.spots is present?
-  spots_per_plate <- PlateSize - num_ctrl * !rand_ctrl
+  spots_per_plate <- plate_size - num_ctrl * !rand_ctrl
   # subtract number of controls if not randomizing controls
 
-  # cols = platesize/8 (b/c 8 rows on each plate)
-  ncols_per_plate <- PlateSize / 8
+  # cols = plate_size/8 (b/c 8 rows on each plate)
+  ncols_per_plate <- plate_size / 8
 
   #if there is a seed, set the seed
   if (!missing(seed)) {
@@ -514,7 +514,7 @@ olink_plate_randomizer <- function(Manifest, # nolint: object_name_linter
                                         nsamples = length(Manifest$SampleID) +
                                           (num_ctrl * rand_ctrl *
                                              plates_needed),
-                                        plate_size = PlateSize,
+                                        plate_size = plate_size,
                                         num_ctrl = num_ctrl,
                                         rand_ctrl = rand_ctrl)
   } else {
@@ -526,7 +526,7 @@ olink_plate_randomizer <- function(Manifest, # nolint: object_name_linter
                                           (num_ctrl *
                                              rand_ctrl *
                                              plates_needed),
-                                        plate_size = PlateSize,
+                                        plate_size = plate_size,
                                         num_ctrl = num_ctrl,
                                         rand_ctrl = rand_ctrl)
 
@@ -790,7 +790,7 @@ olink_plate_randomizer <- function(Manifest, # nolint: object_name_linter
                                                     nsamples = nsamples,
                                                     num_ctrl = num_ctrl,
                                                     rand_ctrl = rand_ctrl,
-                                                    plate_size = PlateSize)
+                                                    plate_size = plate_size)
           } else {
             nsamples <- length(Manifest$SampleID) + j_tot + j
             all.plates.New <- generate_plate_holder(length(available.spots),
@@ -798,7 +798,7 @@ olink_plate_randomizer <- function(Manifest, # nolint: object_name_linter
                                                     nsamples = nsamples,
                                                     num_ctrl = num_ctrl,
                                                     rand_ctrl = rand_ctrl,
-                                                    plate_size = PlateSize)
+                                                    plate_size = plate_size)
           }
           all.plates.New$SampleID <- rep(NA, nrow(all.plates.New))
           all.plates <- all.plates.New
