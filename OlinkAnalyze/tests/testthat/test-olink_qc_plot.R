@@ -96,11 +96,11 @@ osi_data <- osi_data |>
 data1 <- OlinkAnalyze::npx_data1 |>
   dplyr::right_join(
     osi_data |>
-      dplyr::select(all_of(c("SampleID",
-                    "OSITimeToCentrifugation",
-                    "OSIPreparationTemperature",
-                    "OSISummary",
-                    "OSICategory"))),
+      dplyr::select(dplyr::all_of(c("SampleID",
+                                    "OSITimeToCentrifugation",
+                                    "OSIPreparationTemperature",
+                                    "OSISummary",
+                                    "OSICategory"))),
     by = "SampleID"
   ) |>
   dplyr::filter(!grepl("CONTROL", SampleID))

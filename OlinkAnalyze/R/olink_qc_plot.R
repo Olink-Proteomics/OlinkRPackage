@@ -167,11 +167,11 @@ olink_qc_plot <- function(df,
     dplyr::mutate(IQR = IQR(.data[["NPX"]], na.rm = TRUE),
                   sample_median = median(.data[["NPX"]], na.rm = TRUE)) |>
     dplyr::ungroup() |>
-    dplyr::select(all_of(c("SampleID",
-                  "Panel",
-                  "IQR",
-                  "sample_median",
-                  color_g))) |>
+    dplyr::select(dplyr::all_of(c("SampleID",
+                                  "Panel",
+                                  "IQR",
+                                  "sample_median",
+                                  color_g))) |>
     dplyr::distinct() |>
     dplyr::group_by(.data[["Panel"]]) |>
     dplyr::mutate(median_low = mean(.data[["sample_median"]],
