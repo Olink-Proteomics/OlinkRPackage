@@ -649,7 +649,9 @@ ora_pathwayenrichment <- function(test_results,
   ora <- clusterProfiler::enricher(gene = sig_genes,
                                    universe = universe,
                                    TERM2GENE = msig_df,
-                                   pvalueCutoff = 1)
+                                   pvalueCutoff = 1) |>
+    suppressPackageStartupMessages() |>
+    suppressMessages()
 
   if (is.null(ora)) {
     cli::cli_warn(
