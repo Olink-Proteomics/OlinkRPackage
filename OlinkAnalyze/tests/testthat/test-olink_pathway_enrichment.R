@@ -1,3 +1,491 @@
+check_log <- check_npx(df = npx_data1) |>
+  suppressWarnings() |>
+  suppressMessages()
+
+# Test olink_pathway_enrichment ----
+
+test_that(
+  "olink_pathway_enrichment - error - missing args",
+  {
+    skip_on_cran()
+    skip_if_not_installed("clusterProfiler")
+    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    expect_error(
+      object = olink_pathway_enrichment(),
+      regexp = "Arguments `df` and `test_results` are required!"
+    )
+
+    expect_error(
+      object = olink_pathway_enrichment(
+        df = npx_data1
+      ),
+      regexp = "Arguments `df` and `test_results` are required!"
+    )
+
+    expect_error(
+      object = olink_pathway_enrichment(
+        test_results = ttest_results
+      ),
+      regexp = "Arguments `df` and `test_results` are required!"
+    )
+  }
+)
+
+## GSEA ----
+
+test_that(
+  "olink_pathway_enrichment - works - t-test GSEA",
+  {
+    # Load reference results - skipped if files are absent
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
+    skip_on_cran()
+    skip_if_not_installed("clusterProfiler")
+    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = tt_gsea <- olink_pathway_enrichment(
+            df = npx_data1 |>
+              dplyr::filter(
+                !grepl(pattern = "control",
+                       x = .data[["SampleID"]],
+                       ignore.case = TRUE)
+              ),
+            check_log = check_log,
+            test_results = reference_results$t_test
+          ),
+          regexp = "Using MSigDB..."
+        ),
+        regexp = "45 assays are not found in the database"
+      ),
+      regexp = "Gene set enrichment analysis used by default"
+    )
+
+    expect_identical(
+      object = dim(tt_gsea),
+      expected = c(573L, 11L)
+    )
+
+  }
+)
+
+test_that(
+  "olink_pathway_enrichment - works - t-test GSEA, NA",
+  {
+    # Load reference results - skipped if files are absent
+    npx_data_format22 <- get_example_data("npx_data_format-Oct-2022.rds")
+
+    skip_on_cran()
+    skip_if_not_installed("clusterProfiler")
+    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    # prepare data
+
+    ttest_na <- olink_ttest(
+      df = npx_data_format22,
+      check_log = check_npx(npx_data_format22) |>
+        suppressWarnings() |>
+        suppressMessages(),
+      variable = "treatment1"
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    npx_data_format22 <- npx_data_format22 |>
+      dplyr::mutate(
+        OlinkID = dplyr::if_else(.data[["OlinkID"]] == "OID30646",
+                                 "OID12345",
+                                 .data[["OlinkID"]])
+      )
+
+    # run pe
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = expect_message(
+              object = expect_message(
+                object = expect_warning(
+                  object = tt_gsea_na <- olink_pathway_enrichment(
+                    df = npx_data_format22,
+                    test_results = ttest_na,
+                    check_log = check_npx(npx_data_format22) |>
+                      suppressWarnings() |>
+                      suppressMessages()
+                  ),
+                  regexp = paste("The sets of assays in `df` and",
+                                 "`test_results` do not match!")
+                ),
+                regexp = paste("Removed 1530 entries from `df` containing",
+                               "invalid assay identifiers")
+              ),
+              regexp = paste("1 assay in `df` is not represented in",
+                             "`test_results` and will be removed from",
+                             "`df`: \"OID12345\"")
+            ),
+            regexp = paste("1 assay in `test_results` is not represented in",
+                           "`df` and will be removed from `test_results`:",
+                           "\"OID30646\"")
+          ),
+          regexp = "Using MSigDB..."
+        ),
+        regexp = paste("6 assays are not found in the database. Please check",
+                       "the names for the following assays in `test_results`",
+                       "and `df`: \"BAP18\", \"Incubation control 1\",",
+                       "\"SPACA5_SPACA5B\", \"Amplification control 4\",",
+                       "\"AMY1A_AMY1B_AMY1C\", and",
+                       "\"Amplification control 2\"."),
+        fixed = TRUE
+      ),
+      regexp = "Gene set enrichment analysis used by default"
+    )
+
+    expect_identical(
+      object = dim(tt_gsea_na),
+      expected = c(62L, 11L)
+    )
+
+  }
+)
+
+test_that(
+  "olink_pathway_enrichment - works - Reactome GSEA",
+  {
+    # Load reference results - skipped if files are absent
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
+    skip_on_cran()
+    skip_if_not_installed("clusterProfiler")
+    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = tt_gsea_reactome <- olink_pathway_enrichment(
+            df = npx_data1 |>
+              dplyr::filter(
+                !grepl(pattern = "control",
+                       x = .data[["SampleID"]],
+                       ignore.case = TRUE)
+              ),
+            check_log = check_log,
+            test_results = reference_results$t_test,
+            ontology = "Reactome"
+          ),
+          regexp = "Extracting Reactome Database from MSigDB..."
+        ),
+        regexp = paste("65 assays are not found in the database. Please check",
+                       "the names for the following assays in `test_results`",
+                       "and `df`")
+      ),
+      regexp = "Gene set enrichment analysis used by default"
+    )
+
+    expect_equal(
+      object = dim(tt_gsea_reactome),
+      expected = c(20L, 11L)
+    )
+  }
+)
+
+test_that(
+  "olink_pathway_enrichment - works - MSigDB_com GSEA",
+  {
+    # Load reference results - skipped if files are absent
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
+    skip_on_cran()
+    skip_if_not_installed("clusterProfiler")
+    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = tt_gsea_msigdb_com <- olink_pathway_enrichment(
+            df = npx_data1 |>
+              dplyr::filter(
+                !grepl(pattern = "control",
+                       x = .data[["SampleID"]],
+                       ignore.case = TRUE)
+              ),
+            check_log = check_log,
+            test_results = reference_results$t_test,
+            ontology = "MSigDb_com"
+          ),
+          regexp = "Using MSigDB without KEGG subcollections..."
+        ),
+        regexp = paste("45 assays are not found in the database. Please check",
+                       "the names for the following assays in `test_results`",
+                       "and `df`")
+      ),
+      regexp = "Gene set enrichment analysis used by default"
+    )
+
+    expect_equal(
+      object = dim(tt_gsea_msigdb_com),
+      expected = c(568L, 11L)
+    )
+  }
+)
+
+test_that(
+  "olink_pathway_enrichment - works - KEGG GSEA",
+  {
+    # Load reference results - skipped if files are absent
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
+    skip_on_cran()
+    skip_if_not_installed("clusterProfiler")
+    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = tt_gsea_kegg <- olink_pathway_enrichment(
+              df = npx_data1 |>
+                dplyr::filter(
+                  !grepl(pattern = "control",
+                         x = .data[["SampleID"]],
+                         ignore.case = TRUE)
+                ),
+              check_log = check_log,
+              test_results = reference_results$t_test,
+              ontology = "KEGG"
+            ),
+            regexp = "Extracting KEGG Database from MSigDB..."
+          ),
+          regexp = "KEGG is not approved for commercial use!"
+        ),
+        regexp = paste("138 assays are not found in the database. Please check",
+                       "the names for the following assays in `test_results`",
+                       "and `df`")
+      ),
+      regexp = "Gene set enrichment analysis used by default"
+    )
+
+    expect_equal(
+      object = dim(tt_gsea_kegg),
+      expected = c(0L, 8L)
+    )
+  }
+)
+
+test_that(
+  "olink_pathway_enrichment - works - GO GSEA",
+  {
+    # Load reference results - skipped if files are absent
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
+    skip_on_cran()
+    skip_if_not_installed("clusterProfiler")
+    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = tt_gsea_go <- olink_pathway_enrichment(
+            df = npx_data1 |>
+              dplyr::filter(
+                !grepl(pattern = "control",
+                       x = .data[["SampleID"]],
+                       ignore.case = TRUE)
+              ),
+            check_log = check_log,
+            test_results = reference_results$t_test,
+            ontology = "GO"
+          ),
+          regexp = "Extracting GO Database from MSigDB..."
+        ),
+        regexp = paste("45 assays are not found in the database. Please check",
+                       "the names for the following assays in `test_results`",
+                       "and `df`")
+      ),
+      regexp = "Gene set enrichment analysis used by default"
+    )
+
+    expect_equal(
+      object = dim(tt_gsea_go),
+      expected = c(356L, 11L)
+    )
+  }
+)
+
+## ORA ----
+
+test_that(
+  "olink_pathway_enrichment - works - t-test ORA",
+  {
+    # Load reference results - skipped if files are absent
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
+    skip_on_cran()
+    skip_if_not_installed("clusterProfiler")
+    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = tt_ora <- olink_pathway_enrichment(
+            df = npx_data1 |>
+              dplyr::filter(
+                !grepl(pattern = "control",
+                       x = .data[["SampleID"]],
+                       ignore.case = TRUE)
+              ),
+            check_log = check_log,
+            test_results = reference_results$t_test,
+            method = "ORA",
+            ontology = "MSigDb"
+          ),
+          regexp = "Using MSigDB..."
+        ),
+        regexp = paste("45 assays are not found in the database. Please check",
+                       "the names for the following assays in `test_results`",
+                       "and `df`")
+      ),
+      regexp = "Over-representation analysis performed"
+    )
+
+    expect_equal(
+      object = dim(tt_ora),
+      expected = c(345L, 12L)
+    )
+  }
+)
+
+test_that(
+  "olink_pathway_enrichment - works - Reactome ORA",
+  {
+    # Load reference results - skipped if files are absent
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
+    skip_on_cran()
+    skip_if_not_installed("clusterProfiler")
+    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = tt_ora_reactome <- olink_pathway_enrichment(
+            df = npx_data1 |>
+              dplyr::filter(
+                !grepl(pattern = "control",
+                       x = .data[["SampleID"]],
+                       ignore.case = TRUE)
+              ),
+            check_log = check_log,
+            test_results = reference_results$t_test,
+            method = "ORA",
+            ontology = "Reactome"
+          ),
+          regexp = "Extracting Reactome Database from MSigDB..."
+        ),
+        regexp = paste("65 assays are not found in the database. Please check",
+                       "the names for the following assays in `test_results`",
+                       "and `df`")
+      ),
+      regexp = "Over-representation analysis performed"
+    )
+
+    expect_equal(
+      object = dim(tt_ora_reactome),
+      expected = c(15L, 12L)
+    )
+  }
+)
+
+test_that(
+  "olink_pathway_enrichment - works - KEGG ORA",
+  {
+    # Load reference results - skipped if files are absent
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
+    skip_on_cran()
+    skip_if_not_installed("clusterProfiler")
+    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    expect_warning(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = expect_message(
+              object = tt_ora_kegg <- olink_pathway_enrichment(
+                df = npx_data1 |>
+                  dplyr::filter(
+                    !grepl(pattern = "control",
+                           x = .data[["SampleID"]],
+                           ignore.case = TRUE)
+                  ),
+                check_log = check_log,
+                test_results = reference_results$t_test,
+                method = "ORA",
+                ontology = "KEGG"
+              ),
+              regexp = "Extracting KEGG Database from MSigDB..."
+            ),
+            regexp = "KEGG is not approved for commercial use!"
+          ),
+          regexp = paste("138 assays are not found in the database. Please",
+                         "check the names for the following assays in",
+                         "`test_results` and `df`")
+        ),
+        regexp = "Over-representation analysis performed"
+      ),
+      regexp = "No remaining pathways within the range 10-500 proteins!"
+    )
+
+    expect_true(
+      object = is.null(tt_ora_kegg)
+    )
+  }
+)
+
+test_that(
+  "olink_pathway_enrichment - works - GO ORA",
+  {
+    # Load reference results - skipped if files are absent
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
+    skip_on_cran()
+    skip_if_not_installed("clusterProfiler")
+    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = tt_ora_go <- olink_pathway_enrichment(
+            df = npx_data1 |>
+              dplyr::filter(
+                !grepl(pattern = "control",
+                       x = .data[["SampleID"]],
+                       ignore.case = TRUE)
+              ),
+            check_log = check_log,
+            test_results = reference_results$t_test,
+            method = "ORA",
+            ontology = "GO"
+          ),
+          regexp = "Extracting GO Database from MSigDB..."
+        ),
+        regexp = paste("45 assays are not found in the database. Please check",
+                       "the names for the following assays in `test_results`",
+                       "and `df`")
+      ),
+      regexp = "Over-representation analysis performed"
+    )
+
+    expect_equal(
+      object = dim(tt_ora_go),
+      expected = c(212L, 12L)
+    )
+  }
+)
+
 # Test check_pe_inputs ----
 
 test_that(
