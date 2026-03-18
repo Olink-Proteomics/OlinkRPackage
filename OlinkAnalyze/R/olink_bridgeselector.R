@@ -27,10 +27,6 @@
 #'   the sample
 #'   \item{MeanNPX:} Mean NPX for the sample
 #' }
-#' @export
-olink_bridgeselector
-#'
-#' @examples
 #' \donttest{bridge_samples <- olink_bridge_selector(npx_data1,
 #' sample_missing_freq = 0.1, n = 20)}
 #' @importFrom dplyr n select distinct arrange group_by mutate ungroup
@@ -38,7 +34,8 @@ olink_bridgeselector
 #' @importFrom stringr str_detect
 
 
-olink_bridgeselector <- function(df, ..., n) {
+#'
+#' @export
   dots <- list(...)
   # Accept either spelling
   sampleMissingFreq <- dots$sampleMissingFreq %||% dots$sample_missing_freq
@@ -48,3 +45,107 @@ olink_bridgeselector <- function(df, ..., n) {
   return(olink_bridgeselector(df = df, sample_missing_freq = sampleMissingFreq,
                               n = n))
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#' @export
