@@ -68,68 +68,130 @@ olink_pathway_heatmap <- function(enrich_results,
                                   test_results,
                                   method = "GSEA",
                                   keyword = NULL,
-                                  number_of_terms = 20) {
-  if (!(method %in% c("ORA", "GSEA"))) {
-    cli::cli_abort("Method must be \"GSEA\" or \"ORA\".")
+                                  number_of_terms = 20L) {
+  # check inputs ----
+
+  ## check enrichment method ----
+
+  expected_methods <- c("GSEA", "ORA")
+
+  if (!(method %in% expected_methods)) {
+    cli::cli_abort(
+      c(
+        "x" = "{.val {method}} is not a valid method for pathway enrichment!",
+        "i" = "Expected one of {.val {expected_methods}}."
+      ),
+      call = rlang::caller_env(),
+      wrap = TRUE
+    )
   }
+
+  ## check keywords ----
 
   if (!is.null(keyword)) {
     enrich_results <- enrich_results |>
-      dplyr::filter(grepl(pattern = toupper(keyword),
-                          x = .data[["Description"]]))
+      dplyr::filter(
+        grepl(pattern = .env[["keyword"]],
+              x = .data[["Description"]],
+              ignore.case = TRUE),
+      )
 
-    if (nrow(enrich_results) == 0) {
-      cli::cli_abort(paste0("Keyword not found. ",
-                            "Please choose a different keyword or ",
-                            "use a set number of terms."))
+    if (nrow(enrich_results) == 0L) {
+      cli::cli_abort(
+        c(
+          "x" = "Filtering {.arg enrich_results} for {.arg enrich_results} =
+          {.val {keyword}} did not return any results.",
+          "i" = "Ensure that the keyword is spelled correctly and is present in
+          the enrichment results."
+        ),
+        call = rlang::caller_env(),
+        wrap = TRUE
+      )
     }
   }
 
+  ## check number of terms ----
+
+  check_is_scalar_numeric(x = number_of_terms, error = TRUE)
+
+  # prepare data ----
+
   sub_enrich <- enrich_results |>
-    dplyr::arrange(.data[["pvalue"]]) |>
-    dplyr::slice_head(n = number_of_terms) |>
-    dplyr::arrange(dplyr::desc(x = .data[["pvalue"]]))
+    dplyr::arrange(
+      .data[["pvalue"]]
+    ) |>
+    dplyr::slice_head(
+      n = number_of_terms
+    ) |>
+    dplyr::arrange(
+      dplyr::desc(x = .data[["pvalue"]])
+    )
 
   if (method == "ORA") {
-    results_list <- strsplit(x = sub_enrich$geneID, split = "/")
+    results_list <- strsplit(x = sub_enrich[["geneID"]], split = "/")
   } else if (method == "GSEA") {
-    results_list <- strsplit(x = sub_enrich$core_enrichment, split = "/")
+    results_list <- strsplit(x = sub_enrich[["core_enrichment"]], split = "/")
   }
-  names(results_list) <- sub_enrich$Description
+  names(results_list) <- sub_enrich[["Description"]]
 
   long_list <- do.call(rbind, lapply(results_list,
                                      data.frame,
                                      stringsAsFactors = FALSE))
-  long_list$Pathway <- row.names(long_list)
-  long_list$Pathway <- gsub(pattern = "\\..*",
-                            replacement = "",
-                            x = long_list$Pathway)
-  names(long_list)[1] <- "Assay"
+  long_list[["Pathway"]] <- row.names(long_list)
+  long_list[["Pathway"]] <- gsub(pattern = "\\..*",
+                                 replacement = "",
+                                 x = long_list[["Pathway"]])
+  names(long_list)[1L] <- "Assay"
 
   long_list1 <- long_list |>
     as.data.frame() |>
-    dplyr::inner_join(test_results, by = "Assay") |>
-    dplyr::arrange(.data[["estimate"]])
+    dplyr::as_tibble() |>
+    dplyr::inner_join(
+      test_results,
+      by = "Assay",
+      relationship = "many-to-many"
+    ) |>
+    dplyr::arrange(
+      .data[["estimate"]]
+    ) |>
+    dplyr::mutate(
+      Assay = factor(x = .data[["Assay"]],
+                     levels = unique(.data[["Assay"]])),
+      Pathway = stringr::str_trunc(string = .data[["Pathway"]],
+                                   width = 50L,
+                                   side = "center")
+    )
 
-  orderprot <- unique(long_list1[["Assay"]])
+  # plot ----
 
-  p <- ggplot2::ggplot(data = long_list1,
-                       ggplot2::aes(factor(x = .data[["Assay"]],
-                                           levels = orderprot),
-                                    stringr::str_trunc(string =
-                                                         .data[["Pathway"]],
-                                                       width = 50,
-                                                       side = "center"))) +
-    ggplot2::geom_tile(ggplot2::aes(fill = .data[["estimate"]])) +
-    OlinkAnalyze::olink_fill_gradient(coloroption = c("teal",
-                                                      "red"),
-                                      name = "estimate") +
+  p <- ggplot2::ggplot(
+    data = long_list1,
+    mapping = ggplot2::aes(
+      x = .data[["Assay"]],
+      y = .data[["Pathway"]]
+    )
+  ) +
+    ggplot2::geom_tile(
+      mapping = ggplot2::aes(
+        fill = .data[["estimate"]]
+      )
+    ) +
+    OlinkAnalyze::olink_fill_gradient(
+      coloroption = c("teal", "red"),
+      name = "estimate"
+    ) +
     OlinkAnalyze::set_plot_theme() +
-    ggplot2::theme(panel.grid.major = ggplot2::element_blank(),
-                   axis.text.x = ggplot2::element_text(angle = 60,
-                                                       hjust = 1)) +
-    ggplot2::xlab("Protein Symbol") +
-    ggplot2::ylab("Pathway")
+    ggplot2::theme(
+      panel.grid.major = ggplot2::element_blank(),
+      axis.text.x = ggplot2::element_text(
+        angle = 60L,
+        hjust = 1
+      )
+    ) +
+    ggplot2::labs(
+      x = "Protein Symbol",
+      y = "Pathway"
+    )
 
   return(p)
 }
