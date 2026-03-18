@@ -1,72 +1,11 @@
 test_that(
   "olink_pathway_visualization - works",
   {
+    # Load pe reference results - skipped if files are absent
+    pe_results <- get_example_data(filename = "pathway_enrichment_results.rds")
+
     skip_on_cran()
-    suppressMessages(skip_if_not_installed("clusterProfiler"))
-    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
     skip_if_not_installed("vdiffr")
-
-    # data ----
-
-    npx_df <- npx_data1 |>
-      dplyr::filter(
-        !stringr::str_detect(string = .data[["SampleID"]],
-                             pattern = "CONTROL")
-      ) |>
-      dplyr::filter(
-        .data[["Site"]] %in% c("Site_C", "Site_E")
-      ) |>
-      dplyr::filter(
-        .data[["Time"]] %in% c("Baseline", "Week.12")
-      ) |>
-      dplyr::filter(
-        .data[["PlateID"]] == "Example_Data_1_CAM.csv"
-      )
-
-    npx_df_check <- check_npx(df = npx_df) |>
-      suppressMessages() |>
-      suppressWarnings()
-
-    # statistics ----
-
-    ttest_results <- olink_ttest(
-      df = npx_df,
-      check_log = npx_df_check,
-      variable = "Treatment",
-      alternative = "two.sided"
-    ) |>
-      suppressMessages()
-
-    # pathway enrichment ----
-
-    set.seed(123)
-
-    ## GSEA ----
-
-    expect_no_error(
-      object = gsea_results <- olink_pathway_enrichment(
-        df = npx_df,
-        check_log = npx_df_check,
-        ontology = "Reactome",
-        test_results = ttest_results
-      ) |>
-        suppressMessages() |>
-        suppressWarnings()
-    )
-
-    ## ORA ----
-
-    expect_no_error(
-      object = ora_results <- olink_pathway_enrichment(
-        df = npx_df,
-        check_log = npx_df_check,
-        ontology = "Reactome",
-        test_results = ttest_results,
-        method = "ORA"
-      ) |>
-        suppressMessages() |>
-        suppressWarnings()
-    )
 
     # Errors ----
 
@@ -77,7 +16,7 @@ test_that(
 
     expect_error(
       object = olink_pathway_visualization(
-        enrich_results = gsea_results,
+        enrich_results = pe_results$gsea,
         keyword = "hfdklahfajikshf"
       ),
       regexp = paste("Filtering `enrich_results` for `enrich_results` =",
@@ -86,7 +25,7 @@ test_that(
 
     expect_error(
       object = olink_pathway_visualization(
-        enrich_results = ora_results,
+        enrich_results = pe_results$ora,
         method = "ORA",
         keyword = "hfdklahfajikshf"
       ),
@@ -99,7 +38,7 @@ test_that(
     ## v1 ----
 
     gsea_vis <- olink_pathway_visualization(
-      enrich_results = gsea_results
+      enrich_results = pe_results$gsea
     )
     gsea_vis_name <- "GSEA Visualization"
     check_snap_exist(test_dir_name = "olink_pathway_visualization",
@@ -109,7 +48,7 @@ test_that(
     ## v2 ----
 
     gsea_vis_keyword <- olink_pathway_visualization(
-      enrich_results = gsea_results,
+      enrich_results = pe_results$gsea,
       keyword = "immune"
     )
     gsea_vis_keyword_name <- "GSEA Vis with Keyword"
@@ -120,7 +59,7 @@ test_that(
     ## v3 ----
 
     ora_vis_terms <- olink_pathway_visualization(
-      enrich_results = ora_results,
+      enrich_results = pe_results$ora,
       method = "ORA",
       number_of_terms = 15L
     )
@@ -132,7 +71,7 @@ test_that(
     ## v4 ----
 
     ora_vis_keyword <- olink_pathway_visualization(
-      enrich_results = ora_results,
+      enrich_results = pe_results$ora,
       method = "ORA",
       keyword = "SIGNALING"
     )
