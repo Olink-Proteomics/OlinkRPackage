@@ -6,7 +6,7 @@
 \usage{
 olink_plate_randomizer(
   Manifest,
-  PlateSize = 96,
+  plate_size = 96,
   Product,
   SubjectColumn,
   iterations = 500,
@@ -21,9 +21,9 @@ olink_plate_randomizer(
 \item{Manifest}{tibble/data frame in long format containing all sample ID's.
 Sample ID column must be named SampleID.}
 
-\item{PlateSize}{Integer. Either 96 or 48. 96 is default.}
+\item{plate_size}{Integer. Either 96 or 48. 96 is default.}
 
-\item{Product}{String. Name of Olink product used to set PlateSize if not
+\item{Product}{String. Name of Olink product used to set plate_size if not
 provided. Optional.}
 
 \item{SubjectColumn}{(Optional) Column name of the subject ID column. Cannot
