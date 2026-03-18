@@ -16,8 +16,7 @@ olink_pathway_visualization(
 \item{enrich_results}{data frame of enrichment results from
 \code{olink_pathway_enrichment}}
 
-\item{method}{method used in \code{olink_pathway_enrichment} ("GSEA" (default)
-or "ORA")}
+\item{method}{One of "GSEA" (default) or "ORA".}
 
 \item{keyword}{(optional) keyword to filter enrichment results on. If not
 specified, displays top terms.}

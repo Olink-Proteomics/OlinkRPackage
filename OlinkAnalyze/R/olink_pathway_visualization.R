@@ -4,10 +4,9 @@
 #' @description
 #' Pathways are ordered by increasing p-value (unadjusted)
 #'
+#' @inherit olink_pathway_enrichment params
 #' @param enrich_results data frame of enrichment results from
 #' `olink_pathway_enrichment`
-#' @param method method used in `olink_pathway_enrichment` ("GSEA" (default)
-#' or "ORA")
 #' @param keyword (optional) keyword to filter enrichment results on. If not
 #' specified, displays top terms.
 #' @param number_of_terms number of terms to display (default is 20).
@@ -192,7 +191,8 @@ olink_pathway_visualization <- function(enrich_results,
                         gsub(x = .data[["BgRatio"]],
                              pattern = "/.*",
                              replacement = ""),
-                        sep = "/")),
+                        sep = "/")
+        ),
         hjust = -0.1,
         color = "black",
         size = 3.5
