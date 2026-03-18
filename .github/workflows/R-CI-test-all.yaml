@@ -91,3 +91,10 @@ jobs:
             cli::cli_alert_success("Perfect run! 0 warnings, 0 skips.")
           }
         shell: Rscript {0}
+        
+      - name: Upload testthat snapshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: testthat-snapshots
+          path: OlinkAnalyze/tests/testthat/_snaps
