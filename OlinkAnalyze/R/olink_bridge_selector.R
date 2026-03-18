@@ -28,9 +28,6 @@
 #'   \item{MeanNPX:} Mean NPX for the sample
 #' }
 #' @export
-olink_bridge_selector
-#' @export
-olink_bridgeselector
 #'
 #' @examples
 #' \donttest{bridge_samples <- olink_bridge_selector(npx_data1,
@@ -162,3 +159,17 @@ olink_bridge_selector <- function(df, sample_missing_freq, n) {
 
   return(selected_bridges)
 }
+
+#' @rdname olink_bridge_selector
+#' @export
+olink_bridgeselector <- function(df, ..., n) { # nolint: object_name_linter
+  dots <- list(...)
+  # Accept either spelling
+  sampleMissingFreq <- dots$sampleMissingFreq %||% dots$sample_missing_freq
+  if (is.null(sampleMissingFreq)) {
+    stop("Please supply either sampleMissingFreq or sample_missing_freq.")
+  }
+  return(olink_bridgeselector(df = df, sample_missing_freq = sampleMissingFreq,
+                              n = n))
+}  
+
