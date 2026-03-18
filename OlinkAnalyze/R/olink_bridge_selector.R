@@ -171,5 +171,5 @@ olink_bridgeselector <- function(df, ..., n) { # nolint: object_name_linter
     stop("Please supply either sampleMissingFreq or sample_missing_freq.")
   }
   return(olink_bridge_selector(df = df, sample_missing_freq = sampleMissingFreq,
-                              n = n))
+                             n = n))
 }
