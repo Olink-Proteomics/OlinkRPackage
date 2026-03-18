@@ -26,8 +26,6 @@ jobs:
          working-directory: OlinkAnalyze
 
       - name: Strict Test Evaluation (Warnings & Skips)
-        env:
-          TESTTHAT_CPUS: 2
         run: |
           options(cli.num_colors = 256)
           
