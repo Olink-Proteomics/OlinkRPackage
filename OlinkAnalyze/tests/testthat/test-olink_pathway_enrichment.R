@@ -1,409 +1,18 @@
-skip_on_cran()
-skip_if_not_installed("clusterProfiler")
-skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-skip_if_not_installed("broom")
-skip_if_not_installed("car")
-
-# clean up npa_data1
-npx_df <- npx_data1 |>
-  dplyr::filter(
-    !stringr::str_detect(.data[["SampleID"]], "CONTROL")
-  )
-
-check_log <- check_npx(npx_df)
-
-npx_data_format22 <- get_example_data("npx_data_format-Oct-2022.rds")
-
-# example data
-
-check_log_221010 <- check_npx(npx_data_format22) |>
-  suppressWarnings() |>
-  suppressMessages()
-
-ttest_na <- olink_ttest(
-  df = npx_data_format22,
-  check_log = check_log_221010,
-  variable = "treatment1"
-) |>
-  suppressMessages() |>
-  suppressWarnings()
-
-npx_data_format22 <- npx_data_format22 |>
-  dplyr::mutate(OlinkID = ifelse(OlinkID == "OID30646",
-                                 "OID12345",
-                                 OlinkID))
-check_log_221010 <- check_npx(npx_data_format22) |>
-  suppressWarnings() |>
-  suppressMessages()
-
-# statistical tests
-ttest_results <- olink_ttest(
-  df = npx_df,
-  check_log = check_log,
-  variable = "Treatment"
-) |>
-  suppressMessages() |>
-  suppressWarnings()
-
-anova_posthoc_results <- olink_anova_posthoc(
-  df = npx_df,
-  check_log = check_log,
-  variable = "Site",
-  effect = "Site"
-) |>
-  suppressMessages() |>
-  suppressWarnings()
-
-# set seed
-set.seed(123)
-
-test_that("T-test GSEA works", {
-  skip_on_cran()
-  skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
-  expect_no_warning(
-    object = expect_no_error(
-      object = tt_gsea <- olink_pathway_enrichment(
-        df = npx_df,
-        check_log = check_log,
-        test_results = ttest_results
-      ) |>
-        suppressMessages() |>
-        suppressWarnings()
-    )
-  )
-
-  expect_equal(
-    object = nrow(tt_gsea),
-    expected = 573L
-  )
-
-  expect_message(
-    object = expect_warning(
-      object = olink_pathway_enrichment(
-        df = npx_data_format22,
-        test_results = ttest_na,
-        check_log = check_log_221010
-      ),
-      regexp = "The Olink IDs in the df do not all match the Olink IDs"
-    ),
-    regexp = "Filtering df for overlapping OlinkIDs in df"
-  )
-
-})
-
-test_that("Reactome GSEA works", {
-  skip_on_cran()
-  skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
-  expect_no_warning(
-    expect_no_error(
-      object = tt_gsea_reactome <- olink_pathway_enrichment(
-        df = npx_df,
-        check_log = check_log,
-        test_results = ttest_results,
-        ontology = "Reactome"
-      ) |>
-        suppressMessages()
-    )
-  )
-
-  expect_equal(
-    object = nrow(tt_gsea_reactome),
-    expected = 20L
-  )
-})
-
-test_that("MSigDB_com GSEA works", {
-  skip_on_cran()
-  skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
-  expect_no_warning(
-    object = expect_no_error(
-      object = tt_gsea_msigdb_com <- olink_pathway_enrichment(
-        df = npx_df,
-        check_log = check_log,
-        test_results = ttest_results,
-        ontology = "MSigDb_com"
-      ) |>
-        suppressMessages()
-    )
-  )
-
-  expect_equal(
-    object = nrow(tt_gsea_msigdb_com),
-    expected = 568L
-  )
-})
-
-test_that("KEGG GSEA works", {
-  skip_on_cran()
-  skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
-  expect_no_error(
-    object = tt_gsea_kegg <- olink_pathway_enrichment(df = npx_df,
-      check_log = check_log,
-      test_results = ttest_results,
-      ontology = "KEGG"
-    ) |>
-      suppressMessages() |>
-      suppressWarnings()
-  )
-
-  expect_equal(
-    object = nrow(tt_gsea_kegg),
-    expected = 0L
-  )
-})
-
-test_that("GO GSEA works", {
-  skip_on_cran()
-  skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
-  expect_no_warning(
-    object = expect_no_error(
-      object = tt_gsea_go <- olink_pathway_enrichment(
-        df = npx_df,
-        check_log = check_log,
-        test_results = ttest_results,
-        ontology = "GO"
-      ) |>
-        suppressMessages()
-    )
-  )
-
-  expect_equal(
-    object = nrow(tt_gsea_go),
-    expected = 356L
-  )
-})
-
-test_that("T-test ORA works", {
-  skip_on_cran()
-  skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
-  expect_no_warning(
-    object = expect_no_error(
-      object = tt_ora <- olink_pathway_enrichment(
-        df = npx_df,
-        check_log = check_log,
-        test_results = ttest_results,
-        method = "ORA",
-        ontology = "MSigDb"
-      ) |>
-        suppressMessages()
-    )
-  )
-
-  expect_equal(
-    object = nrow(tt_ora),
-    expected = 345L
-  )
-})
-
-test_that("Reactome ORA works", {
-  skip_on_cran()
-  skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
-  expect_no_warning(
-    object = expect_no_error(
-      object = tt_ora_reactome <- olink_pathway_enrichment(
-        df = npx_df,
-        check_log = check_log,
-        test_results = ttest_results,
-        method = "ORA",
-        ontology = "Reactome"
-      ) |>
-        suppressMessages()
-    )
-  )
-
-  expect_equal(
-    object = nrow(tt_ora_reactome),
-    expected = 15L
-  )
-})
-
-test_that("KEGG ORA works", {
-  skip_on_cran()
-  skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
-  expect_warning(
-    object = tt_ora_kegg <- olink_pathway_enrichment(
-      df = npx_df,
-      check_log = check_log,
-      test_results = ttest_results,
-      method = "ORA",
-      ontology = "KEGG"
-    ) |>
-      suppressMessages(),
-    regexp = "No remaining pathways within the range 10-500 proteins!"
-  )
-
-  expect_true(
-    object = is.null(tt_ora_kegg)
-  )
-})
-
-test_that("GO ORA works", {
-  skip_on_cran()
-  skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
-  expect_no_warning(
-    object = expect_no_error(
-      object = tt_ora_go <- olink_pathway_enrichment(
-        df = npx_df,
-        check_log = check_log,
-        test_results = ttest_results,
-        method = "ORA",
-        ontology = "GO"
-      ) |>
-        suppressMessages()
-    )
-  )
-
-  expect_equal(
-    object = nrow(tt_ora_go),
-    expected = 212L
-  )
-})
-
-test_that("Errors occur", {
-  skip_on_cran()
-  skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
-  expect_message(
-    object = expect_message(object = data_prep(df = npx_data_format22,
-                                               test_results = ttest_na,
-                                               check_log = check_log_221010),
-                            regex = "Removing invalid OlinkIDs"),
-    regex = "Filtering df for overlapping OlinkIDs in df"
-  )
-})
-
-test_that(
-  "olink_pathway_enrichment - error - missing args",
-  {
-    skip_on_cran()
-    skip_if_not_installed("clusterProfiler")
-    skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
-    expect_error(
-      object = olink_pathway_enrichment(),
-      regexp = "Arguments `df` and `test_results` are required!"
-    )
-
-    expect_error(
-      object = olink_pathway_enrichment(
-        df = npx_data1
-      ),
-      regexp = "Arguments `df` and `test_results` are required!"
-    )
-
-    expect_error(
-      object = olink_pathway_enrichment(
-        test_results = ttest_results
-      ),
-      regexp = "Arguments `df` and `test_results` are required!"
-    )
-  }
-)
-
-test_that("ORA warns assays not found in database", {
-  skip_on_cran()
-  skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
-  messages <- capture_messages(
-    code = olink_pathway_enrichment(
-      df = npx_df,
-      check_log = check_log,
-      test_results = ttest_results,
-      method = "ORA",
-      ontology = "MSigDb"
-    )
-  )
-  expect_true(
-    object = grepl(
-      pattern = "assays are not found in the database.",
-      x = paste(messages, collapse = "")
-    )
-  )
-})
-
-test_that("gsea warns assays not found in database", {
-  skip_on_cran()
-  skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
-  messages <- capture_messages(
-    code = olink_pathway_enrichment(
-      df = npx_df,
-      check_log = check_log,
-      test_results = ttest_results
-    )
-  )
-  expect_true(
-    object = grepl(
-      pattern = "assays are not found in the database.",
-      x = paste(messages, collapse = "")
-    )
-  )
-})
-
-test_that("mouse works", {
-  skip_on_cran()
-  skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
-  expect_equal(
-    object = select_ont("Reactome", "mouse"),
-    expected = {
-      msigdbr::msigdbr(species = "Mus musculus", collection = "C2") |>
-        dplyr::bind_rows(msigdbr::msigdbr(species = "Mus musculus",
-                                          collection = "C5")) |>
-        dplyr::filter(.data[["gs_subcollection"]] == "CP:REACTOME")  |>
-        dplyr::select(dplyr::any_of(c("gs_name", "gene_symbol")))
-    }
-  )
-})
-
-test_that("test_prep works", {
-  skip_on_cran()
-  skip_if_not_installed("clusterProfiler")
-  skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
-
-  expect_equal(object = test_prep(df = npx_data_format22,
-                                  test_results = ttest_na) |>
-                 dplyr::select(any_of("OlinkID")) |>
-                 dplyr::distinct() |>
-                 dplyr::pull() |>
-                 sort(),
-               expected = intersect(npx_data_format22$OlinkID,
-                                    ttest_na$OlinkID) |>
-                 sort())
-})
-
 # Test check_pe_inputs ----
 
 test_that(
   "check_pe_inputs - warning - non-overlapping OID df and test_results",
   {
+    # Load reference results - skipped if files are absent
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
     expect_warning(
       object = check_pe_inputs(
         df = npx_data1,
-        check_log = check_log,
-        test_results = ttest_results |>
+        check_log = check_npx(df = npx_data1) |>
+          suppressWarnings() |>
+          suppressMessages(),
+        test_results = reference_results$t_test |>
           dplyr::filter(
             !(.data[["OlinkID"]] %in% head(x = npx_data1[["OlinkID"]], n = 1L))
           ),
@@ -419,11 +28,22 @@ test_that(
 test_that(
   "check_pe_inputs - error - too many contrasts",
   {
+    # Load reference results - skipped if files are absent
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
     expect_error(
       object = check_pe_inputs(
-        df = npx_data1,
-        check_log = check_log,
-        test_results = anova_posthoc_results,
+        df = npx_data1 |>
+          dplyr::filter(
+            .data[["OlinkID"]] %in% reference_results$anova_site_posthoc$OlinkID
+          ),
+        check_log = check_npx(df = npx_data1) |>
+          suppressWarnings() |>
+          suppressMessages(),
+        test_results = reference_results$anova_site_posthoc |>
+          dplyr::filter(
+            .data[["OlinkID"]] %in% npx_data1[["OlinkID"]]
+          ),
         method = "GSEA",
         ontology = "MSigDb",
         organism = "human"
@@ -436,11 +56,16 @@ test_that(
 test_that(
   "check_pe_inputs - error - invalid method",
   {
+    # Load reference results - skipped if files are absent
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
     expect_error(
       object = check_pe_inputs(
         df = npx_data1,
-        check_log = check_log,
-        test_results = ttest_results,
+        check_log = check_npx(df = npx_data1) |>
+          suppressWarnings() |>
+          suppressMessages(),
+        test_results = reference_results$t_test,
         method = "IRA",
         ontology = "MSigDb",
         organism = "human"
@@ -453,11 +78,16 @@ test_that(
 test_that(
   "check_pe_inputs - error - invalid ontology",
   {
+    # Load reference results - skipped if files are absent
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
     expect_error(
       object = check_pe_inputs(
         df = npx_data1,
-        check_log = check_log,
-        test_results = ttest_results,
+        check_log = check_npx(df = npx_data1) |>
+          suppressWarnings() |>
+          suppressMessages(),
+        test_results = reference_results$t_test,
         method = "GSEA",
         ontology = "WikiPathways",
         organism = "human"
@@ -470,11 +100,16 @@ test_that(
 test_that(
   "check_pe_inputs - error - invalid organism",
   {
+    # Load reference results - skipped if files are absent
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
     expect_error(
       object =  olink_pathway_enrichment(
         df = npx_data1,
-        check_log = check_log,
-        test_results = ttest_results,
+        check_log = check_npx(df = npx_data1) |>
+          suppressWarnings() |>
+          suppressMessages(),
+        test_results = reference_results$t_test,
         method = "GSEA",
         ontology = "MSigDb",
         organism = "rat"
@@ -489,6 +124,13 @@ test_that(
 test_that(
   "helper_non_overlap_assays - works",
   {
+    # Load reference results - skipped if files are absent
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
+    check_log <- check_npx(df = npx_data1) |>
+      suppressWarnings() |>
+      suppressMessages()
+
     all_assays <- npx_data1[["OlinkID"]] |> unique() |> sort()
 
     # all assays overlap - both ----
@@ -496,7 +138,7 @@ test_that(
     expect_equal(
       object = helper_non_overlap_assays(
         df = npx_data1,
-        test_results = ttest_results,
+        test_results = reference_results$t_test,
         check_log = check_log,
         which = "both"
       ) |>
@@ -509,7 +151,7 @@ test_that(
     expect_equal(
       object = helper_non_overlap_assays(
         df = npx_data1,
-        test_results = ttest_results,
+        test_results = reference_results$t_test,
         check_log = check_log,
         which = "df"
       ) |>
@@ -522,7 +164,7 @@ test_that(
     expect_equal(
       object = helper_non_overlap_assays(
         df = npx_data1,
-        test_results = ttest_results,
+        test_results = reference_results$t_test,
         check_log = check_log,
         which = "res"
       ) |>
@@ -535,7 +177,7 @@ test_that(
     expect_equal(
       object = helper_non_overlap_assays(
         df = npx_data1,
-        test_results = ttest_results |>
+        test_results = reference_results$t_test |>
           dplyr::filter(
             !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
           ),
@@ -551,7 +193,7 @@ test_that(
     expect_equal(
       object = helper_non_overlap_assays(
         df = npx_data1,
-        test_results = ttest_results |>
+        test_results = reference_results$t_test |>
           dplyr::filter(
             !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
           ),
@@ -567,7 +209,7 @@ test_that(
     expect_equal(
       object = helper_non_overlap_assays(
         df = npx_data1,
-        test_results = ttest_results |>
+        test_results = reference_results$t_test |>
           dplyr::filter(
             !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
           ),
@@ -586,7 +228,7 @@ test_that(
           dplyr::filter(
             !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
           ),
-        test_results = ttest_results,
+        test_results = reference_results$t_test,
         check_log = check_log,
         which = "both"
       ) |>
@@ -602,7 +244,7 @@ test_that(
           dplyr::filter(
             !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
           ),
-        test_results = ttest_results,
+        test_results = reference_results$t_test,
         check_log = check_log,
         which = "df"
       ) |>
@@ -618,7 +260,7 @@ test_that(
           dplyr::filter(
             !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
           ),
-        test_results = ttest_results,
+        test_results = reference_results$t_test,
         check_log = check_log,
         which = "res"
       ) |>
@@ -633,6 +275,9 @@ test_that(
 test_that(
   "data_prep - works - remove invalid entries",
   {
+    # Load reference results - skipped if files are absent
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
     npx_data_invalid <- npx_data1 |>
       dplyr::filter(
         !grepl(
@@ -666,7 +311,7 @@ test_that(
     expect_message(
       object = data_prep_out <- data_prep(
         df = npx_data_invalid,
-        test_results = ttest_results,
+        test_results = reference_results$t_test,
         check_log = npx_data_invalid_check
       ),
       regexp = paste("Removed 468 entries from `df` containing invalid assay",
@@ -686,6 +331,9 @@ test_that(
 test_that(
   "data_prep - works - remove non-overlapping assays",
   {
+    # Load reference results - skipped if files are absent
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
     exclude_assays <- npx_data1[["OlinkID"]] |> unique() |> head(n = 5L)
 
     expect_message(
@@ -696,11 +344,13 @@ test_that(
                    x = .data[["SampleID"]],
                    ignore.case = TRUE)
           ),
-        test_results = ttest_results |>
+        test_results = reference_results$t_test |>
           dplyr::filter(
             !(.data[["OlinkID"]] %in% .env[["exclude_assays"]])
           ),
-        check_log = check_log
+        check_log = check_npx(df = npx_data1) |>
+          suppressWarnings() |>
+          suppressMessages()
       ),
       regexp = paste("5 assays in `df` are not represented in `test_results`",
                      "and will be removed from `df`: \"OID01216\",",
@@ -719,11 +369,16 @@ test_that(
 test_that(
   "data_prep - error - duplicates assays for same sample",
   {
+    # Load reference results - skipped if files are absent
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
     expect_error(
       object = data_prep(
         df = npx_data1,
-        test_results = ttest_results,
-        check_log = check_log
+        test_results = reference_results$t_test,
+        check_log = check_npx(df = npx_data1) |>
+          suppressWarnings() |>
+          suppressMessages()
       ),
       regexp = "Detected 184 duplicated assays in `df`: \"CHL1\", \"NRP1\"",
     )
@@ -733,6 +388,9 @@ test_that(
 test_that(
   "data_prep - error - duplicates assays for same sample v2",
   {
+    # Load reference results - skipped if files are absent
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
     duplicate_assay_data <- npx_data1 |>
       dplyr::filter(
         !grepl(
@@ -764,8 +422,10 @@ test_that(
     expect_error(
       object = data_prep(
         df = duplicated_assay_data,
-        test_results = ttest_results,
-        check_log = check_log
+        test_results = reference_results$t_test,
+        check_log = check_npx(df = duplicated_assay_data) |>
+          suppressWarnings() |>
+          suppressMessages()
       ),
       regexp = "Detected 1 duplicated assay in `df`: \"MET\"!"
     )
@@ -777,6 +437,9 @@ test_that(
 test_that(
   "test_prep - works - remove non-overlapping assays",
   {
+    # Load reference results - skipped if files are absent
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
     exclude_assays <- npx_data1[["OlinkID"]] |> unique() |> head(n = 5L)
 
     expect_message(
@@ -790,8 +453,10 @@ test_that(
           dplyr::filter(
             !(.data[["OlinkID"]] %in% .env[["exclude_assays"]])
           ),
-        test_results = ttest_results,
-        check_log = check_log
+        test_results = reference_results$t_test,
+        check_log = check_npx(df = npx_data1) |>
+          suppressWarnings() |>
+          suppressMessages()
       ),
       regexp = paste("5 assays in `test_results` are not represented in `df`",
                      "and will be removed from `test_results`: \"OID01220\",",
@@ -959,15 +624,13 @@ test_that(
     # msigdbr::msigdbr directly, so we run it here to "use up" the startup
     # message for mouse before we run the tests for select_ont.
 
-    expect_no_condition(
-      object = msigdbr::msigdbr(
-        species = "Mus musculus",
-        collection = "C2"
-      ) |>
-        suppressMessages() |>
-        suppressWarnings() |>
-        suppressPackageStartupMessages()
-    )
+    msigdbr::msigdbr(
+      species = "Mus musculus",
+      collection = "C2"
+    ) |>
+      suppressMessages() |>
+      suppressWarnings() |>
+      suppressPackageStartupMessages()
 
     # mouse & MSigDb ----
 
@@ -1112,17 +775,22 @@ test_that(
 test_that(
   "results_to_genelist - works",
   {
+    # Load reference results - skipped if files are absent
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
     # try with ttest_results ----
 
     expect_identical(
-      object = results_to_genelist(test_results = ttest_results),
+      object = results_to_genelist(
+        test_results = reference_results$t_test
+      ),
       expected = setNames(
-        object = ttest_results |>
+        object = reference_results$t_test |>
           dplyr::arrange(
             dplyr::desc(.data[["estimate"]])
           ) |>
           dplyr::pull(.data[["estimate"]]),
-        nm = ttest_results |>
+        nm = reference_results$t_test |>
           dplyr::arrange(
             dplyr::desc(.data[["estimate"]])
           ) |>
