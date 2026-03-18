@@ -79,7 +79,8 @@ check_osi <- function(df,
     check_log = check_log,
     remove_control_sample = TRUE,
     verbose = TRUE
-  )
+  ) |>
+    suppressMessages()
 
   osi_cat_cols <- c("OSICategory")
   osi_cont_cols <- c("OSITimeToCentrifugation",
