@@ -1,5 +1,5 @@
 test_that(
-  "olink_pathway_visualization - valid Keyword needed",
+  "olink_pathway_visualization - works",
   {
     skip_on_cran()
     suppressMessages(skip_if_not_installed("clusterProfiler"))
