@@ -1,14 +1,14 @@
-# Test product_to_platesize ----
+# Test product_to_plate_size ----
 
 test_that(
   "product_to_platesize works",
   {
     expect_equal(
-      object = product_to_platesize(product = "Target 96"),
+      object = product_to_plate_size(product = "Target 96"),
       expected = 96L
     )
     expect_equal(
-      object = product_to_platesize(product = "Target 48"),
+      object = product_to_plate_size(product = "Target 48"),
       expected = 48L
     )
   }
@@ -20,13 +20,13 @@ test_that(
   "olink_display_plate_layout - works",
   {
     skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
-
+    
     # Load reference results
     reference_results <- get_example_data(filename = "reference_results.rds")
-
+    
     # correctness of randomized_result1 is tested here
     # "olink_plate_randomizer - works - v1"
-
+    
     expect_equal(
       object = olink_display_plate_layout(
         data = reference_results$randomized_samples,
@@ -45,11 +45,11 @@ test_that(
     skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
     skip_if_not_installed("vdiffr")
     skip_on_cran()
-
+    
     plate_randomizer_name <- "Randomized_Data"
     check_snap_exist(test_dir_name = "olink_plate_randomizer",
                      snap_name = plate_randomizer_name)
-
+    
     # Run olink_plate_randomizer
     randomized_result5 <- olink_plate_randomizer(
       Manifest = manifest,
@@ -60,7 +60,7 @@ test_that(
     ) |>
       suppressMessages() |>
       suppressWarnings()
-
+    
     vdiffr::expect_doppelganger(
       title = plate_randomizer_name,
       fig = olink_display_plate_layout(
@@ -79,7 +79,7 @@ test_that(
     expect_error(
       object = olink_display_plate_layout(
         data = manifest,
-        PlateSize = 15
+        plate_size = 15
       ),
       regexp = "Plate size needs to be either 48 or 96"
     )
@@ -92,13 +92,13 @@ test_that(
   "olink_display_plate_dist - works",
   {
     skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
-
+    
     # Load reference results
     reference_results <- get_example_data(filename = "reference_results.rds")
-
+    
     # correctness of randomized_result1 is tested here
     # "olink_plate_randomizer - works - v1"
-
+    
     expect_equal(
       object = olink_display_plate_dist(
         data = reference_results$randomized_samples
@@ -118,38 +118,38 @@ test_that(
   {
     expect_equal(object = {
       assign_subject2plate(
-                           plate_map = generate_plate_holder(
-                                                             nplates = 2L,
-                                                             nspots = c(12L,
-                                                                        12L),
-                                                             nsamples = 16L,
-                                                             plate_size = 96L,
-                                                             num_ctrl = 8L,
-                                                             rand_ctrl =
-                                                               FALSE) |>
-                             dplyr::mutate(SampleID = NA_character_),
-                           manifest = manifest |>
-                             head(16) |>
-                             dplyr::mutate(SubjectID = "A"),
-                           subject_id = "A")
+        plate_map = generate_plate_holder(
+          nplates = 2L,
+          nspots = c(12L,
+                     12L),
+          nsamples = 16L,
+          plate_size = 96L,
+          num_ctrl = 8L,
+          rand_ctrl =
+            FALSE) |>
+          dplyr::mutate(SampleID = NA_character_),
+        manifest = manifest |>
+          head(16) |>
+          dplyr::mutate(SubjectID = "A"),
+        subject_id = "A")
     },
     expected = "This Sample does not fit!"
     )
     expect_equal(object = {
       assign_subject2plate(
-                           plate_map = generate_plate_holder(
-                                                             nplates = 2L,
-                                                             nspots = c(22L,
-                                                                        22L),
-                                                             nsamples = 16L,
-                                                             plate_size = 96L,
-                                                             num_ctrl = 8L,
-                                                             rand_ctrl =
-                                                               FALSE) |>
-                             dplyr::mutate(SampleID = NA_character_),
-                           manifest = manifest |>
-                             head(16),
-                           subject_id = "A") |>
+        plate_map = generate_plate_holder(
+          nplates = 2L,
+          nspots = c(22L,
+                     22L),
+          nsamples = 16L,
+          plate_size = 96L,
+          num_ctrl = 8L,
+          rand_ctrl =
+            FALSE) |>
+          dplyr::mutate(SampleID = NA_character_),
+        manifest = manifest |>
+          head(16),
+        subject_id = "A") |>
         dplyr::filter(!is.na(SampleID)) |>
         dplyr::distinct(plate) |>
         nrow()
@@ -175,7 +175,7 @@ test_that(
       ),
       regexp = "Vector of available spots must equal number of plates"
     )
-
+    
     expect_error(
       object = generate_plate_holder(
         nplates = 2L,
@@ -187,7 +187,7 @@ test_that(
       ),
       regexp = "Number of samples per plates cannot exceed"
     )
-
+    
     expect_error(
       object = generate_plate_holder(
         nplates = 2L,
@@ -209,7 +209,7 @@ test_that(
   {
     # Load reference results
     reference_results <- get_example_data(filename = "reference_results.rds")
-
+    
     # Run olink_plate_randomizer
     expect_message(
       object = randomized_result1 <- olink_plate_randomizer(
@@ -218,12 +218,12 @@ test_that(
       ),
       regexp = "Random assignment of SAMPLES to plates"
     )
-
+    
     expect_equal(
       object = droplevels(randomized_result1),
       expected = droplevels(reference_results$randomized_samples)
     )
-
+    
     # Run olink_plate_randomizer
     expect_message(
       object = randomized_result6 <- olink_plate_randomizer(
@@ -233,7 +233,7 @@ test_that(
       ),
       regexp = "Random assignment of SAMPLES to plates"
     )
-
+    
     expect_equal(
       object = randomized_result1,
       expected = randomized_result6
@@ -246,7 +246,7 @@ test_that(
   {
     # Load reference results
     reference_results <- get_example_data(filename = "reference_results.rds")
-
+    
     msgs <- capture_messages(
       {
         randomized_result2 <- olink_plate_randomizer(
@@ -270,7 +270,7 @@ test_that(
         side = "both"
       ) |>
       (\(x) x[x != ""])()
-
+    
     expect_true(
       object = grepl(
         pattern = "Random assignment of SUBJECTS to plates",
@@ -279,7 +279,7 @@ test_that(
       ) |>
         any()
     )
-
+    
     expect_equal(
       object = droplevels(randomized_result2),
       expected = droplevels(reference_results$randomized_subjects)
@@ -292,7 +292,7 @@ test_that(
   {
     # Load reference results
     reference_results <- get_example_data(filename = "reference_results.rds")
-
+    
     msgs <- capture_messages(
       {
         # Run olink_plate_randomizer
@@ -324,7 +324,7 @@ test_that(
         side = "both"
       ) |>
       (\(x) x[x != ""])()
-
+    
     expect_true(
       object = grepl(
         pattern = "`study` column detected in manifest",
@@ -333,7 +333,7 @@ test_that(
       ) |>
         any()
     )
-
+    
     expect_true(
       object = grepl(
         pattern = "Keeping studies together during randomization",
@@ -342,7 +342,7 @@ test_that(
       ) |>
         any()
     )
-
+    
     expect_true(
       object = grepl(
         pattern = "study1 successful",
@@ -351,7 +351,7 @@ test_that(
       ) |>
         any()
     )
-
+    
     expect_true(
       object = grepl(
         pattern = "study2 successful",
@@ -360,7 +360,7 @@ test_that(
       ) |>
         any()
     )
-
+    
     expect_true(
       object = grepl(
         pattern = "Random assignment of SUBJECTS to plates",
@@ -369,7 +369,7 @@ test_that(
       ) |>
         any()
     )
-
+    
     expect_true(
       object = grepl(
         pattern = "Included total of 4 empty well(s) in first and/or",
@@ -378,7 +378,7 @@ test_that(
       ) |>
         any()
     )
-
+    
     expect_true(
       object = grepl(
         pattern = "Please try another seed or increase the number of iteration",
@@ -387,7 +387,7 @@ test_that(
       ) |>
         any()
     )
-
+    
     expect_equal(
       object = droplevels(randomized_result3),
       expected = droplevels(reference_results$randomized_subjects_spots)
@@ -400,7 +400,7 @@ test_that(
   {
     # Load reference results
     reference_results <- get_example_data(filename = "reference_results.rds")
-
+    
     msgs <- capture_messages(
       {
         # Run olink_plate_randomizer
@@ -431,7 +431,7 @@ test_that(
         side = "both"
       ) |>
       (\(x) x[x != ""])()
-
+    
     expect_true(
       object = grepl(
         pattern = "`study` column detected in manifest",
@@ -440,7 +440,7 @@ test_that(
       ) |>
         any()
     )
-
+    
     expect_true(
       object = grepl(
         pattern = "Studies will be kept together during randomization",
@@ -449,7 +449,7 @@ test_that(
       ) |>
         any()
     )
-
+    
     expect_true(
       object = grepl(
         pattern = "Random assignment of SAMPLES to plates by study",
@@ -458,7 +458,7 @@ test_that(
       ) |>
         any()
     )
-
+    
     expect_equal(
       object = droplevels(randomized_result4),
       expected = droplevels(reference_results$randomized_samples_spots)
@@ -471,7 +471,7 @@ test_that(
   {
     # Load reference results
     reference_results <- get_example_data(filename = "reference_results.rds")
-
+    
     msgs <- capture_messages(
       {
         # Run olink_plate_randomizer
@@ -497,7 +497,7 @@ test_that(
         side = "both"
       ) |>
       (\(x) x[x != ""])()
-
+    
     expect_true(
       object = grepl(
         pattern = "Random assignment of SUBJECTS to plates",
@@ -506,7 +506,7 @@ test_that(
       ) |>
         any()
     )
-
+    
     expect_equal(
       object = randomized_result5 |>
         dplyr::filter(
@@ -523,7 +523,7 @@ test_that(
         dplyr::pull(),
       expected = 10L
     )
-
+    
     expect_contains(
       object = randomized_result5$SampleID,
       expected = "CONTROL_SAMPLE"
@@ -556,7 +556,7 @@ test_that(
       ),
       regexp = "`num_ctrl` must be a positive integer"
     )
-
+    
     expect_error(
       object = olink_plate_randomizer(
         Manifest = manifest,
@@ -580,7 +580,7 @@ test_that(
       regexp = paste("SampleID not found! Be sure the column of samples ID's",
                      "is named'SampleID'")
     )
-
+    
     expect_error(
       object = olink_plate_randomizer(
         Manifest = manifest,
@@ -618,7 +618,7 @@ test_that(
   {
     # Load reference results
     reference_results <- get_example_data(filename = "reference_results.rds")
-
+    
     expect_error(
       object = olink_display_plate_layout(
         data = reference_results$randomized_samples,
