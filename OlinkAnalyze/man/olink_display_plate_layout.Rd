@@ -8,7 +8,7 @@
 olink_display_plate_layout(
   data,
   fill.color,
-  PlateSize = 96L,
+  plate_size = 96L,
   num_ctrl = 8L,
   rand_ctrl = FALSE,
   Product,
@@ -18,7 +18,7 @@ olink_display_plate_layout(
 olink_displayPlateLayout(
   data,
   fill.color,
-  PlateSize = 96L,
+  plate_size = 96L,
   num_ctrl = 8L,
   rand_ctrl = FALSE,
   Product,
@@ -31,14 +31,14 @@ olink_plate_randomizer function.}
 
 \item{fill.color}{Column name to be used as coloring variable for wells.}
 
-\item{PlateSize}{Integer. Either 96 or 48. 96 is default.}
+\item{plate_size}{Integer. Either 96 or 48. 96 is default.}
 
 \item{num_ctrl}{Numeric. Number of controls on each plate (default = 8)}
 
 \item{rand_ctrl}{Logical. Whether controls are added to be randomized across
 the plate (default = FALSE)}
 
-\item{Product}{String. Name of Olink product used to set PlateSize if not
+\item{Product}{String. Name of Olink product used to set plate_size if not
 provided. Optional.}
 
 \item{include.label}{Should the variable group be shown in the plot.}
