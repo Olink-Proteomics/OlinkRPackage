@@ -2,7 +2,8 @@
 % Please edit documentation in R/olink_pathway_heatmap.R
 \name{olink_pathway_heatmap}
 \alias{olink_pathway_heatmap}
-\title{Creates a heatmap of selected pathways and proteins}
+\title{Creates a heatmap of proteins related to pathways using enrichment results
+from \code{olink_pathway_enrichment}.}
 \usage{
 olink_pathway_heatmap(
   enrich_results,
@@ -14,56 +15,79 @@ olink_pathway_heatmap(
 }
 \arguments{
 \item{enrich_results}{data frame of enrichment results from
-olink_pathway_enrichment()}
+\code{olink_pathway_enrichment}}
 
-\item{test_results}{filtered results from statistical test with Assay,
-OlinkID, and estimate columns}
+\item{test_results}{a data frame of statistical test results including the
+columns "Adjusted_pval" and "estimate".}
 
-\item{method}{method used in olink_pathway_enrichment ("GSEA" (default)
-or "ORA")}
+\item{method}{One of "GSEA" (default) or "ORA".}
 
-\item{keyword}{(optional) keyword to filter enrichment results on, if not
-specified, displays top terms}
+\item{keyword}{(optional) keyword to filter enrichment results on. If not
+specified, displays top terms.}
 
-\item{number_of_terms}{number of terms to display, default is 20}
+\item{number_of_terms}{number of terms to display (default is 20).}
 }
 \value{
-A heatmap as a ggplot object
+A heatmap as a ggplot object.
 }
 \description{
-Creates a heatmap of proteins related to pathways using enrichment
-results from olink_pathway_enrichment.
+Creates a heatmap of proteins related to pathways using enrichment results
+from \code{olink_pathway_enrichment}.
 }
 \examples{
 \donttest{
-library(dplyr)
-# Run t-test results (see olink_ttest documentation)
-npx_df <- npx_data1 |> filter(!grepl('control',SampleID,
-                               ignore.case = TRUE))
-check_log <- check_npx(npx_df)
-try({ # This expression might fail if dependencies are not installed
-ttest_results <- olink_ttest(df = npx_df,
-                             check_log = check_log,
-                             variable = 'Treatment',
-                             alternative = 'two.sided')
+if (rlang::is_installed(pkg = c("msigdbr", "clusterProfiler"))) {
 
-#  Run olink_pathway_enrichment (see documentation)
-gsea_results <- olink_pathway_enrichment(df = npx_data1,
-                                         check_log = check_log,
-                                        test_results = ttest_results)
-ora_results <- olink_pathway_enrichment(df = npx_data1,
-                                        check_log = check_log,
-                                        test_results = ttest_results,
-                                        method = "ORA")
-olink_pathway_heatmap(enrich_results = gsea_results,
-                      test_results = ttest_results)
-olink_pathway_heatmap(enrich_results = ora_results,
-                      test_results = ttest_results,
-                      method = "ORA",
-                      keyword = "cell")
-})
+  # Run olink_ttest or other stats test (see documentation )
+  npx_df <- npx_data1 |>
+    dplyr::filter(
+      !grepl(
+        pattern = "control",
+        x = .data[["SampleID"]],
+        ignore.case = TRUE
+      )
+    )
 
+  check_log <- check_npx(df = npx_df)
 
+  ttest_results <- OlinkAnalyze::olink_ttest(
+    df = npx_df,
+    variable = "Treatment",
+    alternative = "two.sided",
+    check_log = check_log
+  )
+
+  # Run olink_pathway_enrichment (see documentation)
+
+  # GSEA
+  gsea_results <- OlinkAnalyze::olink_pathway_enrichment(
+    df = npx_df,
+    test_results = ttest_results,
+    check_log = check_log
+  )
+
+  # ORA
+  ora_results <- OlinkAnalyze::olink_pathway_enrichment(
+    df = npx_df,
+    test_results = ttest_results,
+    check_log = check_log,
+    method = "ORA"
+  )
+
+  # Plot
+
+  OlinkAnalyze::olink_pathway_heatmap(
+    enrich_results = gsea_results,
+    test_results = ttest_results
+  )
+
+  OlinkAnalyze::olink_pathway_heatmap(
+    enrich_results = ora_results,
+    test_results = ttest_results,
+    method = "ORA",
+    keyword = "cell"
+  )
+}
 }
 
 }
