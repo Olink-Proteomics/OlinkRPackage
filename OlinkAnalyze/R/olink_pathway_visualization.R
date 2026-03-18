@@ -1,48 +1,80 @@
 #' Creates bargraph of top/selected enrichment terms from GSEA or ORA results
-#' from olink_pathway_enrichment()
+#' from `olink_pathway_enrichment`
 #'
+#' @description
 #' Pathways are ordered by increasing p-value (unadjusted)
 #'
-#'@param enrich_results data frame of enrichment results from
-#'olink_pathway_enrichment()
-#'@param method method used in olink_pathway_enrichment ("GSEA" (default)
-#'or "ORA")
-#'@param keyword (optional) keyword to filter enrichment results on, if not
-#'specified, displays top terms
-#'@param number_of_terms number of terms to display, default is 20
-#'@return A bargraph as a ggplot object
-#'@examples
-#'\donttest{
-#'library(dplyr)
-#'# Run olink_ttest or other stats test (see documentation )
-#'npx_df <- npx_data1 |> filter(!grepl('control',SampleID, ignore.case = TRUE))
-#'check_log <- check_npx(npx_df)
-#' try({ # This expression might fail if dependencies are not installed
-#'ttest_results <- olink_ttest(df = npx_df,
-#'                             check_log = check_log,
-#'                             variable = 'Treatment',
-#'                              alternative = 'two.sided')
+#' @param enrich_results data frame of enrichment results from
+#' `olink_pathway_enrichment`
+#' @param method method used in `olink_pathway_enrichment` ("GSEA" (default)
+#' or "ORA")
+#' @param keyword (optional) keyword to filter enrichment results on. If not
+#' specified, displays top terms.
+#' @param number_of_terms number of terms to display (default is 20).
 #'
-#'# Run olink_pathway_enrichment (see documentation)
-#' gsea_results <- olink_pathway_enrichment(df = npx_df,
-#'                                          check_log = check_log,
-#'                                          test_results = ttest_results)
-#' ora_results <- olink_pathway_enrichment(df = npx_df,
-#'                                         check_log = check_log,
-#'                                         test_results = ttest_results,
-#'                                         method = "ORA")
-#'olink_pathway_visualization(enrich_results = gsea_results)
-#'olink_pathway_visualization(enrich_results = gsea_results,
-#'                            keyword = "immune")
-#'olink_pathway_visualization(enrich_results = ora_results,
-#'                            method = "ORA",
-#'                            number_of_terms = 15)
-#'})
+#' @return A bargraph as a ggplot object.
 #'
+#' @export
+#'
+#' @examples
+#' \donttest{
+#' if (rlang::is_installed(pkg = c("msigdbr", "clusterProfiler"))) {
+#'
+#'   # Run olink_ttest or other stats test (see documentation )
+#'   npx_df <- npx_data1 |>
+#'     dplyr::filter(
+#'       !grepl(
+#'         pattern = "control",
+#'         x = .data[["SampleID"]],
+#'         ignore.case = TRUE
+#'       )
+#'     )
+#'
+#'   check_log <- check_npx(df = npx_df)
+#'
+#'   ttest_results <- OlinkAnalyze::olink_ttest(
+#'     df = npx_df,
+#'     variable = "Treatment",
+#'     alternative = "two.sided",
+#'     check_log = check_log
+#'   )
+#'
+#'   # Run olink_pathway_enrichment (see documentation)
+#'
+#'   # GSEA
+#'   gsea_results <- OlinkAnalyze::olink_pathway_enrichment(
+#'     df = npx_df,
+#'     test_results = ttest_results,
+#'     check_log = check_log
+#'   )
+#'
+#'   # ORA
+#'   ora_results <- OlinkAnalyze::olink_pathway_enrichment(
+#'     df = npx_df,
+#'     test_results = ttest_results,
+#'     check_log = check_log,
+#'     method = "ORA"
+#'   )
+#'
+#'   # Plot
+#'
+#'   OlinkAnalyze::olink_pathway_visualization(
+#'     enrich_results = gsea_results
+#'   )
+#'
+#'   OlinkAnalyze::olink_pathway_visualization(
+#'     enrich_results = gsea_results,
+#'     keyword = "immune"
+#'   )
+#'
+#'   OlinkAnalyze::olink_pathway_visualization(
+#'     enrich_results = ora_results,
+#'     method = "ORA",
+#'     number_of_terms = 15L
+#'   )
+#' }
 #'}
 #'
-#'@export
-
 olink_pathway_visualization <- function(enrich_results,
                                         method = "GSEA",
                                         keyword = NULL,
