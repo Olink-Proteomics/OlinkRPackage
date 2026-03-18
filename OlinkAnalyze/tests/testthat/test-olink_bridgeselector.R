@@ -1,11 +1,10 @@
-load(file = test_path('data','npx_data_format221010.RData'))
+load(file = test_path("data", "npx_data_format221010.RData"))
 
 bridgeSamples <- olink_bridgeselector(df = npx_data1,
-                                      sampleMissingFreq = .1,
+                                      sampleMissingFreq = .1, # nolint: object_name_linter
                                       n = 8)
 
-
-test_that("olink_bridgeselector works", {
+testthat::test_that("olink_bridgeselector works", {
   expect_equal(nrow(bridgeSamples), 8)
   expect_equal(ncol(bridgeSamples), 3)
   expect_equal(bridgeSamples[order(bridgeSamples$MeanNPX, decreasing = TRUE),]$SampleID[3], 'A70')

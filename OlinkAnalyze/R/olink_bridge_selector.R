@@ -53,7 +53,7 @@ olink_bridge_selector <- function(df, sample_missing_freq, n) {
   df <- df_clean |>
     dplyr::filter(!(.data$OlinkID %in% check_log_clean$assay_na)) |>
     dplyr::filter(stringr::str_detect(.data$OlinkID,
-                                      "OID[0-9]{5}")) |> 
+                                      "OID[0-9]{5}")) |>
     dplyr::filter(!stringr::str_detect(.data$SampleID, "CONTROL_SAMPLE*"))
   # ---- STEP 2: Outlier metrics per (Panel, SampleID) -------------------------
   qc_outliers <- df |>
@@ -165,7 +165,8 @@ olink_bridge_selector <- function(df, sample_missing_freq, n) {
 olink_bridgeselector <- function(df, ..., n) { # nolint: object_name_linter
   dots <- list(...)
   # Accept either spelling
-  sampleMissingFreq <- dots$sampleMissingFreq %||% dots$sample_missing_freq
+  sampleMissingFreq <- dots$sampleMissingFreq %||% # nolint: object_name_linter 
+    dots$sample_missing_freq
   if (is.null(sampleMissingFreq)) {
     stop("Please supply either sampleMissingFreq or sample_missing_freq.")
   }
