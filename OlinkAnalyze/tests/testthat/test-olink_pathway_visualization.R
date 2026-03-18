@@ -26,7 +26,9 @@ test_that(
         .data[["PlateID"]] == "Example_Data_1_CAM.csv"
       )
 
-    npx_df_check <- check_npx(df = npx_df)
+    npx_df_check <- check_npx(df = npx_df) |>
+      suppressMessages() |>
+      suppressWarnings()
 
     # statistics ----
 
