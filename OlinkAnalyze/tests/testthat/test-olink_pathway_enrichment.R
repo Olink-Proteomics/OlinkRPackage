@@ -9,9 +9,7 @@ test_that(
     expect_warning(
       object = check_pe_inputs(
         df = npx_data1,
-        check_log = check_npx(df = npx_data1) |>
-          suppressWarnings() |>
-          suppressMessages(),
+        check_log = check_log,
         test_results = reference_results$t_test |>
           dplyr::filter(
             !(.data[["OlinkID"]] %in% head(x = npx_data1[["OlinkID"]], n = 1L))
@@ -37,9 +35,7 @@ test_that(
           dplyr::filter(
             .data[["OlinkID"]] %in% reference_results$anova_site_posthoc$OlinkID
           ),
-        check_log = check_npx(df = npx_data1) |>
-          suppressWarnings() |>
-          suppressMessages(),
+        check_log = check_log,
         test_results = reference_results$anova_site_posthoc |>
           dplyr::filter(
             .data[["OlinkID"]] %in% npx_data1[["OlinkID"]]
@@ -62,9 +58,7 @@ test_that(
     expect_error(
       object = check_pe_inputs(
         df = npx_data1,
-        check_log = check_npx(df = npx_data1) |>
-          suppressWarnings() |>
-          suppressMessages(),
+        check_log = check_log,
         test_results = reference_results$t_test,
         method = "IRA",
         ontology = "MSigDb",
@@ -84,9 +78,7 @@ test_that(
     expect_error(
       object = check_pe_inputs(
         df = npx_data1,
-        check_log = check_npx(df = npx_data1) |>
-          suppressWarnings() |>
-          suppressMessages(),
+        check_log = check_log,
         test_results = reference_results$t_test,
         method = "GSEA",
         ontology = "WikiPathways",
@@ -106,9 +98,7 @@ test_that(
     expect_error(
       object =  olink_pathway_enrichment(
         df = npx_data1,
-        check_log = check_npx(df = npx_data1) |>
-          suppressWarnings() |>
-          suppressMessages(),
+        check_log = check_log,
         test_results = reference_results$t_test,
         method = "GSEA",
         ontology = "MSigDb",
@@ -126,10 +116,6 @@ test_that(
   {
     # Load reference results - skipped if files are absent
     reference_results <- get_example_data(filename = "reference_results.rds")
-
-    check_log <- check_npx(df = npx_data1) |>
-      suppressWarnings() |>
-      suppressMessages()
 
     all_assays <- npx_data1[["OlinkID"]] |> unique() |> sort()
 
@@ -304,15 +290,13 @@ test_that(
         )
       )
 
-    npx_data_invalid_check <- check_npx(df = npx_data_invalid) |>
-      suppressWarnings() |>
-      suppressMessages()
-
     expect_message(
       object = data_prep_out <- data_prep(
         df = npx_data_invalid,
         test_results = reference_results$t_test,
-        check_log = npx_data_invalid_check
+        check_log = check_npx(df = npx_data_invalid) |>
+          suppressWarnings() |>
+          suppressMessages()
       ),
       regexp = paste("Removed 468 entries from `df` containing invalid assay",
                      "identifiers, control assays, and/or 'NA' assays. Run",
@@ -348,9 +332,7 @@ test_that(
           dplyr::filter(
             !(.data[["OlinkID"]] %in% .env[["exclude_assays"]])
           ),
-        check_log = check_npx(df = npx_data1) |>
-          suppressWarnings() |>
-          suppressMessages()
+        check_log = check_log
       ),
       regexp = paste("5 assays in `df` are not represented in `test_results`",
                      "and will be removed from `df`: \"OID01216\",",
@@ -376,9 +358,7 @@ test_that(
       object = data_prep(
         df = npx_data1,
         test_results = reference_results$t_test,
-        check_log = check_npx(df = npx_data1) |>
-          suppressWarnings() |>
-          suppressMessages()
+        check_log = check_log
       ),
       regexp = "Detected 184 duplicated assays in `df`: \"CHL1\", \"NRP1\"",
     )
@@ -454,9 +434,7 @@ test_that(
             !(.data[["OlinkID"]] %in% .env[["exclude_assays"]])
           ),
         test_results = reference_results$t_test,
-        check_log = check_npx(df = npx_data1) |>
-          suppressWarnings() |>
-          suppressMessages()
+        check_log = check_log
       ),
       regexp = paste("5 assays in `test_results` are not represented in `df`",
                      "and will be removed from `test_results`: \"OID01220\",",
