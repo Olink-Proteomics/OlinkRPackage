@@ -123,7 +123,7 @@ olink_pathway_visualization <- function(enrich_results,
 
   ## check number of terms ----
 
-  check_is_scalar_integer(x = number_of_terms, error = TRUE)
+  check_is_scalar_numeric(x = number_of_terms, error = TRUE)
 
   # plot ----
 
@@ -132,7 +132,7 @@ olink_pathway_visualization <- function(enrich_results,
       .data[["pvalue"]]
     ) |>
     dplyr::slice_head(
-      n = .env[["number_of_terms"]]
+      n = number_of_terms
     ) |>
     dplyr::arrange(
       dplyr::desc(x = .data[["pvalue"]])
