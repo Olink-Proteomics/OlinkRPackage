@@ -154,7 +154,7 @@ olink_bridge_selector <- function(df, sample_missing_freq, n) {
 
   selected_bridges <- df_2 |>
     dplyr::filter(.data[["order"]] %in% bridge_samples) |>
-    dplyr::slice_sample(n = dplyr::n()) |>     # random order
+    dplyr::slice_sample(prop = 1) |>     # random order
     dplyr::select(-order)
 
   return(selected_bridges)
@@ -170,6 +170,6 @@ olink_bridgeselector <- function(df, ..., n) { # nolint: object_name_linter
   if (is.null(sampleMissingFreq)) {
     stop("Please supply either sampleMissingFreq or sample_missing_freq.")
   }
-  return(olink_bridgeselector(df = df, sample_missing_freq = sampleMissingFreq,
+  return(olink_bridge_selector(df = df, sample_missing_freq = sampleMissingFreq,
                               n = n))
 }
