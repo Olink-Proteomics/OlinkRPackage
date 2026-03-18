@@ -96,6 +96,12 @@ olink_pathway_visualization <- function(enrich_results,
     )
   }
 
+  ## check test results and enrich results ----
+
+  if (missing(enrich_results)) {
+    cli::cli_abort("Argument {.arg enrich_results} is required!")
+  }
+
   ## check keywords ----
 
   if (!is.null(keyword)) {

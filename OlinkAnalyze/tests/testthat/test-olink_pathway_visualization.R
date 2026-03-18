@@ -72,6 +72,11 @@ test_that(
     # Errors ----
 
     expect_error(
+      object = olink_pathway_visualization(),
+      regexp = "Argument `enrich_results` is required!"
+    )
+
+    expect_error(
       object = olink_pathway_visualization(
         enrich_results = gsea_results,
         keyword = "hfdklahfajikshf"
