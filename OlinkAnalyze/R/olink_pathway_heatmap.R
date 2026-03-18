@@ -86,6 +86,13 @@ olink_pathway_heatmap <- function(enrich_results,
     )
   }
 
+  ## check test results and enrich results ----
+
+  if (missing(test_results) || missing(enrich_results)) {
+    cli::cli_abort("Arguments {.arg enrich_results} and {.arg test_results}
+                   are required!")
+  }
+
   ## check keywords ----
 
   if (!is.null(keyword)) {
