@@ -584,9 +584,9 @@ gsea_pathwayenrichment <- function(gene_list,
 
   if (length(non_ovelapping_assays) != 0L) {
     cli::cli_inform(
-      "{.val {non_ovelapping_assays}} assays are not found in the database.
-      Please check the names for the following assays in {.arg test_results}
-      and {.arg df}: {.val {non_ovelapping_assays}}."
+      "{.val {length(non_ovelapping_assays)}} assays are not found in the
+      database. Please check the names for the following assays in
+      {.arg test_results} and {.arg df}: {.val {non_ovelapping_assays}}."
     )
   }
 
@@ -637,9 +637,9 @@ ora_pathwayenrichment <- function(test_results,
 
   if (length(non_ovelapping_assays) != 0L) {
     cli::cli_inform(
-      "{.val {non_ovelapping_assays}} assays are not found in the database.
-      Please check the names for the following assays in {.arg test_results}
-      and {.arg df}: {.val {non_ovelapping_assays}}."
+      "{.val {length(non_ovelapping_assays)}} assays are not found in the
+      database. Please check the names for the following assays in
+      {.arg test_results} and {.arg df}: {.val {non_ovelapping_assays}}."
     )
   }
 
