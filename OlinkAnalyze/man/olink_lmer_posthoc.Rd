@@ -106,7 +106,7 @@ ascending Tukey adjusted p-values.
 }
 \examples{
 \donttest{
-if (rlang::is_installed(pkg = c("lme4", "lmerTest", "emmeans"))) {
+if (rlang::is_installed(pkg = c("lme4", "lmerTest", "emmeans", "broom"))) {
   #data
   npx_df <- OlinkAnalyze::npx_data1 |>
     dplyr::filter(

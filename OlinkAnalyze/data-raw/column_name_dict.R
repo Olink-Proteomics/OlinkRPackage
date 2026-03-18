@@ -122,7 +122,7 @@ column_name_dict <- dplyr::tibble(
                         "assay_qc"),
     "normalization" = c("Normalization",
                         "normalization"),
-    "qc_version" =    c("PanelDataArchiveVersion",
+    "qc_version"    = c("PanelDataArchiveVersion",
                         "panel_data_archive_version",
                         "paneldataarchiveversion",
                         "ExploreVersion",
@@ -235,5 +235,25 @@ column_name_dict <- dplyr::tibble(
     FALSE, # assay_warn
     FALSE, # normalization
     FALSE # qc_version
+  ),
+  is_updatable = c(
+    FALSE, # sample_id
+    FALSE, # sample_type
+    FALSE, # assay_type
+    FALSE, # olink_id
+    FALSE, # uniprot
+    FALSE, # assay
+    FALSE, # panel
+    FALSE, # block
+    FALSE, # plate_id
+    TRUE, # panel_version
+    FALSE, # lod
+    FALSE, # quant
+    FALSE, # ext_npx
+    FALSE, # count
+    TRUE, # qc_warning
+    TRUE, # assay_warn
+    TRUE, # normalization
+    TRUE # qc_version
   )
 )
