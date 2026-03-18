@@ -86,11 +86,13 @@ Imports:
 Suggests: 
     broom,
     car,
+    clusterProfiler,
     curl,
     emmeans,
     ggpubr,
     lme4,
     lmerTest,
+    msigdbr (> 24.1.0),
     ordinal,
     readxl,
     scales,
