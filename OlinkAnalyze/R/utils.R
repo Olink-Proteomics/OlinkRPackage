@@ -58,7 +58,8 @@ ansi_collapse_quot <- function(x,
   return(x)
 }
 
-#' Utility function to check OSI values for validity
+#' Utility function to check OSI values for validity and remove
+#' external controls
 #'
 #' @param df An Olink dataset.
 #' @param check_log Output log of check_npx()
@@ -70,6 +71,15 @@ ansi_collapse_quot <- function(x,
 check_osi <- function(df,
                       check_log,
                       osi_score) {
+
+  # Remove external controls
+
+  df <- clean_sample_type(
+    df = df,
+    check_log = check_log,
+    remove_control_sample = TRUE,
+    verbose = TRUE
+  )
 
   osi_cat_cols <- c("OSICategory")
   osi_cont_cols <- c("OSITimeToCentrifugation",

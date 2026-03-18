@@ -2,7 +2,8 @@
 % Please edit documentation in R/utils.R
 \name{check_osi}
 \alias{check_osi}
-\title{Utility function to check OSI values for validity}
+\title{Utility function to check OSI values for validity and remove
+external controls}
 \usage{
 check_osi(df, check_log, osi_score)
 }
@@ -17,5 +18,6 @@ check_osi(df, check_log, osi_score)
 An Olink dataset with the OSI column checked and cleaned
 }
 \description{
-Utility function to check OSI values for validity
+Utility function to check OSI values for validity and remove
+external controls
 }
