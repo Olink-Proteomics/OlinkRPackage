@@ -214,3 +214,78 @@ test_that(
     )
   }
 )
+
+# Test check_log_colname ----
+
+test_that(
+  "check_log_colname - works",
+  {
+    check_log <- check_npx(df = npx_data1) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    expect_no_condition(
+      object = check_log_colname(check_log = check_log, col_key = "quant")
+    )
+
+    expect_no_condition(
+      object = check_log_colname(check_log = check_log, col_key = "sample_id")
+    )
+
+    expect_no_condition(
+      object = check_log_colname(check_log = check_log, col_key = "olink_id")
+    )
+  }
+)
+
+test_that(
+  "check_log_colname - error - missing column",
+  {
+    check_log <- check_npx(df = npx_data1) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    expect_error(
+      object = check_log_colname(check_log = check_log,
+                                 col_key = "normalization"),
+      regexp = paste("Input dataset lacks a column matching to the key",
+                     "\"normalization\"!")
+    )
+
+    expect_error(
+      object = check_log_colname(check_log = check_log,
+                                 col_key = "count"),
+      regexp = paste("Input dataset lacks a column matching to the key",
+                     "\"count\"!")
+    )
+  }
+)
+
+# Test check_col_key ----
+
+test_that(
+  "check_col_key - works",
+  {
+    expect_no_condition(
+      object = get_alt_colnames(col_key = "sample_id")
+    )
+
+    expect_no_condition(
+      object = get_alt_colnames(col_key = "olink_id")
+    )
+
+    expect_no_condition(
+      object = get_alt_colnames(col_key = "quant")
+    )
+  }
+)
+
+test_that(
+  "check_col_key - error",
+  {
+    expect_error(
+      object = get_alt_colnames(col_key = "An_Unacceptable_Col_Key"),
+      regexp = "\"An_Unacceptable_Col_Key\" is not a valid column key!"
+    )
+  }
+)

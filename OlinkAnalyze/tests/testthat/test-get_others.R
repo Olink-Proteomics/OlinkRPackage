@@ -121,3 +121,28 @@ test_that(
     )
   }
 )
+
+# Test get_alt_colnames ----
+
+test_that(
+  "get_alt_colnames - works",
+  {
+    expect_identical(
+      object = get_alt_colnames(col_key = "sample_id"),
+      expected = c("SampleID", "sampleid", "sample_id")
+    )
+
+    expect_identical(
+      object = get_alt_colnames(col_key = "olink_id"),
+      expected = c("OlinkID", "OID", "olinkid", "oid", "olink_id")
+    )
+
+    expect_identical(
+      object = get_alt_colnames(col_key = "panel_version"),
+      expected = c("Panel_Lot_Nr", "panel_lot_nr", "Panel_Version",
+                   "panel_version", "PanelVersion", "panelversion",
+                   "DataAnalysisRefID", "data_analysis_ref_id",
+                   "dataanalysisrefid")
+    )
+  }
+)
