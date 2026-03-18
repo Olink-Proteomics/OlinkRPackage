@@ -42,7 +42,7 @@ ora_results <- OlinkAnalyze::olink_pathway_enrichment(
 # write the file
 
 pathway_enrichment_results <- list(
-  t_test_results = ttest_results,
+  ttest_results = ttest_results,
   gsea = gsea_results,
   ora = ora_results
 )
