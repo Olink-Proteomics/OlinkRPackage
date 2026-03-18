@@ -1,5 +1,6 @@
 testthat::test_that("olink_bridgeselector works", {
-  load(file = testthat::test_path("data", "npx_data_format221010.RData"))
+  # Load reference results - skipped if files are absent
+  npx_data_format22 <- get_example_data("npx_data_format-Oct-2022.rds")
   bridgeSamples <- olink_bridgeselector(df = npx_data1, # nolint: object_name_linter
                                         sampleMissingFreq = .1, # nolint: object_name_linter
                                         n = 8)
