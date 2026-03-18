@@ -51,7 +51,7 @@ olink_bridge_selector <- function(df, sample_missing_freq, n) {
   check_log_clean <- OlinkAnalyze::check_npx(df = df_clean)
   # Exclude OlinkIDs with missing NPX
   # Filtering on valid OlinkID
-  df <- df |>
+  df <- df_clean |>
     dplyr::filter(!(.data$OlinkID %in% check_log_clean$assay_na)) |>
     dplyr::filter(stringr::str_detect(.data$OlinkID,
                                       "OID[0-9]{5}"))
