@@ -65,7 +65,7 @@ olink_bridge_selector <- function(df, sample_missing_freq, n) {
     ) |>
     dplyr::group_by(.data[["Panel"]]) |>
     dplyr::mutate(
-      median_low  = stats::mean(.data[["sample_median"]], na.rm = TRUE) - 3 *
+      median_low  = mean(.data[["sample_median"]], na.rm = TRUE) - 3 *
         stats::sd(.data[["sample_median"]], na.rm = TRUE),
       median_high = mean(.data[["sample_median"]], na.rm = TRUE) + 3 *
         stats::sd(.data[["sample_median"]], na.rm = TRUE),
