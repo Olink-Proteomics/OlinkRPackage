@@ -12,7 +12,7 @@ testthat::test_that("olink_bridgeselector works", {
                      digits = 2), 6.21)
   testthat::expect_error(olink_bridgeselector(df = npx_data1,
                                     n = 8))
-  testthat::expect_warning(olink_bridgeselector(npx_data_format221010,
+  testthat::expect_error(olink_bridgeselector(npx_data_format221010,
                                       sampleMissingFreq = 0.1, n = 2))
   ref_data <- npx_data1 |> olink_bridgeselector(sampleMissingFreq = 0.1, n = 8)
   ml_data <- npx_data1 |>
@@ -47,7 +47,7 @@ testthat::test_that("olink_bridgeselector works", {
                   setdiff(lodnpx_data$SampleID, ref_data$SampleID)), 0)
 })
 
-test_that("olink_bridgeselector max num of samples works", {
+testthat::test_that("olink_bridgeselector max num of samples works", {
   testthat::expect_equal({
       olink_bridgeselector(df = npx_data1,
                            sampleMissingFreq = 0.1,
