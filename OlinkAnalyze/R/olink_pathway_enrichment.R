@@ -592,7 +592,10 @@ gsea_pathwayenrichment <- function(gene_list,
 
   gsea <- clusterProfiler::GSEA(geneList = gene_list,
                                 TERM2GENE = msig_df,
-                                pvalueCutoff = 1)
+                                pvalueCutoff = 1,
+                                verbose = FALSE) |>
+    suppressPackageStartupMessages() |>
+    suppressMessages()
 
   if (is.null(gsea)) {
     cli::cli_warn(
