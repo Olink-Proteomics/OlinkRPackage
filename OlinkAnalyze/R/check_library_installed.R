@@ -29,7 +29,7 @@ check_library_installed <- function(x,
 
     if (error == TRUE) {
 
-      cli::cli_abort(
+      cli::cli_abort( # nolint: return_linter
         c(
           "x" = "Missing librar{?y/ies}: {.pkg {missing_libraries}}",
           "i" = "Please install!"
