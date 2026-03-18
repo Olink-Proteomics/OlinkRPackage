@@ -35,6 +35,8 @@ Olink Analyze read_npx function.}
 \item{sample_missing_freq}{The threshold for sample wise missingness.}
 
 \item{n}{Number of bridge samples to be selected.}
+
+\item{...}{Additional arguments passed to methods.}
 }
 \value{
 A "tibble" with sample IDs and mean NPX for a defined number of

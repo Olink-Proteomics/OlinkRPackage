@@ -59,20 +59,20 @@ olink_bridge_selector <- function(df, sample_missing_freq, n) {
   qc_outliers <- df |>
     dplyr::group_by(.data[["Panel"]], .data[["SampleID"]]) |>
     dplyr::summarise(
-      IQR = IQR(.data[["NPX"]], na.rm = TRUE),
-      sample_median = median(.data[["NPX"]], na.rm = TRUE),
+      IQR = stats::IQR(.data[["NPX"]], na.rm = TRUE),
+      sample_median = stats::median(.data[["NPX"]], na.rm = TRUE),
       .groups = "drop"
     ) |>
     dplyr::group_by(.data[["Panel"]]) |>
     dplyr::mutate(
-      median_low  = mean(.data[["sample_median"]], na.rm = TRUE) - 3 *
-        sd(.data[["sample_median"]], na.rm = TRUE),
+      median_low  = stats::mean(.data[["sample_median"]], na.rm = TRUE) - 3 *
+        stats::sd(.data[["sample_median"]], na.rm = TRUE),
       median_high = mean(.data[["sample_median"]], na.rm = TRUE) + 3 *
-        sd(.data[["sample_median"]], na.rm = TRUE),
+        stats::sd(.data[["sample_median"]], na.rm = TRUE),
       iqr_low     = mean(.data[["IQR"]], na.rm = TRUE) - 3 *
-        sd(.data[["IQR"]], na.rm = TRUE),
+        stats::sd(.data[["IQR"]], na.rm = TRUE),
       iqr_high    = mean(.data[["IQR"]], na.rm = TRUE) + 3 *
-        sd(.data[["IQR"]], na.rm = TRUE)
+        stats::sd(.data[["IQR"]], na.rm = TRUE)
     ) |>
     dplyr::ungroup() |>
     dplyr::mutate(
@@ -99,7 +99,7 @@ olink_bridge_selector <- function(df, sample_missing_freq, n) {
       message("Using max LOD as filter criteria...")
     } else {
       df <- df |> dplyr::mutate(LOD = -Inf)
-      message("LOD not available — not filtering by LOD.")
+      message("LOD not available, hence not filtering by LOD.")
     }
   }
 
