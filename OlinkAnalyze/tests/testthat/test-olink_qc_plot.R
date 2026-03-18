@@ -243,8 +243,8 @@ test_that("OSI errors: using npx_data1 and OSI columns", {
 # -------------------------------------------------------
 
 #Load data with hidden/excluded assays (all NPX=NA)
-load(file = test_path("data", "npx_data_format221010.RData"))
-load(file = test_path("data", "npx_data_format221121.RData"))
+npx_data_format221010 <- get_example_data(filename = "npx_data_format221010.rds")
+npx_data_format221121 <- get_example_data(filename = "npx_data_format221121.rds")
 
 
 qc_plot <- npx_data1 |>
