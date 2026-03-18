@@ -155,14 +155,3 @@ olink_bridge_selector <- function(df, sample_missing_freq, n) {
 
   return(selected_bridges)
 }
-
-olink_bridgeselector <- function(df, ..., n) {
-  dots <- list(...)
-  # Accept either spelling
-  sampleMissingFreq <- dots$sampleMissingFreq %||% dots$sample_missing_freq
-  if (is.null(sampleMissingFreq)) {
-    stop("Please supply either sampleMissingFreq or sample_missing_freq.")
-  }
-  return(olink_bridgeselector(df = df, sample_missing_freq = sampleMissingFreq,
-                              n = n))
-}
