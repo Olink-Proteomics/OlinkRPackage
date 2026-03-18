@@ -47,11 +47,24 @@ olink_bridge_selector <- function(df, sample_missing_freq, n) {
     check_log = check_log
   )
   check_log_clean <- OlinkAnalyze::check_npx(df = df_clean)
+<<<<<<< HEAD
   df <- df_clean |>
     dplyr::filter(!(.data[["OlinkID"]] %in% check_log_clean$assay_na)) |>
     dplyr::filter(stringr::str_detect(.data[["OlinkID"]], "OID[0-9]{5}")) |>
     dplyr::filter(!stringr::str_detect(.data[["SampleID"]], "CONTROL_SAMPLE*"))
   # ---- STEP 2: Outlier metrics per (Panel, SampleID) -------------------------
+=======
+  # Exclude OlinkIDs with missing NPX
+  # Filtering on valid OlinkID
+  df <- df_clean |>
+    dplyr::filter(!(.data$OlinkID %in% check_log_clean$assay_na)) |>
+    dplyr::filter(stringr::str_detect(.data$OlinkID,
+                                      "OID[0-9]{5}"))
+  #Filtering out control samples
+  df <- df |>
+    dplyr::filter(!stringr::str_detect(.data$SampleID, "CONTROL_SAMPLE*"))
+  #Outlier calculation as in qc_plot for filtering
+>>>>>>> c26a19d64fefb61d9955cccea92d19a3ed7f821b
   qc_outliers <- df |>
     dplyr::group_by(.data[["Panel"]], .data[["SampleID"]]) |>
     dplyr::summarise(
