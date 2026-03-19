@@ -207,11 +207,13 @@ olink_bridge_selector <- function(df,
   # ---- STEP 5: Select evenly spread bridge samples ---------------------------
 
   if (nrow(df_ready) < n) {
-    stop(
-      paste0(
-        "Only ", nrow(df_ready), " samples eligible. Increase sample_missing_freq",
-        " and/or decrease n."
-      )
+    cli::cli_abort( # nolint: return_linter
+      c(
+        "x" = "Only {.val {nrow(df_ready)}} samples eligible. Increase
+        {.arg sample_missing_freq} and/or decrease {.arg n}."
+      ),
+      call = rlang::caller_env(),
+      wrap = TRUE
     )
   }
 
