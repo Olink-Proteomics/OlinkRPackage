@@ -421,7 +421,7 @@ test_that(
       suppressMessages() |>
       suppressWarnings()
 
-    testthat::expect_error(
+    expect_error(
       object = olink_bridgeselector(
         df = npx_data1,
         n = 8L,
@@ -441,7 +441,7 @@ test_that(
       suppressMessages() |>
       suppressWarnings()
 
-    testthat::expect_error(
+    expect_error(
       object = olink_bridgeselector(
         df = npx_data_format22,
         sampleMissingFreq = 0.1,
