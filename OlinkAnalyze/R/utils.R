@@ -75,6 +75,7 @@ check_osi <- function(df,
   osi_cont_cols <- c("OSITimeToCentrifugation",
                      "OSIPreparationTemperature",
                      "OSISummary")
+osi_cols <- c(osi_cat_cols, osi_cont_cols)
 
   if (is.null(osi_score) || !(osi_score %in% c(osi_cat_cols,
                                                osi_cont_cols))) {
