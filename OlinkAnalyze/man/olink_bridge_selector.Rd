@@ -55,4 +55,5 @@ The function accepts NPX Excel files with data < LOD replaced.
 \examples{
 \donttest{bridge_samples <- olink_bridge_selector(npx_data1,
 sample_missing_freq = 0.1, n = 20)}
+
 }

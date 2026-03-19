@@ -32,10 +32,7 @@
 #' @examples
 #' \donttest{bridge_samples <- olink_bridge_selector(npx_data1,
 #' sample_missing_freq = 0.1, n = 20)}
-#' @importFrom dplyr n select distinct arrange group_by mutate ungroup
-#' left_join filter if_else
-#' @importFrom stringr str_detect
-
+#'
 olink_bridge_selector <- function(df, sample_missing_freq, n) {
   # ---- STEP 1: Remove invalid OlinkIDs & control samples ---------------------
   check_log <- OlinkAnalyze::check_npx(df = df)
