@@ -80,18 +80,21 @@ olink_bridge_selector <- function(df,
     dplyr::group_by(
       dplyr::across(
         dplyr::all_of(
-          c("Panel", "SampleID")
+          c(check_log_clean$col_names$panel,
+            check_log_clean$col_names$sample_id)
         )
       )
     ) |>
     dplyr::summarise(
-      IQR = stats::IQR(.data[["NPX"]], na.rm = TRUE),
-      sample_median = stats::median(.data[["NPX"]], na.rm = TRUE),
+      IQR = stats::IQR(x = check_log_clean$col_names$quant,
+                       na.rm = TRUE),
+      sample_median = stats::median(x = check_log_clean$col_names$quant,
+                                    na.rm = TRUE),
       .groups = "drop"
     ) |>
     dplyr::group_by(
       dplyr::across(
-        dplyr::all_of("Panel")
+        dplyr::all_of(check_log_clean$col_names$panel)
       )
     ) |>
     dplyr::mutate(
@@ -116,7 +119,9 @@ olink_bridge_selector <- function(df,
     ) |>
     dplyr::select(
       dplyr::all_of(
-        c("SampleID", "Panel", "Outlier")
+        c(check_log_clean$col_names$sample_id,
+          check_log_clean$col_names$panel,
+          "Outlier")
       )
     )
 
