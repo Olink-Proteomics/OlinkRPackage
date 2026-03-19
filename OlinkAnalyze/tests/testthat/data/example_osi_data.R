@@ -87,7 +87,7 @@ new_ids <- c(paste0("A", 1L:77L), paste0("B", 1L:23L))
 stopifnot(nrow(osi_data) == length(new_ids))
 
 osi_data <- osi_data |>
-  dplyr::mutate(SampleID = sample(new_ids, size = dplyr::n(), replace = FALSE))
+  dplyr::mutate(SampleID = new_ids)
 
 data1 <- OlinkAnalyze::npx_data1 |>
   dplyr::right_join(
@@ -95,14 +95,15 @@ data1 <- OlinkAnalyze::npx_data1 |>
       dplyr::select(
         dplyr::all_of(
           c("SampleID",
-             "OSITimeToCentrifugation",
-             "OSIPreparationTemperature",
-             "OSISummary",
-             "OSICategory")
+            "OSITimeToCentrifugation",
+            "OSIPreparationTemperature",
+            "OSISummary",
+            "OSICategory")
         )
-      )
-    by = "SampleID"
+      ),
+    by = "SampleID",
+    relationship = "many-to-one"
   ) |>
   dplyr::filter(!grepl(pattern = "CONTROL", x = .data[["SampleID"]]))
 
-saveRDS(data1, file = "tests/testthat/data/osi_data.rds")
+saveRDS(data1, file = "tests/testthat/data/example_osi_data.rds")
