@@ -63,6 +63,76 @@ test_that(
 )
 
 test_that(
+  "olink_bridgeselector - works - check against reference",
+  {
+    # Load reference results - skipped if files are absent
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
+    # npx_data1 ----
+
+    npx_df1 <- npx_data1 |>
+      dplyr::filter(
+        !grepl(pattern = "control",
+               x = .data[["SampleID"]],
+               ignore.case = TRUE
+        )
+      )
+
+    expect_message(
+      object = npx_df1_bridge_samples <- olink_bridgeselector(
+        df = npx_df1,
+        sampleMissingFreq = 0.1,
+        n = 8L,
+        check_log = check_npx(df = npx_df1) |>
+          suppressMessages() |>
+          suppressWarnings()
+      ),
+      regexp = paste("No sample type column detected in the input dataset",
+                     "`df`! Ensure that control samples have been filtered",
+                     "out!")
+    )
+
+    expect_identical(
+      object = npx_df1_bridge_samples |>
+        dplyr::arrange(.data[["SampleID"]]),
+      expected = reference_results$bridge_samples_npx_data1 |>
+        dplyr::arrange(.data[["SampleID"]])
+    )
+
+    # npx_data2 ----
+
+    npx_df2 <- npx_data2 |>
+      dplyr::filter(
+        !grepl(pattern = "control",
+               x = .data[["SampleID"]],
+               ignore.case = TRUE
+        )
+      )
+
+    expect_message(
+      object = npx_df2_bridge_samples <- olink_bridgeselector(
+        df = npx_df2,
+        sampleMissingFreq = 0.2,
+        n = 16L,
+        check_log = check_npx(df = npx_df2) |>
+          suppressMessages() |>
+          suppressWarnings()
+      ),
+      regexp = paste("No sample type column detected in the input dataset",
+                     "`df`! Ensure that control samples have been filtered",
+                     "out!")
+    )
+
+    expect_identical(
+      object = npx_df2_bridge_samples |>
+        dplyr::arrange(.data[["SampleID"]]),
+      expected = reference_results$bridge_samples_npx_data2 |>
+        dplyr::arrange(.data[["SampleID"]])
+    )
+  }
+)
+
+test_that(
   "olink_bridgeselector - works - alternative column names",
   {
     expect_message(
