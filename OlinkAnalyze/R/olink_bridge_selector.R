@@ -57,14 +57,15 @@ olink_bridge_selector <- function(df,
     df = df,
     check_log = check_log,
     remove_qc_warning = FALSE,
-    remove_assay_warning = FALSE
-  )
+    remove_assay_warning = FALSE,
+    verbose = FALSE
+  ) |>
+    suppressMessages() |>
+    suppressWarnings()
 
   check_log_clean <- check_npx(df = df_clean) |>
     suppressMessages() |>
     suppressWarnings()
-
-
 
   # ---- STEP 2: Outlier metrics per (Panel, SampleID) -------------------------
   qc_outliers <- df |>
