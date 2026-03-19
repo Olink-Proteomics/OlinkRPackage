@@ -13,7 +13,7 @@ check_is_arrow_object <- function(x,
 
   # check if input is an ArrowObject
   if (!inherits(x = x,
-                what = "ArrowObject")) {
+                what = c("ArrowObject", "arrow_dplyr_query"))) {
 
     if (error == TRUE) {
 
