@@ -5,7 +5,7 @@
 \alias{olink_bridgeselector}
 \title{Bridge selection function}
 \usage{
-olink_bridge_selector(df, sample_missing_freq, n)
+olink_bridge_selector(df, sample_missing_freq, n, check_log)
 
 olink_bridgeselector(df, ..., n)
 }
@@ -16,6 +16,9 @@ Olink Analyze read_npx function.}
 \item{sample_missing_freq}{The threshold for sample wise missingness.}
 
 \item{n}{Number of bridge samples to be selected.}
+
+\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
 }
 \value{
 A "tibble" with sample IDs and mean NPX for a defined number of
@@ -41,10 +44,13 @@ The function accepts NPX Excel files with data < LOD replaced.
 }
 \examples{
 \donttest{
+  check_log <- OlinkAnalyze::check_npx(df = npx_data1)
+
   bridge_samples <- OlinkAnalyze::olink_bridge_selector(
     df = npx_data1,
     sample_missing_freq = 0.1,
-    n = 20L
+    n = 20L,
+    check_log = check_log
   )
 }
 
