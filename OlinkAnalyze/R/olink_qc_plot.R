@@ -155,17 +155,23 @@ olink_qc_plot <- function(df,
   if ("QC_Warning" %in% names(df)) {
     df_qr <- df |>
       dplyr::group_by(.data[["Panel"]], .data[["SampleID"]]) |>
-      dplyr::mutate(QC_Warning = dplyr::if_else(all(toupper(.data[["QC_Warning"]]) == "PASS"), #nolint line_length_linter
-                                                "Pass",
-                                                "Warning"))
+      dplyr::mutate(
+        QC_Warning = dplyr::if_else(
+          all(toupper(.data[["QC_Warning"]]) == "PASS"),
+          "Pass",
+          "Warning"
+        )
+      )
   } else {
     df_qr <- df |>
       dplyr::group_by(.data[["Panel"]], .data[["SampleID"]])
   }
 
   df_qr <- df_qr |>
-    dplyr::mutate(IQR = IQR(.data[["NPX"]], na.rm = TRUE),
-                  sample_median = median(.data[["NPX"]], na.rm = TRUE)) |>
+    dplyr::mutate(
+      IQR = stats::IQR(.data[["NPX"]], na.rm = TRUE),
+      sample_median = stats::median(.data[["NPX"]], na.rm = TRUE)
+    ) |>
     dplyr::ungroup() |>
     dplyr::select(dplyr::all_of(c("SampleID",
                                   "Panel",
@@ -174,25 +180,32 @@ olink_qc_plot <- function(df,
                                   color_g))) |>
     dplyr::distinct() |>
     dplyr::group_by(.data[["Panel"]]) |>
-    dplyr::mutate(median_low = mean(.data[["sample_median"]],
-                                    na.rm = TRUE) -
-                    .env[["median_outlierDef"]] * sd(.data[["sample_median"]],
-                                                     na.rm = TRUE),
-                  median_high = mean(.data[["sample_median"]], na.rm = TRUE) +
-                    .env[["median_outlierDef"]] * sd(.data[["sample_median"]],
-                                                     na.rm = TRUE),
-                  iqr_low = mean(.data[["IQR"]], na.rm = TRUE) -
-                    .env[["IQR_outlierDef"]] * sd(.data[["IQR"]],
-                                                  na.rm = TRUE),
-                  iqr_high = mean(.data[["IQR"]], na.rm = TRUE) +
-                    .env[["IQR_outlierDef"]] * sd(.data[["IQR"]],
-                                                  na.rm = TRUE)) |>
+    dplyr::mutate(
+      median_low = mean(.data[["sample_median"]],
+                        na.rm = TRUE) -
+        .env[["median_outlierDef"]] * stats::sd(.data[["sample_median"]],
+                                                na.rm = TRUE),
+      median_high = mean(.data[["sample_median"]], na.rm = TRUE) +
+        .env[["median_outlierDef"]] * stats::sd(.data[["sample_median"]],
+                                                na.rm = TRUE),
+      iqr_low = mean(.data[["IQR"]], na.rm = TRUE) -
+        .env[["IQR_outlierDef"]] * stats::sd(.data[["IQR"]],
+                                             na.rm = TRUE),
+      iqr_high = mean(.data[["IQR"]], na.rm = TRUE) +
+        .env[["IQR_outlierDef"]] * stats::sd(.data[["IQR"]],
+                                             na.rm = TRUE)
+    ) |>
     dplyr::ungroup() |>
-    dplyr::mutate(Outlier = dplyr::if_else(.data[["sample_median"]] < .data[["median_high"]] & #nolint line_length_linter
-                                             .data[["sample_median"]] > .data[["median_low"]] & #nolint line_length_linter
-                                             .data[["IQR"]] > .data[["iqr_low"]] & #nolint line_length_linter
-                                             .data[["IQR"]] < .data[["iqr_high"]], #nolint line_length_linter
-                                           0L, 1L))
+    dplyr::mutate(
+      Outlier = dplyr::if_else(
+        .data[["sample_median"]] < .data[["median_high"]] &
+          .data[["sample_median"]] > .data[["median_low"]] &
+          .data[["IQR"]] > .data[["iqr_low"]] &
+          .data[["IQR"]] < .data[["iqr_high"]],
+        0L,
+        1L
+      )
+    )
 
 
   qc_plot <- df_qr |>
