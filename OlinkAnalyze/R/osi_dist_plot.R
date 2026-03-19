@@ -1,5 +1,10 @@
 
-#' Title
+#' OSI distribution plot
+#'
+#' Generates a density plot showing the distribution of the selected
+#' OSI score among dataset samples using ggplot2. OSI score can be one of
+#' "OSITimeToCentrifugation", "OSIPreparationTemperature", or "OSISummary".
+#' Olink external controls are excluded from this visualization.
 #'
 #' @param df data frame with OSI data present
 #' @param check_log check log from check NPX
@@ -11,6 +16,7 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' # Creating fake OSI data from Site data
 #' df1 <-npx_data1 |>
 #'   dplyr::mutate(OSISummary = as.numeric(as.factor(Site))) |>
@@ -22,6 +28,8 @@
 #' olink_osi_dist_plot(df1,
 #'                     check_log = check_log,
 #'                     osi_score = "OSISummary")
+#'}
+#'
 olink_osi_dist_plot <- function(df,
                                 check_log = NULL,
                                 osi_score = NULL) {
@@ -42,19 +50,24 @@ olink_osi_dist_plot <- function(df,
 
   # Filter for distinct sampleID and osi_score
   if (any(is.na(df[[osi_score]]))) {
-    cli::cli_warn(paste("NA data detected in",
-                        osi_score,
-                        "Filtering out NA data."))
+    cli::cli_warn(
+      c(
+        "!" = "NA values detected in column {.val {osi_score}} of {.arg df}.
+        Filtering out NA values."
+      ),
+      call = rlang::caller_env(),
+      wrap = TRUE
+    )
   }
 
-  df1 <- df |>
+  df <- df |>
     dplyr::filter(!is.na(.data[[osi_score]])) |>
-    dplyr::select(dplyr::any_of(c(column_name_dict$col_names$sample_id,
+    dplyr::select(dplyr::all_of(c(check_log$col_names$sample_id,
                                   osi_score))) |>
     dplyr::distinct()
 
   # Check for duplicate sampleIDS
-  if (any(duplicated(df1[[check_log$col_names$sample_id]]))) {
+  if (!length(check_log$sample_id_dups) == 0L) {
     cli::cli_abort("Multiple OSI values detected for same Sample ID.")
   }
 
@@ -66,7 +79,7 @@ olink_osi_dist_plot <- function(df,
                                "OSISummary" ~ "OSI Summary",
                                default = NA_character_)
 
-  p <- ggplot2::ggplot(df1, ggplot2::aes(x = .data[[osi_score]])) +
+  p <- ggplot2::ggplot(df, ggplot2::aes(x = .data[[osi_score]])) +
     ggplot2::geom_histogram(ggplot2::aes(y = ggplot2::after_stat(density)),
                             bins = 30L,
                             fill = "skyblue",
