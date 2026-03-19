@@ -19,16 +19,16 @@
 #'
 #' @return A "tibble" with sample IDs and mean NPX for a defined number of
 #' bridging samples. Columns include:
-#'
-#' @aliases
-#' olink_bridgeselector
-#'
 #' \itemize{
 #'   \item{SampleID:} Sample ID
 #'   \item{perc_assays_below_lod:} Percent of Assays that are below LOD for
 #'   the sample
 #'   \item{MeanNPX:} Mean NPX for the sample
 #' }
+#'
+#' @aliases
+#' olink_bridgeselector
+#'
 #' @export
 #'
 #' @examples
