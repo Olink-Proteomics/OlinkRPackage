@@ -65,7 +65,6 @@ ansi_collapse_quot <- function(x,
 #' @param osi_score Name of OSI column to check
 #'
 #' @returns An Olink dataset with the OSI column checked and cleaned
-#' @export
 #'
 check_osi <- function(df,
                       check_log,
@@ -79,22 +78,32 @@ osi_cols <- c(osi_cat_cols, osi_cont_cols)
 
   if (is.null(osi_score) || !(osi_score %in% c(osi_cat_cols,
                                                osi_cont_cols))) {
-    cli::cli_abort(paste0("`osi_score` must be one of OSICategory,",
-                          " OSISummary, OSITimeToCentrifugation, ",
-                          "or OSIPreparationTemperature."))
+    cli::cli_abort(
+        c(
+          "x" = "Invalid value for {.arg osi_score} = {.val {osi_score}}!",
+          "i" = "Expected one of {.or {.val {osi_cols}}}."
+        ),
+        call = rlang::caller_env(),
+        wrap = FALSE
+      )
   }
 
   if (all(is.na(df[[osi_score]]))) {
-    cli::cli_abort(paste0("All values are NA in {osi_score}. ",
-                          "Please check your data to confirm ",
-                          "OSI data is present."))
+    cli::cli_abort( # nolint: return_linter
+        c(
+          "x" = "All values are 'NA' in the column {.val {osi_score}} of the dataset {.arg df}!",
+          "i" = "Please check your {.arg df} to confirm OSI data is present."
+        ),
+        call = rlang::caller_env(),
+        wrap = TRUE
+      )
   }
 
   # Check for invalid values
   v_chr <- df |>
-    dplyr::select(dplyr::all_of(osi_score)) |>
-    dplyr::pull() |>
-    as.character()
+    dplyr::pull(.data[[osi_score]]) |>
+    as.character() |>
+    unique()
 
   # Categorical checks
   if (osi_score %in% osi_cat_cols) {
@@ -104,9 +113,13 @@ osi_cols <- c(osi_cat_cols, osi_cont_cols)
     invalid_vals <- unique(v_chr[!is.na(v_chr) & !(v_chr %in% allowed)])
 
     if (length(invalid_vals) > 0L) {
-      cli::cli_abort(
-        "Invalid values detected in {osi_score}. Expected only 0, 1, 2, 3, or 4.
-          Found: {.val {invalid_vals}}."
+      cli::cli_abort( # nolint: return_linter
+        c(
+          "x" = "Invalid values detected in column {.val {osi_score}}} of {.arg df}!",
+          "i" = "Expected one of {.or {.val {allowed}}}! Found: {.val {invalid_vals}}!"
+        ),
+        call = rlang::caller_env(),
+        wrap = TRUE
       )
     }
 

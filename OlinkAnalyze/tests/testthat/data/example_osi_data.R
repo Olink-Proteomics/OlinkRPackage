@@ -1,5 +1,5 @@
 # Create OSI data
-osi_data <- tibble::tibble(
+osi_data <- dplyr::tibble(
   OSITimeToCentrifugation = c(
     0.3012289, 0.060720572, 0.94772694, 0.720596273, 0.142294296,
     0.549284656, 0.954091239, 0.585483353, 0.404510282, 0.647893479,
@@ -83,7 +83,7 @@ osi_data <- tibble::tibble(
   )
 )
 
-new_ids <- c(paste0("A", 1:77), paste0("B", 1:23))
+new_ids <- c(paste0("A", 1L:77L), paste0("B", 1L:23L))
 stopifnot(nrow(osi_data) == length(new_ids))
 
 osi_data <- osi_data |>
@@ -92,13 +92,17 @@ osi_data <- osi_data |>
 data1 <- OlinkAnalyze::npx_data1 |>
   dplyr::right_join(
     osi_data |>
-      dplyr::select(SampleID,
-                    OSITimeToCentrifugation,
-                    OSIPreparationTemperature,
-                    OSISummary,
-                    OSICategory),
+      dplyr::select(
+        dplyr::all_of(
+          c("SampleID",
+             "OSITimeToCentrifugation",
+             "OSIPreparationTemperature",
+             "OSISummary",
+             "OSICategory")
+        )
+      )
     by = "SampleID"
   ) |>
-  dplyr::filter(!grepl("CONTROL", SampleID))
+  dplyr::filter(!grepl(pattern = "CONTROL", x = .data[["SampleID"]]))
 
 saveRDS(data1, file = "tests/testthat/data/osi_data.rds")

@@ -1,5 +1,3 @@
-skip_if_not_installed("dplyr")
-skip_if_not_installed("tibble")
 
 data1 <- get_example_data("osi_data.rds")
 check_log_1 <- check_npx(data1)
