@@ -77,7 +77,11 @@ olink_bridge_selector <- function(df,
   # ---- STEP 2: Outlier metrics per (Panel, SampleID) -------------------------
 
   qc_outliers <- df_clean |>
-    dplyr::group_by(.data[["Panel"]], .data[["SampleID"]]) |>
+    dplyr::group_by(
+      dplyr::all_of(
+        c("Panel", "SampleID")
+      )
+    ) |>
     dplyr::summarise(
       IQR = stats::IQR(.data[["NPX"]], na.rm = TRUE),
       sample_median = stats::median(.data[["NPX"]], na.rm = TRUE),
