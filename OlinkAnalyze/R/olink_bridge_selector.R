@@ -263,7 +263,10 @@ olink_bridge_selector <- function(df,
 
 #' @rdname olink_bridge_selector
 #' @export
-olink_bridgeselector <- function(df, ..., n, check_log) { # nolint: object_name_linter
+olink_bridgeselector <- function(df, # nolint: object_name_linter
+                                 ...,
+                                 n,
+                                 check_log = NULL) {
 
   # Accept either spelling for sample_missing_freq for backward compatibility
   dots <- list(...)

@@ -7,7 +7,7 @@
 \usage{
 olink_bridge_selector(df, sample_missing_freq, n, check_log = NULL)
 
-olink_bridgeselector(df, ..., n, check_log)
+olink_bridgeselector(df, ..., n, check_log = NULL)
 }
 \arguments{
 \item{df}{Tibble/data frame in long format such as produced by the
