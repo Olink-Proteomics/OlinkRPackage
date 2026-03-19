@@ -86,10 +86,14 @@ olink_bridge_selector <- function(df,
       )
     ) |>
     dplyr::summarise(
-      IQR = stats::IQR(x = check_log_clean$col_names$quant,
-                       na.rm = TRUE),
-      sample_median = stats::median(x = check_log_clean$col_names$quant,
-                                    na.rm = TRUE),
+      IQR = stats::IQR(
+        x = .data[[check_log_clean$col_names$quant]],
+        na.rm = TRUE
+      ),
+      sample_median = stats::median(
+        x = .data[[check_log_clean$col_names$quant]],
+        na.rm = TRUE
+      ),
       .groups = "drop"
     ) |>
     dplyr::group_by(
