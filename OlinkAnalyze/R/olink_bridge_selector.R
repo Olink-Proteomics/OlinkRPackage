@@ -9,6 +9,7 @@
 #' per sample. If there are not enough samples output, increase to 20\%. \cr\cr
 #' The function accepts NPX Excel files with data < LOD replaced.
 #'
+#' @details
 #' `olink_bridgeselector()` is a synonym of `olink_bridge_selector()` .
 #'
 #' @param df Tibble/data frame in long format such as produced by the
