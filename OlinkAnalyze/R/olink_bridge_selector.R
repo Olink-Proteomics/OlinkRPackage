@@ -229,16 +229,33 @@ olink_bridge_selector <- function(df,
   # if more available samples than required by user, select n samples that are
   # evenly spread across the range of mean NPX values.
   df_ready <- df_ready |>
-    dplyr::arrange(dplyr::desc(.data[["MeanNPX"]])) |>
-    dplyr::mutate(order = dplyr::row_number())
+    dplyr::arrange(
+      dplyr::desc(
+        .data[["MeanNPX"]]
+      )
+    ) |>
+    dplyr::mutate(
+      order = dplyr::row_number()
+    )
 
-  bridge_samples <- floor(seq(1, nrow(df_ready), length.out = n + 2)[c(-1,
-                                                                   -(n + 2))])
+  bridge_samples <- floor(
+    x = seq(
+      from = 1L,
+      to = nrow(df_ready),
+      length.out = n + 2L)[c(-1L, -(n + 2L))]
+  )
 
   selected_bridges <- df_ready |>
-    dplyr::filter(.data[["order"]] %in% bridge_samples) |>
-    dplyr::slice_sample(prop = 1) |>     # random order
-    dplyr::select(-order)
+    dplyr::filter(
+      .data[["order"]] %in% .env[["bridge_samples"]]
+    ) |>
+    # random order
+    dplyr::slice_sample(
+      prop = 1
+    ) |>
+    dplyr::select(
+      -dplyr::all_of("order")
+    )
 
   return(selected_bridges)
 }
