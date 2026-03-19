@@ -72,9 +72,10 @@ test_that(
 
     npx_df1 <- npx_data1 |>
       dplyr::filter(
-        !grepl(pattern = "control",
-               x = .data[["SampleID"]],
-               ignore.case = TRUE
+        !grepl(
+          pattern = "control",
+          x = .data[["SampleID"]],
+          ignore.case = TRUE
         )
       )
 
@@ -103,9 +104,10 @@ test_that(
 
     npx_df2 <- npx_data2 |>
       dplyr::filter(
-        !grepl(pattern = "control",
-               x = .data[["SampleID"]],
-               ignore.case = TRUE
+        !grepl(
+          pattern = "control",
+          x = .data[["SampleID"]],
+          ignore.case = TRUE
         )
       )
 
