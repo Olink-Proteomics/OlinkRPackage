@@ -130,21 +130,28 @@ olink_bridge_selector <- function(df,
     )
 
   # ---- STEP 3: Handle LOD variations ----------------------------------------
-  alt_plate_lods <- c("Plate LOD", "PlateLOD", "plateLOD", "Plate_LOD",
-                      "LODNPX")
-  alt_max_lods   <- c("Max LOD", "MaxLOD", "maxLOD", "Max_LOD")
 
-  if (!("LOD" %in% names(df))) {
-    if (any(alt_plate_lods %in% names(df))) {
-      df <- df |> dplyr::rename(LOD = dplyr::any_of(alt_plate_lods))
-      message("Using plate LOD as filter criteria...")
-    } else if (any(alt_max_lods %in% names(df))) {
-      df <- df |> dplyr::rename(LOD = dplyr::any_of(alt_max_lods))
-      message("Using max LOD as filter criteria...")
-    } else {
-      df <- df |> dplyr::mutate(LOD = -Inf)
-      message("LOD not available, hence not filtering by LOD.")
-    }
+  if (!("lod" %in% names(check_log_clean$col_names))) {
+    df_clean <- df_clean |>
+      dplyr::mutate(
+        LOD = -Inf
+      )
+    check_log_clean$col_names[["lod"]] <- "LOD"
+
+    cli::cli_inform(
+      "LOD not available, hence not filtering by LOD."
+    )
+  } else if (length(check_log_clean$col_names$lod) > 1L) {
+
+    check_log_clean$col_names$lod <- check_log_clean$col_names$lod |>
+      unique() |>
+      sort() |>
+      head(n = 1L)
+
+    cli::cli_inform(
+      "Multiple LOD columns detected. Will be using
+      {.val {check_log_clean$col_names$lod}} as filter criteria."
+    )
   }
 
   if ("SampleQC" %in% names(df)) {
