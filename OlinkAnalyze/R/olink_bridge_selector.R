@@ -67,6 +67,13 @@ olink_bridge_selector <- function(df,
     suppressMessages() |>
     suppressWarnings()
 
+  if (!("sample_type" %in% names(check_log_clean$col_names))) {
+    cli::cli_inform(
+      "No sample type column detected in the input dataset {.arg df}! Ensure
+      that control samples have been filtered out!"
+    )
+  }
+
   # ---- STEP 2: Outlier metrics per (Panel, SampleID) -------------------------
   qc_outliers <- df |>
     dplyr::group_by(.data[["Panel"]], .data[["SampleID"]]) |>
