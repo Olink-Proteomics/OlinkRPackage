@@ -3,25 +3,6 @@
 \name{olink_bridge_selector}
 \alias{olink_bridge_selector}
 \alias{olink_bridgeselector}
-\alias{\itemize{}
-\alias{\item{SampleID:}}
-\alias{Sample}
-\alias{ID}
-\alias{\item{perc_assays_below_lod:}}
-\alias{Percent}
-\alias{of}
-\alias{Assays}
-\alias{that}
-\alias{are}
-\alias{below}
-\alias{LOD}
-\alias{for}
-\alias{the}
-\alias{sample}
-\alias{\item{MeanNPX:}}
-\alias{Mean}
-\alias{NPX}
-\alias{}}
 \title{Bridge selection function}
 \usage{
 olink_bridge_selector(df, sample_missing_freq, n)
@@ -39,6 +20,12 @@ Olink Analyze read_npx function.}
 \value{
 A "tibble" with sample IDs and mean NPX for a defined number of
 bridging samples. Columns include:
+\itemize{
+\item{SampleID:} Sample ID
+\item{perc_assays_below_lod:} Percent of Assays that are below LOD for
+the sample
+\item{MeanNPX:} Mean NPX for the sample
+}
 }
 \description{
 The bridge selection function will select a number of bridge samples based
@@ -53,7 +40,12 @@ The function accepts NPX Excel files with data < LOD replaced.
 \code{olink_bridgeselector()} is a synonym of \code{olink_bridge_selector()} .
 }
 \examples{
-\donttest{bridge_samples <- olink_bridge_selector(npx_data1,
-sample_missing_freq = 0.1, n = 20)}
+\donttest{
+  bridge_samples <- OlinkAnalyze::olink_bridge_selector(
+    df = npx_data1,
+    sample_missing_freq = 0.1,
+    n = 20L
+  )
+}
 
 }
