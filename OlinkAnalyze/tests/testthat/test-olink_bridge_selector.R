@@ -453,6 +453,97 @@ test_that(
       fixed = TRUE
     )
 
+    # invalid `sampleMissingFreq` or `sample_missing_freq` ----
+
+    expect_error(
+      object = olink_bridge_selector(
+        df = npx_data1,
+        n = 8L,
+        check_log = npx_data1_check_log
+      ),
+      regexp = "`sample_missing_freq` is a required, non 'NA', argument!",
+      fixed = TRUE
+    )
+
+    expect_error(
+      object = olink_bridge_selector(
+        df = npx_data1,
+        sample_missing_freq = NA_real_,
+        n = 8L,
+        check_log = npx_data1_check_log
+      ),
+      regexp = "`sample_missing_freq` is a required, non 'NA', argument!",
+      fixed = TRUE
+    )
+
+    expect_error(
+      object = olink_bridge_selector(
+        df = npx_data1,
+        sample_missing_freq = -1.1,
+        n = 8L,
+        check_log = npx_data1_check_log
+      ),
+      regexp = paste("Please provide a value for `sample_missing_freq` between",
+                     "0 and 1!"),
+      fixed = TRUE
+    )
+
+    expect_error(
+      object = olink_bridge_selector(
+        df = npx_data1,
+        sample_missing_freq = 2.3,
+        n = 8L,
+        check_log = npx_data1_check_log
+      ),
+      regexp = paste("Please provide a value for `sample_missing_freq` between",
+                     "0 and 1!"),
+      fixed = TRUE
+    )
+
+    # invalid n ----
+
+    expect_error(
+      object = olink_bridgeselector(
+        df = npx_data1,
+        sampleMissingFreq = 0.1,
+        check_log = npx_data1_check_log
+      ),
+      regexp = "`n` is a required, non 'NA', argument!",
+      fixed = TRUE
+    )
+
+    expect_error(
+      object = olink_bridgeselector(
+        df = npx_data1,
+        sampleMissingFreq = 0.1,
+        n = NA_integer_,
+        check_log = npx_data1_check_log
+      ),
+      regexp = "`n` is a required, non 'NA', argument!",
+      fixed = TRUE
+    )
+
+    expect_error(
+      object = olink_bridgeselector(
+        df = npx_data1,
+        sampleMissingFreq = 0.1,
+        n = -5L,
+        check_log = npx_data1_check_log
+      ),
+      regexp = "Please provide a positive non-decimal value for `n`!",
+      fixed = TRUE
+    )
+
+    expect_error(
+      object = olink_bridgeselector(
+        df = npx_data1,
+        sampleMissingFreq = 0.1,
+        n = 1.1,
+        check_log = npx_data1_check_log
+      ),
+      regexp = "Please provide a positive non-decimal value for `n`!",
+      fixed = TRUE
+    )
   }
 )
 
