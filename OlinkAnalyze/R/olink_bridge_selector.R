@@ -154,10 +154,6 @@ olink_bridge_selector <- function(df,
     )
   }
 
-  if ("SampleQC" %in% names(df)) {
-    df <- df |> dplyr::mutate(QC_Warning = .data[["SampleQC"]])
-  }
-
   # ---- STEP 4: Sample-level QC and filtering --------------------------------
 
   df_1 <- df |>
