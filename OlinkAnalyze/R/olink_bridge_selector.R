@@ -209,6 +209,7 @@ olink_bridge_selector <- function(df,
 
   # ---- STEP 5: Select evenly spread bridge samples ---------------------------
 
+  # if fewer available samples than required by user
   if (nrow(df_ready) < n) {
     cli::cli_abort(
       c(
@@ -220,10 +221,13 @@ olink_bridge_selector <- function(df,
     )
   }
 
+  # if available exactly as many samples as required by user
   if (nrow(df_ready) == n) {
     return(df_ready)
   }
 
+  # if more available samples than required by user, select n samples that are
+  # evenly spread across the range of mean NPX values.
   df_ready <- df_ready |>
     dplyr::arrange(dplyr::desc(.data[["MeanNPX"]])) |>
     dplyr::mutate(order = dplyr::row_number())
