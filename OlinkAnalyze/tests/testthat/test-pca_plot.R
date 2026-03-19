@@ -1,3 +1,5 @@
+testthat::skip_if_not_installed(pkg = "dplyr")
+
 set.seed(123) # reproducible randomization
 
 # Create OSI columns ------------------------------------------------------
@@ -119,6 +121,20 @@ check_log_221010 <- check_npx(npx_data_format22) |>
 # Get reference result ----------------------------------------------------
 ref_results <- get_example_data(filename = "reference_results.rds")
 
+# Test check_log = NULL ---------------------------------------------------
+
+test_that("message - run check_npx()", {
+  expect_message(
+    olink_pca_plot(
+      npx_df,
+      check_log = NULL,
+      color_g = "QC_Warning"
+    ),
+    regexp = "`check_log` not provided. Running `check_npx()`.",
+    fixed = TRUE
+  )
+})
+
 # Test OSI columns --------------------------------------------------------
 
 test_that("error - OSICategory is all NA", {
@@ -132,7 +148,9 @@ test_that("error - OSICategory is all NA", {
       color_g = "OSICategory",
       quiet = TRUE
     ),
-    regexp = "All values are NA in OSICategory",
+
+    regexp = paste0("All values are NA in OSICategory\\. ",
+                    "Please check your data to confirm OSI data is present\\.")
   )
 })
 
@@ -153,7 +171,9 @@ test_that("error - Invalid OSICategory value", {
       color_g = "OSICategory",
       quiet = TRUE
     ),
-    regexp = "Invalid values detected in OSICategory",
+
+    regexp = paste0('Invalid values detected in OSICategory\\.', #nolint quotes_linter
+                    ' Expected only 0, 1, 2, 3, or 4\\. Found: "7".') #nolint quotes_linter
   )
 })
 
@@ -172,7 +192,12 @@ test_that("error - Invalid OSI continuous", {
                    check_log = check_log,
                    color_g = "OSITimeToCentrifugation",
                    quiet = TRUE),
-    regexp = "Invalid values detected in OSITimeToCentrifugation"
+
+    regexp = paste0(
+      'Invalid values detected in OSITimeToCentrifugation\\.', #nolint quotes_linter
+      ' Expected continuous numeric values between 0 and 1\\.', #nolint quotes_linter
+      ' Found non-numeric value\\(s\\): "oops".' #nolint quotes_linter
+    )
   )
 
 })
@@ -194,9 +219,12 @@ test_that("error - out-of-range OSI continuous", {
       color_g = "OSIPreparationTemperature",
       quiet = TRUE
     ),
-    regexp =
-      "Invalid values detected in OSIPreparationTemperature[\\s\\S]*1\\.2",
-    perl = TRUE
+
+    regexp = paste0(
+      "Invalid values detected in OSIPreparationTemperature\\.",
+      " Expected continuous numeric values between 0 and 1\\.",
+      " Found out-of-range value\\(s\\): 1\\.2"
+    )
   )
 })
 
@@ -209,7 +237,9 @@ test_that("error - continuous OSI columns all NA", {
                    check_log = check_log,
                    color_g = "OSISummary",
                    quiet = TRUE),
-    regexp = "All values are NA in OSISummary"
+
+    regexp = paste0("All values are NA in OSISummary\\.",
+                    " Please check your data to confirm OSI data is present\\.")
   )
 })
 
