@@ -195,77 +195,10 @@ olink_pca_plot <- function(df,
 
   if (color_g %in% c(osi_cat_cols, osi_cont_cols)) {
 
-    # Check for invalid values
-    v_chr <- df |>
-      dplyr::select(dplyr::all_of(color_g)) |>
-      dplyr::pull() |>
-      as.character()
-
-    # ERROR if column exists but is entirely NA
-    if (all(is.na(v_chr))) {
-      cli::cli_abort(
-        "All values are NA in {color_g}. Please provide at least one
-        non-missing value."
-      )
-    }
-
-    # Categorical
-    if (color_g %in% osi_cat_cols) {
-
-      # Check that values are in allowed range
-      allowed <- as.character(0:4)
-      invalid_vals <- unique(v_chr[!is.na(v_chr) & !(v_chr %in% allowed)])
-
-      if (length(invalid_vals) > 0L) {
-        cli::cli_abort(
-          "Invalid values detected in {color_g}. Expected only 0, 1, 2, 3, or 4.
-          Found: {.val {invalid_vals}}."
-        )
-      }
-
-      # Convert to factor if needed
-      if (!is.factor(df[[color_g]])) {
-        df[[color_g]] <- factor(as.character(df[[color_g]]), levels = allowed)
-
-        df <- df |>
-          dplyr::mutate(
-            !!color_g := as.character(factor(df[[color_g]], levels = allowed))
-          )
-      }
-    }
-
-    if (color_g %in% osi_cont_cols) {
-
-      # Check if numeric
-      if (!all(is.numeric(df[[color_g]]))) {
-
-        # Detect non-numeric entries (introduced NA after coercion)
-        v_num <- suppressWarnings(as.numeric(df[[color_g]]))
-
-        non_numeric_idx <- which(
-          !is.na(df[[color_g]]) & is.na(v_num)
-        )
-        bad_vals <- unique(df[[color_g]][non_numeric_idx]) #nolint object_name_linter
-        cli::cli_abort(
-          "Invalid values detected in {color_g}. Expected continuous numeric
-          values between 0 and 1. Found non-numeric value(s):
-          {.val {bad_vals}}."
-        )
-      }
-
-      # Detect out-of-range values
-      out_of_range_idx <- which(
-        !is.na(df[[color_g]]) & (df[[color_g]] < 0 | df[[color_g]] > 1)
-      )
-      if (length(out_of_range_idx) > 0L) {
-        bad_vals <- unique(df[[color_g]][out_of_range_idx]) #nolint object_name_linter
-        cli::cli_abort(
-          "Invalid values detected in {.field {color_g}}. Expected continuous
-          numeric values between 0 and 1. Found out-of-range value(s):
-          {.val {bad_vals}}."
-        )
-      }
-    }
+    # Check for invalid values and NA columns
+    df <- check_osi(df = df,
+                    check_log = check_log,
+                    osi_score = color_g)
   }
 
   # Check that the user didn't specify just one of outlierDefX and outlierDefY
@@ -719,4 +652,120 @@ olink_pca_plot.internal <- function( # nolint object_name_linter
   }
 
   return(pca_plot)
+}
+
+
+
+
+# Temp script for check_osi function --------------------------------------
+
+
+#' Utility function to check OSI values for validity and remove
+#' external controls
+#'
+#' @param df An Olink dataset.
+#' @param check_log Output log of check_npx()
+#' @param osi_score Name of OSI column to check
+#'
+#' @returns An Olink dataset with the OSI column checked and cleaned
+#' @export
+#'
+check_osi <- function(df,
+                      check_log,
+                      osi_score) {
+
+  # Remove external controls
+
+  df <- clean_sample_type(
+    df = df,
+    check_log = check_log,
+    remove_control_sample = TRUE,
+    verbose = TRUE
+  ) |>
+    suppressMessages()
+
+  osi_cat_cols <- c("OSICategory")
+  osi_cont_cols <- c("OSITimeToCentrifugation",
+                     "OSIPreparationTemperature",
+                     "OSISummary")
+
+  if (is.null(osi_score) || !(osi_score %in% c(osi_cat_cols,
+                                               osi_cont_cols))) {
+    cli::cli_abort(paste0("`osi_score` must be one of OSICategory,",
+                          " OSISummary, OSITimeToCentrifugation, ",
+                          "or OSIPreparationTemperature."))
+  }
+
+  if (all(is.na(df[[osi_score]]))) {
+    cli::cli_abort(paste0("All values are NA in {osi_score}. ",
+                          "Please check your data to confirm ",
+                          "OSI data is present."))
+  }
+
+  # Check for invalid values
+  v_chr <- df |>
+    dplyr::select(dplyr::all_of(osi_score)) |>
+    dplyr::pull() |>
+    as.character()
+
+  # Categorical checks
+  if (osi_score %in% osi_cat_cols) {
+
+    # Check that values are in allowed range
+    allowed <- as.character(0L:4L)
+    invalid_vals <- unique(v_chr[!is.na(v_chr) & !(v_chr %in% allowed)])
+
+    if (length(invalid_vals) > 0L) {
+      cli::cli_abort(
+        "Invalid values detected in {osi_score}. Expected only 0, 1, 2, 3, or 4.
+          Found: {.val {invalid_vals}}."
+      )
+    }
+
+    # Convert to factor if needed
+    if (!is.factor(df[[osi_score]])) {
+      df[[osi_score]] <- factor(as.character(df[[osi_score]]), levels = allowed)
+
+      df <- df |>
+        dplyr::mutate(
+          !!osi_score := as.character(factor(df[[osi_score]], levels = allowed))
+        )
+    }
+  }
+
+  # Continuous checks
+  if (osi_score %in% osi_cont_cols) {
+
+    # Check if numeric
+    if (!all(is.numeric(df[[osi_score]]))) {
+
+      # Detect non-numeric entries (introduced NA after coercion)
+      v_num <- suppressWarnings(as.numeric(df[[osi_score]]))
+
+      non_numeric_idx <- which(
+        !is.na(df[[osi_score]]) & is.na(v_num)
+      )
+      bad_vals <- unique(df[[osi_score]][non_numeric_idx]) #nolint object_name_linter
+      cli::cli_abort(
+        "Invalid values detected in {osi_score}. Expected continuous numeric
+          values between 0 and 1. Found non-numeric value(s):
+          {.val {bad_vals}}."
+      )
+    }
+
+    # Detect out-of-range values
+    out_of_range_idx <- which(
+      !is.na(df[[osi_score]]) & (df[[osi_score]] < 0L | df[[osi_score]] > 1L)
+    )
+    if (length(out_of_range_idx) > 0L) {
+      bad_vals <- unique(df[[osi_score]][out_of_range_idx]) #nolint object_name_linter
+      cli::cli_abort(
+        "Invalid values detected in {.field {osi_score}}. Expected continuous
+          numeric values between 0 and 1. Found out-of-range value(s):
+          {.val {bad_vals}}."
+      )
+    }
+  }
+
+  return(df)
 }
