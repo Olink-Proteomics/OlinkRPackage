@@ -273,6 +273,23 @@ olink_bridgeselector <- function(df, # nolint: object_name_linter
 
   # Accept either spelling for sample_missing_freq for backward compatibility
   dots <- list(...)
+
+  # Validate names in `...` to avoid silently ignoring unexpected arguments
+  dot_names <- names(dots)
+  if (!is.null(dot_names)) {
+    allowed_dot_args <- c("sample_missing_freq", "sampleMissingFreq")
+    unexpected_args <- setdiff(
+      x = setdiff(x = dot_names,
+                  y = allowed_dot_args),
+      y = "")
+    if (length(unexpected_args) > 0L) {
+      cli::cli_warn(
+        "Unexpected argument name{?s} in `...` will be ignored:
+        {.val {unexpected_args}}!"
+      )
+    }
+  }
+
   if (is.null(dots$sample_missing_freq)) {
     sampleMissingFreq <- dots$sampleMissingFreq # nolint: object_name_linter
   } else {

@@ -456,4 +456,51 @@ test_that(
   }
 )
 
+test_that(
+  "olink_bridgeselector - warning for additional arguments",
+  {
+    npx_data1_check_log <- check_npx(df = npx_data1) |>
+      suppressMessages() |>
+      suppressWarnings()
 
+    expect_warning(
+      object = expect_message(
+        object = olink_bridgeselector(
+          df = npx_data1,
+          sampleMissingFreq = 0.1,
+          n = 8L,
+          check_log = npx_data1_check_log,
+          unexpected_arg = "unexpected"
+        ),
+        regexp = paste("No sample type column detected in the input dataset",
+                       "`df`! Ensure that control samples have been filtered",
+                       "out!")
+      ),
+      regexp = paste("Unexpected argument name in `...` will be ignored:",
+                     "\"unexpected_arg\"!"),
+      fixed = TRUE
+    )
+
+    expect_warning(
+      object = expect_message(
+        object = olink_bridgeselector(
+          df = npx_data1,
+          sampleMissingFreq = 0.1,
+          n = 8L,
+          check_log = npx_data1_check_log,
+          unexpected_arg = "unexpected",
+          unexpected_arg2 = "I_Should_Not_Be_Here",
+          unexpected_arg3 = "Me_Neither"
+        ),
+        regexp = paste("No sample type column detected in the input dataset",
+                       "`df`! Ensure that control samples have been filtered",
+                       "out!")
+      ),
+      regexp = paste("Unexpected argument names in `...` will be ignored:",
+                     "\"unexpected_arg\", \"unexpected_arg2\", and",
+                     "\"unexpected_arg3\"!"),
+      fixed = TRUE
+    )
+
+  }
+)
