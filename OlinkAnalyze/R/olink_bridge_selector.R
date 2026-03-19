@@ -242,7 +242,8 @@ olink_bridge_selector <- function(df,
     x = seq(
       from = 1L,
       to = nrow(df_ready),
-      length.out = n + 2L)[c(-1L, -(n + 2L))]
+      length.out = n + 2L
+    )[c(-1L, -(n + 2L))]
   )
 
   selected_bridges <- df_ready |>
