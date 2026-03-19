@@ -3,7 +3,7 @@
 test_that(
   "olink_lmer - works - reference",
   {
-    skip_if_not_installed(pkg = "lme4")
+    skip_if_not_installed(pkg = "lme4") |> suppressPackageStartupMessages()
     skip_if_not_installed(pkg = "lmerTest")
     skip_if_not_installed(pkg = "broom")
     skip_on_cran()
@@ -64,7 +64,7 @@ test_that(
 test_that(
   "olink_lmer - works - assays with all NA",
   {
-    skip_if_not_installed(pkg = "lme4")
+    skip_if_not_installed(pkg = "lme4") |> suppressPackageStartupMessages()
     skip_if_not_installed(pkg = "lmerTest")
     skip_if_not_installed(pkg = "broom")
     skip_on_cran()
@@ -100,7 +100,7 @@ test_that(
 test_that(
   "olink_lmer - works - column 'Index' is missing",
   {
-    skip_if_not_installed(pkg = "lme4")
+    skip_if_not_installed(pkg = "lme4") |> suppressPackageStartupMessages()
     skip_if_not_installed(pkg = "lmerTest")
     skip_if_not_installed(pkg = "broom")
     skip_on_cran()
@@ -144,7 +144,7 @@ test_that(
 test_that(
   "olink_lmer - error - 'df','variable' or 'random ' not provided",
   {
-    skip_if_not_installed(pkg = "lme4")
+    skip_if_not_installed(pkg = "lme4") |> suppressPackageStartupMessages()
     skip_if_not_installed(pkg = "lmerTest")
     skip_if_not_installed(pkg = "broom")
     skip_on_cran()
@@ -177,7 +177,7 @@ test_that(
 test_that(
   "olink_lmer_posthoc - works reference",
   {
-    skip_if_not_installed(pkg = "lme4")
+    skip_if_not_installed(pkg = "lme4") |> suppressPackageStartupMessages()
     skip_if_not_installed(pkg = "lmerTest")
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")
@@ -258,7 +258,7 @@ test_that(
 test_that(
   "olink_lmer_posthoc - works - assays with all NA",
   {
-    skip_if_not_installed(pkg = "lme4")
+    skip_if_not_installed(pkg = "lme4") |> suppressPackageStartupMessages()
     skip_if_not_installed(pkg = "lmerTest")
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")
@@ -296,7 +296,7 @@ test_that(
 test_that(
   "olink_lmer_posthoc - error - 'df','variable' or 'random ' not provided",
   {
-    skip_if_not_installed(pkg = "lme4")
+    skip_if_not_installed(pkg = "lme4") |> suppressPackageStartupMessages()
     skip_if_not_installed(pkg = "lmerTest")
     skip_if_not_installed(pkg = "broom")
     skip_on_cran()
