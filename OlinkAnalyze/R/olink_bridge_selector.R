@@ -78,8 +78,10 @@ olink_bridge_selector <- function(df,
 
   qc_outliers <- df_clean |>
     dplyr::group_by(
-      dplyr::all_of(
-        c("Panel", "SampleID")
+      dplyr::across(
+        dplyr::all_of(
+          c("Panel", "SampleID")
+        )
       )
     ) |>
     dplyr::summarise(
@@ -87,7 +89,11 @@ olink_bridge_selector <- function(df,
       sample_median = stats::median(.data[["NPX"]], na.rm = TRUE),
       .groups = "drop"
     ) |>
-    dplyr::group_by(.data[["Panel"]]) |>
+    dplyr::group_by(
+      dplyr::across(
+        dplyr::all_of("Panel")
+      )
+    ) |>
     dplyr::mutate(
       median_low  = mean(.data[["sample_median"]], na.rm = TRUE) - 3 *
         stats::sd(.data[["sample_median"]], na.rm = TRUE),
