@@ -23,7 +23,7 @@
 #' bridging samples. Columns include:
 #' \itemize{
 #'   \item{SampleID:} Sample ID
-#'   \item{perc_assays_below_lod:} Percent of Assays that are below LOD for
+#'   \item{PercAssaysBelowLOD:} Percent of Assays that are below LOD for
 #'   the sample
 #'   \item{MeanNPX:} Mean NPX for the sample
 #' }
