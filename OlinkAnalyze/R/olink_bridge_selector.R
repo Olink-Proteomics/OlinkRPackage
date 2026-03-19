@@ -55,7 +55,9 @@ olink_bridge_selector <- function(df,
 
   df_clean <- clean_npx(
     df = df,
-    check_log = check_log
+    check_log = check_log,
+    remove_qc_warning = FALSE,
+    remove_assay_warning = FALSE
   )
 
   check_log_clean <- check_npx(df = df_clean)
