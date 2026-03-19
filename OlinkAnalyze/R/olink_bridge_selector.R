@@ -53,11 +53,12 @@ olink_bridge_selector <- function(df,
 
   check_log <- run_check_npx(df = df, check_log = check_log)
 
-  df_clean <- OlinkAnalyze::clean_npx(
+  df_clean <- clean_npx(
     df = df,
     check_log = check_log
   )
-  check_log_clean <- OlinkAnalyze::check_npx(df = df_clean)
+
+  check_log_clean <- check_npx(df = df_clean)
   df <- df_clean |>
     dplyr::filter(!(.data[["OlinkID"]] %in% check_log_clean$assay_na)) |>
     dplyr::filter(stringr::str_detect(.data[["OlinkID"]], "OID[0-9]{5}")) |>
