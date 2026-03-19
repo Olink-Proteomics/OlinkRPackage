@@ -32,8 +32,13 @@
 #' @export
 #'
 #' @examples
-#' \donttest{bridge_samples <- olink_bridge_selector(npx_data1,
-#' sample_missing_freq = 0.1, n = 20)}
+#' \donttest{
+#'   bridge_samples <- OlinkAnalyze::olink_bridge_selector(
+#'     df = npx_data1,
+#'     sample_missing_freq = 0.1,
+#'     n = 20L
+#'   )
+#' }
 #'
 olink_bridge_selector <- function(df, sample_missing_freq, n) {
   # ---- STEP 1: Remove invalid OlinkIDs & control samples ---------------------
