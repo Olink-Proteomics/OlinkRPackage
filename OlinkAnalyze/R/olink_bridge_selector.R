@@ -267,14 +267,24 @@ olink_bridgeselector <- function(df, ..., n) { # nolint: object_name_linter
   # Accept either spelling
   sampleMissingFreq <- dots$sampleMissingFreq %||% # nolint: object_name_linter
     dots$sample_missing_freq
+
   if (is.null(sampleMissingFreq)) {
-    stop("Please supply either sampleMissingFreq or sample_missing_freq.")
+    cli::cli_abort(
+      c(
+        "x" = "Please provide a value for either {.arg sampleMissingFreq} or
+        {.arg sample_missing_freq}."
+      ),
+      call = rlang::caller_env(),
+      wrap = TRUE
+    )
   }
+
   return(
     olink_bridge_selector(
       df = df,
       sample_missing_freq = sampleMissingFreq,
-      n = n
+      n = n,
+      check_log = check_log
     )
   )
 }
