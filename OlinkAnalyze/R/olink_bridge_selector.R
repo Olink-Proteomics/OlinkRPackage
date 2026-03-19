@@ -114,7 +114,12 @@ olink_bridge_selector <- function(df,
         0, 1
       )
     ) |>
-    dplyr::select(.data[["SampleID"]], .data[["Panel"]], .data[["Outlier"]])
+    dplyr::select(
+      dplyr::all_of(
+        c("SampleID", "Panel", "Outlier")
+      )
+    )
+
   # ---- STEP 3: Handle LOD variations ----------------------------------------
   alt_plate_lods <- c("Plate LOD", "PlateLOD", "plateLOD", "Plate_LOD",
                       "LODNPX")
