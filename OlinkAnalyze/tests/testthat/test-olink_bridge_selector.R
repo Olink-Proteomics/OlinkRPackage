@@ -293,6 +293,56 @@ test_that(
       n = 0L
     )
 
+    # no LOD ----
+
+    expect_message(
+      object = expect_message(
+        object = nolod_data <- olink_bridgeselector(
+          df = npx_data1 |>
+            dplyr::select(-dplyr::all_of("LOD")),
+          sampleMissingFreq = 0.1,
+          n = 8,
+          check_log = npx_data1 |>
+            dplyr::select(-dplyr::all_of("LOD")) |>
+            check_npx() |>
+            suppressMessages() |>
+            suppressWarnings()
+        ),
+        regexp = paste("No sample type column detected in the input dataset",
+                       "`df`! Ensure that control samples have been filtered",
+                       "out!")
+      ),
+      regexp = "LOD not available, hence not filtering by LOD.",
+      fixed = TRUE
+    )
+
+    expect_identical(
+      object = nolod_data |> dplyr::arrange(.data[["SampleID"]]) |> dim(),
+      expected = c(8L, 3L)
+    )
+
+    expect_identical(
+      object = nolod_data |>
+        dplyr::arrange(.data[["SampleID"]]) |>
+        dplyr::pull(.data[["SampleID"]]),
+      expected = c("A55", "A6", "A64", "B16", "B22", "B24", "B45", "B74")
+    )
+
+    expect_identical(
+      object = nolod_data |>
+        dplyr::arrange(.data[["SampleID"]]) |>
+        dplyr::pull(.data[["PercAssaysBelowLOD"]]),
+      expected = rep(x = 0, times = 8L)
+    )
+
+    expect_identical(
+      object = nolod_data |>
+        dplyr::arrange(.data[["SampleID"]]) |>
+        dplyr::pull(.data[["MeanNPX"]]) |>
+        round(digits = 2L),
+      expected = c(5.98, 5.93, 5.60, 5.72, 6.15, 5.76, 6.06, 5.86)
+    )
+
     # SampleQC ----
 
     expect_message(
