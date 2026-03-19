@@ -65,8 +65,6 @@ olink_bridge_selector <- function(df,
     suppressWarnings()
 
   df <- df_clean |>
-    dplyr::filter(!(.data[["OlinkID"]] %in% check_log_clean$assay_na)) |>
-    dplyr::filter(stringr::str_detect(.data[["OlinkID"]], "OID[0-9]{5}")) |>
     dplyr::filter(!stringr::str_detect(.data[["SampleID"]], "CONTROL_SAMPLE*"))
   # Exclude OlinkIDs with missing NPX
   # Filtering on valid OlinkID
