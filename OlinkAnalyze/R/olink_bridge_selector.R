@@ -152,7 +152,7 @@ olink_bridge_selector <- function(df,
     check_log_clean$col_names$lod <- check_log_clean$col_names$lod |>
       unique() |>
       sort() |>
-      head(n = 1L)
+      utils::head(n = 1L)
 
     cli::cli_inform(
       "Multiple LOD columns detected. Will be using
