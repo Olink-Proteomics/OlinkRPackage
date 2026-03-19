@@ -309,7 +309,8 @@ olink_bridgeselector <- function(df, # nolint: object_name_linter
     unexpected_args <- setdiff(
       x = setdiff(x = dot_names,
                   y = allowed_dot_args),
-      y = "")
+      y = ""
+    )
     if (length(unexpected_args) > 0L) {
       cli::cli_warn(
         "Unexpected argument name{?s} in `...` will be ignored:
