@@ -49,6 +49,12 @@ olink_bridge_selector <- function(df,
                                   sample_missing_freq,
                                   n,
                                   check_log = NULL) {
+  # ---- STEP 0: Input checks --------------------------------------------------
+
+  check_is_dataset(x = df, error = TRUE)
+  check_is_scalar_numeric(x = sample_missing_freq, error = TRUE)
+  check_is_scalar_integer(x = n, error = TRUE)
+
   # ---- STEP 1: Remove invalid OlinkIDs & control samples ---------------------
 
   check_log <- run_check_npx(df = df, check_log = check_log)
