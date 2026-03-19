@@ -2,7 +2,7 @@
 % Please edit documentation in R/osi_dist_plot.R
 \name{olink_osi_dist_plot}
 \alias{olink_osi_dist_plot}
-\title{Title}
+\title{OSI distribution plot}
 \usage{
 olink_osi_dist_plot(df, check_log = NULL, osi_score = NULL)
 }
@@ -19,9 +19,13 @@ distribution plot (histogram overlayed with density plot) of
 osi values for corresponding osi_score column
 }
 \description{
-Title
+Generates a density plot showing the distribution of the selected
+OSI score among dataset samples using ggplot2. OSI score can be one of
+"OSITimeToCentrifugation", "OSIPreparationTemperature", or "OSISummary".
+Olink external controls are excluded from this visualization.
 }
 \examples{
+\donttest{
 # Creating fake OSI data from Site data
 df1 <-npx_data1 |>
   dplyr::mutate(OSISummary = as.numeric(as.factor(Site))) |>
@@ -33,4 +37,6 @@ check_log <- check_npx(df1)
 olink_osi_dist_plot(df1,
                     check_log = check_log,
                     osi_score = "OSISummary")
+}
+
 }
