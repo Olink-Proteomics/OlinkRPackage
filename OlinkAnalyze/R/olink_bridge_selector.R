@@ -162,7 +162,7 @@ olink_bridge_selector <- function(df,
 
   # ---- STEP 4: Sample-level QC and filtering --------------------------------
 
-  df_2 <- df_clean |>
+  df_ready <- df_clean |>
     dplyr::left_join(
       qc_outliers,
       by = c(check_log_clean$col_names$sample_id,
@@ -206,27 +206,27 @@ olink_bridge_selector <- function(df,
 
   # ---- STEP 5: Select evenly spread bridge samples ---------------------------
 
-  if (nrow(df_2) < n) {
+  if (nrow(df_ready) < n) {
     stop(
       paste0(
-        "Only ", nrow(df_2), " samples eligible. Increase sample_missing_freq",
+        "Only ", nrow(df_ready), " samples eligible. Increase sample_missing_freq",
         " and/or decrease n."
       )
     )
   }
 
-  if (nrow(df_2) == n) {
-    return(df_2)
+  if (nrow(df_ready) == n) {
+    return(df_ready)
   }
 
-  df_2 <- df_2 |>
+  df_ready <- df_ready |>
     dplyr::arrange(dplyr::desc(.data[["MeanNPX"]])) |>
     dplyr::mutate(order = dplyr::row_number())
 
-  bridge_samples <- floor(seq(1, nrow(df_2), length.out = n + 2)[c(-1,
+  bridge_samples <- floor(seq(1, nrow(df_ready), length.out = n + 2)[c(-1,
                                                                    -(n + 2))])
 
-  selected_bridges <- df_2 |>
+  selected_bridges <- df_ready |>
     dplyr::filter(.data[["order"]] %in% bridge_samples) |>
     dplyr::slice_sample(prop = 1) |>     # random order
     dplyr::select(-order)
