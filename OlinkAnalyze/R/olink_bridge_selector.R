@@ -162,7 +162,7 @@ olink_bridge_selector <- function(df,
 
   # ---- STEP 4: Sample-level QC and filtering --------------------------------
 
-  df_1 <- df_clean |>
+  df_2 <- df_clean |>
     dplyr::left_join(
       qc_outliers,
       by = c(check_log_clean$col_names$sample_id,
@@ -197,9 +197,7 @@ olink_bridge_selector <- function(df,
       .data[["qc_warn"]] == "PASS" &
         .data[["outliers"]] == 0L &
         .data[["frac_below_lod"]] < .env[["sample_missing_freq"]]
-    )
-
-  df_2 <- df_1 |>
+    ) |>
     dplyr::distinct(
       .data[[check_log_clean$col_names$sample_id]],
       .data[["frac_below_lod"]],
