@@ -162,26 +162,49 @@ olink_bridge_selector <- function(df,
 
   # ---- STEP 4: Sample-level QC and filtering --------------------------------
 
-  df_1 <- df |>
-    dplyr::left_join(qc_outliers, by = c("SampleID", "Panel")) |>
-    dplyr::mutate(NPX = ifelse(.data[["NPX"]] <= .data[["LOD"]], NA,
-                               .data[["NPX"]])) |>
-    dplyr::group_by(.data[["SampleID"]]) |>
+  df_1 <- df_clean |>
+    dplyr::left_join(
+      qc_outliers,
+      by = c(check_log_clean$col_names$sample_id,
+             check_log_clean$col_names$panel),
+      relationship = "many-to-one"
+    ) |>
     dplyr::mutate(
-      QC_Warning = dplyr::if_else(all(toupper(.data[["QC_Warning"]]) == "PASS"),
-                                  "PASS", "WARNING"),
-      Outliers = sum(.data[["Outlier"]]),
-      PercAssaysBelowLOD = sum(is.na(.data[["NPX"]])) / dplyr::n(),
-      MeanNPX = mean(.data[["NPX"]], na.rm = TRUE)
+      quant_na = dplyr::if_else(
+        .data[[check_log_clean$col_names$quant]] <=
+          .data[[check_log_clean$col_names$lod]],
+        NA_real_,
+        .data[[check_log_clean$col_names$quant]]
+      )
+    ) |>
+    dplyr::group_by(
+      dplyr::across(
+        dplyr::all_of(check_log_clean$col_names$sample_id)
+      )
+    ) |>
+    dplyr::mutate(
+      qc_warn = dplyr::if_else(
+        all(toupper(.data[[check_log_clean$col_names$qc_warning]]) == "PASS"),
+        "PASS",
+        "WARNING"
+      ),
+      outliers = sum(.data[["Outlier"]], na.rm = TRUE),
+      frac_below_lod = sum(is.na(.data[["quant_na"]])) / dplyr::n(),
+      quant_mean = mean(x = .data[["quant_na"]], na.rm = TRUE)
     ) |>
     dplyr::ungroup() |>
-    dplyr::filter(.data[["QC_Warning"]] == "PASS") |>
-    dplyr::filter(.data[["Outliers"]] == 0) |>
-    dplyr::filter(.data[["PercAssaysBelowLOD"]] < sample_missing_freq)
+    dplyr::filter(
+      .data[["qc_warn"]] == "PASS" &
+        .data[["outliers"]] == 0L &
+        .data[["frac_below_lod"]] < .env[["sample_missing_freq"]]
+    )
 
   df_2 <- df_1 |>
-    dplyr::distinct(.data[["SampleID"]], .data[["PercAssaysBelowLOD"]],
-                    .data[["MeanNPX"]])
+    dplyr::distinct(
+      .data[[check_log_clean$col_names$sample_id]],
+      .data[["frac_below_lod"]],
+      .data[["quant_mean"]]
+    )
 
   # ---- STEP 5: Select evenly spread bridge samples ---------------------------
 
