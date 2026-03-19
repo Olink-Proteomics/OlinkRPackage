@@ -19,6 +19,10 @@ Olink Analyze read_npx function.}
 
 \item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
 \code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+
+\item{...}{Additional arguments. Currently only accepts \code{sampleMissingFreq}
+for backward compatibility. Please use \code{sample_missing_freq} instead of
+\code{sampleMissingFreq} in the future.}
 }
 \value{
 A "tibble" with sample IDs and mean NPX for a defined number of

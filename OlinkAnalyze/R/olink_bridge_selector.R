@@ -262,6 +262,9 @@ olink_bridge_selector <- function(df,
 }
 
 #' @rdname olink_bridge_selector
+#' @param ... Additional arguments. Currently only accepts `sampleMissingFreq`
+#' for backward compatibility. Please use `sample_missing_freq` instead of
+#' `sampleMissingFreq` in the future.
 #' @export
 olink_bridgeselector <- function(df, # nolint: object_name_linter
                                  ...,
