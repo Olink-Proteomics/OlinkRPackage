@@ -1,5 +1,6 @@
 #' Bridge selection function
 #'
+#' @description
 #' The bridge selection function will select a number of bridge samples based
 #' on the input data. It selects samples with good detection that pass QC
 #' and cover a good range of the data. If possible, Olink recommends 8-16
