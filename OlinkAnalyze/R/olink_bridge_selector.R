@@ -189,25 +189,28 @@ olink_bridge_selector <- function(df,
         "WARNING"
       ),
       outliers = sum(.data[["Outlier"]], na.rm = TRUE),
-      frac_below_lod = sum(is.na(.data[["quant_na"]])) / dplyr::n(),
-      quant_mean = mean(x = .data[["quant_na"]], na.rm = TRUE)
+      perc_assays_below_lod = sum(is.na(.data[["quant_na"]])) / dplyr::n(),
+      MeanNPX = mean(x = .data[["quant_na"]], na.rm = TRUE)
     ) |>
     dplyr::ungroup() |>
     dplyr::filter(
       .data[["qc_warn"]] == "PASS" &
         .data[["outliers"]] == 0L &
-        .data[["frac_below_lod"]] < .env[["sample_missing_freq"]]
+        .data[["perc_assays_below_lod"]] < .env[["sample_missing_freq"]]
     ) |>
     dplyr::distinct(
       .data[[check_log_clean$col_names$sample_id]],
-      .data[["frac_below_lod"]],
-      .data[["quant_mean"]]
+      .data[["perc_assays_below_lod"]],
+      .data[["MeanNPX"]]
+    ) |>
+    dplyr::rename(
+      "SampleID" = !!check_log_clean$col_names$sample_id
     )
 
   # ---- STEP 5: Select evenly spread bridge samples ---------------------------
 
   if (nrow(df_ready) < n) {
-    cli::cli_abort( # nolint: return_linter
+    cli::cli_abort(
       c(
         "x" = "Only {.val {nrow(df_ready)}} samples eligible. Increase
         {.arg sample_missing_freq} and/or decrease {.arg n}."
