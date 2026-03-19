@@ -108,6 +108,7 @@ olink_lod <- function(data,
   if (lod_method == "Both") {
     data_nc <- olink_lod_internal(
       data = data,
+      check_log = check_log,
       lod_file_path = lod_file_path,
       lod_method = "NCLOD"
     ) |>
@@ -117,6 +118,7 @@ olink_lod <- function(data,
       )
     data_fixed <- olink_lod_internal(
       data = data,
+      check_log = check_log,
       lod_file_path = lod_file_path,
       lod_method = "FixedLOD"
     ) |>
@@ -130,6 +132,7 @@ olink_lod <- function(data,
   } else {
     data <- olink_lod_internal(
       data = data,
+      check_log = check_log,
       lod_file_path = lod_file_path,
       lod_method = lod_method
     )
@@ -138,6 +141,7 @@ olink_lod <- function(data,
 }
 
 olink_lod_internal <- function(data,
+                               check_log,
                                lod_file_path = NULL,
                                lod_method = "NCLOD") {
 
@@ -157,6 +161,11 @@ olink_lod_internal <- function(data,
       sep = ";",
       header = TRUE
     )
+
+    # check for outdated fixed LOD file for Explore HT panels
+    check_ht_fixed_lod_version(check_log = check_log,
+                               lod_file = lod_file)
+
     lod_data <- olink_fixed_lod(data_analysis_ref_id = data$DataAnalysisRefID,
                                 lod_file = lod_file)
 
@@ -370,4 +379,88 @@ int_norm_count <- function(data,
 
   return(data)
 
+}
+
+#' Help function to check Explore HT Fixed LOD file version
+#'
+#' @description
+#' When invalid `DARID` / `PanelDataArchiveVersion` combinations are detected
+#' in an Explore HT NPX file (`darid_invalid` entries in `check_log`),
+#' this helper checks that the Explore HT Fixed LOD file used for LOD
+#' calculation meets a minimum version requirement (default: \code{"6.0.0"}).
+#'
+#' @author
+#' Kathleen Nevola
+#' Kang Dong
+#'
+#' @keywords internal
+#'
+#' @param lod_file A data frame (or tibble) representing the Fixed LOD file.
+#'   It must contain a \code{Panel} column. If present, a \code{Version}
+#'   column (character) is used to determine whether the file meets the
+#'   \code{min_version} requirement.
+#'
+#' @return A logical scalar returned invisibly:
+#'   \itemize{
+#'     \item \code{TRUE} — the Fixed LOD file is missing/invalid/outdated (and
+#'           a message or warning has been emitted).
+#'     \item \code{FALSE} — the check is not relevant or the Fixed LOD file
+#'           meets the minimum version requirement.
+#'   }
+#'
+check_ht_fixed_lod_version <- function(check_log,
+                                       lod_file) {
+
+  # Only relevant if darid_invalid exists and Explore HT panel is used
+  is_relevant <-
+    nrow(check_log[["darid_invalid"]]) > 0L &&
+    all(lod_file[["Panel"]] == "Explore_HT")
+
+  if (!is_relevant) {
+    return(invisible(FALSE))
+  }
+
+  # Case 1: Version column missing
+  if (!("Version" %in% names(lod_file))) {
+
+    cli::cli_warn(
+      c(
+        "i" = "Outdated version of Fixed LOD file detected.",
+        ">" = "Please download the newest version from Olink.com."
+      )
+    )
+
+    return(invisible(TRUE))
+  }
+
+  # Case 2: Version column present but < version "6.0.0"
+  version <- unique(as.character(lod_file[["Version"]]))
+
+  # Defensive: multiple versions in one file
+  if (length(version) != 1L) {
+
+    cli::cli_warn(
+      c(
+        "i" = "Multiple versions detected: {.val {version}}.",
+        ">" = "Please verify that the correct Fixed LOD file is used."
+      )
+    )
+
+    return(invisible(TRUE))
+  }
+
+  if (utils::compareVersion(version, "6.0.0") == -1L) {
+
+    cli::cli_warn(
+      c(
+        "i" = "Outdated version of Fixed LOD file detected. Detected version
+        {.val {version}}. Minimum required version 6.0.0",
+        ">" = "Please download the newest version from Olink.com."
+      )
+    )
+
+    return(invisible(TRUE))
+  }
+
+  return(invisible(FALSE))
 }
