@@ -189,18 +189,18 @@ olink_bridge_selector <- function(df,
         "WARNING"
       ),
       outliers = sum(.data[["Outlier"]], na.rm = TRUE),
-      perc_assays_below_lod = sum(is.na(.data[["quant_na"]])) / dplyr::n(),
+      PercAssaysBelowLOD  = sum(is.na(.data[["quant_na"]])) / dplyr::n(),
       MeanNPX = mean(x = .data[["quant_na"]], na.rm = TRUE)
     ) |>
     dplyr::ungroup() |>
     dplyr::filter(
       .data[["qc_warn"]] == "PASS" &
         .data[["outliers"]] == 0L &
-        .data[["perc_assays_below_lod"]] < .env[["sample_missing_freq"]]
+        .data[["PercAssaysBelowLOD"]] < .env[["sample_missing_freq"]]
     ) |>
     dplyr::distinct(
       .data[[check_log_clean$col_names$sample_id]],
-      .data[["perc_assays_below_lod"]],
+      .data[["PercAssaysBelowLOD"]],
       .data[["MeanNPX"]]
     ) |>
     dplyr::rename(
