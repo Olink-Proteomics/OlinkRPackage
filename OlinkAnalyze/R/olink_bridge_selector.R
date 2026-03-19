@@ -60,7 +60,10 @@ olink_bridge_selector <- function(df,
     remove_assay_warning = FALSE
   )
 
-  check_log_clean <- check_npx(df = df_clean)
+  check_log_clean <- check_npx(df = df_clean) |>
+    suppressMessages() |>
+    suppressWarnings()
+
   df <- df_clean |>
     dplyr::filter(!(.data[["OlinkID"]] %in% check_log_clean$assay_na)) |>
     dplyr::filter(stringr::str_detect(.data[["OlinkID"]], "OID[0-9]{5}")) |>
