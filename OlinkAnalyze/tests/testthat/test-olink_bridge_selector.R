@@ -445,11 +445,15 @@ test_that(
       object = olink_bridgeselector(
         df = npx_data_format22,
         sampleMissingFreq = 0.1,
-        n = 2L, check_log = npx_data_format22_check_log
+        n = 2L,
+        check_log = npx_data_format22_check_log
       ),
       regexp = paste("Only 0 samples eligible. Increase `sample_missing_freq`",
                      "and/or decrease `n`."),
       fixed = TRUE
     )
+
   }
 )
+
+
