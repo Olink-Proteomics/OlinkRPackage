@@ -51,9 +51,37 @@ olink_bridge_selector <- function(df,
                                   check_log = NULL) {
   # ---- STEP 0: Input checks --------------------------------------------------
 
+  ## dataset ----
   check_is_dataset(x = df, error = TRUE)
+
+  ## sample_missing_freq ----
+
+  # Validate that sample_missing_freq is a proportion in [0, 1]
+  if (missing(sample_missing_freq) || is.na(sample_missing_freq)) {
+    cli::cli_abort(
+      "{.arg sample_missing_freq} is a required, non 'NA', argument!"
+    )
+  }
   check_is_scalar_numeric(x = sample_missing_freq, error = TRUE)
+  if (!dplyr::between(x = sample_missing_freq, left = 0, right = 1)) {
+    cli::cli_abort(
+      "Please provide a value for {.arg sample_missing_freq} between 0 and 1!"
+    )
+  }
+
+  ## n ----
+
+  if (missing(n) || is.na(n)) {
+    cli::cli_abort(
+      "{.arg n} is a required, non 'NA', argument!"
+    )
+  }
   check_is_scalar_numeric(x = n, error = TRUE)
+  if ((n <= 0L) || (n %% 1L != 0L)) {
+    cli::cli_abort(
+      "Please provide a positive non-decimal value for {.arg n}!"
+    )
+  }
 
   # ---- STEP 1: Remove invalid OlinkIDs & control samples ---------------------
 
