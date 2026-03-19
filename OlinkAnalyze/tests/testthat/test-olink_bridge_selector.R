@@ -11,8 +11,8 @@ testthat::test_that("olink_bridgeselector works", {
                          "A70")
   testthat::expect_equal(round(bridgeSamples[order(bridgeSamples$MeanNPX,
                                                    decreasing = TRUE),
-                               ]$MeanNPX[5],
-                               digits = 2), 6.21)
+  ]$MeanNPX[5],
+  digits = 2), 6.21)
   testthat::expect_error(olink_bridgeselector(df = npx_data1,
                                               n = 8))
   testthat::expect_error(olink_bridgeselector(npx_data_format221010,
@@ -54,8 +54,8 @@ testthat::test_that("olink_bridgeselector works", {
 
 testthat::test_that("olink_bridgeselector max num of samples works", {
   testthat::expect_equal({
-                          olink_bridgeselector(df = npx_data1,
-                                               sampleMissingFreq = 0.1,
-                                               n = 150) |>
-                            nrow()}, 150)
+    olink_bridgeselector(df = npx_data1,
+                         sampleMissingFreq = 0.1,
+                         n = 150) |>
+      nrow()}, 150)
 })
