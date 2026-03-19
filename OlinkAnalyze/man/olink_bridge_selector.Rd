@@ -5,7 +5,7 @@
 \alias{olink_bridgeselector}
 \title{Bridge selection function}
 \usage{
-olink_bridge_selector(df, sample_missing_freq, n, check_log)
+olink_bridge_selector(df, sample_missing_freq, n, check_log = NULL)
 
 olink_bridgeselector(df, ..., n)
 }

@@ -48,7 +48,7 @@
 olink_bridge_selector <- function(df,
                                   sample_missing_freq,
                                   n,
-                                  check_log) {
+                                  check_log = NULL) {
   # ---- STEP 1: Remove invalid OlinkIDs & control samples ---------------------
 
   check_log <- run_check_npx(df = df, check_log = check_log)
