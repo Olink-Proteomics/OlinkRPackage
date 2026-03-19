@@ -321,6 +321,46 @@ test_that(
 )
 
 test_that(
+  "olink_bridgeselector - works - alternative argument names",
+  {
+    expect_message(
+      object = ref_data <- olink_bridgeselector(
+        df = npx_data1,
+        sampleMissingFreq = 0.1,
+        n = 8L,
+        check_log = check_npx(df = npx_data1) |>
+          suppressMessages() |>
+          suppressWarnings()
+      ),
+      regexp = paste("No sample type column detected in the input dataset",
+                     "`df`! Ensure that control samples have been filtered",
+                     "out!")
+    )
+
+    # alt data ----
+
+    expect_message(
+      object = alt_data <- olink_bridgeselector(
+        df = npx_data1,
+        sample_missing_freq = 0.1,
+        n = 8L,
+        check_log = check_npx(df = npx_data1) |>
+          suppressMessages() |>
+          suppressWarnings()
+      ),
+      regexp = paste("No sample type column detected in the input dataset",
+                     "`df`! Ensure that control samples have been filtered",
+                     "out!")
+    )
+
+    expect_identical(
+      object = ref_data |> dplyr::arrange(.data[["SampleID"]]),
+      expected = alt_data |> dplyr::arrange(.data[["SampleID"]])
+    )
+  }
+)
+
+test_that(
   "olink_bridgeselector - errors",
   {
     # `sampleMissingFreq` or `sample_missing_freq` must be provided ----
