@@ -62,7 +62,7 @@ ansi_collapse_quot <- function(x,
 #'
 #' @param df An Olink dataset.
 #' @param check_log Output log of check_npx(). Defaults to NULL.
-#' @param osi_score Name of OSI column to check
+#' @param osi_score Name of OSI column to check. Defaults to NULL.
 #'
 #' @keywords internal
 #'
@@ -70,13 +70,12 @@ ansi_collapse_quot <- function(x,
 #'
 check_osi <- function(df,
                       check_log = NULL,
-                      osi_score) {
+                      osi_score = NULL) {
 
-  if (missing(df) || missing(osi_score)) {
+  if (missing(df)) {
     cli::cli_abort(
       c(
-        "x" = "Missing required argument(s) {.arg osi_score} and/or {.arg df}!",
-        "i" = "Please provide both arguments to OSI checks."
+        "x" = "Missing required argument {.arg df}!"
       ),
       call = rlang::caller_env(),
       wrap = TRUE
@@ -84,9 +83,10 @@ check_osi <- function(df,
   } else {
     check_is_dataset(x = df,
                      error = TRUE)
-    check_is_scalar_character(x = osi_score,
-                              error = TRUE)
   }
+
+  check_is_scalar_character(x = osi_score,
+                            error = TRUE)
 
   osi_cat_cols <- c("OSICategory")
   osi_cont_cols <- c("OSITimeToCentrifugation",
