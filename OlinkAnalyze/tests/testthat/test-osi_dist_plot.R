@@ -7,13 +7,17 @@ test_that(
       suppressWarnings() |>
       suppressWarnings()
 
+    # osi_score = "OSICategory" error ----
+
     expect_error(
       object = olink_osi_dist_plot(
         df = osi_data,
         check_log = osi_check_log,
         osi_score = "OSICategory"
       ),
-      regexp = "`osi_score` must be one of OSISummary,"
+      regexp = paste("The argument `osi_score` should be one of the continuous",
+                     "OSI scores, not \"OSICategory\"."),
+      fixed = TRUE
     )
 
     # duplicate SampleID ----
