@@ -68,18 +68,27 @@ test_that(
   }
 )
 
-test_that("olink_osi_dist_plot - works", {
-  testthat::skip_if_not_installed(pkg = "vdiffr")
+test_that(
+  "olink_osi_dist_plot - works - snapshot",
+  {
+    skip_if_not_installed(pkg = "vdiffr")
 
-  data1 <- get_example_data("example_osi_data.rds")
-  check_log_1 <- check_npx(data1)
+    osi_data <- get_example_data("example_osi_data.rds") |>
+      dplyr::filter(
+        !is.na(.data[["OSISummary"]])
+      )
 
-  data1 <- data1 |>
-    dplyr::filter(!is.na(OSISummary))
+    osi_check_log <- check_npx(osi_data) |>
+      suppressWarnings() |>
+      suppressWarnings()
 
-  vdiffr::expect_doppelganger("OSISummary Plot",
-    olink_osi_dist_plot(df = data1,
-                        check_log = check_log_1,
-                        osi_score = "OSISummary")
-  )
-})
+    vdiffr::expect_doppelganger(
+      title = "OSISummary Plot",
+      fig = olink_osi_dist_plot(
+        df = osi_data,
+        check_log = osi_check_log,
+        osi_score = "OSISummary"
+      )
+    )
+  }
+)
