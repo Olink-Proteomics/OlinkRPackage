@@ -4,12 +4,12 @@
 \alias{check_osi}
 \title{Utility function to check OSI values for validity}
 \usage{
-check_osi(df, check_log, osi_score)
+check_osi(df, check_log = NULL, osi_score)
 }
 \arguments{
 \item{df}{An Olink dataset.}
 
-\item{check_log}{Output log of check_npx()}
+\item{check_log}{Output log of check_npx(). Defaults to NULL.}
 
 \item{osi_score}{Name of OSI column to check}
 }

@@ -61,7 +61,7 @@ ansi_collapse_quot <- function(x,
 #' Utility function to check OSI values for validity
 #'
 #' @param df An Olink dataset.
-#' @param check_log Output log of check_npx()
+#' @param check_log Output log of check_npx(). Defaults to NULL.
 #' @param osi_score Name of OSI column to check
 #'
 #' @keywords internal
@@ -69,7 +69,7 @@ ansi_collapse_quot <- function(x,
 #' @return An Olink dataset with the OSI column checked and cleaned
 #'
 check_osi <- function(df,
-                      check_log,
+                      check_log = NULL,
                       osi_score) {
 
   if (missing(check_log) || missing(df)) {
