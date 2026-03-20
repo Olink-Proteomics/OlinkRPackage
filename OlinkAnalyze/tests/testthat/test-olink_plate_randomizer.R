@@ -1,14 +1,14 @@
-# Test product_to_plate_size ----
+# Test product_to_platesize ----
 
 test_that(
   "product_to_platesize works",
   {
     expect_equal(
-      object = product_to_plate_size(product = "Target 96"),
+      object = product_to_platesize(product = "Target 96"),
       expected = 96L
     )
     expect_equal(
-      object = product_to_plate_size(product = "Target 48"),
+      object = product_to_platesize(product = "Target 48"),
       expected = 48L
     )
   }
@@ -79,7 +79,7 @@ test_that(
     expect_error(
       object = olink_display_plate_layout(
         data = manifest,
-        plate_size = 15
+        PlateSize = 15
       ),
       regexp = "Plate size needs to be either 48 or 96"
     )

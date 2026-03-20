@@ -1,5 +1,6 @@
 #' Bridge selection function
 #'
+#' @description
 #' The bridge selection function will select a number of bridge samples based
 #' on the input data. It selects samples with good detection that pass QC
 #' and cover a good range of the data. If possible, Olink recommends 8-16
@@ -8,62 +9,132 @@
 #' per sample. If there are not enough samples output, increase to 20\%. \cr\cr
 #' The function accepts NPX Excel files with data < LOD replaced.
 #'
+#' @details
 #' `olink_bridgeselector()` is a synonym of `olink_bridge_selector()` .
 #'
 #' @param df Tibble/data frame in long format such as produced by the
 #' Olink Analyze read_npx function.
 #' @param sample_missing_freq The threshold for sample wise missingness.
 #' @param n Number of bridge samples to be selected.
+#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
+#' [`check_npx()`] will be run internally using `df`.
 #'
 #' @return A "tibble" with sample IDs and mean NPX for a defined number of
 #' bridging samples. Columns include:
+#' \itemize{
+#'   \item{SampleID:} Sample ID
+#'   \item{PercAssaysBelowLOD:} Percent of Assays that are below LOD for
+#'   the sample
+#'   \item{MeanNPX:} Mean NPX for the sample
+#' }
 #'
 #' @aliases
 #' olink_bridgeselector
 #'
-#' \itemize{
-#'   \item{SampleID:} Sample ID
-#'   \item{perc_assays_below_lod:} Percent of Assays that are below LOD for
-#'   the sample
-#'   \item{MeanNPX:} Mean NPX for the sample
-#' }
 #' @export
 #'
 #' @examples
-#' \donttest{bridge_samples <- olink_bridge_selector(npx_data1,
-#' sample_missing_freq = 0.1, n = 20)}
-#' @importFrom dplyr n select distinct arrange group_by mutate ungroup
-#' left_join filter if_else
-#' @importFrom stringr str_detect
+#' \donttest{
+#'   check_log <- OlinkAnalyze::check_npx(df = npx_data1)
+#'
+#'   bridge_samples <- OlinkAnalyze::olink_bridge_selector(
+#'     df = npx_data1,
+#'     sample_missing_freq = 0.1,
+#'     n = 20L,
+#'     check_log = check_log
+#'   )
+#' }
+#'
+olink_bridge_selector <- function(df,
+                                  sample_missing_freq,
+                                  n,
+                                  check_log = NULL) {
+  # ---- STEP 0: Input checks --------------------------------------------------
 
-olink_bridge_selector <- function(df, sample_missing_freq, n) {
+  ## dataset ----
+  check_is_dataset(x = df, error = TRUE)
+
+  ## sample_missing_freq ----
+
+  # Validate that sample_missing_freq is a proportion in [0, 1]
+  if (missing(sample_missing_freq) || is.na(sample_missing_freq)) {
+    cli::cli_abort(
+      "{.arg sample_missing_freq} is a required, non 'NA', argument!"
+    )
+  }
+  check_is_scalar_numeric(x = sample_missing_freq, error = TRUE)
+  if (!dplyr::between(x = sample_missing_freq, left = 0, right = 1)) {
+    cli::cli_abort(
+      "Please provide a value for {.arg sample_missing_freq} between 0 and 1!"
+    )
+  }
+
+  ## n ----
+
+  if (missing(n) || is.na(n)) {
+    cli::cli_abort(
+      "{.arg n} is a required, non 'NA', argument!"
+    )
+  }
+  check_is_scalar_numeric(x = n, error = TRUE)
+  if ((n <= 0L) || (n %% 1L != 0L)) {
+    cli::cli_abort(
+      "Please provide a positive non-decimal value for {.arg n}!"
+    )
+  }
+
   # ---- STEP 1: Remove invalid OlinkIDs & control samples ---------------------
-  check_log <- OlinkAnalyze::check_npx(df = df)
-  df_clean <- OlinkAnalyze::clean_npx(
+
+  check_log <- run_check_npx(df = df, check_log = check_log)
+
+  df_clean <- clean_npx(
     df = df,
-    check_log = check_log
-  )
-  check_log_clean <- OlinkAnalyze::check_npx(df = df_clean)
-  df <- df_clean |>
-    dplyr::filter(!(.data[["OlinkID"]] %in% check_log_clean$assay_na)) |>
-    dplyr::filter(stringr::str_detect(.data[["OlinkID"]], "OID[0-9]{5}")) |>
-    dplyr::filter(!stringr::str_detect(.data[["SampleID"]], "CONTROL_SAMPLE*"))
-  # Exclude OlinkIDs with missing NPX
-  # Filtering on valid OlinkID
-  df <- df_clean |>
-    dplyr::filter(!(.data$OlinkID %in% check_log_clean$assay_na)) |>
-    dplyr::filter(stringr::str_detect(.data$OlinkID,
-                                      "OID[0-9]{5}")) |>
-    dplyr::filter(!stringr::str_detect(.data$SampleID, "CONTROL_SAMPLE*"))
+    check_log = check_log,
+    remove_qc_warning = FALSE,
+    remove_assay_warning = FALSE,
+    verbose = FALSE
+  ) |>
+    suppressMessages() |>
+    suppressWarnings()
+
+  check_log_clean <- check_npx(df = df_clean) |>
+    suppressMessages() |>
+    suppressWarnings()
+
+  if (!("sample_type" %in% names(check_log_clean$col_names))) {
+    cli::cli_inform(
+      "No sample type column detected in the input dataset {.arg df}! Ensure
+      that control samples have been filtered out!"
+    )
+  }
+
   # ---- STEP 2: Outlier metrics per (Panel, SampleID) -------------------------
-  qc_outliers <- df |>
-    dplyr::group_by(.data[["Panel"]], .data[["SampleID"]]) |>
+
+  qc_outliers <- df_clean |>
+    dplyr::group_by(
+      dplyr::across(
+        dplyr::all_of(
+          c(check_log_clean$col_names$panel,
+            check_log_clean$col_names$sample_id)
+        )
+      )
+    ) |>
     dplyr::summarise(
-      IQR = stats::IQR(.data[["NPX"]], na.rm = TRUE),
-      sample_median = stats::median(.data[["NPX"]], na.rm = TRUE),
+      IQR = stats::IQR(
+        x = .data[[check_log_clean$col_names$quant]],
+        na.rm = TRUE
+      ),
+      sample_median = stats::median(
+        x = .data[[check_log_clean$col_names$quant]],
+        na.rm = TRUE
+      ),
       .groups = "drop"
     ) |>
-    dplyr::group_by(.data[["Panel"]]) |>
+    dplyr::group_by(
+      dplyr::across(
+        dplyr::all_of(check_log_clean$col_names$panel)
+      )
+    ) |>
     dplyr::mutate(
       median_low  = mean(.data[["sample_median"]], na.rm = TRUE) - 3 *
         stats::sd(.data[["sample_median"]], na.rm = TRUE),
@@ -84,92 +155,193 @@ olink_bridge_selector <- function(df, sample_missing_freq, n) {
         0, 1
       )
     ) |>
-    dplyr::select(.data[["SampleID"]], .data[["Panel"]], .data[["Outlier"]])
+    dplyr::select(
+      dplyr::all_of(
+        c(check_log_clean$col_names$sample_id,
+          check_log_clean$col_names$panel,
+          "Outlier")
+      )
+    )
+
   # ---- STEP 3: Handle LOD variations ----------------------------------------
-  alt_plate_lods <- c("Plate LOD", "PlateLOD", "plateLOD", "Plate_LOD",
-                      "LODNPX")
-  alt_max_lods   <- c("Max LOD", "MaxLOD", "maxLOD", "Max_LOD")
 
-  if (!("LOD" %in% names(df))) {
-    if (any(alt_plate_lods %in% names(df))) {
-      df <- df |> dplyr::rename(LOD = dplyr::any_of(alt_plate_lods))
-      message("Using plate LOD as filter criteria...")
-    } else if (any(alt_max_lods %in% names(df))) {
-      df <- df |> dplyr::rename(LOD = dplyr::any_of(alt_max_lods))
-      message("Using max LOD as filter criteria...")
-    } else {
-      df <- df |> dplyr::mutate(LOD = -Inf)
-      message("LOD not available, hence not filtering by LOD.")
-    }
-  }
+  if (!("lod" %in% names(check_log_clean$col_names))) {
+    df_clean <- df_clean |>
+      dplyr::mutate(
+        LOD = -Inf
+      )
+    check_log_clean$col_names[["lod"]] <- "LOD"
 
-  if ("SampleQC" %in% names(df)) {
-    df <- df |> dplyr::mutate(QC_Warning = .data[["SampleQC"]])
+    cli::cli_inform(
+      "LOD not available, hence not filtering by LOD."
+    )
+  } else if (length(check_log_clean$col_names$lod) > 1L) {
+
+    check_log_clean$col_names$lod <- check_log_clean$col_names$lod |>
+      unique() |>
+      sort() |>
+      utils::head(n = 1L)
+
+    cli::cli_inform(
+      "Multiple LOD columns detected. Will be using
+      {.val {check_log_clean$col_names$lod}} as filter criteria."
+    )
   }
 
   # ---- STEP 4: Sample-level QC and filtering --------------------------------
 
-  df_1 <- df |>
-    dplyr::left_join(qc_outliers, by = c("SampleID", "Panel")) |>
-    dplyr::mutate(NPX = ifelse(.data[["NPX"]] <= .data[["LOD"]], NA,
-                               .data[["NPX"]])) |>
-    dplyr::group_by(.data[["SampleID"]]) |>
+  df_ready <- df_clean |>
+    dplyr::left_join(
+      qc_outliers,
+      by = c(check_log_clean$col_names$sample_id,
+             check_log_clean$col_names$panel),
+      relationship = "many-to-one"
+    ) |>
     dplyr::mutate(
-      QC_Warning = dplyr::if_else(all(toupper(.data[["QC_Warning"]]) == "PASS"),
-                                  "PASS", "WARNING"),
-      Outliers = sum(.data[["Outlier"]]),
-      PercAssaysBelowLOD = sum(is.na(.data[["NPX"]])) / dplyr::n(),
-      MeanNPX = mean(.data[["NPX"]], na.rm = TRUE)
+      quant_na = dplyr::if_else(
+        .data[[check_log_clean$col_names$quant]] <=
+          .data[[check_log_clean$col_names$lod]],
+        NA_real_,
+        .data[[check_log_clean$col_names$quant]]
+      )
+    ) |>
+    dplyr::group_by(
+      dplyr::across(
+        dplyr::all_of(check_log_clean$col_names$sample_id)
+      )
+    ) |>
+    dplyr::mutate(
+      qc_warn = dplyr::if_else(
+        all(toupper(.data[[check_log_clean$col_names$qc_warning]]) == "PASS"),
+        "PASS",
+        "WARNING"
+      ),
+      outliers = sum(.data[["Outlier"]], na.rm = TRUE),
+      PercAssaysBelowLOD  = sum(is.na(.data[["quant_na"]])) / dplyr::n(),
+      MeanNPX = mean(x = .data[["quant_na"]], na.rm = TRUE)
     ) |>
     dplyr::ungroup() |>
-    dplyr::filter(.data[["QC_Warning"]] == "PASS") |>
-    dplyr::filter(.data[["Outliers"]] == 0) |>
-    dplyr::filter(.data[["PercAssaysBelowLOD"]] < sample_missing_freq)
-
-  df_2 <- df_1 |>
-    dplyr::distinct(.data[["SampleID"]], .data[["PercAssaysBelowLOD"]],
-                    .data[["MeanNPX"]])
+    dplyr::filter(
+      .data[["qc_warn"]] == "PASS" &
+        .data[["outliers"]] == 0L &
+        .data[["PercAssaysBelowLOD"]] < .env[["sample_missing_freq"]]
+    ) |>
+    dplyr::distinct(
+      .data[[check_log_clean$col_names$sample_id]],
+      .data[["PercAssaysBelowLOD"]],
+      .data[["MeanNPX"]]
+    ) |>
+    dplyr::rename(
+      "SampleID" = !!check_log_clean$col_names$sample_id
+    )
 
   # ---- STEP 5: Select evenly spread bridge samples ---------------------------
 
-  if (nrow(df_2) < n) {
-    stop(
-      paste0(
-        "Only ", nrow(df_2), " samples eligible. Increase sample_missing_freq",
-        " and/or decrease n."
-      )
+  # if fewer available samples than required by user
+  if (nrow(df_ready) < n) {
+    cli::cli_abort(
+      c(
+        "x" = "Only {.val {nrow(df_ready)}} samples eligible. Increase
+        {.arg sample_missing_freq} and/or decrease {.arg n}."
+      ),
+      call = rlang::caller_env(),
+      wrap = TRUE
     )
   }
 
-  if (nrow(df_2) == n) {
-    return(df_2)
+  # if available exactly as many samples as required by user
+  if (nrow(df_ready) == n) {
+    return(df_ready)
   }
 
-  df_2 <- df_2 |>
-    dplyr::arrange(dplyr::desc(.data[["MeanNPX"]])) |>
-    dplyr::mutate(order = dplyr::row_number())
+  # if more available samples than required by user, select n samples that are
+  # evenly spread across the range of mean NPX values.
+  df_ready <- df_ready |>
+    dplyr::arrange(
+      dplyr::desc(
+        .data[["MeanNPX"]]
+      )
+    ) |>
+    dplyr::mutate(
+      order = dplyr::row_number()
+    )
 
-  bridge_samples <- floor(seq(1, nrow(df_2), length.out = n + 2)[c(-1,
-                                                                   -(n + 2))])
+  bridge_samples <- floor(
+    x = seq(
+      from = 1L,
+      to = nrow(df_ready),
+      length.out = n + 2L
+    )[c(-1L, -(n + 2L))]
+  )
 
-  selected_bridges <- df_2 |>
-    dplyr::filter(.data[["order"]] %in% bridge_samples) |>
-    dplyr::slice_sample(prop = 1) |>     # random order
-    dplyr::select(-order)
+  selected_bridges <- df_ready |>
+    dplyr::filter(
+      .data[["order"]] %in% .env[["bridge_samples"]]
+    ) |>
+    # random order
+    dplyr::slice_sample(
+      prop = 1
+    ) |>
+    dplyr::select(
+      -dplyr::all_of("order")
+    )
 
   return(selected_bridges)
 }
 
 #' @rdname olink_bridge_selector
+#' @param ... Additional arguments. Currently only accepts `sampleMissingFreq`
+#' for backward compatibility. Please use `sample_missing_freq` instead of
+#' `sampleMissingFreq` in the future.
 #' @export
-olink_bridgeselector <- function(df, ..., n) { # nolint: object_name_linter
+olink_bridgeselector <- function(df, # nolint: object_name_linter
+                                 ...,
+                                 n,
+                                 check_log = NULL) {
+
+  # Accept either spelling for sample_missing_freq for backward compatibility
   dots <- list(...)
-  # Accept either spelling
-  sampleMissingFreq <- dots$sampleMissingFreq %||% # nolint: object_name_linter 
-    dots$sample_missing_freq
-  if (is.null(sampleMissingFreq)) {
-    stop("Please supply either sampleMissingFreq or sample_missing_freq.")
+
+  # Validate names in `...` to avoid silently ignoring unexpected arguments
+  dot_names <- names(dots)
+  if (!is.null(dot_names)) {
+    allowed_dot_args <- c("sample_missing_freq", "sampleMissingFreq")
+    unexpected_args <- setdiff(
+      x = setdiff(x = dot_names,
+                  y = allowed_dot_args),
+      y = ""
+    )
+    if (length(unexpected_args) > 0L) {
+      cli::cli_warn(
+        "Unexpected argument name{?s} in `...` will be ignored:
+        {.val {unexpected_args}}!"
+      )
+    }
   }
-  return(olink_bridge_selector(df = df, sample_missing_freq = sampleMissingFreq,
-                              n = n))
+
+  if (is.null(dots$sample_missing_freq)) {
+    sampleMissingFreq <- dots$sampleMissingFreq # nolint: object_name_linter
+  } else {
+    sampleMissingFreq <- dots$sample_missing_freq # nolint: object_name_linter
+  }
+
+  if (is.null(sampleMissingFreq)) {
+    cli::cli_abort(
+      c(
+        "x" = "Please provide a value for either {.arg sampleMissingFreq} or
+        {.arg sample_missing_freq}."
+      ),
+      call = rlang::caller_env(),
+      wrap = TRUE
+    )
+  }
+
+  return(
+    olink_bridge_selector(
+      df = df,
+      sample_missing_freq = sampleMissingFreq,
+      n = n,
+      check_log = check_log
+    )
+  )
 }

@@ -3,30 +3,11 @@
 \name{olink_bridge_selector}
 \alias{olink_bridge_selector}
 \alias{olink_bridgeselector}
-\alias{\itemize{}
-\alias{\item{SampleID:}}
-\alias{Sample}
-\alias{ID}
-\alias{\item{perc_assays_below_lod:}}
-\alias{Percent}
-\alias{of}
-\alias{Assays}
-\alias{that}
-\alias{are}
-\alias{below}
-\alias{LOD}
-\alias{for}
-\alias{the}
-\alias{sample}
-\alias{\item{MeanNPX:}}
-\alias{Mean}
-\alias{NPX}
-\alias{}}
 \title{Bridge selection function}
 \usage{
-olink_bridge_selector(df, sample_missing_freq, n)
+olink_bridge_selector(df, sample_missing_freq, n, check_log = NULL)
 
-olink_bridgeselector(df, ..., n)
+olink_bridgeselector(df, ..., n, check_log = NULL)
 }
 \arguments{
 \item{df}{Tibble/data frame in long format such as produced by the
@@ -36,11 +17,22 @@ Olink Analyze read_npx function.}
 
 \item{n}{Number of bridge samples to be selected.}
 
-\item{...}{Additional arguments passed to methods.}
+\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+
+\item{...}{Additional arguments. Currently only accepts \code{sampleMissingFreq}
+for backward compatibility. Please use \code{sample_missing_freq} instead of
+\code{sampleMissingFreq} in the future.}
 }
 \value{
 A "tibble" with sample IDs and mean NPX for a defined number of
 bridging samples. Columns include:
+\itemize{
+\item{SampleID:} Sample ID
+\item{PercAssaysBelowLOD:} Percent of Assays that are below LOD for
+the sample
+\item{MeanNPX:} Mean NPX for the sample
+}
 }
 \description{
 The bridge selection function will select a number of bridge samples based
@@ -55,6 +47,15 @@ The function accepts NPX Excel files with data < LOD replaced.
 \code{olink_bridgeselector()} is a synonym of \code{olink_bridge_selector()} .
 }
 \examples{
-\donttest{bridge_samples <- olink_bridge_selector(npx_data1,
-sample_missing_freq = 0.1, n = 20)}
+\donttest{
+  check_log <- OlinkAnalyze::check_npx(df = npx_data1)
+
+  bridge_samples <- OlinkAnalyze::olink_bridge_selector(
+    df = npx_data1,
+    sample_missing_freq = 0.1,
+    n = 20L,
+    check_log = check_log
+  )
+}
+
 }
