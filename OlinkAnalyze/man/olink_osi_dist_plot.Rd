@@ -27,16 +27,25 @@ Olink external controls are excluded from this visualization.
 \examples{
 \donttest{
 # Creating fake OSI data from Site data
-df1 <-npx_data1 |>
-  dplyr::mutate(OSISummary = as.numeric(as.factor(Site))) |>
-  dplyr::mutate(OSISummary = OSISummary - min(OSISummary, na.rm = TRUE)) |>
-  dplyr::mutate(OSISummary = OSISummary/max(OSISummary, na.rm = TRUE))
+npx_df <- OlinkAnalyze::npx_data1 |>
+  dplyr::mutate(
+    OSISummary = as.numeric(as.factor(.data[["Site"]])),
+    OSISummary = .data[["OSISummary"]] - min(.data[["OSISummary"]],
+                                             na.rm = TRUE),
+    OSISummary = .data[["OSISummary"]] / max(.data[["OSISummary"]],
+                                             na.rm = TRUE)
+  )
 
-check_log <- check_npx(df1)
+check_log <- OlinkAnalyze::check_npx(
+  df = npx_df
+)
+
 # Generate figure
-olink_osi_dist_plot(df1,
-                    check_log = check_log,
-                    osi_score = "OSISummary")
+OlinkAnalyze::olink_osi_dist_plot(
+  df = npx_df,
+  check_log = check_log,
+  osi_score = "OSISummary"
+)
 }
 
 }
