@@ -64,7 +64,9 @@ ansi_collapse_quot <- function(x,
 #' @param check_log Output log of check_npx()
 #' @param osi_score Name of OSI column to check
 #'
-#' @returns An Olink dataset with the OSI column checked and cleaned
+#' @keywords internal
+#'
+#' @return An Olink dataset with the OSI column checked and cleaned
 #'
 check_osi <- function(df,
                       check_log,
