@@ -72,10 +72,21 @@ check_osi <- function(df,
                       check_log,
                       osi_score) {
 
-  check_is_dataset(x = df,
-                   error = TRUE)
-  check_is_scalar_character(x = osi_score,
-                            error = TRUE)
+  if (missing(check_log) || missing(df)) {
+    cli::cli_abort(
+      c(
+        "x" = "Missing required argument(s) {.arg check_log} and/or {.arg df}!",
+        "i" = "Please provide both arguments to OSI checks."
+      ),
+      call = rlang::caller_env(),
+      wrap = TRUE
+    )
+  } else {
+    check_is_dataset(x = df,
+                     error = TRUE)
+    check_is_scalar_character(x = osi_score,
+                              error = TRUE)
+  }
 
   osi_cat_cols <- c("OSICategory")
   osi_cont_cols <- c("OSITimeToCentrifugation",
