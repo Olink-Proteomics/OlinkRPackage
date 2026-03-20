@@ -28,6 +28,11 @@ Olink external controls are excluded from this visualization.
 \donttest{
 # Creating fake OSI data from Site data
 npx_df <- OlinkAnalyze::npx_data1 |>
+  dplyr::filter(
+    !grepl(pattern = "control",
+    x = .data[["SampleID"]],
+    ignore.case = TRUE)
+  ) |>
   dplyr::mutate(
     OSISummary = as.numeric(as.factor(.data[["Site"]])),
     OSISummary = .data[["OSISummary"]] - min(.data[["OSISummary"]],
