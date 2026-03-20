@@ -195,7 +195,7 @@ test_that(
 
     osi_check_log <- check_npx(osi_data) |>
       suppressWarnings() |>
-      suppressWarnings()
+      suppressMessages()
 
     # OSISUmmary ----
 
@@ -269,7 +269,7 @@ test_that(
 
     osi_check_log <- check_npx(osi_data) |>
       suppressWarnings() |>
-      suppressWarnings()
+      suppressMessages()
 
     # check inputs ----
 

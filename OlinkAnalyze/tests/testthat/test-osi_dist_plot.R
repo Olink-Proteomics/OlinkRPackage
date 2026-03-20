@@ -5,7 +5,7 @@ test_that(
 
     osi_check_log <- check_npx(osi_data) |>
       suppressWarnings() |>
-      suppressWarnings()
+      suppressMessages()
 
     # osi_score = "OSICategory" error ----
 
@@ -80,7 +80,7 @@ test_that(
 
     osi_check_log <- check_npx(osi_data) |>
       suppressWarnings() |>
-      suppressWarnings()
+      suppressMessages()
 
     vdiffr::expect_doppelganger(
       title = "OSISummary Plot",
