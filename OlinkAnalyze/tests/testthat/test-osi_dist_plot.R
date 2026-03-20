@@ -36,24 +36,34 @@ test_that(
 
     expect_warning(
       object = expect_error(
-        object = check_osi(
+        object = olink_osi_dist_plot(
           df = osi_data_dup,
           check_log = check_log_dup,
           osi_score = "OSIPreparationTemperature"
         ),
-        regexp = "Multiple OSI values detected for same Sample ID."
+        regexp = "Multiple OSI values detected for the same sample identifier"
       ),
-      regexp = paste0("NA values detected in column ",
-                      "\"OSIPreparationTemperature\"")
+      regexp = paste("NA values detected in column",
+                     "\"OSIPreparationTemperature\" of `df`. Filtering out NA",
+                     "values."),
+      fixed = TRUE
     )
 
-    data1$OSIPreparationTemperature <- NA
+    # NA values in OSI column ----
 
-    expect_warning(olink_osi_dist_plot(df = data1,
-                                       check_log = check_log_1,
-                                       osi_score = "OSITimeToCentrifugation"),
-                   regexp = paste0("NA values detected in column ",
-                                   "\"OSITimeToCentrifugation\""))
+    expect_warning(
+      object = olink_osi_dist_plot(
+        df = osi_data |>
+          dplyr::mutate(
+            OSIPreparationTemperature = NA
+          ),
+        check_log = osi_check_log,
+        osi_score = "OSITimeToCentrifugation"
+      ),
+      regexp = paste("NA values detected in column \"OSITimeToCentrifugation\"",
+                     "of `df`. Filtering out NA values."),
+      fixed = TRUE
+    )
 
   }
 )
