@@ -1,6 +1,9 @@
 test_that("osi_distibution plots works - errors", {
-  data1 <- get_example_data("example_osi_data.rds")
-  check_log_1 <- check_npx(data1)
+  osi_data <- get_example_data("example_osi_data.rds")
+
+  osi_check_log <- check_npx(osi_data) |>
+    suppressWarnings() |>
+    suppressWarnings()
 
   expect_error(olink_osi_dist_plot(df = data1,
                                    check_log = check_log_1,
