@@ -72,10 +72,10 @@ check_osi <- function(df,
                       check_log = NULL,
                       osi_score) {
 
-  if (missing(check_log) || missing(df)) {
+  if (missing(df) || missing(osi_score)) {
     cli::cli_abort(
       c(
-        "x" = "Missing required argument(s) {.arg check_log} and/or {.arg df}!",
+        "x" = "Missing required argument(s) {.arg osi_score} and/or {.arg df}!",
         "i" = "Please provide both arguments to OSI checks."
       ),
       call = rlang::caller_env(),
