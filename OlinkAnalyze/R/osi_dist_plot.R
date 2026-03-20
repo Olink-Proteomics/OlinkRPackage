@@ -45,18 +45,26 @@ olink_osi_dist_plot <- function(df,
                                 osi_score = NULL) {
   check_log <- run_check_npx(df, check_log = check_log)
 
-  # Check specific to osi_dist_plot, OSI value must be continuous
-  if (is.null(osi_score) || !(osi_score %in% c("OSITimeToCentrifugation",
-                                               "OSIPreparationTemperature",
-                                               "OSISummary"))) {
-
-    cli::cli_abort(paste0("`osi_score` must be one of",
-                          " OSISummary, OSITimeToCentrifugation, ",
-                          "or OSIPreparationTemperature."))
-  }
-
   # General OSI checks
-  df <- check_osi(df, check_log, osi_score)
+  df <- check_osi(
+    df = df,
+    check_log = check_log,
+    osi_score = osi_score
+  )
+
+  # Check specific to osi_dist_plot, OSI value must be continuous
+  if (osi_score == "OSICategory") {
+    cli::cli_abort(
+      c(
+        "x" = "The argument {.arg osi_score} should be one of the continuous OSI
+        scores, not {.val {osi_score}}.",
+        "i" = "Expected one of {.or {.val {c(\"OSISummary\",
+        \"OSITimeToCentrifugation\", \"OSIPreparationTemperature\")}}}."
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+  }
 
   # Filter for distinct sampleID and osi_score
   if (any(is.na(df[[osi_score]]))) {
