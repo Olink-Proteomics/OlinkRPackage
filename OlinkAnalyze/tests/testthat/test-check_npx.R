@@ -56,7 +56,10 @@ test_that(
         "expected_col_class" = character(0L)
       ),
       assay_qc = character(0L),
-      non_unique_uniprot = character(0L)
+      non_unique_uniprot = character(0L),
+      darid_invalid = dplyr::tibble(
+        "Panel_Lot_Nr" = character(0L)
+      )
     )
 
     expect_equal(
@@ -91,7 +94,8 @@ test_that(
       PlateID = rep("plate1", 4L),
       QC_Warning = rep("Pass", 4L),
       AssayQC = c(rep("Pass", 3L), "Warning"),
-      Normalization = LETTERS[1L:4L]
+      Normalization = LETTERS[1L:4L],
+      PanelDataArchiveVersion = rep("1.6.0", 4L)
     )
 
     expected_result <- list(
@@ -110,7 +114,8 @@ test_that(
                        count = "Count",
                        qc_warning = "QC_Warning",
                        assay_warn = "AssayQC",
-                       normalization = "Normalization"),
+                       normalization = "Normalization",
+                       qc_version = "PanelDataArchiveVersion"),
       oid_invalid = character(0L),
       assay_na = character(0L),
       sample_id_dups = character(0L),
@@ -122,7 +127,11 @@ test_that(
         "expected_col_class" = character(0L)
       ),
       assay_qc = c("OID12345"),
-      non_unique_uniprot = character(0L)
+      non_unique_uniprot = character(0L),
+      darid_invalid = dplyr::tibble(
+        "Panel_Lot_Nr" = character(0L),
+        "PanelDataArchiveVersion" = character(0L)
+      )
     )
 
     expect_equal(
@@ -177,7 +186,10 @@ test_that(
         "expected_col_class" = c("numeric")
       ),
       assay_qc = character(0L),
-      non_unique_uniprot = character(0L)
+      non_unique_uniprot = character(0L),
+      darid_invalid = dplyr::tibble(
+        "Panel_Lot_Nr" = character(0L)
+      )
     )
 
     expect_equal(
@@ -254,7 +266,10 @@ test_that(
         "expected_col_class" = character(0L)
       ),
       assay_qc = character(0L),
-      non_unique_uniprot = c("OID00002")
+      non_unique_uniprot = c("OID00002"),
+      darid_invalid = dplyr::tibble(
+        "PanelVersion" = character(0L)
+      )
 
     )
 
@@ -273,6 +288,83 @@ test_that(
       ),
       regexp = "Detected multiple UniProt identifiers for assay: \"OID00002\"."
     )
+  }
+)
+
+test_that(
+  "check_npx - warnings - outdated DARID and PanelDataArchiveVersion",
+  {
+    df <- dplyr::tibble(
+      SampleID = LETTERS[1L:4L],
+      SampleType = LETTERS[1L:4L],
+      AssayType = LETTERS[1L:4L],
+      OlinkID = c(paste0("OID1234", seq(1L:3L)), "OID12345"),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Block = as.character(1:4),
+      DataAnalysisRefID = paste0("D", Block, "0007"),
+      LOD = rnorm(4L),
+      NPX = rnorm(4L),
+      Count = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L),
+      AssayQC = rep("Pass", 4L),
+      Normalization = LETTERS[1L:4L],
+      PanelDataArchiveVersion = rep("1.2.1", 4L)
+    )
+
+    expected_result <- list(
+      col_names = list(sample_id = "SampleID",
+                       sample_type = "SampleType",
+                       assay_type = "AssayType",
+                       olink_id = "OlinkID",
+                       uniprot = "UniProt",
+                       assay = "Assay",
+                       panel = "Panel",
+                       block = "Block",
+                       plate_id = "PlateID",
+                       panel_version = "DataAnalysisRefID",
+                       lod = "LOD",
+                       quant = "NPX",
+                       count = "Count",
+                       qc_warning = "QC_Warning",
+                       assay_warn = "AssayQC",
+                       normalization = "Normalization",
+                       qc_version = "PanelDataArchiveVersion"),
+      oid_invalid = character(0L),
+      assay_na = character(0L),
+      sample_id_dups = character(0L),
+      sample_id_na = character(0L),
+      col_class = dplyr::tibble(
+        "col_name" = character(0L),
+        "col_class" = character(0L),
+        "col_key" = character(0L),
+        "expected_col_class" = character(0L)
+      ),
+      assay_qc = character(0L),
+      non_unique_uniprot = character(0L),
+      darid_invalid = dplyr::tibble(
+        DataAnalysisRefID = c("D10007", "D20007", "D30007", "D40007"),
+        PanelDataArchiveVersion = rep("1.2.1", 4L)
+      )
+    )
+
+    expect_equal(
+      object = names(expected_result) |> sort(),
+      expected = check_npx_lst_names |> sort()
+    )
+
+    expect_warning(
+      object = expect_equal(
+        object = check_npx(df = df,
+                           preferred_names = NULL),
+        expected = expected_result
+      ),
+      regexp = paste("DataAnalysisRefID: D10007, D20007, D30007, D40007;",
+                     "PanelDataArchiveVersion: 1.2.1.")
+    )
+
   }
 )
 
@@ -338,7 +430,8 @@ test_that(
       object = run_check_npx(df = npx_data1,
                              check_log = test_check_log),
       regexp = paste("Elements \"sample_id_na\", \"col_class\", \"assay_qc\",",
-                     "and \"non_unique_uniprot\" are missing from `check_log`!")
+                     "\"non_unique_uniprot\", and \"darid_invalid\" are",
+                     "missing from `check_log`!")
     )
   }
 )
@@ -1619,6 +1712,99 @@ test_that(
       ),
       regexp = paste("Detected multiple UniProt identifiers for assays:",
                      "\"OID00002\", \"OID00003\", and \"OID00004\".")
+    )
+  }
+)
+
+# Test check_darid ----
+
+test_that(
+  "does not warn when archive version is >= 1.5.0",
+  {
+    df <- dplyr::tibble(
+      SampleID = rep("Sample1", 3L),
+      OlinkID = c("OID00001", "OID00002", "OID00002"),
+      DataAnalysisRefID = c("D10007", "D20007", "D30007"),
+      PanelDataArchiveVersion = rep("1.6.0", 3L)
+    )
+
+    col_names <- list(
+      sample_id = "SampleID",
+      olink_id = "OlinkID",
+      panel_version = "DataAnalysisRefID",
+      qc_version = "PanelDataArchiveVersion"
+    )
+
+    expect_equal(
+      object = check_darid(df = df,
+                           col_names = col_names),
+      expected = dplyr::tibble(
+        "DataAnalysisRefID" = character(0L),
+        "PanelDataArchiveVersion" = character(0L)
+      )
+    )
+
+  }
+)
+
+test_that(
+  "does not warn when DARID is not D*07, D*08, D*10, or D*14",
+  {
+    df <- dplyr::tibble(
+      SampleID = rep("Sample1", 3L),
+      OlinkID = c("OID00001", "OID00002", "OID00002"),
+      DataAnalysisRefID = c("D10011", "D20011", "D30011"),
+      PanelDataArchiveVersion = rep("1.2.0", 3L)
+    )
+
+    col_names <- list(
+      sample_id    = "SampleID",
+      olink_id     = "OlinkID",
+      panel_version = "DataAnalysisRefID",
+      qc_version   = "PanelDataArchiveVersion"
+    )
+
+    expect_equal(
+      object = check_darid(df = df,
+                           col_names = col_names),
+      expected = dplyr::tibble(
+        "DataAnalysisRefID" = character(0L),
+        "PanelDataArchiveVersion" = character(0L)
+      )
+    )
+  }
+)
+
+test_that(
+  "warn when outdated DARID and Panel Data Archive Version used",
+  {
+    df <- dplyr::tibble(
+      SampleID = rep("Sample1", 3L),
+      OlinkID = c("OID00001", "OID00002", "OID00002"),
+      DataAnalysisRefID = c("D10007", "D20007", "D30007"),
+      PanelDataArchiveVersion = rep("1.2.0", 3L)
+    )
+
+    col_names <- list(
+      sample_id    = "SampleID",
+      olink_id     = "OlinkID",
+      panel_version = "DataAnalysisRefID",
+      qc_version   = "PanelDataArchiveVersion"
+    )
+
+    expected_result <- dplyr::tibble(
+      DataAnalysisRefID = c("D10007", "D20007", "D30007"),
+      PanelDataArchiveVersion = rep("1.2.0", 3L)
+    )
+
+    expect_warning(
+      object = expect_equal(
+        object = check_darid(df = df,
+                             col_names = col_names),
+        expected = expected_result
+      ),
+      regexp = paste("DataAnalysisRefID: D10007, D20007, D30007;",
+                     "PanelDataArchiveVersion: 1.2.0.")
     )
   }
 )

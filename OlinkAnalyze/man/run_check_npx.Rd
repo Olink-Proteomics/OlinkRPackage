@@ -32,6 +32,8 @@ column type \var{col_class} and expected column type
 with at least one assay warning.
 \item\strong{non_unique_uniprot} Character vector of \var{OlinkID} mapped
 to more than one \var{UniProt} ID.
+\item \strong{darid_invalid} Character vector containing outdated
+combinations of \var{DataAnalysisRefID} and \var{PanelDataArchiveVersion}.
 }
 }
 \description{

@@ -40,7 +40,7 @@ accepted_olink_platforms <- dplyr::tibble(
     "T48",
     "Flex",
     "T96",
-    "3k",
+    "E3072",
     "HT",
     "Focus",
     "Reveal"
