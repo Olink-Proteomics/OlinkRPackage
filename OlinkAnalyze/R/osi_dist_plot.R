@@ -86,7 +86,13 @@ olink_osi_dist_plot <- function(df,
 
   # Check for duplicate sampleIDS
   if (!length(check_log$sample_id_dups) == 0L) {
-    cli::cli_abort("Multiple OSI values detected for same Sample ID.")
+    cli::cli_abort(
+      c(
+        "x" = "Multiple OSI values detected for the same sample identifier."
+      ),
+      call = rlang::caller_env(),
+      wrap = TRUE
+    )
   }
 
   xlab <- dplyr::recode_values(
