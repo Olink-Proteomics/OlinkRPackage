@@ -95,7 +95,7 @@ check_osi <- function(df,
 
   # Check if columns are all NA
   if (all(is.na(df[[osi_score]]))) {
-    cli::cli_abort( # nolint: return_linter
+    cli::cli_abort(
       c(
         "x" = "All values are 'NA' in the column {.val {osi_score}} of the
         dataset {.arg df}!",
@@ -120,7 +120,7 @@ check_osi <- function(df,
     invalid_vals <- unique(v_chr[!is.na(v_chr) & !(v_chr %in% allowed)])
 
     if (length(invalid_vals) > 0L) {
-      cli::cli_abort( # nolint: return_linter
+      cli::cli_abort(
         c(
           "x" = "Invalid values detected in column {.val {osi_score}}
           of {.arg df}!",
@@ -151,11 +151,11 @@ check_osi <- function(df,
     # Check if numeric
     if (!all(is.numeric(df[[osi_score]]))) {
 
-      non_numeric_idx <- which( # nolint object_usage_linter
+      non_numeric_idx <- which( # nolint: object_usage_linter
         !is.na(df[[osi_score]]) & is.na(v_num)
       )
 
-      cli::cli_abort( # nolint: return_linter
+      cli::cli_abort(
         c(
           "x" = "Non-numeric values detected in column {.val {osi_score}}
           of {.arg df}!",
@@ -173,7 +173,7 @@ check_osi <- function(df,
     )
 
     if (length(out_of_range_idx) > 0L) {
-      cli::cli_abort( # nolint: return_linter
+      cli::cli_abort(
         c(
           "x" = "Out of range values detected in column {.val {osi_score}}
           of {.arg df}!",
