@@ -185,3 +185,81 @@ test_that(
     )
   }
 )
+
+# Test check_osi ----
+
+test_that(
+  "check_osi - errors",
+  {
+    osi_data <- get_example_data("example_osi_data.rds")
+
+    osi_check_log <- check_npx(osi_data) |>
+      suppressWarnings() |>
+      suppressWarnings()
+
+    # check inputs ----
+
+    expect_error(
+      object = check_osi(),
+      regexp = "Missing required argument `df`!",
+      fixed = TRUE
+    )
+
+    expect_error(
+      object = check_osi(osi_score = "OSISummary"),
+      regexp = "Missing required argument `df`!",
+      fixed = TRUE
+    )
+
+    # missing osi_score argument ----
+
+    expect_error(
+      object = check_osi(
+        df = osi_data,
+        check_log = osi_check_log
+      ),
+      regexp = "`osi_score` must be a scalar character!"
+    )
+
+    # invalid osi_score argument ----
+
+    expect_error(
+      object = check_osi(
+        df = osi_data,
+        check_log = osi_check_log,
+        osi_score = "not a real score"
+      ),
+      regexp = "Invalid value for `osi_score` = \"not a real score\"!"
+    )
+
+    # missing OSI column ----
+
+    expect_error(
+      object = check_osi(
+        df = osi_data |>
+          dplyr::select(
+            -dplyr::all_of("OSISummary")
+          ),
+        check_log = osi_check_log,
+        osi_score = "OSISummary"
+      ),
+      regexp = "\`df` is missing the required columns: \"OSISummary\"!"
+    )
+
+    # All values in OSI column are NA ----
+
+    expect_error(
+      object = check_osi(
+        df = osi_data |>
+          dplyr::mutate(
+            OSIPreparationTemperature = NA
+          ),
+        check_log = osi_check_log,
+        osi_score = "OSIPreparationTemperature"
+      ),
+      regexp = paste("All values are 'NA' in the column",
+                     "\"OSIPreparationTemperature\""),
+      fixed = TRUE
+    )
+  }
+)
