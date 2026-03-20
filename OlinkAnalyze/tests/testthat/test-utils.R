@@ -189,6 +189,80 @@ test_that(
 # Test check_osi ----
 
 test_that(
+  "check_osi - works",
+  {
+    osi_data <- get_example_data("example_osi_data.rds")
+
+    osi_check_log <- check_npx(osi_data) |>
+      suppressWarnings() |>
+      suppressWarnings()
+
+    # OSISUmmary ----
+
+    expect_no_condition(
+      object = osi_summary <- check_osi(
+        df = osi_data,
+        check_log = osi_check_log,
+        osi_score = "OSISummary"
+      )
+    )
+
+    expect_equal(
+      object = osi_summary,
+      expected = osi_data
+    )
+
+    # OSIPreparationTemperature ----
+
+    expect_no_condition(
+      object = osi_prep_temp <- check_osi(
+        df = osi_data,
+        check_log = osi_check_log,
+        osi_score = "OSIPreparationTemperature"
+      )
+    )
+
+    expect_equal(
+      object = osi_prep_temp,
+      expected = osi_data
+    )
+
+    # OSITimeToCentrifugation ----
+
+    expect_no_condition(
+      object = osi_time <- check_osi(
+        df = osi_data,
+        check_log = osi_check_log,
+        osi_score = "OSITimeToCentrifugation"
+      )
+    )
+
+    expect_equal(
+      object = osi_time,
+      expected = osi_data
+    )
+
+    # OSICategory ----
+
+    expect_no_condition(
+      object = osi_cat <- check_osi(
+        df = osi_data,
+        check_log = osi_check_log,
+        osi_score = "OSICategory"
+      )
+    )
+
+    expect_equal(
+      object = osi_cat |>
+        dplyr::mutate(
+          OSICategory = as.character(OSICategory) |> as.numeric()
+        ),
+      expected = osi_data
+    )
+  }
+)
+
+test_that(
   "check_osi - errors",
   {
     osi_data <- get_example_data("example_osi_data.rds")
@@ -260,6 +334,60 @@ test_that(
       regexp = paste("All values are 'NA' in the column",
                      "\"OSIPreparationTemperature\""),
       fixed = TRUE
+    )
+
+    # invalid value is OSICategory ----
+
+    expect_error(
+      object = check_osi(
+        df = osi_data |>
+          dplyr::mutate(
+            OSICategory = dplyr::if_else(
+              .data[["SampleID"]] == "A1",
+              -1,
+              .data[["OSICategory"]]
+            )
+          ),
+        check_log = osi_check_log,
+        osi_score = "OSICategory"
+      ),
+      regexp = "Invalid values detected in column \"OSICategory\" of `df`!"
+    )
+
+    # invalid value is OSISummary - character ----
+
+    expect_error(
+      object = check_osi(
+        df = osi_data |>
+          dplyr::mutate(
+            OSISummary = dplyr::if_else(
+              .data[["SampleID"]] == "A1",
+              "Invalid",
+              as.character(.data[["OSISummary"]])
+            )
+          ),
+        check_log = osi_check_log,
+        osi_score = "OSISummary"
+      ),
+      regexp = "Non-numeric values detected in column \"OSISummary\" of `df`!"
+    )
+
+    # invalid value is OSISummary - out of range ----
+
+    expect_error(
+      object = check_osi(
+        df = osi_data |>
+          dplyr::mutate(
+            OSISummary = dplyr::if_else(
+              .data[["SampleID"]] == "A1",
+              .data[["OSISummary"]] + 2L,
+              .data[["OSISummary"]]
+            )
+          ),
+        check_log = osi_check_log,
+        osi_score = "OSISummary"
+      ),
+      regexp = "Out of range values detected in column \"OSISummary\" of `df`!"
     )
   }
 )
