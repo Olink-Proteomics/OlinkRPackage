@@ -89,20 +89,29 @@ olink_osi_dist_plot <- function(df,
     cli::cli_abort("Multiple OSI values detected for same Sample ID.")
   }
 
-  xlab <- dplyr::recode_values(osi_score,
-                               "OSITimeToCentrifugation" ~
-                                 "Time to Centrifugation",
-                               "OSIPreparationTemperature" ~
-                                 "Preparation Temperature",
-                               "OSISummary" ~ "OSI Summary",
-                               default = NA_character_)
+  xlab <- dplyr::recode_values(
+    osi_score,
+    "OSITimeToCentrifugation" ~ "Time to Centrifugation",
+    "OSIPreparationTemperature" ~ "Preparation Temperature",
+    "OSISummary" ~ "OSI Summary",
+    default = NA_character_
+  )
 
-  p <- ggplot2::ggplot(df, ggplot2::aes(x = .data[[osi_score]])) +
-    ggplot2::geom_histogram(ggplot2::aes(y = ggplot2::after_stat(density)),
-                            bins = 30L,
-                            fill = "skyblue",
-                            color = "grey80",
-                            alpha = 0.5) +
+  p <- ggplot2::ggplot(
+    data = df,
+    mapping = ggplot2::aes(
+      x = .data[[osi_score]]
+    )
+  ) +
+    ggplot2::geom_histogram(
+      mapping = ggplot2::aes(
+        y = ggplot2::after_stat(density)
+      ),
+      bins = 30L,
+      fill = "skyblue",
+      color = "grey80",
+      alpha = 0.5
+    ) +
     ggplot2::geom_density(
       color = "grey40",
       linewidth = 1L
