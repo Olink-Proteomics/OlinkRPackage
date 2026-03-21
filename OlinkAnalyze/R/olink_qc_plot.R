@@ -111,6 +111,9 @@ olink_qc_plot <- function(df,
     }
   }
 
+  # check input
+  check_is_dataset(x = df, error = TRUE)
+
   # Check if check_log is correct
   check_log <- run_check_npx(df = df, check_log = check_log)
 
@@ -134,10 +137,9 @@ olink_qc_plot <- function(df,
   ) |>
     suppressMessages()
 
-  #Check that IQR_outlierDef and median_outlierDef are both numeric
-  if (!all(is.numeric(IQR_outlierDef), is.numeric(median_outlierDef))) {
-    stop("IQR_outlierDef and median_outlierDef have to be numeric values")
-  }
+  # check IQR_outlierDef and median_outlierDef
+  check_is_scalar_numeric(x = IQR_outlierDef, error = TRUE)
+  check_is_scalar_numeric(x = median_outlierDef, error = TRUE)
 
   if (plot_index == TRUE && !("Index" %in% names(df))) {
     warning("Index not available. Setting plot_index to FALSE.")
