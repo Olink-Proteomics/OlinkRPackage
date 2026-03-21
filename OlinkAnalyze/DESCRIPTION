@@ -91,6 +91,7 @@ Suggests:
     curl,
     emmeans,
     ggpubr,
+    ggrepel,
     lme4,
     lmerTest,
     msigdbr (> 24.1.0),
