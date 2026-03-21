@@ -133,83 +133,91 @@ test_that("OSI errors: using npx_data1 and OSI columns", {
 
 })
 
-# -------------------------------------------------------
+test_that(
+  "olink_qc_plot - works - strange datasets",
+  {
+    skip_if_not_installed(pkg = "ggrepel")
 
-#Load data with hidden/excluded assays (all NPX=NA)
-npx_data_format221010 <- get_example_data(filename = "npx_data_format221010.rds") #nolint line_length_linter
-npx_data_format221121 <- get_example_data(filename = "npx_data_format221121.rds") #nolint line_length_linter
-npx_data_extended_format221121 <- get_example_data(filename = "npx_data_extended_format221121.rds") #nolint line_length_linter
+    # Load data with hidden/excluded assays (all NPX=NA)
+    npx_data_format221010 <- get_example_data(
+      filename = "npx_data_format221010.rds"
+    )
+    npx_data_format221121 <- get_example_data(
+      filename = "npx_data_format221121.rds"
+    )
+    npx_data_extended_format221121 <- get_example_data(
+      filename = "npx_data_extended_format221121.rds"
+    )
 
-qc_plot <- npx_data1 |>
-  dplyr::mutate(SampleID = paste(SampleID, "_", Index, sep = "")) |>
-  olink_qc_plot(label_outliers = FALSE) |>
-  suppressMessages()
+    # data with all NPX=NA for some assays
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = olink_qc_plot(
+            df = npx_data_format221010,
+            check_log = check_npx(df = npx_data_format221010) |>
+              suppressMessages() |>
+              suppressWarnings()
+          )
+        )
+      )
+    )
 
-qc_plot2 <- npx_data1 |>
-  dplyr::mutate(SampleID = paste(SampleID, "_", Index, sep = "")) |>
-  olink_qc_plot(coloroption =  c("teal", "pink"), label_outliers = FALSE) |>
-  suppressMessages()
+    # data with all NPX=NA for some assays
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = olink_qc_plot(
+            df = npx_data_format221121,
+            check_log = check_npx(df = npx_data_format221121) |>
+              suppressMessages() |>
+              suppressWarnings()
+          )
+        )
+      )
+    )
 
-test_that("olink_qc_plot works", {
+    # data with all NPX=NA for some assays
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = olink_qc_plot(
+            df = npx_data_extended_format221121,
+            check_log = check_npx(df = npx_data_extended_format221121) |>
+              suppressMessages() |>
+              suppressWarnings()
+          )
+        )
+      )
+    )
+  }
+)
 
-  testthat::skip_if_not_installed(pkg = "ggrepel")
+test_that(
+  "olink_qc_plot - works - snapshots",
+  {
 
-  testthat::expect_message(
-    testthat::expect_message(
-      testthat::expect_warning(olink_qc_plot(npx_data_format221010),
-                               regex = paste0('"OID31309", and "OID31325" have', #nolint quotes_linter
-                                              ' "NPX" = NA for all samples.') #nolint quotes_linter
-      ),
-      regexp = "`check_log` not provided. Running `check_npx()`.",
-      fixed = TRUE
-    ),
-    regexp = paste0("8 assays exhibited assay QC warnings in column ",
-                    "`Assay_Warning` of the dataset"),
-    fixed = TRUE
-  ) # data with all NPX=NA for some assays
+    testthat::skip_if_not_installed(pkg = "ggrepel")
 
-  testthat::expect_message(
-    testthat::expect_message(
-      testthat::expect_warning(olink_qc_plot(npx_data_format221121),
-                               regex = paste0('"OID21069", and "OID21125" have', #nolint quotes_linter
-                                              ' "NPX" = NA for all samples.') #nolint quotes_linter
-      ),
-      regexp = "`check_log` not provided. Running `check_npx()`.",
-      fixed = TRUE
-    ),
-    regexp = paste0("326 assays exhibited assay QC warnings in column ",
-                    "`Assay_Warning` of the dataset"),
-    fixed = TRUE
-  ) # data with all NPX=NA for some assays
+    qc_plot <- npx_data1 |>
+      dplyr::mutate(SampleID = paste(SampleID, "_", Index, sep = "")) |>
+      olink_qc_plot(label_outliers = FALSE) |>
+      suppressMessages()
 
-  testthat::expect_message(
-    testthat::expect_message(
-      testthat::expect_warning(olink_qc_plot(npx_data_extended_format221121),
-                               regex = paste0('"OID21069", and "OID21125" have', #nolint quotes_linter
-                                              ' "NPX" = NA for all samples.') #nolint quotes_linter
-      ),
-      regexp = "`check_log` not provided. Running `check_npx()`.",
-      fixed = TRUE
-    ),
-    regexp = paste0("326 assays exhibited assay QC warnings in column ",
-                    "`Assay_Warning` of the dataset"),
-    fixed = TRUE
-  ) # data with all NPX=NA for some assays
+    qc_plot2 <- npx_data1 |>
+      dplyr::mutate(SampleID = paste(SampleID, "_", Index, sep = "")) |>
+      olink_qc_plot(coloroption =  c("teal", "pink"), label_outliers = FALSE) |>
+      suppressMessages()
 
-})
+    skip_on_cran()
+    skip_if_not_installed("vdiffr")
 
-test_that("olink_qc_plot works - vdiffr", {
+    qc_plot_name <- "QC plot"
+    check_snap_exist(test_dir_name = "olink_qc_plot", snap_name = qc_plot_name)
+    vdiffr::expect_doppelganger(qc_plot_name, qc_plot)
 
-  testthat::skip_if_not_installed(pkg = "ggrepel")
-
-  skip_on_cran()
-  skip_if_not_installed("vdiffr")
-
-  qc_plot_name <- "QC plot"
-  check_snap_exist(test_dir_name = "olink_qc_plot", snap_name = qc_plot_name)
-  vdiffr::expect_doppelganger(qc_plot_name, qc_plot)
-
-  qc_plot2_name <- "QC plot with coloroption"
-  check_snap_exist(test_dir_name = "olink_qc_plot", snap_name = qc_plot2_name)
-  vdiffr::expect_doppelganger(qc_plot2_name, qc_plot2)
-})
+    qc_plot2_name <- "QC plot with coloroption"
+    check_snap_exist(test_dir_name = "olink_qc_plot", snap_name = qc_plot2_name)
+    vdiffr::expect_doppelganger(qc_plot2_name, qc_plot2)
+  }
+)
