@@ -2,7 +2,7 @@
 % Please edit documentation in R/olink_qc_plot.R
 \name{olink_qc_plot}
 \alias{olink_qc_plot}
-\title{Function to plot an overview of a sample cohort per Panel}
+\title{Function to plot an overview of a sample cohort per Panel.}
 \usage{
 olink_qc_plot(
   df,
@@ -19,39 +19,38 @@ olink_qc_plot(
 )
 }
 \arguments{
-\item{df}{NPX data frame in long format.
-Must have columns SampleID, NPX and Panel}
+\item{df}{NPX data frame in long format. Must have columns SampleID, NPX and
+Panel.}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}.
-If \code{NULL}, \code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
 
 \item{color_g}{Character value indicating which column to use as fill color
-(default QC_Warning). Continuous color scale for Olink(R) Sample Index
-(OSI) columns OSITimeToCentrifugation, OSIPreparationTemperature and
-OSISummary is also supported.}
+(default QC_Warning). Continuous color scale for Olink(R) Sample Index (OSI)
+columns OSITimeToCentrifugation, OSIPreparationTemperature and OSISummary is
+also supported.}
 
-\item{plot_index}{Boolean. If FALSE (default), a point will be plotted
-for a sample. If TRUE,
-a sample's unique index number is displayed.}
+\item{plot_index}{Boolean. If FALSE (default), a point will be plotted for a
+sample. If TRUE, a sample's unique index number is displayed.}
 
 \item{label_outliers}{Boolean. If TRUE, an outlier sample will be labelled
 with its SampleID.}
 
 \item{IQR_outlierDef}{The number of standard deviations from the mean IQR
-that defines an outlier (default 3)}
+that defines an outlier. (default 3)}
 
 \item{median_outlierDef}{The number of standard deviations from the mean
 sample median that defines an outlier. (default 3)}
 
-\item{outlierLines}{Draw dashed lines at +/-IQR_outlierDef and
-+/-median_outlierDef standard deviations from the mean IQR and sample median
-respectively (default TRUE)}
+\item{outlierLines}{Draw dashed lines at \eqn{\pm}\var{IQR_outlierDef} and
+\eqn{\pm}\var{median_outlierDef} standard deviations from the mean IQR and
+sample median respectively. (default TRUE)}
 
-\item{facetNrow}{The number of rows that the panels are arranged on}
+\item{facetNrow}{The number of rows that the panels are arranged on.}
 
-\item{facetNcol}{The number of columns that the panels are arranged on}
+\item{facetNcol}{The number of columns that the panels are arranged on.}
 
-\item{...}{coloroption passed to specify color order}
+\item{...}{coloroption passed to specify color order.}
 }
 \value{
 An object of class "ggplot". Scatterplot shows IQR vs median for all
@@ -60,37 +59,46 @@ samples per panel
 \description{
 Generates a facet plot per Panel using ggplot2::ggplot and
 ggplot2::geom_point and stats::IQR plotting IQR vs. median for all samples.
-Horizontal dashed lines indicate +/-IQR_outlierDef standard deviations from
-the mean IQR (default 3).
-Vertical dashed lines indicate +/-median_outlierDef standard deviations from
-the mean sample median (default 3).
+Horizontal dashed lines indicate \eqn{\pm}\var{IQR_outlierDef} standard
+deviations from the mean IQR (default 3). Vertical dashed lines indicate
+\eqn{\pm}\var{median_outlierDef} standard deviations from the mean sample
+median (default 3).
 }
 \examples{
 \donttest{
-library(dplyr)
-
 if (rlang::is_installed(pkg = c("ggrepel"))) {
 
-olink_qc_plot(npx_data1,
-color_g = "QC_Warning",
-label_outliers = TRUE)
+  # standard plot
+  OlinkAnalyze::olink_qc_plot(
+    df = npx_data1,
+    color_g = "QC_Warning",
+    label_outliers = TRUE
+  )
 
-#Change the outlier threshold to +-4SD
-olink_qc_plot(npx_data1,
-color_g = "QC_Warning",
- IQR_outlierDef = 4,
- median_outlierDef = 4,
- label_outliers = TRUE)
+  # Change the outlier threshold to +/-4SD
+  OlinkAnalyze::olink_qc_plot(
+    df = npx_data1,
+    color_g = "QC_Warning",
+    IQR_outlierDef = 4L,
+    median_outlierDef = 4L,
+    label_outliers = TRUE
+  )
 
-#Identify the outliers
-qc <- olink_qc_plot(npx_data1,
-color_g = "QC_Warning",
-IQR_outlierDef = 4,
-median_outlierDef = 4,
-label_outliers = TRUE)
+  # Identify the outliers
+  qc <- OlinkAnalyze::olink_qc_plot(
+    df = npx_data1,
+    color_g = "QC_Warning",
+    IQR_outlierDef = 4L,
+    median_outlierDef = 4L,
+    label_outliers = TRUE
+  )
 
-outliers <- qc$data |> filter(Outlier == 1)
+  outliers <- qc$data |>
+    dplyr::filter(
+      .data[["Outlier"]] == 1L
+    )
 }
 }
+
 }
 \keyword{NPX}
