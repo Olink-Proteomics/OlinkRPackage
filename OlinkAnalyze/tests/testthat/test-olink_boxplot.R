@@ -105,7 +105,7 @@ test_that("olink_boxplot works - vdiffr", {
   # ---- 2 proteins ----
   boxplot_site_2prots_name <- "boxplot site 2prots"
   check_snap_exist(
-    test_dir_name = "Olink_boxplot",
+    test_dir_name = "olink_boxplot",
     snap_name = boxplot_site_2prots_name
   )
   vdiffr::expect_doppelganger(
@@ -115,7 +115,7 @@ test_that("olink_boxplot works - vdiffr", {
   # ---- 10 proteins ----
   boxplot_site_10prots_name <- "boxplot site 10prots"
   check_snap_exist(
-    test_dir_name = "Olink_boxplot",
+    test_dir_name = "olink_boxplot",
     snap_name = boxplot_site_10prots_name
   )
   vdiffr::expect_doppelganger(
@@ -125,7 +125,7 @@ test_that("olink_boxplot works - vdiffr", {
   # ---- Time ----
   boxplot_time_name <- "boxplot time"
   check_snap_exist(
-    test_dir_name = "Olink_boxplot",
+    test_dir_name = "olink_boxplot",
     snap_name = boxplot_time_name
   )
   vdiffr::expect_doppelganger(
@@ -135,7 +135,7 @@ test_that("olink_boxplot works - vdiffr", {
   # ---- Time w/ coloroption ----
   boxplot_time_coloroption_name <- "boxplot time with coloroption"
   check_snap_exist(
-    test_dir_name = "Olink_boxplot",
+    test_dir_name = "olink_boxplot",
     snap_name = boxplot_time_coloroption_name
   )
   vdiffr::expect_doppelganger(
@@ -145,7 +145,7 @@ test_that("olink_boxplot works - vdiffr", {
   # ---- Time + Site ----
   boxplot_time_site_name <- "boxplot time and site"
   check_snap_exist(
-    test_dir_name = "Olink_boxplot",
+    test_dir_name = "olink_boxplot",
     snap_name = boxplot_time_site_name
   )
   vdiffr::expect_doppelganger(
