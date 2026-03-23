@@ -92,8 +92,8 @@ npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
       )
     ) |>
     dplyr::mutate(
-      assay_var = var(x = .data[[check_log$col_names$quant]],
-                      na.rm = TRUE)
+      assay_var = stats::var(x = .data[[check_log$col_names$quant]],
+                             na.rm = TRUE)
     ) |>
     dplyr::ungroup() |>
     dplyr::filter(
