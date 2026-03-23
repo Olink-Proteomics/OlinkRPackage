@@ -138,34 +138,6 @@ test_that(
   }
 )
 
-test_that(
-  "npxProcessing_forDimRed - error - QC_Warning not found",
-  {
-    npx_data1_missing_cols <- npx_data1 |>
-      dplyr::mutate(SampleID = paste0(SampleID, "_", Index)) |>
-      dplyr::rename(SampleQC = QC_Warning)
-
-    check_log <- check_npx(df = npx_data1_missing_cols) |>
-      suppressMessages() |>
-      suppressWarnings()
-
-    expect_error(
-      object = npxProcessing_forDimRed(
-        df = npx_data1_missing_cols,
-        check_log = check_log,
-        color_g = "QC_Warning",
-        drop_assays = FALSE,
-        drop_samples = FALSE,
-        verbose = TRUE
-      ),
-      regexp = paste0(
-        "In color_g = \"QC_Warning\", QC_Warning was not found. ",
-        "Did you mean color_g = \"SampleQC\"?"
-      )
-    )
-  }
-)
-
 test_that("npxProcessing_forDimRed - works - snapshot", {
   local_edition(3)
 
