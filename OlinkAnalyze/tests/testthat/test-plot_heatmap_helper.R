@@ -147,19 +147,68 @@ test_that(
 test_that(
   "plot_heatmap_df_to_wide - works",
   {
+    npx_data_format_clean <- plot_heatmap_clean_df(
+      df = npx_data_format,
+      check_log = check_log_oct,
+      colnames = "assay"
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = npx_data_format_wide <- plot_heatmap_df_to_wide(
+            df = npx_data_format_clean,
+            check_log = check_log_oct,
+            colnames = "assay"
+          )
+        )
+      )
+    )
+
+    expect_identical(
+      object = colnames(npx_data_format_wide) |> sort(),
+      expected = npx_data_format_clean$assay |> unique() |> sort()
+    )
+
+    expect_identical(
+      object = rownames(npx_data_format_wide) |> sort(),
+      expected = npx_data_format_clean$SampleID |> unique() |> sort()
+    )
+
     expect_equal(
-      object = plot_heatmap_df_to_wide(
-        df = clean_heatmap_df(
-          df = npx_data_format,
-          check_log = check_log_oct,
-          colnames = "assay"
+      object = npx_data_format_wide |>
+        dplyr::select(
+          dplyr::all_of("HIF1A")
+        ) |>
+        tibble::rownames_to_column(
+          var = "SampleID"
+        ) |>
+        dplyr::arrange(
+          .data[["SampleID"]]
+        ) |>
+        tibble::column_to_rownames(
+          var = "SampleID"
+        ) |>
+        dplyr::pull(
+          .data[["HIF1A"]]
         ),
-        check_log = check_log_oct,
-        colnames = "assay") |>
-        ncol(),
-      expected = npx_data_format$Assay |>
-        unique() |>
-        length()
+      expected = npx_data_format_clean |>
+        dplyr::filter(
+          .data[["assay"]] == "HIF1A"
+        ) |>
+        dplyr::arrange(
+          .data[["SampleID"]]
+        ) |>
+        dplyr::pull(
+          .data[["NPX"]]
+        ),
+      tolerance = 1e-5
+    )
+
+    expect_true(
+      object = sapply(npx_data_format_wide, is.numeric) |> all()
     )
   }
 )
