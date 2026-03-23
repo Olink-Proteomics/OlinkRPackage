@@ -19,7 +19,7 @@
 #' @param plot_index Boolean. If FALSE (default), a point will be plotted for a
 #' sample. If TRUE, a sample's unique index number is displayed.
 #' @param label_outliers Boolean. If TRUE, an outlier sample will be labelled
-#' with its SampleID.
+#' with its SampleID. (default FALSE)
 #' @param IQR_outlierDef The number of standard deviations from the mean IQR
 #' that defines an outlier. (default 3)
 #' @param median_outlierDef The number of standard deviations from the mean

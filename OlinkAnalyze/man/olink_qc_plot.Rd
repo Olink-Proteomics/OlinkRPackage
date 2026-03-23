@@ -34,7 +34,7 @@ also supported.}
 sample. If TRUE, a sample's unique index number is displayed.}
 
 \item{label_outliers}{Boolean. If TRUE, an outlier sample will be labelled
-with its SampleID.}
+with its SampleID. (default FALSE)}
 
 \item{IQR_outlierDef}{The number of standard deviations from the mean IQR
 that defines an outlier. (default 3)}
