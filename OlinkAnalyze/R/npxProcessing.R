@@ -34,7 +34,7 @@ npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
         )
       ) |>
       dplyr::mutate(
-        QC_Warning = dplyr::if_else(
+        !!check_log$col_names$qc_warning := dplyr::if_else(
           any(grepl(pattern = "warn",
                     x = .data[[check_log$col_names$qc_warning]],
                     ignore.case = TRUE)),
