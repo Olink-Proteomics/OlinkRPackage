@@ -13,27 +13,35 @@ check_heatmap_inputs <- function(colnames, ...) {
     call = rlang::caller_env()
   )
 
-  if (!colnames %in% c("assay", "oid", "both")) {
-    cli::cli_abort("colnames has to be \"assay\", \"oid\", or \"both\"")
+  accepted_colnames <- c("assay", "oid", "both")
+  if (!(colnames %in% accepted_colnames)) {
+    cli::cli_abort( # nolint: return_linter
+      c(
+        "x" = "{.arg colnames} has to be {.or {.var {accepted_colnames}}}!"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
   }
 
+  accepted_add_vars <- c("mat",
+                         "silent",
+                         "scale",
+                         "annotation_row",
+                         "annotation_col")
   if (length(list(...)) > 0L) {
     ellipsis_variables <- names(list(...))
-    if (any(ellipsis_variables %in% c("mat",
-                                      "silent",
-                                      "scale",
-                                      "annotation_row",
-                                      "annotation_col"))) {
-      cli::cli_warn(paste("Argument",
-                          intersect(ellipsis_variables, c("mat",
-                                                          "silent",
-                                                          "scale",
-                                                          "annotation_row",
-                                                          "annotation_col")),
-                          "cannot be manually set in pheatmap - ignoring."))
+    if (any(ellipsis_variables %in% accepted_add_vars)) {
+      cli::cli_warn(
+        message = c(
+          "Argument {.var {intersect(ellipsis_variables, accepted_add_vars)}}
+          cannot be manually set in {.fn pheatmap}! Ignoring!"
+        ),
+        call = rlang::caller_env(),
+        wrap = FALSE
+      )
     }
   }
-
 
   return(NULL)
 }
