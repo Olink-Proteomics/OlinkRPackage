@@ -1,4 +1,4 @@
-testthat:test_that(
+test_that(
   "olink_heatmap_plot - works",
   {
     skip_if_not_installed("ggplotify")
@@ -51,7 +51,9 @@ testthat:test_that(
         df = npx_data,
         check_log = check_log,
         cutree_rows = 3
-      )
+      ) |>
+        suppressMessages() |>
+        suppressWarnings()
     )
   }
 )
