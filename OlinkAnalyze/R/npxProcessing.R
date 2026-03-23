@@ -1,15 +1,21 @@
 #### Internal functions ####
 
-npxProcessing_forDimRed <- function( # nolint object_name_linter
-  df,
-  check_log = NULL,
-  color_g = "QC_Warning",
-  drop_assays = FALSE,
-  drop_samples = FALSE,
-  verbose = FALSE
-) {
+npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
+                                    check_log = NULL,
+                                    color_g = "QC_Warning",
+                                    drop_assays = FALSE,
+                                    drop_samples = FALSE,
+                                    verbose = FALSE) {
   # Check if check_log is correct
   check_log <- run_check_npx(df = df, check_log = check_log)
+
+  # other checks
+  check_is_dataset(x = df, error = TRUE)
+  check_is_scalar_character(x = color_g, error = TRUE)
+  check_is_scalar_boolean(x = drop_assays, error = TRUE)
+  check_is_scalar_boolean(x = drop_samples, error = TRUE)
+  check_is_scalar_boolean(x = verbose, error = TRUE)
+
   # Make sure data is a tibble
   df <- convert_read_npx_output(df = df, out_df = "tibble")
 
@@ -19,110 +25,117 @@ npxProcessing_forDimRed <- function( # nolint object_name_linter
   Sys.setlocale("LC_COLLATE", "C")
 
   #### Set up plotting colors ####
-  # check whether QC_Warning warning column exists
-  if (
-    (color_g == "QC_Warning") &&
-      (!"QC_Warning" %in% names(df)) &&
-      ("SampleQC" %in% names(df))
-  ) {
-    cli::cli_abort("In color_g = \"QC_Warning\", QC_Warning was not found.
-                   Did you mean color_g = \"SampleQC\"?")
-  }
 
-  if (color_g == "QC_Warning") {
+  if (color_g == check_log$col_names$qc_warning) {
     df_temp <- df |>
-      dplyr::group_by(SampleID) |> # nolint object_usage_linter
+      dplyr::group_by(
+        dplyr::across(
+          dplyr::all_of(check_log$col_names$sample_id)
+        )
+      ) |>
       dplyr::mutate(
         QC_Warning = dplyr::if_else(
-          any(QC_Warning == "Warning" | QC_Warning == "WARN"), # nolint object_usage_linter
+          any(grepl(pattern = "warn",
+                    x = .data[[check_log$col_names$qc_warning]],
+                    ignore.case = TRUE)),
           "Warning",
           "Pass"
         )
       ) |>
       dplyr::ungroup()
-
-    plotColors <- df_temp |> # nolint object_name_linter
-      dplyr::group_by(SampleID) |> # nolint object_usage_linter
-      dplyr::summarise(
-        colors = unique(!!rlang::ensym(color_g)),
-        .groups = "drop"
-      )
-  } else if (color_g == "SampleQC") {
-    df_temp <- df |>
-      dplyr::group_by(SampleID) |> # nolint object_usage_linter
-      dplyr::mutate(
-        SampleQC = dplyr::if_else(
-          any(SampleQC == "Warning" | SampleQC == "WARN"), # nolint object_usage_linter
-          "Warning",
-          "Pass"
-        )
-      ) |>
-      dplyr::ungroup()
-
-    plotColors <- df_temp |> # nolint object_name_linter
-      dplyr::group_by(SampleID) |> # nolint object_usage_linter
-      dplyr::summarise(
-        colors = unique(!!rlang::ensym(color_g)),
-        .groups = "drop"
-      )
   } else {
-    number_of_sample_w_more_than_one_color <- df |> # nolint object_length_linter
-      dplyr::group_by(SampleID) |> # nolint object_usage_linter
+
+    check_columns(df = df, col_list = list(color_g))
+
+    n_sample_w_multiple_colors <- df |>
+      dplyr::group_by(
+        dplyr::across(
+          dplyr::all_of(check_log$col_names$sample_id)
+        )
+      ) |>
       dplyr::summarise(
-        n_colors = dplyr::n_distinct(!!rlang::ensym(color_g), na.rm = TRUE),
+        n_colors = dplyr::n_distinct(.data[[color_g]], na.rm = TRUE),
         .groups = "drop"
       ) |>
-      dplyr::filter(n_colors > 1) |> # nolint object_usage_linter
+      dplyr::filter(.data[["n_colors"]] > 1L) |>
       nrow()
 
-    if (number_of_sample_w_more_than_one_color > 0) {
+    if (n_sample_w_multiple_colors > 0L) {
       cli::cli_abort(
         "There are {number_of_sample_w_more_than_one_color} samples that do
         not have a unique color. Only one color per sample is allowed."
       )
     } else {
       df_temp <- df
-
-      plotColors <- df_temp |> # nolint object_name_linter
-        dplyr::group_by(SampleID) |> # nolint object_usage_linter
-        dplyr::summarise(
-          colors = unique(!!rlang::ensym(color_g)),
-          .groups = "drop"
-        )
     }
   }
+
+  plotColors <- df_temp |> # nolint: object_name_linter
+    dplyr::group_by(
+      dplyr::across(
+        dplyr::all_of(check_log$col_names$sample_id)
+      )
+    ) |>
+    dplyr::summarise(
+      colors = unique(.data[[color_g]]),
+      .groups = "drop"
+    )
+
   # df is no longer needed
   rm(df)
 
   #### Remove assays with 0 variance ####
   df_temp <- df_temp |>
-    dplyr::group_by(OlinkID) |> # nolint object_usage_linter
-    dplyr::mutate(assay_var = var(NPX, na.rm = TRUE)) |> # nolint object_usage_linter
+    dplyr::group_by(
+      dplyr::across(
+        dplyr::all_of(check_log$col_names$olink_id)
+      )
+    ) |>
+    dplyr::mutate(
+      assay_var = stats::var(x = .data[[check_log$col_names$quant]],
+                             na.rm = TRUE)
+    ) |>
     dplyr::ungroup() |>
-    dplyr::filter(!(assay_var == 0 | is.na(assay_var))) |> # nolint object_usage_linter
-    dplyr::select(-assay_var) |>
-    dplyr::arrange(SampleID) # nolint object_usage_linter
+    dplyr::filter(
+      !(.data[["assay_var"]] == 0 | is.na(.data[["assay_var"]]))
+    ) |>
+    dplyr::select(
+      -dplyr::all_of("assay_var")
+    ) |>
+    dplyr::arrange(
+      .data[[check_log$col_names$sample_id]]
+    )
 
   # wide format
   df_wide <- df_temp |>
-    dplyr::select(SampleID, OlinkID, NPX) |> # nolint object_usage_linter
-    dplyr::filter(!is.na(NPX)) |>
+    dplyr::select(
+      dplyr::all_of(
+        c(check_log$col_names$sample_id,
+          check_log$col_names$olink_id,
+          check_log$col_names$quant)
+      )
+    ) |>
+    dplyr::filter(
+      !is.na(.data[[check_log$col_names$quant]])
+    ) |>
     tidyr::pivot_wider(
-      names_from = OlinkID,
-      values_from = NPX,
+      names_from = dplyr::all_of(check_log$col_names$olink_id),
+      values_from = dplyr::all_of(check_log$col_names$quant),
       names_sort = TRUE
     )
 
   #### If drop_assays == T, drop assays with any missing values ####
   if (drop_assays) {
-    dropped_assays.na <- colnames(df_wide[, -c(1)])[apply( # nolint object_name_linter
+    dropped_assays.na <- colnames(df_wide[, -c(1)])[apply( # nolint: object_name_linter
       df_wide[, -c(1)],
       2,
       anyNA
     )]
 
     df_wide <- df_wide |>
-      dplyr::select(-tidyselect::all_of(dropped_assays.na))
+      dplyr::select(
+        -dplyr::all_of(dropped_assays.na)
+      )
 
     if (verbose) {
       cli::cli_warn(
@@ -138,7 +151,7 @@ npxProcessing_forDimRed <- function( # nolint object_name_linter
       )
     }
   } else {
-    dropped_assays.na <- NULL # nolint object_name_linter
+    dropped_assays.na <- NULL # nolint: object_name_linter
   }
 
   #### If drop_samples == T, drop samples with any missing values ####
@@ -166,11 +179,11 @@ npxProcessing_forDimRed <- function( # nolint object_name_linter
   percent_missingness <- colSums(is.na(df_wide[, -c(1)])) / nrow(df_wide)
 
   # assays with missingness > 10% are dropped from the PCA
-  PERCENT_CUTOFF <- 0.1 # nolint object_name_linter
+  PERCENT_CUTOFF <- 0.1 # nolint: object_name_linter
 
   # If there are fewer samples than one plate (88), the PERCENT_CUTOFF is 0.05
   if (nrow(df_wide) <= 88) {
-    PERCENT_CUTOFF <- 0.05 # nolint object_name_linter
+    PERCENT_CUTOFF <- 0.05 # nolint: object_name_linter
   }
 
   if (any(percent_missingness > PERCENT_CUTOFF)) {
@@ -178,7 +191,7 @@ npxProcessing_forDimRed <- function( # nolint object_name_linter
     percent_missingness <- percent_missingness[-removed_assays_index]
 
     removed_assays_index <- removed_assays_index + 1
-    dropped_assays.missingness <- colnames(df_wide)[removed_assays_index] # nolint object_name_linter
+    dropped_assays.missingness <- colnames(df_wide)[removed_assays_index] # nolint: object_name_linter
 
     df_wide <- df_wide[, -removed_assays_index]
 
@@ -189,7 +202,7 @@ npxProcessing_forDimRed <- function( # nolint object_name_linter
       )
     }
   } else {
-    dropped_assays.missingness <- NULL # nolint object_name_linter
+    dropped_assays.missingness <- NULL # nolint: object_name_linter
   }
 
   #### Impute remaining missing values by the assay median ####
@@ -204,10 +217,14 @@ npxProcessing_forDimRed <- function( # nolint object_name_linter
     imputed_assays <- colnames(df_wide)[imputed_assays_index]
 
     df_wide <- df_wide |>
-      dplyr::mutate(dplyr::across(
-        dplyr::all_of(imputed_assays),
-        ~ ifelse(is.na(.x), median(.x, na.rm = TRUE), .x)
-      ))
+      dplyr::mutate(
+        dplyr::across(
+          dplyr::all_of(imputed_assays),
+          ~ dplyr::if_else(is.na(.x),
+                           stats::median(x = .x, na.rm = TRUE),
+                           .x)
+        )
+      )
 
     if (verbose) {
       cli::cli_warn(
@@ -225,20 +242,36 @@ npxProcessing_forDimRed <- function( # nolint object_name_linter
 
   #### Format data and wrap up results ####
   df_wide <- df_wide |>
-    dplyr::left_join(plotColors, by = "SampleID") |>
-    dplyr::select(SampleID, colors, dplyr::everything()) # nolint object_usage_linter
+    dplyr::left_join(
+      plotColors,
+      by = "SampleID",
+      relationship = "one-to-one"
+    ) |>
+    dplyr::select(
+      dplyr::all_of(
+        c(check_log$col_names$sample_id,
+          "colors")
+      ),
+      dplyr::everything()
+    )
 
   df_wide_matrix <- df_wide |>
-    dplyr::select(-colors) |>
-    tibble::column_to_rownames("SampleID") |>
+    dplyr::select(
+      -dplyr::all_of("colors")
+    ) |>
+    tibble::column_to_rownames(
+      var = "SampleID"
+    ) |>
     as.matrix()
 
   Sys.setlocale("LC_COLLATE", old_collate)
 
-  return(list(
-    df_wide = df_wide,
-    df_wide_matrix = df_wide_matrix,
-    dropped_assays.na = dropped_assays.na,
-    dropped_assays.missingness = dropped_assays.missingness
-  ))
+  return(
+    list(
+      df_wide = df_wide,
+      df_wide_matrix = df_wide_matrix,
+      dropped_assays.na = dropped_assays.na,
+      dropped_assays.missingness = dropped_assays.missingness
+    )
+  )
 }
