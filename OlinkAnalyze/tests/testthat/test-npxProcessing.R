@@ -140,28 +140,39 @@ test_that(
   }
 )
 
-test_that("npxProcessing_forDimRed - works - snapshot", {
-  local_edition(3)
+test_that(
+  "npxProcessing_forDimRed - works - snapshot",
+  {
+    local_edition(3)
 
-  oids_to_use <- sort(unique(npx_data1$OlinkID))[1:10]
-  sids_to_use <- sort(unique(npx_data1$SampleID))[1:10]
+    oids_to_use <- sort(unique(npx_data1$OlinkID))[1:10L]
+    sids_to_use <- sort(unique(npx_data1$SampleID))[1:10L]
 
-  test_npx_df <- npx_data1 |>
-    dplyr::filter(SampleID %in% sids_to_use) |>
-    dplyr::filter(OlinkID %in% oids_to_use) |>
-    dplyr::mutate(SampleID = paste0(SampleID, "_", Index))
+    test_npx_df <- npx_data1 |>
+      dplyr::filter(
+        .data[["SampleID"]] %in% .env[["sids_to_use"]]
+      ) |>
+      dplyr::filter(
+        .data[["OlinkID"]] %in% .env[["oids_to_use"]]
+      ) |>
+      dplyr::mutate(
+        SampleID = paste0(.data[["SampleID"]], "_", .data[["Index"]])
+      )
 
-  check_log <- check_npx(test_npx_df)
+    check_log <- check_npx(test_npx_df) |>
+      suppressMessages() |>
+      suppressWarnings()
 
-  expect_snapshot_value(
-    npxProcessing_forDimRed(
-      df = test_npx_df,
-      check_log = check_log,
-      color_g = "QC_Warning",
-      drop_assays = FALSE,
-      drop_samples = FALSE,
-      verbose = TRUE
-    ),
-    style = "deparse"
-  )
-})
+    expect_snapshot_value(
+      npxProcessing_forDimRed(
+        df = test_npx_df,
+        check_log = check_log,
+        color_g = "QC_Warning",
+        drop_assays = FALSE,
+        drop_samples = FALSE,
+        verbose = TRUE
+      ),
+      style = "deparse"
+    )
+  }
+)
