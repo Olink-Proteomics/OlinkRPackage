@@ -6,7 +6,7 @@
 #'
 #' @return Null or error/warnings
 #' @keywords internal
-check_heatmap_inputs <- function(colnames, ...) {
+plot_heatmap_check_inputs <- function(colnames, ...) {
   #Checking if packages are installed
   rlang::check_installed(
     pkg = c("ggplotify", "pheatmap"),
