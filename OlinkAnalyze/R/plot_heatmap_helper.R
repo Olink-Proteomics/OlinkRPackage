@@ -187,8 +187,8 @@ plot_heatmap_pheatmap_args <- function(df_wide,
 
   #### Add color assignments ####
   if (!is.null(variable_row_list) ||
-      !is.null(variable_col_list) ||
-      any(names(pheatmap_args) %in% c("annot_col_int"))) {
+        !is.null(variable_col_list) ||
+        any(names(pheatmap_args) %in% c("annot_col_int"))) {
     pheatmap_args <- pheatmap_color_heatmap(
       df = df,
       check_log = check_log,
@@ -214,13 +214,13 @@ pheatmap_extract_ellipsis_arg <- function(pheatmap_args,
                                           ...) {
   ellipsis_variables <- names(list(...))
   annot_col_int <- NULL
-  additional_args <- list(...)[!(ellipsis_variables %in% c("mat",
-                                                           "silent",
-                                                           "scale",
-                                                           "annotation_row",
-                                                           "annotation_col",
-                                                           "annotation_colors")
-  )]
+  additional_args <- list(...)[!(ellipsis_variables %in%
+                                   c("mat",
+                                     "silent",
+                                     "scale",
+                                     "annotation_row",
+                                     "annotation_col",
+                                     "annotation_colors"))]
   if (any(ellipsis_variables == "annotation_colors")) {
     annot_col_int <- list(...)[["annotation_colors"]]
   }

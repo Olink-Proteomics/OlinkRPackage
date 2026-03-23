@@ -282,25 +282,25 @@ test_that(
         annotation_legend = TRUE,
         fontsize = 10,
         annotation_row = npx_data_format_clean |>
-            dplyr::select(
-              dplyr::all_of(
-                c("SampleID", "treatment2")
-              )
-            ) |>
-            dplyr::distinct() |>
-            tibble::column_to_rownames(
-              var = "SampleID"
-            ),
+          dplyr::select(
+            dplyr::all_of(
+              c("SampleID", "treatment2")
+            )
+          ) |>
+          dplyr::distinct() |>
+          tibble::column_to_rownames(
+            var = "SampleID"
+          ),
         annotation_col = npx_data_format_clean |>
-            dplyr::select(
-              dplyr::all_of(
-                c("assay", "Assay_Warning")
-              )
-            ) |>
-            dplyr::distinct() |>
-            tibble::column_to_rownames(
-              var = "assay"
-            ),
+          dplyr::select(
+            dplyr::all_of(
+              c("assay", "Assay_Warning")
+            )
+          ) |>
+          dplyr::distinct() |>
+          tibble::column_to_rownames(
+            var = "assay"
+          ),
         annot_col_int = list(
           Assay_Warning = olink_pal()(5L)[1L:2L],
           treatment2 = olink_pal()(5L)[3L:5L]
@@ -477,25 +477,25 @@ test_that(
         annotation_legend = TRUE,
         fontsize = 10,
         annotation_row = npx_data_format_clean |>
-            dplyr::select(
-              dplyr::all_of(
-                c("SampleID", "treatment2")
-              )
-            ) |>
-            dplyr::distinct() |>
-            tibble::column_to_rownames(
-              var = "SampleID"
-            ),
-        annotation_col = npx_data_format_clean |>
-            dplyr::select(
-              dplyr::all_of(
-                c("assay", "Assay_Warning")
-              )
-            ) |>
-            dplyr::distinct() |>
-            tibble::column_to_rownames(
-              var = "assay"
+          dplyr::select(
+            dplyr::all_of(
+              c("SampleID", "treatment2")
             )
+          ) |>
+          dplyr::distinct() |>
+          tibble::column_to_rownames(
+            var = "SampleID"
+          ),
+        annotation_col = npx_data_format_clean |>
+          dplyr::select(
+            dplyr::all_of(
+              c("assay", "Assay_Warning")
+            )
+          ) |>
+          dplyr::distinct() |>
+          tibble::column_to_rownames(
+            var = "assay"
+          )
       )
     )
   }
