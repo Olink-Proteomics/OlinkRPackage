@@ -98,11 +98,6 @@ olink_one_non_parametric <- function(df,
   withCallingHandlers(
     {
       # Filtering on valid OlinkID
-      # df <- df %>%
-      #   dplyr::filter(stringr::str_detect(
-      #     OlinkID,
-      #     "OID[0-9]{5}"
-      #   ))
       df <- suppressMessages(
         clean_invalid_oid(df = df, check_log = check_log)
       )
@@ -122,12 +117,6 @@ olink_one_non_parametric <- function(df,
       }
 
       df <- df[!is.na(df[[variable_testers]]), ]
-
-      # # Check data format
-      # npxCheck <- npxCheck(df)
-      # data_type <- npxCheck$data_type # Temporary fix to avoid issues with rlang::ensym downstream
-      # # Rename duplicate UniProts
-      # df <- uniprot_replace(df, npxCheck)
 
       # Temporary fix to avoid issues with rlang::ensym downstream
       data_type <- check_log$col_names$quant
@@ -159,7 +148,6 @@ olink_one_non_parametric <- function(df,
       for (effect in single_fixed_effects) {
         current_nas <- df |>
           dplyr::filter(!(OlinkID %in% check_log$assay_na)) |>
-          # dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
           dplyr::group_by(OlinkID, !!rlang::ensym(effect)) |>
           dplyr::summarise(
             n = dplyr::n(),
@@ -176,16 +164,6 @@ olink_one_non_parametric <- function(df,
             "The assay(s) {.val {current_nas}} have only NA values in at least
             one level of {.var {effect}} and will not be tested."
           )
-          # warning(
-          #   paste0(
-          #     "The assay(s) ",
-          #     current_nas,
-          #     " has only NA:s in atleast one level of ",
-          #     effect,
-          #     ". It will not be tested."
-          #   ),
-          #   call. = F
-          # )
         }
 
         number_of_samples_w_more_than_one_level <- df |>
@@ -198,13 +176,6 @@ olink_one_non_parametric <- function(df,
           nrow()
 
         if (number_of_samples_w_more_than_one_level > 0) {
-          # stop(paste0(
-          #   "There are ",
-          #   number_of_samples_w_more_than_one_level,
-          #   " samples that do not have a unique level for the effect ",
-          #   effect,
-          #   ". Only one level per sample is allowed."
-          # ))
           cli::cli_abort(
             "There are {number_of_samples_w_more_than_one_level} samples that
             do not have a unique level for the effect {.var {effect}}. Only one
@@ -222,30 +193,18 @@ olink_one_non_parametric <- function(df,
       # Print verbose message
       if (verbose) {
         if (!is.null(removed.sampleids) & length(removed.sampleids) > 0) {
-          # message(
-          #   "Samples removed due to missing variable ",
-          #   paste(removed.sampleids, collapse = ", ")
-          # )
           cli::cli_inform(
             "Samples removed due to missing variable:
             {.val {removed.sampleids}}"
           )
         }
         if (!is.null(converted.vars)) {
-          # message(paste0(
-          #   "Variables converted from character to factors: ",
-          #   paste(converted.vars, collapse = ", ")
-          # ))
           cli::cli_inform(
             "Variables converted from character to factors:
             {.val {converted.vars}}"
           )
         }
         if (!is.null(num.vars)) {
-          # message(paste0(
-          #   "Variables treated as numeric: ",
-          #   paste(num.vars, collapse = ", ")
-          # ))
           cli::cli_inform(
             "Variables treated as numeric: {.val {num.vars}}"
           )
@@ -254,11 +213,9 @@ olink_one_non_parametric <- function(df,
 
       if (dependence) {
         if (is.null(subject)) {
-          # stop("Subject variable need to be specified!")
           cli::cli_abort("The {.arg subject} variable must be specified.")
         }
         if (verbose) {
-          # message(paste("Friedman model fit to each assay: "), formula_string)
           cli::cli_inform(
             "Friedman model fit to each assay: {.code {formula_string}}"
           )
@@ -268,7 +225,6 @@ olink_one_non_parametric <- function(df,
 
         # add repeat measurement groups
         df_nas_remove <- df |>
-          # dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>%
           dplyr::filter(!(OlinkID %in% check_log$assay_na)) |>
           dplyr::filter(!(OlinkID %in% nas_in_var))
         # remove subject without complete data
@@ -301,7 +257,6 @@ olink_one_non_parametric <- function(df,
           unique()
         )
         ) {
-          # message(paste("Subjects removed due to incomplete data"))
           cli::cli_inform("Subjects removed due to incomplete data")
         }
 
@@ -332,13 +287,11 @@ olink_one_non_parametric <- function(df,
       } else {
         {
           if (verbose) {
-            # message(paste("Kruskal model fit to each assay: "), formula_string)
             cli::cli_inform(
               "Kruskal model fit to each assay: {.code {formula_string}}"
             )
           }
           p.val <- df |>
-            # dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) |>
             dplyr::filter(!(OlinkID %in% check_log$assay_na)) |>
             dplyr::filter(!(OlinkID %in% nas_in_var)) |>
             dplyr::group_by(Assay, OlinkID, UniProt, Panel) |>
