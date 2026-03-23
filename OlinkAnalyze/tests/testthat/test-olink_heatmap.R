@@ -1,5 +1,5 @@
 testthat:test_that(
-  "Heatmap works",
+  "olink_heatmap_plot - works",
   {
     skip_if_not_installed("ggplotify")
     skip_if_not_installed("pheatmap")
