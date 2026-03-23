@@ -47,7 +47,9 @@ testthat::test_that(
       "randomized_result3",                        "randomized_subjects_spots",
       "randomized_result4",                        "randomized_samples_spots",
       "procData",                                  "preprocessing_dim_red",
-      "procData_missingData",                      "preprocessing_dim_red_miss"
+      "procData_missingData",                      "preprocessing_dim_red_miss",
+      "bridge_samples_npx_data1",                  "bridge_samples_npx_data1",
+      "bridge_samples_npx_data2",                  "bridge_samples_npx_data2"
     )
 
     # read NPX ----
@@ -541,6 +543,44 @@ testthat::test_that(
     testthat::expect_equal(
       object = env_new_v$lst_new_v[[match_names$new_v[row_n]]],
       expected = env_legacy_v$ref_results[[match_names$legacy_v[row_n]]]$df_wide
+    )
+
+    # Bridge sample selection ----
+
+    ## Bridge sample selection npx_data1 ----
+
+    row_n <- 28L
+    expect_identical(
+      object = match_names |>
+        dplyr::slice(
+          .env[["row_n"]]
+        ) |>
+        dplyr::pull(
+          .data[["new_v"]]
+        ),
+      expected = "bridge_samples_npx_data1"
+    )
+    testthat::expect_equal(
+      object = env_new_v$lst_new_v[[match_names$new_v[row_n]]],
+      expected = env_legacy_v$ref_results[[match_names$legacy_v[row_n]]]
+    )
+
+    ## Bridge sample selection npx_data2 ----
+
+    row_n <- 29L
+    expect_identical(
+      object = match_names |>
+        dplyr::slice(
+          .env[["row_n"]]
+        ) |>
+        dplyr::pull(
+          .data[["new_v"]]
+        ),
+      expected = "bridge_samples_npx_data2"
+    )
+    testthat::expect_equal(
+      object = env_new_v$lst_new_v[[match_names$new_v[row_n]]],
+      expected = env_legacy_v$ref_results[[match_names$legacy_v[row_n]]]
     )
   }
 )

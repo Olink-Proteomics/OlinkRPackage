@@ -5,7 +5,7 @@ test_that(
   {
     skip_on_cran()
     skip_if_not_installed("vdiffr")
-    skip_if_not_installed(pkg = "lme4")
+    skip_if_not_installed(pkg = "lme4") |> suppressPackageStartupMessages()
     skip_if_not_installed(pkg = "lmerTest")
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")
@@ -59,7 +59,7 @@ test_that(
   {
     skip_on_cran()
     skip_if_not_installed("vdiffr")
-    skip_if_not_installed(pkg = "lme4")
+    skip_if_not_installed(pkg = "lme4") |> suppressPackageStartupMessages()
     skip_if_not_installed(pkg = "lmerTest")
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")
@@ -115,7 +115,7 @@ test_that(
   {
     skip_on_cran()
     skip_if_not_installed("vdiffr")
-    skip_if_not_installed(pkg = "lme4")
+    skip_if_not_installed(pkg = "lme4") |> suppressPackageStartupMessages()
     skip_if_not_installed(pkg = "lmerTest")
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")
@@ -159,7 +159,7 @@ test_that(
   "olink_lmer_plot - works - edge case, assays with missing values only",
   {
     skip_on_cran()
-    skip_if_not_installed(pkg = "lme4")
+    skip_if_not_installed(pkg = "lme4") |> suppressPackageStartupMessages()
     skip_if_not_installed(pkg = "lmerTest")
     skip_if_not_installed(pkg = "broom")
     skip_if_not_installed(pkg = "emmeans")

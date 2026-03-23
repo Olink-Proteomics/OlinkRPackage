@@ -834,6 +834,27 @@ rm(
   preproc_npx_data1_missing_data
 )
 
+# Bridge sample selection ----
+
+## npx_data1 ----
+
+bridge_samples_npx_data1 <- OlinkAnalyze::olink_bridgeselector(
+  df = OlinkAnalyze::npx_data1,
+  sampleMissingFreq = 0.1,
+  n = 8L
+)
+# Duplicate SampleID(s) detected:
+# CONTROL_SAMPLE_AS 1
+# CONTROL_SAMPLE_AS 2
+
+## npx_data2 ----
+
+bridge_samples_npx_data2 <- OlinkAnalyze::olink_bridgeselector(
+  df = OlinkAnalyze::npx_data2,
+  sampleMissingFreq = 0.2,
+  n = 16L
+)
+
 # Wrap up the results ----
 
 reference_results <- list(
@@ -880,7 +901,10 @@ reference_results <- list(
   randomized_samples_spots = randomized_samples_spots,
 
   preprocessing_dim_red = preprocessing_dim_red,
-  preprocessing_dim_red_miss = preprocessing_dim_red_miss
+  preprocessing_dim_red_miss = preprocessing_dim_red_miss,
+
+  bridge_samples_npx_data1 = bridge_samples_npx_data1,
+  bridge_samples_npx_data2 = bridge_samples_npx_data2
 )
 
 i_want_to_override <- FALSE

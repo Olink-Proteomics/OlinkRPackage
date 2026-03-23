@@ -3,6 +3,7 @@ utils::globalVariables(
   c(
     ".env",
     ".data",
-    ":="
+    ":=",
+    "density"
   )
 )
