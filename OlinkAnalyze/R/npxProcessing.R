@@ -33,50 +33,46 @@ npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
                    Did you mean color_g = \"SampleQC\"?")
   }
 
-  if (color_g == "QC_Warning") {
+  if (color_g == check_log$col_names$qc_warning) {
     df_temp <- df |>
-      dplyr::group_by(SampleID) |> # nolint object_usage_linter
+      dplyr::group_by(
+        dplyr::across(
+          dplyr::all_of(check_log$col_names$sample_id)
+        )
+      ) |>
       dplyr::mutate(
         QC_Warning = dplyr::if_else(
-          any(QC_Warning == "Warning" | QC_Warning == "WARN"), # nolint object_usage_linter
+          any(grepl(pattern = "warn",
+                    x = .data[[check_log$col_names$qc_warning]],
+                    ignore.case = TRUE)),
           "Warning",
           "Pass"
         )
       ) |>
       dplyr::ungroup()
 
-    plotColors <- df_temp |> # nolint object_name_linter
-      dplyr::group_by(SampleID) |> # nolint object_usage_linter
-      dplyr::summarise(
-        colors = unique(!!rlang::ensym(color_g)),
-        .groups = "drop"
-      )
-  } else if (color_g == "SampleQC") {
-    df_temp <- df |>
-      dplyr::group_by(SampleID) |> # nolint object_usage_linter
-      dplyr::mutate(
-        SampleQC = dplyr::if_else(
-          any(SampleQC == "Warning" | SampleQC == "WARN"), # nolint object_usage_linter
-          "Warning",
-          "Pass"
+    plotColors <- df_temp |> # nolint: object_name_linter
+      dplyr::group_by(
+        dplyr::across(
+          dplyr::all_of(check_log$col_names$sample_id)
         )
       ) |>
-      dplyr::ungroup()
-
-    plotColors <- df_temp |> # nolint object_name_linter
-      dplyr::group_by(SampleID) |> # nolint object_usage_linter
       dplyr::summarise(
-        colors = unique(!!rlang::ensym(color_g)),
+        colors = unique(.data[[color_g]]),
         .groups = "drop"
       )
   } else {
-    number_of_sample_w_more_than_one_color <- df |> # nolint object_length_linter
-      dplyr::group_by(SampleID) |> # nolint object_usage_linter
+    n_sample_w_multiple_colors <- df |>
+      dplyr::group_by(
+        dplyr::across(
+          dplyr::all_of(check_log$col_names$sample_id)
+        )
+      ) |>
       dplyr::summarise(
-        n_colors = dplyr::n_distinct(!!rlang::ensym(color_g), na.rm = TRUE),
+        n_colors = dplyr::n_distinct(.data[["color_g"]], na.rm = TRUE),
         .groups = "drop"
       ) |>
-      dplyr::filter(n_colors > 1) |> # nolint object_usage_linter
+      dplyr::filter(.data[["n_colors"]] > 1L) |>
       nrow()
 
     if (number_of_sample_w_more_than_one_color > 0) {
