@@ -136,7 +136,9 @@ plot_heatmap_df_to_wide <- function(df,
 #' @inheritParams olink_heatmap_plot
 #'
 #' @return list of arguments for pheatmap
+#'
 #' @keywords internal
+#'
 create_pheatmap_args <- function(df_wide,
                                  df,
                                  check_log,
@@ -457,7 +459,6 @@ set_plot_theme_pheatmap <- function(x,
   }
   return(x)
 }
-
 
 #' Function to edit grob
 #'
