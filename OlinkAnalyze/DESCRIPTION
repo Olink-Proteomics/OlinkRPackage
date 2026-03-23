@@ -78,7 +78,6 @@ Imports:
     duckdb,
     forcats,
     ggplot2,
-    ggrepel,
     grDevices,
     rlang,
     stringr,
