@@ -1,15 +1,21 @@
 #### Internal functions ####
 
-npxProcessing_forDimRed <- function( # nolint object_name_linter
-  df,
-  check_log = NULL,
-  color_g = "QC_Warning",
-  drop_assays = FALSE,
-  drop_samples = FALSE,
-  verbose = FALSE
-) {
+npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
+                                    check_log = NULL,
+                                    color_g = "QC_Warning",
+                                    drop_assays = FALSE,
+                                    drop_samples = FALSE,
+                                    verbose = FALSE) {
   # Check if check_log is correct
   check_log <- run_check_npx(df = df, check_log = check_log)
+
+  # other checks
+  check_is_dataset(df= df, error = TRUE)
+  check_is_scalar_character(x = color_g, error = TRUE)
+  check_is_scalar_boolean(x = drop_assays, error = TRUE)
+  check_is_scalar_boolean(x = drop_samples, error = TRUE)
+  check_is_scalar_boolean(x = verbose, error = TRUE)
+
   # Make sure data is a tibble
   df <- convert_read_npx_output(df = df, out_df = "tibble")
 
@@ -20,11 +26,9 @@ npxProcessing_forDimRed <- function( # nolint object_name_linter
 
   #### Set up plotting colors ####
   # check whether QC_Warning warning column exists
-  if (
-    (color_g == "QC_Warning") &&
-      (!"QC_Warning" %in% names(df)) &&
-      ("SampleQC" %in% names(df))
-  ) {
+  if (color_g == "QC_Warning" &&
+        !("QC_Warning" %in% names(df)) &&
+        "SampleQC" %in% names(df)) {
     cli::cli_abort("In color_g = \"QC_Warning\", QC_Warning was not found.
                    Did you mean color_g = \"SampleQC\"?")
   }
