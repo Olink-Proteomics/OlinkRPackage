@@ -86,12 +86,25 @@ npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
 
   #### Remove assays with 0 variance ####
   df_temp <- df_temp |>
-    dplyr::group_by(OlinkID) |> # nolint object_usage_linter
-    dplyr::mutate(assay_var = var(NPX, na.rm = TRUE)) |> # nolint object_usage_linter
+    dplyr::group_by(
+      dplyr::across(
+        dplyr::all_of(check_log$col_names$olink_id)
+      )
+    ) |>
+    dplyr::mutate(
+      assay_var = var(x = .data[[check_log$col_names$quant]],
+                      na.rm = TRUE)
+    ) |>
     dplyr::ungroup() |>
-    dplyr::filter(!(assay_var == 0 | is.na(assay_var))) |> # nolint object_usage_linter
-    dplyr::select(-assay_var) |>
-    dplyr::arrange(SampleID) # nolint object_usage_linter
+    dplyr::filter(
+      !(.data[["assay_var"]] == 0 | is.na(.data[["assay_var"]]))
+    ) |>
+    dplyr::select(
+      -dplyr::all_of("assay_var")
+    ) |>
+    dplyr::arrange(
+      .data[[check_log$col_names$sample_id]]
+    )
 
   # wide format
   df_wide <- df_temp |>
