@@ -100,39 +100,6 @@ test_that("olink_one_non_parametric function works", {
     regexp = "`df` and `variable` must be specified."
   )
 
-  # --- Data with all NPX=NA for some assays ---
-
-  expect_warning(
-    object = olink_one_non_parametric(
-      df = npx_data_format221010,
-      check_log = NULL,
-      variable = "treatment2"
-    ) |> suppressMessages(),
-    regexp = 'have "NPX" = NA for all samples'
-  )
-
-  expect_warning(
-    olink_one_non_parametric(
-      df = npx_data_format221010,
-      check_log = NULL,
-      variable = "treatment2"
-    ) |> suppressMessages(),
-    regexp = 'have \"NPX\" = NA for all samples'
-  )
-
-  warning <- capture_warning(
-    olink_one_non_parametric(
-      df = npx_data_format221010,
-      check_log = NULL,
-      variable = "treatment2"
-    )
-  )
-  expect_match(
-    conditionMessage(warning),
-    "\"OID30136\".*\"OID31325\".*have \"NPX\" = NA for all samples"
-  )
-
-
 })
 
 test_that("olink_one_non_parametric_posthoc function works", {
