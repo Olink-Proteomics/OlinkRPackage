@@ -1,12 +1,18 @@
 #' Function to plot the NPX distribution by panel
 #'
-#' Generates boxplots of NPX vs. SampleID colored by QC_Warning (default) or any other grouping variable
+#' Generates boxplots of NPX vs. SampleID colored by QC_Warning (default)
+#' or any other grouping variable
 #' and faceted by Panel using ggplot and ggplot2::geom_boxplot.
 #'
-#' @param df NPX data frame in long format. Must have columns SampleID, NPX and Panel
-#' @param color_g Character value indicating which column to use as fill color (default: QC_Warning)
+#' @param df NPX data frame in long format. Must have columns SampleID, NPX and
+#' Panel
+#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
+#' [`check_npx()`] will be run internally using `df`.
+#' @param color_g Character value indicating which column to use as fill color.
+#' (default: QC_Warning)
 #' @param ... Color option passed to specify color order.
-#' @return An object of class "ggplot" which displays NPX distribution for each sample per panel
+#' @return An object of class "ggplot" which displays NPX distribution
+#' for each sample per panel
 #' @keywords NPX
 #' @export
 #' @examples \donttest{olink_dist_plot(npx_data1, color_g = "QC_Warning")}
@@ -14,10 +20,13 @@
 #' @importFrom stats reorder
 #' @importFrom ggplot2 ggplot aes scale_x_discrete geom_boxplot xlab facet_wrap
 #' @importFrom stringr str_replace str_detect
-#' @importFrom magrittr %>%
+#' @importFrom magrittr |>
 #' @importFrom rlang ensym
 
-olink_dist_plot <- function(df, color_g = 'QC_Warning', ...) {
+olink_dist_plot <- function(df,
+                            check_log = NULL,
+                            color_g = 'QC_Warning',
+                            ...) {
 
   #checking ellipsis
   if(length(list(...)) > 0){
@@ -28,32 +37,48 @@ olink_dist_plot <- function(df, color_g = 'QC_Warning', ...) {
 
       if(!(ellipsis_variables == 'coloroption')){
 
-        stop(paste0('The ... option only takes the coloroption argument. ... currently contains the variable ',
+        stop(paste0("The ... option only takes the coloroption argument.",
+                    "... currently contains the variable ",
                     ellipsis_variables,
-                    '.'))
+                    "."))
 
       }
 
     }else{
 
-      stop(paste0('The ... option only takes one argument. ... currently contains the variables ',
-                  paste(ellipsis_variables, collapse = ', '),
-                  '.'))
+      stop(paste0("The ... option only takes one argument.",
+                  "... currently contains the variables ",
+                  paste(ellipsis_variables, collapse = ", "),
+                  "."))
     }
   }
 
+  # check input
+  check_is_dataset(x = df, error = TRUE)
 
+  # Check if check_log is correct
+  check_log <- run_check_npx(df = df, check_log = check_log)
 
-  #Filtering on valid OlinkID
-  df_OlinkID <- df %>%
-    dplyr::filter(stringr::str_detect(OlinkID,
-                               "OID[0-9]{5}"))
+  # Remove invalid OlinkID, assays with all NA values, and convert non-unique
+  # Uniprot IDs. Note that we do not remove samples with duplicate SampleID,
+  # control samples or assays, or samples/assays with QC warnings, as this
+  # would be the user's decision.
+  df <- clean_npx(
+    df,
+    check_log = check_log,
+    remove_assay_na = TRUE,
+    remove_invalid_oid = TRUE,
+    remove_dup_sample_id = FALSE,
+    remove_control_assay = FALSE,
+    remove_control_sample = FALSE,
+    remove_qc_warning = FALSE,
+    remove_assay_warning = FALSE,
+    convert_nonunique_uniprot = TRUE,
+    out_df = "tibble",
+    verbose = FALSE
+  ) |>
+    suppressMessages()
 
-  #Check data format
-  npxCheck <- npxCheck(df)
-
-  # Rename duplicate UniProts
-  df <- uniprot_replace(df, npxCheck)
 
   reorder_within <- function(x, by, within, fun = mean, sep = "___", ...) {
     new_x <- paste(x, within, sep = sep)
@@ -66,22 +91,26 @@ olink_dist_plot <- function(df, color_g = 'QC_Warning', ...) {
   }
 
   #If not all are Pass, the QC_Warning is set as warning for plotting purposes
-  df_OlinkID_fixed <- df_OlinkID %>%
-    dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) %>% #Exclude assays that have all NA:s
-    dplyr::mutate(Panel = Panel %>% stringr::str_replace("Olink ", ""))
-  if("QC_Warning" %in% names(df_OlinkID_fixed)){
-    df_OlinkID_fixed <- df_OlinkID_fixed %>%
-    dplyr::group_by(SampleID, Panel) %>%
-      dplyr::mutate(QC_Warning = dplyr::if_else(all(toupper(QC_Warning) == 'PASS'),
-                                                'Pass',
-                                                'Warning')) %>%
-      dplyr::ungroup()
+  df <- df |>
+    dplyr::mutate(Panel = Panel |> stringr::str_replace("Olink ", ""))
+
+  if("QC_Warning" %in% names(df)){
+
+    df <- df |>
+    dplyr::group_by(SampleID, Panel) |>
+    dplyr::mutate(QC_Warning = dplyr::if_else(
+      all(toupper(QC_Warning) == 'PASS'),
+      'Pass',
+      'Warning')) |>
+    dplyr::ungroup()
 
   }
 
-  df_OlinkID_fixed %>%
-    dplyr::filter(!(is.na(NPX))) %>%
-    ggplot2::ggplot(., ggplot2::aes(x = reorder_within(factor(SampleID), NPX, Panel, median), y = NPX, fill=!!rlang::ensym(color_g)))+
+  df |>
+    ggplot2::ggplot(ggplot2::aes(
+      x = reorder_within(factor(SampleID), NPX, Panel, median),
+      y = NPX,
+      fill=!!rlang::ensym(color_g)))+
     ggplot2::geom_boxplot()+
     scale_x_reordered()+
     ggplot2::xlab("Samples")+
