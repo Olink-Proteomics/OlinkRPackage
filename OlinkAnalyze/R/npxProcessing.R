@@ -44,6 +44,9 @@ npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
       ) |>
       dplyr::ungroup()
   } else {
+
+    check_columns(df = df, col_list = list(color_g))
+
     n_sample_w_multiple_colors <- df |>
       dplyr::group_by(
         dplyr::across(
@@ -51,7 +54,7 @@ npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
         )
       ) |>
       dplyr::summarise(
-        n_colors = dplyr::n_distinct(.data[["color_g"]], na.rm = TRUE),
+        n_colors = dplyr::n_distinct(.data[[color_g]], na.rm = TRUE),
         .groups = "drop"
       ) |>
       dplyr::filter(.data[["n_colors"]] > 1L) |>
