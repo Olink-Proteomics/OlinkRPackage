@@ -3,6 +3,7 @@ test_that(
   {
     skip_if_not_installed("ggplotify")
     skip_if_not_installed("pheatmap")
+    skip_if_not_installed("vdiffr")
 
     # Load data with hidden/excluded assays (all NPX=NA)
     npx_data_format_oct <- get_example_data("npx_data_format-Oct-2022.rds")
@@ -34,6 +35,21 @@ test_that(
       )
     check_log <- check_npx(df = npx_data) |>
       suppressMessages() |>
+      suppressWarnings()
+
+    heatmap_plot_name <- "heatmap"
+    check_snap_exist(test_dir_name = "plot_heatmap",
+                     snap_name = heatmap_plot_name)
+    vdiffr::expect_doppelganger(
+      title = heatmap_plot_name,
+      fig = olink_heatmap_plot(
+        df = npx_data,
+        check_log = check_log
+      ) |>
+        suppressMessages() |>
+        suppressWarnings(),
+      cran = FALSE
+    ) |>
       suppressWarnings()
 
     expect_no_error(
