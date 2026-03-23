@@ -108,11 +108,19 @@ npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
 
   # wide format
   df_wide <- df_temp |>
-    dplyr::select(SampleID, OlinkID, NPX) |> # nolint object_usage_linter
-    dplyr::filter(!is.na(NPX)) |>
+    dplyr::select(
+      dplyr::all_of(
+        c(check_log$col_names$sample_id,
+          check_log$col_names$olink_id,
+          check_log$col_names$quant)
+      )
+    ) |>
+    dplyr::filter(
+      !is.na(.data[[check_log$col_names$quant]])
+    ) |>
     tidyr::pivot_wider(
-      names_from = OlinkID,
-      values_from = NPX,
+      names_from = dplyr::all_of(check_log$col_names$olink_id),
+      values_from = dplyr::all_of(check_log$col_names$quant),
       names_sort = TRUE
     )
 
