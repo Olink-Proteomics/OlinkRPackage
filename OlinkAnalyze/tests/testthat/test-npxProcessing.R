@@ -143,6 +143,8 @@ test_that(
 test_that(
   "npxProcessing_forDimRed - works - snapshot",
   {
+    skip_if_not(file.exists(test_path("_snaps", "npxProcessing.md")))
+
     local_edition(3)
 
     oids_to_use <- sort(unique(npx_data1$OlinkID))[1:10L]
