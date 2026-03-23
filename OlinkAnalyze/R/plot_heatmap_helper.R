@@ -5,7 +5,9 @@
 #' @param ... Additional arguments used in \code{pheatmap::pheatmap}
 #'
 #' @return Null or error/warnings
+#'
 #' @keywords internal
+#'
 plot_heatmap_check_inputs <- function(colnames, ...) {
   #Checking if packages are installed
   rlang::check_installed(
@@ -13,11 +15,12 @@ plot_heatmap_check_inputs <- function(colnames, ...) {
     call = rlang::caller_env()
   )
 
+  check_is_scalar_character(x = colnames, error = TRUE)
   accepted_colnames <- c("assay", "oid", "both")
   if (!(colnames %in% accepted_colnames)) {
     cli::cli_abort( # nolint: return_linter
       c(
-        "x" = "{.arg colnames} has to be {.or {.var {accepted_colnames}}}!"
+        "x" = "{.arg colnames} has to be {.or {.val {accepted_colnames}}}!"
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -34,8 +37,9 @@ plot_heatmap_check_inputs <- function(colnames, ...) {
     if (any(ellipsis_variables %in% accepted_add_vars)) {
       cli::cli_warn(
         message = c(
-          "Argument {.var {intersect(ellipsis_variables, accepted_add_vars)}}
-          cannot be manually set in {.fn pheatmap}! Ignoring!"
+          "Argument{?s}
+          {.val {intersect(ellipsis_variables, accepted_add_vars)}} cannot be
+          manually set in {.fn pheatmap}! Ignoring!"
         ),
         call = rlang::caller_env(),
         wrap = FALSE
@@ -55,8 +59,10 @@ plot_heatmap_check_inputs <- function(colnames, ...) {
 #' Must be 'assay', 'oid', or 'both' (default 'both').
 #'
 #' @return df w/o low var assays with added colnames
+#'
 #' @keywords internal
-clean_heatmap_df <- function(df, check_log, colnames) {
+#'
+plot_heatmap_clean_df <- function(df, check_log, colnames) {
   df <- clean_npx(df = df,
                   check_log = check_log,
                   remove_assay_na = TRUE,
@@ -72,35 +78,55 @@ clean_heatmap_df <- function(df, check_log, colnames) {
                   verbose = FALSE)
   #Remove assays with no variance
   df <- df |>
-    dplyr::group_by(.data[[check_log$col_names$olink_id]]) |>
-    dplyr::mutate(assay_var = stats::var(.data[[check_log$col_names$quant]],
-                                         na.rm = TRUE)) |>
+    dplyr::group_by(
+      dplyr::across(
+        dplyr::all_of(check_log$col_names$olink_id)
+      )
+    ) |>
+    dplyr::mutate(
+      assay_var = stats::var(x = .data[[check_log$col_names$quant]],
+                             na.rm = TRUE)
+    ) |>
     dplyr::ungroup() |>
-    dplyr::filter(!(.data[["assay_var"]] == 0 | is.na(.data[["assay_var"]]))) |>
-    dplyr::select(-dplyr::all_of("assay_var"))
+    dplyr::filter(
+      !(.data[["assay_var"]] == 0 | is.na(.data[["assay_var"]]))
+    ) |>
+    dplyr::select(
+      -dplyr::all_of("assay_var")
+    )
 
   df <- df |>
-    dplyr::mutate(both = paste0(.data[[check_log$col_names$assay]],
-                                "_",
-                                .data[[check_log$col_names$olink_id]])) |>
-    dplyr::rename("oid" = check_log$col_names$olink_id,
-                  "assay" = check_log$col_names$assay)
+    dplyr::mutate(
+      both = paste(.data[[check_log$col_names$assay]],
+                   .data[[check_log$col_names$olink_id]],
+                   sep = "_")
+    ) |>
+    dplyr::rename(
+      "oid" = check_log$col_names$olink_id,
+      "assay" = check_log$col_names$assay
+    )
   return(df)
 }
 
-#' Title
+#' Convert long df to wide
+#'
 #' @inheritParams olink_heatmap_plot
+#'
 #' @keywords internal
-
-df_to_wide <- function(df,
-                       check_log,
-                       colnames) {
+#'
+plot_heatmap_df_to_wide <- function(df,
+                                    check_log,
+                                    colnames) {
   df_wide <- df |>
-    tidyr::pivot_wider(id_cols = dplyr::all_of(check_log$col_names$sample_id),
-                       names_from = dplyr::all_of(colnames),
-                       values_from =
-                         dplyr::all_of(check_log$col_names$quant)) |>
-    tibble::column_to_rownames(check_log$col_names$sample_id)
+    tidyr::pivot_wider(
+      id_cols = dplyr::all_of(check_log$col_names$sample_id),
+      names_from = dplyr::all_of(colnames),
+      values_from =
+        dplyr::all_of(check_log$col_names$quant)
+    ) |>
+    tibble::column_to_rownames(
+      check_log$col_names$sample_id
+    )
   return(df_wide)
 }
 

@@ -1,10 +1,14 @@
 skip_if_not_installed("ggplotify")
-npx_data_format_oct <- get_example_data(filename =
-                                          "npx_data_format-Oct-2022.rds")
-check_log_oct <- check_npx(npx_data_format_oct) |> suppressWarnings()
-npx_data_format <- clean_npx(npx_data_format_oct,
-                             check_log_oct,
-                             verbose = FALSE)
+
+npx_data_format_oct <- get_example_data("npx_data_format-Oct-2022.rds")
+check_log_oct <- check_npx(df = npx_data_format_oct) |>
+  suppressWarnings() |>
+  suppressMessages()
+npx_data_format <- clean_npx(df = npx_data_format_oct,
+                             check_log = check_log_oct,
+                             verbose = FALSE) |>
+  suppressWarnings() |>
+  suppressMessages()
 
 df <- clean_heatmap_df(df = npx_data_format,
                        check_log = check_log_oct,
@@ -13,46 +17,152 @@ df_wide <- df_to_wide(df = df,
                       check_log = check_log_oct,
                       colnames = "assay")
 
-test_that("check_heatmap_inputs - works", {
-  expect_error(check_heatmap_inputs(colnames = "wrong_answer"),
-               "colnames has to be")
-  expect_warning(check_heatmap_inputs(colnames = "both",
-                                      mat = "1234"),
-                 "Argument mat cannot be manually set")
+# Test plot_heatmap_check_inputs ----
 
-  expect_null(check_heatmap_inputs(colnames = "both"))
-})
+test_that(
+  "plot_heatmap_check_inputs - works",
+  {
+    expect_error(
+      object = plot_heatmap_check_inputs(
+        colnames = "wrong_answer"
+      ),
+      regexp = "`colnames` has to be \"assay\", \"oid\", or \"both\"!"
+    )
 
-test_that("clean_heatmap_df - works", {
-  expect_no_error(clean_heatmap_df(df = npx_data_format,
-                                   check_log = check_log_oct,
-                                   colnames = "both"))
+    expect_null(
+      object = plot_heatmap_check_inputs(
+        colnames = "both"
+      )
+    )
 
-  expect_no_error(clean_heatmap_df(df = npx_data_format,
-                                   check_log = check_log_oct,
-                                   colnames = "oid"))
+    expect_warning(
+      object = plot_heatmap_check_inputs(
+        colnames = "both",
+        mat = "1234"
+      ),
+      regexp = paste("Argument \"mat\" cannot be manually set in `pheatmap()`!",
+                     "Ignoring!"),
+      fixed = TRUE
+    )
 
-  expect_no_error(clean_heatmap_df(df = npx_data_format,
-                                   check_log = check_log_oct,
-                                   colnames = "assay"))
-  npx_data_format1 <- npx_data_format |>
-    dplyr::mutate(NPX = ifelse(Assay == "Incubation control 1", 1, NPX))
+    expect_warning(
+      object = plot_heatmap_check_inputs(
+        colnames = "both",
+        mat = "1234",
+        scale = 3L
+      ),
+      regexp = paste("Arguments \"mat\" and \"scale\" cannot be manually set",
+                     "in `pheatmap()`! Ignoring!"),
+      fixed = TRUE
+    )
+  }
+)
 
-  expect_no_match(names(clean_heatmap_df(df = npx_data_format1,
-                                         check_log = check_log_oct,
-                                         colnames = "assay")),
-                  "Incubation control 1")
-})
+# Test plot_heatmap_clean_df ----
 
-test_that("df_to_wide - works", {
+test_that(
+  "plot_heatmap_clean_df - works",
+  {
+    # both, oid, assay ----
 
-  expect_equal(ncol(df_to_wide(df = clean_heatmap_df(df = npx_data_format,
-                                                     check_log = check_log_oct,
-                                                     colnames = "assay"),
-                               check_log = check_log_oct,
-                               colnames = "assay")),
-               length(unique(npx_data_format$Assay)))
-})
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = expect_message(
+            object = df_both <- plot_heatmap_clean_df(
+              df = npx_data_format,
+              check_log = check_log_oct,
+              colnames = "both"
+            ),
+            regexp = "Excluding 17 assays with only \"NA\" values"
+          ),
+          regexp = "No column marking control assays in dataset"
+        )
+      )
+    )
+
+    expect_identical(
+      object = df_both$both,
+      expected = paste(df_both$assay, df_both$oid, sep = "_")
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = expect_message(
+            object = plot_heatmap_clean_df(
+              df = npx_data_format,
+              check_log = check_log_oct,
+              colnames = "oid"
+            ),
+            regexp = "Excluding 17 assays with only \"NA\" values"
+          ),
+          regexp = "No column marking control assays in dataset"
+        )
+      )
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = expect_message(
+            object = plot_heatmap_clean_df(
+              df = npx_data_format,
+              check_log = check_log_oct,
+              colnames = "assay"
+            ),
+            regexp = "Excluding 17 assays with only \"NA\" values"
+          ),
+          regexp = "No column marking control assays in dataset"
+        )
+      )
+    )
+
+    # assays with no war are removed
+
+    expect_no_match(
+      object = plot_heatmap_clean_df(
+        df = npx_data_format |>
+          dplyr::mutate(
+            NPX = dplyr::if_else(
+              .data[["OlinkID"]] == "OID30538",
+              1,
+              .data[["NPX"]]
+            )
+          ),
+        check_log = check_log_oct,
+        colnames = "assay"
+      ) |>
+        suppressMessages() |>
+        suppressWarnings() |>
+        dplyr::pull(.data[["oid"]]) |>
+        unique(),
+      "OID30538"
+    )
+  }
+)
+
+# Test plot_heatmap_df_to_wide ----
+
+test_that(
+  "plot_heatmap_df_to_wide - works",
+  {
+    expect_equal(
+      object = plot_heatmap_df_to_wide(
+        df = clean_heatmap_df(
+          df = npx_data_format,
+          check_log = check_log_oct,
+          colnames = "assay"
+        ),
+        check_log = check_log_oct,
+        colnames = "assay") |>
+        ncol(),
+      expected = npx_data_format$Assay |>
+        unique() |>
+        length()
+    )
+  }
+)
 
 test_that("create_pheatmap_args - works", {
 
