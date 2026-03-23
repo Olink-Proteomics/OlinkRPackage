@@ -15,27 +15,32 @@
 #' for each sample per panel
 #' @keywords NPX
 #' @export
-#' @examples \donttest{olink_dist_plot(npx_data1, color_g = "QC_Warning")}
+#' @examples
+#' \donttest{
+#'
+#' olink_dist_plot(npx_data1,
+#' color_g = "QC_Warning")
+#'
+#' }
 #' @importFrom dplyr filter mutate group_by ungroup if_else
 #' @importFrom stats reorder
 #' @importFrom ggplot2 ggplot aes scale_x_discrete geom_boxplot xlab facet_wrap
 #' @importFrom stringr str_replace str_detect
-#' @importFrom magrittr |>
 #' @importFrom rlang ensym
 
 olink_dist_plot <- function(df,
                             check_log = NULL,
-                            color_g = 'QC_Warning',
+                            color_g = "QC_Warning",
                             ...) {
 
   #checking ellipsis
-  if(length(list(...)) > 0){
+  if (length(list(...)) > 0) {
 
     ellipsis_variables <- names(list(...))
 
-    if(length(ellipsis_variables) == 1){
+    if (length(ellipsis_variables) == 1){
 
-      if(!(ellipsis_variables == 'coloroption')){
+      if (!(ellipsis_variables == "coloroption")) {
 
         stop(paste0("The ... option only takes the coloroption argument.",
                     "... currently contains the variable ",
@@ -44,7 +49,7 @@ olink_dist_plot <- function(df,
 
       }
 
-    }else{
+    } else {
 
       stop(paste0("The ... option only takes one argument.",
                   "... currently contains the variables ",
@@ -55,6 +60,9 @@ olink_dist_plot <- function(df,
 
   # check input
   check_is_dataset(x = df, error = TRUE)
+
+  # check if color column is present
+  check_columns(df = df, col_list = list(color_g))
 
   # Check if check_log is correct
   check_log <- run_check_npx(df = df, check_log = check_log)
@@ -90,16 +98,20 @@ olink_dist_plot <- function(df,
     ggplot2::scale_x_discrete(labels = function(x) gsub(reg, "", x), ...)
   }
 
-  #If not all are Pass, the QC_Warning is set as warning for plotting purposes
+  # Split by panel/block
   df <- df |>
-    dplyr::mutate(Panel = Panel |> stringr::str_replace("Olink ", ""))
+    dplyr::mutate(!!check_log$col_names$panel :=
+                    .data[[check_log$col_names$panel]] |>
+                    stringr::str_replace("Olink ", ""))
 
-  if("QC_Warning" %in% names(df)){
+  # If QC selected to plot
+  # If not all are Pass, the QC_Warning is set as warning for plotting purposes
+  if (color_g %in% column_name_dict$col_names$qc_warning) {
 
     df <- df |>
-    dplyr::group_by(SampleID, Panel) |>
-    dplyr::mutate(QC_Warning = dplyr::if_else(
-      all(toupper(QC_Warning) == 'PASS'),
+    dplyr::group_by(.data[["SampleID"]], .data[["Panel"]]) |>
+    dplyr::mutate(!!check_log$col_names$qc_warning = dplyr::if_else(
+      all(toupper(.data[[check_log$col_names$qc_warning]]) == 'PASS'),
       'Pass',
       'Warning')) |>
     dplyr::ungroup()
@@ -110,11 +122,11 @@ olink_dist_plot <- function(df,
     ggplot2::ggplot(ggplot2::aes(
       x = reorder_within(factor(SampleID), NPX, Panel, median),
       y = NPX,
-      fill=!!rlang::ensym(color_g)))+
-    ggplot2::geom_boxplot()+
-    scale_x_reordered()+
-    ggplot2::xlab("Samples")+
-    ggplot2::facet_wrap(~Panel,  scale="free")+
+      fill=!!rlang::ensym(color_g))) +
+    ggplot2::geom_boxplot() +
+    scale_x_reordered() +
+    ggplot2::xlab("Samples") +
+    ggplot2::facet_wrap(~Panel,  scale="free") +
     OlinkAnalyze::set_plot_theme() +
     OlinkAnalyze::olink_fill_discrete(...)
 }
