@@ -30,7 +30,7 @@
 
 olink_dist_plot <- function(df,
                             check_log = NULL,
-                            color_g = "QC_Warning",
+                            color_g = "QC_Warning", # nolint: object_name_linter
                             ...) {
 
   #checking ellipsis
@@ -38,7 +38,7 @@ olink_dist_plot <- function(df,
 
     ellipsis_variables <- names(list(...))
 
-    if (length(ellipsis_variables) == 1){
+    if (length(ellipsis_variables) == 1) {
 
       if (!(ellipsis_variables == "coloroption")) {
 
@@ -90,12 +90,12 @@ olink_dist_plot <- function(df,
 
   reorder_within <- function(x, by, within, fun = mean, sep = "___", ...) {
     new_x <- paste(x, within, sep = sep)
-    stats::reorder(new_x, by, FUN = fun)
+    stats::reorder(new_x, by, FUN = fun) # nolint: return_linter
   }
 
   scale_x_reordered <- function(..., sep = "___") {
     reg <- paste0(sep, ".+$")
-    ggplot2::scale_x_discrete(labels = function(x) gsub(reg, "", x), ...)
+    ggplot2::scale_x_discrete(labels = function(x) gsub(reg, "", x), ...) # nolint: return_linter
   }
 
   # Split by Panel
@@ -109,23 +109,22 @@ olink_dist_plot <- function(df,
   if (color_g %in% column_name_dict$col_names$qc_warning) {
 
     df <- df |>
-    dplyr::group_by(.data[["SampleID"]], .data[["Panel"]]) |>
-    dplyr::mutate(!!check_log$col_names$qc_warning = dplyr::if_else(
-      all(toupper(.data[[check_log$col_names$qc_warning]]) == 'PASS'),
-      'Pass',
-      'Warning')) |>
-    dplyr::ungroup()
+      dplyr::group_by(.data[["SampleID"]], .data[["Panel"]]) |>
+      dplyr::mutate(!!check_log$col_names$qc_warning := dplyr::if_else(all(toupper(.data[[check_log$col_names$qc_warning]]) == "PASS"),  # nolint: line_length_linter
+                                                                       "Pass",
+                                                                       "Warning")) |>
+      dplyr::ungroup()
 
   }
 
   df |>
-    ggplot2::ggplot(ggplot2::aes(
+    ggplot2::ggplot(ggplot2::aes( # nolint: return_linter
       x = reorder_within(factor(SampleID),
                          NPX,
-                         eval(check_log$col_names$panel),
+                         Panel, # to replace with check_log value
                          median),
       y = NPX,
-      fill=!!rlang::ensym(color_g))) +
+      fill = !!rlang::ensym(color_g))) +
     ggplot2::geom_boxplot() +
     scale_x_reordered() +
     ggplot2::xlab("Samples") +
