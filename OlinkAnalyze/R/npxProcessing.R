@@ -43,17 +43,6 @@ npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
         )
       ) |>
       dplyr::ungroup()
-
-    plotColors <- df_temp |> # nolint: object_name_linter
-      dplyr::group_by(
-        dplyr::across(
-          dplyr::all_of(check_log$col_names$sample_id)
-        )
-      ) |>
-      dplyr::summarise(
-        colors = unique(.data[[color_g]]),
-        .groups = "drop"
-      )
   } else {
     n_sample_w_multiple_colors <- df |>
       dplyr::group_by(
@@ -75,19 +64,20 @@ npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
       )
     } else {
       df_temp <- df
-
-      plotColors <- df_temp |> # nolint: object_name_linter
-        dplyr::group_by(
-          dplyr::across(
-            dplyr::all_of(check_log$col_names$sample_id)
-          )
-        ) |>
-        dplyr::summarise(
-          colors = unique(.data[[color_g]]),
-          .groups = "drop"
-        )
     }
   }
+
+  plotColors <- df_temp |> # nolint: object_name_linter
+    dplyr::group_by(
+      dplyr::across(
+        dplyr::all_of(check_log$col_names$sample_id)
+      )
+    ) |>
+    dplyr::summarise(
+      colors = unique(.data[[color_g]]),
+      .groups = "drop"
+    )
+
   # df is no longer needed
   rm(df)
 
