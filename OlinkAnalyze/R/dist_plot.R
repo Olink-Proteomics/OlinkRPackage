@@ -98,7 +98,7 @@ olink_dist_plot <- function(df,
     ggplot2::scale_x_discrete(labels = function(x) gsub(reg, "", x), ...)
   }
 
-  # Split by panel/block
+  # Split by Panel
   df <- df |>
     dplyr::mutate(!!check_log$col_names$panel :=
                     .data[[check_log$col_names$panel]] |>
@@ -120,13 +120,17 @@ olink_dist_plot <- function(df,
 
   df |>
     ggplot2::ggplot(ggplot2::aes(
-      x = reorder_within(factor(SampleID), NPX, Panel, median),
+      x = reorder_within(factor(SampleID),
+                         NPX,
+                         eval(check_log$col_names$panel),
+                         median),
       y = NPX,
       fill=!!rlang::ensym(color_g))) +
     ggplot2::geom_boxplot() +
     scale_x_reordered() +
     ggplot2::xlab("Samples") +
-    ggplot2::facet_wrap(~Panel,  scale="free") +
+    ggplot2::facet_wrap(as.formula(paste("~", check_log$col_names$panel)),
+                        scale="free") +
     OlinkAnalyze::set_plot_theme() +
     OlinkAnalyze::olink_fill_discrete(...)
 }
