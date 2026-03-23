@@ -139,21 +139,21 @@ plot_heatmap_df_to_wide <- function(df,
 #'
 #' @keywords internal
 #'
-create_pheatmap_args <- function(df_wide,
-                                 df,
-                                 check_log,
-                                 center_scale,
-                                 cluster_rows,
-                                 cluster_cols,
-                                 na_col,
-                                 show_rownames,
-                                 show_colnames,
-                                 annotation_legend,
-                                 fontsize,
-                                 variable_row_list,
-                                 variable_col_list,
-                                 colnames,
-                                 ...) {
+plot_heatmap_pheatmap_args <- function(df_wide,
+                                       df,
+                                       check_log,
+                                       center_scale,
+                                       cluster_rows,
+                                       cluster_cols,
+                                       na_col,
+                                       show_rownames,
+                                       show_colnames,
+                                       annotation_legend,
+                                       fontsize,
+                                       variable_row_list,
+                                       variable_col_list,
+                                       colnames,
+                                       ...) {
   pheatmap_args <- list(mat = df_wide,
                         scale = ifelse(center_scale, "column", "none"),
                         silent = TRUE,
@@ -165,37 +165,40 @@ create_pheatmap_args <- function(df_wide,
                         annotation_legend = annotation_legend,
                         fontsize = fontsize)
 
-
   #### Extract Ellipsis Variables ####
   if (length(list(...)) > 0L) {
-    pheatmap_args <- extract_ellipsis_arg(pheatmap_args = pheatmap_args,
-                                          ...)
+    pheatmap_args <- pheatmap_extract_ellipsis_arg(
+      pheatmap_args = pheatmap_args,
+      ...
+    )
   }
 
   #### Add row and column annotations ####
   if (!is.null(variable_row_list) || !is.null(variable_col_list)) {
-    pheatmap_args <- annotate_heatmap(df = df,
-                                      check_log = check_log,
-                                      colnames = colnames,
-                                      pheatmap_args = pheatmap_args,
-                                      variable_row_list = variable_row_list,
-                                      variable_col_list = variable_col_list)
+    pheatmap_args <- pheatmap_annotate_heatmap(
+      df = df,
+      check_log = check_log,
+      colnames = colnames,
+      pheatmap_args = pheatmap_args,
+      variable_row_list = variable_row_list,
+      variable_col_list = variable_col_list
+    )
   }
 
   #### Add color assignments ####
   if (!is.null(variable_row_list) ||
-        !is.null(variable_col_list) ||
-        any(names(pheatmap_args) %in% c("annot_col_int"))) {
-    pheatmap_args <- color_heatmap(df = df,
-                                   check_log = check_log,
-                                   pheatmap_args = pheatmap_args,
-                                   variable_row_list,
-                                   variable_col_list)
+      !is.null(variable_col_list) ||
+      any(names(pheatmap_args) %in% c("annot_col_int"))) {
+    pheatmap_args <- pheatmap_color_heatmap(
+      df = df,
+      check_log = check_log,
+      pheatmap_args = pheatmap_args,
+      variable_row_list,
+      variable_col_list
+    )
   }
 
-
   return(pheatmap_args)
-
 }
 
 #' extract ellipsis arguments and add to pheatmap arguments
@@ -204,9 +207,11 @@ create_pheatmap_args <- function(df_wide,
 #' @param ... additional arguments to be passed to pheatmap function
 #'
 #' @return updated pheatmap arguments list with ellipsis variables
+#'
 #' @keywords internal
-extract_ellipsis_arg <- function(pheatmap_args,
-                                 ...) {
+#'
+pheatmap_extract_ellipsis_arg <- function(pheatmap_args,
+                                          ...) {
   ellipsis_variables <- names(list(...))
   annot_col_int <- NULL
   additional_args <- list(...)[!(ellipsis_variables %in% c("mat",
@@ -215,19 +220,16 @@ extract_ellipsis_arg <- function(pheatmap_args,
                                                            "annotation_row",
                                                            "annotation_col",
                                                            "annotation_colors")
-                               )]
+  )]
   if (any(ellipsis_variables == "annotation_colors")) {
     annot_col_int <- list(...)[["annotation_colors"]]
   }
 
-  if (length(additional_args) != 0L &&
-        !is.null(annot_col_int)) {
+  if (length(additional_args) != 0L && !is.null(annot_col_int)) {
     additional_args <- append(additional_args,
-                              list(annot_col_int =
-                                     annot_col_int))
+                              list(annot_col_int = annot_col_int))
   } else if (!is.null(annot_col_int)) {
-    additional_args <- list(annot_col_int =
-                              annot_col_int)
+    additional_args <- list(annot_col_int = annot_col_int)
   }
   pheatmap_args <- append(pheatmap_args, additional_args)
   return(pheatmap_args)
@@ -238,26 +240,41 @@ extract_ellipsis_arg <- function(pheatmap_args,
 #' @inheritParams olink_heatmap_plot
 #'
 #' @return updated pheatmap arguments
+#'
 #' @keywords internal
-annotate_heatmap <- function(df,
-                             check_log,
-                             colnames,
-                             pheatmap_args,
-                             variable_row_list,
-                             variable_col_list) {
+#'
+pheatmap_annotate_heatmap <- function(df,
+                                      check_log,
+                                      colnames,
+                                      pheatmap_args,
+                                      variable_row_list,
+                                      variable_col_list) {
   if (!is.null(variable_row_list)) {
     pheatmap_args[["annotation_row"]] <- df |>
-      dplyr::select(dplyr::all_of(c(check_log$col_names$sample_id,
-                                    variable_row_list))) |>
+      dplyr::select(
+        dplyr::all_of(
+          c(check_log$col_names$sample_id,
+            variable_row_list)
+        )
+      ) |>
       dplyr::distinct() |>
-      tibble::column_to_rownames(check_log$col_names$sample_id)
+      tibble::column_to_rownames(
+        var = check_log$col_names$sample_id
+      )
   }
 
   if (!is.null(variable_col_list)) {
     pheatmap_args[["annotation_col"]] <- df |>
-      dplyr::select(dplyr::all_of(c(colnames, variable_col_list))) |>
+      dplyr::select(
+        dplyr::all_of(
+          c(colnames,
+            variable_col_list)
+        )
+      ) |>
       dplyr::distinct() |>
-      tibble::column_to_rownames(colnames)
+      tibble::column_to_rownames(
+        var = colnames
+      )
   }
 
   return(pheatmap_args)
@@ -266,13 +283,16 @@ annotate_heatmap <- function(df,
 #' add colors to pheatmap arguments
 #'
 #' @inheritParams olink_heatmap_plot
+#'
 #' @return updated pheatmap_args
+#'
 #' @keywords internal
-color_heatmap <- function(df,
-                          check_log,
-                          pheatmap_args,
-                          variable_row_list,
-                          variable_col_list) {
+#'
+pheatmap_color_heatmap <- function(df,
+                                   check_log,
+                                   pheatmap_args,
+                                   variable_row_list,
+                                   variable_col_list) {
   col_classes <- sapply(df, "class")
   vars_to_color <- c(sort(variable_col_list, decreasing = TRUE),
                      sort(variable_row_list, decreasing = TRUE))
