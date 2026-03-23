@@ -10,7 +10,7 @@ npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
   check_log <- run_check_npx(df = df, check_log = check_log)
 
   # other checks
-  check_is_dataset(df= df, error = TRUE)
+  check_is_dataset(x = df, error = TRUE)
   check_is_scalar_character(x = color_g, error = TRUE)
   check_is_scalar_boolean(x = drop_assays, error = TRUE)
   check_is_scalar_boolean(x = drop_samples, error = TRUE)
