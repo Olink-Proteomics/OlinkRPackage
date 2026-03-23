@@ -25,13 +25,6 @@ npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
   Sys.setlocale("LC_COLLATE", "C")
 
   #### Set up plotting colors ####
-  # check whether QC_Warning warning column exists
-  if (color_g == "QC_Warning" &&
-        !("QC_Warning" %in% names(df)) &&
-        "SampleQC" %in% names(df)) {
-    cli::cli_abort("In color_g = \"QC_Warning\", QC_Warning was not found.
-                   Did you mean color_g = \"SampleQC\"?")
-  }
 
   if (color_g == check_log$col_names$qc_warning) {
     df_temp <- df |>
@@ -75,7 +68,7 @@ npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
       dplyr::filter(.data[["n_colors"]] > 1L) |>
       nrow()
 
-    if (number_of_sample_w_more_than_one_color > 0) {
+    if (n_sample_w_multiple_colors > 0L) {
       cli::cli_abort(
         "There are {number_of_sample_w_more_than_one_color} samples that do
         not have a unique color. Only one color per sample is allowed."
@@ -83,10 +76,14 @@ npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
     } else {
       df_temp <- df
 
-      plotColors <- df_temp |> # nolint object_name_linter
-        dplyr::group_by(SampleID) |> # nolint object_usage_linter
+      plotColors <- df_temp |> # nolint: object_name_linter
+        dplyr::group_by(
+          dplyr::across(
+            dplyr::all_of(check_log$col_names$sample_id)
+          )
+        ) |>
         dplyr::summarise(
-          colors = unique(!!rlang::ensym(color_g)),
+          colors = unique(.data[[color_g]]),
           .groups = "drop"
         )
     }
