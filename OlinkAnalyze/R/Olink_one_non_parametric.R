@@ -248,7 +248,7 @@ olink_one_non_parametric <- function(df,
           dplyr::summarize(n = n(), .groups = "drop") |>
           dplyr::filter(n == n_subject) |>
           dplyr::mutate(Friedman_remove = "no") |>
-          dplyr::select(-n)
+          dplyr::select(!dplyr::all_of(c("n")))
 
         if (length(
           subject_remove |>
