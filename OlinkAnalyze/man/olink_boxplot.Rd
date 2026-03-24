@@ -17,20 +17,28 @@ olink_boxplot(
 )
 }
 \arguments{
-\item{df}{NPX data frame in long format with at least protein name (Assay), OlinkID (unique), UniProt and at least one grouping variable.}
+\item{df}{NPX data frame in long format with at least protein name (Assay),
+OlinkID (unique), UniProt and at least one grouping variable.}
 
-\item{variable}{A character vector or character value indicating which column to use as the x-axis and fill grouping variable.
-The first or single value is used as x-axis, the second as fill. Further values in a vector are not plotted.}
+\item{variable}{A character vector or character value indicating which
+column to use as the x-axis and fill grouping variable.
+The first or single value is used as x-axis, the second as fill. Further
+values in a vector are not plotted.}
 
-\item{olinkid_list}{Character vector indicating which proteins (OlinkIDs) to plot.}
+\item{olinkid_list}{Character vector indicating which proteins (OlinkIDs)
+to plot.}
 
-\item{verbose}{Boolean. If the plots are shown as well as returned in the list (default is false).}
+\item{verbose}{Boolean. If the plots are shown as well as returned in the
+list (default is false).}
 
-\item{number_of_proteins_per_plot}{Number of boxplots to include in the facet plot (default 6).}
+\item{number_of_proteins_per_plot}{Number of boxplots to include in the
+facet plot (default 6).}
 
-\item{posthoc_results}{Data frame from ANOVA posthoc analysis using olink_anova_posthoc() function.}
+\item{posthoc_results}{Data frame from ANOVA posthoc analysis using
+olink_anova_posthoc() function.}
 
-\item{ttest_results}{Data frame from ttest analysis using olink_ttest() function.}
+\item{ttest_results}{Data frame from ttest analysis using
+olink_ttest() function.}
 
 \item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
 \code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}...}
@@ -38,16 +46,20 @@ The first or single value is used as x-axis, the second as fill. Further values 
 \item{...}{coloroption passed to specify color order}
 }
 \value{
-A list of objects of class “ggplot” (the actual ggplot object is entry 1 in the list). Box and whisker plot of NPX (y-axis) by variable (x-axis) for each Assay
+A list of objects of class “ggplot” (the actual ggplot object is
+entry 1 in the list). Box and whisker plot of NPX (y-axis) by variable
+(x-axis) for each Assay
 }
 \description{
-Generates faceted boxplots of NPX vs. grouping variable(s) for a given list of proteins (OlinkIDs) using ggplot and ggplot2::geom_boxplot.
+Generates faceted boxplots of NPX vs. grouping variable(s) for a given list
+of proteins (OlinkIDs) using ggplot and ggplot2::geom_boxplot.
 }
 \examples{
 \donttest{
 
 library(dplyr)
-npx_df <- npx_data1 |> filter(!grepl('control|ctrl',SampleID, ignore.case = TRUE))
+npx_df <- npx_data1 |> filter(!grepl('control|ctrl',SampleID,
+ignore.case = TRUE))
 anova_results <- olink_anova(npx_df, variable = "Site")
 significant_assays <- anova_results |>
     filter(Threshold == 'Significant') |>
