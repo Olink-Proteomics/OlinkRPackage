@@ -67,9 +67,13 @@ The function handles both factor and numerical variables.
 library(dplyr)
 
 try({ # May fail if dependencies are not installed
+  # Run check_npx
+  check_log <- check_npx(npx_data1)
+
   # One-way Kruskal-Wallis Test
   kruskal_results <- olink_one_non_parametric(
     df = npx_data1,
+    check_log = check_log,
     variable = "Site"
   )
 })
@@ -77,6 +81,7 @@ try({ # May fail if dependencies are not installed
 # Friedman Test
 friedman_results <- olink_one_non_parametric(
   df = npx_data1,
+  check_log = check_log,
   variable = "Time",
   subject = "Subject",
   dependence = TRUE
@@ -84,6 +89,7 @@ friedman_results <- olink_one_non_parametric(
 
 # Posthoc test for the results from Friedman Test
 friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_data1,
+  check_log = check_log,
   variable = "Time",
   test = "friedman",
   olinkid_list = {
