@@ -1,3 +1,100 @@
+test_that(
+  "olink_one_non_parametric - works - match reference results",
+  {
+    # load reference results
+    ref_results <- get_example_data(filename = "reference_results.rds")
+
+    # npx_data1 check_log
+    check_log <- check_npx(npx_data1) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # get data without control
+    npx_data1_noctrl <- clean_control_sample_id(
+      df = npx_data1,
+      check_log = check_log,
+      control_sample_ids = c("CONTROL_SAMPLE_AS 1",
+                             "CONTROL_SAMPLE_AS 2")
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    check_log_noctrl <- check_npx(npx_data1) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # ---- test kruskal with reference file ----
+    skip_if_not_installed(pkg = "FAS")
+    expect_equal(
+      object = kruskal_results <- olink_one_non_parametric(
+        df = npx_data1_noctrl,
+        check_log = check_log_noctrl,
+        variable = "Site",
+        verbose = FALSE
+      ),
+      expected = ref_results$kruskal
+    )
+
+    expect_equal(
+      object = nrow(kruskal_results),
+      expected = 184
+      )
+
+    expect_equal(
+      object = ncol(kruskal_results),
+      expected = 11
+      )
+
+    # ---- test friedman with reference file ----
+    expect_equal(
+      object = friedman_results <- olink_one_non_parametric(
+        df = npx_data1_noctrl,
+        check_log = check_log_noctrl,
+        variable = "Time",
+        subject = "Subject",
+        dependence = TRUE,
+        verbose = FALSE
+      ),
+      expected = ref_results$friedman
+    )
+
+    expect_equal(
+      object = nrow(friedman_results),
+      expected = 184
+      )
+    expect_equal(
+      object = ncol(friedman_results),
+      expected = 11
+      )
+  }
+)
+
+test_that(
+  "olink_one_non_parametric - error - missing input",
+  {
+    # npx_data1 check_log
+    check_log <- check_npx(npx_data1) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # Test for no input data or variable
+    expect_error(
+      object = olink_one_non_parametric(df = NULL),
+      regexp = "`df` and `variable` must be specified."
+    )
+
+    expect_error(
+      object = olink_one_non_parametric(df = npx_data1,
+                                        check_log = check_log),
+      regexp = "`df` and `variable` must be specified."
+    )
+  }
+)
+
+
+
+
+# -------------------------------------------------------------------------
 # Load reference results
 ref_results <- get_example_data(filename = "reference_results.rds")
 
