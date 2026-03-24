@@ -11,6 +11,7 @@ olink_normalization_bridge(
   project_1_name = "P1",
   project_2_name = "P2",
   project_ref_name = "P1",
+  format = FALSE,
   project_1_check_log = NULL,
   project_2_check_log = NULL
 )
@@ -34,11 +35,14 @@ should correspond to the same sample. (required)}
 Needs to be one of the project_1_name or project_2_name. It marks the
 project to which the other project will be adjusted to (default: P1).}
 
+\item{format}{Boolean that controls whether the normalized dataset will be
+formatted for input to downstream analysis.}
+
 \item{project_1_check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If
 \code{NULL}, \code{\link[=check_npx]{check_npx()}} will be run internally using \code{project_1_df}.
 (default: \code{NULL})}
 
-\item{df2_check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If
+\item{project_2_check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If
 \code{NULL}, \code{\link[=check_npx]{check_npx()}} will be run internally using \code{project_2_df}.
 (default: \code{NULL})}
 }

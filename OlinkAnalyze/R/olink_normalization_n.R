@@ -418,7 +418,6 @@
 #' )
 #' }
 #'
-#'
 olink_normalization_n <- function(norm_schema) {
   # Upcoming updates/features:
   #   automatic detection of bridge samples
@@ -583,10 +582,12 @@ olink_normalization_n <- function(norm_schema) {
 #' @param project_ref_name Name of the project to be used as reference set.
 #' Needs to be one of the project_1_name or project_2_name. It marks the
 #' project to which the other project will be adjusted to (default: P1).
+#' @param format Boolean that controls whether the normalized dataset will be
+#' formatted for input to downstream analysis.
 #' @param project_1_check_log A named list returned by [`check_npx()`]. If
 #' `NULL`, [`check_npx()`] will be run internally using `project_1_df`.
 #' (default: `NULL`)
-#' @param df2_check_log A named list returned by [`check_npx()`]. If
+#' @param project_2_check_log A named list returned by [`check_npx()`]. If
 #' `NULL`, [`check_npx()`] will be run internally using `project_2_df`.
 #' (default: `NULL`)
 #'
@@ -652,6 +653,7 @@ olink_normalization_bridge <- function(project_1_df,
                                        project_1_name = "P1",
                                        project_2_name = "P2",
                                        project_ref_name = "P1",
+                                       format = FALSE,
                                        project_1_check_log = NULL,
                                        project_2_check_log = NULL) {
 
@@ -701,7 +703,10 @@ olink_normalization_bridge <- function(project_1_df,
     df1_project_nr = project_1_name,
     df2_project_nr = project_2_name,
     reference_project = project_ref_name,
-    reference_medians = NULL
+    reference_medians = NULL,
+    format = format,
+    df1_check_log = project_1_check_log,
+    df2_check_log = project_2_check_log
   )
 
   # switch back to the original non-reference project's SampleID
@@ -754,6 +759,14 @@ olink_normalization_bridge <- function(project_1_df,
 #' @param project_ref_name Name of the project to be used as reference set.
 #' Needs to be one of the project_1_name or project_2_name. It marks the
 #' project to which the other project will be adjusted to (default: P1).
+#' @param format Boolean that controls whether the normalized dataset will be
+#' formatted for input to downstream analysis.
+#' @param project_1_check_log A named list returned by [`check_npx()`]. If
+#' `NULL`, [`check_npx()`] will be run internally using `project_1_df`.
+#' (default: `NULL`)
+#' @param project_2_check_log A named list returned by [`check_npx()`]. If
+#' `NULL`, [`check_npx()`] will be run internally using `project_2_df`.
+#' (default: `NULL`)
 #'
 #' @return A "tibble" of NPX data in long format containing normalized NPX
 #' values, including adjustment factors and name of project.
@@ -946,6 +959,7 @@ olink_normalization_subset <- function(project_1_df,
                                        project_1_name = "P1",
                                        project_2_name = "P2",
                                        project_ref_name = "P1",
+                                       format = FALSE,
                                        project_1_check_log = NULL,
                                        project_2_check_log = NULL) {
 
@@ -978,7 +992,10 @@ olink_normalization_subset <- function(project_1_df,
     df1_project_nr = project_1_name,
     df2_project_nr = project_2_name,
     reference_project = project_ref_name,
-    reference_medians = NULL
+    reference_medians = NULL,
+    format = format,
+    df1_check_log = project_1_check_log,
+    df2_check_log = project_2_check_log
   )
 
   return(norm_df)

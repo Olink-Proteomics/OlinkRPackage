@@ -855,6 +855,7 @@ olink_norm_input_check_df_cols <- function(lst_df, lst_cols) {
   # check classes across shared columns
   lst_class_non_match <- lst_class |>
     lapply(function(x) x[names(x) %in% lst_class_shared]) |>
+    lapply(function(x) x[match(sort(lst_class_shared), names(x))]) |>
     as.data.frame() |>
     tibble::rownames_to_column(
       var = "df_name"
