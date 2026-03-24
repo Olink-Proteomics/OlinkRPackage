@@ -503,7 +503,7 @@ olink_normalization_n <- function(norm_schema) {
     # the normalization function
     project_ref_npx <- project_ref_npx |>
       dplyr::select(
-        -dplyr::all_of(
+        -dplyr::any_of(
           c("Project", "Adj_factor")
         )
       )
@@ -531,6 +531,22 @@ olink_normalization_n <- function(norm_schema) {
         project_2_name = project_i_name,
         project_ref_name = project_ref_names_combo
       )
+
+      # remove bridge samples from non-reference dataset
+      project_i_npx_norm <- project_i_npx_norm |>
+        dplyr::anti_join(
+          project_i_npx |>
+            dplyr::filter(.data[["SampleID"]] %in% samples_norm$DF2) |>
+            dplyr::mutate(Project = .env[["project_i_name"]]) |>
+            dplyr::distinct(.data[["SampleID"]], .data[["Project"]]),
+          by = c("SampleID", "Project")
+        )
+
+      cli::cli_inform(
+        "Removed {.val {length(samples_norm$DF2)}} bridge samples from the
+        bridge normalized dataset between {.val {project_ref_names_combo}} and
+        {.val {project_i_name}}."
+      )
     }
 
     # add to main list of normalized npx datasets
@@ -550,6 +566,15 @@ olink_normalization_n <- function(norm_schema) {
   }
 
   normalized_npx <- dplyr::bind_rows(normalized_npx)
+
+  # update maxlod if present
+  normalized_npx <- norm_internal_update_maxlod(
+    df = normalized_npx,
+    cols = check_npx(df = normalized_npx) |>
+      suppressMessages() |>
+      suppressWarnings() |>
+      (\(.) .$col_names)()
+  )
 
   return(normalized_npx)
 }
@@ -721,7 +746,8 @@ olink_normalization_bridge <- function(project_1_df,
       )
     ) |>
     dplyr::select(-dplyr::all_of("SampleID")) |>
-    dplyr::rename("SampleID" = "SampleID_df2")
+    dplyr::rename("SampleID" = "SampleID_df2") |>
+    dplyr::select(dplyr::all_of(names(norm_df)))
   rm(update_sampleid)
 
   return(norm_df)

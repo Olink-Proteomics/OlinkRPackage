@@ -422,7 +422,6 @@ OlinkAnalyze::olink_normalization_n(
 )
 }
 
-
 }
 \keyword{Bridge}
 \keyword{Normalization}
