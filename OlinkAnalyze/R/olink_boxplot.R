@@ -35,18 +35,35 @@
 #' @examples
 #' \donttest{
 #'
-#' library(dplyr)
-#' npx_df <- npx_data1 |> filter(!grepl('control|ctrl',SampleID,
-#' ignore.case = TRUE))
-#' anova_results <- olink_anova(npx_df, variable = "Site")
-#' significant_assays <- anova_results |>
-#'     filter(Threshold == 'Significant') |>
-#'     pull(OlinkID)
-#' olink_boxplot(npx_df,
-#'               variable = "Site",
-#'               olinkid_list = significant_assays,
-#'               verbose = TRUE,
-#'               number_of_proteins_per_plot = 3)}
+#' if (rlang::is_installed(pkg = c("broom", "car"))) {
+#'   npx_df <- npx_data1 |>
+#'     dplyr::filter(
+#'       !grepl(pattern = "control|ctrl",
+#'              x = .data[["SampleID"]],
+#'              ignore.case = TRUE)
+#'     )
+#'   
+#'   anova_results <- OlinkAnalyze::olink_anova(
+#'     df = npx_df,
+#'     variable = "Site"
+#'   )
+#'   
+#'   significant_assays <- anova_results |>
+#'     dplyr::filter(
+#'       .data[["Threshold"]] == "Significant"
+#'     ) |>
+#'     dplyr::pull(
+#'       .data[["OlinkID"]]
+#'     )
+#'   
+#'   OlinkAnalyze::olink_boxplot(
+#'     df = npx_df,
+#'     variable = "Site",
+#'     olinkid_list = significant_assays,
+#'     verbose = TRUE,
+#'     number_of_proteins_per_plot = 3L
+#'   )
+#' }
 #'
 olink_boxplot <- function(df,
                           variable,

@@ -54,20 +54,3 @@ entry 1 in the list). Box and whisker plot of NPX (y-axis) by variable
 Generates faceted boxplots of NPX vs. grouping variable(s) for a given list
 of proteins (OlinkIDs) using ggplot and ggplot2::geom_boxplot.
 }
-\examples{
-\donttest{
-
-library(dplyr)
-npx_df <- npx_data1 |> filter(!grepl('control|ctrl',SampleID,
-ignore.case = TRUE))
-anova_results <- olink_anova(npx_df, variable = "Site")
-significant_assays <- anova_results |>
-    filter(Threshold == 'Significant') |>
-    pull(OlinkID)
-olink_boxplot(npx_df,
-              variable = "Site",
-              olinkid_list = significant_assays,
-              verbose = TRUE,
-              number_of_proteins_per_plot = 3)}
-
-}
