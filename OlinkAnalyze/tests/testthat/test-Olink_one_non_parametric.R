@@ -55,8 +55,8 @@ test_that(
 
     # ---- test posthoc test for the results from Kruskal-Wallis test ----
     sig_oids <- kruskal_results |>
-      dplyr::filter(Threshold == 'Significant') |>
-      dplyr::select(OlinkID) |>
+      dplyr::filter(.data[["Threshold"]] == "Significant") |>
+      dplyr::select(dplyr::all_of(c("OlinkID"))) |>
       dplyr::distinct() |>
       dplyr::pull()
 
@@ -69,15 +69,15 @@ test_that(
           test = "kruskal",
           olinkid_list = sig_oids
         ) |>
-          dplyr::mutate(id = as.character(OlinkID)) |>
-          dplyr::arrange(id, contrast) |>  # for consistency.
+          dplyr::mutate(id = as.character(.data[["OlinkID"]])) |>
+          dplyr::arrange(id, contrast) |> # for consistency.
           dplyr::select(-id),
         regexp = "Variables converted from character to factors: \"Site\"",
         fixed = TRUE
       ),
       regexp = paste0(
-      "Pairwise comparisons for Kruskal-Wallis test using ",
-      "Dunn test were performed"
+        "Pairwise comparisons for Kruskal-Wallis test using ",
+        "Dunn test were performed"
       ),
       fixed = TRUE
     )
@@ -85,12 +85,12 @@ test_that(
     expect_equal(
       object = kruskal_posthoc_results,
       expected = ref_results$kruskal_posthoc
-      )
+    )
 
     expect_equal(
       object = nrow(kruskal_posthoc_results),
       expected = 190
-      )
+    )
 
     expect_equal(
       object = kruskal_posthoc_results |>
@@ -98,7 +98,7 @@ test_that(
         unique() |>
         nrow(),
       expected = 10
-      )
+    )
 
     # ---- test friedman with reference file ----
     expect_message(
@@ -133,8 +133,8 @@ test_that(
 
     # ---- test posthoc test for the results from Friedman test ----
     sig_oids <- friedman_results |>
-      dplyr::filter(Threshold == 'Significant') |>
-      dplyr::select(OlinkID) |>
+      dplyr::filter(.data[["Threshold"]] == "Significant") |>
+      dplyr::select(dplyr::all_of(c("OlinkID"))) |>
       dplyr::distinct() |>
       dplyr::pull()
 
@@ -148,8 +148,8 @@ test_that(
           subject = "Subject",
           olinkid_list = sig_oids
         ) |>
-          dplyr::mutate(id = as.character(OlinkID)) |>
-          dplyr::arrange(id, contrast) |>  # for consistency.
+          dplyr::mutate(id = as.character(.data[["OlinkID"]])) |>
+          dplyr::arrange(id, contrast) |> # for consistency.
           dplyr::select(-id),
         regexp = "Variables converted from character to factors: \"Time\"",
         fixed = TRUE
@@ -164,20 +164,20 @@ test_that(
     expect_equal(
       object = friedman_posthoc_results,
       expected = ref_results$friedman_posthoc
-      )
+    )
 
     expect_equal(
       object = nrow(friedman_posthoc_results),
       expected = 3
-      )
+    )
 
     expect_equal(
       object = friedman_posthoc_results |>
-                   dplyr::select(contrast) |>
-                   unique() %>%
-                   nrow(),
+        dplyr::select(contrast) |>
+        unique() |>
+        nrow(),
       expected = 3
-      )
+    )
   }
 )
 
@@ -196,10 +196,53 @@ test_that(
     )
 
     expect_error(
-      object = olink_one_non_parametric(df = npx_data1,
-                                        check_log = check_log),
+      object = olink_one_non_parametric(
+        df = npx_data1,
+        check_log = check_log
+      ),
       regexp = "`df` and `variable` must be specified."
     )
+  }
+)
 
+test_that(
+  "olink_one_non_parametric - warn - assays with only NA in one level",
+  {
+    # Create test data
+    check_log <- check_npx(npx_data1) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    npx_data1_na <- npx_data1 |>
+      clean_control_sample_id(
+        check_log = check_log,
+        control_sample_ids = c("CONTROL_SAMPLE_AS 1", "CONTROL_SAMPLE_AS 2")
+      ) |>
+      dplyr::mutate(NPX = dplyr::if_else(
+        .data[["Site"]] == "Site_A" & .data[["OlinkID"]] == "OID01216",
+        NA_real_,
+        .data[["NPX"]]
+      )) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    check_log_na <- check_npx(npx_data1_na) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # test kruskal
+    expect_warning(
+      object = kruskal_results <- olink_one_non_parametric(
+        df = npx_data1_na,
+        check_log = check_log_na,
+        variable = "Site"
+      ) |>
+        suppressMessages(),
+      regexp = paste0(
+        "The assay(s) \"OID01216\" have only NA values in at ",
+        "least one level of `Site` and will not be tested."
+      ),
+      fixed = TRUE
+    )
   }
 )
