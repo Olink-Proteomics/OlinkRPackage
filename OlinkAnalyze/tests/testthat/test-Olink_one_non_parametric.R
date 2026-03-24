@@ -13,8 +13,7 @@ test_that(
     npx_data1_noctrl <- clean_control_sample_id(
       df = npx_data1,
       check_log = check_log,
-      control_sample_ids = c("CONTROL_SAMPLE_AS 1",
-                             "CONTROL_SAMPLE_AS 2")
+      control_sample_ids = c("CONTROL_SAMPLE_AS 1", "CONTROL_SAMPLE_AS 2")
     ) |>
       suppressMessages() |>
       suppressWarnings()
@@ -25,47 +24,66 @@ test_that(
 
     # ---- test kruskal with reference file ----
     skip_if_not_installed(pkg = "FAS")
-    expect_equal(
-      object = kruskal_results <- olink_one_non_parametric(
-        df = npx_data1_noctrl,
-        check_log = check_log_noctrl,
-        variable = "Site",
-        verbose = FALSE
+    expect_message(
+      object = expect_message(
+        object = kruskal_results <- olink_one_non_parametric(
+          df = npx_data1_noctrl,
+          check_log = check_log_noctrl,
+          variable = "Site"
+        ),
+        regexp = "Variables converted from character to factors: \"Site\"",
+        fixed = TRUE
       ),
+      regexp = "Kruskal model fit to each assay: `NPX~Site`",
+      fixed = TRUE
+    )
+
+    expect_equal(
+      object = kruskal_results,
       expected = ref_results$kruskal
     )
 
     expect_equal(
       object = nrow(kruskal_results),
       expected = 184
-      )
+    )
 
     expect_equal(
       object = ncol(kruskal_results),
       expected = 11
-      )
+    )
 
     # ---- test friedman with reference file ----
-    expect_equal(
-      object = friedman_results <- olink_one_non_parametric(
-        df = npx_data1_noctrl,
-        check_log = check_log_noctrl,
-        variable = "Time",
-        subject = "Subject",
-        dependence = TRUE,
-        verbose = FALSE
+
+    expect_message(
+      object = expect_message(
+        object = friedman_results <- olink_one_non_parametric(
+          df = npx_data1_noctrl,
+          check_log = check_log_noctrl,
+          variable = "Time",
+          subject = "Subject",
+          dependence = TRUE
+        ),
+        regexp = "Variables converted from character to factors: \"Time\"",
+        fixed = TRUE
       ),
+      regexp = "Friedman model fit to each assay: `NPX~Time`",
+      fixed = TRUE
+    )
+
+    expect_equal(
+      object = friedman_results,
       expected = ref_results$friedman
     )
 
     expect_equal(
       object = nrow(friedman_results),
       expected = 184
-      )
+    )
     expect_equal(
       object = ncol(friedman_results),
       expected = 11
-      )
+    )
   }
 )
 
