@@ -82,7 +82,9 @@ Imports:
     rlang,
     stringr,
     tibble,
-    tidyr
+    tidyr,
+    generics,
+    rstatix
 Suggests: 
     broom,
     car,
