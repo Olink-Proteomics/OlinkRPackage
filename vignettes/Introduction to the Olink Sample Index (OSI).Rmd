@@ -62,7 +62,7 @@ them, and demonstrates how they can be used in exploratory plots and
 statistical models. A practical workflow is to begin with the combined
 OSI summary and OSI category, then investigate the individual time and
 temperature components, and finally use OSITimeToCentrifugation and
-OSITemperature as covariates in downstream analyses.
+OSIPreparationTemperature as covariates in downstream analyses.
 
 ```{r, echo=FALSE}
 library(OlinkAnalyze)
@@ -270,7 +270,7 @@ data.frame(
   Variable = c("OSISummary",
                "OSICategory",
                "OSITimeToCentrifugation",
-               "OSITemperature"),
+               "OSIPreparationTemperature"),
   Type = c("Continuous",
            "Categorical",
            "Continuous",
@@ -314,9 +314,9 @@ shorter delays before centrifugation. This variable is particularly
 useful for understanding whether delayed sample processing may explain
 variation in the data.
 
-### OSITemperature
+### OSIPreparationTemperature
 
-`OSITemperature` captures the temperature-related component of
+`OSIPreparationTemperature` captures the temperature-related component of
 pre-analytical variation. In contrast to the time variable, neither end
 of the scale should be interpreted as universally better or worse on its
 own. Instead, the key question is whether samples are handled
@@ -331,17 +331,17 @@ A practical workflow for OSI is:
 overview of pre-analytical variation in the dataset.
 
 -   If variation, clustering, or outliers are observed, examine
-`OSITimeToCentrifugation` and `OSITemperature` separately to
+`OSITimeToCentrifugation` and `OSIPreparationTemperature` separately to
 understand which handling dimension contributes to the observed
 structure.
 
--   Use `OSITimeToCentrifugation` and `OSITemperature` as covariates in
+-   Use `OSITimeToCentrifugation` and `OSIPreparationTemperature` as covariates in
 downstream statistical models.
 
 This reflects the intended use of OSI as a contextual QC and analysis
 support tool rather than an automatic filter for excluding samples.
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval = FALSE}
 npx_data <- read_NPX("~/NPX_file_location.xlsx")
 ```
 
@@ -360,7 +360,7 @@ interpreted relative to the dataset, so the overall pattern is usually
 more informative than any single sample’s absolute value. The PCA plots could be created based on the `OSISummary` (Figure 1) and the `OSICategory` (Figure 2), separately.
 
 ```{r, echo=T,eval = T , message=FALSE, fig.cap= "Figure 1. PCA plot of the dataset colored by OSISummary."}
-npx_data|>
+npx_data |>
   filter(!str_detect(SampleID, "CONTROL"))|>
   olink_pca_plot(color_g = "OSISummary")
 ```
@@ -379,7 +379,7 @@ After the summary variables have been reviewed, the next step is to
 inspect the parameter-specific variables. These are often more useful
 for identifying the likely source of the observed pre-analytical signal.
 
-The same as OSI summary variables, PCA plots could be used to evaluate both `OSITimeToCentrifugation` (Figure 3) and `OSITemperature` (Figure 4).
+The same as OSI summary variables, PCA plots could be used to evaluate both `OSITimeToCentrifugation` (Figure 3) and `OSIPreparationTemperature` (Figure 4).
 
 ```{r, echo=T,eval = T , message=FALSE, fig.cap= "Figure 3. PCA plot of the dataset colored by OSITimeToCentrifugation."}
 npx_data|>
@@ -387,13 +387,13 @@ npx_data|>
   olink_pca_plot(color_g = "OSITimeToCentrifugation")
 ```
 
-```{r, echo=T,eval = T , message=FALSE, fig.cap= "Figure 4. PCA plot of the dataset colored by OSITemperature."}
+```{r, echo=T,eval = T , message=FALSE, fig.cap= "Figure 4. PCA plot of the dataset colored by OSIPreparationTemperature."}
 npx_data|>
   filter(!str_detect(SampleID, "CONTROL"))|>
-  olink_pca_plot(color_g = "OSITemperature")
+  olink_pca_plot(color_g = "OSIPreparationTemperature")
 ```
 
-Besides PCA plots, we could also visualize the OSI by density plots for both `OSITimeToCentrifugation` (Figure 5) and `OSITemperature` (Figure 6).
+Besides PCA plots, we could also visualize the OSI by density plots for both `OSITimeToCentrifugation` (Figure 5) and `OSIPreparationTemperature` (Figure 6).
 
 ```{r, echo=T,eval = T , message=FALSE, fig.cap= "Figure 5. Density plot of the OSITimeToCentrifugation values."}
 npx_data|>
@@ -401,20 +401,20 @@ npx_data|>
   olink_osi_dist_plot(osi_score = "OSITimeToCentrifugation")
 ```
 
-```{r, echo=T,eval = T , message=FALSE, fig.cap= "Figure 5. Density plot of the OSITemperature values."}
+```{r, echo=T,eval = T , message=FALSE, fig.cap= "Figure 5. Density plot of the OSIPreparationTemperature values."}
 npx_data|>
   filter(!str_detect(SampleID, "CONTROL"))|>
-  olink_osi_dist_plott(osi_score = "OSITemperature")
+  olink_osi_dist_plot(osi_score = "OSIPreparationTemperature")
 ```
 
-Compared to `OSITemperature`, `OSITimeToCentrifugation` displays greater heterogeneity 
+Compared to `OSIPreparationTemperature`, `OSITimeToCentrifugation` displays greater heterogeneity 
 and aligns with the structure observed in the PCA plot, indicating that it is 
 likely the main contributor to the observed pre-analytical signal.
 
 ## How to use OSI in statistical models
 
 For downstream statistical analysis, the recommended approach is to use
-`OSITimeToCentrifugation` and `OSITemperature` as covariates. The
+`OSITimeToCentrifugation` and `OSIPreparationTemperature` as covariates. The
 combined summary variables are more useful for initial QC and
 visualization, whereas the individual time and temperature variables are
 preferred for correction because they preserve more information about
@@ -457,7 +457,7 @@ considered in downstream analyses.
 -   OSITimeToCentrifugation is directional, where lower values
 generally reflect shorter delays.
 
--   OSITemperature is not inherently directional in the same way, so
+-   OSIPreparationTemperature is not inherently directional in the same way, so
 consistency is more informative than magnitude alone.
 
 ## Good to know and edge cases
@@ -508,7 +508,7 @@ structured way to detect and account for handling-related effects in
 Olink® Explore HT EDTA plasma datasets. OSI is most effective when used
 as part of a workflow that begins with OSISummary and OSICategory
 for initial QC, then moves to OSITimeToCentrifugation and
-OSITemperature for interpretation and statistical adjustment.
+OSIPreparationTemperature for interpretation and statistical adjustment.
 
 In practice, the most important question is not whether a sample has a
 high or low absolute OSI value, but whether OSI reveals heterogeneity,
