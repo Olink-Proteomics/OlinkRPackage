@@ -583,6 +583,12 @@ olink_normalization_n <- function(norm_schema) {
 #' @param project_ref_name Name of the project to be used as reference set.
 #' Needs to be one of the project_1_name or project_2_name. It marks the
 #' project to which the other project will be adjusted to (default: P1).
+#' @param project_1_check_log A named list returned by [`check_npx()`]. If
+#' `NULL`, [`check_npx()`] will be run internally using `project_1_df`.
+#' (default: `NULL`)
+#' @param df2_check_log A named list returned by [`check_npx()`]. If
+#' `NULL`, [`check_npx()`] will be run internally using `project_2_df`.
+#' (default: `NULL`)
 #'
 #' @return A "tibble" of NPX data in long format containing normalized NPX
 #' values, including adjustment factors and name of project.
@@ -623,6 +629,10 @@ olink_normalization_n <- function(norm_schema) {
 #' overlap_samples_list <- list("DF1" = overlap_samples,
 #'                              "DF2" = overlap_samples)
 #'
+#' # check npx
+#' df1_check_log <- OlinkAnalyze::check_npx(df = npx_df1)
+#' df2_check_log <- OlinkAnalyze::check_npx(df = npx_df2)
+#'
 #' # Normalize
 #' OlinkAnalyze::olink_normalization_bridge(
 #'   project_1_df = npx_df1,
@@ -630,7 +640,9 @@ olink_normalization_n <- function(norm_schema) {
 #'   bridge_samples = overlap_samples_list,
 #'   project_1_name = "P1",
 #'   project_2_name = "P2",
-#'   project_ref_name = "P1"
+#'   project_ref_name = "P1",
+#'   project_1_check_log = df1_check_log,
+#'   project_2_check_log = df2_check_log
 #' )
 #' }
 #'
@@ -639,7 +651,9 @@ olink_normalization_bridge <- function(project_1_df,
                                        bridge_samples,
                                        project_1_name = "P1",
                                        project_2_name = "P2",
-                                       project_ref_name = "P1") {
+                                       project_ref_name = "P1",
+                                       project_1_check_log = NULL,
+                                       project_2_check_log = NULL) {
 
   check_project_name <- olink_normalization_project_name_check(
     project_1_name = project_1_name,
@@ -825,6 +839,10 @@ olink_normalization_bridge <- function(project_1_df,
 #' subset_samples_list <- list("DF1" = df1_samples,
 #'                             "DF2" = df2_samples)
 #'
+#' # check npx
+#' df1_check_log <- OlinkAnalyze::check_npx(df = npx_df1)
+#' df2_check_log <- OlinkAnalyze::check_npx(df = npx_df2)
+#'
 #' # Normalize
 #' OlinkAnalyze::olink_normalization_subset(
 #'   project_1_df = npx_df1,
@@ -832,7 +850,9 @@ olink_normalization_bridge <- function(project_1_df,
 #'   reference_samples = subset_samples_list,
 #'   project_1_name = "P1",
 #'   project_2_name = "P2",
-#'   project_ref_name = "P1"
+#'   project_ref_name = "P1",
+#'   project_1_check_log = df1_check_log,
+#'   project_2_check_log = df2_check_log
 #' )
 #'
 #'
@@ -903,6 +923,10 @@ olink_normalization_bridge <- function(project_1_df,
 #' subset_samples_all_list <- list("DF1" = df1_samples_all,
 #'                                 "DF2" = df2_samples_all)
 #'
+#' # check npx
+#' df1_check_log <- OlinkAnalyze::check_npx(df = npx_df1)
+#' df2_check_log <- OlinkAnalyze::check_npx(df = npx_df2)
+#'
 #' # Normalize
 #' OlinkAnalyze::olink_normalization_subset(
 #'   project_1_df = npx_df1,
@@ -910,7 +934,9 @@ olink_normalization_bridge <- function(project_1_df,
 #'   reference_samples = subset_samples_all_list,
 #'   project_1_name = "P1",
 #'   project_2_name = "P2",
-#'   project_ref_name = "P1"
+#'   project_ref_name = "P1",
+#'   project_1_check_log = df1_check_log,
+#'   project_2_check_log = df2_check_log
 #' )
 #' }
 #'
@@ -919,7 +945,9 @@ olink_normalization_subset <- function(project_1_df,
                                        reference_samples,
                                        project_1_name = "P1",
                                        project_2_name = "P2",
-                                       project_ref_name = "P1") {
+                                       project_ref_name = "P1",
+                                       project_1_check_log = NULL,
+                                       project_2_check_log = NULL) {
 
   check_project_name <- olink_normalization_project_name_check(
     project_1_name = project_1_name,

@@ -10,7 +10,9 @@ olink_normalization_bridge(
   bridge_samples,
   project_1_name = "P1",
   project_2_name = "P2",
-  project_ref_name = "P1"
+  project_ref_name = "P1",
+  project_1_check_log = NULL,
+  project_2_check_log = NULL
 )
 }
 \arguments{
@@ -31,6 +33,14 @@ should correspond to the same sample. (required)}
 \item{project_ref_name}{Name of the project to be used as reference set.
 Needs to be one of the project_1_name or project_2_name. It marks the
 project to which the other project will be adjusted to (default: P1).}
+
+\item{project_1_check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If
+\code{NULL}, \code{\link[=check_npx]{check_npx()}} will be run internally using \code{project_1_df}.
+(default: \code{NULL})}
+
+\item{df2_check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If
+\code{NULL}, \code{\link[=check_npx]{check_npx()}} will be run internally using \code{project_2_df}.
+(default: \code{NULL})}
 }
 \value{
 A "tibble" of NPX data in long format containing normalized NPX
@@ -82,6 +92,10 @@ overlap_samples <- dplyr::intersect(x = unique(npx_df1[["SampleID"]]),
 overlap_samples_list <- list("DF1" = overlap_samples,
                              "DF2" = overlap_samples)
 
+# check npx
+df1_check_log <- OlinkAnalyze::check_npx(df = npx_df1)
+df2_check_log <- OlinkAnalyze::check_npx(df = npx_df2)
+
 # Normalize
 OlinkAnalyze::olink_normalization_bridge(
   project_1_df = npx_df1,
@@ -89,7 +103,9 @@ OlinkAnalyze::olink_normalization_bridge(
   bridge_samples = overlap_samples_list,
   project_1_name = "P1",
   project_2_name = "P2",
-  project_ref_name = "P1"
+  project_ref_name = "P1",
+  project_1_check_log = df1_check_log,
+  project_2_check_log = df2_check_log
 )
 }
 
