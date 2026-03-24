@@ -32,6 +32,9 @@ The first or single value is used as x-axis, the second as fill. Further values 
 
 \item{ttest_results}{Data frame from ttest analysis using olink_ttest() function.}
 
+\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}...}
+
 \item{...}{coloroption passed to specify color order}
 }
 \value{
