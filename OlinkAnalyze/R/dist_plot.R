@@ -98,7 +98,7 @@ olink_dist_plot <- function(df,
     ggplot2::scale_x_discrete(labels = function(x) gsub(reg, "", x), ...) # nolint: return_linter
   }
 
-  # Split by Panel
+  # Format Panel names
   df <- df |>
     dplyr::mutate(!!check_log$col_names$panel :=
                     .data[[check_log$col_names$panel]] |>
@@ -110,26 +110,34 @@ olink_dist_plot <- function(df,
 
     df <- df |>
       dplyr::group_by(.data[["SampleID"]], .data[["Panel"]]) |>
-      dplyr::mutate(!!check_log$col_names$qc_warning := dplyr::if_else(all(toupper(.data[[check_log$col_names$qc_warning]]) == "PASS"),  # nolint: line_length_linter
-                                                                       "Pass",
-                                                                       "Warning")) |>
+      dplyr::mutate(
+        !!check_log$col_names$qc_warning := dplyr::if_else(
+          all(
+            toupper(.data[[check_log$col_names$qc_warning]]) == "PASS"
+          ),
+          "Pass",
+          "Warning"
+        )
+      ) |>
       dplyr::ungroup()
 
   }
 
-  df |>
-    ggplot2::ggplot(ggplot2::aes( # nolint: return_linter
-      x = reorder_within(factor(SampleID),
-                         NPX,
-                         Panel, # to replace with check_log value
-                         median),
+  df |> # nolint: return_linter
+    ggplot2::ggplot(ggplot2::aes(
+      x = reorder_within(factor(SampleID), # nolint: object_usage_linter
+                         NPX, # nolint: object_usage_linter
+                         Panel, # nolint: object_usage_linter
+                         median # nolint: object_usage_linter
+      ),
       y = NPX,
-      fill = !!rlang::ensym(color_g))) +
+      fill = !!rlang::ensym(color_g)
+    )) +
     ggplot2::geom_boxplot() +
     scale_x_reordered() +
     ggplot2::xlab("Samples") +
     ggplot2::facet_wrap(as.formula(paste("~", check_log$col_names$panel)),
-                        scale="free") +
+                        scale = "free") +
     OlinkAnalyze::set_plot_theme() +
     OlinkAnalyze::olink_fill_discrete(...)
 }
