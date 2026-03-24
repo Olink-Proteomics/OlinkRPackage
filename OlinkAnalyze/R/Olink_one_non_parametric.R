@@ -142,7 +142,7 @@ olink_one_non_parametric <- function(df,
       # Not testing assays that have all NA:s in one level
       # Every sample needs to have a unique level of the factor
 
-      nas_in_var <- character(0)
+      nas_in_var <- character(0L)
 
       single_fixed_effects <- variable
 
@@ -155,11 +155,11 @@ olink_one_non_parametric <- function(df,
             n_na = sum(is.na(!!rlang::ensym(data_type))),
             .groups = "drop"
           ) |>
-          dplyr::filter(n == n_na) |> # nolint object_usage_linter
+          dplyr::filter(n == .data[["n_na"]]) |>
           dplyr::distinct(.data[["OlinkID"]]) |>
           dplyr::pull(.data[["OlinkID"]])
 
-        if (length(current_nas) > 0) {
+        if (length(current_nas) > 0L) {
           nas_in_var <- c(nas_in_var, current_nas)
           cli::cli_warn(
             "The assay(s) {.val {current_nas}} have only NA values in at least
@@ -173,7 +173,7 @@ olink_one_non_parametric <- function(df,
             n_levels = dplyr::n_distinct(!!rlang::ensym(effect), na.rm = TRUE),
             .groups = "drop"
           ) |>
-          dplyr::filter(n_levels > 1L) |> # nolint object_usage_linter
+          dplyr::filter(.data[["n_levels"]] > 1L) |>
           nrow()
 
         if (number_of_samples_w_more_than_one_level > 0L) {
@@ -193,7 +193,7 @@ olink_one_non_parametric <- function(df,
 
       # Print verbose message
       if (verbose) {
-        if (!is.null(removed.sampleids) & length(removed.sampleids) > 0) { # nolint object_name_linter
+        if (!is.null(removed.sampleids) & length(removed.sampleids) > 0L) { # nolint object_name_linter
           cli::cli_inform(
             "Samples removed due to missing variable:
             {.val {removed.sampleids}}"
@@ -271,12 +271,13 @@ olink_one_non_parametric <- function(df,
             .data[["UniProt"]],
             .data[["Panel"]]
           ) |>
-          dplyr::do(
-            rstatix::friedman_test(as.formula(formula_string),
-              data = ., # nolint object_usage_linter
+          dplyr::group_modify(~ {
+            rstatix::friedman_test(
+              as.formula(formula_string),
+              data = .x,
               na.action = na.omit
             )
-          ) |>
+          }) |>
           dplyr::ungroup() |>
           dplyr::mutate(
             Adjusted_pval = p.adjust(.data[["p"]], method = "BH")
@@ -309,11 +310,14 @@ olink_one_non_parametric <- function(df,
               .data[["UniProt"]],
               .data[["Panel"]]
             ) |>
-            dplyr::do(broom::tidy(
-              kruskal.test(as.formula(formula_string),
-                data = . # nolint object_usage_linter
+            dplyr::group_modify(~ {
+              broom::tidy(
+                kruskal.test(
+                  as.formula(formula_string),
+                  data = .x
+                )
               )
-            )) |>
+            }) |>
             dplyr::ungroup() |>
             dplyr::mutate(
               Adjusted_pval = p.adjust(.data[["p.value"]], method = "BH")
@@ -389,9 +393,13 @@ olink_one_non_parametric <- function(df,
 #' library(dplyr)
 #'
 #' try({ # May fail if dependencies are not installed
+#'   # Run check_npx
+#'   check_log <- check_npx(npx_data1)
+#'
 #'   # One-way Kruskal-Wallis Test
 #'   kruskal_results <- olink_one_non_parametric(
 #'     df = npx_data1,
+#'     check_log = check_log,
 #'     variable = "Site"
 #'   )
 #' })
@@ -399,6 +407,7 @@ olink_one_non_parametric <- function(df,
 #' # Friedman Test
 #' friedman_results <- olink_one_non_parametric(
 #'   df = npx_data1,
+#'   check_log = check_log,
 #'   variable = "Time",
 #'   subject = "Subject",
 #'   dependence = TRUE
@@ -406,6 +415,7 @@ olink_one_non_parametric <- function(df,
 #'
 #' # Posthoc test for the results from Friedman Test
 #' friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_data1,
+#'   check_log = check_log,
 #'   variable = "Time",
 #'   test = "friedman",
 #'   olinkid_list = {
@@ -499,7 +509,7 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
         num.vars <- c(num.vars, variable_testers) # nolint object_name_linter
       }
 
-      formula_string <- paste0(data_type, "~", paste(variable, collapse = "*"))
+      formula_string <- paste0(data_type, "~", paste(variable, collapse = "*")) #nolint
 
       # Print verbose message
       if (verbose) {
@@ -531,7 +541,7 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
         # Not testing assays that have all NA:s in one level
         # Every sample needs to have a unique level of the factor
 
-        nas_in_var <- character(0)
+        nas_in_var <- character(0L)
 
         single_fixed_effects <- variable
 
@@ -548,7 +558,7 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
             dplyr::distinct(.data[["OlinkID"]]) |>
             dplyr::pull(.data[["OlinkID"]])
 
-          if (length(current_nas) > 0) {
+          if (length(current_nas) > 0L) {
             nas_in_var <- c(nas_in_var, current_nas)
             cli::cli_warn(
               "The assay(s) {.val {current_nas}} have only NA values in at
@@ -565,10 +575,10 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
               ),
               .groups = "drop"
             ) |>
-            dplyr::filter(.data[["n_levels"]] > 1) |>
+            dplyr::filter(.data[["n_levels"]] > 1L) |>
             nrow()
 
-          if (number_of_samples_w_more_than_one_level > 0) {
+          if (number_of_samples_w_more_than_one_level > 0L) {
             cli::cli_abort(
               "There are {number_of_samples_w_more_than_one_level} samples
               that do not have a unique level for the effect {.var {effect}}.
@@ -644,14 +654,16 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
             .data[["UniProt"]],
             .data[["Panel"]]
           ) |>
-          dplyr::do(rstatix::wilcox_test(
-            data = ., # nolint object_usage_linter
-            as.formula(formula_string),
-            p.adjust.method = "BH",
-            detailed = TRUE,
-            conf.level = 0.95,
-            paired = TRUE
-          )) |>
+          dplyr::group_modify(~ {
+            rstatix::wilcox_test(
+              data = .x,
+              formula = as.formula(formula_string),
+              p.adjust.method = "BH",
+              detailed = TRUE,
+              conf.level = 0.95,
+              paired = TRUE
+            )
+          }) |>
           dplyr::ungroup() |>
           dplyr::mutate("variable" = variable) |>
           dplyr::mutate(Threshold = dplyr::if_else(
@@ -684,13 +696,13 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
             .data[["UniProt"]],
             .data[["Panel"]]
           ) |>
-          dplyr::do(
+          dplyr::group_modify(~ {
             FSA::dunnTest(
-              data = ., # nolint object_usage_linter
               as.formula(formula_string),
+              data = .x,
               method = "bh"
             )$res
-          ) |>
+          }) |>
           dplyr::ungroup() |>
           dplyr::mutate("variable" = variable) |>
           dplyr::mutate(Threshold = dplyr::if_else(
