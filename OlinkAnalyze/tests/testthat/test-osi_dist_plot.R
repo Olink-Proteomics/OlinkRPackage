@@ -78,10 +78,13 @@ test_that(
         !is.na(.data[["OSISummary"]])
       )
 
-    osi_check_log <- check_npx(osi_data) |>
+    osi_check_log <- check_npx(df = osi_data) |>
       suppressWarnings() |>
       suppressMessages()
 
+    osi_dist_plot_name <- "osisummary-plot"
+    check_snap_exist(test_dir_name = "osi_dist_plot",
+                     snap_name = osi_dist_plot_name)
     vdiffr::expect_doppelganger(
       title = "OSISummary Plot",
       fig = olink_osi_dist_plot(
