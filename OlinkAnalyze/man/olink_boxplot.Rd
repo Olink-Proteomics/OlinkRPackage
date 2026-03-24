@@ -2,60 +2,57 @@
 % Please edit documentation in R/olink_boxplot.R
 \name{olink_boxplot}
 \alias{olink_boxplot}
-\title{Generate boxplots for selected Olink proteins}
+\title{Function which plots boxplots of selected variables}
 \usage{
 olink_boxplot(
   df,
   variable,
   olinkid_list,
   verbose = FALSE,
-  number_of_proteins_per_plot = 6L,
+  number_of_proteins_per_plot = 6,
   posthoc_results = NULL,
   ttest_results = NULL,
   check_log = NULL,
   ...
 )
 }
+\arguments{
+\item{df}{NPX data frame in long format with at least protein name (Assay), OlinkID (unique), UniProt and at least one grouping variable.}
+
+\item{variable}{A character vector or character value indicating which column to use as the x-axis and fill grouping variable.
+The first or single value is used as x-axis, the second as fill. Further values in a vector are not plotted.}
+
+\item{olinkid_list}{Character vector indicating which proteins (OlinkIDs) to plot.}
+
+\item{verbose}{Boolean. If the plots are shown as well as returned in the list (default is false).}
+
+\item{number_of_proteins_per_plot}{Number of boxplots to include in the facet plot (default 6).}
+
+\item{posthoc_results}{Data frame from ANOVA posthoc analysis using olink_anova_posthoc() function.}
+
+\item{ttest_results}{Data frame from ttest analysis using olink_ttest() function.}
+
+\item{...}{coloroption passed to specify color order}
+}
+\value{
+A list of objects of class “ggplot” (the actual ggplot object is entry 1 in the list). Box and whisker plot of NPX (y-axis) by variable (x-axis) for each Assay
+}
 \description{
-This function creates boxplots (optionally annotated with posthoc or
-t-test results) for a set of proteins specified by OlinkID.
+Generates faceted boxplots of NPX vs. grouping variable(s) for a given list of proteins (OlinkIDs) using ggplot and ggplot2::geom_boxplot.
 }
-\details{
-\subsection{Steps performed internally:}{
-\enumerate{
-\item \strong{Input validation}
-\itemize{
-\item Check dataset format
-\item Validate variable names, olinkid list, verbosity, integer parameters
-\item Validate ellipsis arguments (\code{coloroption} only)
+\examples{
+\donttest{
+
+library(dplyr)
+npx_df <- npx_data1 |> filter(!grepl('control|ctrl',SampleID, ignore.case = TRUE))
+anova_results <- olink_anova(npx_df, variable = "Site")
+significant_assays <- anova_results |>
+    filter(Threshold == 'Significant') |>
+    pull(OlinkID)
+olink_boxplot(npx_df,
+              variable = "Site",
+              olinkid_list = significant_assays,
+              verbose = TRUE,
+              number_of_proteins_per_plot = 3)}
+
 }
-\item \strong{QC & NPX Cleaning}
-\itemize{
-\item Run QC log checks
-\item Clean NPX using Olink standard workflows
-\item Warn if sample type is missing
-}
-\item \strong{Column validation}
-\itemize{
-\item Ensure all required variables exist
-\item Ensure only the first two variables are used if more are provided
-}
-\item \strong{Tidy evaluation setup}
-\itemize{
-\item Convert variables to tidy-eval symbols for ggplot
-}
-\item \strong{Loop over batches of proteins}
-\itemize{
-\item For each \code{number_of_proteins_per_plot} chunk:
-\itemize{
-\item Filter NPX values
-\item Prepare combined label column
-\item Build the boxplot
-\item Optionally add posthoc or t-test annotation
-}
-}
-\item \strong{Return list of ggplot objects (invisible)}
-}
-}
-}
-\keyword{internal}
