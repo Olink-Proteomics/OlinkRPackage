@@ -42,12 +42,10 @@
 #'              x = .data[["SampleID"]],
 #'              ignore.case = TRUE)
 #'     )
-#'   
 #'   anova_results <- OlinkAnalyze::olink_anova(
 #'     df = npx_df,
 #'     variable = "Site"
 #'   )
-#'   
 #'   significant_assays <- anova_results |>
 #'     dplyr::filter(
 #'       .data[["Threshold"]] == "Significant"
@@ -55,7 +53,6 @@
 #'     dplyr::pull(
 #'       .data[["OlinkID"]]
 #'     )
-#'   
 #'   OlinkAnalyze::olink_boxplot(
 #'     df = npx_df,
 #'     variable = "Site",
