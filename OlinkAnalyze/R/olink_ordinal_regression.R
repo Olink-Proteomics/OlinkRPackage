@@ -654,7 +654,7 @@ olink_ordinal_regression_posthoc <- function(df, # nolint: object_length_linter
       }
 
       if (!missing(effect_formula)) {
-        e_form <- stats::as.formula(object = effect_formula) # nolintv object_usage_linter
+        e_form <- stats::as.formula(object = effect_formula) # nolint: object_usage_linter
       } else {
         e_form <- stats::as.formula(
           object = paste0("pairwise~", paste(effect, collapse = "+")) # nolint: object_usage_linter

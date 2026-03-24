@@ -410,7 +410,7 @@ generate_plate_holder <- function(nplates,
 #' olink_displayPlateDistributions(randomized.manifest_b, fill.color = 'Site')
 #' }
 olink_plate_randomizer <- function(Manifest, # nolint: object_name_linter
-                                   PlateSize = 96, # nolint object_name_linter
+                                   PlateSize = 96, # nolint: object_name_linter
                                    Product, # nolint: object_name_linter
                                    SubjectColumn, # nolint: object_name_linter
                                    iterations = 500,
