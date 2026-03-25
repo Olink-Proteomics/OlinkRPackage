@@ -245,9 +245,8 @@ olink_umap_plot <- function(df,
     # Strip "Olink" from the panel names
     df <- df |>
       dplyr::mutate(
-        Panel = stringr::str_replace(string = .data[["Panel"]],
-                                     replacement = "Olink ",
-                                     pattern = "")
+        Panel = stringr::str_remove_all(string = .data[["Panel"]],
+                                        pattern = "Olink ")
       )
 
     plotList <- lapply(unique(df$Panel), function(x) { # nolint: object_name_linter
