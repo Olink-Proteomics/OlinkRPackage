@@ -54,40 +54,30 @@
 #' }
 #'
 #' @export
-#' @examples \donttest{
+#' @examples
+#' \donttest{
+#' if (rlang::is_installed(pkg = c("lme4", "lmerTest", "broom"))) {
 #'
-#' library(dplyr)
+#'  check_log <- check_npx(df = npx_data1)
 #'
-#' # One-way Kruskal-Wallis Test
-#' try({ # May fail if dependencies are not installed
-#'   check_log <- check_npx(npx_data1)
-#'
-#'   kruskal_results <- olink_one_non_parametric(
+#'  # One-way Kruskal-Wallis Test
+#'  kruskal_results <- OlinkAnalyze::olink_one_non_parametric(
 #'     df = npx_data1,
 #'     check_log = check_log,
 #'     variable = "Site"
 #'   )
-#' })
 #'
-#' # Friedman Test
-#' friedman_results <- olink_one_non_parametric(
-#'   df = npx_data1,
-#'   check_log = check_log,
-#'   variable = "Time",
-#'   subject = "Subject",
-#'   dependence = TRUE
-#' )
+#'   # Friedman Test
+#'   friedman_results <- OlinkAnalyze::olink_one_non_parametric(
+#'     df = npx_data1,
+#'     check_log = check_log,
+#'     variable = "Time",
+#'     subject = "Subject",
+#'     dependence = TRUE
+#'   )
+#' }
 #' }
 #'
-#' @importFrom dplyr n filter group_by summarise ungroup pull n_distinct do
-#' select arrange mutate
-#' @importFrom stringr str_detect
-#' @importFrom generics tidy
-#' @importFrom stats kruskal.test IQR as.formula contr.sum lm median na.omit
-#' p.adjust sd t.test var
-#' @importFrom rstatix friedman_test convert_as_factor
-#' @importFrom utils glob2rx read.table globalVariables
-
 olink_one_non_parametric <- function(df,
                                      check_log = NULL,
                                      variable,
