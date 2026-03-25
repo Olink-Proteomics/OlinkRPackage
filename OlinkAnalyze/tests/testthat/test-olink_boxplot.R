@@ -12,10 +12,15 @@ ref_results <- get_example_data(
 npx_data_format221010 <- get_example_data(
   filename = "npx_data_format-Oct-2022.rds"
 )
-npx_check <- suppressWarnings(check_npx(npx_data_format221010))
+npx_check <- check_npx(npx_data_format221010) |>
+  suppressWarnings() |>
+  suppressMessages()
 # -------------------------------------------------------------------------
 # Create plots for testing
 # -------------------------------------------------------------------------
+npx_data1_check <- check_npx(df = npx_data1) |>
+  suppressWarnings() |>
+  suppressMessages()
 
 boxplot_site_2prots <- npx_data1 |>
   na.omit() |>
@@ -24,7 +29,8 @@ boxplot_site_2prots <- npx_data1 |>
     olinkid_list = ref_results$anova_site |>
       dplyr::filter(Threshold == "Significant") |>
       head(2) |>
-      dplyr::pull(OlinkID)
+      dplyr::pull(OlinkID),
+    check_log = npx_data1_check
   )
 
 boxplot_site_10prots <- npx_data1 |>
@@ -35,7 +41,8 @@ boxplot_site_10prots <- npx_data1 |>
       dplyr::filter(Threshold == "Significant") |>
       head(10) |>
       dplyr::pull(OlinkID),
-    number_of_proteins_per_plot = 5L
+    number_of_proteins_per_plot = 5L,
+    check_log = npx_data1_check
   )
 
 boxplot_time <- npx_data1 |>
@@ -43,7 +50,8 @@ boxplot_time <- npx_data1 |>
     variable = "Time",
     olinkid_list = ref_results$anova_time |>
       head(10) |>
-      dplyr::pull(OlinkID)
+      dplyr::pull(OlinkID),
+    check_log = npx_data1_check
   )
 
 boxplot_time_coloroption <- npx_data1 |>
@@ -52,7 +60,8 @@ boxplot_time_coloroption <- npx_data1 |>
     olinkid_list = ref_results$anova_time |>
       head(10) |>
       dplyr::pull(OlinkID),
-    coloroption = c("teal", "pink", "orange", "turqoise")
+    coloroption = c("teal", "pink", "orange", "turqoise"),
+    check_log = npx_data1_check
   )
 
 boxplot_time_site <- npx_data1 |>
@@ -61,7 +70,8 @@ boxplot_time_site <- npx_data1 |>
     variable = c("Time", "Site"),
     olinkid_list = ref_results$anova_time |>
       head(10) |>
-      dplyr::pull(OlinkID)
+      dplyr::pull(OlinkID),
+    check_log = npx_data1_check
   )
 
 # -------------------------------------------------------------------------
