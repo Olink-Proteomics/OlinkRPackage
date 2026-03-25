@@ -82,8 +82,7 @@ Imports:
     rlang,
     stringr,
     tibble,
-    tidyr,
-    rstatix
+    tidyr
 Suggests: 
     broom,
     car,
@@ -108,4 +107,5 @@ Suggests:
     withr,
     writexl,
     zip,
-    FSA
+    FSA,
+    rstatix
