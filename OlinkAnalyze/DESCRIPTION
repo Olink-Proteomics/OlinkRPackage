@@ -107,6 +107,6 @@ Suggests:
     withr,
     writexl,
     zip,
-    umap
-    FSA,
-    rstatix
+    umap,
+    rstatix,
+    FSA
