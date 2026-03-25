@@ -2,6 +2,8 @@ test_that(
   "olink_umap_plot - works - snapshot",
   {
     skip_if_not_installed("umap")
+    skip_if_not_installed("ggrepel")
+    skip_if_not_installed("ggpubr")
     skip_if_not_installed("vdiffr")
 
     withr::local_seed(123)
@@ -11,7 +13,9 @@ test_that(
 
     npx_df <- npx_data1 |>
       dplyr::filter(
-        !grepl("control", SampleID, ignore.case = TRUE)
+        !grepl(pattern = "control",
+               x = .data[["SampleID"]],
+               ignore.case = TRUE)
       )
 
     expect_no_error(
@@ -48,6 +52,8 @@ test_that(
   "olink_umap_plot - works - clusters are there and outlier group is detected",
   {
     skip_if_not_installed("umap")
+    skip_if_not_installed("ggrepel")
+    skip_if_not_installed("ggpubr")
 
     out_group <- c("A1_1", "A10_11", "A12_13", "A17_18", "A25_27",
                    "A69_71", "B2_81", "B31_112", "B66_147", "B71_152")
@@ -112,6 +118,8 @@ test_that(
   "olink_umap_plot - warnings",
   {
     skip_if_not_installed("umap")
+    skip_if_not_installed("ggrepel")
+    skip_if_not_installed("ggpubr")
 
     # Two Warnings thrown: for dropped assays and droppes samples
     expect_warning(
@@ -154,6 +162,154 @@ test_that(
                      "\"OID30748\", \"OID30866\", \"OID30899\", \"OID31054\",",
                      "\"OID31113\", \"OID31186\", \"OID31225\", \"OID31309\",",
                      "and \"OID31325\" have \"NPX\" = NA for all samples")
+    )
+  }
+)
+
+test_that(
+  "olink_qc_plot - works - OSI snapshots",
+  {
+    skip_if_not_installed("ggrepel")
+    skip_if_not_installed("ggpubr")
+    skip_if_not_installed("umap")
+    skip_if_not_installed("vdiffr")
+
+    withr::local_seed(123)
+
+    cfg <- umap::umap.defaults
+    cfg$random_state <- 123
+
+    osi_data <- get_example_data("example_osi_data.rds")
+
+    check_log <- check_npx(df = osi_data) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = umap_osi_cat <- olink_umap_plot(
+            df = osi_data,
+            color_g = "OSICategory",
+            check_log = check_log,
+            config = cfg,
+            quiet = TRUE
+          )
+        )
+      )
+    )
+    umap_osi_cat_name <- "umap_plot_osi_category"
+    # check_snap_exist(test_dir_name = "plot_umap",
+    # snap_name = umap_osi_cat_name)
+    vdiffr::expect_doppelganger(umap_osi_cat_name, umap_osi_cat[[1L]]) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = umap_osi_sum <- olink_umap_plot(
+            df = osi_data,
+            color_g = "OSISummary",
+            check_log = check_log,
+            config = cfg,
+            quiet = TRUE
+          )
+        )
+      )
+    )
+    umap_osi_sum_name <- "umap_plot_osi_summary"
+    # check_snap_exist(test_dir_name = "plot_umap",
+    # snap_name = umap_osi_sum_name)
+    vdiffr::expect_doppelganger(umap_osi_sum_name, umap_osi_sum[[1L]]) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = umap_osi_temp <- olink_umap_plot(
+            df = osi_data,
+            color_g = "OSIPreparationTemperature",
+            check_log = check_log,
+            config = cfg,
+            quiet = TRUE
+          )
+        )
+      )
+    )
+    umap_osi_temp_name <- "umap_plot_osi_temperature"
+    # check_snap_exist(test_dir_name = "plot_umap",
+    # snap_name = umap_osi_temp_name)
+    vdiffr::expect_doppelganger(umap_osi_temp_name, umap_osi_temp[[1L]]) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = umap_osi_centr <- olink_umap_plot(
+            df = osi_data,
+            color_g = "OSITimeToCentrifugation",
+            check_log = check_log,
+            config = cfg,
+            quiet = TRUE
+          )
+        )
+      )
+    )
+    umap_osi_centr_name <- "umap_plot_osi_centrifugation"
+    # check_snap_exist(test_dir_name = "plot_umap",
+    # snap_name = umap_osi_centr_name)
+    vdiffr::expect_doppelganger(umap_osi_centr_name, umap_osi_centr[[1L]]) |>
+      suppressMessages() |>
+      suppressWarnings()
+  }
+)
+
+test_that(
+  "olink_qc_plot - works - OSI edge cases",
+  {
+    skip_if_not_installed("ggrepel")
+    skip_if_not_installed("ggpubr")
+    skip_if_not_installed("umap")
+
+    osi_data <- get_example_data("example_osi_data.rds")
+
+    # ----------------------------
+    # OSICategory all NA
+    # ----------------------------
+    df_cat_all_na <- osi_data |>
+      dplyr::mutate(OSICategory = NA)
+
+    expect_error(
+      object = olink_qc_plot(
+        df = df_cat_all_na,
+        color_g = "OSICategory",
+        check_log = check_npx(df = df_cat_all_na) |>
+          suppressMessages() |>
+          suppressWarnings()
+      ),
+      regexp = paste("All values are 'NA' in the column \"OSICategory\" of the",
+                     "dataset `df`!")
+    )
+
+    # ----------------------------
+    # Continuous OSI column all NA
+    # ----------------------------
+    df_cont_all_na <- osi_data |>
+      dplyr::mutate(OSISummary = NA)
+
+    expect_error(
+      object = olink_qc_plot(
+        df = df_cont_all_na,
+        color_g = "OSISummary",
+        check_log = check_npx(df = df_cont_all_na) |>
+          suppressMessages() |>
+          suppressWarnings()
+      ),
+      regexp = paste("All values are 'NA' in the column \"OSISummary\" of the",
+                     "dataset `df`!")
     )
   }
 )
