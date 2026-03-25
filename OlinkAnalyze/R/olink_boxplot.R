@@ -1,7 +1,8 @@
-#'Function which plots boxplots of selected variables
+#' Function which plots boxplots of selected variables
 #'
-#'Generates faceted boxplots of NPX vs. grouping variable(s) for a given list
-#'of proteins (OlinkIDs) using ggplot and ggplot2::geom_boxplot.
+#' @description
+#' Generates faceted boxplots of NPX vs. grouping variable(s) for a given list
+#' of proteins (OlinkIDs) using ggplot and ggplot2::geom_boxplot.
 #'
 #' @param df NPX data frame in long format with at least protein name (Assay),
 #'  OlinkID (unique), UniProt and at least one grouping variable.
@@ -26,12 +27,9 @@
 #' @return A list of objects of class “ggplot” (the actual ggplot object is
 #' entry 1 in the list). Box and whisker plot of NPX (y-axis) by variable
 #'  (x-axis) for each Assay
-#' @importFrom dplyr filter mutate select
-#' @importFrom stringr str_detect
-#' @importFrom tidyr unite
-#' @importFrom ggplot2 ggplot aes geom_boxplot theme facet_wrap
-#' @importFrom forcats as_factor
+#'
 #' @export
+#'
 #' @examples
 #' \donttest{
 #'
@@ -60,6 +58,7 @@
 #'     verbose = TRUE,
 #'     number_of_proteins_per_plot = 3L
 #'   )
+#' }
 #' }
 #'
 olink_boxplot <- function(df,
