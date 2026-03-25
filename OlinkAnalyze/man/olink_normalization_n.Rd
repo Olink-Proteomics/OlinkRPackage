@@ -373,14 +373,15 @@ overlap_samples <- dplyr::intersect(unique(npx_df1[["SampleID"]]),
                                     unique(npx_df2[["SampleID"]]))
 overlap_samples_df1_df2 <- list("DF1" = overlap_samples,
                                 "DF2" = overlap_samples)
-rm(overlap_samples)
 
 # Bridge samples with different identifiers between npx_df2 and npx_df3
 overlap_samples_df2_df3 <- list(
-  "DF1" = sample(x = unique(npx_df2[["SampleID"]]),
+  "DF1" = sample(x = setdiff(x = unique(npx_df2[["SampleID"]]),
+                             y = overlap_samples),
                  size = 10L,
                  replace = FALSE),
-  "DF2" = sample(x = unique(npx_df3[["SampleID"]]),
+  "DF2" = sample(x = setdiff(x = unique(npx_df3[["SampleID"]]),
+                             y = overlap_samples),
                  size = 10L,
                  replace = FALSE)
 )
