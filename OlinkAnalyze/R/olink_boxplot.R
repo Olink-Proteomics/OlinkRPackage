@@ -102,21 +102,9 @@ olink_boxplot <- function(df,
       )
     }
   }
-  # ---- QC & CLEANING --------------------------------------------------------
+  # ---- QC -------------------------------------------------------------------
   check_log <- run_check_npx(df = df, check_log = check_log)
-  df <- clean_npx(
-    df = df,
-    check_log = check_log,
-    remove_qc_warning = FALSE,
-    remove_assay_warning = FALSE,
-    verbose = FALSE
-  ) |>
-    suppressMessages() |>
-    suppressWarnings()
-  check_log_clean <- check_npx(df = df) |>
-    suppressMessages() |>
-    suppressWarnings()
-  if (!("sample_type" %in% names(check_log_clean$col_names))) {
+  if (!("sample_type" %in% names(check_log$col_names))) {
     cli::cli_inform(
       paste("No sample type column detected in input {.arg df}. Control",
             "samples may not be filtered out.")

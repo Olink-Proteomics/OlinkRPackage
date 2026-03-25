@@ -83,41 +83,56 @@ olink_bridge_selector <- function(df,
     )
   }
 
-  # ---- STEP 1: run_check_npx ------------------------------------------------
+  # ---- STEP 1: Remove invalid OlinkIDs & control samples ---------------------
 
   check_log <- run_check_npx(df = df, check_log = check_log)
-  if (!("sample_type" %in% names(check_log$col_names))) {
+
+  df_clean <- clean_npx(
+    df = df,
+    check_log = check_log,
+    remove_qc_warning = FALSE,
+    remove_assay_warning = FALSE,
+    verbose = FALSE
+  ) |>
+    suppressMessages() |>
+    suppressWarnings()
+
+  check_log_clean <- check_npx(df = df_clean) |>
+    suppressMessages() |>
+    suppressWarnings()
+
+  if (!("sample_type" %in% names(check_log_clean$col_names))) {
     cli::cli_inform(
       "No sample type column detected in the input dataset {.arg df}! Ensure
       that control samples have been filtered out!"
     )
   }
 
-  # ---- STEP 2: Outlier metrics per (Panel, SampleID) ------------------------
+  # ---- STEP 2: Outlier metrics per (Panel, SampleID) -------------------------
 
-  qc_outliers <- df |>
+  qc_outliers <- df_clean |>
     dplyr::group_by(
       dplyr::across(
         dplyr::all_of(
-          c(check_log$col_names$panel,
-            check_log$col_names$sample_id)
+          c(check_log_clean$col_names$panel,
+            check_log_clean$col_names$sample_id)
         )
       )
     ) |>
     dplyr::summarise(
       IQR = stats::IQR(
-        x = .data[[check_log$col_names$quant]],
+        x = .data[[check_log_clean$col_names$quant]],
         na.rm = TRUE
       ),
       sample_median = stats::median(
-        x = .data[[check_log$col_names$quant]],
+        x = .data[[check_log_clean$col_names$quant]],
         na.rm = TRUE
       ),
       .groups = "drop"
     ) |>
     dplyr::group_by(
       dplyr::across(
-        dplyr::all_of(check_log$col_names$panel)
+        dplyr::all_of(check_log_clean$col_names$panel)
       )
     ) |>
     dplyr::mutate(
@@ -142,62 +157,62 @@ olink_bridge_selector <- function(df,
     ) |>
     dplyr::select(
       dplyr::all_of(
-        c(check_log$col_names$sample_id,
-          check_log$col_names$panel,
+        c(check_log_clean$col_names$sample_id,
+          check_log_clean$col_names$panel,
           "Outlier")
       )
     )
 
   # ---- STEP 3: Handle LOD variations ----------------------------------------
 
-  if (!("lod" %in% names(check_log$col_names))) {
-    df <- df |>
+  if (!("lod" %in% names(check_log_clean$col_names))) {
+    df_clean <- df_clean |>
       dplyr::mutate(
         LOD = -Inf
       )
-    check_log$col_names[["lod"]] <- "LOD"
+    check_log_clean$col_names[["lod"]] <- "LOD"
 
     cli::cli_inform(
       "LOD not available, hence not filtering by LOD."
     )
-  } else if (length(check_log$col_names$lod) > 1L) {
+  } else if (length(check_log_clean$col_names$lod) > 1L) {
 
-    check_log$col_names$lod <- check_log$col_names$lod |>
+    check_log_clean$col_names$lod <- check_log_clean$col_names$lod |>
       unique() |>
       sort() |>
       utils::head(n = 1L)
 
     cli::cli_inform(
       "Multiple LOD columns detected. Will be using
-      {.val {check_log$col_names$lod}} as filter criteria."
+      {.val {check_log_clean$col_names$lod}} as filter criteria."
     )
   }
 
   # ---- STEP 4: Sample-level QC and filtering --------------------------------
 
-  df_ready <- df |>
+  df_ready <- df_clean |>
     dplyr::left_join(
       qc_outliers,
-      by = c(check_log$col_names$sample_id,
-             check_log$col_names$panel),
+      by = c(check_log_clean$col_names$sample_id,
+             check_log_clean$col_names$panel),
       relationship = "many-to-one"
     ) |>
     dplyr::mutate(
       quant_na = dplyr::if_else(
-        .data[[check_log$col_names$quant]] <=
-          .data[[check_log$col_names$lod]],
+        .data[[check_log_clean$col_names$quant]] <=
+          .data[[check_log_clean$col_names$lod]],
         NA_real_,
-        .data[[check_log$col_names$quant]]
+        .data[[check_log_clean$col_names$quant]]
       )
     ) |>
     dplyr::group_by(
       dplyr::across(
-        dplyr::all_of(check_log$col_names$sample_id)
+        dplyr::all_of(check_log_clean$col_names$sample_id)
       )
     ) |>
     dplyr::mutate(
       qc_warn = dplyr::if_else(
-        all(toupper(.data[[check_log$col_names$qc_warning]]) == "PASS"),
+        all(toupper(.data[[check_log_clean$col_names$qc_warning]]) == "PASS"),
         "PASS",
         "WARNING"
       ),
@@ -212,12 +227,12 @@ olink_bridge_selector <- function(df,
         .data[["PercAssaysBelowLOD"]] < .env[["sample_missing_freq"]]
     ) |>
     dplyr::distinct(
-      .data[[check_log$col_names$sample_id]],
+      .data[[check_log_clean$col_names$sample_id]],
       .data[["PercAssaysBelowLOD"]],
       .data[["MeanNPX"]]
     ) |>
     dplyr::rename(
-      "SampleID" = !!check_log$col_names$sample_id
+      "SampleID" = !!check_log_clean$col_names$sample_id
     )
 
   # ---- STEP 5: Select evenly spread bridge samples ---------------------------
