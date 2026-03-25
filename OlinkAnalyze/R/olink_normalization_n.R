@@ -1234,9 +1234,9 @@ olink_normalization_n_check <- function(norm_schema) {
       miss_cols_print <- miss_cols
     } else {
       miss_cols_print <- miss_cols |>
-        head(-1) |>
+        utils::head(-1) |>
         paste(collapse = ", ") |>
-        paste("and", tail(x = miss_cols, n = -1))
+        paste("and", utils::tail(x = miss_cols, n = -1))
     }
 
     return(
@@ -1282,9 +1282,9 @@ olink_normalization_n_check <- function(norm_schema) {
       check_project_print <- check_project
     } else {
       check_project_print <- check_project |>
-        head(-1) |>
+        utils::head(-1) |>
         paste(collapse = ", ") |>
-        paste("and", tail(x = check_project, n = -1))
+        paste("and", utils::tail(x = check_project, n = -1))
     }
 
     return(
@@ -1304,9 +1304,9 @@ olink_normalization_n_check <- function(norm_schema) {
       check_project_print <- check_project
     } else {
       check_project_print <- check_project |>
-        head(-1) |>
+        utils::head(-1) |>
         paste(collapse = ", ") |>
-        paste("and", tail(x = check_project, n = -1))
+        paste("and", utils::tail(x = check_project, n = -1))
     }
 
     return(
@@ -1367,9 +1367,9 @@ olink_normalization_n_check <- function(norm_schema) {
       order_and_norm_to_print <- order_and_norm_to
     } else {
       order_and_norm_to_print <- order_and_norm_to |>
-        head(-1) |>
+        utils::head(-1) |>
         paste(collapse = ", ") |>
-        paste("and", tail(x = order_and_norm_to, n = -1))
+        paste("and", utils::tail(x = order_and_norm_to, n = -1))
     }
 
     return(
