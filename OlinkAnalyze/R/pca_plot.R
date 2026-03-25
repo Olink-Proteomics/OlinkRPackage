@@ -157,6 +157,18 @@ olink_pca_plot <- function(df,
   # Check if check_log is correct
   check_log <- run_check_npx(df = df, check_log = check_log)
 
+  # other checks
+  check_is_dataset(x = df, error = TRUE)
+  check_is_scalar_character(x = color_g, error = TRUE)
+  check_is_scalar_boolean(x = label_samples, error = TRUE)
+  check_is_scalar_boolean(x = drop_assays, error = TRUE)
+  check_is_scalar_boolean(x = drop_samples, error = TRUE)
+  check_is_scalar_boolean(x = byPanel, error = TRUE)
+  check_is_scalar_boolean(x = outlierLines, error = TRUE)
+  check_is_scalar_boolean(x = label_outliers, error = TRUE)
+  check_is_scalar_boolean(x = quiet, error = TRUE)
+  check_is_scalar_boolean(x = verbose, error = TRUE)
+
   # Stop if duplicate sample ID's detected
   if (length(check_log$sample_id_dups) > 0) {
     cli::cli_abort(
