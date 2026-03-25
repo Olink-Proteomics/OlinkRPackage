@@ -1,4 +1,50 @@
 test_that(
+  "olink_umap_plot - works - snapshot",
+  {
+    skip_if_not_installed("umap")
+    skip_if_not_installed("vdiffr")
+
+    withr::local_seed(123)
+
+    cfg <- umap::umap.defaults
+    cfg$random_state <- 123
+
+    npx_df <- npx_data1 |>
+      dplyr::filter(
+        !grepl("control", SampleID, ignore.case = TRUE)
+      )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = check_log <- check_npx(df = npx_df)
+        )
+      )
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = umap_plot <- olink_umap_plot(
+            df = npx_df,
+            color_g = "QC_Warning",
+            quiet = TRUE,
+            config = cfg,
+            check_log = check_log
+          )
+        )
+      )
+    )
+
+    umap_plot_name <- "umap_plot_QC_warning"
+    check_snap_exist(test_dir_name = "plot_umap", snap_name = umap_plot_name)
+    vdiffr::expect_doppelganger(umap_plot_name, umap_plot[[1L]]) |>
+      suppressMessages() |>
+      suppressWarnings()
+  }
+)
+
+test_that(
   "olink_umap_plot - works - clusters are there and outlier group is detected",
   {
     skip_if_not_installed("umap")
