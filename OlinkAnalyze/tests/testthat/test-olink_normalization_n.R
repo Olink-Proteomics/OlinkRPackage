@@ -13,7 +13,7 @@ test_that(
       data = list(
         "df1_no_norm" = ref_norm_res$lst_df$df1_no_norm,
         "df2_no_norm" = ref_norm_res$lst_df$df2_no_norm
-        ),
+      ),
       samples = list(
         "df1_no_norm" = NA_character_,
         "df2_no_norm" = list(
@@ -25,7 +25,7 @@ test_that(
       normalize_to = c(NA_character_, "1")
     )
 
-    normalization_results_bridge_nonorm <- olink_normalization_n(
+    norm_results_bridge_nonorm <- olink_normalization_n(
       norm_schema = norm_schema_bridge_nonorm
     ) |>
       suppressMessages() |>
@@ -35,7 +35,7 @@ test_that(
       )
 
     expect_equal(
-      object = normalization_results_bridge_nonorm,
+      object = norm_results_bridge_nonorm,
       expected = ref_norm_res$lst_norm$bridge_norm$no_norm,
       tolerance = 1e-4
     )
@@ -60,7 +60,7 @@ test_that(
       normalize_to = c(NA_character_, "1")
     )
 
-    normalization_results_bridge_norm <- olink_normalization_n(
+    norm_results_bridge_norm <- olink_normalization_n(
       norm_schema = norm_schema_bridge_norm
     ) |>
       suppressMessages() |>
@@ -70,7 +70,7 @@ test_that(
       )
 
     expect_equal(
-      object = normalization_results_bridge_norm,
+      object = norm_results_bridge_norm,
       expected = ref_norm_res$lst_norm$bridge_norm$norm,
       tolerance = 1e-4
     )
@@ -95,7 +95,7 @@ test_that(
       normalize_to = c(NA_character_, "1")
     )
 
-    normalization_results_bridge_nolod <- olink_normalization_n(
+    norm_results_bridge_nolod <- olink_normalization_n(
       norm_schema = norm_schema_bridge_nolod
     ) |>
       suppressMessages() |>
@@ -105,7 +105,7 @@ test_that(
       )
 
     expect_equal(
-      object = normalization_results_bridge_nolod,
+      object = norm_results_bridge_nolod,
       expected = ref_norm_res$lst_norm$bridge_norm$no_lod,
       tolerance = 1e-4
     )
@@ -130,7 +130,7 @@ test_that(
       normalize_to = c(NA_character_, "1")
     )
 
-    normalization_results_bridge_multilod <- olink_normalization_n(
+    norm_results_bridge_multilod <- olink_normalization_n(
       norm_schema = norm_schema_bridge_multilod
     ) |>
       suppressMessages() |>
@@ -140,7 +140,7 @@ test_that(
       )
 
     expect_equal(
-      object = normalization_results_bridge_multilod,
+      object = norm_results_bridge_multilod,
       expected = ref_norm_res$lst_norm$bridge_norm$multiple_lod,
       tolerance = 1e-4
     )
@@ -172,7 +172,7 @@ test_that(
       normalize_to = c(NA_character_, "1")
     )
 
-    normalization_results_intensity_nonorm <- olink_normalization_n(
+    norm_results_intensity_nonorm <- olink_normalization_n(
       norm_schema = norm_schema_intensity_nonorm
     ) |>
       suppressMessages() |>
@@ -182,7 +182,7 @@ test_that(
       )
 
     expect_equal(
-      object = normalization_results_intensity_nonorm,
+      object = norm_results_intensity_nonorm,
       expected = ref_norm_res$lst_norm$intensity_norm$no_norm,
       tolerance = 1e-4
     )
@@ -207,7 +207,7 @@ test_that(
       normalize_to = c(NA_character_, "1")
     )
 
-    normalization_results_intensity_norm <- olink_normalization_n(
+    norm_results_intensity_norm <- olink_normalization_n(
       norm_schema = norm_schema_intensity_norm
     ) |>
       suppressMessages() |>
@@ -217,7 +217,7 @@ test_that(
       )
 
     expect_equal(
-      object = normalization_results_intensity_norm,
+      object = norm_results_intensity_norm,
       expected = ref_norm_res$lst_norm$intensity_norm$norm,
       tolerance = 1e-4
     )
@@ -242,7 +242,7 @@ test_that(
       normalize_to = c(NA_character_, "1")
     )
 
-    normalization_results_intensity_nolod <- olink_normalization_n(
+    norm_results_intensity_nolod <- olink_normalization_n(
       norm_schema = norm_schema_intensity_nolod
     ) |>
       suppressMessages() |>
@@ -252,7 +252,7 @@ test_that(
       )
 
     expect_equal(
-      object = normalization_results_intensity_nolod,
+      object = norm_results_intensity_nolod,
       expected = ref_norm_res$lst_norm$intensity_norm$no_lod,
       tolerance = 1e-4
     )
@@ -277,7 +277,7 @@ test_that(
       normalize_to = c(NA_character_, "1")
     )
 
-    normalization_results_intensity_multilod <- olink_normalization_n(
+    norm_res_intensity_multilod <- olink_normalization_n(
       norm_schema = norm_schema_intensity_multilod
     ) |>
       suppressMessages() |>
@@ -287,7 +287,7 @@ test_that(
       )
 
     expect_equal(
-      object = normalization_results_intensity_multilod,
+      object = norm_res_intensity_multilod,
       expected = ref_norm_res$lst_norm$intensity_norm$multiple_lod,
       tolerance = 1e-4
     )
@@ -319,7 +319,7 @@ test_that(
       normalize_to = c(NA_character_, "1")
     )
 
-    normalization_results_subset_nonorm <- olink_normalization_n(
+    norm_results_subset_nonorm <- olink_normalization_n(
       norm_schema = norm_schema_subset_nonorm
     ) |>
       suppressMessages() |>
@@ -329,7 +329,7 @@ test_that(
       )
 
     expect_equal(
-      object = normalization_results_subset_nonorm,
+      object = norm_results_subset_nonorm,
       expected = ref_norm_res$lst_norm$subset_norm$no_norm,
       tolerance = 1e-4
     )
@@ -354,7 +354,7 @@ test_that(
       normalize_to = c(NA_character_, "1")
     )
 
-    normalization_results_subset_norm <- olink_normalization_n(
+    norm_results_subset_norm <- olink_normalization_n(
       norm_schema = norm_schema_subset_norm
     ) |>
       suppressMessages() |>
@@ -364,7 +364,7 @@ test_that(
       )
 
     expect_equal(
-      object = normalization_results_subset_norm,
+      object = norm_results_subset_norm,
       expected = ref_norm_res$lst_norm$subset_norm$norm,
       tolerance = 1e-4
     )
@@ -389,7 +389,7 @@ test_that(
       normalize_to = c(NA_character_, "1")
     )
 
-    normalization_results_subset_nolod <- olink_normalization_n(
+    norm_results_subset_nolod <- olink_normalization_n(
       norm_schema = norm_schema_subset_nolod
     ) |>
       suppressMessages() |>
@@ -399,7 +399,7 @@ test_that(
       )
 
     expect_equal(
-      object = normalization_results_subset_nolod,
+      object = norm_results_subset_nolod,
       expected = ref_norm_res$lst_norm$subset_norm$no_lod,
       tolerance = 1e-4
     )
@@ -424,7 +424,7 @@ test_that(
       normalize_to = c(NA_character_, "1")
     )
 
-    normalization_results_subset_multilod <- olink_normalization_n(
+    norm_results_subset_multilod <- olink_normalization_n(
       norm_schema = norm_schema_subset_multilod
     ) |>
       suppressMessages() |>
@@ -434,7 +434,7 @@ test_that(
       )
 
     expect_equal(
-      object = normalization_results_subset_multilod,
+      object = norm_results_subset_multilod,
       expected = ref_norm_res$lst_norm$subset_norm$multiple_lod,
       tolerance = 1e-4
     )
@@ -444,6 +444,10 @@ test_that(
 test_that(
   "olink_normalization_n - works - multi-batch",
   {
+    # Load reference results
+    # tests are skipped if files are absent
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
     ### Simple multi-project normalization example
 
     npx_multi_df1 <- npx_data1 |>
@@ -520,7 +524,7 @@ test_that(
       dplyr::filter(
         !stringr::str_detect(
           string = .data[["value"]],
-          pattern = 'CONTROL_SAMPLE'
+          pattern = "CONTROL_SAMPLE"
         )
       ) |>
       dplyr::pull(
@@ -573,7 +577,7 @@ test_that(
                 "B69_mod2", "B7_mod2", "B70_mod2", "B71_mod2", "B72_mod2",
                 "B73_mod2", "B74_mod2", "B75_mod2", "B76_mod2", "B77_mod2",
                 "B78_mod2", "B79_mod2", "B8_mod2", "B9_mod2")
-      )
+    )
 
     # create tibble for input
     norm_schema_npx_multi <- dplyr::tibble(
@@ -616,529 +620,12 @@ test_that(
         .data[["OlinkID"]],
         .data[["SampleID"]]
       )
-  }
-)
 
-test_that("olink_normalization multi-batch works",
-          {
-            # Reference ----
-
-            ## check that multi-batch simple example is replicated in the reference set ----
-            expect_equal(normalization_results.multi,
-                         ref_results$normalization_results.multi)
-
-            ## check that multi-batch advanced example works as expected ----
-            expect_equal({ normalization_results.complex_n |> nrow() },
-                         14520L)
-
-            expect_equal({ normalization_results.complex_n |> ncol() },
-                         16L)
-
-            expect_equal({ normalization_results.complex_n$Project |> unique() },
-                         c("DF1b",
-                           "DF2b",
-                           "DF3b",
-                           "DF4b",
-                           "DF5b",
-                           "DF6b",
-                           "DF1s",
-                           "DF2s",
-                           "DF3s",
-                           "DF4s",
-                           "DF5s"))
-
-            expect_equal(
-              {
-                c({ normalization_results.complex_n$Adj_factor |> min(na.rm = TRUE) },
-                  { normalization_results.complex_n$Adj_factor |> max(na.rm = TRUE) },
-                  { normalization_results.complex_n$Adj_factor |> median(na.rm = TRUE) },
-                  { normalization_results.complex_n$Adj_factor |> mean(na.rm = TRUE) },
-                  { normalization_results.complex_n$Adj_factor |> quantile(probs = 0.9, na.rm = TRUE, names = FALSE) },
-                  { normalization_results.complex_n$Adj_factor |> quantile(probs = 0.1, na.rm = TRUE, names = FALSE) },
-                  { normalization_results.complex_n$Adj_factor |> quantile(probs = 0.25, na.rm = TRUE, names = FALSE) },
-                  { normalization_results.complex_n$Adj_factor |> quantile(probs = 0.75, na.rm = TRUE, names = FALSE) })
-              },
-              c(-0.4964, 0.56055, 0, -0.007244697, 0.20235, -0.22285, -0.10125, 0.06785))
-
-            # Hidden/removed assays ----
-
-            ### Testing the excluded assay bridging ###
-            ## With P1 as the reference
-            #Test that all excluded assays from project 1 remain NA after bridging
-            expect_true(npxBridged.n %>%
-                          filter(Project == 'P1' & OlinkID %in% excludedOIDs.proj1) %>%
-                          pull(NPX) %>%
-                          is.na() %>%
-                          all())
-
-            #Test that the non-excluded assays in project 2 remain unchanged
-            expect_true(npxBridged.n %>%
-                          filter(Project == 'P2' & OlinkID %in% setdiff(excludedOIDs.proj1, excludedOIDs.proj2)) %>%
-                          left_join(npx_data_format221010.project2, by = c('SampleID', 'OlinkID')) %>%
-                          mutate(match = NPX.x == NPX.y) %>%
-                          pull(match) %>%
-                          all())
-
-            ## With P2 as the reference
-            #Test that all excluded assays from project 1 remain NA after bridging
-            expect_true(npxBridged_proj2ref.n %>%
-                          filter(Project == 'P1' & OlinkID %in% excludedOIDs.proj1) %>%
-                          pull(NPX) %>%
-                          is.na() %>%
-                          all())
-
-            #Test that the non-excluded assays in project 2 remain unchanged
-            expect_true(npxBridged_proj2ref.n %>%
-                          filter(Project == 'P2' & OlinkID %in% setdiff(excludedOIDs.proj1, excludedOIDs.proj2)) %>%
-                          left_join(npx_data_format221010.project2, by = c('SampleID', 'OlinkID')) %>%
-                          mutate(match = NPX.x == NPX.y) %>%
-                          pull(match) %>%
-                          all())
-          }
-)
-
-test_that(
-  "",
-  {
-    # Errors ----
-
-    ## error thrown when column is not provided ----
-    expect_error(
-      {
-        olink_normalization_n(
-          norm_schema = dplyr::tibble(
-            order              = c(1, 2),
-            name               = c("P1", "P2"),
-            data               = list("P1" =
-                                        {
-                                          npx_data1 |>
-                                            dplyr::select(-Project) |>
-                                            dplyr::mutate(Normalization = "Intensity")
-                                        },
-                                      "P2" =
-                                        {
-                                          npx_data2 |>
-                                            dplyr::select(-Project) |>
-                                            dplyr::mutate(Normalization = "Intensity")
-                                        }),
-            normalization_type = c(NA_character_, "Bridge"),
-            normalize_to       = c(NA_character_, "1")
-          )
-        )
-      }
-    ) # Non overlapping samples for bridging
-
-    ## error thrown if order is NA ----
-    expect_error(olink_normalization_n(
-      norm_schema = dplyr::tibble(
-        order              = c(1L, NA),
-        name               = c("20200001", "20200002"),
-        data               = list("20200001" =
-                                    {
-                                      npx_data1 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    },
-                                  "20200002" =
-                                    {
-                                      npx_data2 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    }),
-        samples            = list("20200001" = NA_character_,
-                                  "20200002" = list("DF1" = overlap_samples,
-                                                    "DF2" = overlap_samples)),
-        normalization_type = c(NA_character_, "Bridge"),
-        normalize_to       = c(NA_character_, "1")
-      )))
-
-    ## error thrown if order is Inf ----
-    expect_error(olink_normalization_n(
-      norm_schema = dplyr::tibble(
-        order              = c(1L, Inf),
-        name               = c("20200001", "20200002"),
-        data               = list("20200001" =
-                                    {
-                                      npx_data1 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    },
-                                  "20200002" =
-                                    {
-                                      npx_data2 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    }),
-        samples            = list("20200001" = NA_character_,
-                                  "20200002" = list("DF1" = overlap_samples,
-                                                    "DF2" = overlap_samples)),
-        normalization_type = c(NA_character_, "Bridge"),
-        normalize_to       = c(NA_character_, "1")
-      )))
-
-    ## error thrown if order is character ----
-    expect_error(olink_normalization_n(
-      norm_schema = dplyr::tibble(
-        order              = c(1L, "A"),
-        name               = c("20200001", "20200002"),
-        data               = list("20200001" =
-                                    {
-                                      npx_data1 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    },
-                                  "20200002" =
-                                    {
-                                      npx_data2 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    }),
-        samples            = list("20200001" = NA_character_,
-                                  "20200002" = list("DF1" = overlap_samples,
-                                                    "DF2" = overlap_samples)),
-        normalization_type = c(NA_character_, "Bridge"),
-        normalize_to       = c(NA_character_, "1")
-      )))
-
-    ## error thrown if order is does not start from 1 ----
-    expect_error(olink_normalization_n(
-      norm_schema = dplyr::tibble(
-        order              = c(2L, 3L),
-        name               = c("20200001", "20200002"),
-        data               = list("20200001" =
-                                    {
-                                      npx_data1 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    },
-                                  "20200002" =
-                                    {
-                                      npx_data2 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    }),
-        samples            = list("20200001" = NA_character_,
-                                  "20200002" = list("DF1" = overlap_samples,
-                                                    "DF2" = overlap_samples)),
-        normalization_type = c(NA_character_, "Bridge"),
-        normalize_to       = c(NA_character_, "1")
-      )))
-
-    ## error thrown if order is does not increase by 1 ----
-    expect_error(olink_normalization_n(
-      norm_schema = dplyr::tibble(
-        order              = c(1L, 3L),
-        name               = c("20200001", "20200002"),
-        data               = list("20200001" =
-                                    {
-                                      npx_data1 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    },
-                                  "20200002" =
-                                    {
-                                      npx_data2 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    }),
-        samples            = list("20200001" = NA_character_,
-                                  "20200002" = list("DF1" = overlap_samples,
-                                                    "DF2" = overlap_samples)),
-        normalization_type = c(NA_character_, "Bridge"),
-        normalize_to       = c(NA_character_, "1")
-      )))
-
-    ## error thrown if data is not in a nested list ----
-    expect_error(olink_normalization_n(
-      norm_schema = dplyr::tibble(
-        order              = c(1L, 2L),
-        name               = c("20200001", "20200002"),
-        data               = c("20200001" = 1L,
-                               "20200002" = 2L),
-        samples            = list("20200001" = NA_character_,
-                                  "20200002" = list("DF1" = overlap_samples,
-                                                    "DF2" = overlap_samples)),
-        normalization_type = c(NA_character_, "Bridge"),
-        normalize_to       = c(NA_character_, "1")
-      )))
-
-    ## error thrown if data is the nested list is not a data.frame ----
-    expect_error(olink_normalization_n(
-      norm_schema = dplyr::tibble(
-        order              = c(1L, 2L),
-        name               = c("20200001", "20200002"),
-        data               = list("20200001" = 1L,
-                                  "20200002" = 2L),
-        samples            = list("20200001" = NA_character_,
-                                  "20200002" = list("DF1" = overlap_samples,
-                                                    "DF2" = overlap_samples)),
-        normalization_type = c(NA_character_, "Bridge"),
-        normalize_to       = c(NA_character_, "1")
-      )))
-
-    ## error thrown if data is the nested list contains NA ----
-    expect_error(olink_normalization_n(
-      norm_schema = dplyr::tibble(
-        order              = c(1L, 2L),
-        name               = c("20200001", "20200002"),
-        data               = list("20200001" =
-                                    {
-                                      npx_data1 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    },
-                                  "20200002" = NA),
-        samples            = list("20200001" = NA_character_,
-                                  "20200002" = list("DF1" = overlap_samples,
-                                                    "DF2" = overlap_samples)),
-        normalization_type = c(NA_character_, "Bridge"),
-        normalize_to       = c(NA_character_, "1")
-      )))
-
-    ## error thrown if column "Project" is present ----
-    expect_error(olink_normalization_n(
-      norm_schema = dplyr::tibble(
-        order              = c(1, 2),
-        name               = c("20200001", "20200002"),
-        data               = list("20200001" =
-                                    {
-                                      npx_data1 |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    },
-                                  "20200002" =
-                                    {
-                                      npx_data2 |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    }),
-        samples            = list("20200001" = NA_character_,
-                                  "20200002" = list("DF1" = overlap_samples,
-                                                    "DF2" = overlap_samples)),
-        normalization_type = c(NA_character_, "Bridge"),
-        normalize_to       = c(NA_character_, "1")
-      )))
-
-    ## error thrown if column "Adj_factor" is present ----
-    expect_error(olink_normalization_n(
-      norm_schema = dplyr::tibble(
-        order              = c(1, 2),
-        name               = c("20200001", "20200002"),
-        data               = list("20200001" =
-                                    {
-                                      npx_data1 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity",
-                                                      Adj_factor = -1)
-                                    },
-                                  "20200002" =
-                                    {
-                                      npx_data2 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity",
-                                                      Adj_factor = -1)
-                                    }),
-        samples            = list("20200001" = NA_character_,
-                                  "20200002" = list("DF1" = overlap_samples,
-                                                    "DF2" = overlap_samples)),
-        normalization_type = c(NA_character_, "Bridge"),
-        normalize_to       = c(NA_character_, "1")
-      )))
-
-    ## error thrown if samples is not a list ----
-    expect_error(olink_normalization_n(
-      norm_schema = dplyr::tibble(
-        order              = c(1L, 2L),
-        name               = c("20200001", "20200002"),
-        data               = list("20200001" =
-                                    {
-                                      npx_data1 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    },
-                                  "20200002" =
-                                    {
-                                      npx_data2 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    }),
-        samples            = c("20200001" = NA_character_,
-                               "20200002" = NA),
-        normalization_type = c(NA_character_, "Bridge"),
-        normalize_to       = c(NA_character_, "1")
-      )))
-
-    ## error thrown if normalization_type is not a character vector ----
-    expect_error(olink_normalization_n(
-      norm_schema = dplyr::tibble(
-        order              = c(1L, 2L),
-        name               = c("20200001", "20200002"),
-        data               = list("20200001" =
-                                    {
-                                      npx_data1 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    },
-                                  "20200002" =
-                                    {
-                                      npx_data2 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    }),
-        samples            = list("20200001" = NA_character_,
-                                  "20200002" = list("DF1" = overlap_samples,
-                                                    "DF2" = overlap_samples)),
-        normalization_type = list(NA_character_, "Bridge"),
-        normalize_to       = c(NA_character_, "1")
-      )))
-
-    expect_error(olink_normalization_n(
-      norm_schema = dplyr::tibble(
-        order              = c(1L, 2L),
-        name               = c("20200001", "20200002"),
-        data               = list("20200001" =
-                                    {
-                                      npx_data1 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    },
-                                  "20200002" =
-                                    {
-                                      npx_data2 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    }),
-        samples            = list("20200001" = NA_character_,
-                                  "20200002" = list("DF1" = overlap_samples,
-                                                    "DF2" = overlap_samples)),
-        normalization_type = c(1, 2),
-        normalize_to       = c(NA_character_, "1")
-      )))
-
-    ## error thrown if normalization_type does not contain expected value ----
-    expect_error(olink_normalization_n(
-      norm_schema = dplyr::tibble(
-        order              = c(1L, 2L),
-        name               = c("20200001", "20200002"),
-        data               = list("20200001" =
-                                    {
-                                      npx_data1 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    },
-                                  "20200002" =
-                                    {
-                                      npx_data2 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    }),
-        samples            = list("20200001" = NA_character_,
-                                  "20200002" = list("DF1" = overlap_samples,
-                                                    "DF2" = overlap_samples)),
-        normalization_type = c(NA_character_, "A"),
-        normalize_to       = c(NA_character_, "1")
-      )))
-
-    ## error thrown if normalize_to is not a character array ----
-    expect_error(olink_normalization_n(
-      norm_schema = dplyr::tibble(
-        order              = c(1L, 2L),
-        name               = c("20200001", "20200002"),
-        data               = list("20200001" =
-                                    {
-                                      npx_data1 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    },
-                                  "20200002" =
-                                    {
-                                      npx_data2 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    }),
-        samples            = list("20200001" = NA_character_,
-                                  "20200002" = list("DF1" = overlap_samples,
-                                                    "DF2" = overlap_samples)),
-        normalization_type = c(NA_character_, "Bridge"),
-        normalize_to       = list(NA_character_, "1")
-      )))
-
-    ## error thrown if elements from normalize_to not present in order column ----
-    expect_error(olink_normalization_n(
-      norm_schema = dplyr::tibble(
-        order              = c(1L, 2L),
-        name               = c("20200001", "20200002"),
-        data               = list("20200001" =
-                                    {
-                                      npx_data1 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    },
-                                  "20200002" =
-                                    {
-                                      npx_data2 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    }),
-        samples            = list("20200001" = NA_character_,
-                                  "20200002" = list("DF1" = overlap_samples,
-                                                    "DF2" = overlap_samples)),
-        normalization_type = c(NA_character_, "Bridge"),
-        normalize_to       = c(NA_character_, "1,3")
-      )))
-
-    ## error thrown if elements from normalize_to contain order column identifier from same row ----
-    expect_error(olink_normalization_n(
-      norm_schema = dplyr::tibble(
-        order              = c(1L, 2L),
-        name               = c("20200001", "20200002"),
-        data               = list("20200001" =
-                                    {
-                                      npx_data1 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    },
-                                  "20200002" =
-                                    {
-                                      npx_data2 |>
-                                        dplyr::select(-Project) |>
-                                        dplyr::mutate(Normalization = "Intensity")
-                                    }),
-        samples            = list("20200001" = NA_character_,
-                                  "20200002" = list("DF1" = overlap_samples,
-                                                    "DF2" = overlap_samples)),
-        normalization_type = c(NA_character_, "Bridge"),
-        normalize_to       = c(NA_character_, "1,2")
-      )))
-
-    ## error thrown when bridge/subset samples are not present ----
-
-    expect_error(
-      {
-        olink_normalization_n(
-          norm_schema = dplyr::tibble(
-            order              = c(1, 2),
-            name               = c("P1", "P2"),
-            data               = list("P1" =
-                                        {
-                                          npx_data1 |>
-                                            dplyr::select(-Project) |>
-                                            dplyr::mutate(Normalization = "Intensity")
-                                        },
-                                      "P2" =
-                                        {
-                                          npx_data2 |>
-                                            dplyr::select(-Project) |>
-                                            dplyr::mutate(Normalization = "Intensity")
-                                        }),
-            samples            = list("P1" = NA_character_,
-                                      "P2" = list("DF1" = c("B64", "B36", "A77", "B7", "A24", "A49", "B76"),
-                                                  "DF2" = c("B64", "B36", "A77", "B7", "A24", "A49", "B76"))),
-            normalization_type = c(NA_character_, "Bridge"),
-            normalize_to       = c(NA_character_, "1")
-          )
-        )
-      }
-    ) # Non overlapping samples for bridging
-
+    expect_equal(
+      object = normalization_results_multi,
+      expected = reference_results$normalization_multibatch,
+      tolerance = 1e-4
+    )
   }
 )
 
@@ -1360,7 +847,7 @@ test_that(
           "DF2" = intersect(npx_data1$SampleID, npx_data2$SampleID) |>
             sort() |>
             head(10L)
-          ),
+        ),
         project_1_name = "P1",
         project_2_name = "P1",
         project_ref_name = "P2"
@@ -1394,10 +881,14 @@ test_that(
           project_2_name = "df2_no_norm",
           project_ref_name = "df1_no_norm",
           format = FALSE,
-          project_1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_norm) |>
+          project_1_check_log = check_npx(
+            df = ref_norm_res$lst_df$df1_no_norm
+          ) |>
             suppressMessages() |>
             suppressWarnings(),
-          project_2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_norm) |>
+          project_2_check_log = check_npx(
+            df = ref_norm_res$lst_df$df2_no_norm
+          ) |>
             suppressMessages() |>
             suppressWarnings()
         ) |>
@@ -1544,10 +1035,14 @@ test_that(
           project_2_name = "df2_no_norm",
           project_ref_name = "df1_no_norm",
           format = FALSE,
-          project_1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_norm) |>
+          project_1_check_log = check_npx(
+            df = ref_norm_res$lst_df$df1_no_norm
+          ) |>
             suppressMessages() |>
             suppressWarnings(),
-          project_2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_norm) |>
+          project_2_check_log = check_npx(
+            df = ref_norm_res$lst_df$df2_no_norm
+          ) |>
             suppressMessages() |>
             suppressWarnings()
         ) |>
