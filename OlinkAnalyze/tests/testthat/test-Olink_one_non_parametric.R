@@ -4,6 +4,8 @@ test_that(
     # load reference results
     ref_results <- get_example_data(filename = "reference_results.rds")
 
+    skip_if_not_installed("FSA") |> suppressMessages()
+
     # npx_data1 check_log
     check_log <- check_npx(npx_data1) |>
       suppressMessages() |>
@@ -18,12 +20,12 @@ test_that(
       suppressMessages() |>
       suppressWarnings()
 
-    check_log_noctrl <- check_npx(npx_data1) |>
+    check_log_noctrl <- check_npx(npx_data1_noctrl) |>
       suppressMessages() |>
       suppressWarnings()
 
     # ---- test kruskal with reference file ----
-    skip_if_not_installed("FSA")
+
     expect_message(
       object = expect_message(
         object = kruskal_results <- olink_one_non_parametric(
