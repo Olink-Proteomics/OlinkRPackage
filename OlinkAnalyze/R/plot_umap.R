@@ -61,24 +61,28 @@
 #' @export
 #' @examples
 #' \donttest{
-#' if (rlang::is_installed(pkg = c("umap"))) {
+#' if (rlang::is_installed(pkg = c("umap", "ggrepel", "ggpubr"))) {
 #'
 #'   npx_data <- npx_data1 |>
 #'     dplyr::mutate(
 #'       SampleID = paste(.data[["SampleID"]], "_", .data[["Index"]], sep = "")
 #'     )
 #'
+#'   check_log <- check_npx(df = npx_data)
+#'
 #'   # UMAP using all the data
 #'   OlinkAnalyze::olink_umap_plot(
 #'     df = npx_data,
-#'     color_g = "QC_Warning"
+#'     color_g = "QC_Warning",
+#'     check_log = check_log
 #'   )
 #'
 #'   # UMAP per panel
 #'   g <- OlinkAnalyze::olink_umap_plot(
 #'     df = npx_data,
 #'     color_g = "QC_Warning",
-#'     byPanel = TRUE
+#'     byPanel = TRUE,
+#'     check_log = check_log
 #'   )
 #'   # Plot only the Inflammation panel
 #'   g$Inflammation
@@ -88,7 +92,8 @@
 #'     df = npx_data,
 #'     color_g = "QC_Warning",
 #'     outlierDefX = 2L,
-#'     outlierDefY = 4L
+#'     outlierDefY = 4L,
+#'     check_log = check_log
 #'   )
 #'
 #'   OlinkAnalyze::olink_umap_plot(
@@ -96,7 +101,8 @@
 #'     color_g = "QC_Warning",
 #'     outlierDefX = 3L,
 #'     outlierDefY = 2L,
-#'     byPanel = TRUE
+#'     byPanel = TRUE,
+#'     check_log = check_log
 #'   )
 #'
 #'   # Retrieve outliers
@@ -105,7 +111,8 @@
 #'     color_g = "QC_Warning",
 #'     outlierDefX = 3L,
 #'     outlierDefY = 2L,
-#'     byPanel = TRUE
+#'     byPanel = TRUE,
+#'     check_log = check_log
 #'   )
 #'   outliers <- lapply(p, function(x) x$data) |>
 #'     dplyr::bind_rows() |>
@@ -134,7 +141,7 @@ olink_umap_plot <- function(df,
                             ...) {
   # Check if all required libraries for this function are installed
   rlang::check_installed(
-    pkg = c("umap"),
+    pkg = c("umap", "ggrepel", "ggpubr"),
     call = rlang::caller_env()
   )
 
@@ -169,23 +176,32 @@ olink_umap_plot <- function(df,
     }
   }
 
-  # Filtering on valid OlinkID
-  df <- df |>
-    dplyr::filter(
-      stringr::str_detect(
-        string = .data[["OlinkID"]],
-        pattern = "OID[0-9]{5}"
-      )
-    )
-
   # Check data format
   check_log <- run_check_npx(df = df, check_log = check_log)
 
-  # Exclude assays that have all NA:s
-  df <- df |>
-    dplyr::filter(
-      !(.data[["OlinkID"]] %in% check_log$assay_na)
-    )
+  # input checks
+
+  check_is_dataset(x = df, error = TRUE)
+
+  # Remove invalid OlinkID, assays with all NA values, and convert non-unique
+  # Uniprot IDs. Note that we do not remove samples with duplicate SampleID,
+  # control samples or assays, or samples/assays with QC warnings, as this
+  # would be the user's decision.
+  df <- clean_npx(
+    df,
+    check_log = check_log,
+    remove_assay_na = TRUE,
+    remove_invalid_oid = TRUE,
+    remove_dup_sample_id = FALSE,
+    remove_control_assay = FALSE,
+    remove_control_sample = FALSE,
+    remove_qc_warning = FALSE,
+    remove_assay_warning = FALSE,
+    convert_nonunique_uniprot = TRUE,
+    out_df = "tibble",
+    verbose = FALSE
+  ) |>
+    suppressMessages()
 
   # Check that the user didn't specify just one of outlierDefX and outlierDefY
   if (sum(c(is.numeric(outlierDefX), is.numeric(outlierDefY))) == 1L) {
@@ -204,6 +220,20 @@ olink_umap_plot <- function(df,
               "numerical values")
       )
     }
+  }
+
+  # OSI checks - ran only if OSI columns selected to color
+  osi_cat_cols <- c("OSICategory")
+  osi_cont_cols <- c("OSITimeToCentrifugation",
+                     "OSIPreparationTemperature",
+                     "OSISummary")
+
+  if (color_g %in% c(osi_cat_cols, osi_cont_cols)) {
+
+    # Check for invalid values and NA columns
+    df <- check_osi(df = df,
+                    check_log = check_log,
+                    osi_score = color_g)
   }
 
   if (byPanel) {
@@ -239,6 +269,7 @@ olink_umap_plot <- function(df,
           outlierLines = outlierLines,
           label_outliers = label_outliers,
           verbose = verbose,
+          osi_cont_cols = osi_cont_cols,
           ...
         ) +
         ggplot2::labs(
@@ -275,6 +306,7 @@ olink_umap_plot <- function(df,
       outlierLines = outlierLines,
       label_outliers = label_outliers,
       verbose = verbose,
+      osi_cont_cols = osi_cont_cols,
       ...
     )
 
@@ -303,6 +335,7 @@ olink_umap_plot.internal <- function(df, # nolint: object_name_linter
                                      outlierLines, # nolint: object_name_linter
                                      label_outliers,
                                      verbose = TRUE,
+                                     osi_cont_cols,
                                      ...) {
 
   ### Data pre-processing ###
@@ -342,13 +375,13 @@ olink_umap_plot.internal <- function(df, # nolint: object_name_linter
       ) |>
       dplyr::mutate(
         umapX_low = mean(x = .data[["umapX"]], na.rm = TRUE) -
-          .env[["outlierDefX"]] * sd(x = .data[["umapX"]], na.rm = TRUE),
+          .env[["outlierDefX"]] * stats::sd(x = .data[["umapX"]], na.rm = TRUE),
         umapX_high = mean(x = .data[["umapX"]], na.rm = TRUE) +
-          .env[["outlierDefX"]] * sd(x = .data[["umapX"]], na.rm = TRUE),
+          .env[["outlierDefX"]] * stats::sd(x = .data[["umapX"]], na.rm = TRUE),
         umapY_low = mean(x = .data[["umapY"]], na.rm = TRUE) -
-          .env[["outlierDefY"]] * sd(x = .data[["umapY"]], na.rm = TRUE),
+          .env[["outlierDefY"]] * stats::sd(x = .data[["umapY"]], na.rm = TRUE),
         umapY_high = mean(x = .data[["umapY"]], na.rm = TRUE) +
-          .env[["outlierDefY"]] * sd(x = .data[["umapY"]], na.rm = TRUE)
+          .env[["outlierDefY"]] * stats::sd(x = .data[["umapY"]], na.rm = TRUE)
       ) |>
       dplyr::mutate(
         Outlier = dplyr::if_else(
@@ -461,9 +494,24 @@ olink_umap_plot.internal <- function(df, # nolint: object_name_linter
       )
   }
 
+  if (color_g %in% osi_cont_cols) {
+
+    umap_plot <- umap_plot +
+      ggplot2::scale_color_gradient(
+        low = "#FFB200FF",
+        high = "#332D56FF",
+        limits = c(0L, 1L),
+        breaks = seq(from = 0L, to = 1L, by = 0.25),
+        oob = scales::squish
+      )
+
+  } else {
+    umap_plot <- umap_plot +
+      OlinkAnalyze::olink_color_discrete(..., drop = FALSE)
+  }
+
   umap_plot <- umap_plot +
-    OlinkAnalyze::set_plot_theme() +
-    OlinkAnalyze::olink_color_discrete(..., drop = FALSE)
+    OlinkAnalyze::set_plot_theme()
 
   return(umap_plot)
 }
