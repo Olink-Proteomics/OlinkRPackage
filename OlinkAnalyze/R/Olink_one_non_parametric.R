@@ -149,7 +149,7 @@ olink_one_non_parametric <- function(df,
             n_na = sum(is.na(!!rlang::ensym(data_type))),
             .groups = "drop"
           ) |>
-          dplyr::filter(n == .data[["n_na"]]) |>
+          dplyr::filter(.data[["n"]] == .data[["n_na"]]) |>
           dplyr::distinct(.data[["OlinkID"]]) |>
           dplyr::pull(.data[["OlinkID"]])
 
@@ -236,7 +236,7 @@ olink_one_non_parametric <- function(df,
           dplyr::filter(!is.na(.data[["NPX"]])) |>
           dplyr::group_by(.data[["Assay"]], !!!rlang::syms(subject)) |>
           dplyr::summarize(n = dplyr::n(), .groups = "drop") |>
-          dplyr::filter(n == n_subject) |>
+          dplyr::filter(.data[["n"]] == .env[["n_subject"]]) |>
           dplyr::mutate(Friedman_remove = "no") |>
           dplyr::select(!dplyr::all_of(c("n")))
 
@@ -543,7 +543,7 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
               n_na = sum(is.na(!!rlang::ensym(data_type))),
               .groups = "drop"
             ) |>
-            dplyr::filter(n == .data[["n_na"]]) |>
+            dplyr::filter(.data[["n"]] == .data[["n_na"]]) |>
             dplyr::distinct(.data[["OlinkID"]]) |>
             dplyr::pull(.data[["OlinkID"]])
 
@@ -602,9 +602,9 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
           dplyr::filter(!is.na(.data[["NPX"]])) |>
           dplyr::group_by(.data[["Assay"]], !!!rlang::syms(subject)) |>
           dplyr::summarize(n = dplyr::n(), .groups = "drop") |>
-          dplyr::filter(n == n_subject) |>
+          dplyr::filter(.data[["n"]] == .env[["n_subject"]]) |>
           dplyr::mutate(Friedman_remove = "no") |>
-          dplyr::select(-n)
+          dplyr::select(-dplyr::all_of("n"))
 
         if (length(
           subject_remove |>
