@@ -91,7 +91,7 @@ if (rlang::is_installed(pkg = c("FSA", "broom", "rstatix"))) {
     variable = "Time",
     test = "friedman",
     olinkid_list = friedman_results |>
-      dplyr::filter(.data[["Threshold"]] == "Significant") \%>\%
+      dplyr::filter(.data[["Threshold"]] == "Significant") |>
       dplyr::select(
         dplyr::all_of("OlinkID")
       ) |>

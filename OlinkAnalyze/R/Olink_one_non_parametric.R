@@ -149,10 +149,10 @@ olink_one_non_parametric <- function(df,
       for (effect in single_fixed_effects) {
         current_nas <- df |>
           dplyr::filter(!(.data[["OlinkID"]] %in% check_log$assay_na)) |>
-          dplyr::group_by(.data[["OlinkID"]], !!rlang::ensym(effect)) |>
+          dplyr::group_by(.data[["OlinkID"]], .data[[effect]]) |>
           dplyr::summarise(
             n = dplyr::n(),
-            n_na = sum(is.na(!!rlang::ensym(data_type))),
+            n_na = sum(is.na(.data[[data_type]])),
             .groups = "drop"
           ) |>
           dplyr::filter(.data[["n"]] == .data[["n_na"]]) |>
@@ -170,7 +170,7 @@ olink_one_non_parametric <- function(df,
         number_of_samples_w_more_than_one_level <- df |> # nolint object_length_linter
           dplyr::group_by(.data[["SampleID"]]) |>
           dplyr::summarise(
-            n_levels = dplyr::n_distinct(!!rlang::ensym(effect), na.rm = TRUE),
+            n_levels = dplyr::n_distinct(.data[[effect]], na.rm = TRUE),
             .groups = "drop"
           ) |>
           dplyr::filter(.data[["n_levels"]] > 1L) |>
@@ -232,7 +232,7 @@ olink_one_non_parametric <- function(df,
         ## number of the items in the subject
 
         n_subject <- df_nas_remove |>
-          dplyr::select(!!!rlang::syms(variable)) |>
+          dplyr::select(dplyr::all_of(variable)) |>
           stats::na.omit() |>
           unique() |>
           dplyr::pull() |>
@@ -240,20 +240,20 @@ olink_one_non_parametric <- function(df,
 
         subject_remove <- df_nas_remove |>
           dplyr::filter(!is.na(.data[["NPX"]])) |>
-          dplyr::group_by(.data[["Assay"]], !!!rlang::syms(subject)) |>
+          dplyr::group_by(.data[["Assay"]], .data[[subject]]) |>
           dplyr::summarize(n = dplyr::n(), .groups = "drop") |>
           dplyr::filter(.data[["n"]] == .env[["n_subject"]]) |>
           dplyr::mutate(Friedman_remove = "no") |>
-          dplyr::select(!dplyr::all_of(c("n")))
+          dplyr::select(-dplyr::all_of(c("n")))
 
         if (length(
           subject_remove |>
-            dplyr::select(!!!rlang::syms(subject)) |>
+            dplyr::select(dplyr::all_of(subject)) |>
             dplyr::pull() |>
             unique()
         ) < length(
           df_nas_remove |>
-            dplyr::select(!!!rlang::syms(subject)) |>
+            dplyr::select(dplyr::all_of(subject)) |>
             dplyr::pull() |>
             unique()
         )
@@ -280,16 +280,16 @@ olink_one_non_parametric <- function(df,
           }) |>
           dplyr::ungroup() |>
           dplyr::mutate(
-            Adjusted_pval = p.adjust(.data[["p"]], method = "BH")
+            Adjusted_pval = stats::p.adjust(p = .data[["p"]], method = "BH")
           ) |>
           dplyr::mutate(Threshold = ifelse(
             .data[["Adjusted_pval"]] < 0.05, "Significant", "Non-significant"
           )) |>
           dplyr::ungroup() |>
           dplyr::arrange(.data[["Adjusted_pval"]]) |>
-          dplyr::select(!dplyr::all_of(c("n", ".y."))) |>
-          dplyr::mutate(term = variable) |>
-          dplyr::rename(p.value = .data[["p"]]) |>
+          dplyr::select(-dplyr::all_of(c("n", ".y."))) |>
+          dplyr::mutate(term = .env[["variable"]]) |>
+          dplyr::rename("p.value" = "p") |>
           dplyr::select(dplyr::all_of(c(
             "Assay", "OlinkID", "UniProt", "Panel", "term", "df", "method",
             "statistic", "p.value", "Adjusted_pval", "Threshold"
@@ -320,7 +320,8 @@ olink_one_non_parametric <- function(df,
             }) |>
             dplyr::ungroup() |>
             dplyr::mutate(
-              Adjusted_pval = p.adjust(.data[["p.value"]], method = "BH")
+              Adjusted_pval = stats::p.adjust(p = .data[["p.value"]],
+                                              method = "BH")
             ) |>
             dplyr::mutate(Threshold = ifelse(
               .data[["Adjusted_pval"]] < 0.05, "Significant", "Non-significant"
@@ -328,8 +329,8 @@ olink_one_non_parametric <- function(df,
             dplyr::ungroup() |>
             dplyr::arrange(.data[["Adjusted_pval"]])
         } |> # nolint brace_linter
-          dplyr::mutate(term = variable) |>
-          dplyr::rename(df = .data[["parameter"]]) |>
+          dplyr::mutate(term = .env[["variable"]]) |>
+          dplyr::rename("df" = "parameter") |>
           dplyr::select(dplyr::all_of(c(
             "Assay", "OlinkID", "UniProt", "Panel", "term", "df", "method",
             "statistic", "p.value", "Adjusted_pval", "Threshold"
@@ -339,7 +340,7 @@ olink_one_non_parametric <- function(df,
     warning = function(w) {
       if (grepl(
         x = w,
-        pattern = glob2rx("*contains implicit NA, consider using*")
+        pattern = utils::glob2rx("*contains implicit NA, consider using*")
       )) {
         invokeRestart("muffleWarning")
       }
@@ -418,7 +419,7 @@ olink_one_non_parametric <- function(df,
 #'     variable = "Time",
 #'     test = "friedman",
 #'     olinkid_list = friedman_results |>
-#'       dplyr::filter(.data[["Threshold"]] == "Significant") %>%
+#'       dplyr::filter(.data[["Threshold"]] == "Significant") |>
 #'       dplyr::select(
 #'         dplyr::all_of("OlinkID")
 #'       ) |>
@@ -464,7 +465,7 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
 
       if (is.null(olinkid_list)) {
         olinkid_list <- df |>
-          dplyr::select(dplyr::all_of(c("OlinkID"))) |>
+          dplyr::select(dplyr::all_of("OlinkID")) |>
           dplyr::distinct() |>
           dplyr::pull()
       }
@@ -540,10 +541,10 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
         for (effect in single_fixed_effects) {
           current_nas <- df |>
             dplyr::filter(!(.data[["OlinkID"]] %in% check_log$assay_na)) |>
-            dplyr::group_by(.data[["OlinkID"]], !!rlang::ensym(effect)) |>
+            dplyr::group_by(.data[["OlinkID"]], .data[[effect]]) |>
             dplyr::summarise(
               n = dplyr::n(),
-              n_na = sum(is.na(!!rlang::ensym(data_type))),
+              n_na = sum(is.na(.data[[data_type]])),
               .groups = "drop"
             ) |>
             dplyr::filter(.data[["n"]] == .data[["n_na"]]) |>
@@ -562,7 +563,7 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
             dplyr::group_by(.data[["SampleID"]]) |>
             dplyr::summarise(
               n_levels = dplyr::n_distinct(
-                !!rlang::ensym(effect),
+                .data[[effect]],
                 na.rm = TRUE
               ),
               .groups = "drop"
@@ -595,7 +596,7 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
         ## number of the items in the subject
 
         n_subject <- df_nas_remove |>
-          dplyr::select(!!!rlang::syms(variable)) |>
+          dplyr::select(dplyr::all_of(variable)) |>
           stats::na.omit() |>
           unique() |>
           dplyr::pull() |>
@@ -603,7 +604,7 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
 
         subject_remove <- df_nas_remove |>
           dplyr::filter(!is.na(.data[["NPX"]])) |>
-          dplyr::group_by(.data[["Assay"]], !!!rlang::syms(subject)) |>
+          dplyr::group_by(.data[["Assay"]], .data[[subject]]) |>
           dplyr::summarize(n = dplyr::n(), .groups = "drop") |>
           dplyr::filter(.data[["n"]] == .env[["n_subject"]]) |>
           dplyr::mutate(Friedman_remove = "no") |>
@@ -611,12 +612,12 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
 
         if (length(
           subject_remove |>
-            dplyr::select(!!!rlang::syms(subject)) |>
+            dplyr::select(dplyr::all_of(subject)) |>
             dplyr::pull() |>
             unique()
         ) < length(
           df_nas_remove |>
-            dplyr::select(!!!rlang::syms(subject)) |>
+            dplyr::select(dplyr::all_of(subject)) |>
             dplyr::pull() |>
             unique()
         )
@@ -627,7 +628,7 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
         p.hoc_val <- df_nas_remove |> # nolint object_name_linter
           dplyr::left_join(subject_remove, by = c("Assay", subject)) |>
           dplyr::filter(.data[["Friedman_remove"]] == "no") |>
-          dplyr::filter(.data[["OlinkID"]] %in% olinkid_list) |>
+          dplyr::filter(.data[["OlinkID"]] %in% .env[["olinkid_list"]]) |>
           dplyr::filter(!(.data[["OlinkID"]] %in% check_log$assay_na)) |>
           dplyr::mutate(
             OlinkID = factor(.data[["OlinkID"]], levels = olinkid_list)
@@ -661,12 +662,12 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
           dplyr::mutate(Threshold = dplyr::if_else(
             .data[["p.adj"]] < 0.05, "Significant", "Non-significant"
           )) |>
-          dplyr::rename(term = variable) |>
+          dplyr::rename("term" = "variable") |>
           dplyr::mutate(
             contrast = paste(.data[["group1"]], .data[["group2"]], sep = " - ")
           ) |>
           dplyr::arrange(.data[["p.adj"]]) |>
-          dplyr::rename(Adjusted_pval = .data[["p.adj"]]) |>
+          dplyr::rename("Adjusted_pval" = "p.adj") |>
           dplyr::select(dplyr::all_of(c(
             "Assay", "OlinkID", "UniProt", "Panel", "term", "contrast",
             "estimate", "Adjusted_pval", "Threshold"
@@ -677,7 +678,7 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
           were performed"
         )
         p.hoc_val <- df |> # nolint object_name_linter
-          dplyr::filter(.data[["OlinkID"]] %in% olinkid_list) |>
+          dplyr::filter(.data[["OlinkID"]] %in% .env[["olinkid_list"]]) |>
           dplyr::filter(!(.data[["OlinkID"]] %in% check_log$assay_na)) |>
           dplyr::mutate(
             OlinkID = factor(.data[["OlinkID"]], levels = olinkid_list)
@@ -696,15 +697,15 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
             )$res
           }) |>
           dplyr::ungroup() |>
-          dplyr::mutate("variable" = variable) |>
+          dplyr::mutate(variable = .env[["variable"]]) |>
           dplyr::mutate(Threshold = dplyr::if_else(
             .data[["P.adj"]] < 0.05, "Significant", "Non-significant"
           )) |>
-          dplyr::rename(term = variable) |>
-          dplyr::rename(contrast = .data[["Comparison"]]) |>
+          dplyr::rename("term" = "variable") |>
+          dplyr::rename("contrast" = "Comparison") |>
           dplyr::arrange(.data[["P.adj"]]) |>
-          dplyr::rename(Adjusted_pval = .data[["P.adj"]]) |>
-          dplyr::rename(estimate = .data[["Z"]]) |>
+          dplyr::rename("Adjusted_pval" = "P.adj") |>
+          dplyr::rename("estimate" = "Z") |>
           dplyr::select(dplyr::all_of(c(
             "Assay", "OlinkID", "UniProt", "Panel", "term", "contrast",
             "estimate", "Adjusted_pval", "Threshold"
@@ -716,7 +717,7 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
     warning = function(w) {
       if (grepl(
         x = w,
-        pattern = glob2rx("*contains implicit NA, consider using*")
+        pattern = utils::glob2rx("*contains implicit NA, consider using*")
       )
       ) {
         invokeRestart("muffleWarning")
