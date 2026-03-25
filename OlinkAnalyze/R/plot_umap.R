@@ -1,72 +1,118 @@
 #' Function to make a UMAP plot from the data
 #'
-#' Computes a manifold approximation and projection using umap::umap and plots the two specified components.
-#' Unique sample names are required and imputation by the median is done for assays with missingness <10\% for multi-plate projects and <5\% for single plate projects.
+#' @description
+#' Computes a manifold approximation and projection using umap::umap and plots
+#' the two specified components. Unique sample names are required and imputation
+#' by the median is done for assays with missingness <10\% for multi-plate
+#' projects and <5\% for single plate projects.
 #'
-#' The plot is printed, and a list of ggplot objects is returned. \cr\cr
-#' If byPanel = TRUE, the data processing (imputation of missing values etc) and subsequent UMAP is performed separately per panel. A faceted plot is printed, while the individual ggplot objects are returned. \cr\cr
-#' The arguments outlierDefX and outlierDefY can be used to identify outliers in the UMAP results. Samples more than +/- outlierDefX and outlierDefY standard deviations from the mean of the plotted UMAP component will be labelled. Both arguments have to be specified.
-#' NOTE: UMAP is a non-linear data transformation that might not accurately preserve the properties of the data. Distances in the UMAP plane should therefore be interpreted with caution.
+#' @details
+#' The plot is printed, and a list of ggplot objects is returned.
 #'
-#' @param df data frame in long format with Sample Id, NPX and column of choice for colors
-#' @param color_g Character value indicating which column to use for colors (default QC_Warning)
-#' @param x_val Integer indicating which UMAP component to plot along the x-axis (default 1)
-#' @param y_val Integer indicating which UMAP component to plot along the y-axis (default 2)
-#' @param label_samples Logical. If TRUE, points are replaced with SampleID (default FALSE)
-#' @param config object of class umap.config, specifying the parameters for the UMAP algorithm (default umap::umap.defaults)
-#' @param drop_assays Logical. All assays with any missing values will be dropped. Takes precedence over sample drop.
-#' @param drop_samples Logical. All samples with any missing values will be dropped.
+#' If byPanel = TRUE, the data processing (imputation of missing values etc) and
+#' subsequent UMAP is performed separately per panel. A faceted plot is printed,
+#' while the individual ggplot objects are returned. The arguments outlierDefX
+#' and outlierDefY can be used to identify outliers in the UMAP results. Samples
+#' more than +/- outlierDefX and outlierDefY standard deviations from the mean
+#' of the plotted UMAP component will be labelled. Both arguments have to be
+#' specified.
+#'
+#' NOTE: UMAP is a non-linear data transformation that might not accurately
+#' preserve the properties of the data. Distances in the UMAP plane should
+#' therefore be interpreted with caution.
+#'
+#' @param df data frame in long format with Sample Id, NPX and column of choice
+#' for colors.
+#' @param color_g Character value indicating which column to use for colors
+#' (default QC_Warning)
+#' @param x_val Integer indicating which UMAP component to plot along the x-axis
+#' (default 1)
+#' @param y_val Integer indicating which UMAP component to plot along the y-axis
+#' (default 2)
+#' @param label_samples Logical. If TRUE, points are replaced with SampleID
+#' (default FALSE)
+#' @param config object of class umap.config, specifying the parameters for the
+#' UMAP algorithm (default umap::umap.defaults)
+#' @param drop_assays Logical. All assays with any missing values will be
+#' dropped. Takes precedence over sample drop.
+#' @param drop_samples Logical. All samples with any missing values will be
+#' dropped.
 #' @param byPanel Perform the UMAP per panel (default FALSE)
-#' @param outlierDefX The number standard deviations along the UMAP dimension plotted on the x-axis that defines an outlier. See also 'Details"
-#' @param outlierDefY The number standard deviations along the UMAP dimension plotted on the y-axis that defines an outlier. See also 'Details"
-#' @param outlierLines Draw dashed lines at +/- outlierDefX and outlierDefY standard deviations from the mean of the plotted PCs (default FALSE)
-#' @param label_outliers Use ggrepel to label samples lying outside the limits set by the outlierLines (default TRUE)
+#' @param outlierDefX The number standard deviations along the UMAP dimension
+#' plotted on the x-axis that defines an outlier. See also 'Details"
+#' @param outlierDefY The number standard deviations along the UMAP dimension
+#' plotted on the y-axis that defines an outlier. See also 'Details"
+#' @param outlierLines Draw dashed lines at +/- outlierDefX and outlierDefY
+#' standard deviations from the mean of the plotted PCs (default FALSE)
+#' @param label_outliers Use ggrepel to label samples lying outside the limits
+#' set by the outlierLines (default TRUE)
 #' @param quiet Logical. If TRUE, the resulting plot is not printed
-#' @param verbose Logical. Whether warnings about the number of samples and/or assays dropped or imputed should be printed to the console.
+#' @param verbose Logical. Whether warnings about the number of samples and/or
+#' assays dropped or imputed should be printed to the console.
 #' @param ... coloroption passed to specify color order.
-#' @return A list of objects of class "ggplot", each plot contains scatter plot of UMAPs
+#'
+#' @return A list of objects of class "ggplot", each plot contains scatter plot
+#' of UMAPs
+#'
 #' @keywords NPX UMAP
+#'
 #' @export
 #' @examples
 #' \donttest{
-#' library(dplyr)
-#' npx_data <- npx_data1 %>%
-#'     mutate(SampleID = paste(SampleID, "_", Index, sep = ""))
-#' try({ # Requires umap package dependency
-#' #UMAP using all the data
-#' olink_umap_plot(df=npx_data, color_g = "QC_Warning")
+#' if (rlang::is_installed(pkg = c("umap"))) {
 #'
-#' #UMAP per panel
-#' g <- olink_umap_plot(df=npx_data, color_g = "QC_Warning", byPanel = TRUE)
-#' g$Inflammation #Plot only the Inflammation panel
+#'   npx_data <- npx_data1 |>
+#'     dplyr::mutate(
+#'       SampleID = paste(.data[["SampleID"]], "_", .data[["Index"]], sep = "")
+#'     )
 #'
-#' #Label outliers
-#' olink_umap_plot(df=npx_data, color_g = "QC_Warning",
-#'                outlierDefX = 2, outlierDefY = 4) #All data
-#' olink_umap_plot(df=npx_data, color_g = "QC_Warning",
-#'                outlierDefX = 3, outlierDefY = 2, byPanel = TRUE) #Per panel
+#'   # UMAP using all the data
+#'   OlinkAnalyze::olink_umap_plot(
+#'     df = npx_data,
+#'     color_g = "QC_Warning"
+#'   )
 #'
-#' #Retrieve the outliers
-#' g <- olink_umap_plot(df=npx_data, color_g = "QC_Warning",
-#'                     outlierDefX = 3, outlierDefY = 2, byPanel = TRUE)
-#' outliers <- lapply(g, function(x){x$data}) %>%
-#'     bind_rows() %>%
-#'     filter(Outlier == 1)
-#' })
+#'   # UMAP per panel
+#'   g <- OlinkAnalyze::olink_umap_plot(
+#'     df = npx_data,
+#'     color_g = "QC_Warning",
+#'     byPanel = TRUE
+#'   )
+#'   # Plot only the Inflammation panel
+#'   g$Inflammation
+#'
+#'   # Label outliers
+#'   OlinkAnalyze::olink_umap_plot(
+#'     df = npx_data,
+#'     color_g = "QC_Warning",
+#'     outlierDefX = 2L,
+#'     outlierDefY = 4L
+#'   )
+#'
+#'   OlinkAnalyze::olink_umap_plot(
+#'     df = npx_data,
+#'     color_g = "QC_Warning",
+#'     outlierDefX = 3L,
+#'     outlierDefY = 2L,
+#'     byPanel = TRUE
+#'   )
+#'
+#'   # Retrieve outliers
+#'   p <- OlinkAnalyze::olink_umap_plot(
+#'     df = npx_data,
+#'     color_g = "QC_Warning",
+#'     outlierDefX = 3L,
+#'     outlierDefY = 2L,
+#'     byPanel = TRUE
+#'   )
+#'   outliers <- lapply(p, function(x) x$data) |>
+#'     dplyr::bind_rows() |>
+#'     dplyr::filter(
+#'       .data[["Outlier"]] == 1L
+#'     )
 #' }
-#' @importFrom magrittr %>%
-#' @importFrom dplyr filter select group_by ungroup mutate mutate_at if_else n_distinct summarise left_join arrange distinct
-#' @importFrom stringr str_detect
-#' @importFrom tidyr spread
-#' @importFrom tidyselect all_of
-#' @importFrom rlang ensym
-#' @importFrom tibble column_to_rownames
-#' @importFrom stats prcomp
-#' @importFrom ggplot2 ggplot aes xlab ylab geom_text geom_point geom_segment  labs guides arrow
-#' @importFrom ggrepel geom_label_repel
-#' @importFrom utils head
-#' @importFrom grid unit
-
+#' }
+#'
 olink_umap_plot <- function (df,
                              color_g = "QC_Warning",
                              x_val = 1,
