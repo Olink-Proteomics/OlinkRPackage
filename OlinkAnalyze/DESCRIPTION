@@ -106,4 +106,6 @@ Suggests:
     vdiffr,
     withr,
     writexl,
-    zip
+    zip,
+    FSA,
+    rstatix

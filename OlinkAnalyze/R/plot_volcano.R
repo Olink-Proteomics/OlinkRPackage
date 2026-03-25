@@ -21,7 +21,7 @@
 #'
 #' @examples
 #' \donttest{
-#' if (rlang::is_installed(pkg = c("broom"))) {
+#' if (rlang::is_installed(pkg = c("broom", "ggrepel"))) {
 #'   npx_df <- npx_data1 |>
 #'   dplyr::filter(
 #'     !grepl(pattern = "control",
