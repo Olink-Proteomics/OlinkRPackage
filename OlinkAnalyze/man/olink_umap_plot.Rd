@@ -100,24 +100,28 @@ therefore be interpreted with caution.
 }
 \examples{
 \donttest{
-if (rlang::is_installed(pkg = c("umap"))) {
+if (rlang::is_installed(pkg = c("umap", "ggrepel", "ggpubr"))) {
 
   npx_data <- npx_data1 |>
     dplyr::mutate(
       SampleID = paste(.data[["SampleID"]], "_", .data[["Index"]], sep = "")
     )
 
+  check_log <- check_npx(df = npx_data)
+
   # UMAP using all the data
   OlinkAnalyze::olink_umap_plot(
     df = npx_data,
-    color_g = "QC_Warning"
+    color_g = "QC_Warning",
+    check_log = check_log
   )
 
   # UMAP per panel
   g <- OlinkAnalyze::olink_umap_plot(
     df = npx_data,
     color_g = "QC_Warning",
-    byPanel = TRUE
+    byPanel = TRUE,
+    check_log = check_log
   )
   # Plot only the Inflammation panel
   g$Inflammation
@@ -127,7 +131,8 @@ if (rlang::is_installed(pkg = c("umap"))) {
     df = npx_data,
     color_g = "QC_Warning",
     outlierDefX = 2L,
-    outlierDefY = 4L
+    outlierDefY = 4L,
+    check_log = check_log
   )
 
   OlinkAnalyze::olink_umap_plot(
@@ -135,7 +140,8 @@ if (rlang::is_installed(pkg = c("umap"))) {
     color_g = "QC_Warning",
     outlierDefX = 3L,
     outlierDefY = 2L,
-    byPanel = TRUE
+    byPanel = TRUE,
+    check_log = check_log
   )
 
   # Retrieve outliers
@@ -144,7 +150,8 @@ if (rlang::is_installed(pkg = c("umap"))) {
     color_g = "QC_Warning",
     outlierDefX = 3L,
     outlierDefY = 2L,
-    byPanel = TRUE
+    byPanel = TRUE,
+    check_log = check_log
   )
   outliers <- lapply(p, function(x) x$data) |>
     dplyr::bind_rows() |>
