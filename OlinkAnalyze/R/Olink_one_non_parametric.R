@@ -235,7 +235,7 @@ olink_one_non_parametric <- function(df,
         subject_remove <- df_nas_remove |>
           dplyr::filter(!is.na(.data[["NPX"]])) |>
           dplyr::group_by(.data[["Assay"]], !!!rlang::syms(subject)) |>
-          dplyr::summarize(n = n(), .groups = "drop") |>
+          dplyr::summarize(n = dplyr::n(), .groups = "drop") |>
           dplyr::filter(n == n_subject) |>
           dplyr::mutate(Friedman_remove = "no") |>
           dplyr::select(!dplyr::all_of(c("n")))
@@ -606,7 +606,7 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
         subject_remove <- df_nas_remove |>
           dplyr::filter(!is.na(.data[["NPX"]])) |>
           dplyr::group_by(.data[["Assay"]], !!!rlang::syms(subject)) |>
-          dplyr::summarize(n = n(), .groups = "drop") |>
+          dplyr::summarize(n = dplyr::n(), .groups = "drop") |>
           dplyr::filter(n == n_subject) |>
           dplyr::mutate(Friedman_remove = "no") |>
           dplyr::select(-n)
