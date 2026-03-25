@@ -595,8 +595,8 @@ norm_overlap_samples_df1_df2 <- list(
 
 # Bridge samples for npx_multi_df2 and npx_multi_df3
 norm_overlap_samples_df2_df3 <- list(
-  "DF1" = c("A13", "A29", "A30", "A36", "A45", "A46", "A52", "A63", "A71",
-            "A73"),
+  "DF1" = c("C19", "C2", "C20", "C21", "C22", "C23", "C24", "C25", "C26",
+            "C27"),
   "DF2" = c("C1_mod", "C10_mod", "C11_mod", "C12_mod", "C13_mod", "C14_mod",
             "C15_mod", "C16_mod", "C17_mod", "C18_mod")
 )
