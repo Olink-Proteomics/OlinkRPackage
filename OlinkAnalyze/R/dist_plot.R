@@ -9,7 +9,7 @@
 #' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
 #' [`check_npx()`] will be run internally using `df`.
 #' @param color_g Character value indicating which column to use as fill color.
-#' (default: QC_Warning)
+#' (default: QC_Warning).
 #' @param ... Color option passed to specify color order.
 #' @return An object of class "ggplot" which displays NPX distribution
 #' for each sample per panel
@@ -18,8 +18,17 @@
 #' @examples
 #' \donttest{
 #'
+#'# Optional: check and clean dataset
+#' check_log <- check_npx(df = npx_data1)
+#' cleaned_data <- clean_npx(npx_data1,
+#'                           check_log = check_log)
 #' olink_dist_plot(npx_data1,
-#' color_g = "QC_Warning")
+#'                 check_log = check_log,
+#'                 color_g = "QC_Warning")
+#'
+#' olink_dist_plot(cleaned_data,
+#'                 check_log = check_log,
+#'                 color_g = "QC_Warning")
 #'
 #' }
 #' @importFrom dplyr filter mutate group_by ungroup if_else

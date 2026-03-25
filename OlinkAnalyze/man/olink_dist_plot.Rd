@@ -14,7 +14,7 @@ Panel}
 \code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
 
 \item{color_g}{Character value indicating which column to use as fill color.
-(default: QC_Warning)}
+(default: QC_Warning).}
 
 \item{...}{Color option passed to specify color order.}
 }
@@ -30,8 +30,17 @@ and faceted by Panel using ggplot and ggplot2::geom_boxplot.
 \examples{
 \donttest{
 
+# Optional: check and clean dataset
+check_log <- check_npx(df = npx_data1)
+cleaned_data <- clean_npx(npx_data1,
+                          check_log = check_log)
 olink_dist_plot(npx_data1,
-color_g = "QC_Warning")
+                check_log = check_log,
+                color_g = "QC_Warning")
+
+olink_dist_plot(cleaned_data,
+                check_log = check_log,
+                color_g = "QC_Warning")
 
 }
 }
