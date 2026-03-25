@@ -106,4 +106,5 @@ Suggests:
     vdiffr,
     withr,
     writexl,
-    zip
+    zip,
+    tidyselect

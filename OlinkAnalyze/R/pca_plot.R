@@ -73,47 +73,50 @@
 #' library(dplyr)
 #' }
 #' npx_data <- npx_data1 |>
-#'   filter(!grepl("CONTROL", SampleID))
+#'   dplyr::filter(!grepl("CONTROL", SampleID))
+#' check_log <- check_npx(npx_data)
 #'
 #' # PCA using all the data
-#' olink_pca_plot(df = npx_data, color_g = "QC_Warning")
+#' olink_pca_plot(df = npx_data, check_log = check_log, color_g = "QC_Warning")
 #'
 #' # PCA per panel
-#' g <- olink_pca_plot(df = npx_data, color_g = "QC_Warning", byPanel = TRUE)
+#' g <- olink_pca_plot(
+#'   df = npx_data,
+#'   check_log = check_log,
+#'   color_g = "QC_Warning",
+#'   byPanel = TRUE
+#' )
 #' g[[2]] # Plot only the second panel
 #'
 #' # Label outliers
 #' olink_pca_plot(
-#'   df = npx_data, color_g = "QC_Warning",
+#'   df = npx_data, check_log = check_log, color_g = "QC_Warning",
 #'   outlierDefX = 2, outlierDefY = 4
 #' ) # All data
 #' olink_pca_plot(
-#'   df = npx_data, color_g = "QC_Warning",
+#'   df = npx_data, check_log = check_log, color_g = "QC_Warning",
 #'   outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE
 #' ) # Per panel
 #'
 #' # Retrieve the outliers
 #' g <- olink_pca_plot(
-#'   df = npx_data, color_g = "QC_Warning",
+#'   df = npx_data, check_log = check_log, color_g = "QC_Warning",
 #'   outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE
 #' )
 #' outliers <- lapply(g, function(x) {
-#'   x$data
+#'   return(x$data)
 #' }) |>
-#'   bind_rows() |>
-#'   filter(Outlier == 1)
+#'   dplyr::bind_rows() |>
+#'   dplyr::filter(Outlier == 1)
 #'
 #' @importFrom dplyr filter select group_by ungroup mutate mutate_at if_else
 #' n_distinct summarise left_join arrange distinct
 #' @importFrom stringr str_detect
 #' @importFrom tidyr spread
-#' @importFrom tidyselect all_of
 #' @importFrom rlang ensym
-#' @importFrom tibble column_to_rownames
 #' @importFrom stats prcomp
 #' @importFrom ggplot2 ggplot aes xlab ylab geom_text geom_point geom_segment
 #' labs guides arrow
-#' @importFrom ggrepel geom_label_repel
 #' @importFrom utils head
 #' @importFrom grid unit
 
@@ -139,7 +142,7 @@ olink_pca_plot <- function(df,
   if (length(list(...)) > 0) {
     ellipsis_variables <- names(list(...))
 
-    if (length(ellipsis_variables) == 1) {
+    if (length(ellipsis_variables) == 1L) {
       if (!(ellipsis_variables == "coloroption")) {
         cli::cli_abort(
           "The ... option only takes the coloroption argument. ... currently
@@ -251,7 +254,7 @@ olink_pca_plot <- function(df,
         )
       ) # Strip "Olink" from the panel names
 
-    plotList <- lapply(unique(df$Panel), function(x) { # nolint object_name_linter
+    plotList <- lapply(unique(df[["Panel"]]), function(x) { # nolint object_name_linter
       g <- olink_pca_plot.internal(
         df = df |> dplyr::filter(.data[["Panel"]] == x),
         check_log = check_log,
@@ -278,7 +281,7 @@ olink_pca_plot <- function(df,
 
       return(g)
     })
-    names(plotList) <- unique(df[["Panel"]]) #nolint object_name_linter
+    names(plotList) <- unique(df[["Panel"]]) # nolint object_name_linter
     if (!quiet) {
       print(ggpubr::ggarrange(
         plotlist = plotList,
@@ -313,11 +316,11 @@ olink_pca_plot <- function(df,
 
 
 olink_calculate_pca <- function(
-    procData, # nolint object_name_linter
-    x_val = 1,
-    y_val = 2,
-    outlierDefX = NA, # nolint object_name_linter
-    outlierDefY = NA # nolint object_name_linter
+  procData, # nolint object_name_linter
+  x_val = 1,
+  y_val = 2,
+  outlierDefX = NA, # nolint object_name_linter
+  outlierDefY = NA # nolint object_name_linter
 ) {
   #### PCA ####
   pca_fit <- stats::prcomp(
@@ -341,14 +344,21 @@ olink_calculate_pca <- function(
   old_collate <- Sys.getlocale("LC_COLLATE")
   Sys.setlocale("LC_COLLATE", "C")
 
-  scores <- data.frame(cbind(PCX, PCY)) |>
-    tibble::rownames_to_column() |>
-    dplyr::arrange(rowname, .locale = "C") |> # nolint object_usage_linter
-    tibble::column_to_rownames()
-  loadings <- data.frame(variables = rownames(pca_fit$rotation), LX, LY)
+  scores <- tibble::tibble(
+    SampleID = rownames(pca_fit$x),
+    PCX = PCX,
+    PCY = PCY
+  ) |>
+    dplyr::arrange(.data[["SampleID"]], .locale = "C") |>
+    tibble::column_to_rownames(var = "SampleID")
+
+  loadings <- tibble::tibble(
+    variables = rownames(pca_fit$rotation),
+    LX = LX,
+    LY = LY
+  )
 
   Sys.setlocale("LC_COLLATE", old_collate)
-
 
   range_PX <- c(-abs(min(PCX, na.rm = TRUE)), abs(max(PCX, na.rm = TRUE))) # nolint object_name_linter
   range_PY <- c(-abs(min(PCY, na.rm = TRUE)), abs(max(PCY, na.rm = TRUE))) # nolint object_name_linter
@@ -362,22 +372,22 @@ olink_calculate_pca <- function(
     scores <- scores |>
       tibble::rownames_to_column(var = "SampleID") |>
       dplyr::mutate(
-        PCX_low = mean(PCX, na.rm = TRUE) -
-          outlierDefX * sd(PCX, na.rm = TRUE),
-        PCX_high = mean(PCX, na.rm = TRUE) +
-          outlierDefX * sd(PCX, na.rm = TRUE),
-        PCY_low = mean(PCY, na.rm = TRUE) -
-          outlierDefY * sd(PCY, na.rm = TRUE),
-        PCY_high = mean(PCY, na.rm = TRUE) +
-          outlierDefY * sd(PCY, na.rm = TRUE)
+        PCX_low = mean(.data[["PCX"]], na.rm = TRUE) -
+          outlierDefX * sd(.data[["PCX"]], na.rm = TRUE),
+        PCX_high = mean(.data[["PCX"]], na.rm = TRUE) +
+          outlierDefX * sd(.data[["PCX"]], na.rm = TRUE),
+        PCY_low = mean(.data[["PCY"]], na.rm = TRUE) -
+          outlierDefY * sd(.data[["PCY"]], na.rm = TRUE),
+        PCY_high = mean(.data[["PCY"]], na.rm = TRUE) +
+          outlierDefY * sd(.data[["PCY"]], na.rm = TRUE)
       ) |>
       dplyr::mutate(
         Outlier = dplyr::if_else(
-          PCX < PCX_high & # nolint object_usage_linter
-            PCX > PCX_low & # nolint object_usage_linter
-            PCY > PCY_low & # nolint object_usage_linter
-            PCY < PCY_high, # nolint object_usage_linter
-          0, 1
+          .data[["PCX"]] < .data[["PCX_high"]] &
+            .data[["PCX"]] > .data[["PCX_low"]] &
+            .data[["PCY"]] > .data[["PCY_low"]] &
+            .data[["PCY"]] < .data[["PCY_high"]],
+          0L, 1L
         )
       )
   }
@@ -392,7 +402,7 @@ olink_calculate_pca <- function(
 }
 
 
-olink_pca_plot.internal <- function( # nolint object_name_linter
+olink_pca_plot.internal <- function(# nolint object_name_linter
   df,
   check_log = NULL,
   color_g = "QC_Warning",
@@ -416,7 +426,7 @@ olink_pca_plot.internal <- function( # nolint object_name_linter
   # Ensure one unique color value per SampleID (required by
   # npxProcessing_forDimRed)
   df <- df |>
-    dplyr::group_by(SampleID) |> # nolint object_usage_linter
+    dplyr::group_by(.data[["SampleID"]]) |>
     dplyr::mutate(
       !!rlang::sym(color_g) := dplyr::first(stats::na.omit(.data[[color_g]]))
     ) |>
@@ -507,18 +517,18 @@ olink_pca_plot.internal <- function( # nolint object_name_linter
 
   loadings <- pca_results$loading
   loadings_scaling_factor <- pca_results$loadings_scaling_factor
-  PoV <- pca_results$PoV # nolint object_name_linter
+  PoV <- pca_results[["PoV"]] #nolint
 
   # Plotting
   pca_plot <- ggplot2::ggplot(
     scores,
-    ggplot2::aes(x = PCX, y = PCY) # nolint object_usage_linter
+    ggplot2::aes(x = .data[["PCX"]], y = .data[["PCY"]])
   ) +
     ggplot2::xlab(
-      paste0("PC", x_val, " (", round(PoV[x_val] * 100, digits = 2), "%)")
+      paste0("PC", x_val, " (", round(PoV[x_val] * 100, digits = 2L), "%)")
     ) +
     ggplot2::ylab(
-      paste0("PC", y_val, " (", round(PoV[y_val] * 100, digits = 2), "%)")
+      paste0("PC", y_val, " (", round(PoV[y_val] * 100, digits = 2L), "%)")
     )
 
 
