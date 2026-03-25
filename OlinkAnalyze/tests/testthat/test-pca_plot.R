@@ -201,18 +201,6 @@ test_that(
     skip_if_not_installed(pkg = "ggplot2", minimum_version = "3.4.0")
     skip_if_not_installed(pkg = c("ggrepel"))
 
-    # # ------------------------------
-    # # Load data with unique SampleID
-    # # ------------------------------
-    # npx_data1_uniqueid <- npx_data1 |>
-    #   dplyr::mutate(SampleID = paste(
-    #     .data[["SampleID"]], "_", Index, sep = ""
-    #   ))
-    #
-    # check_log_uniqueid <- check_npx(npx_data1_uniqueid) |>
-    #   suppressMessages() |>
-    #   suppressWarnings()
-
     # -------------------------------
     # Test dropped assays and samples
     # -------------------------------
@@ -261,7 +249,7 @@ test_that(
 
     expect_equal(
       object = lapply(pca_plot_outliers, function(x) {
-        x$data
+        return(x$data)
       }) |>
         dplyr::bind_rows() |>
         dplyr::filter(Outlier == 1L) |>
@@ -556,7 +544,8 @@ pca_outside <- npx_data1_uniqueid |>
   olink_calculate_pca()
 
 test_that(
-  "PCA calculation - output order 2 & output values", {
+  "PCA calculation - output order 2 & output values",
+  {
     pca <- npx_data1_uniqueid |>
       npxProcessing_forDimRed(check_log = check_log_uniqueid) |>
       olink_calculate_pca()
@@ -625,8 +614,10 @@ test_that(
     skip_on_cran()
 
     pca_plot <- npx_data1_uniqueid |>
-      olink_pca_plot(check_log = check_log_uniqueid,
-                     label_outliers = FALSE)
+      olink_pca_plot(
+        check_log = check_log_uniqueid,
+        label_outliers = FALSE
+      )
 
     pca_mini_plot_name <- "PCA plot - not label outliers"
     check_snap_exist(
@@ -639,8 +630,10 @@ test_that(
     )
 
     pca_plot_outliers <- npx_data1_uniqueid |>
-      olink_pca_plot(check_log = check_log_uniqueid,
-                     label_outliers = TRUE)
+      olink_pca_plot(
+        check_log = check_log_uniqueid,
+        label_outliers = TRUE
+      )
 
     pca_plot_outliers_name <- "PCA plot - label outliers"
     check_snap_exist(
@@ -654,42 +647,49 @@ test_that(
 
     # Remove index
     npx_data_reindex <- npx_data1 |>
-      dplyr::mutate(SampleID = paste(SampleID, "_", Index, sep = ""),
-                    Index = dplyr::if_else(
-                      Panel == "Olink Cardiometabolic", Index + 1L, Index
-                    )
+      dplyr::mutate(
+        SampleID = paste(SampleID, "_", Index, sep = ""),
+        Index = dplyr::if_else(
+          Panel == "Olink Cardiometabolic", Index + 1L, Index
+        )
       )
     check_log_reindex <- check_npx(npx_data_reindex) |>
       suppressMessages() |>
       suppressWarnings()
 
-    pca_plot_reindex <- olink_pca_plot(df = npx_data_reindex,
-                                       check_log = check_log_reindex)
+    pca_plot_reindex <- olink_pca_plot(
+      df = npx_data_reindex,
+      check_log = check_log_reindex
+    )
 
-    expect_true(all(abs(sort(pca_plot_reindex[[1]]$data$PCX) -
-                          sort(pca_plot[[1]]$data$PCX)) == 0L))
-    expect_true(all(abs(sort(pca_plot_reindex[[1]]$data$PCY) -
-                          sort(pca_plot[[1]]$data$PCY)) == 0L))
+    expect_true(all(
+      abs(sort(pca_plot_reindex[[1]]$data$PCX) -
+            sort(pca_plot[[1]]$data$PCX)) == 0L
+    ))
 
+    expect_true(all(
+      abs(sort(pca_plot_reindex[[1]]$data$PCY) -
+            sort(pca_plot[[1]]$data$PCY)) == 0L
+    ))
   }
 )
 
 # prcomp
-C <- chol(S <- toeplitz(.9^(0:31))) # Cov.matrix and its root
+c <- chol(s <- toeplitz(.9^(0:31))) # Cov.matrix and its root
 set.seed(17)
-X <- matrix(rnorm(32000), 1000, 32)
-Z <- X %*% C ## ==>  cov(Z) ~=  C'C = S
+x <- matrix(rnorm(32000), 1000, 32)
+z <- x %*% c ## ==>  cov(Z) ~=  C'C = S
 
-pZ_outside <- prcomp(Z, tol = 0.1)
+p_z_outside <- prcomp(z, tol = 0.1)
 
 test_that(
   "prcomp - works",
   {
-    pZ_inside <- prcomp(Z, tol = 0.1)
+    p_z_inside <- prcomp(z, tol = 0.1)
 
     expect_equal(
-      object = pZ_outside,
-      expected = pZ_inside
+      object = p_z_outside,
+      expected = p_z_inside
     )
   }
 )
