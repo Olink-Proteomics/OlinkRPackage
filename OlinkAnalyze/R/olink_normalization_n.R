@@ -450,7 +450,7 @@ olink_normalization_n <- function(norm_schema) {
 
   normalized_npx[[project_ref_global]] <- normalized_npx[[project_ref_global]] |> # nolint: line_length_linter
     dplyr::mutate(Project = .env[["project_ref_global"]],
-                  Adj_factor = 0)
+                  Adj_factor = 0L)
 
   # extract remaining batches
   project_remaining <- norm_schema |>
@@ -1231,13 +1231,13 @@ olink_normalization_n_check <- function(norm_schema) {
   if (!all(input_colnames %in% colnames(norm_schema))) {
     miss_cols <- input_colnames[!input_colnames %in% colnames(norm_schema)]
 
-    if (length(miss_cols == 1)) {
+    if (length(miss_cols == 1L)) {
       miss_cols_print <- miss_cols
     } else {
       miss_cols_print <- miss_cols |>
-        utils::head(-1) |>
+        utils::head(-1L) |>
         paste(collapse = ", ") |>
-        paste("and", utils::tail(x = miss_cols, n = -1))
+        paste("and", utils::tail(x = miss_cols, n = -1L))
     }
 
     return(
@@ -1279,13 +1279,13 @@ olink_normalization_n_check <- function(norm_schema) {
       sapply(function(x) "Project" %in% colnames(x)) |>
       names()
 
-    if (length(check_project) == 1) {
+    if (length(check_project) == 1L) {
       check_project_print <- check_project
     } else {
       check_project_print <- check_project |>
-        utils::head(-1) |>
+        utils::head(-1L) |>
         paste(collapse = ", ") |>
-        paste("and", utils::tail(x = check_project, n = -1))
+        paste("and", utils::tail(x = check_project, n = -1L))
     }
 
     return(
@@ -1301,13 +1301,13 @@ olink_normalization_n_check <- function(norm_schema) {
       sapply(function(x) "Adj_factor" %in% colnames(x)) |>
       names()
 
-    if (length(check_project) == 1) {
+    if (length(check_project) == 1L) {
       check_project_print <- check_project
     } else {
       check_project_print <- check_project |>
-        utils::head(-1) |>
+        utils::head(-1L) |>
         paste(collapse = ", ") |>
-        paste("and", utils::tail(x = check_project, n = -1))
+        paste("and", utils::tail(x = check_project, n = -1L))
     }
 
     return(
@@ -1363,14 +1363,14 @@ olink_normalization_n_check <- function(norm_schema) {
   }) |>
     unlist()
   if (!is.null(order_and_norm_to)
-      && length(order_and_norm_to) > 0) {
-    if (length(order_and_norm_to) == 1) {
+      && length(order_and_norm_to) > 0L) {
+    if (length(order_and_norm_to) == 1L) {
       order_and_norm_to_print <- order_and_norm_to
     } else {
       order_and_norm_to_print <- order_and_norm_to |>
-        utils::head(-1) |>
+        utils::head(-1L) |>
         paste(collapse = ", ") |>
-        paste("and", utils::tail(x = order_and_norm_to, n = -1))
+        paste("and", utils::tail(x = order_and_norm_to, n = -1L))
     }
 
     return(
