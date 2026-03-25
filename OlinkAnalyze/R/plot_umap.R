@@ -29,6 +29,8 @@
 #' (default 1)
 #' @param y_val Integer indicating which UMAP component to plot along the y-axis
 #' (default 2)
+#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
+#' [`check_npx()`] will be run internally using `df`.
 #' @param label_samples Logical. If TRUE, points are replaced with SampleID
 #' (default FALSE)
 #' @param config object of class umap.config, specifying the parameters for the
@@ -113,248 +115,355 @@
 #' }
 #' }
 #'
-olink_umap_plot <- function (df,
-                             color_g = "QC_Warning",
-                             x_val = 1,
-                             y_val = 2,
-                             config = NULL,
-                             label_samples = FALSE,
-                             drop_assays = FALSE,
-                             drop_samples = FALSE,
-                             byPanel = FALSE,
-                             outlierDefX = NA,
-                             outlierDefY = NA,
-                             outlierLines = FALSE,
-                             label_outliers = TRUE,
-                             quiet = FALSE,
-                             verbose = TRUE,
-                             ...){
-  #Is the umap package installed?
-  if(!requireNamespace("umap")){
-    stop("Could not load the package umap")
-  }
+olink_umap_plot <- function(df,
+                            color_g = "QC_Warning",
+                            x_val = 1L,
+                            y_val = 2L,
+                            check_log = NULL,
+                            config = NULL,
+                            label_samples = FALSE,
+                            drop_assays = FALSE,
+                            drop_samples = FALSE,
+                            byPanel = FALSE, # nolint: object_name_linter
+                            outlierDefX = NA, # nolint: object_name_linter
+                            outlierDefY = NA, # nolint: object_name_linter
+                            outlierLines = FALSE, # nolint: object_name_linter
+                            label_outliers = TRUE,
+                            quiet = FALSE,
+                            verbose = TRUE,
+                            ...) {
+  # Check if all required libraries for this function are installed
+  rlang::check_installed(
+    pkg = c("umap"),
+    call = rlang::caller_env()
+  )
 
-  if(is.null(config)){
+  if (is.null(config)) {
     config <- umap::umap.defaults
   }
 
-  #checking ellipsis
-  if(length(list(...)) > 0){
-
+  # checking ellipsis
+  if (length(list(...)) > 0L) {
     ellipsis_variables <- names(list(...))
-
-    if(length(ellipsis_variables) == 1){
-
-      if(!(ellipsis_variables == 'coloroption')){
-
-        stop(paste0('The ... option only takes the coloroption argument. ... currently contains the variable ',
-                    ellipsis_variables,
-                    '.'))
-
+    if (length(ellipsis_variables) == 1L) {
+      if (!(ellipsis_variables == "coloroption")) {
+        cli::cli_abort(
+          c(
+            "x" = "The {.arg ...} option only takes the coloroption argument.
+            {.arg ...} currently contains the variable
+            {.val {ellipsis_variables}}."
+          ),
+          call = rlang::caller_env(),
+          wrap = FALSE
+        )
       }
-
-    }else{
-
-      stop(paste0('The ... option only takes one argument. ... currently contains the variables ',
-                  paste(ellipsis_variables, collapse = ', '),
-                  '.'))
+    } else {
+      cli::cli_abort(
+        c(
+          "x" = "The {.arg ...} option only takes one argument. {.arg ...}
+          currently contains the variables {.val {ellipsis_variables}}."
+        ),
+        call = rlang::caller_env(),
+        wrap = FALSE
+      )
     }
   }
 
-  #Filtering on valid OlinkID
-  df <- df %>%
-    dplyr::filter(stringr::str_detect(OlinkID,
-                                      "OID[0-9]{5}"))
+  # Filtering on valid OlinkID
+  df <- df |>
+    dplyr::filter(
+      stringr::str_detect(
+        string = .data[["OlinkID"]],
+        pattern = "OID[0-9]{5}"
+      )
+    )
 
-  #Check data format
-  npxCheck <- npxCheck(df)
-  df <- df %>% dplyr::filter(!(OlinkID %in% npxCheck$all_nas)) #Exclude assays that have all NA:s
+  # Check data format
+  check_log <- run_check_npx(df = df, check_log = check_log)
 
-  # Rename duplicate UniProts
-  df <- uniprot_replace(df, npxCheck)
+  # Exclude assays that have all NA:s
+  df <- df |>
+    dplyr::filter(
+      !(.data[["OlinkID"]] %in% check_log$assay_na)
+    )
 
-  #Check that the user didn't specify just one of outlierDefX and outlierDefY
-  if(sum(c(is.numeric(outlierDefX), is.numeric(outlierDefY))) == 1){
-    stop('To label outliers, both outlierDefX and outlierDefY have to be specified as numerical values')
+  # Check that the user didn't specify just one of outlierDefX and outlierDefY
+  if (sum(c(is.numeric(outlierDefX), is.numeric(outlierDefY))) == 1L) {
+    stop(
+      paste("To label outliers, both outlierDefX and outlierDefY have to be",
+            "specified as numerical values")
+    )
   }
 
-  #If outlierLines == TRUE, both outlierDefX and outlierDefY have to be specified
-  if(outlierLines){
-    if(!all(is.numeric(outlierDefX), is.numeric(outlierDefY))){
-      stop('outlierLines requested but boundaries not specified. To draw lines, both outlierDefX and outlierDefY have to be specified as numerical values')
+  # If outlierLines=TRUE, both outlierDefX and outlierDefY have to be specified
+  if (outlierLines) {
+    if (!all(is.numeric(outlierDefX), is.numeric(outlierDefY))) {
+      stop(
+        paste("outlierLines requested but boundaries not specified. To draw",
+              "lines, both outlierDefX and outlierDefY have to be specified as",
+              "numerical values")
+      )
     }
   }
 
-  if(byPanel){
+  if (byPanel) {
     # Convert color_g variable to factor
-    if(!is.factor(df[[paste(color_g)]])){
+    if (!is.factor(df[[paste(color_g)]])) {
       df[[paste(color_g)]] <- as.factor(df[[paste(color_g)]])
     }
-    df <- df %>%
-      dplyr::mutate(Panel = Panel  %>% stringr::str_replace("Olink ", "")) #Strip "Olink" from the panel names
 
-    plotList <- lapply(unique(df$Panel), function(x) {
-      g <- df %>%
-        dplyr::filter(Panel == x) %>%
-        olink_umap_plot.internal(df = .,
-                                 color_g = color_g,
-                                 x_val = x_val,
-                                 y_val = y_val,
-                                 label_samples = label_samples,
-                                 config = config,
-                                 drop_assays = drop_assays,
-                                 drop_samples = drop_samples,
-                                 outlierDefX = outlierDefX,
-                                 outlierDefY = outlierDefY,
-                                 outlierLines = outlierLines,
-                                 label_outliers = label_outliers,
-                                 verbose = verbose,
-                                 ...) +
-        ggplot2::labs(title = x)
+    # Strip "Olink" from the panel names
+    df <- df |>
+      dplyr::mutate(
+        Panel = stringr::str_replace(string = .data[["Panel"]],
+                                     replacement = "Olink ",
+                                     pattern = "")
+      )
+
+    plotList <- lapply(unique(df$Panel), function(x) { # nolint: object_name_linter
+      g <- df |>
+        dplyr::filter(
+          .data[["Panel"]] == .env[["x"]]
+        ) |>
+        olink_umap_plot.internal(
+          color_g = color_g,
+          x_val = x_val,
+          y_val = y_val,
+          check_log = check_log,
+          label_samples = label_samples,
+          config = config,
+          drop_assays = drop_assays,
+          drop_samples = drop_samples,
+          outlierDefX = outlierDefX,
+          outlierDefY = outlierDefY,
+          outlierLines = outlierLines,
+          label_outliers = label_outliers,
+          verbose = verbose,
+          ...
+        ) +
+        ggplot2::labs(
+          title = x
+        )
 
       #Add Panel info inside the ggplot object
-      g$data <- g$data %>%
-        dplyr::mutate(Panel = x)
+      g$data <- g$data |>
+        dplyr::mutate(
+          Panel = .env[["x"]]
+        )
 
-      g
+      return(g)
     })
-    names(plotList) <- unique(df$Panel)
-    if(!quiet) print(ggpubr::ggarrange(plotlist = plotList, common.legend = TRUE))
+    names(plotList) <- unique(df$Panel) # nolint: object_name_linter
 
-  } else{
-    umap_plot <- olink_umap_plot.internal(df = df,
-                                         color_g = color_g,
-                                         x_val = x_val,
-                                         y_val = y_val,
-                                         label_samples = label_samples,
-                                         config = config,
-                                         drop_assays = drop_assays,
-                                         drop_samples = drop_samples,
-                                         outlierDefX = outlierDefX,
-                                         outlierDefY = outlierDefY,
-                                         outlierLines = outlierLines,
-                                         label_outliers = label_outliers,
-                                         verbose = verbose,
-                                         ...)
-    if(!quiet) print(umap_plot)
-    plotList <- list(umap_plot) #For consistency, return a list even when there's just one plot
+    if (quiet == FALSE) {
+      print(ggpubr::ggarrange(plotlist = plotList, common.legend = TRUE))
+    }
+
+  } else {
+    umap_plot <- olink_umap_plot.internal(
+      df = df,
+      color_g = color_g,
+      x_val = x_val,
+      y_val = y_val,
+      check_log = check_log,
+      label_samples = label_samples,
+      config = config,
+      drop_assays = drop_assays,
+      drop_samples = drop_samples,
+      outlierDefX = outlierDefX,
+      outlierDefY = outlierDefY,
+      outlierLines = outlierLines,
+      label_outliers = label_outliers,
+      verbose = verbose,
+      ...
+    )
+
+    if (quiet == FALSE) {
+      print(umap_plot)
+    }
+
+    # For consistency, return a list even when there's just one plot
+    plotList <- list(umap_plot) # nolint: object_name_linter
   }
 
   return(invisible(plotList))
 }
 
-olink_umap_plot.internal <- function (df,
+olink_umap_plot.internal <- function(df, # nolint: object_name_linter
                                      color_g,
                                      x_val,
                                      y_val,
+                                     check_log = NULL,
                                      label_samples,
                                      config,
                                      drop_assays,
                                      drop_samples,
-                                     outlierDefX,
-                                     outlierDefY,
-                                     outlierLines,
+                                     outlierDefX, # nolint: object_name_linter
+                                     outlierDefY, # nolint: object_name_linter
+                                     outlierLines, # nolint: object_name_linter
                                      label_outliers,
                                      verbose = TRUE,
-                                     ...){
+                                     ...) {
 
   ### Data pre-processing ###
-  procData <- npxProcessing_forDimRed(df = df,
-                                      color_g = color_g,
-                                      drop_assays = drop_assays,
-                                      drop_samples = drop_samples,
-                                      verbose = verbose)
+  procData <- npxProcessing_forDimRed( # nolint: object_name_linter
+    df = df,
+    check_log = check_log,
+    color_g = color_g,
+    drop_assays = drop_assays,
+    drop_samples = drop_samples,
+    verbose = verbose
+  )
 
   #### UMAP ####
   #Determine number of UMAP components
   n_components <- config$n_components
-  if(max(c(x_val, y_val)) > n_components){
+  if (max(c(x_val, y_val)) > n_components) {
     n_components <- max(c(x_val, y_val))
   }
 
-  umap_fit <- umap::umap(procData$df_wide_matrix, config = config, n_components = n_components)
-  umapX <- umap_fit$layout[, x_val]
-  umapY <- umap_fit$layout[, y_val]
-  observation_names <- procData$df_wide$SampleID
-  observation_colors <- procData$df_wide$colors
+  umap_fit <- umap::umap(
+    d = procData$df_wide_matrix,
+    config = config,
+    n_components = n_components
+  )
+
+  umapX <- umap_fit$layout[, x_val] # nolint: object_name_linter
+  umapY <- umap_fit$layout[, y_val] # nolint: object_name_linter
+  observation_names <- procData$df_wide[["SampleID"]]
+  observation_colors <- procData$df_wide[["colors"]]
   scores <- data.frame(umapX, umapY)
 
   #Identify outliers
-  if(!is.na(outlierDefX) & !is.na(outlierDefY)){
-    scores <- scores %>%
-      tibble::rownames_to_column(var = 'SampleID') %>%
-      dplyr::mutate( umapX_low = mean(umapX, na.rm = TRUE) - outlierDefX*sd(umapX, na.rm = TRUE),
-                     umapX_high = mean(umapX, na.rm = TRUE) + outlierDefX*sd(umapX, na.rm = TRUE),
-                     umapY_low = mean(umapY, na.rm = TRUE) - outlierDefY*sd(umapY, na.rm = TRUE),
-                     umapY_high = mean(umapY, na.rm = TRUE) + outlierDefY*sd(umapY, na.rm = TRUE)) %>%
-      dplyr::mutate(Outlier = dplyr::if_else(umapX < umapX_high &
-                                               umapX > umapX_low &
-                                               umapY > umapY_low &
-                                               umapY < umapY_high,
-                                             0, 1))
+  if (!is.na(outlierDefX) && !is.na(outlierDefY)) {
+    scores <- scores |>
+      tibble::rownames_to_column(
+        var = "SampleID"
+      ) |>
+      dplyr::mutate(
+        umapX_low = mean(x = .data[["umapX"]], na.rm = TRUE) -
+          .env[["outlierDefX"]] * sd(x = .data[["umapX"]], na.rm = TRUE),
+        umapX_high = mean(x = .data[["umapX"]], na.rm = TRUE) +
+          .env[["outlierDefX"]] * sd(x = .data[["umapX"]], na.rm = TRUE),
+        umapY_low = mean(x = .data[["umapY"]], na.rm = TRUE) -
+          .env[["outlierDefY"]] * sd(x = .data[["umapY"]], na.rm = TRUE),
+        umapY_high = mean(x = .data[["umapY"]], na.rm = TRUE) +
+          .env[["outlierDefY"]] * sd(x = .data[["umapY"]], na.rm = TRUE)
+      ) |>
+      dplyr::mutate(
+        Outlier = dplyr::if_else(
+          .data[["umapX"]] < .data[["umapX_high"]] &
+            .data[["umapX"]] > .data[["umapX_low"]] &
+            .data[["umapY"]] > .data[["umapY_low"]] &
+            .data[["umapY"]] < .data[["umapY_high"]],
+          0L,
+          1L
+        )
+      )
   }
 
   #### Plotting ####
-  umap_plot <- ggplot2::ggplot(scores, ggplot2::aes(x = umapX, y = umapY)) +
-    ggplot2::xlab(paste0('UMAP', x_val)) +
-    ggplot2::ylab(paste0('UMAP', y_val))
+  umap_plot <- ggplot2::ggplot(
+    data = scores,
+    mapping = ggplot2::aes(
+      x = .data[["umapX"]],
+      y = .data[["umapY"]]
+    )
+  ) +
+    ggplot2::xlab(
+      paste0("UMAP", x_val)
+    ) +
+    ggplot2::ylab(
+      paste0("UMAP", y_val)
+    )
 
+  # Drawing scores
 
-  #Drawing scores
-
-  if(label_samples){
-
+  if (label_samples) {
     umap_plot <- umap_plot +
-      ggplot2::geom_text(ggplot2::aes(label = observation_names, color = observation_colors), size = 3) +
-      ggplot2::labs(color = color_g) +
-      ggplot2::guides(size = "none")
-
-  }else{
-
+      ggplot2::geom_text(
+        mapping = ggplot2::aes(
+          label = .env[["observation_names"]],
+          color = .env[["observation_colors"]]
+        ),
+        size = 3L
+      )
+  } else {
     umap_plot <- umap_plot +
-      ggplot2::geom_point(ggplot2::aes(color = observation_colors), size = 2.5) +
-      ggplot2::labs(color = color_g) +
-      ggplot2::guides(size = "none")
-
+      ggplot2::geom_point(
+        mapping = ggplot2::aes(
+          color = .env[["observation_colors"]]
+        ),
+        size = 2.5
+      )
   }
 
+  umap_plot <- umap_plot +
+    ggplot2::labs(
+      color = color_g
+    ) +
+    ggplot2::guides(
+      size = "none"
+    )
 
-  #Label outliers in figure
-  if(!is.na(outlierDefX) & !is.na(outlierDefY) & label_outliers){
+  # Label outliers in figure
+  if (!is.na(outlierDefX) && !is.na(outlierDefY) && label_outliers) {
     umap_plot <- umap_plot +
-      ggrepel::geom_label_repel(data = . %>% dplyr::mutate(SampleIDPlot = dplyr::case_when(Outlier == 1 ~ SampleID,
-                                                                                           TRUE ~ "")),
-                                ggplot2::aes(label=SampleIDPlot),
-                                box.padding = 0.5,
-                                min.segment.length = 0.1,
-                                show.legend=FALSE,
-                                size = 3)
+      ggrepel::geom_label_repel(
+        data = umap_plot$data |>
+          dplyr::mutate(
+            SampleIDPlot = dplyr::if_else(
+              .data[["Outlier"]] == 1L,
+              .data[["SampleID"]],
+              ""
+            )
+          ),
+        mapping = ggplot2::aes(
+          label = .data[["SampleIDPlot"]]
+        ),
+        box.padding = 0.5,
+        min.segment.length = 0.1,
+        show.legend = FALSE,
+        size = 3L
+      )
   }
 
-  #Add outlier lines
-  if(outlierLines){
+  # Add outlier lines
+  if (outlierLines) {
     umap_plot <- umap_plot +
-      ggplot2::geom_hline(ggplot2::aes(yintercept=umapY_low),
-                          linetype = 'dashed',
-                          color = 'grey') +
-      ggplot2::geom_hline(ggplot2::aes(yintercept=umapY_high),
-                          linetype = 'dashed',
-                          color = 'grey') +
-      ggplot2::geom_vline(ggplot2::aes(xintercept = umapX_low),
-                          linetype = 'dashed',
-                          color = 'grey') +
-      ggplot2::geom_vline(ggplot2::aes(xintercept = umapX_high),
-                          linetype = 'dashed',
-                          color = 'grey')
+      ggplot2::geom_hline(
+        mapping = ggplot2::aes(
+          yintercept = .data[["umapY_low"]]
+        ),
+        linetype = "dashed",
+        color = "grey"
+      ) +
+      ggplot2::geom_hline(
+        mapping = ggplot2::aes(
+          yintercept = .data[["umapY_high"]]
+        ),
+        linetype = "dashed",
+        color = "grey"
+      ) +
+      ggplot2::geom_vline(
+        mapping = ggplot2::aes(
+          xintercept = .data[["umapX_low"]]
+        ),
+        linetype = "dashed",
+        color = "grey"
+      ) +
+      ggplot2::geom_vline(
+        mapping = ggplot2::aes(
+          xintercept = .data[["umapX_high"]]
+        ),
+        linetype = "dashed",
+        color = "grey"
+      )
   }
-
-
 
   umap_plot <- umap_plot +
     OlinkAnalyze::set_plot_theme() +
-    OlinkAnalyze::olink_color_discrete(...,drop=FALSE)
+    OlinkAnalyze::olink_color_discrete(..., drop = FALSE)
 
   return(umap_plot)
-
-
 }

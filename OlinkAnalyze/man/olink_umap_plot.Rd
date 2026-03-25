@@ -7,8 +7,9 @@
 olink_umap_plot(
   df,
   color_g = "QC_Warning",
-  x_val = 1,
-  y_val = 2,
+  x_val = 1L,
+  y_val = 2L,
+  check_log = NULL,
   config = NULL,
   label_samples = FALSE,
   drop_assays = FALSE,
@@ -35,6 +36,9 @@ for colors.}
 
 \item{y_val}{Integer indicating which UMAP component to plot along the y-axis
 (default 2)}
+
+\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
 
 \item{config}{object of class umap.config, specifying the parameters for the
 UMAP algorithm (default umap::umap.defaults)}
