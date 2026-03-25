@@ -108,3 +108,5 @@ Suggests:
     writexl,
     zip,
     umap
+    FSA,
+    rstatix
