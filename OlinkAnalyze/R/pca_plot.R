@@ -201,20 +201,23 @@ olink_pca_plot <- function(df,
 
   # OSI checks - ran only if OSI columns selected to color
   osi_cat_cols <- c("OSICategory")
-  osi_cont_cols <- c("OSITimeToCentrifugation",
-                     "OSIPreparationTemperature",
-                     "OSISummary")
+  osi_cont_cols <- c(
+    "OSITimeToCentrifugation",
+    "OSIPreparationTemperature",
+    "OSISummary"
+  )
 
   if (color_g %in% c(osi_cat_cols, osi_cont_cols)) {
-
     # Check for invalid values and NA columns
-    df <- check_osi(df = df,
-                    check_log = check_log,
-                    osi_score = color_g)
+    df <- check_osi(
+      df = df,
+      check_log = check_log,
+      osi_score = color_g
+    )
   }
 
   # Check that the user didn't specify just one of outlierDefX and outlierDefY
-  if (sum(c(is.numeric(outlierDefX), is.numeric(outlierDefY))) == 1) {
+  if (sum(c(is.numeric(outlierDefX), is.numeric(outlierDefY))) == 1L) {
     cli::cli_abort(
       "To label outliers, both outlierDefX and outlierDefY have to be specified
       as numerical values."
@@ -234,7 +237,6 @@ olink_pca_plot <- function(df,
   }
 
   if (byPanel) {
-
     # Keep continuous OSI cols unchanged; only convert other color_g to factor
     if (!color_g %in% osi_cont_cols) {
       if (!is.factor(df[[color_g]])) {
@@ -244,12 +246,15 @@ olink_pca_plot <- function(df,
 
     df <- df |>
       dplyr::mutate(
-        Panel = stringr::str_replace(Panel, "Olink ", "") # nolint object_usage_linter
+        Panel = stringr::str_replace(
+          .data[[check_log$col_names$panel]], "Olink ", ""
+        )
       ) # Strip "Olink" from the panel names
 
     plotList <- lapply(unique(df$Panel), function(x) { # nolint object_name_linter
       g <- olink_pca_plot.internal(
-        df = df |> dplyr::filter(Panel == x), # nolint object_usage_linter
+        df = df |> dplyr::filter(.data[["Panel"]] == x),
+        check_log = check_log,
         color_g = color_g,
         x_val = x_val,
         y_val = y_val,
@@ -273,7 +278,7 @@ olink_pca_plot <- function(df,
 
       return(g)
     })
-    names(plotList) <- unique(df$Panel) # nolint object_name_linter
+    names(plotList) <- unique(df[["Panel"]]) #nolint object_name_linter
     if (!quiet) {
       print(ggpubr::ggarrange(
         plotlist = plotList,
@@ -283,6 +288,7 @@ olink_pca_plot <- function(df,
   } else {
     pca_plot <- olink_pca_plot.internal(
       df = df,
+      check_log = check_log,
       color_g = color_g,
       x_val = x_val,
       y_val = y_val,
@@ -299,7 +305,8 @@ olink_pca_plot <- function(df,
       ...
     )
     if (!quiet) print(pca_plot)
-    plotList <- list(pca_plot) # nolint object_name_linter # For consistency, return a list even when there's just one plot
+    # For consistency, return a list even when there's just one plot
+    plotList <- list(pca_plot) # nolint object_name_linter
   }
   return(invisible(plotList))
 }
@@ -366,7 +373,7 @@ olink_calculate_pca <- function(
       ) |>
       dplyr::mutate(
         Outlier = dplyr::if_else(
-          PCX < PCX_high &  # nolint object_usage_linter
+          PCX < PCX_high & # nolint object_usage_linter
             PCX > PCX_low & # nolint object_usage_linter
             PCY > PCY_low & # nolint object_usage_linter
             PCY < PCY_high, # nolint object_usage_linter
@@ -387,6 +394,7 @@ olink_calculate_pca <- function(
 
 olink_pca_plot.internal <- function( # nolint object_name_linter
   df,
+  check_log = NULL,
   color_g = "QC_Warning",
   x_val = 1,
   y_val = 2,
@@ -402,6 +410,9 @@ olink_pca_plot.internal <- function( # nolint object_name_linter
   verbose = verbose,
   ...
 ) {
+  # Check if check_log is correct
+  check_log <- run_check_npx(df = df, check_log = check_log)
+
   # Ensure one unique color value per SampleID (required by
   # npxProcessing_forDimRed)
   df <- df |>
@@ -414,6 +425,7 @@ olink_pca_plot.internal <- function( # nolint object_name_linter
   # Data pre-processing
   procData <- npxProcessing_forDimRed( # nolint object_name_linter
     df = df,
+    check_log = check_log,
     color_g = color_g,
     drop_assays = drop_assays,
     drop_samples = drop_samples,
@@ -527,12 +539,13 @@ olink_pca_plot.internal <- function( # nolint object_name_linter
   }
 
   # Continuous color scale for OSI columns
-  osi_cols <- c(
+  osi_cont_cols <- c(
     "OSITimeToCentrifugation",
     "OSIPreparationTemperature",
     "OSISummary"
   )
-  if (color_g %in% osi_cols) {
+
+  if (color_g %in% osi_cont_cols) {
     # Ensure numeric for continuous scale (handles character/factor inputs)
     if (is.factor(scores$colors)) scores$colors <- as.character(scores$colors)
     scores$colors <- suppressWarnings(as.numeric(scores$colors))
@@ -588,7 +601,7 @@ olink_pca_plot.internal <- function( # nolint object_name_linter
           x = 0,
           y = 0,
           xend = LX * loadings_scaling_factor, # nolint object_usage_linter
-          yend = LY * loadings_scaling_factor  # nolint object_usage_linter
+          yend = LY * loadings_scaling_factor # nolint object_usage_linter
         ),
         arrow = ggplot2::arrow(length = grid::unit(1 / 2, "picas")),
         color = "black"
@@ -653,12 +666,7 @@ olink_pca_plot.internal <- function( # nolint object_name_linter
   pca_plot <- pca_plot +
     OlinkAnalyze::set_plot_theme()
 
-  osi_cols <- c(
-    "OSITimeToCentrifugation",
-    "OSIPreparationTemperature",
-    "OSISummary"
-  )
-  if (!(color_g %in% osi_cols)) {
+  if (!(color_g %in% osi_cont_cols)) {
     pca_plot <- pca_plot +
       OlinkAnalyze::olink_color_discrete(..., drop = FALSE)
   }
