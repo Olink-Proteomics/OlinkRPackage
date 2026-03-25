@@ -5,6 +5,8 @@ test_that(
     ref_results <- get_example_data(filename = "reference_results.rds")
 
     skip_if_not_installed("FSA") |> suppressMessages()
+    skip_if_not_installed("broom")
+    skip_if_not_installed("rstatix")
 
     # npx_data1 check_log
     check_log <- check_npx(npx_data1) |>
@@ -210,6 +212,10 @@ test_that(
 test_that(
   "olink_one_non_parametric - warn - assays with only NA in one level",
   {
+    skip_if_not_installed("FSA") |> suppressMessages()
+    skip_if_not_installed("broom")
+    skip_if_not_installed("rstatix")
+
     # Create test data
     check_log <- check_npx(npx_data1) |>
       suppressMessages() |>
