@@ -56,7 +56,7 @@
 #' @export
 #' @examples
 #' \donttest{
-#' if (rlang::is_installed(pkg = c("lme4", "lmerTest", "broom"))) {
+#' if (rlang::is_installed(pkg = c("broom"))) {
 #'
 #'  check_log <- check_npx(df = npx_data1)
 #'
@@ -341,7 +341,6 @@ olink_one_non_parametric <- function(df,
   )
 }
 
-
 #' Function which performs posthoc test per protein for the results from
 #' Friedman or Kruskal-Wallis Test.
 #'
@@ -383,50 +382,46 @@ olink_one_non_parametric <- function(df,
 #' }
 #'
 #' @export
-#' @examples \donttest{
-#' library(dplyr)
 #'
-#' try({ # May fail if dependencies are not installed
-#'   # Run check_npx
-#'   check_log <- check_npx(npx_data1)
+#' @examples
+#' \donttest{
+#' if (rlang::is_installed(pkg = c("FSA", "broom"))) {
+#'
+#'   check_log <- check_npx(df = npx_data1)
 #'
 #'   # One-way Kruskal-Wallis Test
-#'   kruskal_results <- olink_one_non_parametric(
+#'   kruskal_results <- OlinkAnalyze::olink_one_non_parametric(
 #'     df = npx_data1,
 #'     check_log = check_log,
 #'     variable = "Site"
 #'   )
-#' })
 #'
-#' # Friedman Test
-#' friedman_results <- olink_one_non_parametric(
-#'   df = npx_data1,
-#'   check_log = check_log,
-#'   variable = "Time",
-#'   subject = "Subject",
-#'   dependence = TRUE
-#' )
+#'   # Friedman Test
+#'   friedman_results <- OlinkAnalyze::olink_one_non_parametric(
+#'     df = npx_data1,
+#'     check_log = check_log,
+#'     variable = "Time",
+#'     subject = "Subject",
+#'     dependence = TRUE
+#'   )
 #'
-#' # Posthoc test for the results from Friedman Test
-#' friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_data1,
-#'   check_log = check_log,
-#'   variable = "Time",
-#'   test = "friedman",
-#'   olinkid_list = {
-#'     friedman_results %>%
-#'       filter(Threshold == "Significant") %>%
-#'       dplyr::select(OlinkID) %>%
-#'       distinct() %>%
-#'       pull()
-#'   }
-#' )
+#'   # Posthoc test for the results from Friedman Test
+#'   friedman_posthoc_results <- OlinkAnalyze::olink_one_non_parametric_posthoc(
+#'     df = npx_data1,
+#'     check_log = check_log,
+#'     variable = "Time",
+#'     test = "friedman",
+#'     olinkid_list = friedman_results |>
+#'       dplyr::filter(.data[["Threshold"]] == "Significant") %>%
+#'       dplyr::select(
+#'         dplyr::all_of("OlinkID")
+#'       ) |>
+#'       dplyr::distinct() |>
+#'       dplyr::pull()
+#'   )
+#' }
 #' }
 #'
-#' @importFrom dplyr filter group_by ungroup pull do select arrange mutate
-#' @importFrom stringr str_detect
-#' @importFrom rstatix wilcox_test
-
-
 olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
                                              check_log = NULL,
                                              olinkid_list = NULL,
