@@ -188,6 +188,9 @@ test_that(
 test_that(
   "olink_one_non_parametric - error - missing input",
   {
+    skip_if_not_installed("broom")
+    skip_if_not_installed("rstatix")
+
     # npx_data1 check_log
     check_log <- check_npx(npx_data1) |>
       suppressMessages() |>
