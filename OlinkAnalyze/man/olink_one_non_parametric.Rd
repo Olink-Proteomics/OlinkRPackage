@@ -76,7 +76,7 @@ The threshold is determined by logic evaluation of Adjusted_pval < 0.05.
 }
 \examples{
 \donttest{
-if (rlang::is_installed(pkg = c("broom"))) {
+if (rlang::is_installed(pkg = c("broom", "rstatix"))) {
 
  check_log <- check_npx(df = npx_data1)
 

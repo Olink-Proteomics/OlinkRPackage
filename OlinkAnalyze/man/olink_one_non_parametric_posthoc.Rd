@@ -64,7 +64,7 @@ The function handles both factor and numerical variables.
 }
 \examples{
 \donttest{
-if (rlang::is_installed(pkg = c("FSA", "broom"))) {
+if (rlang::is_installed(pkg = c("FSA", "broom", "rstatix"))) {
 
   check_log <- check_npx(df = npx_data1)
 

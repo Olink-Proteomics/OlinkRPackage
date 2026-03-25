@@ -56,7 +56,7 @@
 #' @export
 #' @examples
 #' \donttest{
-#' if (rlang::is_installed(pkg = c("broom"))) {
+#' if (rlang::is_installed(pkg = c("broom", "rstatix"))) {
 #'
 #'  check_log <- check_npx(df = npx_data1)
 #'
@@ -84,6 +84,12 @@ olink_one_non_parametric <- function(df,
                                      dependence = FALSE,
                                      subject = NULL,
                                      verbose = TRUE) {
+  # Check if all required libraries for this function are installed
+  rlang::check_installed(
+    pkg = c("broom", "rstatix"),
+    call = rlang::caller_env()
+  )
+
   if (missing(df) || missing(variable)) {
     cli::cli_abort("{.arg df} and {.arg variable} must be specified.")
   }
@@ -385,7 +391,7 @@ olink_one_non_parametric <- function(df,
 #'
 #' @examples
 #' \donttest{
-#' if (rlang::is_installed(pkg = c("FSA", "broom"))) {
+#' if (rlang::is_installed(pkg = c("FSA", "broom", "rstatix"))) {
 #'
 #'   check_log <- check_npx(df = npx_data1)
 #'
@@ -429,15 +435,12 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
                                              test = "kruskal",
                                              subject = "Subject",
                                              verbose = TRUE) {
-  if (test != "friedman") {
-    if (!requireNamespace("FSA", quietly = TRUE)) {
-      cli::cli_abort(c(
-        "Kruskal test requires the {.pkg FSA} package.",
-        "i" = "Please install it before continuing:",
-        " " = "{.code install.packages(\"FSA\")}"
-      ))
-    }
-  }
+  # Check if all required libraries for this function are installed
+  rlang::check_installed(
+    pkg = c("FSA", "rstatix"),
+    call = rlang::caller_env()
+  )
+
   if (missing(df) || missing(variable)) {
     cli::cli_abort(
       "{.arg df} and {.arg variable} must be specified."
