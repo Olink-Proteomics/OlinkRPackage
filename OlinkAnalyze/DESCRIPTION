@@ -83,7 +83,6 @@ Imports:
     stringr,
     tibble,
     tidyr,
-    generics,
     rstatix
 Suggests: 
     broom,
