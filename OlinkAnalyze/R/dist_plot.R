@@ -155,19 +155,22 @@ olink_dist_plot <- function(df,
 
   df |> # nolint: return_linter
     ggplot2::ggplot(ggplot2::aes(
-      x = reorder_within(factor(SampleID), # nolint: object_usage_linter
-                         NPX, # nolint: object_usage_linter
-                         Panel, # nolint: object_usage_linter
-                         median # nolint: object_usage_linter
+      x = reorder_within(
+        x = factor(.data[[check_log$col_names$sample_id]]),
+        by = .data[[check_log$col_names$quant]],
+        within = .data[[check_log$col_names$panel]],
+        fun = stats::median
       ),
-      y = NPX,
-      fill = !!rlang::ensym(color_g)
+      y = .data[[check_log$col_names$quant]],
+      fill = .data[[color_g]]
     )) +
     ggplot2::geom_boxplot() +
     scale_x_reordered() +
     ggplot2::xlab("Samples") +
-    ggplot2::facet_wrap(as.formula(paste("~", check_log$col_names$panel)),
-                        scale = "free") +
+    ggplot2::facet_wrap(
+      facets = stats::as.formula(paste("~", check_log$col_names$panel)),
+      scale = "free"
+    ) +
     OlinkAnalyze::set_plot_theme() +
     OlinkAnalyze::olink_fill_discrete(...)
 }
