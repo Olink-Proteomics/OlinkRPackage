@@ -146,10 +146,10 @@ olink_pca_plot <- function(df,
                            drop_samples = FALSE,
                            n_loadings = 0,
                            loadings_list = NULL,
-                           byPanel = FALSE, # nolint object_name_linter
-                           outlierDefX = NA, # nolint object_name_linter
-                           outlierDefY = NA, # nolint object_name_linter
-                           outlierLines = FALSE, # nolint object_name_linter
+                           byPanel = FALSE, # nolint: object_name_linter
+                           outlierDefX = NA, # nolint: object_name_linter
+                           outlierDefY = NA, # nolint: object_name_linter
+                           outlierLines = FALSE, # nolint: object_name_linter
                            label_outliers = TRUE,
                            quiet = FALSE,
                            verbose = TRUE,
@@ -270,7 +270,7 @@ olink_pca_plot <- function(df,
         )
       ) # Strip "Olink" from the panel names
 
-    plotList <- lapply(unique(df[["Panel"]]), function(x) { # nolint object_name_linter
+    plotList <- lapply(unique(df[["Panel"]]), function(x) { # nolint: object_name_linter
       g <- olink_pca_plot.internal(
         df = df |> dplyr::filter(.data[["Panel"]] == x),
         check_log = check_log,
@@ -297,7 +297,7 @@ olink_pca_plot <- function(df,
 
       return(g)
     })
-    names(plotList) <- unique(df[["Panel"]]) # nolint object_name_linter
+    names(plotList) <- unique(df[["Panel"]]) # nolint: object_name_linter
     if (!quiet) {
       print(ggpubr::ggarrange(
         plotlist = plotList,
@@ -325,17 +325,17 @@ olink_pca_plot <- function(df,
     )
     if (!quiet) print(pca_plot)
     # For consistency, return a list even when there's just one plot
-    plotList <- list(pca_plot) # nolint object_name_linter
+    plotList <- list(pca_plot) # nolint: object_name_linter
   }
   return(invisible(plotList))
 }
 
 olink_calculate_pca <- function(
-  procData, # nolint object_name_linter
+  procData, # nolint: object_name_linter
   x_val = 1,
   y_val = 2,
-  outlierDefX = NA, # nolint object_name_linter
-  outlierDefY = NA # nolint object_name_linter
+  outlierDefX = NA, # nolint: object_name_linter
+  outlierDefY = NA # nolint: object_name_linter
 ) {
   #### PCA ####
   pca_fit <- stats::prcomp(
@@ -347,11 +347,11 @@ olink_calculate_pca <- function(
   # Standardizing and selecting components
   scaling_factor_lambda <- pca_fit$sdev * sqrt(nrow(procData$df_wide_matrix))
 
-  PCX <- pca_fit$x[, x_val] / scaling_factor_lambda[x_val] # nolint object_name_linter
-  PCY <- pca_fit$x[, y_val] / scaling_factor_lambda[y_val] # nolint object_name_linter
-  PoV <- pca_fit$sdev^2 / sum(pca_fit$sdev^2) # nolint object_name_linter
-  LX <- pca_fit$rotation[, x_val] # nolint object_name_linter
-  LY <- pca_fit$rotation[, y_val] # nolint object_name_linter
+  PCX <- pca_fit$x[, x_val] / scaling_factor_lambda[x_val] # nolint: object_name_linter
+  PCY <- pca_fit$x[, y_val] / scaling_factor_lambda[y_val] # nolint: object_name_linter
+  PoV <- pca_fit$sdev^2 / sum(pca_fit$sdev^2) # nolint: object_name_linter
+  LX <- pca_fit$rotation[, x_val] # nolint: object_name_linter
+  LY <- pca_fit$rotation[, y_val] # nolint: object_name_linter
 
 
   # Sort order is dependent on locale -> set locale here to make code
@@ -375,10 +375,10 @@ olink_calculate_pca <- function(
 
   Sys.setlocale("LC_COLLATE", old_collate)
 
-  range_PX <- c(-abs(min(PCX, na.rm = TRUE)), abs(max(PCX, na.rm = TRUE))) # nolint object_name_linter
-  range_PY <- c(-abs(min(PCY, na.rm = TRUE)), abs(max(PCY, na.rm = TRUE))) # nolint object_name_linter
-  range_LX <- c(-abs(min(LX, na.rm = TRUE)), abs(max(LX, na.rm = TRUE))) # nolint object_name_linter
-  range_LY <- c(-abs(min(LY, na.rm = TRUE)), abs(max(LY, na.rm = TRUE))) # nolint object_name_linter
+  range_PX <- c(-abs(min(PCX, na.rm = TRUE)), abs(max(PCX, na.rm = TRUE))) # nolint: object_name_linter
+  range_PY <- c(-abs(min(PCY, na.rm = TRUE)), abs(max(PCY, na.rm = TRUE))) # nolint: object_name_linter
+  range_LX <- c(-abs(min(LX, na.rm = TRUE)), abs(max(LX, na.rm = TRUE))) # nolint: object_name_linter
+  range_LY <- c(-abs(min(LY, na.rm = TRUE)), abs(max(LY, na.rm = TRUE))) # nolint: object_name_linter
 
   loadings_scaling_factor <- 0.8 / max(range_LX / range_PX, range_LY / range_PY)
 
@@ -416,7 +416,7 @@ olink_calculate_pca <- function(
   ))
 }
 
-olink_pca_plot.internal <- function(# nolint object_name_linter
+olink_pca_plot.internal <- function( # nolint: object_name_linter
   df,
   check_log = NULL,
   color_g = "QC_Warning",
@@ -427,9 +427,9 @@ olink_pca_plot.internal <- function(# nolint object_name_linter
   drop_samples = FALSE,
   n_loadings = 0,
   loadings_list = NULL,
-  outlierDefX, # nolint object_name_linter
-  outlierDefY, # nolint object_name_linter
-  outlierLines, # nolint object_name_linter
+  outlierDefX, # nolint: object_name_linter
+  outlierDefY, # nolint: object_name_linter
+  outlierLines, # nolint: object_name_linter
   label_outliers,
   verbose = verbose,
   ...
@@ -447,7 +447,7 @@ olink_pca_plot.internal <- function(# nolint object_name_linter
     dplyr::ungroup()
 
   # Data pre-processing
-  procData <- npxProcessing_forDimRed( # nolint object_name_linter
+  procData <- npxProcessing_forDimRed( # nolint: object_name_linter
     df = df,
     check_log = check_log,
     color_g = color_g,
@@ -520,7 +520,7 @@ olink_pca_plot.internal <- function(# nolint object_name_linter
   }
   if (is.numeric(procData$df_wide[["SampleID"]])) {
     message("SampleID converted to character.")
-    procData$df_wide[["SampleID"]] <- #nolint
+    procData$df_wide[["SampleID"]] <-  # nolint: object_name_linter
       as.character(procData$df_wide[["SampleID"]])
   }
 
@@ -532,7 +532,7 @@ olink_pca_plot.internal <- function(# nolint object_name_linter
 
   loadings <- pca_results$loading
   loadings_scaling_factor <- pca_results$loadings_scaling_factor
-  PoV <- pca_results[["PoV"]] #nolint
+  PoV <- pca_results[["PoV"]] # nolint: object_name_linter
 
   # Plotting
   pca_plot <- ggplot2::ggplot(
@@ -590,18 +590,18 @@ olink_pca_plot.internal <- function(# nolint object_name_linter
   # Drawing loadings
 
   if (n_loadings > 0 || !is.null(loadings_list)) {
-    N_loadings <- data.frame( # nolint object_name_linter
+    N_loadings <- data.frame( # nolint: object_name_linter
       matrix(vector(), 0, ncol(loadings)),
       stringsAsFactors = FALSE
     )
-    colnames(N_loadings) <- colnames(loadings) # nolint object_name_linter
+    colnames(N_loadings) <- colnames(loadings) # nolint: object_name_linter
 
-    L_loadings <- N_loadings # nolint object_name_linter
+    L_loadings <- N_loadings # nolint: object_name_linter
 
     if (n_loadings > 0) {
       # Largest loadings based on Pythagoras
 
-      N_loadings <- loadings |> # nolint object_name_linter
+      N_loadings <- loadings |> # nolint: object_name_linter
         dplyr::mutate(abs_loading = sqrt(.data[["LX"]]^2 + .data[["LY"]]^2)) |>
         dplyr::arrange(dplyr::desc(.data[["abs_loading"]])) |>
         utils::head(n_loadings) |>
@@ -611,7 +611,7 @@ olink_pca_plot.internal <- function(# nolint object_name_linter
     if (!is.null(loadings_list)) {
       # Selected loadings
 
-      L_loadings <- loadings |> # nolint object_name_linter
+      L_loadings <- loadings |> # nolint: object_name_linter
         dplyr::filter(.data[["variables"]] %in% loadings_list)
     }
 
