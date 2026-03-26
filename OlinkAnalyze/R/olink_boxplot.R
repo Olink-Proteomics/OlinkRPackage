@@ -211,7 +211,7 @@ ttest_results <- ttest_results |>
         dplyr::mutate(
           C1 = gsub("[()]", "", sub(" .*", "", .data[["contrast"]])),
           C2 = gsub("[()]", "", sub(".* ", "", .data[["contrast"]])),
-          rp = my_round(.data[["Adjusted_pval"]]),
+          rp = mapply(function(x) my_round(x), .data[["Adjusted_pval"]]),
           p_value = paste0(.data[["rp"]], " Contrast: ", .data[["contrast"]])
         ) |>
         dplyr::group_by(.data[["Name_OID"]], .data[["contrast"]]) |>
