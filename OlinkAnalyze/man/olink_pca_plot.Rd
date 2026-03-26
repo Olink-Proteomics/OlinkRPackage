@@ -114,8 +114,7 @@ will be labelled. Both arguments have to be specified.
 }
 \examples{
 \donttest{
-library(dplyr)
-}
+if (rlang::is_installed(pkg = c("ggrepel", "ggpubr"))) {
 npx_data <- npx_data1 |>
   dplyr::filter(!grepl("CONTROL", SampleID))
 check_log <- check_npx(npx_data)
@@ -152,7 +151,8 @@ outliers <- lapply(g, function(x) {
 }) |>
   dplyr::bind_rows() |>
   dplyr::filter(Outlier == 1)
-
+  }
+}
 }
 \keyword{NPX}
 \keyword{PCA}

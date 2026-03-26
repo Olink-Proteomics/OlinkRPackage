@@ -107,4 +107,6 @@ Suggests:
     withr,
     writexl,
     zip,
-    tidyselect
+    tidyselect,
+    FSA,
+    rstatix
