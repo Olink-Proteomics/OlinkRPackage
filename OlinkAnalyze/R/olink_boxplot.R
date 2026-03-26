@@ -152,12 +152,12 @@ olink_boxplot <- function(df,
       )
   }
   if (!is.null(ttest_results)) {
-ttest_results <- ttest_results |>
-    dplyr::mutate(
-      Name_OID = forcats::as_factor(
-        paste(.data[["Assay"]], .data[["OlinkID"]])
+    ttest_results <- ttest_results |>
+      dplyr::mutate(
+        Name_OID = forcats::as_factor(
+          paste(.data[["Assay"]], .data[["OlinkID"]])
+        )
       )
-    )
   }
   # ---- MAIN LOOP ------------------------------------------------------------
   for (i in seq_along(protein_index)) {
@@ -200,7 +200,9 @@ ttest_results <- ttest_results |>
         drop = FALSE
       ]
       scale_inf <- npx_plot |>
-        dplyr::mutate(Name_OID = forcats::as_factor(paste(Assay, OlinkID))) |>
+        dplyr::mutate(Name_OID = forcats::as_factor(
+          paste(.data[["Assay"]],
+                .data[["OlinkID"]]))) |>
         dplyr::group_by(.data[["Name_OID"]]) |>
         dplyr::summarise(
           maxNPX = max(.data[["NPX"]]),
