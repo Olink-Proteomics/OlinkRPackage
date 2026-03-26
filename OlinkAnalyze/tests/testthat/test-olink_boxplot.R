@@ -31,7 +31,8 @@ boxplot_site_2prots <- npx_data1 |>
       head(2) |>
       dplyr::pull(OlinkID),
     check_log = npx_data1_check
-  )
+  ) |>
+  suppressMessages()
 
 boxplot_site_10prots <- npx_data1 |>
   na.omit() |>
@@ -43,7 +44,8 @@ boxplot_site_10prots <- npx_data1 |>
       dplyr::pull(OlinkID),
     number_of_proteins_per_plot = 5L,
     check_log = npx_data1_check
-  )
+  ) |>
+  suppressMessages()
 
 boxplot_time <- npx_data1 |>
   olink_boxplot(
@@ -52,7 +54,8 @@ boxplot_time <- npx_data1 |>
       head(10) |>
       dplyr::pull(OlinkID),
     check_log = npx_data1_check
-  )
+  ) |>
+  suppressMessages()
 
 ref_results$anova_time_posthoc[1, "Threshold"] <- "Significant"
 ref_results$anova_time_posthoc[1, "Adjusted_pval"] <- 0.0003
@@ -65,7 +68,8 @@ boxplot_time_posthoc <- npx_data1 |>
       dplyr::pull(OlinkID),
     posthoc_results = ref_results$anova_time_posthoc,
     check_log = npx_data1_check
-  )
+  ) |>
+  suppressMessages()
 
 boxplot_time_coloroption <- npx_data1 |>
   olink_boxplot(
@@ -75,7 +79,8 @@ boxplot_time_coloroption <- npx_data1 |>
       dplyr::pull(OlinkID),
     coloroption = c("teal", "pink", "orange", "turqoise"),
     check_log = npx_data1_check
-  )
+  ) |>
+  suppressMessages()
 
 boxplot_time_site <- npx_data1 |>
   na.omit() |>
@@ -85,7 +90,8 @@ boxplot_time_site <- npx_data1 |>
       head(10) |>
       dplyr::pull(OlinkID),
     check_log = npx_data1_check
-  )
+  ) |>
+  suppressMessages()
 
 boxplot_treatment_ttest <- npx_data1 |>
   olink_boxplot(
@@ -95,31 +101,50 @@ boxplot_treatment_ttest <- npx_data1 |>
       dplyr::pull(OlinkID),
     ttest_result = ref_results$t_test,
     check_log = npx_data1_check
-  )
+  ) |>
+  suppressMessages()
+
 # -------------------------------------------------------------------------
 # Tests
 # -------------------------------------------------------------------------
 
 test_that("olink_boxplot works", {
-  expect_warning(
-    npx_data_format221010 |>
-      olink_boxplot(
-        variable = "treatment2",
-        olinkid_list = c(
-          npx_check$assay_na[1:5],
-          "OID30538"
-        )
-      )
+  expect_message(
+    object = expect_message(
+      object = expect_warning(
+        npx_data_format221010 |>
+          olink_boxplot(
+            variable = "treatment2",
+            olinkid_list = c(
+              npx_check$assay_na[1:5],
+              "OID30538"
+            )
+          )
+      ),
+      regexp = "check_log` not provided. Running `check_npx()`",
+      fixed = TRUE
+    ),
+    regexp = paste("8 assays exhibited assay QC warnings in column",
+                   "`Assay_Warning` of the dataset")
   )
-  boxplot_npxcheck <- suppressWarnings(
-    olink_boxplot(
-      df = npx_data_format221010,
-      variable = "treatment2",
-      olinkid_list = c(
-        npx_check$assay_na[1:5],
-        "OID30538"
-      )
-    )
+
+  expect_message(
+    object = expect_message(
+      object = boxplot_npxcheck <- suppressWarnings(
+        olink_boxplot(
+          df = npx_data_format221010,
+          variable = "treatment2",
+          olinkid_list = c(
+            npx_check$assay_na[1:5],
+            "OID30538"
+          )
+        )
+      ),
+      regexp = "check_log` not provided. Running `check_npx()`",
+      fixed = TRUE
+    ),
+    regexp = paste("8 assays exhibited assay QC warnings in column",
+                   "`Assay_Warning` of the dataset")
   )
   expect_length(
     unique(boxplot_npxcheck[[1]]$data$Name_OID),
@@ -142,7 +167,7 @@ test_that("olink_boxplot works - vdiffr", {
   )
   vdiffr::expect_doppelganger(
     boxplot_site_2prots_name,
-    boxplot_site_2prots
+    boxplot_site_2prots[[1L]]
   )
   # ---- 10 proteins ----
   boxplot_site_10prots_name <- "boxplot site 10prots"
@@ -152,7 +177,7 @@ test_that("olink_boxplot works - vdiffr", {
   )
   vdiffr::expect_doppelganger(
     boxplot_site_10prots_name,
-    boxplot_site_10prots[[2]]
+    boxplot_site_10prots[[2L]]
   )
   # ---- Time ----
   boxplot_time_name <- "boxplot time"
@@ -162,7 +187,7 @@ test_that("olink_boxplot works - vdiffr", {
   )
   vdiffr::expect_doppelganger(
     boxplot_time_name,
-    boxplot_time
+    boxplot_time[[2L]]
   )
   # ---- Time w/ coloroption ----
   boxplot_time_coloroption_name <- "boxplot time with coloroption"
@@ -172,7 +197,7 @@ test_that("olink_boxplot works - vdiffr", {
   )
   vdiffr::expect_doppelganger(
     boxplot_time_coloroption_name,
-    boxplot_time_coloroption
+    boxplot_time_coloroption[[2L]]
   )
   # ---- Time + Site ----
   boxplot_time_site_name <- "boxplot time and site"
@@ -182,7 +207,7 @@ test_that("olink_boxplot works - vdiffr", {
   )
   vdiffr::expect_doppelganger(
     boxplot_time_site_name,
-    boxplot_time_site
+    boxplot_time_site[[2L]]
   )
   # ---- Time + Posthoc ----
   boxplot_time_posthoc_name <- "boxplot time and posthoc"
@@ -192,7 +217,7 @@ test_that("olink_boxplot works - vdiffr", {
   )
   vdiffr::expect_doppelganger(
     boxplot_time_posthoc_name,
-    boxplot_time_posthoc
+    boxplot_time_posthoc[[2L]]
   )
   # ---- Treatment + ttest ----
   boxplot_treatment_ttest_name <- "boxplot treatment and ttest"
@@ -202,6 +227,6 @@ test_that("olink_boxplot works - vdiffr", {
   )
   vdiffr::expect_doppelganger(
     boxplot_treatment_ttest_name,
-    boxplot_treatment_ttest
+    boxplot_treatment_ttest[[2L]]
   )
 })

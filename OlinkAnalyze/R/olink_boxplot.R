@@ -226,7 +226,7 @@ olink_boxplot <- function(df,
         ) |>
         dplyr::ungroup() |>
         tidyr::pivot_longer(
-          c(.data[["C1"]], .data[["C2"]]),
+          dplyr::all_of(c("C1", "C2")),
           names_to = "tmp",
           values_to = "x_vals"
         ) |>
@@ -297,7 +297,7 @@ olink_boxplot <- function(df,
           y_anchor = .data[["maxNPX"]] + .data[["rangeNPX"]] * 0.2
         ) |>
         tidyr::pivot_longer(
-          c(.data[["C1"]], .data[["C2"]]),
+          dplyr::all_of(c("C1", "C2")),
           names_to = "tmp",
           values_to = "x_vals"
         ) |>
