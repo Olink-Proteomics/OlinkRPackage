@@ -26,7 +26,7 @@
 #'
 #' @return A list of objects of class “ggplot” (the actual ggplot object is
 #' entry 1 in the list). Box and whisker plot of NPX (y-axis) by variable
-#'  (x-axis) for each Assay
+#'  (x-axis) for each Assay.
 #'
 #' @export
 #'
