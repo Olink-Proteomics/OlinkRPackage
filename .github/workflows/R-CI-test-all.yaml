@@ -1,0 +1,97 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+on: pull_request
+
+name: R-CI-tests-pass
+
+jobs:
+  R-CI-tests-pass:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+         extra-packages: any::pak, any::cli, any::testthat, any::curl
+         working-directory: OlinkAnalyze
+
+      - name: Strict Test Evaluation (Warnings & Skips)
+        run: |
+          options(cli.num_colors = 256)
+          
+          # 1. Setup Reporters
+          list_rep <- testthat::ListReporter$new()
+          prog_rep <- testthat::ProgressReporter$new()
+          reporter <- testthat::MultiReporter$new(list(list_rep, prog_rep))
+          
+          # 2. Run Tests with tryCatch
+          # This prevents the script from crashing before we can process the results
+          tryCatch({
+            testthat::test_local(
+              path = "OlinkAnalyze", 
+              reporter = reporter
+            )
+          }, error = function(e) {
+            cli::cli_alert_danger("Tests failed, but proceeding to generate summary...")
+          })
+          
+          # 3. Analyze Results
+          results <- as.data.frame(list_rep$get_results())
+          n_warn <- sum(results$warning)
+          n_skip <- sum(results$skipped)
+          n_fail <- sum(results$failed)
+          
+          # 4. Identify problematic tests
+          issues <- results[results$warning > 0 | results$skipped > 0 | results$failed > 0, ]
+          
+          # 5. Build GitHub Summary Markdown
+          summary_md <- paste0(
+            "### 📊 Test Results: OlinkAnalyze\n\n",
+            "| Metric | Count |\n",
+            "| :--- | :--- |\n",
+            "| ✅ Passed | ", sum(results$passed), " |\n",
+            "| ⚠️ Warnings | **", n_warn, "** |\n",
+            "| ⏭️ Skipped | **", n_skip, "** |\n",
+            "| ❌ Failed | **", n_fail, "** |\n\n"
+          )
+          
+          if (nrow(issues) > 0) {
+            summary_md <- paste0(summary_md, "#### 🚩 Issues Identified\n\n",
+                                 "| File | Test Case | Type |\n",
+                                 "| :--- | :--- | :--- |\n")
+            
+            for (i in seq_len(nrow(issues))) {
+              type <- ifelse(issues$failed[i] > 0, "❌ Fail", 
+                      ifelse(issues$warning[i] > 0, "⚠️ Warning", "⏭️ Skip"))
+              
+              summary_md <- paste0(summary_md, "| `", issues$file[i], "` | ", issues$test[i], " | ", type, " |\n")
+            }
+          }
+          
+          write(summary_md, file = Sys.getenv("GITHUB_STEP_SUMMARY"), append = TRUE)
+
+          # 6. Final Console Output & Exit
+          if (n_warn > 0 || n_skip > 0 || n_fail > 0) {
+            cli::cli_h1("Strict Policy Violation")
+            print(issues[, c("file", "test", "warning", "skipped", "failed")])
+            cli::cli_abort("Failing build due to {n_warn} warning(s) and {n_skip} skip(s).")
+          } else {
+            cli::cli_alert_success("Perfect run! 0 warnings, 0 skips.")
+          }
+        shell: Rscript {0}
+        
+      - name: Upload testthat snapshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: testthat-snapshots
+          path: OlinkAnalyze/tests/testthat/_snaps
