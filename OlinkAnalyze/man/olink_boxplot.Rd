@@ -43,16 +43,16 @@ olink_ttest() function.}
 \item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
 \code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}...}
 
-\item{...}{coloroption passed to specify color order}
+\item{...}{coloroption passed to specify color order.}
 }
 \value{
 A list of objects of class “ggplot” (the actual ggplot object is
 entry 1 in the list). Box and whisker plot of NPX (y-axis) by variable
-(x-axis) for each Assay
+(x-axis) for each Assay.
 }
 \description{
 Generates faceted boxplots of NPX vs. grouping variable(s) for a given list
-of proteins (OlinkIDs) using ggplot and ggplot2::geom_boxplot.
+of proteins (OlinkIDs) using ggplot2::ggplot and ggplot2::geom_boxplot.
 }
 \examples{
 \donttest{
