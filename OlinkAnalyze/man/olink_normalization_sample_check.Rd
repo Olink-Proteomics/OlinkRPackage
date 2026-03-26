@@ -39,3 +39,4 @@ expected to run all checks on SampleID to make sure that normalization can
 be performed smoothly. It should work independently of the function calling
 it.
 }
+\keyword{internal}

@@ -4,10 +4,13 @@
 \alias{olink_lod}
 \title{Calculate LOD using Negative Controls or Fixed LOD}
 \usage{
-olink_lod(data, lod_file_path = NULL, lod_method = "NCLOD")
+olink_lod(data, check_log = NULL, lod_file_path = NULL, lod_method = "NCLOD")
 }
 \arguments{
 \item{data}{npx data file}
+
+\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
 
 \item{lod_file_path}{location of lod file from Olink. Only needed if
 lod_method = "FixedLOD" or "Both". Default \code{NULL}.}
@@ -16,14 +19,20 @@ lod_method = "FixedLOD" or "Both". Default \code{NULL}.}
 negative controls ("NCLOD"), or both ("Both"). Default \code{NCLOD}.}
 }
 \value{
-A dataframe with 2 additional columns, LOD and PCNormalizedLOD if \code{lod_method} is FixedLOD or NCLOD. When \code{Normalization = "Plate Control"}, LOD and PCNormalizedLOD are identical.
+A dataframe with 2 additional columns, LOD and PCNormalizedLOD if
+\code{lod_method} is FixedLOD or NCLOD. When \code{Normalization = "Plate Control"},
+LOD and PCNormalizedLOD are identical.
 
 If \code{lod_method} is "Both", 4 additional columns will be added:
 \itemize{
-\item NCLOD - LOD calculated from negative controls and normalized based on normalization column
-\item NCPCNormalizedLOD - PC Normalized LOD calculated from negative controls
-\item FixedLOD - LOD calculated from fixed LOD file and normalized based on normalization column
-\item FixedPCNormalizedLOD - PC Normalized LOD calculated from fixed LOD file
+\item NCLOD - LOD calculated from negative controls and normalized based
+on normalization column
+\item NCPCNormalizedLOD - PC Normalized LOD calculated from negative
+controls
+\item FixedLOD - LOD calculated from fixed LOD file and normalized based on
+normalization column
+\item FixedPCNormalizedLOD - PC Normalized LOD calculated from fixed LOD
+file
 }
 }
 \description{
@@ -31,23 +40,53 @@ Calculate LOD using Negative Controls or Fixed LOD
 }
 \examples{
 \dontrun{
-   \donttest{
-  try({ # This will fail if the files do not exist.
+  \donttest{
+  try(
+    {
+      # This will fail if the files do not exist.
 
-  # Import NPX data
-    npx_data <- read_NPX("path/to/npx_file")
+      # Import NPX data
+      npx_data <- read_npx(filename = "path/to/npx_file")
 
-  # Estimate LOD from negative controls
-    npx_data_lod_NC <- olink_lod(data = npx_data,  lod_method = "NCLOD")
+      # Check NPX data
+      check_log <- check_npx(df = npx_data)
 
-  # Estimate LOD from fixed LOD
-  ## Locate the fixed LOD file
-    lod_file_path <- "path/to/lod_file"
+      # Clean NPX data
+      npx_data_clean <- clean_npx(
+        df = npx_data,
+        check_log = check_log
+      )
 
-    npx_data_lod_Fixed <- olink_lod(data = npx_data,
-                                    lod_file_path = lod_file_path,
-                                    lod_method = "FixedLOD")
-     })
+      # Re-check NPX data
+      check_log_clean <- check_npx(df = npx_data_clean)
+
+      # Estimate LOD from negative controls
+      npx_data_lod_nc <- olink_lod(
+        data = npx_data_clean,
+        check_log = check_log_clean,
+        lod_method = "NCLOD"
+      )
+
+      # Estimate LOD from fixed LOD
+      ## Locate the fixed LOD file
+      lod_file_path <- "path/to/lod_file"
+
+      npx_data_lod_Fixed <- olink_lod(
+        data = npx_data,
+        check_log = check_log_clean,
+        lod_file_path = lod_file_path,
+        lod_method = "FixedLOD"
+      )
+
+      # Estimate LOD from both negative controls and fixed LOD
+      npx_data_lod_both <- olink_lod(
+        data = npx_data,
+        check_log = check_log_clean,
+        lod_file_path = lod_file_path,
+        lod_method = "Both"
+      )
+    }
+  )
   }
 }
 

@@ -7,8 +7,6 @@
 test_that(
   "olink_normalization_format - works - within-product bridge norm",
   {
-    skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
-
     ref_norm_res <- get_example_data("ref_results_norm.rds")
 
     # all assays present in both datasets ----
@@ -18,10 +16,20 @@ test_that(
 
     df_norm_bridge_v1 <- ref_norm_res$lst_norm$bridge_norm$norm
 
+    df1_bridge_v1_check <- check_npx(df1_bridge_v1) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df2_bridge_v1_check <- check_npx(df2_bridge_v1) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     # run input check for normalization
     check_lst_bridge_v1 <- olink_norm_input_check(
       df1 = df1_bridge_v1,
+      df1_check_log = df1_bridge_v1_check,
       df2 = df2_bridge_v1,
+      df2_check_log = df2_bridge_v1_check,
       overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "df1_norm",
@@ -56,10 +64,20 @@ test_that(
 
     df_norm_bridge_v2 <- ref_norm_res$lst_norm$bridge_norm$norm
 
+    df1_bridge_v2_check <- check_npx(df1_bridge_v2) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df2_bridge_v2_check <- check_npx(df2_bridge_v2) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     # run input check for normalization
     check_lst_bridge_v2 <- olink_norm_input_check(
       df1 = df1_bridge_v2,
+      df1_check_log = df1_bridge_v2_check,
       df2 = df2_bridge_v2,
+      df2_check_log = df2_bridge_v2_check,
       overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "df1_norm",
@@ -84,39 +102,49 @@ test_that(
 
     df1_bridge_v3 <- ref_norm_res$lst_df$df1_norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
     df2_bridge_v3 <- ref_norm_res$lst_df$df2_norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "C66" ~ "NEG_CTRL",
           "D1" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
 
     df_norm_bridge_v3 <- ref_norm_res$lst_norm$bridge_norm$norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "PLATE_CTRL",
           "C66" ~ "NEG_CTRL",
           "D1" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
+
+    df1_bridge_v3_check <- check_npx(df1_bridge_v3) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df2_bridge_v3_check <- check_npx(df2_bridge_v3) |>
+      suppressMessages() |>
+      suppressWarnings()
 
     # run input check for normalization
     check_lst_bridge_v3 <- olink_norm_input_check(
       df1 = df1_bridge_v3,
+      df1_check_log = df1_bridge_v3_check,
       df2 = df2_bridge_v3,
+      df2_check_log = df2_bridge_v3_check,
       overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "df1_norm",
@@ -152,11 +180,11 @@ test_that(
         !(.data[["OlinkID"]] %in% .env[["oid_only_in_nonref_v4"]])
       ) |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
     df2_bridge_v4 <- ref_norm_res$lst_df$df2_norm |>
@@ -164,30 +192,40 @@ test_that(
         !(.data[["OlinkID"]] %in% .env[["oid_only_in_ref_v4"]])
       ) |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "C66" ~ "NEG_CTRL",
           "D1" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
 
     df_norm_bridge_v4 <- ref_norm_res$lst_norm$bridge_norm$norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "PLATE_CTRL",
           "C66" ~ "NEG_CTRL",
           "D1" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
+
+    df1_bridge_v4_check <- check_npx(df1_bridge_v4) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df2_bridge_v4_check <- check_npx(df2_bridge_v4) |>
+      suppressMessages() |>
+      suppressWarnings()
 
     # run input check for normalization
     check_lst_bridge_v4 <- olink_norm_input_check(
       df1 = df1_bridge_v4,
+      df1_check_log = df1_bridge_v4_check,
       df2 = df2_bridge_v4,
+      df2_check_log = df2_bridge_v4_check,
       overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "df1_norm",
@@ -222,8 +260,6 @@ test_that(
 test_that(
   "olink_normalization_format - works - within-product subset norm",
   {
-    skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
-
     ref_norm_res <- get_example_data("ref_results_norm.rds")
 
     # all assays present in both datasets ----
@@ -233,10 +269,20 @@ test_that(
 
     df_norm_subset_v1 <- ref_norm_res$lst_norm$subset_norm$norm
 
+    df1_subset_v1_check <- check_npx(df1_subset_v1) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df2_subset_v1_check <- check_npx(df2_subset_v1) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     # run input check for normalization
     check_lst_subset_v1 <- olink_norm_input_check(
       df1 = df1_subset_v1,
+      df1_check_log = df1_subset_v1_check,
       df2 = df2_subset_v1,
+      df2_check_log = df2_subset_v1_check,
       overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
       overlapping_samples_df2 = ref_norm_res$lst_sample$df2_subset,
       df1_project_nr = "df1_norm",
@@ -271,10 +317,20 @@ test_that(
 
     df_norm_subset_v2 <- ref_norm_res$lst_norm$subset_norm$norm
 
+    df1_subset_v2_check <- check_npx(df1_subset_v2) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df2_subset_v2_check <- check_npx(df2_subset_v2) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     # run input check for normalization
     check_lst_subset_v2 <- olink_norm_input_check(
       df1 = df1_subset_v2,
+      df1_check_log = df1_subset_v2_check,
       df2 = df2_subset_v2,
+      df2_check_log = df2_subset_v2_check,
       overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
       overlapping_samples_df2 = ref_norm_res$lst_sample$df2_subset,
       df1_project_nr = "df1_norm",
@@ -299,39 +355,49 @@ test_that(
 
     df1_subset_v3 <- ref_norm_res$lst_df$df1_norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
     df2_subset_v3 <- ref_norm_res$lst_df$df2_norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "C66" ~ "NEG_CTRL",
           "D1" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
 
     df_norm_subset_v3 <- ref_norm_res$lst_norm$subset_norm$norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "PLATE_CTRL",
           "C66" ~ "NEG_CTRL",
           "D1" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
+
+    df1_subset_v3_check <- check_npx(df1_subset_v3) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df2_subset_v3_check <- check_npx(df2_subset_v3) |>
+      suppressMessages() |>
+      suppressWarnings()
 
     # run input check for normalization
     check_lst_subset_v3 <- olink_norm_input_check(
       df1 = df1_subset_v3,
+      df1_check_log = df1_subset_v3_check,
       df2 = df2_subset_v3,
+      df2_check_log = df2_subset_v3_check,
       overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
       overlapping_samples_df2 = ref_norm_res$lst_sample$df2_subset,
       df1_project_nr = "df1_norm",
@@ -367,11 +433,11 @@ test_that(
         !(.data[["OlinkID"]] %in% .env[["oid_only_in_nonref_v4"]])
       ) |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
     df2_subset_v4 <- ref_norm_res$lst_df$df2_norm |>
@@ -379,30 +445,40 @@ test_that(
         !(.data[["OlinkID"]] %in% .env[["oid_only_in_ref_v4"]])
       ) |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "C66" ~ "NEG_CTRL",
           "D1" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
 
     df_norm_subset_v4 <- ref_norm_res$lst_norm$subset_norm$norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "PLATE_CTRL",
           "C66" ~ "NEG_CTRL",
           "D1" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
+
+    df1_subset_v4_check <- check_npx(df1_subset_v4) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df2_subset_v4_check <- check_npx(df2_subset_v4) |>
+      suppressMessages() |>
+      suppressWarnings()
 
     # run input check for normalization
     check_lst_subset_v4 <- olink_norm_input_check(
       df1 = df1_subset_v4,
+      df1_check_log = df1_subset_v4_check,
       df2 = df2_subset_v4,
+      df2_check_log = df2_subset_v4_check,
       overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
       overlapping_samples_df2 = ref_norm_res$lst_sample$df2_subset,
       df1_project_nr = "df1_norm",
@@ -437,8 +513,6 @@ test_that(
 test_that(
   "olink_normalization_format - works - within-product ref med norm",
   {
-    skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
-
     ref_norm_res <- get_example_data("ref_results_norm.rds")
 
     # all assays present in both datasets ----
@@ -448,9 +522,14 @@ test_that(
 
     df_norm_refmed_v1 <- ref_norm_res$lst_norm$ref_med_norm$norm
 
+    df1_refmed_v1_check <- check_npx(df1_refmed_v1) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     # run input check for normalization
     check_lst_refmed_v1 <- olink_norm_input_check(
       df1 = df1_refmed_v1,
+      df1_check_log = df1_refmed_v1_check,
       df2 = NULL,
       overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
       overlapping_samples_df2 = NULL,
@@ -486,9 +565,14 @@ test_that(
 
     df_norm_refmed_v2 <- ref_norm_res$lst_norm$ref_med_norm$norm
 
+    df1_refmed_v2_check <- check_npx(df1_refmed_v2) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     # run input check for normalization
     check_lst_refmed_v2 <- olink_norm_input_check(
       df1 = df1_refmed_v2,
+      df1_check_log = df1_refmed_v2_check,
       df2 = NULL,
       overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
       overlapping_samples_df2 = NULL,
@@ -514,28 +598,33 @@ test_that(
 
     df1_refmed_v3 <- ref_norm_res$lst_df$df1_norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
     refmed_v3 <- ref_norm_res$lst_df$ref_med
 
     df_norm_refmed_v3 <- ref_norm_res$lst_norm$ref_med_norm$norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
+
+    df1_refmed_v3_check <- check_npx(df1_refmed_v3) |>
+      suppressMessages() |>
+      suppressWarnings()
 
     # run input check for normalization
     check_lst_refmed_v3 <- olink_norm_input_check(
       df1 = df1_refmed_v3,
+      df1_check_log = df1_refmed_v3_check,
       df2 = NULL,
       overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
       overlapping_samples_df2 = NULL,
@@ -572,11 +661,11 @@ test_that(
         !(.data[["OlinkID"]] %in% .env[["oid_only_in_nonref_v4"]])
       ) |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
     refmed_v4 <- ref_norm_res$lst_df$ref_med |>
@@ -586,17 +675,22 @@ test_that(
 
     df_norm_refmed_v4 <- ref_norm_res$lst_norm$ref_med_norm$norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "PLATE_CTRL",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
+
+    df1_refmed_v4_check <- check_npx(df1_refmed_v4) |>
+      suppressMessages() |>
+      suppressWarnings()
 
     # run input check for normalization
     check_lst_refmed_v4 <- olink_norm_input_check(
       df1 = df1_refmed_v4,
+      df1_check_log = df1_refmed_v4_check,
       df2 = NULL,
       overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
       overlapping_samples_df2 = NULL,
@@ -632,9 +726,6 @@ test_that(
 test_that(
   "olink_normalization_format - works - cross-product normalization",
   {
-    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
-
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
 
@@ -687,9 +778,19 @@ test_that(
     ) |>
       (\(x) x[!grepl("CONTROL", x)])()
 
+    df_ht_v1_check <- check_npx(data_ht_v1) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df_3k_v1_check <- check_npx(data_3k_v1) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     lst_check_cross_product_v1 <- olink_norm_input_check(
       df1 = data_ht_v1,
+      df1_check_log = df_ht_v1_check,
       df2 = data_3k_v1,
+      df2_check_log = df_3k_v1_check,
       overlapping_samples_df1 = bridge_samples_crossproduct_v1,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "HT",
@@ -707,7 +808,9 @@ test_that(
       df1_project_nr = "HT",
       df2_project_nr = "3K",
       reference_project = "HT",
-      format = FALSE
+      format = FALSE,
+      df1_check_log = df_ht_v1_check,
+      df2_check_log = df_3k_v1_check
     ) |>
       suppressMessages() |>
       suppressWarnings()
@@ -775,9 +878,19 @@ test_that(
     ) |>
       (\(x) x[!grepl("CONTROL", x)])()
 
+    df_ht_v2_check <- check_npx(data_ht_v2) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df_3k_v2_check <- check_npx(data_3k_v2) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     lst_check_cross_product_v2 <- olink_norm_input_check(
       df1 = data_ht_v2,
+      df1_check_log = df_ht_v2_check,
       df2 = data_3k_v2,
+      df2_check_log = df_3k_v2_check,
       overlapping_samples_df1 = bridge_samples_crossproduct_v2,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "HT",
@@ -795,7 +908,9 @@ test_that(
       df1_project_nr = "HT",
       df2_project_nr = "3K",
       reference_project = "HT",
-      format = FALSE
+      format = FALSE,
+      df1_check_log = df_ht_v2_check,
+      df2_check_log = df_3k_v2_check
     ) |>
       suppressMessages() |>
       suppressWarnings()
@@ -850,9 +965,19 @@ test_that(
     ) |>
       (\(x) x[!grepl("CONTROL", x)])()
 
+    df_ht_v3_check <- check_npx(data_ht_v3) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df_3k_v3_check <- check_npx(data_3k_v3) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     lst_check_cross_product_v3 <- olink_norm_input_check(
       df1 = data_ht_v3,
+      df1_check_log = df_ht_v3_check,
       df2 = data_3k_v3,
+      df2_check_log = df_3k_v3_check,
       overlapping_samples_df1 = bridge_samples_crossproduct_v3,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "HT",
@@ -870,7 +995,9 @@ test_that(
       df1_project_nr = "HT",
       df2_project_nr = "3K",
       reference_project = "HT",
-      format = FALSE
+      format = FALSE,
+      df1_check_log = df_ht_v3_check,
+      df2_check_log = df_3k_v3_check
     ) |>
       suppressMessages() |>
       suppressWarnings()
@@ -925,9 +1052,19 @@ test_that(
     ) |>
       (\(x) x[!grepl("CONTROL", x)])()
 
+    df_ht_v4_check <- check_npx(data_ht_v4) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df_3k_v4_check <- check_npx(data_3k_v4) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     lst_check_cross_product_v4 <- olink_norm_input_check(
       df1 = data_ht_v4,
+      df1_check_log = df_ht_v4_check,
       df2 = data_3k_v4,
+      df2_check_log = df_3k_v4_check,
       overlapping_samples_df1 = bridge_samples_crossproduct_v4,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "HT",
@@ -945,7 +1082,9 @@ test_that(
       df1_project_nr = "HT",
       df2_project_nr = "3K",
       reference_project = "HT",
-      format = FALSE
+      format = FALSE,
+      df1_check_log = df_ht_v4_check,
+      df2_check_log = df_3k_v4_check
     ) |>
       suppressMessages() |>
       suppressWarnings()
@@ -976,15 +1115,19 @@ test_that(
 test_that(
   "olink_format_rm_ext_ctrl - works - no external controls",
   {
-    skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
-
     ref_norm_res <- get_example_data("ref_results_norm.rds")
 
     ### bridge normalization - no norm column ----
 
     bridge_nonorm_noctrl_check <- olink_norm_input_check(
       df1 = ref_norm_res$lst_df$df1_no_norm,
+      df1_check_log = check_npx(ref_norm_res$lst_df$df1_no_norm) |>
+        suppressMessages() |>
+        suppressWarnings(),
       df2 = ref_norm_res$lst_df$df2_no_norm,
+      df2_check_log = check_npx(ref_norm_res$lst_df$df2_no_norm) |>
+        suppressMessages() |>
+        suppressWarnings(),
       overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "df1_no_norm",
@@ -1006,7 +1149,13 @@ test_that(
 
     bridge_norm_noctrl_check <- olink_norm_input_check(
       df1 = ref_norm_res$lst_df$df1_norm,
+      df1_check_log = check_npx(ref_norm_res$lst_df$df1_norm) |>
+        suppressMessages() |>
+        suppressWarnings(),
       df2 = ref_norm_res$lst_df$df2_norm,
+      df2_check_log = check_npx(ref_norm_res$lst_df$df2_norm) |>
+        suppressMessages() |>
+        suppressWarnings(),
       overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "df1_norm",
@@ -1028,7 +1177,13 @@ test_that(
 
     bridge_nolod_noctrl_check <- olink_norm_input_check(
       df1 = ref_norm_res$lst_df$df1_no_lod,
+      df1_check_log = check_npx(ref_norm_res$lst_df$df1_no_lod) |>
+        suppressMessages() |>
+        suppressWarnings(),
       df2 = ref_norm_res$lst_df$df2_no_lod,
+      df2_check_log = check_npx(ref_norm_res$lst_df$df2_no_lod) |>
+        suppressMessages() |>
+        suppressWarnings(),
       overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "df1_nolod",
@@ -1050,7 +1205,13 @@ test_that(
 
     bridge_multilod_noctrl_check <- olink_norm_input_check(
       df1 = ref_norm_res$lst_df$df1_multiple_lod,
+      df1_check_log = check_npx(ref_norm_res$lst_df$df1_multiple_lod) |>
+        suppressMessages() |>
+        suppressWarnings(),
       df2 = ref_norm_res$lst_df$df2_multiple_lod,
+      df2_check_log = check_npx(ref_norm_res$lst_df$df2_multiple_lod) |>
+        suppressMessages() |>
+        suppressWarnings(),
       overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "df1_multiple_lod",
@@ -1073,13 +1234,17 @@ test_that(
 test_that(
   "olink_format_rm_ext_ctrl - works - external controls - no sample_type",
   {
-    skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
-
     ref_norm_res <- get_example_data("ref_results_norm.rds")
 
     bridge_norm_noctrl_check <- olink_norm_input_check(
       df1 = ref_norm_res$lst_df$df1_norm,
+      df1_check_log = check_npx(ref_norm_res$lst_df$df1_norm) |>
+        suppressMessages() |>
+        suppressWarnings(),
       df2 = ref_norm_res$lst_df$df2_norm,
+      df2_check_log = check_npx(ref_norm_res$lst_df$df2_norm) |>
+        suppressMessages() |>
+        suppressWarnings(),
       overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "df1_norm",
@@ -1095,7 +1260,7 @@ test_that(
     # Add NCs to remove
     bridge_norm_wctrl_nc <- ref_norm_res$lst_norm$bridge_norm$no_norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "NEGATIVE_CONTROL",
@@ -1103,7 +1268,7 @@ test_that(
           "D1" ~ "NEG_CTRL_2",
           "D52" ~ "NEGATIVE_CONTROL_2",
           "D75" ~ "Neg_Ctrl_2",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
 
@@ -1126,7 +1291,7 @@ test_that(
     # Add PCs to remove
     bridge_norm_wctrl_pc <- ref_norm_res$lst_norm$bridge_norm$no_norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "PLATE",
           "A38" ~ "IPC",
@@ -1134,7 +1299,7 @@ test_that(
           "D1" ~ "plate",
           "D52" ~ "plate_control",
           "D75" ~ "Plate_Control",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
 
@@ -1155,7 +1320,7 @@ test_that(
 
     bridge_norm_wctrl_ncpc <- ref_norm_res$lst_norm$bridge_norm$no_norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL",
           "A38" ~ "IPC",
@@ -1163,7 +1328,7 @@ test_that(
           "D1" ~ "plate",
           "D52" ~ "NEGATIVE_CONTROL_2",
           "D75" ~ "Plate_Control",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
 
@@ -1189,9 +1354,6 @@ test_that(
 test_that(
   "olink_format_rm_ext_ctrl - works - external controls - with sample_type",
   {
-    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
-
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
 
@@ -1205,7 +1367,13 @@ test_that(
 
     bridge_norm_noctrl_check_v1 <- olink_norm_input_check(
       df1 = data_ht,
+      df1_check_log = check_npx(data_ht) |>
+        suppressMessages() |>
+        suppressWarnings(),
       df2 = data_3k,
+      df2_check_log = check_npx(data_3k) |>
+        suppressMessages() |>
+        suppressWarnings(),
       overlapping_samples_df1 = bridge_samples_3k_ht,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "df1_norm",
@@ -1234,10 +1402,20 @@ test_that(
 
     bridge_norm_noctrl_check_v2 <- olink_norm_input_check(
       df1 = data_ht,
+      df1_check_log = check_npx(data_ht) |>
+        suppressMessages() |>
+        suppressWarnings(),
       df2 = data_3k |>
         dplyr::rename(
           "Sample_Type" = "SampleType"
         ),
+      df2_check_log = data_3k |>
+        dplyr::rename(
+          "Sample_Type" = "SampleType"
+        ) |>
+        check_npx() |>
+        suppressMessages() |>
+        suppressWarnings(),
       overlapping_samples_df1 = bridge_samples_3k_ht,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "df1_norm",
@@ -1269,10 +1447,20 @@ test_that(
 
     bridge_norm_noctrl_check_v3 <- olink_norm_input_check(
       df1 = data_ht,
+      df1_check_log = check_npx(data_ht) |>
+        suppressMessages() |>
+        suppressWarnings(),
       df2 = data_3k |>
         dplyr::select(
           -dplyr::all_of("SampleType")
         ),
+      df2_check_log = data_3k |>
+        dplyr::select(
+          -dplyr::all_of("SampleType")
+        ) |>
+        check_npx() |>
+        suppressMessages() |>
+        suppressWarnings(),
       overlapping_samples_df1 = bridge_samples_3k_ht,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "df1_norm",
@@ -1310,8 +1498,6 @@ test_that(
 test_that(
   "olink_format_oid_no_overlap - works - reference median normalization",
   {
-    skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
-
     ref_norm_res <- get_example_data("ref_results_norm.rds")
 
     oid_only_in_ref <- c("OID01216", "OID01217")
@@ -1328,6 +1514,9 @@ test_that(
     # run input check for normalization
     ref_med_check_lst <- olink_norm_input_check(
       df1 = df1_ref_med,
+      df1_check_log = check_npx(df1_ref_med) |>
+        suppressMessages() |>
+        suppressWarnings(),
       df2 = NULL,
       overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
       overlapping_samples_df2 = NULL,
@@ -1370,8 +1559,6 @@ test_that(
 test_that(
   "olink_format_oid_no_overlap - works - bridge/subset normalization",
   {
-    skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
-
     ref_norm_res <- get_example_data("ref_results_norm.rds")
 
     # assays present in reference dataset only ----
@@ -1389,7 +1576,13 @@ test_that(
     # run input check for normalization
     subset_check_lst_v1 <- olink_norm_input_check(
       df1 = df1_subset_v1,
+      df1_check_log = check_npx(df1_subset_v1) |>
+        suppressMessages() |>
+        suppressWarnings(),
       df2 = df2_subset_v1,
+      df2_check_log = check_npx(df2_subset_v1) |>
+        suppressMessages() |>
+        suppressWarnings(),
       overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
       overlapping_samples_df2 = ref_norm_res$lst_sample$df2_subset,
       df1_project_nr = "df1_norm",
@@ -1443,7 +1636,13 @@ test_that(
     # run input check for normalization
     subset_check_lst_v2 <- olink_norm_input_check(
       df1 = df1_subset_v2,
+      df1_check_log = check_npx(df1_subset_v2) |>
+        suppressMessages() |>
+        suppressWarnings(),
       df2 = df2_subset_v2,
+      df2_check_log = check_npx(df2_subset_v2) |>
+        suppressMessages() |>
+        suppressWarnings(),
       overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
       overlapping_samples_df2 = ref_norm_res$lst_sample$df2_subset,
       df1_project_nr = "df1_norm",
@@ -1488,7 +1687,13 @@ test_that(
     # run input check for normalization
     subset_check_lst_v3 <- olink_norm_input_check(
       df1 = df1_subset_v2,
+      df1_check_log = check_npx(df1_subset_v2) |>
+        suppressMessages() |>
+        suppressWarnings(),
       df2 = df2_subset_v1,
+      df2_check_log = check_npx(df2_subset_v1) |>
+        suppressMessages() |>
+        suppressWarnings(),
       overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
       overlapping_samples_df2 = ref_norm_res$lst_sample$df2_subset,
       df1_project_nr = "df1_norm",
@@ -1544,9 +1749,6 @@ test_that(
 test_that(
   "olink_format_oid_no_overlap - works - cross-product normalization",
   {
-    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
-
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
 
@@ -1601,7 +1803,13 @@ test_that(
 
     lst_check_cross_product_v1 <- olink_norm_input_check(
       df1 = data_ht_v1,
+      df1_check_log = check_npx(data_ht_v1) |>
+        suppressMessages() |>
+        suppressWarnings(),
       df2 = data_3k_v1,
+      df2_check_log = check_npx(data_3k_v1) |>
+        suppressMessages() |>
+        suppressWarnings(),
       overlapping_samples_df1 = bridge_samples_crossproduct_v1,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "HT",
@@ -1697,7 +1905,13 @@ test_that(
 
     lst_check_cross_product_v2 <- olink_norm_input_check(
       df1 = data_ht_v2,
+      df1_check_log = check_npx(data_ht_v2) |>
+        suppressMessages() |>
+        suppressWarnings(),
       df2 = data_3k_v2,
+      df2_check_log = check_npx(data_3k_v2) |>
+        suppressMessages() |>
+        suppressWarnings(),
       overlapping_samples_df1 = bridge_samples_crossproduct_v2,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "HT",
@@ -1781,7 +1995,13 @@ test_that(
 
     lst_check_cross_product_v3 <- olink_norm_input_check(
       df1 = data_ht_v3,
+      df1_check_log = check_npx(data_ht_v3) |>
+        suppressMessages() |>
+        suppressWarnings(),
       df2 = data_3k_v3,
+      df2_check_log = check_npx(data_3k_v3) |>
+        suppressMessages() |>
+        suppressWarnings(),
       overlapping_samples_df1 = bridge_samples_crossproduct_v3,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "HT",
@@ -1865,7 +2085,13 @@ test_that(
 
     lst_check_cross_product_v4 <- olink_norm_input_check(
       df1 = data_ht_v4,
+      df1_check_log = check_npx(data_ht_v4) |>
+        suppressMessages() |>
+        suppressWarnings(),
       df2 = data_3k_v4,
+      df2_check_log = check_npx(data_3k_v4) |>
+        suppressMessages() |>
+        suppressWarnings(),
       overlapping_samples_df1 = bridge_samples_crossproduct_v4,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "HT",
@@ -1923,9 +2149,6 @@ test_that(
 test_that(
   "olink_normalization_format - works - HT-E3072 panel concatenation",
   {
-    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
-
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
 
@@ -1938,9 +2161,19 @@ test_that(
     ) |>
       (\(x) x[!grepl("CONTROL", x)])()
 
+    data_ht_v1_check <- check_npx(data_ht_v1) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    data_3k_v1_check <- check_npx(data_3k_v1) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     lst_check_cross_product_v1 <- olink_norm_input_check(
       df1 = data_ht_v1,
+      df1_check_log = data_ht_v1_check,
       df2 = data_3k_v1,
+      df2_check_log = data_3k_v1_check,
       overlapping_samples_df1 = bridge_samples_crossproduct_v1,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "HT",
@@ -1958,7 +2191,9 @@ test_that(
       df1_project_nr = "HT",
       df2_project_nr = "3K",
       reference_project = "HT",
-      format = FALSE
+      format = FALSE,
+      df1_check_log = data_ht_v1_check,
+      df2_check_log = data_3k_v1_check
     ) |>
       suppressMessages() |>
       suppressWarnings()
@@ -1986,26 +2221,44 @@ test_that(
 
     # Combine and set combined OlinkIDs for bridgeable assays
     data_ht_3k_norm_v1_combo <- data_ht_3k_norm_v1 |>
-      dplyr::filter(BridgingRecommendation %in% c(
-        "MedianCentering", "QuantileSmoothing"
-      )) |>
+      dplyr::filter(
+        .data[["BridgingRecommendation"]] %in% c("MedianCentering",
+                                                 "QuantileSmoothing")
+      ) |>
       dplyr::bind_rows(
         data_ht_3k_v1_not_bridge,
         data_ht_3k_v1_no_overlap
       ) |>
-      dplyr::mutate(OID_combo = paste0(OlinkID, "_", OlinkID_E3072)) |>
-      dplyr::mutate(OlinkID = ifelse(BridgingRecommendation %in% c(
-        "MedianCentering", "QuantileSmoothing"
-      ), OID_combo, OlinkID))
+      dplyr::mutate(
+        OID_combo = paste0(.data[["OlinkID"]], "_", .data[["OlinkID_E3072"]]),
+        OlinkID = dplyr::if_else(
+          .data[["BridgingRecommendation"]] %in% c("MedianCentering",
+                                                   "QuantileSmoothing"),
+          .data[["OID_combo"]],
+          .data[["OlinkID"]]
+        )
+      )
 
     # Combined panels for bridgeable OlinkIDs
     panels_per_oid <- data_ht_3k_norm_v1_combo |>
-      dplyr::mutate(Panel = forcats::fct_relevel(Panel, "Explore_HT")) |>
-      dplyr::group_by(OlinkID) |>
-      dplyr::summarise(Panel = paste(sort(unique(Panel)), collapse = "_")) |>
-      dplyr::select(all_of(c("OlinkID", "Panel"))) |>
-      dplyr::arrange(OlinkID)
-
+      dplyr::mutate(
+        Panel = forcats::fct_relevel(.data[["Panel"]], "Explore_HT")
+      ) |>
+      dplyr::group_by(
+        dplyr::across(
+          dplyr::all_of(
+            c("OlinkID")
+          )
+        )
+      ) |>
+      dplyr::summarise(
+        Panel = paste(sort(unique(.data[["Panel"]])), collapse = "_")
+      ) |>
+      dplyr::arrange(.data[["OlinkID"]]) |>
+      dplyr::ungroup() |>
+      dplyr::select(
+        dplyr::all_of(c("OlinkID", "Panel"))
+      )
 
     # Format function output
     data_ht_3k_norm_v1_format <- olink_normalization_format(
@@ -2016,10 +2269,11 @@ test_that(
 
     # Combined panels from format function output
     panels_format <- data_ht_3k_norm_v1_format |>
-      dplyr::select(all_of(c("OlinkID", "Panel"))) |>
+      dplyr::select(
+        dplyr::all_of(c("OlinkID", "Panel"))
+      ) |>
       dplyr::distinct() |>
-      dplyr::arrange(OlinkID)
-
+      dplyr::arrange(.data[["OlinkID"]])
 
     expect_identical(as.matrix(panels_per_oid),
                      as.matrix(panels_format))
@@ -2029,12 +2283,8 @@ test_that(
 test_that(
   "olink_normalization_format - works - Reveal-E3072 panel concatenation",
   {
-    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data", "example_Reveal_data.rds")))
-
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
-
 
     bridge_samples_crossproduct <- intersect(
       x = unique(data_3k$SampleID),
@@ -2042,9 +2292,19 @@ test_that(
     ) |>
       (\(x) x[!grepl("CONTROL", x)])()
 
+    data_3k_check <- check_npx(data_3k) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    data_reveal_check <- check_npx(data_reveal) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     lst_check_cross_product <- olink_norm_input_check(
       df1 = data_reveal,
+      df1_check_log = data_reveal_check,
       df2 = data_3k,
+      df2_check_log = data_3k_check,
       overlapping_samples_df1 = bridge_samples_crossproduct,
       overlapping_samples_df2 = NULL,
       df1_project_nr = "Reveal",
@@ -2062,7 +2322,9 @@ test_that(
       df1_project_nr = "Reveal",
       df2_project_nr = "E3072",
       reference_project = "Reveal",
-      format = FALSE
+      format = FALSE,
+      df1_check_log = data_reveal_check,
+      df2_check_log = data_3k_check
     ) |>
       suppressMessages() |>
       suppressWarnings()
@@ -2090,26 +2352,44 @@ test_that(
 
     # Combine and set combined OlinkIDs for bridgeable assays
     data_reveal_3k_norm_combo <- data_reveal_3k_norm |>
-      dplyr::filter(BridgingRecommendation %in% c(
-        "MedianCentering", "QuantileSmoothing"
-      )) |>
+      dplyr::filter(
+        .data[["BridgingRecommendation"]] %in% c("MedianCentering",
+                                                 "QuantileSmoothing")
+      ) |>
       dplyr::bind_rows(
         data_reveal_3k_not_bridge,
         data_reveal_3k_no_overlap
       ) |>
-      dplyr::mutate(OID_combo = paste0(OlinkID, "_", OlinkID_E3072)) |>
-      dplyr::mutate(OlinkID = ifelse(BridgingRecommendation %in% c(
-        "MedianCentering", "QuantileSmoothing"
-      ), OID_combo, OlinkID))
+      dplyr::mutate(
+        OID_combo = paste0(.data[["OlinkID"]], "_", .data[["OlinkID_E3072"]]),
+        OlinkID = dplyr::if_else(
+          .data[["BridgingRecommendation"]] %in% c("MedianCentering",
+                                                   "QuantileSmoothing"),
+          .data[["OID_combo"]],
+          .data[["OlinkID"]]
+        )
+      )
 
     # Combined panels for bridgeable OlinkIDs
     panels_per_oid <- data_reveal_3k_norm_combo |>
-      dplyr::mutate(Panel = forcats::fct_relevel(Panel, "Reveal")) |>
-      dplyr::group_by(OlinkID) |>
-      dplyr::summarise(Panel = paste(sort(unique(Panel)), collapse = "_")) |>
-      dplyr::select(all_of(c("OlinkID", "Panel"))) |>
-      dplyr::arrange(OlinkID)
-
+      dplyr::mutate(
+        Panel = forcats::fct_relevel(.data[["Panel"]], "Reveal")
+      ) |>
+      dplyr::group_by(
+        dplyr::across(
+          dplyr::all_of(
+            c("OlinkID")
+          )
+        )
+      ) |>
+      dplyr::summarise(
+        Panel = paste(sort(unique(.data[["Panel"]])), collapse = "_")
+      ) |>
+      dplyr::arrange(.data[["OlinkID"]]) |>
+      dplyr::ungroup() |>
+      dplyr::select(
+        dplyr::all_of(c("OlinkID", "Panel"))
+      )
 
     # Format function output
     data_reveal_3k_norm_format <- olink_normalization_format(
@@ -2120,10 +2400,11 @@ test_that(
 
     # Combined panels from format function output
     panels_format <- data_reveal_3k_norm_format |>
-      dplyr::select(all_of(c("OlinkID", "Panel"))) |>
+      dplyr::select(
+        dplyr::all_of(c("OlinkID", "Panel"))
+      ) |>
       dplyr::distinct() |>
-      dplyr::arrange(OlinkID)
-
+      dplyr::arrange(.data[["OlinkID"]])
 
     expect_identical(as.matrix(panels_per_oid),
                      as.matrix(panels_format))

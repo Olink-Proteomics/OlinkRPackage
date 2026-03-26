@@ -11,11 +11,21 @@ test_that(
                                 y = npx_data2$SampleID) |>
       (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x)])()
 
+    df1_check_log <- check_npx(df = npx_data1) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df2_check_log <- check_npx(df = npx_data2) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     expect_warning(
       object = expect_message(
         object = lst_check_out <- olink_norm_input_check(
           df1 = npx_data1,
+          df1_check_log = df1_check_log,
           df2 = npx_data2,
+          df2_check_log = df2_check_log,
           overlapping_samples_df1 = bridge_samples,
           overlapping_samples_df2 = NULL,
           df1_project_nr = "20200001",
@@ -34,43 +44,15 @@ test_that(
       expected = list(
         ref_df = npx_data1,
         ref_original_df = npx_data1,
+        ref_check_log = df1_check_log,
         ref_samples = bridge_samples,
         ref_name = "20200001",
-        ref_cols = list(sample_id = "SampleID",
-                        olink_id = "OlinkID",
-                        uniprot = "UniProt",
-                        assay = "Assay",
-                        panel = "Panel",
-                        panel_version = "Panel_Version",
-                        plate_id = "PlateID",
-                        qc_warn = "QC_Warning",
-                        assay_warn = character(0L),
-                        quant = "NPX",
-                        lod = "LOD",
-                        normalization = character(0L),
-                        count = character(0L),
-                        sample_type = character(0L),
-                        assay_type = character(0L)),
         ref_product = "other",
         not_ref_df = npx_data2,
         not_ref_original_df = npx_data2,
+        not_ref_check_log = df2_check_log,
         not_ref_samples = NULL,
         not_ref_name = "20200002",
-        not_ref_cols = list(sample_id = "SampleID",
-                            olink_id = "OlinkID",
-                            uniprot = "UniProt",
-                            assay = "Assay",
-                            panel = "Panel",
-                            panel_version = "Panel_Version",
-                            plate_id = "PlateID",
-                            qc_warn = "QC_Warning",
-                            assay_warn = character(0L),
-                            quant = "NPX",
-                            lod = "LOD",
-                            normalization = character(0L),
-                            count = character(0L),
-                            sample_type = character(0L),
-                            assay_type = character(0L)),
         not_ref_product = "other",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge,
@@ -84,16 +66,30 @@ test_that(
                                 y = npx_data2$SampleID) |>
       (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x)])()
 
+    npx_data1_norm <- npx_data1 |>
+      dplyr::mutate(
+        Normalization = "Intensity"
+      )
+
+    npx_data2_norm <- npx_data2 |>
+      dplyr::mutate(
+        Normalization = "Intensity"
+      )
+
+    df1_norm_check_log <- check_npx(df = npx_data1_norm) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df2_norm_check_log <- check_npx(df = npx_data2_norm) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     expect_message(
-      object = lst_check_out <- olink_norm_input_check(
-        df1 = npx_data1 |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ),
-        df2 = npx_data2 |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ),
+      object = lst_check_out_norm <- olink_norm_input_check(
+        df1 = npx_data1_norm,
+        df1_check_log = df1_norm_check_log,
+        df2 = npx_data2_norm,
+        df2_check_log = df2_norm_check_log,
         overlapping_samples_df1 = bridge_samples,
         overlapping_samples_df2 = NULL,
         df1_project_nr = "20200001",
@@ -105,59 +101,19 @@ test_that(
     )
 
     expect_identical(
-      object = lst_check_out,
+      object = lst_check_out_norm,
       expected = list(
-        ref_df = npx_data2 |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ),
-        ref_original_df = npx_data2 |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ),
+        ref_df = npx_data2_norm,
+        ref_original_df = npx_data2_norm,
+        ref_check_log = df2_norm_check_log,
         ref_samples = bridge_samples,
         ref_name = "20200002",
-        ref_cols = list(sample_id = "SampleID",
-                        olink_id = "OlinkID",
-                        uniprot = "UniProt",
-                        assay = "Assay",
-                        panel = "Panel",
-                        panel_version = "Panel_Version",
-                        plate_id = "PlateID",
-                        qc_warn = "QC_Warning",
-                        assay_warn = character(0L),
-                        quant = "NPX",
-                        lod = "LOD",
-                        normalization = "Normalization",
-                        count = character(0L),
-                        sample_type = character(0L),
-                        assay_type = character(0L)),
         ref_product = "other",
-        not_ref_df = npx_data1 |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ),
-        not_ref_original_df = npx_data1 |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ),
+        not_ref_df = npx_data1_norm,
+        not_ref_original_df = npx_data1_norm,
+        not_ref_check_log = df1_norm_check_log,
         not_ref_samples = NULL,
         not_ref_name = "20200001",
-        not_ref_cols = list(sample_id = "SampleID",
-                            olink_id = "OlinkID",
-                            uniprot = "UniProt",
-                            assay = "Assay",
-                            panel = "Panel",
-                            panel_version = "Panel_Version",
-                            plate_id = "PlateID",
-                            qc_warn = "QC_Warning",
-                            assay_warn = character(0L),
-                            quant = "NPX",
-                            lod = "LOD",
-                            normalization = "Normalization",
-                            count = character(0L),
-                            sample_type = character(0L),
-                            assay_type = character(0L)),
         not_ref_product = "other",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge,
@@ -171,20 +127,34 @@ test_that(
                                 y = npx_data2$SampleID) |>
       (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x)])()
 
+    npx_data1_noid <- npx_data1 |>
+      dplyr::mutate(
+        Normalization = "Intensity"
+      ) |>
+      dplyr::mutate(OlinkID = ifelse(.data[["OlinkID"]] == "OID01216",
+                                     "OID00000",
+                                     .data[["OlinkID"]]))
+
+    npx_data2_noid <- npx_data2 |>
+      dplyr::mutate(
+        Normalization = "Intensity"
+      )
+
+    df1_noid_check_log <- check_npx(df = npx_data1_noid) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df2_noid_check_log <- check_npx(df = npx_data2_norm) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     expect_message(
       expect_warning(
-        object = lst_check_out <- olink_norm_input_check(
-          df1 = npx_data1 |>
-            dplyr::mutate(
-              Normalization = "Intensity"
-            ) |>
-            dplyr::mutate(OlinkID = ifelse(.data[["OlinkID"]] == "OID01216",
-                                           "OID00000",
-                                           .data[["OlinkID"]])),
-          df2 = npx_data2 |>
-            dplyr::mutate(
-              Normalization = "Intensity"
-            ),
+        object = lst_check_out_noid <- olink_norm_input_check(
+          df1 = npx_data1_noid,
+          df1_check_log = df1_noid_check_log,
+          df2 = npx_data2_noid,
+          df2_check_log = df2_noid_check_log,
           overlapping_samples_df1 = bridge_samples,
           overlapping_samples_df2 = NULL,
           df1_project_nr = "20200001",
@@ -198,64 +168,23 @@ test_that(
     )
 
     expect_identical(
-      object = lst_check_out,
+      object = lst_check_out_noid,
       expected = list(
-        ref_df = npx_data2 |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ) |>
-          dplyr::filter(!(.data[["OlinkID"]] == "OID01216")), # rm changed assay
-        ref_original_df = npx_data2 |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ),
+        ref_df = npx_data2_noid |>
+          # rm changed assay
+          dplyr::filter(!(.data[["OlinkID"]] == "OID01216")),
+        ref_original_df = npx_data2_noid,
+        ref_check_log = df2_noid_check_log,
         ref_samples = bridge_samples,
         ref_name = "20200002",
-        ref_cols = list(sample_id = "SampleID",
-                        olink_id = "OlinkID",
-                        uniprot = "UniProt",
-                        assay = "Assay",
-                        panel = "Panel",
-                        panel_version = "Panel_Version",
-                        plate_id = "PlateID",
-                        qc_warn = "QC_Warning",
-                        assay_warn = character(0L),
-                        quant = "NPX",
-                        lod = "LOD",
-                        normalization = "Normalization",
-                        count = character(0L),
-                        sample_type = character(0L),
-                        assay_type = character(0L)),
         ref_product = "other",
-        not_ref_df = npx_data1 |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ) |>
-          dplyr::filter(!(.data[["OlinkID"]] == "OID01216")), # rm changed assay
-        not_ref_original_df = npx_data1 |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ) |>
-          dplyr::mutate(OlinkID = ifelse(.data[["OlinkID"]] == "OID01216",
-                                         "OID00000",
-                                         .data[["OlinkID"]])),
+        not_ref_df = npx_data1_noid |>
+          # rm changed assay
+          dplyr::filter(!(.data[["OlinkID"]] %in% c("OID00000", "OID01216"))),
+        not_ref_original_df = npx_data1_noid,
+        not_ref_check_log = df1_noid_check_log,
         not_ref_samples = NULL,
         not_ref_name = "20200001",
-        not_ref_cols = list(sample_id = "SampleID",
-                            olink_id = "OlinkID",
-                            uniprot = "UniProt",
-                            assay = "Assay",
-                            panel = "Panel",
-                            panel_version = "Panel_Version",
-                            plate_id = "PlateID",
-                            qc_warn = "QC_Warning",
-                            assay_warn = character(0L),
-                            quant = "NPX",
-                            lod = "LOD",
-                            normalization = "Normalization",
-                            count = character(0L),
-                            sample_type = character(0L),
-                            assay_type = character(0L)),
         not_ref_product = "other",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge,
@@ -270,92 +199,59 @@ test_that(
                                 y = npx_data2$SampleID) |>
       (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x)])()
 
+    npx_data1_multiq <- npx_data1 |>
+      dplyr::mutate(
+        Normalization = "Intensity",
+        Ct = .data[["NPX"]]
+      )
+
+    npx_data2_multiq <- npx_data2 |>
+      dplyr::mutate(
+        Normalization = "Intensity",
+        Quantified_value = .data[["NPX"]]
+      )
+
+    df1_multiq_check_log <- check_npx(df = npx_data1_multiq) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df2_multiq_check_log <- check_npx(df = npx_data2_multiq) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     expect_warning(
       object = expect_message(
-        object = expect_message(
-          object = lst_check_out <- olink_norm_input_check(
-            df1 = npx_data1 |>
-              dplyr::mutate(
-                Normalization = "Intensity",
-                Ct = .data[["NPX"]]
-              ),
-            df2 = npx_data2 |>
-              dplyr::mutate(
-                Normalization = "Intensity",
-                Quantified_value = .data[["NPX"]]
-              ),
-            overlapping_samples_df1 = bridge_samples,
-            overlapping_samples_df2 = NULL,
-            df1_project_nr = "20200001",
-            df2_project_nr = "20200002",
-            reference_project = "20200002",
-            reference_medians = NULL
-          ),
-          regexp = "Bridge normalization will be performed!"
+        object = lst_check_out_multiq <- olink_norm_input_check(
+          df1 = npx_data1_multiq,
+          df1_check_log = df1_multiq_check_log,
+          df2 = npx_data2_multiq,
+          df2_check_log = df2_multiq_check_log,
+          overlapping_samples_df1 = bridge_samples,
+          overlapping_samples_df2 = NULL,
+          df1_project_nr = "20200001",
+          df2_project_nr = "20200002",
+          reference_project = "20200002",
+          reference_medians = NULL
         ),
-        regexp = "\"NPX\" will be used for normalization"
+        regexp = "Bridge normalization will be performed!"
       ),
       regexp = "Columns not present across datasets"
     )
 
     expect_identical(
-      object = lst_check_out,
+      object = lst_check_out_multiq,
       expected = list(
-        ref_df = npx_data2 |>
-          dplyr::mutate(
-            Normalization = "Intensity",
-            Quantified_value = .data[["NPX"]]
-          ),
-        ref_original_df = npx_data2 |>
-          dplyr::mutate(
-            Normalization = "Intensity",
-            Quantified_value = .data[["NPX"]]
-          ),
+        ref_df = npx_data2_multiq,
+        ref_original_df = npx_data2_multiq,
+        ref_check_log = df2_multiq_check_log,
         ref_samples = bridge_samples,
         ref_name = "20200002",
-        ref_cols = list(sample_id = "SampleID",
-                        olink_id = "OlinkID",
-                        uniprot = "UniProt",
-                        assay = "Assay",
-                        panel = "Panel",
-                        panel_version = "Panel_Version",
-                        plate_id = "PlateID",
-                        qc_warn = "QC_Warning",
-                        assay_warn = character(0L),
-                        quant = "NPX",
-                        lod = "LOD",
-                        normalization = "Normalization",
-                        count = character(0L),
-                        sample_type = character(0L),
-                        assay_type = character(0L)),
         ref_product = "other",
-        not_ref_df = npx_data1 |>
-          dplyr::mutate(
-            Normalization = "Intensity",
-            Ct = .data[["NPX"]]
-          ),
-        not_ref_original_df = npx_data1 |>
-          dplyr::mutate(
-            Normalization = "Intensity",
-            Ct = .data[["NPX"]]
-          ),
+        not_ref_df = npx_data1_multiq,
+        not_ref_original_df = npx_data1_multiq,
+        not_ref_check_log = df1_multiq_check_log,
         not_ref_samples = NULL,
         not_ref_name = "20200001",
-        not_ref_cols = list(sample_id = "SampleID",
-                            olink_id = "OlinkID",
-                            uniprot = "UniProt",
-                            assay = "Assay",
-                            panel = "Panel",
-                            panel_version = "Panel_Version",
-                            plate_id = "PlateID",
-                            qc_warn = "QC_Warning",
-                            assay_warn = character(0L),
-                            quant = "NPX",
-                            lod = "LOD",
-                            normalization = "Normalization",
-                            count = character(0L),
-                            sample_type = character(0L),
-                            assay_type = character(0L)),
         not_ref_product = "other",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge,
@@ -369,89 +265,56 @@ test_that(
                                 y = npx_data2$SampleID) |>
       (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x)])()
 
+    npx_data1_multiq_v2 <- npx_data1 |>
+      dplyr::mutate(
+        Normalization = "Intensity",
+        Quantified_value = .data[["NPX"]]
+      )
+
+    npx_data2_multiq_v2 <- npx_data2 |>
+      dplyr::mutate(
+        Normalization = "Intensity",
+        Quantified_value = .data[["NPX"]]
+      )
+
+    df1_multiqv2_check_log <- check_npx(df = npx_data1_multiq_v2) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df2_multiqv2_check_log <- check_npx(df = npx_data2_multiq_v2) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     expect_message(
-      object = expect_message(
-        object = lst_check_out <- olink_norm_input_check(
-          df1 = npx_data1 |>
-            dplyr::mutate(
-              Normalization = "Intensity",
-              Quantified_value = .data[["NPX"]]
-            ),
-          df2 = npx_data2 |>
-            dplyr::mutate(
-              Normalization = "Intensity",
-              Quantified_value = .data[["NPX"]]
-            ),
-          overlapping_samples_df1 = bridge_samples,
-          overlapping_samples_df2 = NULL,
-          df1_project_nr = "20200001",
-          df2_project_nr = "20200002",
-          reference_project = "20200002",
-          reference_medians = NULL
-        ),
-        regexp = "Bridge normalization will be performed!"
+      object = lst_check_out_multiq_v2 <- olink_norm_input_check(
+        df1 = npx_data1_multiq_v2,
+        df1_check_log = df1_multiqv2_check_log,
+        df2 = npx_data2_multiq_v2,
+        df2_check_log = df2_multiqv2_check_log,
+        overlapping_samples_df1 = bridge_samples,
+        overlapping_samples_df2 = NULL,
+        df1_project_nr = "20200001",
+        df2_project_nr = "20200002",
+        reference_project = "20200002",
+        reference_medians = NULL
       ),
-      regexp = "\"NPX\" will be used for normalization"
+      regexp = "Bridge normalization will be performed!"
     )
 
     expect_identical(
-      object = lst_check_out,
+      object = lst_check_out_multiq_v2,
       expected = list(
-        ref_df = npx_data2 |>
-          dplyr::mutate(
-            Normalization = "Intensity",
-            Quantified_value = .data[["NPX"]]
-          ),
-        ref_original_df = npx_data2 |>
-          dplyr::mutate(
-            Normalization = "Intensity",
-            Quantified_value = .data[["NPX"]]
-          ),
+        ref_df = npx_data2_multiq_v2,
+        ref_original_df = npx_data2_multiq_v2,
+        ref_check_log = df2_multiqv2_check_log,
         ref_samples = bridge_samples,
         ref_name = "20200002",
-        ref_cols = list(sample_id = "SampleID",
-                        olink_id = "OlinkID",
-                        uniprot = "UniProt",
-                        assay = "Assay",
-                        panel = "Panel",
-                        panel_version = "Panel_Version",
-                        plate_id = "PlateID",
-                        qc_warn = "QC_Warning",
-                        assay_warn = character(0L),
-                        quant = "NPX",
-                        lod = "LOD",
-                        normalization = "Normalization",
-                        count = character(0L),
-                        sample_type = character(0L),
-                        assay_type = character(0L)),
         ref_product = "other",
-        not_ref_df = npx_data1 |>
-          dplyr::mutate(
-            Normalization = "Intensity",
-            Quantified_value = .data[["NPX"]]
-          ),
-        not_ref_original_df = npx_data1 |>
-          dplyr::mutate(
-            Normalization = "Intensity",
-            Quantified_value = .data[["NPX"]]
-          ),
+        not_ref_df = npx_data1_multiq_v2,
+        not_ref_original_df = npx_data1_multiq_v2,
+        not_ref_check_log = df1_multiqv2_check_log,
         not_ref_samples = NULL,
         not_ref_name = "20200001",
-        not_ref_cols = list(sample_id = "SampleID",
-                            olink_id = "OlinkID",
-                            uniprot = "UniProt",
-                            assay = "Assay",
-                            panel = "Panel",
-                            panel_version = "Panel_Version",
-                            plate_id = "PlateID",
-                            qc_warn = "QC_Warning",
-                            assay_warn = character(0L),
-                            quant = "NPX",
-                            lod = "LOD",
-                            normalization = "Normalization",
-                            count = character(0L),
-                            sample_type = character(0L),
-                            assay_type = character(0L)),
         not_ref_product = "other",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge,
@@ -477,11 +340,21 @@ test_that(
       sort() |>
       head(20L)
 
+    df_3k_check_log <- check_npx(df = data_3k) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df_ht_check_log <- check_npx(df = data_ht) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     expect_message(
       expect_warning(
         object = lst_check_out <- olink_norm_input_check(
           df1 = data_3k,
+          df1_check_log = df_3k_check_log,
           df2 = data_ht,
+          df2_check_log = df_ht_check_log,
           overlapping_samples_df1 = bridge_samples,
           overlapping_samples_df2 = NULL,
           df1_project_nr = "E3072",
@@ -520,23 +393,9 @@ test_that(
             .data[["OlinkID_HT"]] != .data[["OlinkID"]]
           ),
         ref_original_df = data_ht,
+        ref_check_log = df_ht_check_log,
         ref_samples = bridge_samples,
         ref_name = "HT",
-        ref_cols = list(sample_id = "SampleID",
-                        olink_id = "OlinkID",
-                        uniprot = "UniProt",
-                        assay = "Assay",
-                        panel = "Panel",
-                        panel_version = "DataAnalysisRefID",
-                        plate_id = "PlateID",
-                        qc_warn = "SampleQC",
-                        assay_warn = "AssayQC",
-                        quant = "NPX",
-                        lod = character(0),
-                        normalization = "Normalization",
-                        count = "Count",
-                        sample_type = "SampleType",
-                        assay_type = "AssayType"),
         ref_product = "HT",
         not_ref_df = data_3k |>
           dplyr::rename(
@@ -561,23 +420,9 @@ test_that(
             .data[["OlinkID_E3072"]] != .data[["OlinkID"]]
           ),
         not_ref_original_df = data_3k,
+        not_ref_check_log = df_3k_check_log,
         not_ref_samples = NULL,
         not_ref_name = "E3072",
-        not_ref_cols = list(sample_id = "SampleID",
-                            olink_id = "OlinkID",
-                            uniprot = "UniProt",
-                            assay = "Assay",
-                            panel = "Panel",
-                            panel_version = "DataAnalysisRefID",
-                            plate_id = "PlateID",
-                            qc_warn = "SampleQC",
-                            assay_warn = "AssayQC",
-                            quant = "NPX",
-                            lod = character(0),
-                            normalization = "Normalization",
-                            count = "Count",
-                            sample_type = "SampleType",
-                            assay_type = "AssayType"),
         not_ref_product = "E3072",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product,
@@ -611,11 +456,21 @@ test_that(
       sort() |>
       head(32L)
 
+    df_3k_check_log <- check_npx(df = data_3k) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df_reveal_check_log <- check_npx(df = data_reveal) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     expect_message(
       object = expect_warning(
         reveal_input <- olink_norm_input_check(
           df1 = data_reveal,
+          df1_check_log = df_reveal_check_log,
           df2 = data_3k,
+          df2_check_log = df_3k_check_log,
           overlapping_samples_df1 = bridge_samples,
           overlapping_samples_df2 = NULL,
           df1_project_nr = "Reveal",
@@ -654,23 +509,9 @@ test_that(
             .data[["OlinkID_Reveal"]] != .data[["OlinkID"]]
           ),
         ref_original_df = data_reveal,
+        ref_check_log = df_reveal_check_log,
         ref_samples = bridge_samples,
         ref_name = "Reveal",
-        ref_cols = list(sample_id = "SampleID",
-                        olink_id = "OlinkID",
-                        uniprot = "UniProt",
-                        assay = "Assay",
-                        panel = "Panel",
-                        panel_version = "DataAnalysisRefID",
-                        plate_id = "PlateID",
-                        qc_warn = "SampleQC",
-                        assay_warn = "AssayQC",
-                        quant = "NPX",
-                        lod = character(0),
-                        normalization = "Normalization",
-                        count = "Count",
-                        sample_type = "SampleType",
-                        assay_type = "AssayType"),
         ref_product = "Reveal",
         not_ref_df = data_3k |>
           dplyr::rename(
@@ -697,23 +538,9 @@ test_that(
               .data[["OlinkID_E3072"]] != "OID20473"
           ),
         not_ref_original_df = data_3k,
+        not_ref_check_log = df_3k_check_log,
         not_ref_samples = NULL,
         not_ref_name = "E3072",
-        not_ref_cols = list(sample_id = "SampleID",
-                            olink_id = "OlinkID",
-                            uniprot = "UniProt",
-                            assay = "Assay",
-                            panel = "Panel",
-                            panel_version = "DataAnalysisRefID",
-                            plate_id = "PlateID",
-                            qc_warn = "SampleQC",
-                            assay_warn = "AssayQC",
-                            quant = "NPX",
-                            lod = character(0),
-                            normalization = "Normalization",
-                            count = "Count",
-                            sample_type = "SampleType",
-                            assay_type = "AssayType"),
         not_ref_product = "E3072",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product,
@@ -767,13 +594,23 @@ test_that(
       sort() |>
       head(32L)
 
+    df_ht_check_log <- check_npx(df = data_ht) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df_reveal_check_log <- check_npx(df = data_reveal) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     # HT-Reveal normalization - HT is ref ----
 
     expect_message(
       expect_warning(
         object = lst_check_out_ht_reveal <- olink_norm_input_check(
           df1 = data_reveal,
+          df1_check_log = df_reveal_check_log,
           df2 = data_ht,
+          df2_check_log = df_ht_check_log,
           overlapping_samples_df1 = bridge_samples,
           overlapping_samples_df2 = NULL,
           df1_project_nr = "Reveal",
@@ -814,23 +651,9 @@ test_that(
               !(.data[["OlinkID_HT"]] %in% c("OID42114", "OID43204"))
           ),
         ref_original_df = data_ht,
+        ref_check_log = df_ht_check_log,
         ref_samples = bridge_samples,
         ref_name = "HT",
-        ref_cols = list(sample_id = "SampleID",
-                        olink_id = "OlinkID",
-                        uniprot = "UniProt",
-                        assay = "Assay",
-                        panel = "Panel",
-                        panel_version = "DataAnalysisRefID",
-                        plate_id = "PlateID",
-                        qc_warn = "SampleQC",
-                        assay_warn = "AssayQC",
-                        quant = "NPX",
-                        lod = character(0),
-                        normalization = "Normalization",
-                        count = "Count",
-                        sample_type = "SampleType",
-                        assay_type = "AssayType"),
         ref_product = "HT",
         not_ref_df = data_reveal |>
           dplyr::rename(
@@ -855,23 +678,9 @@ test_that(
             .data[["OlinkID_Reveal"]] != .data[["OlinkID"]]
           ),
         not_ref_original_df = data_reveal,
+        not_ref_check_log = df_reveal_check_log,
         not_ref_samples = NULL,
         not_ref_name = "Reveal",
-        not_ref_cols = list(sample_id = "SampleID",
-                            olink_id = "OlinkID",
-                            uniprot = "UniProt",
-                            assay = "Assay",
-                            panel = "Panel",
-                            panel_version = "DataAnalysisRefID",
-                            plate_id = "PlateID",
-                            qc_warn = "SampleQC",
-                            assay_warn = "AssayQC",
-                            quant = "NPX",
-                            lod = character(0),
-                            normalization = "Normalization",
-                            count = "Count",
-                            sample_type = "SampleType",
-                            assay_type = "AssayType"),
         not_ref_product = "Reveal",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product,
@@ -905,7 +714,9 @@ test_that(
       expect_warning(
         object = lst_check_out_reveal_ht <- olink_norm_input_check(
           df1 = data_reveal,
+          df1_check_log = df_reveal_check_log,
           df2 = data_ht,
+          df2_check_log = df_ht_check_log,
           overlapping_samples_df1 = bridge_samples,
           overlapping_samples_df2 = NULL,
           df1_project_nr = "Reveal",
@@ -944,23 +755,9 @@ test_that(
             .data[["OlinkID_Reveal"]] != .data[["OlinkID"]]
           ),
         ref_original_df = data_reveal,
+        ref_check_log = df_reveal_check_log,
         ref_samples = bridge_samples,
         ref_name = "Reveal",
-        ref_cols = list(sample_id = "SampleID",
-                        olink_id = "OlinkID",
-                        uniprot = "UniProt",
-                        assay = "Assay",
-                        panel = "Panel",
-                        panel_version = "DataAnalysisRefID",
-                        plate_id = "PlateID",
-                        qc_warn = "SampleQC",
-                        assay_warn = "AssayQC",
-                        quant = "NPX",
-                        lod = character(0),
-                        normalization = "Normalization",
-                        count = "Count",
-                        sample_type = "SampleType",
-                        assay_type = "AssayType"),
         ref_product = "Reveal",
         not_ref_df = data_ht |>
           dplyr::rename(
@@ -987,23 +784,9 @@ test_that(
               !(.data[["OlinkID_HT"]] %in% c("OID42114", "OID43204"))
           ),
         not_ref_original_df = data_ht,
+        not_ref_check_log = df_ht_check_log,
         not_ref_samples = NULL,
         not_ref_name = "HT",
-        not_ref_cols = list(sample_id = "SampleID",
-                            olink_id = "OlinkID",
-                            uniprot = "UniProt",
-                            assay = "Assay",
-                            panel = "Panel",
-                            panel_version = "DataAnalysisRefID",
-                            plate_id = "PlateID",
-                            qc_warn = "SampleQC",
-                            assay_warn = "AssayQC",
-                            quant = "NPX",
-                            lod = character(0),
-                            normalization = "Normalization",
-                            count = "Count",
-                            sample_type = "SampleType",
-                            assay_type = "AssayType"),
         not_ref_product = "HT",
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product,
@@ -1040,13 +823,33 @@ test_that(
 
     # no normalization column ----
 
+    df1_npx <- npx_data1 |>
+      dplyr::filter(
+        !grepl(pattern = "CONTROL_SAMPLE", x = .data[["SampleID"]])
+      )
+
+    df2_npx <- npx_data2 |>
+      dplyr::filter(
+        !grepl(pattern = "CONTROL_SAMPLE", x = .data[["SampleID"]])
+      )
+
+    df1_check_log <- check_npx(df = df1_npx) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df2_check_log <- check_npx(df = df2_npx) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     expect_warning(
       object = expect_message(
         object = lst_check_out <- olink_norm_input_check(
-          df1 = npx_data1,
-          df2 = npx_data2,
-          overlapping_samples_df1 = unique(npx_data1$SampleID),
-          overlapping_samples_df2 = unique(npx_data2$SampleID),
+          df1 = df1_npx,
+          df1_check_log = df1_check_log,
+          df2 = df2_npx,
+          df2_check_log = df2_check_log,
+          overlapping_samples_df1 = unique(df1_npx$SampleID),
+          overlapping_samples_df2 = unique(df2_npx$SampleID),
           df1_project_nr = "20200001",
           df2_project_nr = "20200002",
           reference_project = "20200001",
@@ -1061,45 +864,17 @@ test_that(
     expect_identical(
       object = lst_check_out,
       expected = list(
-        ref_df = npx_data1,
-        ref_original_df = npx_data1,
-        ref_samples = unique(npx_data1$SampleID),
+        ref_df = df1_npx,
+        ref_original_df = df1_npx,
+        ref_check_log = df1_check_log,
+        ref_samples = unique(df1_npx$SampleID),
         ref_name = "20200001",
-        ref_cols = list(sample_id = "SampleID",
-                        olink_id = "OlinkID",
-                        uniprot = "UniProt",
-                        assay = "Assay",
-                        panel = "Panel",
-                        panel_version = "Panel_Version",
-                        plate_id = "PlateID",
-                        qc_warn = "QC_Warning",
-                        assay_warn = character(0L),
-                        quant = "NPX",
-                        lod = "LOD",
-                        normalization = character(0L),
-                        count = character(0L),
-                        sample_type = character(0L),
-                        assay_type = character(0L)),
         ref_product = NULL,
-        not_ref_df = npx_data2,
-        not_ref_original_df = npx_data2,
-        not_ref_samples = unique(npx_data2$SampleID),
+        not_ref_df = df2_npx,
+        not_ref_original_df = df2_npx,
+        not_ref_check_log = df2_check_log,
+        not_ref_samples = unique(df2_npx$SampleID),
         not_ref_name = "20200002",
-        not_ref_cols = list(sample_id = "SampleID",
-                            olink_id = "OlinkID",
-                            uniprot = "UniProt",
-                            assay = "Assay",
-                            panel = "Panel",
-                            panel_version = "Panel_Version",
-                            plate_id = "PlateID",
-                            qc_warn = "QC_Warning",
-                            assay_warn = character(0L),
-                            quant = "NPX",
-                            lod = "LOD",
-                            normalization = character(0L),
-                            count = character(0L),
-                            sample_type = character(0L),
-                            assay_type = character(0L)),
         not_ref_product = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset,
@@ -1109,18 +884,38 @@ test_that(
 
     # with normalization column ----
 
+    npx_data1_norm <- npx_data1 |>
+      dplyr::filter(
+        !grepl(pattern = "CONTROL_SAMPLE", x = .data[["SampleID"]])
+      ) |>
+      dplyr::mutate(
+        Normalization = "Intensity"
+      )
+
+    npx_data2_norm <- npx_data2 |>
+      dplyr::filter(
+        !grepl(pattern = "CONTROL_SAMPLE", x = .data[["SampleID"]])
+      ) |>
+      dplyr::mutate(
+        Normalization = "Intensity"
+      )
+
+    df1_norm_check_log <- check_npx(df = npx_data1_norm) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df2_norm_check_log <- check_npx(df = npx_data2_norm) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     expect_message(
-      object = lst_check_out <- olink_norm_input_check(
-        df1 = npx_data1 |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ),
-        df2 = npx_data2 |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ),
-        overlapping_samples_df1 = unique(npx_data1$SampleID),
-        overlapping_samples_df2 = unique(npx_data2$SampleID),
+      object = lst_check_out_norm <- olink_norm_input_check(
+        df1 = npx_data1_norm,
+        df1_check_log = df1_norm_check_log,
+        df2 = npx_data2_norm,
+        df2_check_log = df2_norm_check_log,
+        overlapping_samples_df1 = unique(npx_data1_norm$SampleID),
+        overlapping_samples_df2 = unique(npx_data2_norm$SampleID),
         df1_project_nr = "20200001",
         df2_project_nr = "20200002",
         reference_project = "20200002",
@@ -1130,59 +925,19 @@ test_that(
     )
 
     expect_identical(
-      object = lst_check_out,
+      object = lst_check_out_norm,
       expected = list(
-        ref_df = npx_data2 |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ),
-        ref_original_df = npx_data2 |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ),
-        ref_samples = unique(npx_data2$SampleID),
+        ref_df = npx_data2_norm,
+        ref_original_df = npx_data2_norm,
+        ref_check_log = df2_norm_check_log,
+        ref_samples = unique(npx_data2_norm$SampleID),
         ref_name = "20200002",
-        ref_cols = list(sample_id = "SampleID",
-                        olink_id = "OlinkID",
-                        uniprot = "UniProt",
-                        assay = "Assay",
-                        panel = "Panel",
-                        panel_version = "Panel_Version",
-                        plate_id = "PlateID",
-                        qc_warn = "QC_Warning",
-                        assay_warn = character(0L),
-                        quant = "NPX",
-                        lod = "LOD",
-                        normalization = "Normalization",
-                        count = character(0L),
-                        sample_type = character(0L),
-                        assay_type = character(0L)),
         ref_product = NULL,
-        not_ref_df = npx_data1 |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ),
-        not_ref_original_df = npx_data1 |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ),
-        not_ref_samples = unique(npx_data1$SampleID),
+        not_ref_df = npx_data1_norm,
+        not_ref_original_df = npx_data1_norm,
+        not_ref_check_log = df1_norm_check_log,
+        not_ref_samples = unique(npx_data1_norm$SampleID),
         not_ref_name = "20200001",
-        not_ref_cols = list(sample_id = "SampleID",
-                            olink_id = "OlinkID",
-                            uniprot = "UniProt",
-                            assay = "Assay",
-                            panel = "Panel",
-                            panel_version = "Panel_Version",
-                            plate_id = "PlateID",
-                            qc_warn = "QC_Warning",
-                            assay_warn = character(0L),
-                            quant = "NPX",
-                            lod = "LOD",
-                            normalization = "Normalization",
-                            count = character(0L),
-                            sample_type = character(0L),
-                            assay_type = character(0L)),
         not_ref_product = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset,
@@ -1204,12 +959,32 @@ test_that(
 
     # no normalization column ----
 
+    df1_npx <- npx_data1 |>
+      dplyr::filter(
+        !grepl(pattern = "CONTROL_SAMPLE", x = .data[["SampleID"]])
+      )
+
+    df2_npx <- npx_data2 |>
+      dplyr::filter(
+        !grepl(pattern = "CONTROL_SAMPLE", x = .data[["SampleID"]])
+      )
+
+    df1_check_log <- check_npx(df = df1_npx) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df2_check_log <- check_npx(df = df2_npx) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     expect_warning(
       object = expect_message(
         object = lst_check_out <- olink_norm_input_check(
-          df1 = npx_data1,
-          df2 = npx_data2,
-          overlapping_samples_df1 = unique(npx_data1$SampleID),
+          df1 = df1_npx,
+          df1_check_log = df1_check_log,
+          df2 = df2_npx,
+          df2_check_log = df2_check_log,
+          overlapping_samples_df1 = unique(df1_npx$SampleID),
           overlapping_samples_df2 = npx_df2_samples,
           df1_project_nr = "20200001",
           df2_project_nr = "20200002",
@@ -1225,45 +1000,17 @@ test_that(
     expect_identical(
       object = lst_check_out,
       expected = list(
-        ref_df = npx_data1,
-        ref_original_df = npx_data1,
-        ref_samples = unique(npx_data1$SampleID),
+        ref_df = df1_npx,
+        ref_original_df = df1_npx,
+        ref_check_log = df1_check_log,
+        ref_samples = unique(df1_npx$SampleID),
         ref_name = "20200001",
-        ref_cols = list(sample_id = "SampleID",
-                        olink_id = "OlinkID",
-                        uniprot = "UniProt",
-                        assay = "Assay",
-                        panel = "Panel",
-                        panel_version = "Panel_Version",
-                        plate_id = "PlateID",
-                        qc_warn = "QC_Warning",
-                        assay_warn = character(0L),
-                        quant = "NPX",
-                        lod = "LOD",
-                        normalization = character(0L),
-                        count = character(0L),
-                        sample_type = character(0L),
-                        assay_type = character(0L)),
         ref_product = NULL,
-        not_ref_df = npx_data2,
-        not_ref_original_df = npx_data2,
+        not_ref_df = df2_npx,
+        not_ref_original_df = df2_npx,
+        not_ref_check_log = df2_check_log,
         not_ref_samples = npx_df2_samples,
         not_ref_name = "20200002",
-        not_ref_cols = list(sample_id = "SampleID",
-                            olink_id = "OlinkID",
-                            uniprot = "UniProt",
-                            assay = "Assay",
-                            panel = "Panel",
-                            panel_version = "Panel_Version",
-                            plate_id = "PlateID",
-                            qc_warn = "QC_Warning",
-                            assay_warn = character(0L),
-                            quant = "NPX",
-                            lod = "LOD",
-                            normalization = character(0L),
-                            count = character(0L),
-                            sample_type = character(0L),
-                            assay_type = character(0L)),
         not_ref_product = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset,
@@ -1273,17 +1020,37 @@ test_that(
 
     # with normalization column ----
 
+    npx_data1_norm <- npx_data1 |>
+      dplyr::filter(
+        !grepl(pattern = "CONTROL_SAMPLE", x = .data[["SampleID"]])
+      ) |>
+      dplyr::mutate(
+        Normalization = "Intensity"
+      )
+
+    npx_data2_norm <- npx_data2 |>
+      dplyr::filter(
+        !grepl(pattern = "CONTROL_SAMPLE", x = .data[["SampleID"]])
+      ) |>
+      dplyr::mutate(
+        Normalization = "Intensity"
+      )
+
+    df1_norm_check_log <- check_npx(df = npx_data1_norm) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df2_norm_check_log <- check_npx(df = npx_data2_norm) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     expect_message(
-      object = lst_check_out <- olink_norm_input_check(
-        df1 = npx_data1 |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ),
-        df2 = npx_data2 |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ),
-        overlapping_samples_df1 = unique(npx_data1$SampleID),
+      object = lst_check_out_norm <- olink_norm_input_check(
+        df1 = npx_data1_norm,
+        df1_check_log = df1_norm_check_log,
+        df2 = npx_data2_norm,
+        df2_check_log = df2_norm_check_log,
+        overlapping_samples_df1 = unique(npx_data1_norm$SampleID),
         overlapping_samples_df2 = npx_df2_samples,
         df1_project_nr = "20200001",
         df2_project_nr = "20200002",
@@ -1294,59 +1061,19 @@ test_that(
     )
 
     expect_identical(
-      object = lst_check_out,
+      object = lst_check_out_norm,
       expected = list(
-        ref_df = npx_data2 |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ),
-        ref_original_df = npx_data2 |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ),
+        ref_df = npx_data2_norm,
+        ref_original_df = npx_data2_norm,
+        ref_check_log = df2_norm_check_log,
         ref_samples = npx_df2_samples,
         ref_name = "20200002",
-        ref_cols = list(sample_id = "SampleID",
-                        olink_id = "OlinkID",
-                        uniprot = "UniProt",
-                        assay = "Assay",
-                        panel = "Panel",
-                        panel_version = "Panel_Version",
-                        plate_id = "PlateID",
-                        qc_warn = "QC_Warning",
-                        assay_warn = character(0L),
-                        quant = "NPX",
-                        lod = "LOD",
-                        normalization = "Normalization",
-                        count = character(0L),
-                        sample_type = character(0L),
-                        assay_type = character(0L)),
         ref_product = NULL,
-        not_ref_df = npx_data1 |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ),
-        not_ref_original_df = npx_data1 |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ),
-        not_ref_samples = unique(npx_data1$SampleID),
+        not_ref_df = npx_data1_norm,
+        not_ref_original_df = npx_data1_norm,
+        not_ref_check_log = df1_norm_check_log,
+        not_ref_samples = unique(npx_data1_norm$SampleID),
         not_ref_name = "20200001",
-        not_ref_cols = list(sample_id = "SampleID",
-                            olink_id = "OlinkID",
-                            uniprot = "UniProt",
-                            assay = "Assay",
-                            panel = "Panel",
-                            panel_version = "Panel_Version",
-                            plate_id = "PlateID",
-                            qc_warn = "QC_Warning",
-                            assay_warn = character(0L),
-                            quant = "NPX",
-                            lod = "LOD",
-                            normalization = "Normalization",
-                            count = character(0L),
-                            sample_type = character(0L),
-                            assay_type = character(0L)),
         not_ref_product = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset,
@@ -1379,11 +1106,17 @@ test_that(
 
     # no normalization column ----
 
+    df1_check_log <- check_npx(df = npx_data1) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     expect_warning(
       object = expect_message(
         object = lst_check_out <- olink_norm_input_check(
           df1 = npx_data1,
+          df1_check_log = df1_check_log,
           df2 = NULL,
+          df2_check_log = NULL,
           overlapping_samples_df1 = npx_df1_samples,
           overlapping_samples_df2 = NULL,
           df1_project_nr = "20200001",
@@ -1402,29 +1135,15 @@ test_that(
       expected = list(
         ref_df = npx_data1,
         ref_original_df = npx_data1,
+        ref_check_log = df1_check_log,
         ref_samples = npx_df1_samples,
         ref_name = "20200001",
-        ref_cols = list(sample_id = "SampleID",
-                        olink_id = "OlinkID",
-                        uniprot = "UniProt",
-                        assay = "Assay",
-                        panel = "Panel",
-                        panel_version = "Panel_Version",
-                        plate_id = "PlateID",
-                        qc_warn = "QC_Warning",
-                        assay_warn = character(0L),
-                        quant = "NPX",
-                        lod = "LOD",
-                        normalization = character(0L),
-                        count = character(0L),
-                        sample_type = character(0L),
-                        assay_type = character(0L)),
         ref_product = NULL,
         not_ref_df = NULL,
         not_ref_original_df = NULL,
+        not_ref_check_log = NULL,
         not_ref_samples = NULL,
         not_ref_name = NULL,
-        not_ref_cols = NULL,
         not_ref_product = NULL,
         reference_medians = ref_median_df,
         norm_mode = olink_norm_modes$ref_median,
@@ -1434,15 +1153,23 @@ test_that(
 
     # with normalization column ----
 
+    npx_data1_norm <- npx_data1 |>
+      dplyr::mutate(
+        Normalization = "Plate control"
+      ) |>
+      arrow::as_arrow_table() |>
+      dplyr::collect()
+
+    df1_norm_check_log <- check_npx(df = npx_data1_norm) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     expect_message(
-      object = lst_check_out <- olink_norm_input_check(
-        df1 = npx_data1 |>
-          dplyr::mutate(
-            Normalization = "Plate control"
-          ) |>
-          arrow::as_arrow_table() |>
-          dplyr::collect(),
+      object = lst_check_out_norm <- olink_norm_input_check(
+        df1 = npx_data1_norm,
+        df1_check_log = df1_norm_check_log,
         df2 = NULL,
+        df2_check_log = NULL,
         overlapping_samples_df1 = npx_df1_samples,
         overlapping_samples_df2 = NULL,
         df1_project_nr = "20200001",
@@ -1453,42 +1180,20 @@ test_that(
       regexp = "Reference median normalization will be performed!"
     )
 
-    lst_check_out$ref_df <- dplyr::as_tibble(lst_check_out$ref_df)
-
     expect_identical(
-      object = lst_check_out,
+      object = lst_check_out_norm,
       expected = list(
-        ref_df = npx_data1 |>
-          dplyr::mutate(
-            Normalization = "Plate control"
-          ),
-        ref_original_df = npx_data1 |>
-          dplyr::mutate(
-            Normalization = "Plate control"
-          ),
+        ref_df = npx_data1_norm,
+        ref_original_df = npx_data1_norm,
+        ref_check_log = df1_norm_check_log,
         ref_samples = npx_df1_samples,
         ref_name = "20200001",
-        ref_cols = list(sample_id = "SampleID",
-                        olink_id = "OlinkID",
-                        uniprot = "UniProt",
-                        assay = "Assay",
-                        panel = "Panel",
-                        panel_version = "Panel_Version",
-                        plate_id = "PlateID",
-                        qc_warn = "QC_Warning",
-                        assay_warn = character(0L),
-                        quant = "NPX",
-                        lod = "LOD",
-                        normalization = "Normalization",
-                        count = character(0L),
-                        sample_type = character(0L),
-                        assay_type = character(0L)),
         ref_product = NULL,
         not_ref_df = NULL,
         not_ref_original_df = NULL,
+        not_ref_check_log = NULL,
         not_ref_samples = NULL,
         not_ref_name = NULL,
-        not_ref_cols = NULL,
         not_ref_product = NULL,
         reference_medians = ref_median_df,
         norm_mode = olink_norm_modes$ref_median,
@@ -1507,6 +1212,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - error - df1=0, df2=0, s1=0, s2=0, rm=0",
   {
+    skip_on_cran()
+
     expect_error(
       object = olink_norm_input_validate(
         df2 = NULL,
@@ -1521,6 +1228,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - error - df1=0, df2=0, s1=0, s2=0, rm=1",
   {
+    skip_on_cran()
+
     expect_error(
       object = olink_norm_input_validate(
         df2 = NULL,
@@ -1538,6 +1247,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - error - df1=0, df2=0, s1=0, s2=1, rm=0",
   {
+    skip_on_cran()
+
     expect_error(
       object = olink_norm_input_validate(
         df2 = NULL,
@@ -1552,6 +1263,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - error - df1=0, df2=0, s1=0, s2=1, rm=1",
   {
+    skip_on_cran()
+
     expect_error(
       object = olink_norm_input_validate(
         df2 = NULL,
@@ -1569,6 +1282,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - error - df1=0, df2=0, s1=1, s2=0, rm=0",
   {
+    skip_on_cran()
+
     expect_error(
       object = olink_norm_input_validate(
         df2 = NULL,
@@ -1602,6 +1317,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - error - df1=0, df2=0, s1=1, s2=1, rm=0",
   {
+    skip_on_cran()
+
     expect_error(
       object = olink_norm_input_validate(
         df2 = NULL,
@@ -1617,6 +1334,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - error - df1=0, df2=0, s1=1, s2=1, rm=1",
   {
+    skip_on_cran()
+
     expect_error(
       object = olink_norm_input_validate(
         df2 = NULL,
@@ -1635,6 +1354,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - error - df1=0, df2=1, s1=0, s2=0, rm=0",
   {
+    skip_on_cran()
+
     expect_error(
       object = olink_norm_input_validate(
         df2 = npx_data2,
@@ -1649,6 +1370,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - error - df1=0, df2=1, s1=0, s2=0, rm=1",
   {
+    skip_on_cran()
+
     expect_error(
       object = olink_norm_input_validate(
         df2 = npx_data2,
@@ -1666,6 +1389,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - error - df1=0, df2=1, s1=0, s2=1, rm=0",
   {
+    skip_on_cran()
+
     expect_error(
       object = olink_norm_input_validate(
         df2 = npx_data2,
@@ -1680,6 +1405,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - error - df1=0, df2=1, s1=0, s2=1, rm=1",
   {
+    skip_on_cran()
+
     expect_error(
       object = olink_norm_input_validate(
         df2 = npx_data2,
@@ -1697,6 +1424,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - error - df1=0, df2=1, s1=1, s2=0, rm=0",
   {
+    skip_on_cran()
+
     expect_error(
       object = olink_norm_input_validate(
         df2 = npx_data2,
@@ -1712,6 +1441,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - error - df1=0, df2=1, s1=1, s2=0, rm=1",
   {
+    skip_on_cran()
+
     expect_error(
       object = olink_norm_input_validate(
         df2 = npx_data2,
@@ -1730,6 +1461,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - error - df1=0, df2=1, s1=1, s2=1, rm=0",
   {
+    skip_on_cran()
+
     expect_error(
       object = olink_norm_input_validate(
         df2 = npx_data2,
@@ -1745,6 +1478,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - error - df1=0, df2=1, s1=1, s2=1, rm=1",
   {
+    skip_on_cran()
+
     expect_error(
       object = olink_norm_input_validate(
         df2 = npx_data2,
@@ -1765,6 +1500,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - df1=1, df2=0, s1=0, s2=0, rm=0",
   {
+    skip_on_cran()
+
     expect_error(
       object = olink_norm_input_validate(
         df1 = npx_data1,
@@ -1781,6 +1518,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - df1=1, df2=0, s1=0, s2=0, rm=1",
   {
+    skip_on_cran()
+
     expect_error(
       object = olink_norm_input_validate(
         df1 = npx_data1,
@@ -1800,6 +1539,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - df1=1, df2=0, s1=0, s2=1, rm=0",
   {
+    skip_on_cran()
+
     expect_error(
       object = olink_norm_input_validate(
         df1 = npx_data1,
@@ -1816,6 +1557,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - df1=1, df2=0, s1=0, s2=1, rm=1",
   {
+    skip_on_cran()
+
     expect_error(
       object = olink_norm_input_validate(
         df1 = npx_data1,
@@ -1835,6 +1578,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - df1=1, df2=0, s1=1, s2=0, rm=0",
   {
+    skip_on_cran()
+
     expect_error(
       object = olink_norm_input_validate(
         df1 = npx_data1,
@@ -1852,6 +1597,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - df1=1, df2=0, s1=1, s2=0, rm=1",
   {
+    skip_on_cran()
+
     expect_no_condition(
       object = norm_valid <- olink_norm_input_validate(
         df1 = npx_data1,
@@ -1864,6 +1611,8 @@ test_that(
         )
       )
     )
+
+    skip_on_cran()
 
     expect_equal(
       object = norm_valid,
@@ -1878,6 +1627,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - df1=1, df2=0, s1=1, s2=1, rm=0",
   {
+    skip_on_cran()
+
     expect_error(
       object = olink_norm_input_validate(
         df1 = npx_data1,
@@ -1895,6 +1646,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - df1=1, df2=0, s1=1, s2=1, rm=1",
   {
+    skip_on_cran()
+
     expect_warning(
       object = norm_valid <- olink_norm_input_validate(
         df1 = npx_data1,
@@ -1909,6 +1662,8 @@ test_that(
       regexp = "`overlapping_samples_df2` will be ignored"
     )
 
+    skip_on_cran()
+
     expect_equal(
       object = norm_valid,
       expected = list(
@@ -1922,6 +1677,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - df1=1, df2=1, s1=0, s2=0, rm=0",
   {
+    skip_on_cran()
+
     expect_error(
       object = olink_norm_input_validate(
         df1 = npx_data1,
@@ -1938,6 +1695,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - df1=1, df2=1, s1=0, s2=0, rm=1",
   {
+    skip_on_cran()
+
     expect_error(
       object = olink_norm_input_validate(
         df1 = npx_data1,
@@ -1957,6 +1716,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - df1=1, df2=1, s1=0, s2=1, rm=0",
   {
+    skip_on_cran()
+
     expect_error(
       object = olink_norm_input_validate(
         df1 = npx_data1,
@@ -1973,6 +1734,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - df1=1, df2=1, s1=0, s2=1, rm=1",
   {
+    skip_on_cran()
+
     expect_error(
       object = olink_norm_input_validate(
         df1 = npx_data1,
@@ -1992,6 +1755,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - df1=1, df2=1, s1=1, s2=0, rm=0",
   {
+    skip_on_cran()
+
     expect_no_condition(
       object = norm_valid <- olink_norm_input_validate(
         df1 = npx_data1,
@@ -2015,6 +1780,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - df1=1, df2=1, s1=1, s2=0, rm=1",
   {
+    skip_on_cran()
+
     expect_warning(
       object = norm_valid <- olink_norm_input_validate(
         df1 = npx_data1,
@@ -2042,6 +1809,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - df1=1, df2=1, s1=1, s2=1, rm=0",
   {
+    skip_on_cran()
+
     expect_no_condition(
       object = norm_valid <- olink_norm_input_validate(
         df1 = npx_data1,
@@ -2065,6 +1834,8 @@ test_that(
 test_that(
   "olink_norm_input_validate - df1=1, df2=1, s1=1, s2=1, rm=1",
   {
+    skip_on_cran()
+
     expect_warning(
       object = norm_valid <- olink_norm_input_validate(
         df1 = npx_data1,
@@ -2095,12 +1866,13 @@ test_that(
   "olink_norm_input_class - error - df1",
   {
     skip_if_not_installed("arrow")
+    skip_on_cran()
 
     expect_error(
       object = olink_norm_input_class(
         df1 = c(1L, 2L)
       ),
-      regexp = "`df1` should be a tibble or an R6 ArrowObject"
+      regexp = "`df1` is not a tibble or an ArrowObject dataset"
     )
   }
 )
@@ -2109,6 +1881,7 @@ test_that(
   "olink_norm_input_class - df2",
   {
     skip_if_not_installed("arrow")
+    skip_on_cran()
 
     expect_error(
       object = olink_norm_input_class(
@@ -2118,7 +1891,7 @@ test_that(
         df1_project_nr = "P1",
         norm_mode = olink_norm_modes$bridge
       ),
-      regexp = "`df2` should be a tibble or an R6 ArrowObject"
+      regexp = "`df2` is not a tibble or an ArrowObject dataset"
     )
   }
 )
@@ -2127,13 +1900,14 @@ test_that(
   "olink_norm_input_class - error - overlapping_samples_df1",
   {
     skip_if_not_installed("arrow")
+    skip_on_cran()
 
     expect_error(
       object = olink_norm_input_class(
         df1 = npx_data1,
         overlapping_samples_df1 = TRUE
       ),
-      regexp = "`overlapping_samples_df1` should be a character vector"
+      regexp = "`overlapping_samples_df1` must be a character vector"
     )
 
     expect_error(
@@ -2142,7 +1916,7 @@ test_that(
           arrow::as_arrow_table(),
         overlapping_samples_df1 = TRUE
       ),
-      regexp = "`overlapping_samples_df1` should be a character vector"
+      regexp = "`overlapping_samples_df1` must be a character vector"
     )
   }
 )
@@ -2151,6 +1925,7 @@ test_that(
   "olink_norm_input_class - error - df1_project_nr",
   {
     skip_if_not_installed("arrow")
+    skip_on_cran()
 
     expect_error(
       object = olink_norm_input_class(
@@ -2158,7 +1933,7 @@ test_that(
         overlapping_samples_df1 = c("A", "B", "C"),
         df1_project_nr = 1L
       ),
-      regexp = "`df1_project_nr` should be a character vector"
+      regexp = "`df1_project_nr` must be a scalar character"
     )
 
     expect_error(
@@ -2168,7 +1943,7 @@ test_that(
         overlapping_samples_df1 = c("A", "B", "C"),
         df1_project_nr = npx_data2
       ),
-      regexp = "`df1_project_nr` should be a character vector"
+      regexp = "`df1_project_nr` must be a scalar character"
     )
   }
 )
@@ -2177,6 +1952,7 @@ test_that(
   "olink_norm_input_class - overlapping_samples_df2",
   {
     skip_if_not_installed("arrow")
+    skip_on_cran()
 
     expect_error(
       object = olink_norm_input_class(
@@ -2189,7 +1965,7 @@ test_that(
         reference_project = "P1",
         norm_mode = olink_norm_modes$subset
       ),
-      regexp = "`overlapping_samples_df2` should be a character vector"
+      regexp = "`overlapping_samples_df2` must be a character vector"
     )
 
     expect_error(
@@ -2205,7 +1981,7 @@ test_that(
         overlapping_samples_df2 = npx_data1,
         norm_mode = olink_norm_modes$subset
       ),
-      regexp = "`overlapping_samples_df2` should be a character vector"
+      regexp = "`overlapping_samples_df2` must be a character vector"
     )
   }
 )
@@ -2214,6 +1990,7 @@ test_that(
   "olink_norm_input_class - df*_project_nr & reference_project",
   {
     skip_if_not_installed("arrow")
+    skip_on_cran()
 
     ## df1_project_nr ----
 
@@ -2228,7 +2005,7 @@ test_that(
         reference_project = "P1",
         norm_mode = olink_norm_modes$subset
       ),
-      regexp = "`df1_project_nr` should be a character vector"
+      regexp = "`df1_project_nr` must be a scalar character"
     )
 
     ## df2_project_nr ----
@@ -2244,7 +2021,7 @@ test_that(
         reference_project = "P1",
         norm_mode = olink_norm_modes$subset
       ),
-      regexp = "`df2_project_nr` should be a character vector"
+      regexp = "`df2_project_nr` must be a scalar character"
     )
 
     ## reference_project ----
@@ -2261,7 +2038,7 @@ test_that(
           arrow::as_arrow_table(),
         norm_mode = olink_norm_modes$subset
       ),
-      regexp = "`reference_project` should be a character vector"
+      regexp = "`reference_project` must be a scalar character"
     )
 
     ## reference project not in df*_project_nr ----
@@ -2303,6 +2080,7 @@ test_that(
   "olink_norm_input_class - reference_medians",
   {
     skip_if_not_installed("arrow")
+    skip_on_cran()
 
     expect_error(
       object = olink_norm_input_class(
@@ -2312,7 +2090,7 @@ test_that(
         reference_medians = 1L,
         norm_mode = olink_norm_modes$ref_median
       ),
-      regexp = "`reference_medians` should be a tibble or an R6 ArrowObject"
+      regexp = "`reference_medians` is not a tibble or an ArrowObject dataset"
     )
 
     expect_error(
@@ -2324,7 +2102,7 @@ test_that(
         reference_medians = TRUE,
         norm_mode = olink_norm_modes$ref_median
       ),
-      regexp = "`reference_medians` should be a tibble or an R6 ArrowObject"
+      regexp = "`reference_medians` is not a tibble or an ArrowObject dataset"
     )
 
     # If reference median normalization we do not check df2_project_nr and
@@ -2373,171 +2151,78 @@ test_that(
   "olink_norm_input_check_df_cols - Normalization col - 1 dataset",
   {
     skip_if_not_installed("arrow")
+    skip_on_cran()
 
     # df does not have Normalization col ----
 
-    expect_warning(
-      object = lst_col <- olink_norm_input_check_df_cols(
-        lst_df = list(
-          "p1" = npx_data1
-        ) |>
-          lapply(function(l_df) {
-            l_df |> # nolint return_linter
-              dplyr::select(
-                -dplyr::any_of(c("Normalization"))
-              )
-          })
-      ),
-      regexp = "Dataset \"p1\" does not contain a column named"
-    )
-
-    expect_identical(
-      object = lst_col,
-      expected = list(
-        "p1" = list(
-          sample_id = "SampleID",
-          olink_id = "OlinkID",
-          uniprot = "UniProt",
-          assay = "Assay",
-          panel = "Panel",
-          panel_version = "Panel_Version",
-          plate_id = "PlateID",
-          qc_warn = "QC_Warning",
-          assay_warn = character(0L),
-          quant = "NPX",
-          lod = "LOD",
-          normalization = character(0L),
-          count = character(0L),
-          sample_type = character(0L),
-          assay_type = character(0L)
-        )
+    npx_data1_no_norm <- npx_data1 |>
+      dplyr::select(
+        -dplyr::any_of(c("Normalization"))
       )
+    npx_data1_no_norm_check <- check_npx(df = npx_data1_no_norm) |>
+      suppressWarnings() |>
+      suppressMessages() |>
+      (\(.) .$col_names)()
+
+    expect_warning(
+      object = olink_norm_input_check_df_cols(
+        lst_df = list("p1" = npx_data1_no_norm),
+        lst_cols = list("p1" = npx_data1_no_norm_check)
+      ),
+      regexp = paste("Dataset \"p1\" does not contain a column named",
+                     "\"Normalization\" or \"normalization\"."),
+      fixed = TRUE
     )
 
     # df does not have Normalization col - arrow ----
 
-    expect_warning(
-      object = lst_col <- olink_norm_input_check_df_cols(
-        lst_df = list(
-          "p1" = npx_data1
-        ) |>
-          lapply(function(l_df) {
-            l_df |> # nolint return_linter
-              dplyr::select(
-                -dplyr::any_of(c("Normalization"))
-              ) |>
-              arrow::as_arrow_table()
-          })
-      ),
-      regexp = "Dataset \"p1\" does not contain a column named"
-    )
+    npx_data1_no_norm <- npx_data1_no_norm |>
+      arrow::as_arrow_table()
 
-    expect_identical(
-      object = lst_col,
-      expected = list(
-        "p1" = list(
-          sample_id = "SampleID",
-          olink_id = "OlinkID",
-          uniprot = "UniProt",
-          assay = "Assay",
-          panel = "Panel",
-          panel_version = "Panel_Version",
-          plate_id = "PlateID",
-          qc_warn = "QC_Warning",
-          assay_warn = character(0L),
-          quant = "NPX",
-          lod = "LOD",
-          normalization = character(0L),
-          count = character(0L),
-          sample_type = character(0L),
-          assay_type = character(0L)
-        )
-      )
+    expect_warning(
+      object = olink_norm_input_check_df_cols(
+        lst_df = list("p1" = npx_data1_no_norm),
+        lst_cols = list("p1" = npx_data1_no_norm_check)
+      ),
+      regexp = paste("Dataset \"p1\" does not contain a column named",
+                     "\"Normalization\" or \"normalization\"."),
+      fixed = TRUE
     )
 
     # df has Normalization col ----
 
+    npx_data1_norm <- npx_data1 |>
+      dplyr::mutate(
+        Normalization = "Intensity"
+      )
+    npx_data1_norm_check <- check_npx(df = npx_data1_norm) |>
+      suppressWarnings() |>
+      suppressMessages() |>
+      (\(.) .$col_names)()
+
     expect_no_error(
       object = expect_no_warning(
         object = expect_no_message(
-          object = lst_col <- olink_norm_input_check_df_cols(
-            lst_df = list(
-              "p1" = npx_data1
-            ) |>
-              lapply(function(l_df) {
-                l_df |> # nolint return_linter
-                  dplyr::mutate(
-                    Normalization = "Intensity"
-                  )
-              })
+          object = olink_norm_input_check_df_cols(
+            lst_df = list("p1" = npx_data1_norm),
+            lst_cols = list("p1" = npx_data1_norm_check)
           )
-        )
-      )
-    )
-
-    expect_identical(
-      object = lst_col,
-      expected = list(
-        "p1" = list(
-          sample_id = "SampleID",
-          olink_id = "OlinkID",
-          uniprot = "UniProt",
-          assay = "Assay",
-          panel = "Panel",
-          panel_version = "Panel_Version",
-          plate_id = "PlateID",
-          qc_warn = "QC_Warning",
-          assay_warn = character(0L),
-          quant = "NPX",
-          lod = "LOD",
-          normalization = "Normalization",
-          count = character(0L),
-          sample_type = character(0L),
-          assay_type = character(0L)
         )
       )
     )
 
     # df has Normalization col - arrow ----
 
+    npx_data1_norm <- npx_data1_norm |>
+      arrow::as_arrow_table()
+
     expect_no_error(
       object = expect_no_warning(
         object = expect_no_message(
-          object = lst_col <- olink_norm_input_check_df_cols(
-            lst_df = list(
-              "p1" = npx_data1
-            ) |>
-              lapply(function(l_df) {
-                l_df |> # nolint return_linter
-                  dplyr::mutate(
-                    Normalization = "Intensity"
-                  ) |>
-                  arrow::as_arrow_table()
-              })
+          object = olink_norm_input_check_df_cols(
+            lst_df = list("p1" = npx_data1_norm),
+            lst_cols = list("p1" = npx_data1_norm_check)
           )
-        )
-      )
-    )
-
-    expect_identical(
-      object = lst_col,
-      expected = list(
-        "p1" = list(
-          sample_id = "SampleID",
-          olink_id = "OlinkID",
-          uniprot = "UniProt",
-          assay = "Assay",
-          panel = "Panel",
-          panel_version = "Panel_Version",
-          plate_id = "PlateID",
-          qc_warn = "QC_Warning",
-          assay_warn = character(0L),
-          quant = "NPX",
-          lod = "LOD",
-          normalization = "Normalization",
-          count = character(0L),
-          sample_type = character(0L),
-          assay_type = character(0L)
         )
       )
     )
@@ -2548,326 +2233,196 @@ test_that(
   "olink_norm_input_check_df_cols - Normalization col - 2 datasets",
   {
     skip_if_not_installed("arrow")
+    skip_on_cran()
 
     # no df has Normalization col ----
 
-    expect_warning(
-      object = lst_col <- olink_norm_input_check_df_cols(
-        lst_df = list(
-          "p1" = npx_data1,
-          "p2" = npx_data2
-        ) |>
-          lapply(function(l_df) {
-            l_df |> # nolint return_linter
-              dplyr::select(
-                -dplyr::any_of(c("Normalization"))
-              )
-          })
-      ),
-      regexp = "Datasets \"p1\" and \"p2\" do not contain a column named"
-    )
+    lst_df_no_norm <- list(
+      "p1" = npx_data1,
+      "p2" = npx_data2
+    ) |>
+      lapply(function(l_df) {
+        l_df |> # nolint: return_linter
+          dplyr::select(
+            -dplyr::any_of(c("Normalization"))
+          )
+      })
 
-    expect_identical(
-      object = lst_col,
-      expected = list(
-        "p1" = list(
-          sample_id = "SampleID",
-          olink_id = "OlinkID",
-          uniprot = "UniProt",
-          assay = "Assay",
-          panel = "Panel",
-          panel_version = "Panel_Version",
-          plate_id = "PlateID",
-          qc_warn = "QC_Warning",
-          assay_warn = character(0L),
-          quant = "NPX",
-          lod = "LOD",
-          normalization = character(0L),
-          count = character(0L),
-          sample_type = character(0L),
-          assay_type = character(0L)
-        ),
-        "p2" = list(
-          sample_id = "SampleID",
-          olink_id = "OlinkID",
-          uniprot = "UniProt",
-          assay = "Assay",
-          panel = "Panel",
-          panel_version = "Panel_Version",
-          plate_id = "PlateID",
-          qc_warn = "QC_Warning",
-          assay_warn = character(0L),
-          quant = "NPX",
-          lod = "LOD",
-          normalization = character(0L),
-          count = character(0L),
-          sample_type = character(0L),
-          assay_type = character(0L)
-        )
-      )
+    lst_df_no_norm_check <- lst_df_no_norm |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
+
+    expect_warning(
+      object = olink_norm_input_check_df_cols(
+        lst_df = lst_df_no_norm,
+        lst_cols = lst_df_no_norm_check
+      ),
+      regexp = paste("Datasets \"p1\" and \"p2\" do not contain a column named",
+                     "\"Normalization\" or \"normalization\"."),
+      fixed = TRUE
     )
 
     # both df have same Normalization col ----
 
+    lst_df_norm <- list(
+      "p1" = npx_data1,
+      "p2" = npx_data2
+    ) |>
+      lapply(function(l_df) {
+        l_df |> # nolint: return_linter
+          dplyr::mutate(
+            Normalization = "Intensity"
+          )
+      })
+
+    lst_df_norm_check <- lst_df_norm |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
+
     expect_no_error(
       object = expect_no_warning(
         object = expect_no_message(
-          object = lst_col <- olink_norm_input_check_df_cols(
-            lst_df = list(
-              "p1" = npx_data1,
-              "p2" = npx_data2
-            ) |>
-              lapply(function(l_df) {
-                l_df |> # nolint return_linter
-                  dplyr::mutate(
-                    Normalization = "Intensity"
-                  )
-              })
+          object = olink_norm_input_check_df_cols(
+            lst_df = lst_df_norm,
+            lst_cols = lst_df_norm_check
           )
-        )
-      )
-    )
-
-    expect_identical(
-      object = lst_col,
-      expected = list(
-        "p1" = list(
-          sample_id = "SampleID",
-          olink_id = "OlinkID",
-          uniprot = "UniProt",
-          assay = "Assay",
-          panel = "Panel",
-          panel_version = "Panel_Version",
-          plate_id = "PlateID",
-          qc_warn = "QC_Warning",
-          assay_warn = character(0L),
-          quant = "NPX",
-          lod = "LOD",
-          normalization = "Normalization",
-          count = character(0L),
-          sample_type = character(0L),
-          assay_type = character(0L)
-        ),
-        "p2" = list(
-          sample_id = "SampleID",
-          olink_id = "OlinkID",
-          uniprot = "UniProt",
-          assay = "Assay",
-          panel = "Panel",
-          panel_version = "Panel_Version",
-          plate_id = "PlateID",
-          qc_warn = "QC_Warning",
-          assay_warn = character(0L),
-          quant = "NPX",
-          lod = "LOD",
-          normalization = "Normalization",
-          count = character(0L),
-          sample_type = character(0L),
-          assay_type = character(0L)
         )
       )
     )
 
     # both df have different Normalization col ----
 
+    lst_df_diff_norm <- list(
+      "p1" = npx_data1 |>
+        dplyr::mutate(Normalization = "Intensity"),
+      "p2" = npx_data2 |>
+        dplyr::mutate(Normalization = "Plate control")
+    )
+
+    lst_df_diff_norm_check <- lst_df_diff_norm |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
+
     expect_no_error(
       object = expect_no_warning(
         object = expect_no_message(
-          object = lst_col <- olink_norm_input_check_df_cols(
-            lst_df = list(
-              "p1" = npx_data1 |>
-                dplyr::mutate(Normalization = "Intensity"),
-              "p2" = npx_data2 |>
-                dplyr::mutate(Normalization = "Plate control")
-            )
+          object = olink_norm_input_check_df_cols(
+            lst_df = lst_df_diff_norm,
+            lst_cols = lst_df_diff_norm_check
           )
-        )
-      )
-    )
-
-    expect_identical(
-      object = lst_col,
-      expected = list(
-        "p1" = list(
-          sample_id = "SampleID",
-          olink_id = "OlinkID",
-          uniprot = "UniProt",
-          assay = "Assay",
-          panel = "Panel",
-          panel_version = "Panel_Version",
-          plate_id = "PlateID",
-          qc_warn = "QC_Warning",
-          assay_warn = character(0L),
-          quant = "NPX",
-          lod = "LOD",
-          normalization = "Normalization",
-          count = character(0L),
-          sample_type = character(0L),
-          assay_type = character(0L)
-        ),
-        "p2" = list(
-          sample_id = "SampleID",
-          olink_id = "OlinkID",
-          uniprot = "UniProt",
-          assay = "Assay",
-          panel = "Panel",
-          panel_version = "Panel_Version",
-          plate_id = "PlateID",
-          qc_warn = "QC_Warning",
-          assay_warn = character(0L),
-          quant = "NPX",
-          lod = "LOD",
-          normalization = "Normalization",
-          count = character(0L),
-          sample_type = character(0L),
-          assay_type = character(0L)
         )
       )
     )
 
     # ERROR - one df has Normalization col ----
 
+    lst_df_one_norm <- list(
+      "p1" = npx_data1 |>
+        dplyr::mutate(Normalization = "Intensity"),
+      "p2" = npx_data2 |>
+        dplyr::select(-dplyr::any_of(c("Normalization")))
+    )
+
+    lst_df_one_norm_check <- lst_df_one_norm |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
+
     expect_error(
       object = olink_norm_input_check_df_cols(
-        lst_df = list(
-          "p1" = npx_data1 |>
-            dplyr::mutate(Normalization = "Intensity"),
-          "p2" = npx_data2
-        )
+        lst_df = lst_df_one_norm,
+        lst_cols = lst_df_one_norm_check
       ),
-      regexp = "Dataset \"p2\" does not contain a column named \"Normalization"
+      regexp = paste("Dataset \"p2\" does not contain a column named",
+                     "\"Normalization\" or \"normalization\"!")
     )
 
     # ERROR - one df has Normalization col - arrow ----
 
+    lst_df_one_norm$p1 <- lst_df_one_norm$p1 |>
+      arrow::as_arrow_table()
+
     expect_error(
       object = olink_norm_input_check_df_cols(
-        lst_df = list(
-          "p1" = npx_data1 |>
-            dplyr::mutate(Normalization = "Intensity") |>
-            arrow::as_arrow_table(),
-          "p2" = npx_data2
-        )
+        lst_df = lst_df_one_norm,
+        lst_cols = lst_df_one_norm_check
       ),
-      regexp = "Dataset \"p2\" does not contain a column named \"Normalization"
+      regexp =  paste("Dataset \"p2\" does not contain a column named",
+                      "\"Normalization\" or \"normalization\"!")
     )
 
     # one df had LODNPX ----
 
+    lst_df_lod_norm <- list(
+      "p1" = npx_data1 |>
+        dplyr::mutate(Normalization = "Intensity"),
+      "p2" = npx_data2 |>
+        dplyr::mutate(Normalization = "Plate control") |>
+        dplyr::rename("LODNPX" = "LOD")
+    )
+
+    lst_df_lod_norm_check <- lst_df_lod_norm |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
+
     expect_no_error(
       object = expect_no_warning(
         object = expect_no_message(
-          object = lst_col <- olink_norm_input_check_df_cols(
-            lst_df = list(
-              "p1" = npx_data1 |>
-                dplyr::mutate(Normalization = "Intensity"),
-              "p2" = npx_data2 |>
-                dplyr::mutate(Normalization = "Plate control") |>
-                dplyr::rename("LODNPX" = "LOD")
-            )
+          object = olink_norm_input_check_df_cols(
+            lst_df = lst_df_lod_norm,
+            lst_cols = lst_df_lod_norm_check
           )
-        )
-      )
-    )
-
-    expect_identical(
-      object = lst_col,
-      expected = list(
-        "p1" = list(
-          sample_id = "SampleID",
-          olink_id = "OlinkID",
-          uniprot = "UniProt",
-          assay = "Assay",
-          panel = "Panel",
-          panel_version = "Panel_Version",
-          plate_id = "PlateID",
-          qc_warn = "QC_Warning",
-          assay_warn = character(0L),
-          quant = "NPX",
-          lod = "LOD",
-          normalization = "Normalization",
-          count = character(0L),
-          sample_type = character(0L),
-          assay_type = character(0L)
-        ),
-        "p2" = list(
-          sample_id = "SampleID",
-          olink_id = "OlinkID",
-          uniprot = "UniProt",
-          assay = "Assay",
-          panel = "Panel",
-          panel_version = "Panel_Version",
-          plate_id = "PlateID",
-          qc_warn = "QC_Warning",
-          assay_warn = character(0L),
-          quant = "NPX",
-          lod = "LODNPX",
-          normalization = "Normalization",
-          count = character(0L),
-          sample_type = character(0L),
-          assay_type = character(0L)
         )
       )
     )
 
     # one datasets has PanelVersion ----
 
+    lst_df_panel_norm <- list(
+      "p1" = npx_data1 |>
+        dplyr::mutate(Normalization = "Intensity"),
+      "p2" = npx_data2 |>
+        dplyr::mutate(Normalization = "Plate control") |>
+        dplyr::rename("LODNPX" = "LOD")
+    )
+
+    lst_df_panel_norm_check <- lst_df_panel_norm |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
+
     expect_no_error(
       object = expect_no_warning(
         object = expect_no_message(
-          object = lst_col <- olink_norm_input_check_df_cols(
-            lst_df = list(
-              "p1" = npx_data1 |>
-                dplyr::mutate(Normalization = "Intensity") |>
-                dplyr::rename("PanelVersion" = "Panel_Version"),
-              "p2" = npx_data2 |>
-                dplyr::mutate(Normalization = "Intensity")
-            )
+          object = olink_norm_input_check_df_cols(
+            lst_df = lst_df_panel_norm,
+            lst_cols = lst_df_panel_norm_check
           )
         )
       )
     )
-
-    expect_identical(
-      object = lst_col,
-      expected = list(
-        "p1" = list(
-          sample_id = "SampleID",
-          olink_id = "OlinkID",
-          uniprot = "UniProt",
-          assay = "Assay",
-          panel = "Panel",
-          panel_version = "PanelVersion",
-          plate_id = "PlateID",
-          qc_warn = "QC_Warning",
-          assay_warn = character(0L),
-          quant = "NPX",
-          lod = "LOD",
-          normalization = "Normalization",
-          count = character(0L),
-          sample_type = character(0L),
-          assay_type = character(0L)
-        ),
-        "p2" = list(
-          sample_id = "SampleID",
-          olink_id = "OlinkID",
-          uniprot = "UniProt",
-          assay = "Assay",
-          panel = "Panel",
-          panel_version = "Panel_Version",
-          plate_id = "PlateID",
-          qc_warn = "QC_Warning",
-          assay_warn = character(0L),
-          quant = "NPX",
-          lod = "LOD",
-          normalization = "Normalization",
-          count = character(0L),
-          sample_type = character(0L),
-          assay_type = character(0L)
-        )
-      )
-    )
-
   }
 )
 
@@ -2875,219 +2430,137 @@ test_that(
   "olink_norm_input_check_df_cols - Normalization col - 3+ datasets",
   {
     skip_if_not_installed("arrow")
+    skip_on_cran()
 
     # ERROR - df 1 and 2 do not have Normalization col ----
 
+    lst_df_some_norm <- list(
+      "p1" = OlinkAnalyze::npx_data1 |>
+        dplyr::select(-dplyr::any_of(c("Normalization"))) |>
+        arrow::as_arrow_table(),
+      "p2" = OlinkAnalyze::npx_data2 |>
+        dplyr::select(-dplyr::any_of(c("Normalization"))),
+      "p3" = OlinkAnalyze::npx_data1 |>
+        dplyr::mutate(Normalization = "Intensity"),
+      "p4" = OlinkAnalyze::npx_data2 |>
+        dplyr::mutate(Normalization = "Intensity")
+    )
+
+    lst_df_some_norm_check <- lst_df_some_norm |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
+
     expect_error(
       object = olink_norm_input_check_df_cols(
-        lst_df = list("p1" = OlinkAnalyze::npx_data1 |>
-                        arrow::as_arrow_table(),
-                      "p2" = OlinkAnalyze::npx_data2,
-                      "p3" = OlinkAnalyze::npx_data1 |>
-                        dplyr::mutate(Normalization = "Intensity"),
-                      "p4" = OlinkAnalyze::npx_data2 |>
-                        dplyr::mutate(Normalization = "Intensity"))
+        lst_df = lst_df_some_norm,
+        lst_cols = lst_df_some_norm_check
       ),
-      regexp = "Datasets \"p1\" and \"p2\" do not contain a column named"
+      regexp = paste("Datasets \"p1\" and \"p2\" do not contain a column named",
+                     "\"Normalization\" or \"normalization\"!")
     )
 
     # ERROR - df 1 does not have Normalization col ----
 
+    lst_df_some_norm_v2 <- list(
+      "p1" = OlinkAnalyze::npx_data1,
+      "p2" = OlinkAnalyze::npx_data2 |>
+        dplyr::mutate(Normalization = "Intensity") |>
+        arrow::as_arrow_table(),
+      "p3" = OlinkAnalyze::npx_data1 |>
+        dplyr::mutate(Normalization = "Intensity"),
+      "p4" = OlinkAnalyze::npx_data2 |>
+        dplyr::mutate(Normalization = "Intensity")
+    )
+
+    lst_df_some_norm_v2_check <- lst_df_some_norm_v2 |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
+
     expect_error(
       object = olink_norm_input_check_df_cols(
-        lst_df = list("p1" = OlinkAnalyze::npx_data1,
-                      "p2" = OlinkAnalyze::npx_data2 |>
-                        dplyr::mutate(Normalization = "Intensity") |>
-                        arrow::as_arrow_table(),
-                      "p3" = OlinkAnalyze::npx_data1 |>
-                        dplyr::mutate(Normalization = "Intensity"),
-                      "p4" = OlinkAnalyze::npx_data2 |>
-                        dplyr::mutate(Normalization = "Intensity"))
+        lst_df = lst_df_some_norm_v2,
+        lst_cols = lst_df_some_norm_v2_check
       ),
-      regexp = "Dataset \"p1\" does not contain a column named"
+      regexp = paste("Dataset \"p1\" does not contain a column named",
+                     "\"Normalization\" or \"normalization\"!")
     )
 
     # some Normalization col are different ----
 
+    lst_df_norm <- list(
+      "p1" = OlinkAnalyze::npx_data1 |>
+        dplyr::mutate(Normalization = "Plate control"),
+      "p2" = OlinkAnalyze::npx_data2 |>
+        dplyr::mutate(Normalization = "Intensity"),
+      "p3" = OlinkAnalyze::npx_data1 |>
+        dplyr::mutate(Normalization = "Intensity") |>
+        arrow::as_arrow_table(),
+      "p4" = OlinkAnalyze::npx_data2 |>
+        dplyr::mutate(Normalization = "Plate control")
+    )
+
+    lst_df_norm_check <- lst_df_norm |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
+
     expect_no_error(
       object = expect_no_warning(
         object = expect_no_message(
-          object = lst_col <- olink_norm_input_check_df_cols(
-            lst_df = list("p1" = OlinkAnalyze::npx_data1 |>
-                            dplyr::mutate(Normalization = "Plate control"),
-                          "p2" = OlinkAnalyze::npx_data2 |>
-                            dplyr::mutate(Normalization = "Intensity"),
-                          "p3" = OlinkAnalyze::npx_data1 |>
-                            dplyr::mutate(Normalization = "Intensity") |>
-                            arrow::as_arrow_table(),
-                          "p4" = OlinkAnalyze::npx_data2 |>
-                            dplyr::mutate(Normalization = "Plate control"))
+          object = olink_norm_input_check_df_cols(
+            lst_df = lst_df_norm,
+            lst_cols = lst_df_norm_check
           )
-        )
-      )
-    )
-
-    expect_identical(
-      object = lst_col,
-      expected = list(
-        "p1" = list(
-          sample_id = "SampleID",
-          olink_id = "OlinkID",
-          uniprot = "UniProt",
-          assay = "Assay",
-          panel = "Panel",
-          panel_version = "Panel_Version",
-          plate_id = "PlateID",
-          qc_warn = "QC_Warning",
-          assay_warn = character(0L),
-          quant = "NPX",
-          lod = "LOD",
-          normalization = "Normalization",
-          count = character(0L),
-          sample_type = character(0L),
-          assay_type = character(0L)
-        ),
-        "p2" = list(
-          sample_id = "SampleID",
-          olink_id = "OlinkID",
-          uniprot = "UniProt",
-          assay = "Assay",
-          panel = "Panel",
-          panel_version = "Panel_Version",
-          plate_id = "PlateID",
-          qc_warn = "QC_Warning",
-          assay_warn = character(0L),
-          quant = "NPX",
-          lod = "LOD",
-          normalization = "Normalization",
-          count = character(0L),
-          sample_type = character(0L),
-          assay_type = character(0L)
-        ),
-        "p3" = list(
-          sample_id = "SampleID",
-          olink_id = "OlinkID",
-          uniprot = "UniProt",
-          assay = "Assay",
-          panel = "Panel",
-          panel_version = "Panel_Version",
-          plate_id = "PlateID",
-          qc_warn = "QC_Warning",
-          assay_warn = character(0L),
-          quant = "NPX",
-          lod = "LOD",
-          normalization = "Normalization",
-          count = character(0L),
-          sample_type = character(0L),
-          assay_type = character(0L)
-        ),
-        "p4" = list(
-          sample_id = "SampleID",
-          olink_id = "OlinkID",
-          uniprot = "UniProt",
-          assay = "Assay",
-          panel = "Panel",
-          panel_version = "Panel_Version",
-          plate_id = "PlateID",
-          qc_warn = "QC_Warning",
-          assay_warn = character(0L),
-          quant = "NPX",
-          lod = "LOD",
-          normalization = "Normalization",
-          count = character(0L),
-          sample_type = character(0L),
-          assay_type = character(0L)
         )
       )
     )
 
     # no df has Normalization col ----
 
+    lst_df_no_norm <- list(
+      "p1" = OlinkAnalyze::npx_data1,
+      "p2" = OlinkAnalyze::npx_data2,
+      "p3" = OlinkAnalyze::npx_data1,
+      "p4" = OlinkAnalyze::npx_data2
+    ) |>
+      lapply(function(l_df) {
+        l_df |> # nolint: return_linter
+          dplyr::select(
+            -dplyr::any_of(c("Normalization"))
+          )
+      })
+    lst_df_no_norm$p3 <- lst_df_no_norm$p3 |>
+      arrow::as_arrow_table()
+
+    lst_df_no_norm_check <- lst_df_no_norm |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
+
     expect_warning(
-      object = lst_col <- olink_norm_input_check_df_cols(
-        lst_df = list("p1" = OlinkAnalyze::npx_data1,
-                      "p2" = OlinkAnalyze::npx_data2 |>
-                        arrow::as_arrow_table(),
-                      "p3" = OlinkAnalyze::npx_data1,
-                      "p4" = OlinkAnalyze::npx_data2)
+      object = olink_norm_input_check_df_cols(
+        lst_df = lst_df_no_norm,
+        lst_cols = lst_df_no_norm_check
       ),
-      regexp = "Datasets \"p1\", \"p2\", \"p3\", and \"p4\" do not contain a"
+      regexp = paste("Datasets \"p1\", \"p2\", \"p3\", and \"p4\" do not",
+                     "contain a column named \"Normalization\" or",
+                     "\"normalization\"."),
+      fixed = TRUE
     )
-
-    expect_identical(
-      object = lst_col,
-      expected = list(
-        "p1" = list(
-          sample_id = "SampleID",
-          olink_id = "OlinkID",
-          uniprot = "UniProt",
-          assay = "Assay",
-          panel = "Panel",
-          panel_version = "Panel_Version",
-          plate_id = "PlateID",
-          qc_warn = "QC_Warning",
-          assay_warn = character(0L),
-          quant = "NPX",
-          lod = "LOD",
-          normalization = character(0L),
-          count = character(0L),
-          sample_type = character(0L),
-          assay_type = character(0L)
-        ),
-        "p2" = list(
-          sample_id = "SampleID",
-          olink_id = "OlinkID",
-          uniprot = "UniProt",
-          assay = "Assay",
-          panel = "Panel",
-          panel_version = "Panel_Version",
-          plate_id = "PlateID",
-          qc_warn = "QC_Warning",
-          assay_warn = character(0L),
-          quant = "NPX",
-          lod = "LOD",
-          normalization = character(0L),
-          count = character(0L),
-          sample_type = character(0L),
-          assay_type = character(0L)
-        ),
-        "p3" = list(
-          sample_id = "SampleID",
-          olink_id = "OlinkID",
-          uniprot = "UniProt",
-          assay = "Assay",
-          panel = "Panel",
-          panel_version = "Panel_Version",
-          plate_id = "PlateID",
-          qc_warn = "QC_Warning",
-          assay_warn = character(0L),
-          quant = "NPX",
-          lod = "LOD",
-          normalization = character(0L),
-          count = character(0L),
-          sample_type = character(0L),
-          assay_type = character(0L)
-        ),
-        "p4" = list(
-          sample_id = "SampleID",
-          olink_id = "OlinkID",
-          uniprot = "UniProt",
-          assay = "Assay",
-          panel = "Panel",
-          panel_version = "Panel_Version",
-          plate_id = "PlateID",
-          qc_warn = "QC_Warning",
-          assay_warn = character(0L),
-          quant = "NPX",
-          lod = "LOD",
-          normalization = character(0L),
-          count = character(0L),
-          sample_type = character(0L),
-          assay_type = character(0L)
-        )
-      )
-    )
-
   }
 )
 
@@ -3095,61 +2568,95 @@ test_that(
   "olink_norm_input_check_df_cols - message - multiple LOD columns",
   {
     skip_if_not_installed("arrow")
+    skip_on_cran()
 
     # only df1 has Plate_LOD and LOD ----
+
+    lst_df_lod_v1 <- list(
+      "p1" = npx_data1 |>
+        dplyr::mutate(
+          Plate_LOD = .data[["LOD"]]
+        ),
+      "p2" = npx_data2
+    ) |>
+      lapply(dplyr::mutate, Normalization = "Intensity")
+
+    lst_df_lod_v1_check <- lst_df_lod_v1 |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
 
     expect_warning(
       object = expect_message(
         object = olink_norm_input_check_df_cols(
-          lst_df = list(
-            "p1" = npx_data1 |>
-              dplyr::mutate(
-                Plate_LOD = LOD
-              ),
-            "p2" = npx_data2
-          ) |>
-            lapply(dplyr::mutate, Normalization = "Intensity")
+          lst_df = lst_df_lod_v1,
+          lst_cols = lst_df_lod_v1_check
         ),
-        regexp = "Dataset \"p1\" contains multiple columns matching `LOD`"
+        regexp = "Dataset \"p1\" contains multiple columns matching \"LOD\""
       ),
       regexp = "* p2: Plate_LOD"
     )
 
     # df1 and df2 have Plate_LOD and LOD ----
 
+    lst_df_lod_v2 <- list(
+      "p1" = npx_data1 |>
+        dplyr::mutate(
+          Plate_LOD = LOD
+        ),
+      "p2" = npx_data2 |>
+        dplyr::mutate(
+          Plate_LOD = LOD
+        )
+    ) |>
+      lapply(dplyr::mutate, Normalization = "Intensity")
+
+    lst_df_lod_v2_check <- lst_df_lod_v2 |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
+
     expect_message(
       object = olink_norm_input_check_df_cols(
-        lst_df = list(
-          "p1" = npx_data1 |>
-            dplyr::mutate(
-              Plate_LOD = LOD
-            ),
-          "p2" = npx_data2 |>
-            dplyr::mutate(
-              Plate_LOD = LOD
-            )
-        ) |>
-          lapply(dplyr::mutate, Normalization = "Intensity")
+        lst_df = lst_df_lod_v2,
+        lst_cols = lst_df_lod_v2_check
       ),
       regexp = "Datasets \"p1\" and \"p2\" contain multiple columns matching"
     )
 
     # df1 and df2 have different LODs ----
 
+    lst_df_lod_v3 <- list(
+      "p1" = npx_data1 |>
+        dplyr::mutate(
+          PlateLOD = LOD
+        ),
+      "p2" = npx_data2 |>
+        dplyr::mutate(
+          MaxLOD = LOD
+        )
+    ) |>
+      lapply(dplyr::mutate, Normalization = "Intensity")
+
+    lst_df_lod_v3_check <- lst_df_lod_v3 |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
+
     expect_warning(
       object = expect_message(
         object = olink_norm_input_check_df_cols(
-          lst_df = list(
-            "p1" = npx_data1 |>
-              dplyr::mutate(
-                PlateLOD = LOD
-              ),
-            "p2" = npx_data2 |>
-              dplyr::mutate(
-                MaxLOD = LOD
-              )
-          ) |>
-            lapply(dplyr::mutate, Normalization = "Intensity")
+          lst_df = lst_df_lod_v3,
+          lst_cols = lst_df_lod_v3_check
         ),
         regexp = "Datasets \"p1\" and \"p2\" contain multiple columns matching"
       ),
@@ -3165,194 +2672,51 @@ test_that(
 
     # df has assay_warn ----
 
-    expect_warning(
-      object = lst_col <- olink_norm_input_check_df_cols(
-        lst_df = list(
-          "p1" = npx_data1
-        ) |>
-          lapply(function(l_df) {
-            l_df |> # nolint return_linter
-              dplyr::mutate(
-                Assay_Warning = NA_character_
-              )
-          })
-      ),
-      regexp = "Dataset \"p1\" does not contain a column named"
-    )
+    lst_df_assay_warn <- list(
+      "p1" = npx_data1
+    ) |>
+      lapply(dplyr::mutate, Assay_Warning = NA_character_)
 
-    expect_identical(
-      object = lst_col,
-      expected = list(
-        "p1" = list(
-          sample_id = "SampleID",
-          olink_id = "OlinkID",
-          uniprot = "UniProt",
-          assay = "Assay",
-          panel = "Panel",
-          panel_version = "Panel_Version",
-          plate_id = "PlateID",
-          qc_warn = "QC_Warning",
-          assay_warn = "Assay_Warning",
-          quant = "NPX",
-          lod = "LOD",
-          normalization = character(0L),
-          count = character(0L),
-          sample_type = character(0L),
-          assay_type = character(0L)
-        )
-      )
+    lst_df_assay_warn_check <- lst_df_assay_warn |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
+
+    expect_warning(
+      object = olink_norm_input_check_df_cols(
+        lst_df = lst_df_assay_warn,
+        lst_cols = lst_df_assay_warn_check
+      ),
+      regexp = paste("Dataset \"p1\" does not contain a column named",
+                     "\"Normalization\" or \"normalization\"")
     )
 
     # df has Count ----
 
+    lst_df_count <- list(
+      "p1" = npx_data1
+    ) |>
+      lapply(dplyr::mutate, Count = NA_integer_)
+
+    lst_df_count_check <- lst_df_count |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
+
     expect_warning(
-      object = lst_col <- olink_norm_input_check_df_cols(
-        lst_df = list(
-          "p1" = npx_data1
-        ) |>
-          lapply(function(l_df) {
-            l_df |> # nolint return_linter
-              dplyr::mutate(
-                Count = NA_integer_
-              )
-          })
-      ),
-      regexp = "Dataset \"p1\" does not contain a column named"
-    )
-
-    expect_identical(
-      object = lst_col,
-      expected = list(
-        "p1" = list(
-          sample_id = "SampleID",
-          olink_id = "OlinkID",
-          uniprot = "UniProt",
-          assay = "Assay",
-          panel = "Panel",
-          panel_version = "Panel_Version",
-          plate_id = "PlateID",
-          qc_warn = "QC_Warning",
-          assay_warn = character(0L),
-          quant = "NPX",
-          lod = "LOD",
-          normalization = character(0L),
-          count = "Count",
-          sample_type = character(0L),
-          assay_type = character(0L)
-        )
-      )
-    )
-  }
-)
-
-test_that(
-  "olink_norm_input_check_df_cols - error - missing cols",
-  {
-    skip_if_not_installed("arrow")
-
-    # 2 df missing cols v1 ----
-
-    expect_error(
       object = olink_norm_input_check_df_cols(
-        lst_df = list(
-          "p1" = npx_data1 |>
-            dplyr::select(
-              -dplyr::all_of(c("SampleID"))
-            ) |>
-            arrow::as_arrow_table(),
-          "p2" = npx_data2 |>
-            dplyr::select(
-              -dplyr::all_of(c("OlinkID", "PlateID"))
-            )
-        ) |>
-          lapply(dplyr::mutate, Normalization = "Intensity")
+        lst_df = lst_df_count,
+        lst_cols = lst_df_count_check
       ),
-      regexp = "Datasets with missing column"
+      regexp = paste("Dataset \"p1\" does not contain a column named",
+                     "\"Normalization\" or \"normalization\"")
     )
-
-    # 2 df missing cols v2 ----
-
-    expect_error(
-      object = olink_norm_input_check_df_cols(
-        lst_df = list(
-          "p1" = npx_data1 |>
-            dplyr::select(
-              -dplyr::all_of(c("Panel_Version"))
-            ),
-          "p2" = npx_data2 |>
-            dplyr::select(
-              -dplyr::all_of(c("QC_Warning"))
-            ) |>
-            arrow::as_arrow_table()
-        ) |>
-          lapply(dplyr::mutate, Normalization = "Intensity")
-      ),
-      regexp = "Datasets with missing column"
-    )
-
-    # one df missing cols v1 ----
-
-    expect_error(
-      object = olink_norm_input_check_df_cols(
-        lst_df = list(
-          "p1" = npx_data1 |>
-            dplyr::select(
-              -dplyr::all_of(c("Panel"))
-            ),
-          "p2" = npx_data2 |>
-            arrow::as_arrow_table()
-        ) |>
-          lapply(dplyr::mutate, Normalization = "Intensity")
-      ),
-      regexp = "Dataset with missing column"
-    )
-
-    # one df missing cols v2 ----
-
-    expect_error(
-      object = olink_norm_input_check_df_cols(
-        lst_df = list(
-          "p1" = npx_data1,
-          "p2" = npx_data2 |>
-            dplyr::select(
-              -dplyr::all_of(c("Panel"))
-            ) |>
-            arrow::as_arrow_table()
-        ) |>
-          lapply(dplyr::mutate, Normalization = "Intensity")
-      ),
-      regexp = "Dataset with missing column"
-    )
-
-    # multiple df missing cols ----
-
-    expect_error(
-      object = olink_norm_input_check_df_cols(
-        lst_df = list(
-          "p1" = OlinkAnalyze::npx_data1 |>
-            dplyr::select(
-              -dplyr::all_of(c("Panel_Version", "OlinkID"))
-            ),
-          "p2" = OlinkAnalyze::npx_data2 |>
-            dplyr::select(
-              -dplyr::all_of(c("Panel", "Panel_Version"))
-            ) |>
-            arrow::as_arrow_table(),
-          "p3" = OlinkAnalyze::npx_data1 |>
-            dplyr::select(
-              -dplyr::all_of(c("Assay", "UniProt"))
-            ),
-          "p4" = OlinkAnalyze::npx_data2 |>
-            dplyr::select(
-              -dplyr::all_of(c("QC_Warning"))
-            ) |>
-            arrow::as_arrow_table()
-        ) |>
-          lapply(dplyr::mutate, Normalization = "Intensity")
-      ),
-      regexp = "Datasets with missing column"
-    )
-
   }
 )
 
@@ -3363,102 +2727,190 @@ test_that(
 
     # 2 df with different quant method ----
 
+    lst_df_quant_v1 <- list(
+      "p1" = npx_data1 |>
+        dplyr::rename(
+          "Quantified_value" = "NPX"
+        ),
+      "p2" = npx_data2 |>
+        arrow::as_arrow_table()
+    ) |>
+      lapply(dplyr::mutate, Normalization = "Intensity")
+
+    lst_df_quant_v1_check <- lst_df_quant_v1 |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
+
     expect_error(
       object = olink_norm_input_check_df_cols(
-        lst_df = list(
-          "p1" = npx_data1 |>
-            dplyr::rename(
-              "Quantified_value" = "NPX"
-            ),
-          "p2" = npx_data2 |>
-            arrow::as_arrow_table()
-        ) |>
-          lapply(dplyr::mutate, Normalization = "Intensity")
+        lst_df = lst_df_quant_v1,
+        lst_cols = lst_df_quant_v1_check
       ),
       regexp = "Datasets are not quantified with the same method"
     )
-
-    # multiple df with different quant method ----
-
-    expect_error(
-      object = olink_norm_input_check_df_cols(
-        lst_df = list(
-          "p1" = npx_data1 |>
-            dplyr::rename(
-              "Quantified_value" = "NPX"
-            ),
-          "p2" = npx_data2,
-          "p3" = OlinkAnalyze::npx_data1,
-          "p4" = OlinkAnalyze::npx_data2 |>
-            dplyr::rename(
-              "Ct" = "NPX"
-            ) |>
-            arrow::as_arrow_table()
-        ) |>
-          lapply(dplyr::mutate, Normalization = "Intensity")
-      ),
-      regexp = "Datasets are not quantified with the same method"
-    )
-
   }
 )
 
 test_that(
-  "olink_norm_input_check_df_cols - error - missing non-required cols",
+  "olink_norm_input_check_df_cols - error - different olink_id cols",
+  {
+    skip_if_not_installed("arrow")
+
+    # 2 df with different olink_id method ----
+
+    lst_df_quant_v1 <- list(
+      "p1" = npx_data1 |>
+        dplyr::rename(
+          "olink_id" = "OlinkID"
+        ),
+      "p2" = npx_data2
+    ) |>
+      lapply(dplyr::mutate, Normalization = "Intensity")
+
+    lst_df_quant_v1_check <- lst_df_quant_v1 |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
+
+    expect_error(
+      object = olink_norm_input_check_df_cols(
+        lst_df = lst_df_quant_v1,
+        lst_cols = lst_df_quant_v1_check
+      ),
+      regexp = "Datasets do not have the same OlinkID column"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_check_df_cols - error - different sample_id cols",
+  {
+    skip_if_not_installed("arrow")
+
+    # 2 df with different sample_id method ----
+
+    lst_df_quant_v1 <- list(
+      "p1" = npx_data1 |>
+        dplyr::rename(
+          "sample_id" = "SampleID"
+        ),
+      "p2" = npx_data2
+    ) |>
+      lapply(dplyr::mutate, Normalization = "Intensity")
+
+    lst_df_quant_v1_check <- lst_df_quant_v1 |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
+
+    expect_error(
+      object = olink_norm_input_check_df_cols(
+        lst_df = lst_df_quant_v1,
+        lst_cols = lst_df_quant_v1_check
+      ),
+      regexp = "Datasets do not have the same SampleID column"
+    )
+  }
+)
+
+test_that(
+  "olink_norm_input_check_df_cols - message - missing non-required cols",
   {
     skip_if_not_installed("arrow")
 
     # df 1 missing 1 col ----
 
+    lst_df_1_missing_col <- list(
+      "p1" = npx_data1 |>
+        dplyr::select(
+          -dplyr::all_of(c("Index"))
+        ),
+      "p2" = npx_data2
+    ) |>
+      lapply(dplyr::mutate, Normalization = "Intensity")
+
+    lst_df_1_missing_col_check <- lst_df_1_missing_col |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
+
     expect_warning(
       object = olink_norm_input_check_df_cols(
-        lst_df = list(
-          "p1" = npx_data1 |>
-            dplyr::select(
-              -dplyr::all_of(c("Index"))
-            ),
-          "p2" = npx_data2 |>
-            arrow::as_arrow_table()
-        ) |>
-          lapply(dplyr::mutate, Normalization = "Intensity")
+        lst_df = lst_df_1_missing_col,
+        lst_cols = lst_df_1_missing_col_check
       ),
       regexp = "Column not present across datasets"
     )
 
     # df 1 missing 2 col & df 2 missing 1 col ----
 
+    lst_df_some_missing_col <- list(
+      "p1" = npx_data1 |>
+        dplyr::select(
+          -dplyr::all_of(c("Index", "Site"))
+        ),
+      "p2" = npx_data2 |>
+        dplyr::select(
+          -dplyr::all_of(c("Treatment"))
+        )
+    ) |>
+      lapply(dplyr::mutate, Normalization = "Intensity")
+
+
+    lst_df_some_missing_col_check <- lst_df_some_missing_col |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
+
     expect_warning(
       object = olink_norm_input_check_df_cols(
-        lst_df = list(
-          "p1" = npx_data1 |>
-            dplyr::select(
-              -dplyr::all_of(c("Index", "Site"))
-            ),
-          "p2" = npx_data2 |>
-            dplyr::select(
-              -dplyr::all_of(c("Treatment"))
-            ) |>
-            arrow::as_arrow_table()
-        ) |>
-          lapply(dplyr::mutate, Normalization = "Intensity")
+        lst_df = lst_df_some_missing_col,
+        lst_cols = lst_df_some_missing_col_check
       ),
       regexp = "Columns not present across datasets"
     )
 
     # one df - no warn ----
 
+    lst_df_one_df_no_warn <- list(
+      "p1" = npx_data1 |>
+        dplyr::select(
+          -dplyr::all_of(c("Index"))
+        ) |>
+        arrow::as_arrow_table()
+    ) |>
+      lapply(dplyr::mutate, Normalization = "Intensity")
+
+    lst_df_one_df_no_warn_check <- lst_df_one_df_no_warn |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
+
     expect_no_error(
       object = expect_no_warning(
         object = expect_no_message(
           object = olink_norm_input_check_df_cols(
-            lst_df = list(
-              "p1" = npx_data1 |>
-                dplyr::select(
-                  -dplyr::all_of(c("Index"))
-                ) |>
-                arrow::as_arrow_table()
-            ) |>
-              lapply(dplyr::mutate, Normalization = "Intensity")
+            lst_df = lst_df_one_df_no_warn,
+            lst_cols = lst_df_one_df_no_warn_check
           )
         )
       )
@@ -3466,25 +2918,36 @@ test_that(
 
     # multiple df missing non-required cols ----
 
+    lst_df_multi_df_some_mis_col <- list(
+      "p1" = npx_data1 |>
+        dplyr::select(
+          -dplyr::all_of(c("Index", "Site"))
+        ),
+      "p2" = npx_data2 |>
+        dplyr::select(
+          -dplyr::all_of(c("Treatment"))
+        ) |>
+        arrow::as_arrow_table(),
+      "p3" = npx_data1 |>
+        dplyr::select(
+          -dplyr::all_of(c("Treatment", "Project", "Subject"))
+        ),
+      "p4" = npx_data2
+    ) |>
+      lapply(dplyr::mutate, Normalization = "Intensity")
+
+    lst_df_multi_some_mis_col_chck <- lst_df_multi_df_some_mis_col |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
+
     expect_warning(
       object = olink_norm_input_check_df_cols(
-        lst_df = list(
-          "p1" = npx_data1 |>
-            dplyr::select(
-              -dplyr::all_of(c("Index", "Site"))
-            ),
-          "p2" = npx_data2 |>
-            dplyr::select(
-              -dplyr::all_of(c("Treatment"))
-            ) |>
-            arrow::as_arrow_table(),
-          "p3" = npx_data1 |>
-            dplyr::select(
-              -dplyr::all_of(c("Treatment", "Project", "Subject"))
-            ),
-          "p4" = npx_data2
-        ) |>
-          lapply(dplyr::mutate, Normalization = "Intensity")
+        lst_df = lst_df_multi_df_some_mis_col,
+        lst_cols = lst_df_multi_some_mis_col_chck
       ),
       regexp = "Columns not present across datasets"
     )
@@ -3499,278 +2962,65 @@ test_that(
 
     # 1 non-matching col ----
 
+    lst_df_one_non_match_col <- list(
+      "p1" = npx_data1 |>
+        dplyr::mutate(
+          SampleID = as.factor(.data[["SampleID"]])
+        ),
+      "p2" = npx_data2
+    ) |>
+      lapply(dplyr::mutate, Normalization = "Intensity")
+
+    lst_df_one_non_match_col_check <- lst_df_one_non_match_col |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
+
     expect_error(
       object = olink_norm_input_check_df_cols(
-        lst_df = list(
-          "p1" = npx_data1 |>
-            dplyr::mutate(
-              SampleID = as.factor(.data[["SampleID"]])
-            ),
-          "p2" = npx_data2 |>
-            arrow::as_arrow_table()
-        ) |>
-          lapply(dplyr::mutate, Normalization = "Intensity")
+        lst_df = lst_df_one_non_match_col,
+        lst_cols = lst_df_one_non_match_col_check
       ),
-      regexp = "Column with non-matching classes"
+      regexp = paste("Column with non-matching classes across datasets",
+                     "\"SampleID\"."),
+      fixed = TRUE
     )
 
     # 3 non-matching cols ----
 
+    lst_df_multi_nomatch_col <- list(
+      "p1" = npx_data1 |>
+        dplyr::mutate(
+          SampleID = as.factor(.data[["SampleID"]]),
+          Treatment = as.character(.data[["Treatment"]])
+        ),
+      "p2" = npx_data2 |>
+        dplyr::mutate(
+          SampleID = as.character(.data[["SampleID"]]),
+          Treatment = as.factor(.data[["Treatment"]])
+        )
+    ) |>
+      lapply(dplyr::mutate, Normalization = "Intensity")
+
+    lst_df_multi_nomatch_col_check <- lst_df_multi_nomatch_col |>
+      lapply(function(.x) {
+        check_npx(df = .x) |> # nolint: return_linter
+          suppressWarnings() |>
+          suppressMessages() |>
+          (\(.) .$col_names)()
+      })
+
     expect_error(
       object = olink_norm_input_check_df_cols(
-        lst_df = list(
-          "p1" = npx_data1 |>
-            dplyr::mutate(
-              SampleID = as.factor(.data[["SampleID"]])
-            ),
-          "p2" = npx_data2 |>
-            dplyr::mutate(
-              NPX = as.character(.data[["NPX"]])
-            ) |>
-            arrow::as_arrow_table()
-        ) |>
-          lapply(dplyr::mutate, Normalization = "Intensity")
+        lst_df = lst_df_multi_nomatch_col,
+        lst_cols = lst_df_multi_nomatch_col_check
       ),
-      regexp = "Columns with non-matching classes"
-    )
-  }
-)
-
-# Test olink_norm_input_check_quant ----
-
-test_that(
-  "olink_norm_input_check_quant - error - at least one quant col present",
-  {
-    # df does not have quant col - one df ----
-
-    quant_cols <- list(
-      "DF1" = character(0L) ### empty quant list
-    )
-
-    expect_error(
-      object = olink_norm_input_check_quant(
-        quant_cols = quant_cols,
-        quant_cols_set = c("NPX", "Quantified_value", "Ct")
-      ),
-      regexp = "No quantification column identified in at least one of the"
-    )
-
-    # df does not have quant col - two df ----
-
-    quant_cols <- list(
-      "DF1" = character(0L),
-      "DF2" = "Ct"
-    )
-
-    expect_error(
-      object = olink_norm_input_check_quant(
-        quant_cols = quant_cols,
-        quant_cols_set = c("NPX", "Quantified_value", "Ct")
-      ),
-      regexp = "No quantification column identified in at least one of the"
-    )
-  }
-)
-
-test_that(
-  "olink_norm_input_check_quant - error - different quant cols in datasets",
-  {
-    # dfs does not have matching quant col ----
-
-    quant_cols <- list(
-      "DF1" =  "NPX",
-      "DF2" =  "Ct"
-    )
-
-    expect_error(
-      object = olink_norm_input_check_quant(
-        quant_cols = quant_cols,
-        quant_cols_set = c("NPX", "Quantified_value", "Ct")
-      ),
-      regexp = "Re-export data with at least one shared quantification method"
-    )
-
-    # dfs does not have matching quant col v2 ----
-
-    quant_cols <- list(
-      "DF1" =  "NPX",
-      "DF2" =  c("Quantified_value", "Ct")
-    )
-
-    expect_error(
-      object = olink_norm_input_check_quant(
-        quant_cols = quant_cols,
-        quant_cols_set = c("NPX", "Quantified_value", "Ct")
-      ),
-      regexp = "Re-export data with at least one shared quantification method"
-    )
-  }
-)
-
-test_that(
-  "olink_norm_input_check_quant - works - one dataset",
-  {
-    # dfs has one col ----
-
-    quant_cols <- list(
-      "DF1" =  "NPX"
-    )
-
-    expect_identical(
-      object = olink_norm_input_check_quant(
-        quant_cols = quant_cols,
-        quant_cols_set = c("NPX", "Quantified_value", "Ct")
-      ),
-      expected = list("DF1" =  "NPX")
-    )
-
-    # dfs has one col v2 ----
-
-    quant_cols <- list(
-      "DF1" =  "Quantified_value"
-    )
-
-    expect_identical(
-      object = olink_norm_input_check_quant(
-        quant_cols = quant_cols,
-        quant_cols_set = c("NPX", "Quantified_value", "Ct")
-      ),
-      expected = list("DF1" =  "Quantified_value")
-    )
-
-    # dfs has two cols ----
-
-    quant_cols <- list(
-      "DF1" =  c("NPX", "Quantified_value")
-    )
-
-    expect_message(
-      object = quant_check <- olink_norm_input_check_quant(
-        quant_cols = quant_cols,
-        quant_cols_set = c("NPX", "Quantified_value", "Ct")
-      ),
-      regexp = "Multiple quantification methods detected in dataset \"DF1\""
-    )
-
-    expect_identical(
-      object = quant_check,
-      expected = list("DF1" =  "NPX")
-    )
-
-    # dfs has two cols v2 ----
-
-    quant_cols <- list(
-      "DF1" =  c("Ct", "Quantified_value")
-    )
-
-    expect_message(
-      object = quant_check <- olink_norm_input_check_quant(
-        quant_cols = quant_cols,
-        quant_cols_set = c("NPX", "Quantified_value", "Ct")
-      ),
-      regexp = "Multiple quantification methods detected in dataset \"DF1\""
-    )
-
-    expect_identical(
-      object = quant_check,
-      expected = list("DF1" =  "Quantified_value")
-    )
-  }
-)
-
-test_that(
-  "olink_norm_input_check_quant - works - two datasets",
-  {
-    # dfs have one matching quant col, 2 dfs ----
-
-    quant_cols <- list(
-      "DF1" = c("Ct", "NPX"),
-      "DF2" = c("Quantified_value", "NPX")
-    )
-
-    expect_message(
-      object = quant_check <- olink_norm_input_check_quant(
-        quant_cols = quant_cols,
-        quant_cols_set = c("NPX", "Quantified_value", "Ct")
-      ),
-      regexp = "\"NPX\" will be used for normalization."
-    )
-
-    expect_identical(
-      object = quant_check,
-      expected = list(
-        "DF1" = "NPX",
-        "DF2" = "NPX"
-      )
-    )
-
-    # dfs have one matching quant col, 2 dfs ----
-
-    quant_cols <- list(
-      "DF1" = c("NPX"),
-      "DF2" = c("Quantified_value", "NPX", "Ct")
-    )
-
-    expect_message(
-      object = quant_check <- olink_norm_input_check_quant(
-        quant_cols = quant_cols,
-        quant_cols_set = c("NPX", "Quantified_value", "Ct")
-      ),
-      regexp = "\"NPX\" will be used for normalization."
-    )
-
-    expect_identical(
-      object = quant_check,
-      expected = list(
-        "DF1" = "NPX",
-        "DF2" = "NPX"
-      )
-    )
-
-    # dfs have multiple matching quant col, 2 dfs ----
-
-    quant_cols <- list(
-      "DF1" =  c("Ct", "NPX", "Quantified_value"),
-      "DF2" =  c("Quantified_value", "Ct", "NPX")
-    )
-
-    expect_message(
-      object = quant_check <- olink_norm_input_check_quant(
-        quant_cols = quant_cols,
-        quant_cols_set = c("NPX", "Quantified_value", "Ct")
-      ),
-      regexp = "Multiple matching quantification methods detected in datasets"
-    )
-
-    expect_identical(
-      object = quant_check,
-      expected = list(
-        "DF1" = "NPX",
-        "DF2" = "NPX"
-      )
-    )
-
-    # dfs have multiple matching quant col, 2 dfs  - v2----
-
-    quant_cols <- list(
-      "DF1" =  c("Ct", "Quantified_value"),
-      "DF2" =  c("Quantified_value", "Ct", "NPX")
-    )
-
-    expect_message(
-      object = quant_check <- olink_norm_input_check_quant(
-        quant_cols = quant_cols,
-        quant_cols_set = c("NPX", "Quantified_value", "Ct")
-      ),
-      regexp = "Multiple matching quantification methods detected in datasets"
-    )
-
-    expect_identical(
-      object = quant_check,
-      expected = list(
-        "DF1" = "Quantified_value",
-        "DF2" = "Quantified_value"
-      )
+      regexp = paste("Columns with non-matching classes across datasets",
+                     "\"SampleID\" and \"Treatment\"."),
+      fixed = TRUE
     )
   }
 )
@@ -4405,6 +3655,65 @@ test_that(
   }
 )
 
+test_that(
+  "olink_norm_input_cross_product - error - not same count col",
+  {
+    skip_if_not_installed("arrow")
+
+    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
+    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
+
+    data_3k <- get_example_data(filename = "example_3k_data.rds")
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
+
+    expect_error(
+      object = olink_norm_input_cross_product(
+        lst_df = list(
+          "p1" = data_3k |>
+            dplyr::rename("count" = "Count"),
+          "p2" = data_ht
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel",
+                      olink_id = "OlinkID",
+                      count = "count"),
+          "p2" = list(panel = "Panel",
+                      olink_id = "OlinkID",
+                      count = "Count")
+        ),
+        reference_project = "p2",
+        product_ids = c("p1" = "E3072", "p2" = "HT"),
+        ref_ids = c("p1" = "not_ref", "p2" = "ref")
+      ),
+      regexp = paste("Datasets \"p1\" and \"p2\" contain a column matching",
+                     "\"Count\" or \"count\" but with different names!")
+    )
+
+    expect_error(
+      object = olink_norm_input_cross_product(
+        lst_df = list(
+          "p1" = data_3k,
+          "p2" = data_ht |>
+            dplyr::rename("count" = "Count")
+        ),
+        lst_cols = list(
+          "p1" = list(panel = "Panel",
+                      olink_id = "OlinkID",
+                      count = "Count"),
+          "p2" = list(panel = "Panel",
+                      olink_id = "OlinkID",
+                      count = "count")
+        ),
+        reference_project = "p2",
+        product_ids = c("p1" = "E3072", "p2" = "HT"),
+        ref_ids = c("p1" = "not_ref", "p2" = "ref")
+      ),
+      regexp = paste("Datasets \"p1\" and \"p2\" contain a column matching",
+                     "\"Count\" or \"count\" but with different names!")
+    )
+  }
+)
+
 # Test olink_norm_input_check_samples ----
 
 test_that(
@@ -4433,6 +3742,9 @@ test_that(
                 sort() |>
                 head(n = 6L)
             ),
+            lst_dup_samples = list(
+              "p1" = character(0L)
+            ),
             norm_mode = "ref_median"
           )
         )
@@ -4458,6 +3770,9 @@ test_that(
                 dplyr::pull(.data[["SampleID"]]) |>
                 unique() |>
                 sort()
+            ),
+            lst_dup_samples = list(
+              "p1" = character(0L)
             ),
             norm_mode = "ref_median"
           )
@@ -4493,6 +3808,10 @@ test_that(
               "p1" = ref_samples_bridge,
               "p2" = ref_samples_bridge
             ),
+            lst_dup_samples = list(
+              "p1" = character(0L),
+              "p2" = character(0L)
+            ),
             norm_mode = "bridge"
           )
         )
@@ -4527,6 +3846,10 @@ test_that(
             lst_ref_samples = list(
               "p1" = ref_samples_bridge_3k_ht,
               "p2" = ref_samples_bridge_3k_ht
+            ),
+            lst_dup_samples = list(
+              "p1" = character(0L),
+              "p2" = character(0L)
             ),
             norm_mode = "norm_cross_product"
           )
@@ -4574,6 +3897,10 @@ test_that(
               "p1" = ref_samples_subset_1,
               "p2" = ref_samples_subset_2
             ),
+            lst_dup_samples = list(
+              "p1" = character(0L),
+              "p2" = character(0L)
+            ),
             norm_mode = "subset"
           )
         )
@@ -4610,6 +3937,10 @@ test_that(
                    paste0(ref_samples_bridge[13L:16L], "_not_here")),
           "p2" = ref_samples_bridge
         ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
+        ),
         norm_mode = "bridge"
       ),
       regexp = "B37_not_here, B45_not_here, B63_not_here, and B75_not_here"
@@ -4632,6 +3963,10 @@ test_that(
           "p2" = c(paste0(ref_samples_bridge[1L:2L], "_not_here"),
                    ref_samples_bridge[3L:12L])
         ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
+        ),
         norm_mode = "bridge"
       ),
       regexp = "A13_not_here and A29_not_here"
@@ -4652,6 +3987,10 @@ test_that(
           "p1" = ref_samples_bridge,
           "p2" = c(paste0(ref_samples_bridge[1L:2L], "_not_here"),
                    ref_samples_bridge[3L:12L])
+        ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
         ),
         norm_mode = "bridge"
       ),
@@ -4700,6 +4039,10 @@ test_that(
                    ref_samples_subset_1[61L:156L]),
           "p2" = ref_samples_subset_2
         ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
+        ),
         norm_mode = "subset"
       ),
       regexp = "A52_not_here, A53_not_here, A54_not_here, A55_not_here, A56_not"
@@ -4723,6 +4066,10 @@ test_that(
           "p2" = c(paste0(ref_samples_subset_2[1L:50L], "_not_here"),
                    ref_samples_subset_2)
         ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
+        ),
         norm_mode = "subset"
       ),
       regexp = "A52_not_here, A53_not_here, A54_not_here, A55_not_here, A56_not"
@@ -4743,6 +4090,10 @@ test_that(
           "p1" = ref_samples_subset_1,
           "p2" = c(paste0(ref_samples_subset_2[1L:50L], "_not_here"),
                    ref_samples_subset_2)
+        ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
         ),
         norm_mode = "subset"
       ),
@@ -4779,6 +4130,10 @@ test_that(
                    ref_samples_bridge),
           "p2" = ref_samples_bridge
         ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
+        ),
         norm_mode = "bridge"
       ),
       regexp = "* p1: A13 and A29"
@@ -4799,6 +4154,10 @@ test_that(
           "p1" = ref_samples_bridge,
           "p2" = c(ref_samples_bridge[1L:2L],
                    ref_samples_bridge)
+        ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
         ),
         norm_mode = "bridge"
       ),
@@ -4846,6 +4205,10 @@ test_that(
                    ref_samples_subset_1),
           "p2" = ref_samples_subset_2
         ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
+        ),
         norm_mode = "subset"
       ),
       regexp = "* p1: A1, A2, A3, A4, A5, A6, A7, A8, A9, A10,"
@@ -4867,6 +4230,10 @@ test_that(
                    ref_samples_subset_1),
           "p2" = c(ref_samples_subset_2[1L:50L],
                    ref_samples_subset_2)
+        ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
         ),
         norm_mode = "subset"
       ),
@@ -4902,6 +4269,10 @@ test_that(
           "p1" = head(x = ref_samples_bridge, 10L),
           "p2" = ref_samples_bridge
         ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
+        ),
         norm_mode = "bridge"
       ),
       regexp = "There are 10 bridge samples for dataset `p1` and 16 bridge samp"
@@ -4921,6 +4292,10 @@ test_that(
         lst_ref_samples = list(
           "p1" = ref_samples_bridge,
           "p2" = head(x = ref_samples_bridge, -5L)
+        ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
         ),
         norm_mode = "bridge"
       ),
@@ -4956,6 +4331,11 @@ test_that(
           "p3" = unique(npx_data1$SampleID)
         ),
         lst_ref_samples = list(),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L),
+          "p3" = character(0L)
+        ),
         norm_mode = "ref_median"
       ),
       regexp = "More than 2 sets of samples provided in `lst_df_samples`!"
@@ -4978,6 +4358,10 @@ test_that(
           "p2" = unique(npx_data2$SampleID)
         ),
         lst_ref_samples = list(),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
+        ),
         norm_mode = "ref_median"
       ),
       regexp = "No sets of samples provided in `lst_ref_samples`!"
@@ -4995,6 +4379,11 @@ test_that(
           "p1" = c("A", "B"),
           "p2" = c("A", "B"),
           "p3" = c("A", "B")
+        ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L),
+          "p3" = character(0L)
         ),
         norm_mode = "ref_median"
       ),
@@ -5022,6 +4411,10 @@ test_that(
                            y = npx_data2$SampleID) |>
             (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x, fixed = TRUE)])()
         ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
+        ),
         norm_mode = "bridge"
       ),
       regexp = "Number of sample vectors in `lst_df_samples` differs from the n"
@@ -5040,11 +4433,107 @@ test_that(
             (\(x) x[!grepl(pattern = "CONTROL_SAMPLE", x = x, fixed = TRUE)])(),
           "p2" = c("A", "B", "C")
         ),
+        lst_dup_samples = list(
+          "p1" = character(0L),
+          "p2" = character(0L)
+        ),
         norm_mode = "bridge"
       ),
       regexp = "Number of sample vectors in `lst_df_samples` differs from the n"
     )
 
+  }
+)
+
+test_that(
+  "olink_norm_input_check_samples - error - ref samples are duplicated in df",
+  {
+    skip_if_not_installed("arrow")
+
+    # duplicate ref samples in df - 1 dataset ----
+
+    expect_error(
+      object = olink_norm_input_check_samples(
+        lst_df_samples = list(
+          "p1" = c("A", "B", "C", "D", "A")
+        ),
+        lst_ref_samples = list(
+          "p1" = c("A", "B")
+        ),
+        lst_dup_samples = list(
+          "p1" = c("A")
+        ),
+        norm_mode = "ref_median"
+      ),
+      regexp = "* p1: A",
+      fixed = TRUE
+    )
+
+    # duplicate ref samples in df - 2 datasets ----
+
+    expect_error(
+      object = olink_norm_input_check_samples(
+        lst_df_samples = list(
+          "p1" = c("A", "B", "C", "D", "A"),
+          "p2" = c("E", "F", "G", "H", "E")
+        ),
+        lst_ref_samples = list(
+          "p1" = c("A", "B"),
+          "p2" = c("E", "F")
+        ),
+        lst_dup_samples = list(
+          "p1" = c("A"),
+          "p2" = c("E")
+        ),
+        norm_mode = "bridge"
+      ),
+      regexp = "* p1: A\n* p2: E",
+      fixed = TRUE
+    )
+
+    # duplicate ref samples in df - 2 datasets and multiple replicates ----
+
+    expect_error(
+      object = olink_norm_input_check_samples(
+        lst_df_samples = list(
+          "p1" = c("A", "B", "C", "D", "A", "A"),
+          "p2" = c("E", "F", "G", "H", "E", "E")
+        ),
+        lst_ref_samples = list(
+          "p1" = c("A", "B"),
+          "p2" = c("E", "F")
+        ),
+        lst_dup_samples = list(
+          "p1" = c("A"),
+          "p2" = c("E")
+        ),
+        norm_mode = "bridge"
+      ),
+      regexp = "* p1: A\n* p2: E",
+      fixed = TRUE
+    )
+
+    # duplicate ref samples in df - 2 datasets and multiple replicates v2 ----
+
+    expect_error(
+      object = olink_norm_input_check_samples(
+        lst_df_samples = list(
+          "p1" = c("A", "A", "B", "B", "D", "D", "E", "E", "C", "F", "G", "H"),
+          "p2" = c("A", "A", "B", "C", "D", "E", "E", "G", "H", "I", "J", "K")
+        ),
+        lst_ref_samples = list(
+          "p1" = c("A", "B", "C", "D"),
+          "p2" = c("A", "B", "C", "D")
+        ),
+        lst_dup_samples = list(
+          "p1" = c("A", "B", "D", "E"),
+          "p2" = c("A", "E")
+        ),
+        norm_mode = "bridge"
+      ),
+      regexp = "* p1: A, B, and D\n* p2: A",
+      fixed = TRUE
+    )
   }
 )
 
@@ -5224,8 +4713,7 @@ test_that(
             lst_df = lst_df_v0,
             reference_medians = NULL,
             lst_cols = list(
-              "p1" = list(olink_id = "OlinkID",
-                          normalization = character(0L))
+              "p1" = list(olink_id = "OlinkID")
             ),
             norm_mode = olink_norm_modes$bridge
           )
@@ -5252,8 +4740,7 @@ test_that(
         lst_df = lst_df_v2,
         reference_medians = NULL,
         lst_cols = list(
-          "p1" = list(olink_id = "OlinkID",
-                      normalization = character(0L))
+          "p1" = list(olink_id = "OlinkID")
         ),
         norm_mode = olink_norm_modes$bridge
       ),
@@ -5269,7 +4756,7 @@ test_that(
     lst_df_v3 <- list(
       "p1" = lst_out <- npx_data1 |>
         dplyr::mutate(
-          OlinkID = dplyr::case_match(
+          OlinkID = dplyr::recode_values(
             .data[["OlinkID"]],
             "OID00471" ~ "OID00471A",
             "OID00472" ~ "OID00471B",
@@ -5279,7 +4766,7 @@ test_that(
             "OID00477" ~ "OID0047",
             "OID00478" ~ "OID00471#",
             "OID00479" ~ "OID00471&",
-            .default = .data[["OlinkID"]]
+            default = .data[["OlinkID"]]
           )
         )
     )
@@ -5289,8 +4776,7 @@ test_that(
         lst_df = lst_df_v3,
         reference_medians = NULL,
         lst_cols = list(
-          "p1" = list(olink_id = "OlinkID",
-                      normalization = character(0L))
+          "p1" = list(olink_id = "OlinkID")
         ),
         norm_mode = olink_norm_modes$bridge
       ),
@@ -5321,10 +4807,8 @@ test_that(
             lst_df = lst_df_v4,
             reference_medians = NULL,
             lst_cols = list(
-              "p1" = list(olink_id = "OlinkID",
-                          normalization = character(0L)),
-              "p2" = list(olink_id = "OlinkID",
-                          normalization = character(0L))
+              "p1" = list(olink_id = "OlinkID"),
+              "p2" = list(olink_id = "OlinkID")
             ),
             norm_mode = olink_norm_modes$bridge
           )
@@ -5357,10 +4841,8 @@ test_that(
         lst_df = lst_df_v5,
         reference_medians = NULL,
         lst_cols = list(
-          "p1" = list(olink_id = "OlinkID",
-                      normalization = character(0L)),
-          "p2" = list(olink_id = "OlinkID",
-                      normalization = character(0L))
+          "p1" = list(olink_id = "OlinkID"),
+          "p2" = list(olink_id = "OlinkID")
         ),
         norm_mode = olink_norm_modes$bridge
       ),
@@ -5380,7 +4862,7 @@ test_that(
     lst_df_v6 <- list(
       "p1" = npx_data1 |>
         dplyr::mutate(
-          OlinkID = dplyr::case_match(
+          OlinkID = dplyr::recode_values(
             .data[["OlinkID"]],
             "OID00471" ~ "OID00471A",
             "OID00472" ~ "OID00471B",
@@ -5390,12 +4872,12 @@ test_that(
             "OID00477" ~ "OID0047",
             "OID00478" ~ "OID00471#",
             "OID00479" ~ "OID00471&",
-            .default = .data[["OlinkID"]]
+            default = .data[["OlinkID"]]
           )
         ),
       "p2" = npx_data2 |>
         dplyr::mutate(
-          OlinkID = dplyr::case_match(
+          OlinkID = dplyr::recode_values(
             .data[["OlinkID"]],
             "OID01301" ~ "OID01301A",
             "OID01302" ~ "OID01302B",
@@ -5404,7 +4886,7 @@ test_that(
             "OID01305" ~ "OID01305E",
             "OID01306" ~ "OID0130",
             "OID01307" ~ "OID01307#",
-            .default = .data[["OlinkID"]]
+            default = .data[["OlinkID"]]
           )
         )
     )
@@ -5414,10 +4896,8 @@ test_that(
         lst_df = lst_df_v6,
         reference_medians = NULL,
         lst_cols = list(
-          "p1" = list(olink_id = "OlinkID",
-                      normalization = character(0L)),
-          "p2" = list(olink_id = "OlinkID",
-                      normalization = character(0L))
+          "p1" = list(olink_id = "OlinkID"),
+          "p2" = list(olink_id = "OlinkID")
         ),
         norm_mode = olink_norm_modes$bridge
       ),
@@ -5465,10 +4945,8 @@ test_that(
         lst_df = lst_df_v7,
         reference_medians = NULL,
         lst_cols = list(
-          "p1" = list(olink_id = "OlinkID",
-                      normalization = character(0L)),
-          "p2" = list(olink_id = "OlinkID",
-                      normalization = character(0L))
+          "p1" = list(olink_id = "OlinkID"),
+          "p2" = list(olink_id = "OlinkID")
         ),
         norm_mode = olink_norm_modes$bridge
       ),
@@ -5515,14 +4993,10 @@ test_that(
         lst_df = lst_df_v8,
         reference_medians = NULL,
         lst_cols = list(
-          "p1" = list(olink_id = "OlinkID",
-                      normalization = character(0L)),
-          "p2" = list(olink_id = "OlinkID",
-                      normalization = character(0L)),
-          "p3" = list(olink_id = "OlinkID",
-                      normalization = character(0L)),
-          "p4" = list(olink_id = "OlinkID",
-                      normalization = character(0L))
+          "p1" = list(olink_id = "OlinkID"),
+          "p2" = list(olink_id = "OlinkID"),
+          "p3" = list(olink_id = "OlinkID"),
+          "p4" = list(olink_id = "OlinkID")
         ),
         norm_mode = olink_norm_modes$bridge
       ),
@@ -5582,8 +5056,7 @@ test_that(
             lst_df = lst_df_v0,
             reference_medians = NULL,
             lst_cols = list(
-              "p1" = list(olink_id = "OlinkID",
-                          normalization = character(0L))
+              "p1" = list(olink_id = "OlinkID")
             ),
             norm_mode = olink_norm_modes$norm_cross_product
           )
@@ -5628,8 +5101,7 @@ test_that(
         lst_df = lst_df_v2,
         reference_medians = NULL,
         lst_cols = list(
-          "p1" = list(olink_id = "OlinkID",
-                      normalization = character(0L))
+          "p1" = list(olink_id = "OlinkID")
         ),
         norm_mode = olink_norm_modes$norm_cross_product
       ),
@@ -5667,8 +5139,7 @@ test_that(
             ),
             reference_medians = reference_medians_v0,
             lst_cols = list(
-              "p1" = list(olink_id = "OlinkID",
-                          normalization = character(0L))
+              "p1" = list(olink_id = "OlinkID")
             ),
             norm_mode = olink_norm_modes$ref_median
           )
@@ -5702,8 +5173,7 @@ test_that(
         ),
         reference_medians = reference_medians_v1,
         lst_cols = list(
-          "p1" = list(olink_id = "OlinkID",
-                      normalization = character(0L))
+          "p1" = list(olink_id = "OlinkID")
         ),
         norm_mode = olink_norm_modes$ref_median
       ),
@@ -5726,7 +5196,7 @@ test_that(
       dplyr::distinct() |>
       dplyr::mutate(
         Reference_NPX = 0.1,
-        OlinkID = dplyr::case_match(
+        OlinkID = dplyr::recode_values(
           .data[["OlinkID"]],
           "OID00471" ~ "OID00471A",
           "OID00472" ~ "OID00471B",
@@ -5736,7 +5206,7 @@ test_that(
           "OID00477" ~ "OID0047",
           "OID00478" ~ "OID00471#",
           "OID00479" ~ "OID00471&",
-          .default = .data[["OlinkID"]]
+          default = .data[["OlinkID"]]
         )
       )
 
@@ -5747,8 +5217,7 @@ test_that(
         ),
         reference_medians = reference_medians_v2,
         lst_cols = list(
-          "p1" = list(olink_id = "OlinkID",
-                      normalization = character(0L))
+          "p1" = list(olink_id = "OlinkID")
         ),
         norm_mode = olink_norm_modes$ref_median
       ),
@@ -5788,8 +5257,7 @@ test_that(
         ),
         reference_medians = reference_medians_v3,
         lst_cols = list(
-          "p1" = list(olink_id = "OlinkID",
-                      normalization = character(0L))
+          "p1" = list(olink_id = "OlinkID")
         ),
         norm_mode = olink_norm_modes$ref_median
       ),
@@ -5830,8 +5298,7 @@ test_that(
             OlinkID = paste0(.data[["OlinkID"]], "X")
           ),
         lst_cols = list(
-          "p1" = list(olink_id = "OlinkID",
-                      normalization = character(0L))
+          "p1" = list(olink_id = "OlinkID")
         ),
         norm_mode = olink_norm_modes$subset
       ),
@@ -6557,7 +6024,7 @@ test_that(
     expect_identical(
       object = lst_out$lst_df,
       expected = lapply(lst_df_v1, function(x) {
-        x |> # nolint return_linter
+        x |> # nolint: return_linter
           dplyr::filter(
             .data[["OlinkID"]] != "OID00471"
           )
@@ -6606,7 +6073,7 @@ test_that(
     expect_identical(
       object = lst_out$lst_df,
       expected = lapply(lst_df_v2, function(x) {
-        x |> # nolint return_linter
+        x |> # nolint: return_linter
           dplyr::filter(
             !(.data[["OlinkID"]] %in% c("OID00471", "OID00472",
                                         "OID00474", "OID00475",
@@ -6652,7 +6119,7 @@ test_that(
     expect_identical(
       object = lst_out$lst_df,
       expected = lapply(lst_df_v3, function(x) {
-        x |> # nolint return_linter
+        x |> # nolint: return_linter
           dplyr::filter(
             .data[["OlinkID"]] != "OID00471"
           )
@@ -6691,7 +6158,7 @@ test_that(
     expect_identical(
       object = lst_out$lst_df,
       expected = lapply(lst_df_v4, function(x) {
-        x |> # nolint return_linter
+        x |> # nolint: return_linter
           dplyr::filter(
             !(.data[["OlinkID"]] %in% c("OID01300", "OID01301",
                                         "OID01302", "OID01303",
@@ -6740,7 +6207,7 @@ test_that(
     expect_identical(
       object = lst_out$lst_df,
       expected = lapply(lst_df_v5, function(x) {
-        x |> # nolint return_linter
+        x |> # nolint: return_linter
           dplyr::filter(
             !(.data[["OlinkID"]] %in% c("OID01300", "OID01301",
                                         "OID01302", "OID01303",
@@ -6955,10 +6422,8 @@ test_that(
           "p2" = npx_data2
         ),
         lst_cols = list(
-          "p1" = list(olink_id = "OlinkID",
-                      normalization = character(0L)),
-          "p2" = list(olink_id = "OlinkID",
-                      normalization = character(0L))
+          "p1" = list(olink_id = "OlinkID"),
+          "p2" = list(olink_id = "OlinkID")
         )
       ),
       regexp = "Column `Normalization` not present in all datasets."
@@ -6974,8 +6439,7 @@ test_that(
             )
         ),
         lst_cols = list(
-          "p1" = list(olink_id = "OlinkID",
-                      normalization = character(0L)),
+          "p1" = list(olink_id = "OlinkID"),
           "p2" = list(olink_id = "OlinkID",
                       normalization = "Normalization")
         )

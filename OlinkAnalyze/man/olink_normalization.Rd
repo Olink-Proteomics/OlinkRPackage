@@ -13,7 +13,9 @@ olink_normalization(
   df2_project_nr = "P2",
   reference_project = "P1",
   reference_medians = NULL,
-  format = FALSE
+  format = FALSE,
+  df1_check_log = NULL,
+  df2_check_log = NULL
 )
 }
 \arguments{
@@ -43,6 +45,12 @@ Required for reference median normalization.}
 
 \item{format}{Boolean that controls whether the normalized dataset will be
 formatted for input to downstream analysis.}
+
+\item{df1_check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df1}.}
+
+\item{df2_check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df2}.}
 }
 \value{
 Tibble or ArrowObject with the normalized dataset.
@@ -121,7 +129,6 @@ normalized values is more suitable for downstream analysis.
 }
 \examples{
 \donttest{
-
 # prepare datasets
 npx_df1 <- npx_data1 |>
   dplyr::mutate(
@@ -131,6 +138,11 @@ npx_df2 <- npx_data2 |>
   dplyr::mutate(
     Normalization = "Intensity"
   )
+
+# check datasets
+
+npx_df1_check <- check_npx(df = npx_df1)
+npx_df2_check <- check_npx(df = npx_df2)
 
 # bridge normalization
 
@@ -146,7 +158,9 @@ olink_normalization(
   overlapping_samples_df1 = overlap_samples,
   df1_project_nr = "P1",
   df2_project_nr = "P2",
-  reference_project = "P1"
+  reference_project = "P1",
+  df1_check_log = npx_df1_check,
+  df2_check_log = npx_df2_check
 )
 
 # subset normalization
@@ -201,7 +215,9 @@ olink_normalization(
   overlapping_samples_df2 = df2_subset,
   df1_project_nr = "P1",
   df2_project_nr = "P2",
-  reference_project = "P1"
+  reference_project = "P1",
+  df1_check_log = npx_df1_check,
+  df2_check_log = npx_df2_check
 )
 
 # special case of subset normalization using all samples
@@ -212,7 +228,9 @@ olink_normalization(
   overlapping_samples_df2 = df2_samples,
   df1_project_nr = "P1",
   df2_project_nr = "P2",
-  reference_project = "P1"
+  reference_project = "P1",
+  df1_check_log = npx_df1_check,
+  df2_check_log = npx_df2_check
 )
 
 # reference median normalization
@@ -235,7 +253,8 @@ ref_med_df <- npx_data1 |>
 olink_normalization(
   df1 = npx_df1,
   overlapping_samples_df1 = df1_subset,
-  reference_medians = ref_med_df
+  reference_medians = ref_med_df,
+  df1_check_log = npx_df1_check
 )
 
 # cross-product normalization
@@ -247,6 +266,11 @@ overlap_samples_product <- intersect(
 ) |>
   (\(.) .[!grepl("CONTROL", .)])()
 
+# check datasets
+
+npx_ht_check <- check_npx(df = OlinkAnalyze:::data_ht_small)
+npx_3k_check <- check_npx(df = OlinkAnalyze:::data_3k_small)
+
 # normalize
 olink_normalization(
   df1 = OlinkAnalyze:::data_ht_small,
@@ -255,7 +279,9 @@ olink_normalization(
   df1_project_nr = "proj_ht",
   df2_project_nr = "proj_3k",
   reference_project = "proj_ht",
-  format = FALSE
+  format = FALSE,
+  df1_check_log = npx_ht_check,
+  df2_check_log = npx_3k_check
 )
 }
 

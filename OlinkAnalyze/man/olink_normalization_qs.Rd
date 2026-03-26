@@ -53,7 +53,6 @@ Olink Explore 3072 and Olink Explore HT) by performing the following
 steps: \cr
 
 \itemize{
-
 \item An empirical cumulative distribution function is used to map
 datapoints for the bridging samples from one product to the equivalent
 space in the other product.
@@ -62,7 +61,6 @@ and mapped data from one product, using anchor points from the
 quantiles defined above.
 \item The spline regression model is used to predict the normalized
 NPX values for all datapoints
-
 }
 
 More information on quantile smoothing and between product normalization
@@ -77,10 +75,21 @@ bridge_samples <- intersect(
 ) |>
   (\(x) x[!grepl("CONTROL", x)])()
 
+# check_npx
+data_ht_small_check <- OlinkAnalyze::check_npx(
+  df = OlinkAnalyze:::data_ht_small
+)
+
+data_3k_small_check <- OlinkAnalyze::check_npx(
+  df = OlinkAnalyze:::data_3k_small
+)
+
 # Run the internal function olink_norm_input_check
 check_norm <- OlinkAnalyze:::olink_norm_input_check(
   df1 = OlinkAnalyze:::data_ht_small,
+  df1_check_log = data_ht_small_check,
   df2 = OlinkAnalyze:::data_3k_small,
+  df2_check_log = data_3k_small_check,
   overlapping_samples_df1 = bridge_samples,
   overlapping_samples_df2 = NULL,
   df1_project_nr = "P1",
@@ -96,15 +105,15 @@ lst_df <- list(
 )
 names(lst_df) <- c(check_norm$ref_name, check_norm$not_ref_name)
 
-ref_cols <- check_norm$ref_cols
-not_ref_cols <- check_norm$not_ref_cols
+ref_cols <- check_norm$ref_check_log$col_names
+not_ref_cols <- check_norm$not_ref_check_log$col_names
 
 qs_result <- OlinkAnalyze:::olink_normalization_qs(
- lst_df = lst_df,
- ref_cols = ref_cols,
- not_ref_cols = not_ref_cols,
- bridge_samples = bridge_samples,
- prod_uniq = c("E3072","HT")
+  lst_df = lst_df,
+  ref_cols = ref_cols,
+  not_ref_cols = not_ref_cols,
+  bridge_samples = bridge_samples,
+  prod_uniq = c("E3072", "HT")
 )
 }
 

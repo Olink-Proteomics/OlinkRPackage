@@ -84,6 +84,10 @@
 #' Required for reference median normalization.
 #' @param format Boolean that controls whether the normalized dataset will be
 #' formatted for input to downstream analysis.
+#' @param df1_check_log A named list returned by [`check_npx()`]. If `NULL`,
+#' [`check_npx()`] will be run internally using `df1`.
+#' @param df2_check_log A named list returned by [`check_npx()`]. If `NULL`,
+#' [`check_npx()`] will be run internally using `df2`.
 #'
 #' @return Tibble or ArrowObject with the normalized dataset.
 #'
@@ -91,7 +95,6 @@
 #'
 #' @examples
 #' \donttest{
-#'
 #' # prepare datasets
 #' npx_df1 <- npx_data1 |>
 #'   dplyr::mutate(
@@ -101,6 +104,11 @@
 #'   dplyr::mutate(
 #'     Normalization = "Intensity"
 #'   )
+#'
+#' # check datasets
+#'
+#' npx_df1_check <- check_npx(df = npx_df1)
+#' npx_df2_check <- check_npx(df = npx_df2)
 #'
 #' # bridge normalization
 #'
@@ -116,7 +124,9 @@
 #'   overlapping_samples_df1 = overlap_samples,
 #'   df1_project_nr = "P1",
 #'   df2_project_nr = "P2",
-#'   reference_project = "P1"
+#'   reference_project = "P1",
+#'   df1_check_log = npx_df1_check,
+#'   df2_check_log = npx_df2_check
 #' )
 #'
 #' # subset normalization
@@ -171,7 +181,9 @@
 #'   overlapping_samples_df2 = df2_subset,
 #'   df1_project_nr = "P1",
 #'   df2_project_nr = "P2",
-#'   reference_project = "P1"
+#'   reference_project = "P1",
+#'   df1_check_log = npx_df1_check,
+#'   df2_check_log = npx_df2_check
 #' )
 #'
 #' # special case of subset normalization using all samples
@@ -182,7 +194,9 @@
 #'   overlapping_samples_df2 = df2_samples,
 #'   df1_project_nr = "P1",
 #'   df2_project_nr = "P2",
-#'   reference_project = "P1"
+#'   reference_project = "P1",
+#'   df1_check_log = npx_df1_check,
+#'   df2_check_log = npx_df2_check
 #' )
 #'
 #' # reference median normalization
@@ -205,7 +219,8 @@
 #' olink_normalization(
 #'   df1 = npx_df1,
 #'   overlapping_samples_df1 = df1_subset,
-#'   reference_medians = ref_med_df
+#'   reference_medians = ref_med_df,
+#'   df1_check_log = npx_df1_check
 #' )
 #'
 #' # cross-product normalization
@@ -217,6 +232,11 @@
 #' ) |>
 #'   (\(.) .[!grepl("CONTROL", .)])()
 #'
+#' # check datasets
+#'
+#' npx_ht_check <- check_npx(df = OlinkAnalyze:::data_ht_small)
+#' npx_3k_check <- check_npx(df = OlinkAnalyze:::data_3k_small)
+#'
 #' # normalize
 #' olink_normalization(
 #'   df1 = OlinkAnalyze:::data_ht_small,
@@ -225,7 +245,9 @@
 #'   df1_project_nr = "proj_ht",
 #'   df2_project_nr = "proj_3k",
 #'   reference_project = "proj_ht",
-#'   format = FALSE
+#'   format = FALSE,
+#'   df1_check_log = npx_ht_check,
+#'   df2_check_log = npx_3k_check
 #' )
 #' }
 #'
@@ -237,12 +259,16 @@ olink_normalization <- function(df1,
                                 df2_project_nr = "P2",
                                 reference_project = "P1",
                                 reference_medians = NULL,
-                                format = FALSE) {
+                                format = FALSE,
+                                df1_check_log = NULL,
+                                df2_check_log = NULL) {
 
   # check input ----
   lst_check <- olink_norm_input_check(
     df1 = df1,
+    df1_check_log = df1_check_log,
     df2 = df2,
+    df2_check_log = df2_check_log,
     overlapping_samples_df1 = overlapping_samples_df1,
     overlapping_samples_df2 = overlapping_samples_df2,
     df1_project_nr = df1_project_nr,
@@ -260,7 +286,7 @@ olink_normalization <- function(df1,
       ref_df = lst_check$ref_df,
       ref_samples = lst_check$ref_samples,
       ref_name = lst_check$ref_name,
-      ref_cols = lst_check$ref_cols,
+      ref_cols = lst_check$ref_check_log$col_names,
       reference_medians = lst_check$reference_medians
     )
 
@@ -269,16 +295,12 @@ olink_normalization <- function(df1,
 
     # update selected colnames of not_ref_df based on colnames of ref_df
     lst_check$not_ref_df <- norm_internal_rename_cols(
-      ref_cols = lst_check$ref_cols,
-      not_ref_cols = lst_check$not_ref_cols,
+      ref_cols = lst_check$ref_check_log$col_names,
+      not_ref_cols = lst_check$not_ref_check_log$col_names,
       not_ref_df = lst_check$not_ref_df
     )
     # update not_ref_cols, which is the non-reference df
-    lst_check$not_ref_cols <- olink_norm_input_check_df_cols(
-      lst_df = list(
-        "non_ref" = lst_check$not_ref_df
-      )
-    )[[1L]] |>
+    lst_check$not_ref_check_log <- check_npx(df = lst_check$not_ref_df) |>
       suppressWarnings() |>
       suppressMessages()
 
@@ -291,10 +313,10 @@ olink_normalization <- function(df1,
         ref_df = lst_check$ref_df,
         ref_samples = lst_check$ref_samples,
         ref_name = lst_check$ref_name,
-        ref_cols = lst_check$ref_cols,
+        ref_cols = lst_check$ref_check_log$col_names,
         not_ref_df = lst_check$not_ref_df,
         not_ref_name = lst_check$not_ref_name,
-        not_ref_cols = lst_check$not_ref_cols
+        not_ref_cols = lst_check$not_ref_check_log$col_names
       )
 
     } else if (lst_check$norm_mode == olink_norm_modes$norm_cross_product) {
@@ -304,11 +326,11 @@ olink_normalization <- function(df1,
         ref_df = lst_check$ref_df,
         ref_samples = lst_check$ref_samples,
         ref_name = lst_check$ref_name,
-        ref_cols = lst_check$ref_cols,
+        ref_cols = lst_check$ref_check_log$col_names,
         prod_uniq = c(lst_check$not_ref_product, lst_check$ref_product),
         not_ref_df = lst_check$not_ref_df,
         not_ref_name = lst_check$not_ref_name,
-        not_ref_cols = lst_check$not_ref_cols
+        not_ref_cols = lst_check$not_ref_check_log$col_names
       )
 
     } else if (lst_check$norm_mode == olink_norm_modes$subset) {
@@ -318,11 +340,11 @@ olink_normalization <- function(df1,
         ref_df = lst_check$ref_df,
         ref_samples = lst_check$ref_samples,
         ref_name = lst_check$ref_name,
-        ref_cols = lst_check$ref_cols,
+        ref_cols = lst_check$ref_check_log$col_names,
         not_ref_df = lst_check$not_ref_df,
         not_ref_samples = lst_check$not_ref_samples,
         not_ref_name = lst_check$not_ref_name,
-        not_ref_cols = lst_check$not_ref_cols
+        not_ref_cols = lst_check$not_ref_check_log$col_names
       )
 
     }
@@ -345,7 +367,7 @@ olink_normalization <- function(df1,
 
   df_norm <- norm_internal_update_maxlod(
     df = df_norm,
-    cols = lst_check$ref_cols
+    cols = lst_check$ref_check_log$col_names
   )
 
   # format output dataset ----
@@ -388,7 +410,13 @@ norm_internal_rename_cols <- function(ref_cols,
                                       not_ref_df) {
 
   # only these columns can be updated to the reference df
-  cols_to_update <- c("panel_version", "qc_warn", "assay_warn")
+  cols_to_update <- column_name_dict |>
+    dplyr::filter(
+      .data[["is_updatable"]] == TRUE
+    ) |>
+    dplyr::pull(
+      .data[["col_key"]]
+    )
 
   # tibble with 2 columns, one from reference and the other one from the
   # non-reference df. Used next to rename all columns of non-reference df
@@ -398,7 +426,7 @@ norm_internal_rename_cols <- function(ref_cols,
       if (length(ref_cols[[c_to_u]]) != length(not_ref_cols[[c_to_u]])
           && all(c(length(ref_cols[[c_to_u]]),
                    length(not_ref_cols[[c_to_u]])) != 0L)) {
-        cli::cli_abort(  # nolint return_linter
+        cli::cli_abort(  # nolint: return_linter
           c(
             "x" = "Cannot rename {cli::qty(not_ref_cols[[c_to_u]])}
             column{?s} {.val {not_ref_cols[[c_to_u]]}}, with
@@ -408,15 +436,18 @@ norm_internal_rename_cols <- function(ref_cols,
           )
         )
       } else {
-        dplyr::tibble(ref = ref_cols[[c_to_u]], # nolint return_linter
+        dplyr::tibble(ref = ref_cols[[c_to_u]], # nolint: return_linter
                       non_ref = not_ref_cols[[c_to_u]])
       }
     } else {
-      dplyr::tibble(ref = not_ref_cols[[c_to_u]], # nolint return_linter
+      dplyr::tibble(ref = not_ref_cols[[c_to_u]], # nolint: return_linter
                     non_ref = not_ref_cols[[c_to_u]])
     }
   }) |>
-    dplyr::bind_rows()
+    dplyr::bind_rows() |>
+    # drop rows where ref or non_ref are NA, which means that the column is not
+    # present in one of the datasets and thus cannot be renamed
+    tidyr::drop_na()
 
   # rename columns from non-reference df
   not_ref_df <- not_ref_df |>
@@ -477,7 +508,7 @@ norm_internal_assay_median <- function(df,
       )
     ) |>
     dplyr::summarise(
-      assay_med = median(x = .data[[cols$quant]], na.rm = TRUE),
+      assay_med = stats::median(x = .data[[cols$quant]], na.rm = TRUE),
       .groups = "drop"
     )
 
@@ -616,7 +647,7 @@ norm_internal_bridge <- function(ref_df,
       )
     ) |>
     dplyr::summarise(
-      Adj_factor = median(x = .data[["quant_diff"]], na.rm = TRUE),
+      Adj_factor = stats::median(x = .data[["quant_diff"]], na.rm = TRUE),
       .groups = "drop"
     ) |>
     dplyr::mutate(
@@ -697,7 +728,7 @@ norm_internal_cross_product <- function(ref_df,
     lst_df = lst_df |> # keep only bridge samples
       lapply(
         function(l_df) {
-          l_df |> # nolint return_linter
+          l_df |> # nolint: return_linter
             dplyr::filter(
               .data[[ref_cols$sample_id]] %in% .env[["ref_samples"]]
             )
@@ -1010,8 +1041,11 @@ norm_internal_adjust_not_ref <- function(df,
 norm_internal_update_maxlod <- function(df,
                                         cols) {
 
+  maxlod_cols <- get_alt_colnames(col_key = "lod") |>
+    (\(.) .[grepl(pattern = "max", x = ., ignore.case = TRUE)])()
+
   # check if MaxLOD is present in the column names
-  if (any(names(df) %in% olink_norm_recalc$max_lod)) {
+  if (any(names(df) %in% maxlod_cols)) {
 
     # update MaxLOD to the maximum of the MaxLODs for each assay
     df_update_maxlod <- df |>
@@ -1020,7 +1054,7 @@ norm_internal_update_maxlod <- function(df,
       ) |>
       dplyr::mutate(
         dplyr::across(
-          dplyr::any_of(olink_norm_recalc$max_lod),
+          dplyr::any_of(maxlod_cols),
           ~ max(.x, na.rm = TRUE)
         )
       ) |>
