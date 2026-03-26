@@ -195,7 +195,7 @@ test_that("olink_boxplot works - vdiffr", {
     boxplot_time_posthoc_name,
     boxplot_time_posthoc
   )
-  # ---- Time + Posthoc ----
+  # ---- Time + ttest ----
   boxplot_site_ttest_name <- "boxplot site and ttest"
   check_snap_exist(
     test_dir_name = "olink_boxplot",
