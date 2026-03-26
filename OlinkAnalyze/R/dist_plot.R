@@ -117,16 +117,29 @@ olink_dist_plot <- function(df,
 
   # Format Panel names
   df <- df |>
-    dplyr::mutate(!!check_log$col_names$panel :=
-                    .data[[check_log$col_names$panel]] |>
-                    stringr::str_replace("Olink ", ""))
+    dplyr::mutate(
+      !!check_log$col_names$panel := stringr::str_replace(
+        string = .data[[check_log$col_names$panel]],
+        pattern = "Olink ",
+        replacement = ""
+      )
+    )
 
   # If QC selected to plot
   # If not all are Pass, the QC_Warning is set as warning for plotting purposes
   if (color_g %in% column_name_dict$col_names$qc_warning) {
 
     df <- df |>
-      dplyr::group_by(.data[["SampleID"]], .data[["Panel"]]) |>
+      dplyr::group_by(
+        dplyr::pick(
+          dplyr::all_of(
+            c(
+              check_log$col_names$sample_id,
+              check_log$col_names$panel
+            )
+          )
+        )
+      ) |>
       dplyr::mutate(
         !!check_log$col_names$qc_warning := dplyr::if_else(
           all(
