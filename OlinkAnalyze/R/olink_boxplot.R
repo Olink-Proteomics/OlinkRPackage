@@ -152,6 +152,7 @@ olink_boxplot <- function(df,
       )
   }
   if (!is.null(ttest_results)) {
+ttest_results <- ttest_results |>
     dplyr::mutate(
       Name_OID = forcats::as_factor(
         paste(.data[["Assay"]], .data[["OlinkID"]])
