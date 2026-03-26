@@ -43,5 +43,6 @@ olink_dist_plot(cleaned_data,
                 color_g = "QC_Warning")
 
 }
+
 }
 \keyword{NPX}

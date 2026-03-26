@@ -11,9 +11,12 @@
 #' @param color_g Character value indicating which column to use as fill color.
 #' (default: QC_Warning).
 #' @param ... Color option passed to specify color order.
+#'
 #' @return An object of class "ggplot" which displays NPX distribution
 #' for each sample per panel
+#'
 #' @keywords NPX
+#'
 #' @export
 #' @examples
 #' \donttest{
@@ -31,12 +34,7 @@
 #'                 color_g = "QC_Warning")
 #'
 #' }
-#' @importFrom dplyr filter mutate group_by ungroup if_else
-#' @importFrom stats reorder
-#' @importFrom ggplot2 ggplot aes scale_x_discrete geom_boxplot xlab facet_wrap
-#' @importFrom stringr str_replace str_detect
-#' @importFrom rlang ensym
-
+#'
 olink_dist_plot <- function(df,
                             check_log = NULL,
                             color_g = "QC_Warning", # nolint: object_name_linter
