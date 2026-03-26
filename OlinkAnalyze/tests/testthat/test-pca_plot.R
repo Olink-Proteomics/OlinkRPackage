@@ -1,28 +1,4 @@
-set.seed(10)
-
-# Load reference results
-ref_results <- get_example_data("reference_results.rds")
-
-# Load data with unique SampleID
-npx_data1_uniqueid <- npx_data1 |>
-  dplyr::mutate(
-    SampleID = paste(.data[["SampleID"]], "_", Index, sep = "")
-  )
-
-check_log_uniqueid <- check_npx(npx_data1_uniqueid) |>
-  suppressMessages() |>
-  suppressWarnings()
-
-# Load data with unique SampleID and complete treatment
-npx_data1_treatment <- npx_data1 |>
-  dplyr::mutate(
-    SampleID = paste(.data[["SampleID"]], "_", Index, sep = "")
-  ) |>
-  dplyr::filter(!is.na(.data[["Treatment"]]))
-
-check_log_treatment <- check_npx(npx_data1_treatment) |>
-  suppressMessages() |>
-  suppressWarnings()
+# Test olink_pca_plot ----
 
 test_that(
   "olink_pca_plot - works - OSI",
@@ -52,7 +28,8 @@ test_that(
           object = olink_pca_plot(
             df = df_bad_cat,
             color_g = "QC_Warning",
-            check_log = df_bad_cat_check
+            check_log = df_bad_cat_check,
+            quiet = TRUE
           )
         )
       )
@@ -64,7 +41,8 @@ test_that(
           object = olink_pca_plot(
             df = df_bad_cat,
             color_g = "OSICategory",
-            check_log = df_bad_cat_check
+            check_log = df_bad_cat_check,
+            quiet = TRUE
           )
         )
       ),
@@ -83,7 +61,8 @@ test_that(
         color_g = "OSICategory",
         check_log = check_npx(df = df_cat_all_na) |>
           suppressMessages() |>
-          suppressWarnings()
+          suppressWarnings(),
+        quiet = TRUE
       ),
       regexp = paste(
         "All values are 'NA' in the column \"OSICategory\" of the",
@@ -109,7 +88,8 @@ test_that(
         color_g = "OSITimeToCentrifugation",
         check_log = check_npx(df = df_bad_cont_nonnum) |>
           suppressMessages() |>
-          suppressWarnings()
+          suppressWarnings(),
+        quiet = TRUE
       ),
       regexp = paste(
         "Non-numeric values detected in column",
@@ -129,7 +109,8 @@ test_that(
         color_g = "OSISummary",
         check_log = check_npx(df = df_cont_all_na) |>
           suppressMessages() |>
-          suppressWarnings()
+          suppressWarnings(),
+        quiet = TRUE
       ),
       regexp = paste(
         "All values are 'NA' in the column \"OSISummary\" of the",
@@ -151,7 +132,8 @@ test_that(
           object = olink_pca_plot(
             df = osi_data,
             color_g = "OSICategory",
-            check_log = check_log
+            check_log = check_log,
+            quiet = TRUE
           )
         )
       )
@@ -163,7 +145,8 @@ test_that(
           object = olink_pca_plot(
             df = osi_data,
             color_g = "OSISummary",
-            check_log = check_log
+            check_log = check_log,
+            quiet = TRUE
           )
         )
       )
@@ -175,7 +158,8 @@ test_that(
           object = olink_pca_plot(
             df = osi_data,
             color_g = "OSIPreparationTemperature",
-            check_log = check_log
+            check_log = check_log,
+            quiet = TRUE
           )
         )
       )
@@ -187,7 +171,8 @@ test_that(
           object = olink_pca_plot(
             df = osi_data,
             color_g = "OSITimeToCentrifugation",
-            check_log = check_log
+            check_log = check_log,
+            quiet = TRUE
           )
         )
       )
@@ -200,6 +185,18 @@ test_that(
   {
     skip_if_not_installed(pkg = "ggplot2", minimum_version = "3.4.0")
     skip_if_not_installed(pkg = c("ggrepel"))
+
+    withr::local_seed(10)
+
+    # Load data with unique SampleID
+    npx_data1_uniqueid <- npx_data1 |>
+      dplyr::mutate(
+        SampleID = paste(.data[["SampleID"]], "_", .data[["Index"]], sep = "")
+      )
+
+    check_log_uniqueid <- check_npx(df = npx_data1_uniqueid) |>
+      suppressMessages() |>
+      suppressWarnings()
 
     # -------------------------------
     # Test dropped assays and samples
@@ -270,6 +267,33 @@ test_that(
     skip_if_not_installed(pkg = c("vdiffr"))
     skip_if_not_installed(pkg = c("ggrepel"))
     skip_on_cran()
+
+    # Load reference results
+    # tests are skipped if files are absent
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
+    withr::local_seed(10)
+
+    # Load data with unique SampleID
+    npx_data1_uniqueid <- npx_data1 |>
+      dplyr::mutate(
+        SampleID = paste(.data[["SampleID"]], "_", .data[["Index"]], sep = "")
+      )
+
+    check_log_uniqueid <- check_npx(df = npx_data1_uniqueid) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # Load data with unique SampleID and complete treatment
+    npx_data1_treatment <- npx_data1 |>
+      dplyr::mutate(
+        SampleID = paste(.data[["SampleID"]], "_", .data[["Index"]], sep = "")
+      ) |>
+      dplyr::filter(!is.na(.data[["Treatment"]]))
+
+    check_log_treatment <- check_npx(df = npx_data1_treatment) |>
+      suppressMessages() |>
+      suppressWarnings()
 
     # --------
     # PCA plot
@@ -382,7 +406,7 @@ test_that(
         check_log = check_log_treatment,
         color_g = "Treatment",
         loadings_list = {
-          ref_results$t_test |>
+          reference_results$t_test |>
             utils::head(5) |>
             dplyr::pull(.data[["OlinkID"]])
         },
@@ -403,12 +427,110 @@ test_that(
 )
 
 test_that(
+  "olink_pca_plot - works - Minimal PCA plot",
+  {
+    skip_if_not_installed(pkg = "ggplot2", minimum_version = "3.4.0")
+    skip_if_not_installed(pkg = c("vdiffr"))
+    skip_if_not_installed(pkg = c("ggrepel"))
+    skip_on_cran()
+
+    withr::local_seed(10)
+
+    # Load data with unique SampleID
+    npx_data1_uniqueid <- npx_data1 |>
+      dplyr::mutate(
+        SampleID = paste(.data[["SampleID"]], "_", .data[["Index"]], sep = "")
+      )
+
+    check_log_uniqueid <- check_npx(df = npx_data1_uniqueid) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    pca_plot <- npx_data1_uniqueid |>
+      olink_pca_plot(
+        check_log = check_log_uniqueid,
+        label_outliers = FALSE,
+        quiet = TRUE
+      )
+
+    pca_mini_plot_name <- "PCA plot - not label outliers"
+    check_snap_exist(
+      test_dir_name = "pca_plot",
+      snap_name = pca_mini_plot_name
+    )
+    vdiffr::expect_doppelganger(
+      pca_mini_plot_name,
+      pca_plot[[1]]
+    )
+
+    pca_plot_outliers <- npx_data1_uniqueid |>
+      olink_pca_plot(
+        check_log = check_log_uniqueid,
+        label_outliers = TRUE,
+        quiet = TRUE
+      )
+
+    pca_plot_outliers_name <- "PCA plot - label outliers"
+    check_snap_exist(
+      test_dir_name = "pca_plot",
+      snap_name = pca_plot_outliers_name
+    )
+    vdiffr::expect_doppelganger(
+      pca_plot_outliers_name,
+      pca_plot_outliers[[1]]
+    )
+
+    # Remove index
+    npx_data_reindex <- npx_data1 |>
+      dplyr::mutate(
+        SampleID = paste(SampleID, "_", Index, sep = ""),
+        Index = dplyr::if_else(
+          Panel == "Olink Cardiometabolic", Index + 1L, Index
+        )
+      )
+    check_log_reindex <- check_npx(npx_data_reindex) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    pca_plot_reindex <- olink_pca_plot(
+      df = npx_data_reindex,
+      check_log = check_log_reindex,
+      quiet = TRUE
+    )
+
+    expect_true(all(
+      abs(sort(pca_plot_reindex[[1]]$data$PCX) -
+            sort(pca_plot[[1]]$data$PCX)) == 0L
+    ))
+
+    expect_true(all(
+      abs(sort(pca_plot_reindex[[1]]$data$PCY) -
+            sort(pca_plot[[1]]$data$PCY)) == 0L
+    ))
+  }
+)
+
+# Test olink_pca_plot.internal ----
+
+test_that(
   "olink_pca_plot.internal - works",
   {
     skip_if_not_installed(pkg = "ggplot2", minimum_version = "3.4.0")
     skip_if_not_installed(pkg = c("vdiffr"))
     skip_if_not_installed(pkg = c("ggrepel"))
     skip_on_cran()
+
+    withr::local_seed(10)
+
+    # Load data with unique SampleID
+    npx_data1_uniqueid <- npx_data1 |>
+      dplyr::mutate(
+        SampleID = paste(.data[["SampleID"]], "_", .data[["Index"]], sep = "")
+      )
+
+    check_log_uniqueid <- check_npx(df = npx_data1_uniqueid) |>
+      suppressMessages() |>
+      suppressWarnings()
 
     # -----------------
     # PCA plot internal
@@ -489,30 +611,43 @@ test_that(
   }
 )
 
-
-# PCA calculation output order 1
-# With set local
-
-old_collate <- Sys.getlocale("LC_COLLATE")
-Sys.setlocale("LC_COLLATE", "C")
-
-locale_outside <- Sys.getlocale(category = "LC_ALL")
-
-pca_outside <- npx_data1_uniqueid |>
-  npxProcessing_forDimRed(check_log = check_log_uniqueid) |>
-  olink_calculate_pca()
-
-locale_outside <- Sys.getlocale(category = "LC_ALL")
-Sys.setlocale("LC_COLLATE", old_collate)
+# Test olink_calculate_pca ----
 
 test_that(
   "olink_calculate_pca - works - output order",
   {
     skip_if_not(file.exists(test_path("_snaps", "pca_plot.md")))
     skip_if_not_installed(pkg = "ggplot2", minimum_version = "3.4.0")
-    skip_if_not_installed(pkg = c("vdiffr"))
     skip_if_not_installed(pkg = c("ggrepel"))
     skip_on_cran()
+
+    withr::local_seed(10)
+
+    # Load data with unique SampleID
+    npx_data1_uniqueid <- npx_data1 |>
+      dplyr::mutate(
+        SampleID = paste(.data[["SampleID"]], "_", .data[["Index"]], sep = "")
+      )
+
+    check_log_uniqueid <- check_npx(df = npx_data1_uniqueid) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # ------------------------------
+    # PCA outside with Locale
+    # ------------------------------
+
+    old_collate <- Sys.getlocale("LC_COLLATE")
+    Sys.setlocale("LC_COLLATE", "C")
+
+    locale_outside <- Sys.getlocale(category = "LC_ALL")
+
+    pca_outside <- npx_data1_uniqueid |>
+      npxProcessing_forDimRed(check_log = check_log_uniqueid) |>
+      olink_calculate_pca()
+
+    locale_outside <- Sys.getlocale(category = "LC_ALL")
+    Sys.setlocale("LC_COLLATE", old_collate)
 
     # ------------------------------
     # PCA calculation output order 2
@@ -538,14 +673,34 @@ test_that(
   }
 )
 
-# Without set local
-pca_outside <- npx_data1_uniqueid |>
-  npxProcessing_forDimRed(check_log = check_log_uniqueid) |>
-  olink_calculate_pca()
-
 test_that(
-  "PCA calculation - output order 2 & output values",
+  "olink_calculate_pca - output order 2 & output values",
   {
+    skip_if_not_installed(pkg = "ggplot2", minimum_version = "3.4.0")
+    skip_if_not_installed(pkg = c("ggrepel"))
+    skip_on_cran()
+
+    withr::local_seed(10)
+
+    # Load data with unique SampleID
+    npx_data1_uniqueid <- npx_data1 |>
+      dplyr::mutate(
+        SampleID = paste(.data[["SampleID"]], "_", .data[["Index"]], sep = "")
+      )
+
+    check_log_uniqueid <- check_npx(df = npx_data1_uniqueid) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # ------------------------------
+    # PCA outside with Locale
+    # ------------------------------
+
+    # Without set local
+    pca_outside <- npx_data1_uniqueid |>
+      npxProcessing_forDimRed(check_log = check_log_uniqueid) |>
+      olink_calculate_pca()
+
     pca <- npx_data1_uniqueid |>
       npxProcessing_forDimRed(check_log = check_log_uniqueid) |>
       olink_calculate_pca()
@@ -578,12 +733,24 @@ test_that(
 )
 
 test_that(
-  "PCA basic plotting",
+  "olink_calculate_pca - PCA basic plotting",
   {
     skip_if_not_installed(pkg = "ggplot2", minimum_version = "3.4.0")
     skip_if_not_installed(pkg = c("vdiffr"))
     skip_if_not_installed(pkg = c("ggrepel"))
     skip_on_cran()
+
+    withr::local_seed(10)
+
+    # Load data with unique SampleID
+    npx_data1_uniqueid <- npx_data1 |>
+      dplyr::mutate(
+        SampleID = paste(.data[["SampleID"]], "_", .data[["Index"]], sep = "")
+      )
+
+    check_log_uniqueid <- check_npx(df = npx_data1_uniqueid) |>
+      suppressMessages() |>
+      suppressWarnings()
 
     pca_input <- npx_data1_uniqueid |>
       npxProcessing_forDimRed(check_log = check_log_uniqueid) |>
@@ -605,89 +772,19 @@ test_that(
   }
 )
 
-test_that(
-  "Minimal PCA plot",
-  {
-    skip_if_not_installed(pkg = "ggplot2", minimum_version = "3.4.0")
-    skip_if_not_installed(pkg = c("vdiffr"))
-    skip_if_not_installed(pkg = c("ggrepel"))
-    skip_on_cran()
-
-    pca_plot <- npx_data1_uniqueid |>
-      olink_pca_plot(
-        check_log = check_log_uniqueid,
-        label_outliers = FALSE,
-        quiet = TRUE
-      )
-
-    pca_mini_plot_name <- "PCA plot - not label outliers"
-    check_snap_exist(
-      test_dir_name = "pca_plot",
-      snap_name = pca_mini_plot_name
-    )
-    vdiffr::expect_doppelganger(
-      pca_mini_plot_name,
-      pca_plot[[1]]
-    )
-
-    pca_plot_outliers <- npx_data1_uniqueid |>
-      olink_pca_plot(
-        check_log = check_log_uniqueid,
-        label_outliers = TRUE,
-        quiet = TRUE
-      )
-
-    pca_plot_outliers_name <- "PCA plot - label outliers"
-    check_snap_exist(
-      test_dir_name = "pca_plot",
-      snap_name = pca_plot_outliers_name
-    )
-    vdiffr::expect_doppelganger(
-      pca_plot_outliers_name,
-      pca_plot_outliers[[1]]
-    )
-
-    # Remove index
-    npx_data_reindex <- npx_data1 |>
-      dplyr::mutate(
-        SampleID = paste(SampleID, "_", Index, sep = ""),
-        Index = dplyr::if_else(
-          Panel == "Olink Cardiometabolic", Index + 1L, Index
-        )
-      )
-    check_log_reindex <- check_npx(npx_data_reindex) |>
-      suppressMessages() |>
-      suppressWarnings()
-
-    pca_plot_reindex <- olink_pca_plot(
-      df = npx_data_reindex,
-      check_log = check_log_reindex,
-      quiet = TRUE
-    )
-
-    expect_true(all(
-      abs(sort(pca_plot_reindex[[1]]$data$PCX) -
-            sort(pca_plot[[1]]$data$PCX)) == 0L
-    ))
-
-    expect_true(all(
-      abs(sort(pca_plot_reindex[[1]]$data$PCY) -
-            sort(pca_plot[[1]]$data$PCY)) == 0L
-    ))
-  }
-)
-
-# prcomp
-c <- chol(s <- toeplitz(.9^(0:31))) # Cov.matrix and its root
-set.seed(17)
-x <- matrix(rnorm(32000), 1000, 32)
-z <- x %*% c ## ==>  cov(Z) ~=  C'C = S
-
-p_z_outside <- prcomp(z, tol = 0.1)
+# Test others ----
 
 test_that(
   "prcomp - works",
   {
+    # prcomp
+    c <- chol(s <- toeplitz(.9^(0:31))) # Cov.matrix and its root
+    set.seed(17)
+    x <- matrix(rnorm(32000), 1000, 32)
+    z <- x %*% c ## ==>  cov(Z) ~=  C'C = S
+
+    p_z_outside <- prcomp(z, tol = 0.1)
+
     p_z_inside <- prcomp(z, tol = 0.1)
 
     expect_equal(
@@ -697,18 +794,17 @@ test_that(
   }
 )
 
-# PCA calculation
-# local
-old_collate <- Sys.getlocale("LC_COLLATE")
-Sys.setlocale("LC_COLLATE", "C")
-
-locale_outside <- Sys.getlocale(category = "LC_ALL")
-Sys.setlocale("LC_COLLATE", old_collate)
-
-# inside
 test_that(
   "PCA calculation",
   {
+    # PCA calculation
+    # local
+    old_collate <- Sys.getlocale("LC_COLLATE")
+    Sys.setlocale("LC_COLLATE", "C")
+
+    locale_outside <- Sys.getlocale(category = "LC_ALL")
+    Sys.setlocale("LC_COLLATE", old_collate)
+
     locale_inside <- Sys.getlocale(category = "LC_ALL")
 
     expect_equal(
