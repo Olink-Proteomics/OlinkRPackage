@@ -115,44 +115,68 @@ will be labelled. Both arguments have to be specified.
 \examples{
 \donttest{
 if (rlang::is_installed(pkg = c("ggrepel", "ggpubr"))) {
-npx_data <- npx_data1 |>
-  dplyr::filter(!grepl("CONTROL", SampleID))
-check_log <- check_npx(npx_data)
+  npx_data <- npx_data1 |>
+    dplyr::filter(
+      !grepl(pattern = "CONTROL",
+             x = .data[["SampleID"]],
+             ignore.case = TRUE)
+    )
 
-# PCA using all the data
-olink_pca_plot(df = npx_data, check_log = check_log, color_g = "QC_Warning")
+  check_log <- check_npx(npx_data)
 
-# PCA per panel
-g <- olink_pca_plot(
-  df = npx_data,
-  check_log = check_log,
-  color_g = "QC_Warning",
-  byPanel = TRUE
-)
-g[[2]] # Plot only the second panel
+  # PCA using all the data
+  OlinkAnalyze::olink_pca_plot(
+    df = npx_data,
+    check_log = check_log,
+    color_g = "QC_Warning"
+  )
 
-# Label outliers
-olink_pca_plot(
-  df = npx_data, check_log = check_log, color_g = "QC_Warning",
-  outlierDefX = 2, outlierDefY = 4
-) # All data
-olink_pca_plot(
-  df = npx_data, check_log = check_log, color_g = "QC_Warning",
-  outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE
-) # Per panel
+  # PCA per panel
+  g <- OlinkAnalyze::olink_pca_plot(
+    df = npx_data,
+    check_log = check_log,
+    color_g = "QC_Warning",
+    byPanel = TRUE
+  )
+  g[[2L]] # Plot only the second panel
 
-# Retrieve the outliers
-g <- olink_pca_plot(
-  df = npx_data, check_log = check_log, color_g = "QC_Warning",
-  outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE
-)
-outliers <- lapply(g, function(x) {
-  return(x$data)
-}) |>
+  # Label outliers
+  OlinkAnalyze::olink_pca_plot(
+    df = npx_data,
+    check_log = check_log,
+    color_g = "QC_Warning",
+    outlierDefX = 2L,
+    outlierDefY = 4L
+   ) # All data
+
+  OlinkAnalyze::olink_pca_plot(
+    df = npx_data,
+    check_log = check_log,
+    color_g = "QC_Warning",
+    outlierDefX = 2.5,
+    outlierDefY = 4L,
+    byPanel = TRUE
+  ) # Per panel
+
+  # Retrieve the outliers
+  g <- OlinkAnalyze::olink_pca_plot(
+    df = npx_data,
+    check_log = check_log,
+    color_g = "QC_Warning",
+    outlierDefX = 2.5,
+    outlierDefY = 4L,
+    byPanel = TRUE
+  )
+  outliers <- lapply(g, function(x) {
+    return(x$data)
+  }) |>
   dplyr::bind_rows() |>
-  dplyr::filter(Outlier == 1)
-  }
+  dplyr::filter(
+    .data[["Outlier"]] == 1L
+  )
 }
+}
+
 }
 \keyword{NPX}
 \keyword{PCA}
