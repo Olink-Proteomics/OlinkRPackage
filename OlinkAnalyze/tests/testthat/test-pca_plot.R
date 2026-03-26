@@ -390,13 +390,13 @@ test_that(
       )
     )
 
-    pca_plot_treat_top_loadings_name <- "PCA plot with loadings"
+    pca_plot_top_loadings_name <- "PCA plot with loadings"
     check_snap_exist(
       test_dir_name = "pca_plot",
-      snap_name = pca_plot_treat_top_loadings_name
+      snap_name = pca_plot_top_loadings_name
     )
     vdiffr::expect_doppelganger(
-      pca_plot_treat_top_loadings_name,
+      pca_plot_top_loadings_name,
       pca_plot_treat_top_loading[[1]]
     )
   }
