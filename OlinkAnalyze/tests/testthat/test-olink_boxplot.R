@@ -31,7 +31,8 @@ boxplot_site_2prots <- npx_data1 |>
       head(2) |>
       dplyr::pull(OlinkID),
     check_log = npx_data1_check
-  )
+  ) |>
+  suppressMessages()
 
 boxplot_site_10prots <- npx_data1 |>
   na.omit() |>
@@ -43,7 +44,8 @@ boxplot_site_10prots <- npx_data1 |>
       dplyr::pull(OlinkID),
     number_of_proteins_per_plot = 5L,
     check_log = npx_data1_check
-  )
+  ) |>
+  suppressMessages()
 
 boxplot_time <- npx_data1 |>
   olink_boxplot(
@@ -52,7 +54,8 @@ boxplot_time <- npx_data1 |>
       head(10) |>
       dplyr::pull(OlinkID),
     check_log = npx_data1_check
-  )
+  ) |>
+  suppressMessages()
 
 ref_results$anova_time_posthoc[1, "Threshold"] <- "Significant"
 ref_results$anova_time_posthoc[1, "Adjusted_pval"] <- 0.0003
@@ -65,7 +68,8 @@ boxplot_time_posthoc <- npx_data1 |>
       dplyr::pull(OlinkID),
     posthoc_results = ref_results$anova_time_posthoc,
     check_log = npx_data1_check
-  )
+  ) |>
+  suppressMessages()
 
 boxplot_time_coloroption <- npx_data1 |>
   olink_boxplot(
@@ -75,7 +79,8 @@ boxplot_time_coloroption <- npx_data1 |>
       dplyr::pull(OlinkID),
     coloroption = c("teal", "pink", "orange", "turqoise"),
     check_log = npx_data1_check
-  )
+  ) |>
+  suppressMessages()
 
 boxplot_time_site <- npx_data1 |>
   na.omit() |>
@@ -85,7 +90,8 @@ boxplot_time_site <- npx_data1 |>
       head(10) |>
       dplyr::pull(OlinkID),
     check_log = npx_data1_check
-  )
+  ) |>
+  suppressMessages()
 
 boxplot_treatment_ttest <- npx_data1 |>
   olink_boxplot(
@@ -95,31 +101,50 @@ boxplot_treatment_ttest <- npx_data1 |>
       dplyr::pull(OlinkID),
     ttest_result = ref_results$t_test,
     check_log = npx_data1_check
-  )
+  ) |>
+  suppressMessages()
+
 # -------------------------------------------------------------------------
 # Tests
 # -------------------------------------------------------------------------
 
 test_that("olink_boxplot works", {
-  expect_warning(
-    npx_data_format221010 |>
-      olink_boxplot(
-        variable = "treatment2",
-        olinkid_list = c(
-          npx_check$assay_na[1:5],
-          "OID30538"
-        )
-      )
+  expect_message(
+    object = expect_message(
+      object = expect_warning(
+        npx_data_format221010 |>
+          olink_boxplot(
+            variable = "treatment2",
+            olinkid_list = c(
+              npx_check$assay_na[1:5],
+              "OID30538"
+            )
+          )
+      ),
+      regexp = "check_log` not provided. Running `check_npx()`",
+      fixed = TRUE
+    ),
+    regexp = paste("8 assays exhibited assay QC warnings in column",
+                   "`Assay_Warning` of the dataset")
   )
-  boxplot_npxcheck <- suppressWarnings(
-    olink_boxplot(
-      df = npx_data_format221010,
-      variable = "treatment2",
-      olinkid_list = c(
-        npx_check$assay_na[1:5],
-        "OID30538"
-      )
-    )
+
+  expect_message(
+    object = expect_message(
+      object = boxplot_npxcheck <- suppressWarnings(
+        olink_boxplot(
+          df = npx_data_format221010,
+          variable = "treatment2",
+          olinkid_list = c(
+            npx_check$assay_na[1:5],
+            "OID30538"
+          )
+        )
+      ),
+      regexp = "check_log` not provided. Running `check_npx()`",
+      fixed = TRUE
+    ),
+    regexp = paste("8 assays exhibited assay QC warnings in column",
+                   "`Assay_Warning` of the dataset")
   )
   expect_length(
     unique(boxplot_npxcheck[[1]]$data$Name_OID),
