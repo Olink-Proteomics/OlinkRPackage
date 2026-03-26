@@ -139,8 +139,8 @@
 olink_pca_plot <- function(df,
                            check_log = NULL,
                            color_g = "QC_Warning",
-                           x_val = 1,
-                           y_val = 2,
+                           x_val = 1L,
+                           y_val = 2L,
                            label_samples = FALSE,
                            drop_assays = FALSE,
                            drop_samples = FALSE,
@@ -155,7 +155,7 @@ olink_pca_plot <- function(df,
                            verbose = TRUE,
                            ...) {
   # checking ellipsis
-  if (length(list(...)) > 0) {
+  if (length(list(...)) > 0L) {
     ellipsis_variables <- names(list(...))
 
     if (length(ellipsis_variables) == 1L) {
@@ -189,7 +189,7 @@ olink_pca_plot <- function(df,
   check_is_scalar_boolean(x = verbose, error = TRUE)
 
   # Stop if duplicate sample ID's detected
-  if (length(check_log$sample_id_dups) > 0) {
+  if (length(check_log$sample_id_dups) > 0L) {
     cli::cli_abort(
       "Duplicate SampleID(s) detected:
       {paste(check_log$sample_id_dups, collapse = ', ')}.
@@ -293,16 +293,18 @@ olink_pca_plot <- function(df,
 
       # Add Panel info inside the ggplot object
       g$data <- g$data |>
-        dplyr::mutate(Panel = x)
+        dplyr::mutate(Panel = .env[["x"]])
 
       return(g)
     })
     names(plotList) <- unique(df[["Panel"]]) # nolint: object_name_linter
-    if (!quiet) {
-      print(ggpubr::ggarrange(
-        plotlist = plotList,
-        common.legend = TRUE
-      ))
+    if (quiet == FALSE) {
+      print(
+        ggpubr::ggarrange(
+          plotlist = plotList,
+          common.legend = TRUE
+        )
+      )
     }
   } else {
     pca_plot <- olink_pca_plot.internal(
@@ -323,20 +325,21 @@ olink_pca_plot <- function(df,
       verbose = verbose,
       ...
     )
-    if (!quiet) print(pca_plot)
+    if (quiet == FALSE) {
+      print(pca_plot)
+    }
     # For consistency, return a list even when there's just one plot
     plotList <- list(pca_plot) # nolint: object_name_linter
   }
   return(invisible(plotList))
 }
 
-olink_calculate_pca <- function(
-  procData, # nolint: object_name_linter
-  x_val = 1,
-  y_val = 2,
-  outlierDefX = NA, # nolint: object_name_linter
-  outlierDefY = NA # nolint: object_name_linter
-) {
+olink_calculate_pca <- function(procData, # nolint: object_name_linter
+                                x_val = 1L,
+                                y_val = 2L,
+                                outlierDefX = NA, # nolint: object_name_linter
+                                outlierDefY = NA ) { # nolint: object_name_linter
+
   #### PCA ####
   pca_fit <- stats::prcomp(
     procData$df_wide_matrix,
@@ -349,7 +352,7 @@ olink_calculate_pca <- function(
 
   PCX <- pca_fit$x[, x_val] / scaling_factor_lambda[x_val] # nolint: object_name_linter
   PCY <- pca_fit$x[, y_val] / scaling_factor_lambda[y_val] # nolint: object_name_linter
-  PoV <- pca_fit$sdev^2 / sum(pca_fit$sdev^2) # nolint: object_name_linter
+  PoV <- pca_fit$sdev^2L / sum(pca_fit$sdev^2L) # nolint: object_name_linter
   LX <- pca_fit$rotation[, x_val] # nolint: object_name_linter
   LY <- pca_fit$rotation[, y_val] # nolint: object_name_linter
 
@@ -388,13 +391,13 @@ olink_calculate_pca <- function(
       tibble::rownames_to_column(var = "SampleID") |>
       dplyr::mutate(
         PCX_low = mean(.data[["PCX"]], na.rm = TRUE) -
-          outlierDefX * sd(.data[["PCX"]], na.rm = TRUE),
+          outlierDefX * stats::sd(.data[["PCX"]], na.rm = TRUE),
         PCX_high = mean(.data[["PCX"]], na.rm = TRUE) +
-          outlierDefX * sd(.data[["PCX"]], na.rm = TRUE),
+          outlierDefX * stats::sd(.data[["PCX"]], na.rm = TRUE),
         PCY_low = mean(.data[["PCY"]], na.rm = TRUE) -
-          outlierDefY * sd(.data[["PCY"]], na.rm = TRUE),
+          outlierDefY * stats::sd(.data[["PCY"]], na.rm = TRUE),
         PCY_high = mean(.data[["PCY"]], na.rm = TRUE) +
-          outlierDefY * sd(.data[["PCY"]], na.rm = TRUE)
+          outlierDefY * stats::sd(.data[["PCY"]], na.rm = TRUE)
       ) |>
       dplyr::mutate(
         Outlier = dplyr::if_else(
@@ -402,38 +405,38 @@ olink_calculate_pca <- function(
             .data[["PCX"]] > .data[["PCX_low"]] &
             .data[["PCY"]] > .data[["PCY_low"]] &
             .data[["PCY"]] < .data[["PCY_high"]],
-          0L, 1L
+          0L,
+          1L
         )
       )
   }
 
-
-  return(list(
-    scores = scores,
-    loading = loadings,
-    loadings_scaling_factor = loadings_scaling_factor,
-    PoV = PoV
-  ))
+  return(
+    list(
+      scores = scores,
+      loading = loadings,
+      loadings_scaling_factor = loadings_scaling_factor,
+      PoV = PoV
+    )
+  )
 }
 
-olink_pca_plot.internal <- function( # nolint: object_name_linter
-  df,
-  check_log = NULL,
-  color_g = "QC_Warning",
-  x_val = 1,
-  y_val = 2,
-  label_samples = FALSE,
-  drop_assays = FALSE,
-  drop_samples = FALSE,
-  n_loadings = 0,
-  loadings_list = NULL,
-  outlierDefX, # nolint: object_name_linter
-  outlierDefY, # nolint: object_name_linter
-  outlierLines, # nolint: object_name_linter
-  label_outliers,
-  verbose = verbose,
-  ...
-) {
+olink_pca_plot.internal <- function(df, # nolint: object_name_linter
+                                    check_log = NULL,
+                                    color_g = "QC_Warning",
+                                    x_val = 1L,
+                                    y_val = 2L,
+                                    label_samples = FALSE,
+                                    drop_assays = FALSE,
+                                    drop_samples = FALSE,
+                                    n_loadings = 0,
+                                    loadings_list = NULL,
+                                    outlierDefX, # nolint: object_name_linter
+                                    outlierDefY, # nolint: object_name_linter
+                                    outlierLines, # nolint: object_name_linter
+                                    label_outliers,
+                                    verbose = verbose,
+                                    ...) {
   # Check if check_log is correct
   check_log <- run_check_npx(df = df, check_log = check_log)
 
@@ -464,7 +467,7 @@ olink_pca_plot.internal <- function( # nolint: object_name_linter
       loadings_list
     )
 
-    if (length(dropped_loadings) > 0) {
+    if (length(dropped_loadings) > 0L) {
       if (verbose) {
         cli::cli_warn(
           "The loading(s) {paste0(dropped_loadings, collapse = ', ')} from the
@@ -482,7 +485,7 @@ olink_pca_plot.internal <- function( # nolint: object_name_linter
       loadings_list
     )
 
-    if (length(dropped_loadings) > 0) {
+    if (length(dropped_loadings) > 0L) {
       if (verbose) {
         cli::cli_warn(
           "The loading(s) {paste0(dropped_loadings, collapse = ', ')} from the
@@ -493,7 +496,7 @@ olink_pca_plot.internal <- function( # nolint: object_name_linter
       loadings_list <- setdiff(loadings_list, dropped_loadings)
     }
 
-    if (length(loadings_list) == 0) {
+    if (length(loadings_list) == 0L) {
       loadings_list <- NULL
     }
   }
@@ -536,31 +539,49 @@ olink_pca_plot.internal <- function( # nolint: object_name_linter
 
   # Plotting
   pca_plot <- ggplot2::ggplot(
-    scores,
-    ggplot2::aes(x = .data[["PCX"]], y = .data[["PCY"]])
+    data = scores,
+    mapping = ggplot2::aes(
+      x = .data[["PCX"]],
+      y = .data[["PCY"]]
+    )
   ) +
     ggplot2::xlab(
-      paste0("PC", x_val, " (", round(PoV[x_val] * 100, digits = 2L), "%)")
+      paste0("PC", x_val, " (", round(x = PoV[x_val] * 100L, digits = 2L), "%)")
     ) +
     ggplot2::ylab(
-      paste0("PC", y_val, " (", round(PoV[y_val] * 100, digits = 2L), "%)")
+      paste0("PC", y_val, " (", round(x = PoV[y_val] * 100L, digits = 2L), "%)")
     )
-
 
   # Drawing scores
   if (label_samples) {
     pca_plot <- pca_plot +
       ggplot2::geom_text(
-        ggplot2::aes(label = .data[["SampleID"]], color = .data[["colors"]]),
-        size = 3
+        mapping = ggplot2::aes(
+          label = .data[["SampleID"]],
+          color = .data[["colors"]]
+        ),
+        size = 3L
       ) +
-      ggplot2::labs(color = color_g) +
-      ggplot2::guides(size = "none")
+      ggplot2::labs(
+        color = color_g
+      ) +
+      ggplot2::guides(
+        size = "none"
+      )
   } else {
     pca_plot <- pca_plot +
-      ggplot2::geom_point(ggplot2::aes(color = colors), size = 2.5) +
-      ggplot2::labs(color = color_g) +
-      ggplot2::guides(size = "none")
+      ggplot2::geom_point(
+        mapping = ggplot2::aes(
+          color = colors
+        ),
+        size = 2.
+      ) +
+      ggplot2::labs(
+        color = color_g
+      ) +
+      ggplot2::guides(
+        size = "none"
+      )
   }
 
   # Continuous color scale for OSI columns
@@ -602,17 +623,25 @@ olink_pca_plot.internal <- function( # nolint: object_name_linter
       # Largest loadings based on Pythagoras
 
       N_loadings <- loadings |> # nolint: object_name_linter
-        dplyr::mutate(abs_loading = sqrt(.data[["LX"]]^2 + .data[["LY"]]^2)) |>
-        dplyr::arrange(dplyr::desc(.data[["abs_loading"]])) |>
+        dplyr::mutate(
+          abs_loading = sqrt(.data[["LX"]]^2L + .data[["LY"]]^2L)
+        ) |>
+        dplyr::arrange(
+          dplyr::desc(.data[["abs_loading"]])
+        ) |>
         utils::head(n_loadings) |>
-        dplyr::select(-.data[["abs_loading"]])
+        dplyr::select(
+          -dplyr::all_of("abs_loading")
+        )
     }
 
     if (!is.null(loadings_list)) {
       # Selected loadings
 
       L_loadings <- loadings |> # nolint: object_name_linter
-        dplyr::filter(.data[["variables"]] %in% loadings_list)
+        dplyr::filter(
+          .data[["variables"]] %in% .env[["loadings_list"]]
+        )
     }
 
     loadings <- rbind(
@@ -630,7 +659,9 @@ olink_pca_plot.internal <- function( # nolint: object_name_linter
           xend = .data[["LX"]] * loadings_scaling_factor,
           yend = .data[["LY"]] * loadings_scaling_factor
         ),
-        arrow = ggplot2::arrow(length = grid::unit(1 / 2, "picas")),
+        arrow = ggplot2::arrow(
+          length = grid::unit(1 / 2, "picas")
+        ),
         color = "black"
       ) +
       ggrepel::geom_label_repel(
@@ -652,16 +683,17 @@ olink_pca_plot.internal <- function( # nolint: object_name_linter
       ggrepel::geom_label_repel(
         data = pca_plot$data |>
           dplyr::mutate(
-            SampleIDPlot = dplyr::case_when(
-              Outlier == 1 ~ .data[["SampleID"]],
-              TRUE ~ ""
+            SampleIDPlot = dplyr::if_else(
+              .data[["Outlier"]] == 1L,
+              .data[["SampleID"]],
+              ""
             )
           ),
         ggplot2::aes(label = .data[["SampleIDPlot"]]),
         box.padding = 0.5,
         min.segment.length = 0.1,
         show.legend = FALSE,
-        size = 3
+        size = 3L
       )
   }
 
@@ -669,22 +701,30 @@ olink_pca_plot.internal <- function( # nolint: object_name_linter
   if (outlierLines) {
     pca_plot <- pca_plot +
       ggplot2::geom_hline(
-        ggplot2::aes(yintercept = .data[["PCY_low"]]),
+        ggplot2::aes(
+          yintercept = .data[["PCY_low"]]
+        ),
         linetype = "dashed",
         color = "grey"
       ) +
       ggplot2::geom_hline(
-        ggplot2::aes(yintercept = .data[["PCY_high"]]),
+        ggplot2::aes(
+          yintercept = .data[["PCY_high"]]
+        ),
         linetype = "dashed",
         color = "grey"
       ) +
       ggplot2::geom_vline(
-        ggplot2::aes(xintercept = .data[["PCX_low"]]),
+        ggplot2::aes(
+          xintercept = .data[["PCX_low"]]
+        ),
         linetype = "dashed",
         color = "grey"
       ) +
       ggplot2::geom_vline(
-        ggplot2::aes(xintercept = .data[["PCX_high"]]),
+        ggplot2::aes(
+          xintercept = .data[["PCX_high"]]
+        ),
         linetype = "dashed",
         color = "grey"
       )
