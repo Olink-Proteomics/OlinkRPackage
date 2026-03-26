@@ -64,9 +64,12 @@
 #' samples and/or assays dropped or imputed should be printed to
 #' the console.
 #' @param ... coloroption passed to specify color order.
+#'
 #' @return A list of objects of class "ggplot", each plot contains
 #' scatter plot of PCs
+#'
 #' @keywords NPX PCA
+#'
 #' @export
 #' @examples
 #' \donttest{
@@ -109,19 +112,7 @@
 #'   dplyr::filter(Outlier == 1)
 #'   }
 #' }
-#' @importFrom dplyr filter select group_by ungroup mutate mutate_at if_else
-#' n_distinct summarise left_join arrange distinct
-#' @importFrom stringr str_detect
-#' @importFrom tidyr spread
-#' @importFrom rlang ensym
-#' @importFrom stats prcomp
-#' @importFrom ggplot2 ggplot aes xlab ylab geom_text geom_point geom_segment
-#' labs guides arrow
-#' @importFrom utils head
-#' @importFrom grid unit
-#' @importFrom grDevices colors
-#' @importFrom stats sd
-
+#'
 olink_pca_plot <- function(df,
                            check_log = NULL,
                            color_g = "QC_Warning",
@@ -316,7 +307,6 @@ olink_pca_plot <- function(df,
   return(invisible(plotList))
 }
 
-
 olink_calculate_pca <- function(
   procData, # nolint object_name_linter
   x_val = 1,
@@ -402,7 +392,6 @@ olink_calculate_pca <- function(
     PoV = PoV
   ))
 }
-
 
 olink_pca_plot.internal <- function(# nolint object_name_linter
   df,
