@@ -203,7 +203,7 @@ olink_pca_plot <- function(df,
   # control samples or assays, or samples/assays with QC warnings, as this
   # would be the user's decision.
   df <- clean_npx(
-    df,
+    df = df,
     check_log = check_log,
     remove_assay_na = TRUE,
     remove_invalid_oid = TRUE,
