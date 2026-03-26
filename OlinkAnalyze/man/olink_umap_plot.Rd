@@ -29,7 +29,9 @@ olink_umap_plot(
 for colors.}
 
 \item{color_g}{Character value indicating which column to use for colors
-(default QC_Warning)}
+(default QC_Warning). Continuous color scale for Olink(R) Sample Index (OSI)
+columns OSITimeToCentrifugation, OSIPreparationTemperature and OSISummary is
+also supported.}
 
 \item{x_val}{Integer indicating which UMAP component to plot along the x-axis
 (default 1)}

@@ -24,7 +24,9 @@
 #' @param df data frame in long format with Sample Id, NPX and column of choice
 #' for colors.
 #' @param color_g Character value indicating which column to use for colors
-#' (default QC_Warning)
+#' (default QC_Warning). Continuous color scale for Olink(R) Sample Index (OSI)
+#' columns OSITimeToCentrifugation, OSIPreparationTemperature and OSISummary is
+#' also supported.
 #' @param x_val Integer indicating which UMAP component to plot along the x-axis
 #' (default 1)
 #' @param y_val Integer indicating which UMAP component to plot along the y-axis
