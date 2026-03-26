@@ -572,7 +572,7 @@ olink_pca_plot.internal <- function(df, # nolint: object_name_linter
     pca_plot <- pca_plot +
       ggplot2::geom_point(
         mapping = ggplot2::aes(
-          color = colors
+          color = .data[["colors"]]
         ),
         size = 2.
       ) +
