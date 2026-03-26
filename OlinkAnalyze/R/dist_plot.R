@@ -11,32 +11,40 @@
 #' @param color_g Character value indicating which column to use as fill color.
 #' (default: QC_Warning).
 #' @param ... Color option passed to specify color order.
+#'
 #' @return An object of class "ggplot" which displays NPX distribution
 #' for each sample per panel
+#'
 #' @keywords NPX
+#'
 #' @export
 #' @examples
 #' \donttest{
 #'
-#'# Optional: check and clean dataset
-#' check_log <- check_npx(df = npx_data1)
-#' cleaned_data <- clean_npx(npx_data1,
-#'                           check_log = check_log)
-#' olink_dist_plot(npx_data1,
-#'                 check_log = check_log,
-#'                 color_g = "QC_Warning")
+#' # Optional: check and clean dataset
+#' check_log <- OlinkAnalyze::check_npx(
+#'   df = npx_data1
+#' )
 #'
-#' olink_dist_plot(cleaned_data,
-#'                 check_log = check_log,
-#'                 color_g = "QC_Warning")
+#' cleaned_data <- OlinkAnalyze::clean_npx(
+#'   df = npx_data1,
+#'   check_log = check_log
+#' )
+#'
+#' OlinkAnalyze::olink_dist_plot(
+#'   df = npx_data1,
+#'   check_log = check_log,
+#'   color_g = "QC_Warning"
+#' )
+#'
+#' OlinkAnalyze::olink_dist_plot(
+#'   df = cleaned_data,
+#'   check_log = check_log,
+#'   color_g = "QC_Warning"
+#' )
 #'
 #' }
-#' @importFrom dplyr filter mutate group_by ungroup if_else
-#' @importFrom stats reorder
-#' @importFrom ggplot2 ggplot aes scale_x_discrete geom_boxplot xlab facet_wrap
-#' @importFrom stringr str_replace str_detect
-#' @importFrom rlang ensym
-
+#'
 olink_dist_plot <- function(df,
                             check_log = NULL,
                             color_g = "QC_Warning", # nolint: object_name_linter
@@ -109,16 +117,29 @@ olink_dist_plot <- function(df,
 
   # Format Panel names
   df <- df |>
-    dplyr::mutate(!!check_log$col_names$panel :=
-                    .data[[check_log$col_names$panel]] |>
-                    stringr::str_replace("Olink ", ""))
+    dplyr::mutate(
+      !!check_log$col_names$panel := stringr::str_replace(
+        string = .data[[check_log$col_names$panel]],
+        pattern = "Olink ",
+        replacement = ""
+      )
+    )
 
   # If QC selected to plot
   # If not all are Pass, the QC_Warning is set as warning for plotting purposes
   if (color_g %in% column_name_dict$col_names$qc_warning) {
 
     df <- df |>
-      dplyr::group_by(.data[["SampleID"]], .data[["Panel"]]) |>
+      dplyr::group_by(
+        dplyr::pick(
+          dplyr::all_of(
+            c(
+              check_log$col_names$sample_id,
+              check_log$col_names$panel
+            )
+          )
+        )
+      ) |>
       dplyr::mutate(
         !!check_log$col_names$qc_warning := dplyr::if_else(
           all(
@@ -134,19 +155,22 @@ olink_dist_plot <- function(df,
 
   df |> # nolint: return_linter
     ggplot2::ggplot(ggplot2::aes(
-      x = reorder_within(factor(SampleID), # nolint: object_usage_linter
-                         NPX, # nolint: object_usage_linter
-                         Panel, # nolint: object_usage_linter
-                         median # nolint: object_usage_linter
+      x = reorder_within(
+        x = factor(.data[[check_log$col_names$sample_id]]),
+        by = .data[[check_log$col_names$quant]],
+        within = .data[[check_log$col_names$panel]],
+        fun = stats::median
       ),
-      y = NPX,
-      fill = !!rlang::ensym(color_g)
+      y = .data[[check_log$col_names$quant]],
+      fill = .data[[color_g]]
     )) +
     ggplot2::geom_boxplot() +
     scale_x_reordered() +
     ggplot2::xlab("Samples") +
-    ggplot2::facet_wrap(as.formula(paste("~", check_log$col_names$panel)),
-                        scale = "free") +
+    ggplot2::facet_wrap(
+      facets = stats::as.formula(paste("~", check_log$col_names$panel)),
+      scale = "free"
+    ) +
     OlinkAnalyze::set_plot_theme() +
     OlinkAnalyze::olink_fill_discrete(...)
 }
