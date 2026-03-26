@@ -690,11 +690,11 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
             .data[["Panel"]]
           ) |>
           dplyr::group_modify(~ {
-            FSA::dunnTest(
-              as.formula(formula_string),
+            quiet_dunn(
+              formula = stats::as.formula(formula_string),
               data = .x,
               method = "bh"
-            )$res
+            )
           }) |>
           dplyr::ungroup() |>
           dplyr::mutate(variable = .env[["variable"]]) |>
@@ -724,4 +724,24 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
       }
     }
   )
+}
+
+quiet_dunn <- function(formula, data, method = "bh") {
+  null_file <- if (.Platform$OS.type == "windows") "NUL" else "/dev/null"
+  zz <- file(null_file, open = "wt")
+
+  on.exit({
+    try(sink(type = "message"), silent = TRUE)
+    try(sink(), silent = TRUE)
+    try(close(zz), silent = TRUE)
+  }, add = FALSE)
+
+  sink(zz)
+  sink(zz, type = "message")
+
+  out <- suppressMessages(
+    FSA::dunnTest(x = formula, data = data, method = method)
+  )
+
+  return(out$res)
 }
