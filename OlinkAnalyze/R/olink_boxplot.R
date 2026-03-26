@@ -2,7 +2,7 @@
 #'
 #' @description
 #' Generates faceted boxplots of NPX vs. grouping variable(s) for a given list
-#' of proteins (OlinkIDs) using ggplot and ggplot2::geom_boxplot.
+#' of proteins (OlinkIDs) using ggplot2::ggplot and ggplot2::geom_boxplot.
 #'
 #' @param df NPX data frame in long format with at least protein name (Assay),
 #'  OlinkID (unique), UniProt and at least one grouping variable.
