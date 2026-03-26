@@ -22,7 +22,7 @@
 #'  list (default is false).
 #' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
 #' [`check_npx()`] will be run internally using `df`...
-#' @param ... coloroption passed to specify color order
+#' @param ... coloroption passed to specify color order.
 #'
 #' @return A list of objects of class “ggplot” (the actual ggplot object is
 #' entry 1 in the list). Box and whisker plot of NPX (y-axis) by variable
