@@ -70,8 +70,7 @@
 #' @export
 #' @examples
 #' \donttest{
-#' library(dplyr)
-#' }
+#' if (rlang::is_installed(pkg = c("ggrepel", "ggpubr"))) {
 #' npx_data <- npx_data1 |>
 #'   dplyr::filter(!grepl("CONTROL", SampleID))
 #' check_log <- check_npx(npx_data)
@@ -108,7 +107,8 @@
 #' }) |>
 #'   dplyr::bind_rows() |>
 #'   dplyr::filter(Outlier == 1)
-#'
+#'   }
+#' }
 #' @importFrom dplyr filter select group_by ungroup mutate mutate_at if_else
 #' n_distinct summarise left_join arrange distinct
 #' @importFrom stringr str_detect
