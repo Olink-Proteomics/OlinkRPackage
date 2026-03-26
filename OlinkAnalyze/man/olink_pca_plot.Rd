@@ -150,8 +150,8 @@ g <- olink_pca_plot(
 outliers <- lapply(g, function(x) {
   return(x$data)
 }) |>
-  bind_rows() |>
-  filter(Outlier == 1)
+  dplyr::bind_rows() |>
+  dplyr::filter(Outlier == 1)
 
 }
 \keyword{NPX}

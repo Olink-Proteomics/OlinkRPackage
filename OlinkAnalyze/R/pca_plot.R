@@ -119,6 +119,8 @@
 #' labs guides arrow
 #' @importFrom utils head
 #' @importFrom grid unit
+#' @importFrom grDevices colors
+#' @importFrom stats sd
 
 olink_pca_plot <- function(df,
                            check_log = NULL,
@@ -500,13 +502,14 @@ olink_pca_plot.internal <- function(# nolint object_name_linter
       dplyr::mutate(SampleID = rownames(scores))
   }
 
-  if (is.numeric(scores$SampleID)) {
+  if (is.numeric(scores[["SampleID"]])) {
     message("SampleID converted to character.")
-    scores$SampleID <- as.character(scores$SampleID)
+    scores[["SampleID"]] <- as.character(scores[["SampleID"]])
   }
-  if (is.numeric(procData$df_wide$SampleID)) {
+  if (is.numeric(procData$df_wide[["SampleID"]])) {
     message("SampleID converted to character.")
-    procData$df_wide$SampleID <- as.character(procData$df_wide$SampleID) # nolint object_name_linter
+    procData$df_wide[["SampleID"]] <- #nolint
+      as.character(procData$df_wide[["SampleID"]])
   }
 
   scores <- scores |>
@@ -536,7 +539,7 @@ olink_pca_plot.internal <- function(# nolint object_name_linter
   if (label_samples) {
     pca_plot <- pca_plot +
       ggplot2::geom_text(
-        ggplot2::aes(label = SampleID, color = colors), # nolint object_usage_linter
+        ggplot2::aes(label = .data[["SampleID"]], color = .data[["colors"]]),
         size = 3
       ) +
       ggplot2::labs(color = color_g) +
@@ -557,8 +560,10 @@ olink_pca_plot.internal <- function(# nolint object_name_linter
 
   if (color_g %in% osi_cont_cols) {
     # Ensure numeric for continuous scale (handles character/factor inputs)
-    if (is.factor(scores$colors)) scores$colors <- as.character(scores$colors)
-    scores$colors <- suppressWarnings(as.numeric(scores$colors))
+    if (is.factor(scores[["colors"]])) {
+      scores[["colors"]] <- as.character(scores[["colors"]])
+    }
+    scores[["colors"]] <- suppressWarnings(as.numeric(scores[["colors"]]))
 
     pca_plot <- pca_plot +
       ggplot2::scale_color_gradient(
@@ -585,17 +590,17 @@ olink_pca_plot.internal <- function(# nolint object_name_linter
       # Largest loadings based on Pythagoras
 
       N_loadings <- loadings |> # nolint object_name_linter
-        dplyr::mutate(abs_loading = sqrt(LX^2 + LY^2)) |> # nolint object_usage_linter
-        dplyr::arrange(desc(abs_loading)) |> # nolint object_usage_linter
+        dplyr::mutate(abs_loading = sqrt(.data[["LX"]]^2 + .data[["LY"]]^2)) |>
+        dplyr::arrange(dplyr::desc(.data[["abs_loading"]])) |>
         utils::head(n_loadings) |>
-        dplyr::select(-abs_loading)
+        dplyr::select(-.data[["abs_loading"]])
     }
 
     if (!is.null(loadings_list)) {
       # Selected loadings
 
       L_loadings <- loadings |> # nolint object_name_linter
-        dplyr::filter(variables %in% loadings_list) # nolint object_usage_linter
+        dplyr::filter(.data[["variables"]] %in% loadings_list)
     }
 
     loadings <- rbind(
@@ -610,8 +615,8 @@ olink_pca_plot.internal <- function(# nolint object_name_linter
         ggplot2::aes(
           x = 0,
           y = 0,
-          xend = LX * loadings_scaling_factor, # nolint object_usage_linter
-          yend = LY * loadings_scaling_factor # nolint object_usage_linter
+          xend = .data[["LX"]] * loadings_scaling_factor,
+          yend = .data[["LY"]] * loadings_scaling_factor
         ),
         arrow = ggplot2::arrow(length = grid::unit(1 / 2, "picas")),
         color = "black"
@@ -619,9 +624,9 @@ olink_pca_plot.internal <- function(# nolint object_name_linter
       ggrepel::geom_label_repel(
         data = loadings,
         ggplot2::aes(
-          x = LX * loadings_scaling_factor,
-          y = LY * loadings_scaling_factor,
-          label = variables # nolint object_usage_linter
+          x = .data[["LX"]] * loadings_scaling_factor,
+          y = .data[["LY"]] * loadings_scaling_factor,
+          label = .data[["variables"]]
         ),
         box.padding = 1,
         show.legend = FALSE,
@@ -636,11 +641,11 @@ olink_pca_plot.internal <- function(# nolint object_name_linter
         data = pca_plot$data |>
           dplyr::mutate(
             SampleIDPlot = dplyr::case_when(
-              Outlier == 1 ~ SampleID,
+              Outlier == 1 ~ .data[["SampleID"]],
               TRUE ~ ""
             )
           ),
-        ggplot2::aes(label = SampleIDPlot), # nolint object_usage_linter
+        ggplot2::aes(label = .data[["SampleIDPlot"]]),
         box.padding = 0.5,
         min.segment.length = 0.1,
         show.legend = FALSE,
@@ -652,22 +657,22 @@ olink_pca_plot.internal <- function(# nolint object_name_linter
   if (outlierLines) {
     pca_plot <- pca_plot +
       ggplot2::geom_hline(
-        ggplot2::aes(yintercept = PCY_low), # nolint object_usage_linter
+        ggplot2::aes(yintercept = .data[["PCY_low"]]),
         linetype = "dashed",
         color = "grey"
       ) +
       ggplot2::geom_hline(
-        ggplot2::aes(yintercept = PCY_high), # nolint object_usage_linter
+        ggplot2::aes(yintercept = .data[["PCY_high"]]),
         linetype = "dashed",
         color = "grey"
       ) +
       ggplot2::geom_vline(
-        ggplot2::aes(xintercept = PCX_low), # nolint object_usage_linter
+        ggplot2::aes(xintercept = .data[["PCX_low"]]),
         linetype = "dashed",
         color = "grey"
       ) +
       ggplot2::geom_vline(
-        ggplot2::aes(xintercept = PCX_high), # nolint object_usage_linter
+        ggplot2::aes(xintercept = .data[["PCX_high"]]),
         linetype = "dashed",
         color = "grey"
       )

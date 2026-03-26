@@ -616,7 +616,8 @@ test_that(
     pca_plot <- npx_data1_uniqueid |>
       olink_pca_plot(
         check_log = check_log_uniqueid,
-        label_outliers = FALSE
+        label_outliers = FALSE,
+        quiet = TRUE
       )
 
     pca_mini_plot_name <- "PCA plot - not label outliers"
@@ -632,7 +633,8 @@ test_that(
     pca_plot_outliers <- npx_data1_uniqueid |>
       olink_pca_plot(
         check_log = check_log_uniqueid,
-        label_outliers = TRUE
+        label_outliers = TRUE,
+        quiet = TRUE
       )
 
     pca_plot_outliers_name <- "PCA plot - label outliers"
@@ -659,7 +661,8 @@ test_that(
 
     pca_plot_reindex <- olink_pca_plot(
       df = npx_data_reindex,
-      check_log = check_log_reindex
+      check_log = check_log_reindex,
+      quiet = TRUE
     )
 
     expect_true(all(
