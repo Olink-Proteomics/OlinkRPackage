@@ -54,16 +54,6 @@ boxplot_time <- npx_data1 |>
     check_log = npx_data1_check
   )
 
-boxplot_site_ttest <- npx_data1 |>
-  olink_boxplot(
-    variable = "Site",
-    olinkid_list = ref_results$anova_site |>
-      head(10) |>
-      dplyr::pull(OlinkID),
-    ttest_results = ref_results$anova_site,
-    check_log = npx_data1_check
-  )
-
 ref_results$anova_time_posthoc[1, "Threshold"] <- "Significant"
 ref_results$anova_time_posthoc[1, "Adjusted_pval"] <- 0.0003
 
@@ -96,6 +86,7 @@ boxplot_time_site <- npx_data1 |>
       dplyr::pull(OlinkID),
     check_log = npx_data1_check
   )
+
 boxplot_treatment_ttest <- npx_data1 |>
   olink_boxplot(
     variable = "Treatment",
@@ -203,15 +194,14 @@ test_that("olink_boxplot works - vdiffr", {
     boxplot_time_posthoc_name,
     boxplot_time_posthoc
   )
-  # ---- Time + ttest ----
-  boxplot_site_ttest_name <- "boxplot site and ttest"
+  # ---- Treatment + ttest ----
+  boxplot_treatment_ttest_name <- "boxplot treatment and ttest"
   check_snap_exist(
     test_dir_name = "olink_boxplot",
-    snap_name = boxplot_site_ttest_name
+    snap_name = boxplot_treatment_ttest_name
   )
   vdiffr::expect_doppelganger(
-    boxplot_site_ttest_name,
-    boxplot_site_ttest
+    boxplot_treatment_ttest_name,
+    boxplot_treatment_ttest
   )
-  boxplot_site_ttest
 })
