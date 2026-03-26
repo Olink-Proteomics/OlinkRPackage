@@ -167,7 +167,7 @@ test_that("olink_boxplot works - vdiffr", {
   )
   vdiffr::expect_doppelganger(
     boxplot_site_2prots_name,
-    boxplot_site_2prots
+    boxplot_site_2prots[[1L]]
   )
   # ---- 10 proteins ----
   boxplot_site_10prots_name <- "boxplot site 10prots"
@@ -177,7 +177,7 @@ test_that("olink_boxplot works - vdiffr", {
   )
   vdiffr::expect_doppelganger(
     boxplot_site_10prots_name,
-    boxplot_site_10prots[[2]]
+    boxplot_site_10prots[[2L]]
   )
   # ---- Time ----
   boxplot_time_name <- "boxplot time"
@@ -187,7 +187,7 @@ test_that("olink_boxplot works - vdiffr", {
   )
   vdiffr::expect_doppelganger(
     boxplot_time_name,
-    boxplot_time
+    boxplot_time[[2L]]
   )
   # ---- Time w/ coloroption ----
   boxplot_time_coloroption_name <- "boxplot time with coloroption"
@@ -197,7 +197,7 @@ test_that("olink_boxplot works - vdiffr", {
   )
   vdiffr::expect_doppelganger(
     boxplot_time_coloroption_name,
-    boxplot_time_coloroption
+    boxplot_time_coloroption[[2L]]
   )
   # ---- Time + Site ----
   boxplot_time_site_name <- "boxplot time and site"
@@ -207,7 +207,7 @@ test_that("olink_boxplot works - vdiffr", {
   )
   vdiffr::expect_doppelganger(
     boxplot_time_site_name,
-    boxplot_time_site
+    boxplot_time_site[[2L]]
   )
   # ---- Time + Posthoc ----
   boxplot_time_posthoc_name <- "boxplot time and posthoc"
@@ -217,7 +217,7 @@ test_that("olink_boxplot works - vdiffr", {
   )
   vdiffr::expect_doppelganger(
     boxplot_time_posthoc_name,
-    boxplot_time_posthoc
+    boxplot_time_posthoc[[2L]]
   )
   # ---- Treatment + ttest ----
   boxplot_treatment_ttest_name <- "boxplot treatment and ttest"
@@ -227,6 +227,6 @@ test_that("olink_boxplot works - vdiffr", {
   )
   vdiffr::expect_doppelganger(
     boxplot_treatment_ttest_name,
-    boxplot_treatment_ttest
+    boxplot_treatment_ttest[[2L]]
   )
 })
