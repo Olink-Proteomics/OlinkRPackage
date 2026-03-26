@@ -96,7 +96,15 @@ boxplot_time_site <- npx_data1 |>
       dplyr::pull(OlinkID),
     check_log = npx_data1_check
   )
-
+boxplot_treatment_ttest <- npx_data1 |>
+  olink_boxplot(
+    variable = "Treatment",
+    olinkid_list = ref_results$t_test |>
+      head(10) |>
+      dplyr::pull(OlinkID),
+    ttest_result = ref_results$t_test,
+    check_log = npx_data1_check
+  )
 # -------------------------------------------------------------------------
 # Tests
 # -------------------------------------------------------------------------
