@@ -273,7 +273,7 @@ olink_one_non_parametric <- function(df,
           ) |>
           dplyr::group_modify(~ {
             rstatix::friedman_test(
-              as.formula(formula_string),
+              stats::as.formula(formula_string),
               data = .x,
               na.action = na.omit
             )
@@ -313,7 +313,7 @@ olink_one_non_parametric <- function(df,
             dplyr::group_modify(~ {
               broom::tidy(
                 kruskal.test(
-                  as.formula(formula_string),
+                  stats::as.formula(formula_string),
                   data = .x
                 )
               )
@@ -650,7 +650,7 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
           dplyr::group_modify(~ {
             rstatix::wilcox_test(
               data = .x,
-              formula = as.formula(formula_string),
+              formula = stats::as.formula(formula_string),
               p.adjust.method = "BH",
               detailed = TRUE,
               conf.level = 0.95,
