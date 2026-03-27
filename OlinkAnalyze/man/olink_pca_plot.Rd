@@ -6,9 +6,10 @@
 \usage{
 olink_pca_plot(
   df,
+  check_log = NULL,
   color_g = "QC_Warning",
-  x_val = 1,
-  y_val = 2,
+  x_val = 1L,
+  y_val = 2L,
   label_samples = FALSE,
   drop_assays = FALSE,
   drop_samples = FALSE,
@@ -25,80 +26,157 @@ olink_pca_plot(
 )
 }
 \arguments{
-\item{df}{data frame in long format with Sample Id, NPX and column of choice for colors}
+\item{df}{data frame in long format with Sample Id, NPX and column
+of choice for colors.}
 
-\item{color_g}{Character value indicating which column to use for colors (default QC_Warning). Continuous color scale for Olink(R) Sample Index (OSI) columns OSITimeToCentrifugation, OSIPreparationTemperature and OSISummary is also supported.}
+\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
 
-\item{x_val}{Integer indicating which principal component to plot along the x-axis (default 1)}
+\item{color_g}{Character value indicating which column to use for
+colors (default QC_Warning). Continuous color scale for Olink(R)
+Sample Index (OSI) columns OSITimeToCentrifugation,
+OSIPreparationTemperature and OSISummary is also supported.}
 
-\item{y_val}{Integer indicating which principal component to plot along the y-axis (default 2)}
+\item{x_val}{Integer indicating which principal component to plot
+along the x-axis (default 1)}
 
-\item{label_samples}{Logical. If TRUE, points are replaced with SampleID (default FALSE)}
+\item{y_val}{Integer indicating which principal component to plot
+along the y-axis (default 2)}
 
-\item{drop_assays}{Logical. All assays with any missing values will be dropped. Takes precedence over sample drop.}
+\item{label_samples}{Logical. If TRUE, points are replaced with
+SampleID (default FALSE)}
 
-\item{drop_samples}{Logical. All samples with any missing values will be dropped.}
+\item{drop_assays}{Logical. All assays with any missing values will
+be dropped. Takes precedence over sample drop.}
 
-\item{n_loadings}{Integer. Will plot the top n_loadings based on size.}
+\item{drop_samples}{Logical. All samples with any missing values
+will be dropped.}
 
-\item{loadings_list}{Character vector indicating for which OlinkID's to plot as loadings. It is possible to use n_loadings and loadings_list simultaneously.}
+\item{n_loadings}{Integer. Will plot the top n_loadings based on
+size.}
+
+\item{loadings_list}{Character vector indicating for which
+OlinkID's to plot as loadings. It is possible to use n_loadings
+and loadings_list simultaneously.}
 
 \item{byPanel}{Perform the PCA per panel (default FALSE)}
 
-\item{outlierDefX}{The number standard deviations along the PC plotted on the x-axis that defines an outlier. See also 'Details"}
+\item{outlierDefX}{The number standard deviations along the PC
+plotted on the x-axis that defines an outlier. See also 'Details"}
 
-\item{outlierDefY}{The number standard deviations along the PC plotted on the y-axis that defines an outlier. See also 'Details"}
+\item{outlierDefY}{The number standard deviations along the PC
+plotted on the y-axis that defines an outlier. See also 'Details"}
 
-\item{outlierLines}{Draw dashed lines at +/- outlierDefX and outlierDefY standard deviations from the mean of the plotted PCs (default FALSE)}
+\item{outlierLines}{Draw dashed lines at +/- outlierDefX and
+outlierDefY standard deviations from the mean of the plotted PCs
+(default FALSE)}
 
-\item{label_outliers}{Use ggrepel to label samples lying outside the limits set by the outlierLines (default TRUE)}
+\item{label_outliers}{Use ggrepel to label samples lying outside
+the limits set by the outlierLines (default TRUE)}
 
 \item{quiet}{Logical. If TRUE, the resulting plot is not printed}
 
-\item{verbose}{Logical. Whether warnings about the number of samples and/or assays dropped or imputed should be printed to the console.}
+\item{verbose}{Logical. Whether warnings about the number of
+samples and/or assays dropped or imputed should be printed to
+the console.}
 
 \item{...}{coloroption passed to specify color order.}
 }
 \value{
-A list of objects of class "ggplot", each plot contains scatter plot of PCs
+A list of objects of class "ggplot", each plot contains
+scatter plot of PCs
 }
 \description{
-Generates a PCA projection of all samples from NPX data along two principal components (default PC2 vs. PC1) including the explained variance and dots colored by QC_Warning using stats::prcomp and ggplot2::ggplot.
-}
-\details{
-The values are by default scaled and centered in the PCA and proteins with missing NPX values are by default removed from the corresponding assay.
+Generates a PCA projection of all samples from NPX data along two
+principal components (default PC2 vs. PC1) including the explained
+variance and dots colored by QC_Warning using
+\code{stats::prcomp} and \code{ggplot2::ggplot}.
+
+The values are by default scaled and centered in the PCA and
+proteins with missing NPX values are by default removed from the
+corresponding assay.
+
 Unique sample names are required.
-Imputation by the median is done for assays with missingness <10\\% for multi-plate projects and <5\\% for single plate projects.
-The plot is printed, and a list of ggplot objects is returned. \cr\cr
-If byPanel = TRUE, the data processing (imputation of missing values etc) and subsequent PCA is performed separately per panel. A faceted plot is printed, while the individual ggplot objects are returned. \cr\cr
-The arguments outlierDefX and outlierDefY can be used to identify outliers in the PCA. Samples more than +/- outlierDefX and outlierDefY standard deviations from the mean of the plotted PC will be labelled. Both arguments have to be specified.
+
+Imputation by the median is done for assays with missingness <10\\%
+for multi-plate projects and <5\\% for single plate projects.
+
+The plot is printed, and a list of ggplot objects is returned.
+If byPanel = TRUE, the data processing (imputation of missing
+values etc) and subsequent PCA is performed separately per panel.
+A faceted plot is printed, while the individual ggplot objects
+are returned.
+
+The arguments outlierDefX and outlierDefY can be used to identify
+outliers in the PCA. Samples more than +/- outlierDefX and
+outlierDefY standard deviations from the mean of the plotted PC
+will be labelled. Both arguments have to be specified.
 }
 \examples{
 \donttest{
-library(dplyr)
-npx_data <- npx_data1 \%>\%
-    filter(!grepl('CONTROL', SampleID))
+if (rlang::is_installed(pkg = c("ggrepel", "ggpubr"))) {
+  npx_data <- npx_data1 |>
+    dplyr::filter(
+      !grepl(pattern = "CONTROL",
+             x = .data[["SampleID"]],
+             ignore.case = TRUE)
+    )
 
-#PCA using all the data
-olink_pca_plot(df=npx_data, color_g = "QC_Warning")
+  check_log <- check_npx(npx_data)
 
-#PCA per panel
-g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning", byPanel = TRUE)
-g[[2]] #Plot only the second panel
+  # PCA using all the data
+  OlinkAnalyze::olink_pca_plot(
+    df = npx_data,
+    check_log = check_log,
+    color_g = "QC_Warning"
+  )
 
-#Label outliers
-olink_pca_plot(df=npx_data, color_g = "QC_Warning",
-               outlierDefX = 2, outlierDefY = 4) #All data
-olink_pca_plot(df=npx_data, color_g = "QC_Warning",
-               outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE) #Per panel
+  # PCA per panel
+  g <- OlinkAnalyze::olink_pca_plot(
+    df = npx_data,
+    check_log = check_log,
+    color_g = "QC_Warning",
+    byPanel = TRUE
+  )
+  g[[2L]] # Plot only the second panel
 
-#Retrieve the outliers
-g <- olink_pca_plot(df=npx_data, color_g = "QC_Warning",
-                    outlierDefX = 2.5, outlierDefY = 4, byPanel = TRUE)
-outliers <- lapply(g, function(x){x$data}) \%>\%
-    bind_rows() \%>\%
-    filter(Outlier == 1)
+  # Label outliers
+  OlinkAnalyze::olink_pca_plot(
+    df = npx_data,
+    check_log = check_log,
+    color_g = "QC_Warning",
+    outlierDefX = 2L,
+    outlierDefY = 4L
+   ) # All data
+
+  OlinkAnalyze::olink_pca_plot(
+    df = npx_data,
+    check_log = check_log,
+    color_g = "QC_Warning",
+    outlierDefX = 2.5,
+    outlierDefY = 4L,
+    byPanel = TRUE
+  ) # Per panel
+
+  # Retrieve the outliers
+  g <- OlinkAnalyze::olink_pca_plot(
+    df = npx_data,
+    check_log = check_log,
+    color_g = "QC_Warning",
+    outlierDefX = 2.5,
+    outlierDefY = 4L,
+    byPanel = TRUE
+  )
+  outliers <- lapply(g, function(x) {
+    return(x$data)
+  }) |>
+  dplyr::bind_rows() |>
+  dplyr::filter(
+    .data[["Outlier"]] == 1L
+  )
 }
+}
+
 }
 \keyword{NPX}
 \keyword{PCA}

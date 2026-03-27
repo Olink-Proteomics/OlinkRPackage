@@ -43,7 +43,7 @@ normalization to be performed. Output from
 \code{\link{olink_norm_input_validate}}.}
 }
 \value{
-\code{NULL} unless there is an error
+\code{NULL} unless there is an error.
 }
 \description{
 Check if \var{df1}, \var{df2} and/or \var{reference_medians} are tibble or

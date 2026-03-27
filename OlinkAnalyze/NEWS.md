@@ -1,32 +1,3 @@
-# Olink Analyze 4.5.0
-## Minor Changes
-* Added section to LOD vignette about how to handle LOD in bridged data (#656, @KangD-dev)
-* Support for NPX files from NPX Map 2.0 was added to read_NPX (#660, @kathy-nevola)
-* Continuous color scale was added to PCA for graphing Olink Sample Index (OSI) continuous columns (#659, @amrita-kar)
-* Function for formatting bridged data was updated to work with other types of normalization (#643, @dtopouza, #644, @klevdiamanti) 
-
-## Bug Fixes
-* olink_ordinalRegression changed from type = 3 to type = "marginal" to work with newest version of ordinal package (#657, @kathy-nevola)
-* Regex fixed for DarID detection in olink_lod and read_NPX (#658, @kathy-nevola)
-
-# Olink Analyze 4.4.0
-## Minor Changes
-* Added support for bridging Olink Explore HT and Olink Reveal (#645, #636, #639, @boxizhang, @amrita-kar, @kathy-nevola, @dtopouza, @klev-diamanti)
-* Add warning message for specific DarID-SW export combinations that require re-export (#635, @kathy-nevola)
-* Added instructions for how to add LOD data to cross product bridging (#642, @KangD-dev)
-
-## Bug Fixes
-* Fix wording of bridgeable assays in cross-product bridging tutorial (#632, #630, @kathy-nevola)
-* Fixed warning message in case of duplicate samples so that samples with control assays did not count as duplicated samples (#634, @amrita-kar) 
-* QS Normalization will now exclude bridge samples with NA with warning, preventing error (#640, @klev-diamanti)
-
-# Olink Analyze 4.3.2
-## Bug Fixes
-* Tests for `olink_wilcox()` are now arranged by Assay name to handle ties (#616, @boxizhang)
-* The `extrafont` package has been removed as a dependency as it is archived on CRAN (#619, @klevdiamanti)
-* Regex in `olink_lmer()` has been improved to better capture the warning message (#618, @klevdiamanti)
-* Handling for when `AssayQC` is not present in both data sets for normalization (#620, @klevdiamanti)
-
 # Olink Analyze 4.3.1
 ## Bug Fixes
 * `olink_lod()` call to `checkNPX()` now correctly uses data instead of df, allowing the function to run without error (#579, @klevdiamanti)
@@ -60,14 +31,12 @@
 * If count data is not provided in cross-product bridging, an error message will occur (#510, @kristynchin-olink)
 * For cross-product bridging, if the sample type and assay warning columns do not have the same column naming (ex: SampleType and Sample_Type), both columns will be included in the output. (#515, @spollo-olprot, @MasoumehSheikh)
 
-
 # Olink Analyze 4.1.1
 ## Minor Changes
 * Images were decreased in dimension to meet CRAN Size requirements (#500, @kathy-nevola)
 
 ## Bug Fixes
 * Dataframe name was corrected in Olink Explore 3072 to Olink Explore HT bridging tutorial Downstream Analysis section. (#500, @kathy-nevola)
-
 
 # Olink Analyze 4.1.0
 ## Minor Changes
@@ -88,14 +57,12 @@
 * The Block column is now transformed into a character value to ensure consistency across products.
 * An error that had previously impacted paired Wilcoxon tests has been resolved. (#485, @boxizhang)
 
-
 # Olink Analyze 4.0.2
 ## Bug Fixes
 * Product is now identified by column name for cross-product normalization, rather than OlinkIDs. This allows for non-overlapping assays to be present in input files. (#469, @kathy-nevola)
 * Added many-to-many mapping in joining Explore HT data to the mapping file to support correlation assays (#469, @kathy-nevola)
 * Corrected spelling in error message. (#469, @kathy-nevola)
 * Fixed typo in NotBridgeable category name in tutorial (#471, @dtopouza)
-
 
 # Olink Analyze 4.0.1
 ## Minor Changes
@@ -105,7 +72,6 @@
 ## Major Changes
 * olink_normalization can now be used for bridging Explore 3072 data to Explore HT data (#453, #452, #439, #449, #447,#446, #441, #440, #434, #422, #436, #435 @klevdiamanti, @kathy-nevola, @kristynchin-olink, @dtopouza, @amrita-kar, @MasoumehSheikh)
 * olink_normalization has undergone major changes to improve speed, reproducibility, and extending functionality (#418, @klevdiamanti, @kristynchin-olink, @MasoumehSheikh)
-
 
 ## Minor Changes
 * New tutorial has been added to explain and support Explore 3072 to Explore HT bridging (#448, #428, #427, #426, #425, #424, #423, @kristynchin-olink, @boxizhang, @dtopouza, @kathy-nevola, @MasoumehSheikh)
@@ -231,14 +197,12 @@
 ## Bug Fixes
 * Update to olink_wilcox documentation and UniProt description in documentation has been corrected (@boxizhang, #235)
 
-
 # Olink Analyze 3.3.1
 ## Bug Fixes
 * olink_pathway_enrichment now prints a message when there are non matching names when using method = "ORA" (@MasoumehSheikhi, #222)
 * olink_pca_plot will now generate PCA when data is missing from the first OlinkID (@kathy-nevola, #221)
 * read_NPX now supports csv files with Sample_Type column but not ExploreVersion column (@klevdiamanti, #220)
 * extra columns in input file will no longer result in a warning message (@kathy-nevola, #223)
-
 
 # Olink Analyze 3.3.0
 ## Minor Changes
@@ -259,9 +223,7 @@
 ## Bug Fixes
 * Change in unit test to write to temporary directory (@AskPascal, #181)
 
-
 # Olink Analyze 3.2.0
-
 ## Minor Changes
 * Addition of functions to perform Uniform Manifold Approximation and Projection (UMAP) dimensional reduction and plots (@simfor, #139)
 * Add additional install methods to Readme (@AskPascal, #153)
@@ -272,7 +234,6 @@
 * Read_NPX will now warn the user when NAs are detected in the NPX column (@AskPascal, #170)
 * Friedman test interface and documentation was updated to be more intuitive (@boxizhang, #171)
 
-
 ## Bug fixes
 * Pathway enrichment p-values are now in the correct order when plotting (@klevdiamanti, #164)
 * PCAs now behave the same with any locale (@AskPascal, #173)
@@ -282,9 +243,7 @@
 * vdiffr based unit tests were reactivated (@AskPascal, #172)
 
 # Olink Analyze 3.1.0
-
 ## Minor Changes
-
 * Non-parametric functions are now available (@boxizhang, #114, #142)
 * Updated installation instructions to reflect CRAN acceptance (@kathy-nevola, #107)
 * Zipped files from MyData can now be used as input for read_NPX (@klevdiamanti, #115)
@@ -299,7 +258,6 @@
 * Added Kristian Hodén as contributor
 
 ## Bug Fixes
-
 * olink_pca_plot by Panel will now show correct colors when a variable is missing (@MasoumehSheikhi, Issue #117, Commit 0f2f157) 
 * olink_ttest will now return a warning message if an assay has less than 2 datapoints in a group. (@marisand, #110)
 * LMER class is now checked using inherits (@MasoumehSheikhi, #134)
@@ -307,58 +265,44 @@
 * Correct output type of olink_dist_plot in vignette to ggplot object (@kathy-nevola, Issue #112, #141)
 * Previously called "intensity normalization" has been clarified as a special type of subset normalization and an example has been added to the documentation and vignette (@Orbmac, #144)
 
-
 # Olink Analyze 3.0.0
-
 ## Major Changes
-
 * displayPlateDistributions and displayPlateLayout names were updated to olink_displayPlateDistributions and olink_displayPlateLayout (@simfor, #98)
 
 ## Minor Changes
-
 * Update CI to Ubuntu 20.04 (@AskPascal, #97)
 * olink_bridgeselector will now give an error if less than n (number of) bridge samples can be selected based on set sampleMissingFreq (@marisand, #100)
 * update return value documentation for all functions to specify columns and class of output (@kathy-nevola, #102)
 * replaced or removed cat/print with message/stop so messages printed to the console can be suppressed (@jrguess, #103)
 
 ## Bugfixes
-
 * fixed spelling mistakes in documentation (@kathy-nevola, #92)
 * updated DESCRIPTION to fit CRAN specification (@kathy-nevola, #94)
 * change T/F to TRUE/FALSE for stability (@AskPascal, #96)
 * updated documentation to olink_plate_randomizer, olink_displayPlateDistributions and olink_displayPlateLayout to link related functions and clarify olink_plate_randomizer documentation (@simfor, #98)
 * fixed keywords in documentation (@kathy-nevola, #99)
 
-
 # Olink Analyze 2.0.1
-
 ## Bug Fixes
-
 * Remove hexagon from Readme (@kathy-nevola, #86)
 * Replace OlinkAnalyze with Olink® Analyze (@kathy-nevola, #86)
 * Add Ola Caster to author list
 * Update documentation to change olinkR to Olink Analyze (@jrguess, #89)
 
 # Olink Analyze 2.0.0
-
 ## Major Changes
-
 * Package is in the process of being submitted to CRAN
 * Added ability to prevent OlinkAnalyze from loading fonts and setting to themes (@OlaCaster, #73)
 * Decreased the size of npx_data1 and npx_data2 to 2 panels instead of 12 (@kathy-nevola, #76)
 * Updates to the olink_qc_plot and olink_pca_plot functions (@simfor, #78)
 
 ## BugFixes
-
 * Moved NEWS.md to correct level (@kathy-nevola, #74)
 * Added cran-comments.md file to document Notes for CRAN submission (@kathy-nevola, #74)
 * Update Vignette to reflect new functionality (@kathy-nevola, #78)
 
-
 # Olink Analyze 1.3.0
-
 ## Major Changes
-
 * DESCRIPTION file updated to include all authors and maintainers (@kathy-nevola, #66)
 * Unit testing was added (@marisand, @simfor, #65, #55, #47)
 * Continuous Integration (CI) was added (@AskPascal, #57, #53, #40, #31)
@@ -368,7 +312,6 @@
 * Changed `olink_pal()` to have gray instead of light blue (@marisand, #22)
 
 ## Bug Fixes
-
 * `set_plot_theme()` will now load Swedish Gothic Thin if available on all OS (@marisand, @AskPascal, #70, #39)
 * Help documentation was updated to correct typos and clarify notation for ANOVA and LME models (@kathy-nevola, @marisand,@AskPascal #67, #33, #37)
 * Fix `olink_dist_plot()` from showing multiple bars when sample has QC warning in some assays (@marisand, @AskPascal, #64)
@@ -380,9 +323,3 @@
 * Fix summary casting "tukey" to "sidak" adjustment warning in `olink_anova_posthoc()` and `olink_lmer_posthoc()` functions (@marisand, #38)
 * Update functions to import selectively (@kathy-nevola, @Orbmac, @AskPascal, @marisand, #21, #20, #19, #18, #15, #29)
 * Fix guides size argument in `olink_pca_plot()` (#17) (@AskPascal, #24)
-
-
-
-
-
-

@@ -14,8 +14,6 @@
 test_that(
   "olink_normalization - works - bridge normalization",
   {
-    skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
-
     ref_norm_res <- get_example_data("ref_results_norm.rds")
 
     ### bridge normalization - no norm column ----
@@ -30,7 +28,13 @@ test_that(
             df1_project_nr = "df1_no_norm",
             df2_project_nr = "df2_no_norm",
             reference_project = "df1_no_norm",
-            format = FALSE
+            format = FALSE,
+            df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_norm) |>
+              suppressMessages() |>
+              suppressWarnings(),
+            df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_norm) |>
+              suppressMessages() |>
+              suppressWarnings()
           ) |>
             dplyr::filter(
               .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -60,7 +64,13 @@ test_that(
           df1_project_nr = "df1_norm",
           df2_project_nr = "df2_norm",
           reference_project = "df1_norm",
-          format = FALSE
+          format = FALSE,
+          df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_norm) |>
+            suppressMessages() |>
+            suppressWarnings(),
+          df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_norm) |>
+            suppressMessages() |>
+            suppressWarnings()
         ) |>
           dplyr::filter(
             .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -87,7 +97,13 @@ test_that(
           df1_project_nr = "df1_no_lod",
           df2_project_nr = "df2_no_lod",
           reference_project = "df1_no_lod",
-          format = FALSE
+          format = FALSE,
+          df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_lod) |>
+            suppressMessages() |>
+            suppressWarnings(),
+          df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_lod) |>
+            suppressMessages() |>
+            suppressWarnings()
         ) |>
           dplyr::filter(
             .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -115,7 +131,17 @@ test_that(
             df1_project_nr = "df1_multiple_lod",
             df2_project_nr = "df2_multiple_lod",
             reference_project = "df1_multiple_lod",
-            format = FALSE
+            format = FALSE,
+            df1_check_log = check_npx(
+              df = ref_norm_res$lst_df$df1_multiple_lod
+            ) |>
+              suppressMessages() |>
+              suppressWarnings(),
+            df2_check_log = check_npx(
+              df = ref_norm_res$lst_df$df2_multiple_lod
+            ) |>
+              suppressMessages() |>
+              suppressWarnings()
           ) |>
             dplyr::filter(
               .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -123,7 +149,7 @@ test_that(
           regexp = "Bridge normalization will be performed!"
         ),
         regexp = paste("Datasets \"df1_multiple_lod\" and \"df2_multiple_lod\"",
-                       "contain")
+                       "contain multiple columns matching")
       ),
       regexp = "Output includes two sets of bridging samples"
     )
@@ -139,8 +165,6 @@ test_that(
 test_that(
   "olink_normalization - works - bridge normalization - format",
   {
-    skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
-
     ref_norm_res <- get_example_data("ref_results_norm.rds")
 
     sample_subset <- ref_norm_res$lst_sample$sample_subset
@@ -166,7 +190,13 @@ test_that(
           df1_project_nr = "df1_norm",
           df2_project_nr = "df2_norm",
           reference_project = "df1_norm",
-          format = TRUE
+          format = TRUE,
+          df1_check_log = check_npx(df = df_norm_ref_v1) |>
+            suppressMessages() |>
+            suppressWarnings(),
+          df2_check_log = check_npx(df = df_norm_not_ref_v1) |>
+            suppressMessages() |>
+            suppressWarnings()
         ) |>
           dplyr::filter(
             .data[["SampleID"]] %in% .env[["sample_subset"]]
@@ -247,7 +277,13 @@ test_that(
               df1_project_nr = "df1_norm",
               df2_project_nr = "df2_norm",
               reference_project = "df1_norm",
-              format = TRUE
+              format = TRUE,
+              df1_check_log = check_npx(df = df_norm_ref_v2) |>
+                suppressMessages() |>
+                suppressWarnings(),
+              df2_check_log = check_npx(df = df_norm_not_ref_v2) |>
+                suppressMessages() |>
+                suppressWarnings()
             ) |>
               dplyr::filter(
                 .data[["SampleID"]] %in% .env[["sample_subset"]]
@@ -276,20 +312,20 @@ test_that(
 
     df_norm_ref_v3 <- ref_norm_res$lst_df$df1_norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL_1",
           "A38" ~ "PLATE_CTRL_1",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
     df_norm_not_ref_v3 <- ref_norm_res$lst_df$df2_norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "C66" ~ "NEG_CTRL_2",
           "D1" ~ "PLATE_CTRL_2",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
 
@@ -297,13 +333,13 @@ test_that(
 
     ref_bridge_norm_v3 <- ref_norm_res$lst_norm$bridge_norm$norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL_1",
           "A38" ~ "PLATE_CTRL_1",
           "C66" ~ "NEG_CTRL_2",
           "D1" ~ "PLATE_CTRL_2",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       ) |>
       dplyr::filter(
@@ -326,7 +362,13 @@ test_that(
                 df1_project_nr = "df1_norm",
                 df2_project_nr = "df2_norm",
                 reference_project = "df1_norm",
-                format = TRUE
+                format = TRUE,
+                df1_check_log = check_npx(df = df_norm_ref_v3) |>
+                  suppressMessages() |>
+                  suppressWarnings(),
+                df2_check_log = check_npx(df = df_norm_not_ref_v3) |>
+                  suppressMessages() |>
+                  suppressWarnings()
               ) |>
                 dplyr::filter(
                   .data[["SampleID"]] %in% .env[["sample_subset"]]
@@ -365,11 +407,11 @@ test_that(
         !(.data[["OlinkID"]] %in% .env[["oid_only_in_nonref_v4"]])
       ) |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL_1",
           "A38" ~ "PLATE_CTRL_1",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
     df_norm_not_ref_v4 <- ref_norm_res$lst_df$df2_norm |>
@@ -377,11 +419,11 @@ test_that(
         !(.data[["OlinkID"]] %in% .env[["oid_only_in_ref_v4"]])
       ) |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "C66" ~ "NEG_CTRL_2",
           "D1" ~ "PLATE_CTRL_2",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
 
@@ -419,13 +461,13 @@ test_that(
       ) |>
       # create controls
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL_1",
           "A38" ~ "PLATE_CTRL_1",
           "C66" ~ "NEG_CTRL_2",
           "D1" ~ "PLATE_CTRL_2",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       ) |>
       # remove controls
@@ -451,7 +493,13 @@ test_that(
                     df1_project_nr = "df1_norm",
                     df2_project_nr = "df2_norm",
                     reference_project = "df1_norm",
-                    format = TRUE
+                    format = TRUE,
+                    df1_check_log = check_npx(df = df_norm_ref_v4) |>
+                      suppressMessages() |>
+                      suppressWarnings(),
+                    df2_check_log = check_npx(df = df_norm_not_ref_v4) |>
+                      suppressMessages() |>
+                      suppressWarnings()
                   ) |>
                     dplyr::filter(
                       .data[["SampleID"]] %in% .env[["sample_subset"]]
@@ -492,8 +540,6 @@ test_that(
 test_that(
   "olink_normalization - works - intensity normalization",
   {
-    skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
-
     ref_norm_res <- get_example_data("ref_results_norm.rds")
 
     ### intensity normalization - no norm column ----
@@ -508,7 +554,13 @@ test_that(
           df1_project_nr = "df1_no_norm",
           df2_project_nr = "df2_no_norm",
           reference_project = "df1_no_norm",
-          format = FALSE
+          format = FALSE,
+          df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_norm) |>
+            suppressMessages() |>
+            suppressWarnings(),
+          df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_norm) |>
+            suppressMessages() |>
+            suppressWarnings()
         ) |>
           dplyr::filter(
             .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -536,7 +588,13 @@ test_that(
         df1_project_nr = "df1_norm",
         df2_project_nr = "df2_norm",
         reference_project = "df1_norm",
-        format = FALSE
+        format = FALSE,
+        df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_norm) |>
+          suppressMessages() |>
+          suppressWarnings(),
+        df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_norm) |>
+          suppressMessages() |>
+          suppressWarnings()
       ) |>
         dplyr::filter(
           .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -561,7 +619,13 @@ test_that(
         df1_project_nr = "df1_no_lod",
         df2_project_nr = "df2_no_lod",
         reference_project = "df1_no_lod",
-        format = FALSE
+        format = FALSE,
+        df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_lod) |>
+          suppressMessages() |>
+          suppressWarnings(),
+        df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_lod) |>
+          suppressMessages() |>
+          suppressWarnings()
       ) |>
         dplyr::filter(
           .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -587,7 +651,17 @@ test_that(
           df1_project_nr = "df1_multiple_lod",
           df2_project_nr = "df2_multiple_lod",
           reference_project = "df1_multiple_lod",
-          format = FALSE
+          format = FALSE,
+          df1_check_log = check_npx(
+            df = ref_norm_res$lst_df$df1_multiple_lod
+          ) |>
+            suppressMessages() |>
+            suppressWarnings(),
+          df2_check_log = check_npx(
+            df = ref_norm_res$lst_df$df2_multiple_lod
+          ) |>
+            suppressMessages() |>
+            suppressWarnings()
         ) |>
           dplyr::filter(
             .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -608,8 +682,6 @@ test_that(
 test_that(
   "olink_normalization - works - subset normalization",
   {
-    skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
-
     ref_norm_res <- get_example_data("ref_results_norm.rds")
 
     ### subset normalization - no norm column ----
@@ -624,7 +696,13 @@ test_that(
           df1_project_nr = "df1_no_norm",
           df2_project_nr = "df2_no_norm",
           reference_project = "df1_no_norm",
-          format = FALSE
+          format = FALSE,
+          df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_norm) |>
+            suppressMessages() |>
+            suppressWarnings(),
+          df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_norm) |>
+            suppressMessages() |>
+            suppressWarnings()
         ) |>
           dplyr::filter(
             .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -652,7 +730,13 @@ test_that(
         df1_project_nr = "df1_norm",
         df2_project_nr = "df2_norm",
         reference_project = "df1_norm",
-        format = FALSE
+        format = FALSE,
+        df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_norm) |>
+          suppressMessages() |>
+          suppressWarnings(),
+        df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_norm) |>
+          suppressMessages() |>
+          suppressWarnings()
       ) |>
         dplyr::filter(
           .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -677,7 +761,13 @@ test_that(
         df1_project_nr = "df1_no_lod",
         df2_project_nr = "df2_no_lod",
         reference_project = "df1_no_lod",
-        format = FALSE
+        format = FALSE,
+        df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_lod) |>
+          suppressMessages() |>
+          suppressWarnings(),
+        df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_lod) |>
+          suppressMessages() |>
+          suppressWarnings()
       ) |>
         dplyr::filter(
           .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -703,7 +793,17 @@ test_that(
           df1_project_nr = "df1_multiple_lod",
           df2_project_nr = "df2_multiple_lod",
           reference_project = "df1_multiple_lod",
-          format = FALSE
+          format = FALSE,
+          df1_check_log = check_npx(
+            df = ref_norm_res$lst_df$df1_multiple_lod
+          ) |>
+            suppressMessages() |>
+            suppressWarnings(),
+          df2_check_log = check_npx(
+            df = ref_norm_res$lst_df$df2_multiple_lod
+          ) |>
+            suppressMessages() |>
+            suppressWarnings()
         ) |>
           dplyr::filter(
             .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -724,8 +824,6 @@ test_that(
 test_that(
   "olink_normalization - works - subset normalization - format",
   {
-    skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
-
     ref_norm_res <- get_example_data("ref_results_norm.rds")
 
     sample_subset <- ref_norm_res$lst_sample$sample_subset
@@ -752,7 +850,13 @@ test_that(
         df1_project_nr = "df1_norm",
         df2_project_nr = "df2_norm",
         reference_project = "df1_norm",
-        format = TRUE
+        format = TRUE,
+        df1_check_log = check_npx(df = df_norm_ref_v1) |>
+          suppressMessages() |>
+          suppressWarnings(),
+        df2_check_log = check_npx(df = df_norm_not_ref_v1) |>
+          suppressMessages() |>
+          suppressWarnings()
       ) |>
         dplyr::filter(
           .data[["SampleID"]] %in% .env[["sample_subset"]]
@@ -832,7 +936,13 @@ test_that(
             df1_project_nr = "df1_norm",
             df2_project_nr = "df2_norm",
             reference_project = "df1_norm",
-            format = TRUE
+            format = TRUE,
+            df1_check_log = check_npx(df = df_norm_ref_v2) |>
+              suppressMessages() |>
+              suppressWarnings(),
+            df2_check_log = check_npx(df = df_norm_not_ref_v2) |>
+              suppressMessages() |>
+              suppressWarnings()
           ) |>
             dplyr::filter(
               .data[["SampleID"]] %in% .env[["sample_subset"]]
@@ -859,20 +969,20 @@ test_that(
 
     df_norm_ref_v3 <- ref_norm_res$lst_df$df1_norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL_1",
           "A38" ~ "PLATE_CTRL_1",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
     df_norm_not_ref_v3 <- ref_norm_res$lst_df$df2_norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "C66" ~ "NEG_CTRL_2",
           "D1" ~ "PLATE_CTRL_2",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
 
@@ -881,13 +991,13 @@ test_that(
 
     ref_subset_norm_v3 <- ref_norm_res$lst_norm$subset_norm$norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL_1",
           "A38" ~ "PLATE_CTRL_1",
           "C66" ~ "NEG_CTRL_2",
           "D1" ~ "PLATE_CTRL_2",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       ) |>
       dplyr::filter(
@@ -910,7 +1020,13 @@ test_that(
               df1_project_nr = "df1_norm",
               df2_project_nr = "df2_norm",
               reference_project = "df1_norm",
-              format = TRUE
+              format = TRUE,
+              df1_check_log = check_npx(df = df_norm_ref_v3) |>
+                suppressMessages() |>
+                suppressWarnings(),
+              df2_check_log = check_npx(df = df_norm_not_ref_v3) |>
+                suppressMessages() |>
+                suppressWarnings()
             ) |>
               dplyr::filter(
                 .data[["SampleID"]] %in% .env[["sample_subset"]]
@@ -947,11 +1063,11 @@ test_that(
         !(.data[["OlinkID"]] %in% .env[["oid_only_in_nonref_v4"]])
       ) |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL_1",
           "A38" ~ "PLATE_CTRL_1",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
     df_norm_not_ref_v4 <- ref_norm_res$lst_df$df2_norm |>
@@ -959,11 +1075,11 @@ test_that(
         !(.data[["OlinkID"]] %in% .env[["oid_only_in_ref_v4"]])
       ) |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "C66" ~ "NEG_CTRL_2",
           "D1" ~ "PLATE_CTRL_2",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
 
@@ -1002,13 +1118,13 @@ test_that(
       ) |>
       # create controls
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL_1",
           "A38" ~ "PLATE_CTRL_1",
           "C66" ~ "NEG_CTRL_2",
           "D1" ~ "PLATE_CTRL_2",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       ) |>
       # remove controls
@@ -1034,7 +1150,13 @@ test_that(
                   df1_project_nr = "df1_norm",
                   df2_project_nr = "df2_norm",
                   reference_project = "df1_norm",
-                  format = TRUE
+                  format = TRUE,
+                  df1_check_log = check_npx(df = df_norm_ref_v4) |>
+                    suppressMessages() |>
+                    suppressWarnings(),
+                  df2_check_log = check_npx(df = df_norm_not_ref_v4) |>
+                    suppressMessages() |>
+                    suppressWarnings()
                 ) |>
                   dplyr::filter(
                     .data[["SampleID"]] %in% .env[["sample_subset"]]
@@ -1073,8 +1195,6 @@ test_that(
 test_that(
   "olink_normalization - works - reference median normalization",
   {
-    skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
-
     ref_norm_res <- get_example_data("ref_results_norm.rds")
 
     ### reference median normalization - no norm column ----
@@ -1086,7 +1206,10 @@ test_that(
           overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
           df1_project_nr = "df1_no_norm",
           reference_medians = ref_norm_res$lst_df$ref_med,
-          format = FALSE
+          format = FALSE,
+          df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_norm) |>
+            suppressMessages() |>
+            suppressWarnings()
         ) |>
           dplyr::filter(
             .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -1111,7 +1234,10 @@ test_that(
         overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
         df1_project_nr = "df1_norm",
         reference_medians = ref_norm_res$lst_df$ref_med,
-        format = FALSE
+        format = FALSE,
+        df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_norm) |>
+          suppressMessages() |>
+          suppressWarnings()
       ) |>
         dplyr::filter(
           .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -1133,7 +1259,10 @@ test_that(
         overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
         df1_project_nr = "df1_no_lod",
         reference_medians = ref_norm_res$lst_df$ref_med,
-        format = FALSE
+        format = FALSE,
+        df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_lod) |>
+          suppressMessages() |>
+          suppressWarnings()
       ) |>
         dplyr::filter(
           .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -1156,7 +1285,12 @@ test_that(
           overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
           df1_project_nr = "df1_multiple_lod",
           reference_medians = ref_norm_res$lst_df$ref_med,
-          format = FALSE
+          format = FALSE,
+          df1_check_log = check_npx(
+            df = ref_norm_res$lst_df$df1_multiple_lod
+          ) |>
+            suppressMessages() |>
+            suppressWarnings()
         ) |>
           dplyr::filter(
             .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
@@ -1177,8 +1311,6 @@ test_that(
 test_that(
   "olink_normalization - works - reference median normalization - format",
   {
-    skip_if_not(file.exists(test_path("data", "ref_results_norm.rds")))
-
     ref_norm_res <- get_example_data("ref_results_norm.rds")
 
     sample_subset <- ref_norm_res$lst_sample$sample_subset
@@ -1201,7 +1333,10 @@ test_that(
         overlapping_samples_df1 = subset_samples_v1,
         df1_project_nr = "df1_norm",
         reference_medians = df_ref_med_v1,
-        format = TRUE
+        format = TRUE,
+        df1_check_log = check_npx(df = df_norm_ref_v1) |>
+          suppressMessages() |>
+          suppressWarnings()
       ) |>
         dplyr::filter(
           .data[["SampleID"]] %in% .env[["sample_subset"]]
@@ -1277,7 +1412,10 @@ test_that(
             overlapping_samples_df1 = subset_samples_v2,
             df1_project_nr = "df1_norm",
             reference_medians = df_ref_med_v2,
-            format = TRUE
+            format = TRUE,
+            df1_check_log = check_npx(df = df_norm_ref_v2) |>
+              suppressMessages() |>
+              suppressWarnings()
           ) |>
             dplyr::filter(
               .data[["SampleID"]] %in% .env[["sample_subset"]]
@@ -1304,11 +1442,11 @@ test_that(
 
     df_norm_ref_v3 <- ref_norm_res$lst_df$df1_norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL_1",
           "A38" ~ "PLATE_CTRL_1",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
     df_ref_med_v3 <- ref_norm_res$lst_df$ref_med
@@ -1317,11 +1455,11 @@ test_that(
 
     ref_refmed_norm_v3 <- ref_norm_res$lst_norm$ref_med_norm$norm |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL_1",
           "A38" ~ "PLATE_CTRL_1",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       ) |>
       dplyr::filter(
@@ -1341,7 +1479,10 @@ test_that(
               overlapping_samples_df1 = subset_samples_v3,
               df1_project_nr = "df1_norm",
               reference_medians = df_ref_med_v3,
-              format = TRUE
+              format = TRUE,
+              df1_check_log = check_npx(df = df_norm_ref_v3) |>
+                suppressMessages() |>
+                suppressWarnings()
             ) |>
               dplyr::filter(
                 .data[["SampleID"]] %in% .env[["sample_subset"]]
@@ -1378,11 +1519,11 @@ test_that(
         !(.data[["OlinkID"]] %in% .env[["oid_only_in_nonref_v4"]])
       ) |>
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL_1",
           "A38" ~ "PLATE_CTRL_1",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       )
     df_ref_med_v4 <- ref_norm_res$lst_df$ref_med |>
@@ -1424,11 +1565,11 @@ test_that(
       ) |>
       # create controls
       dplyr::mutate(
-        SampleID = dplyr::case_match(
+        SampleID = dplyr::recode_values(
           .data[["SampleID"]],
           "A6" ~ "NEG_CTRL_1",
           "A38" ~ "PLATE_CTRL_1",
-          .default = .data[["SampleID"]]
+          default = .data[["SampleID"]]
         )
       ) |>
       # remove controls
@@ -1451,7 +1592,10 @@ test_that(
                   overlapping_samples_df1 = subset_samples_v4,
                   df1_project_nr = "df1_norm",
                   reference_medians = df_ref_med_v4,
-                  format = TRUE
+                  format = TRUE,
+                  df1_check_log = check_npx(df = df_norm_ref_v4) |>
+                    suppressMessages() |>
+                    suppressWarnings()
                 ) |>
                   dplyr::filter(
                     .data[["SampleID"]] %in% .env[["sample_subset"]]
@@ -1490,10 +1634,6 @@ test_that(
 test_that(
   "olink_normalization - works - 3k-HT normalization",
   {
-
-    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
-
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
 
@@ -1513,7 +1653,13 @@ test_that(
             df1_project_nr = "df_ht",
             df2_project_nr = "df_3k",
             reference_project = "df_ht",
-            format = FALSE
+            format = FALSE,
+            df1_check_log = check_npx(df = data_ht) |>
+              suppressMessages() |>
+              suppressWarnings(),
+            df2_check_log = check_npx(df = data_3k) |>
+              suppressMessages() |>
+              suppressWarnings()
           ),
           regexp = "2 assays are not shared across products."
         ),
@@ -1557,7 +1703,13 @@ test_that(
                     df1_project_nr = "df_ht",
                     df2_project_nr = "df_3k",
                     reference_project = "df_ht",
-                    format = TRUE
+                    format = TRUE,
+                    df1_check_log = check_npx(df = data_ht) |>
+                      suppressMessages() |>
+                      suppressWarnings(),
+                    df2_check_log = check_npx(df = data_3k) |>
+                      suppressMessages() |>
+                      suppressWarnings()
                   ),
                   regexp = "2 assays are not shared across products."
                 ),
@@ -1596,9 +1748,6 @@ test_that(
 test_that(
   "olink_normalization - works - 3k-Reveal",
   {
-    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data", "example_Reveal_data.rds")))
-
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
 
@@ -1621,7 +1770,13 @@ test_that(
               df1_project_nr = "Reveal",
               df2_project_nr = "3k",
               reference_project = "Reveal",
-              format = FALSE
+              format = FALSE,
+              df1_check_log = check_npx(df = data_reveal) |>
+                suppressMessages() |>
+                suppressWarnings(),
+              df2_check_log = check_npx(df = data_3k) |>
+                suppressMessages() |>
+                suppressWarnings()
             ),
             regexp = "Cross-product normalization will be performed!"
           ),
@@ -1670,7 +1825,13 @@ test_that(
                       df1_project_nr = "Reveal",
                       df2_project_nr = "3k",
                       reference_project = "Reveal",
-                      format = TRUE
+                      format = TRUE,
+                      df1_check_log = check_npx(df = data_reveal) |>
+                        suppressMessages() |>
+                        suppressWarnings(),
+                      df2_check_log = check_npx(df = data_3k) |>
+                        suppressMessages() |>
+                        suppressWarnings()
                     ),
                     regexp = "Cross-product normalization will be performed!"
                   ),
@@ -1717,29 +1878,30 @@ test_that(
 
     ## example 1: panel_version ----
 
-    lst_cnames_v1 <- olink_norm_input_check_df_cols(
-      lst_df = list(
-        "p1" = npx_data1 |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ),
-        "p2" = npx_data2 |>
-          dplyr::rename(
-            "Panel_Lot_Nr" = "Panel_Version"
-          ) |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          )
+    ref_df <- npx_data2 |>
+      dplyr::rename(
+        "Panel_Lot_Nr" = "Panel_Version"
+      ) |>
+      dplyr::mutate(
+        Normalization = "Intensity"
       )
-    )
+    not_ref_df <- npx_data1 |>
+      dplyr::mutate(
+        Normalization = "Intensity"
+      )
+
+    ref_df_check <- check_npx(df = ref_df) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    not_ref_df_check <- check_npx(df = not_ref_df) |>
+      suppressMessages() |>
+      suppressWarnings()
 
     update_cnames_v1 <- norm_internal_rename_cols(
-      ref_cols = lst_cnames_v1$p2,
-      not_ref_cols = lst_cnames_v1$p1,
-      not_ref_df = npx_data1 |>
-        dplyr::mutate(
-          Normalization = "Intensity"
-        ) |>
+      ref_cols = ref_df_check$col_names,
+      not_ref_cols = not_ref_df_check$col_names,
+      not_ref_df = not_ref_df |>
         dplyr::slice_head(n = 10L)
     ) |>
       names()
@@ -1752,35 +1914,34 @@ test_that(
 
     ## example 2: panel_version & qc_warn ----
 
-    lst_cnames_v2 <- olink_norm_input_check_df_cols(
-      lst_df = list(
-        "p1" = npx_data1 |>
-          dplyr::rename(
-            "SampleQC" = "QC_Warning"
-          ) |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ),
-        "p2" = npx_data2 |>
-          dplyr::rename(
-            "Panel_Lot_Nr" = "Panel_Version"
-          ) |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          )
+    ref_df_v2 <- npx_data1 |>
+      dplyr::rename(
+        "SampleQC" = "QC_Warning"
+      ) |>
+      dplyr::mutate(
+        Normalization = "Intensity"
       )
-    )
+    not_ref_df_v2 <- npx_data2 |>
+      dplyr::rename(
+        "Panel_Lot_Nr" = "Panel_Version"
+      ) |>
+      dplyr::mutate(
+        Normalization = "Intensity"
+      )
+
+    ref_df_v2_check <- check_npx(df = ref_df_v2) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    not_ref_df_v2_check <- check_npx(df = not_ref_df_v2) |>
+      suppressMessages() |>
+      suppressWarnings()
 
     update_cnames_v2 <- norm_internal_rename_cols(
-      ref_cols = lst_cnames_v2$p1,
-      not_ref_cols = lst_cnames_v2$p2,
-      not_ref_df = npx_data2 |>
-        dplyr::rename(
-          "Panel_Lot_Nr" = "Panel_Version"
-        ) |>
-        dplyr::mutate(
-          Normalization = "Intensity"
-        )
+      ref_cols = ref_df_v2_check$col_names,
+      not_ref_cols = not_ref_df_v2_check$col_names,
+      not_ref_df = not_ref_df_v2 |>
+        dplyr::slice_head(n = 10L)
     ) |>
       names()
 
@@ -1792,41 +1953,38 @@ test_that(
 
     ## example 2: panel_version, qc_warn, assay_qc - arrow ----
 
-    lst_cnames_v3 <- olink_norm_input_check_df_cols(
-      lst_df = list(
-        "p1" = npx_data1 |>
-          dplyr::rename(
-            "SampleQC" = "QC_Warning"
-          ) |>
-          dplyr::mutate(
-            Normalization = "Intensity",
-            AssayQC = "Pass"
-          ) |>
-          arrow::as_arrow_table(),
-        "p2" = npx_data2 |>
-          dplyr::rename(
-            "Panel_Lot_Nr" = "Panel_Version"
-          ) |>
-          dplyr::mutate(
-            Normalization = "Intensity",
-            Assay_Warning = "Pass"
-          ) |>
-          arrow::as_arrow_table()
-      )
-    )
+    ref_df_v3 <- npx_data1 |>
+      dplyr::rename(
+        "SampleQC" = "QC_Warning"
+      ) |>
+      dplyr::mutate(
+        Normalization = "Intensity",
+        AssayQC = "Pass"
+      ) |>
+      arrow::as_arrow_table()
+
+    not_ref_df_v3 <-  npx_data2 |>
+      dplyr::rename(
+        "Panel_Lot_Nr" = "Panel_Version"
+      ) |>
+      dplyr::mutate(
+        Normalization = "Intensity",
+        Assay_Warning = "Pass"
+      ) |>
+      arrow::as_arrow_table()
+
+    ref_df_v3_check <- check_npx(df = ref_df_v3) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    not_ref_df_v3_check <- check_npx(df = not_ref_df_v3) |>
+      suppressMessages() |>
+      suppressWarnings()
 
     update_cnames_v3 <- norm_internal_rename_cols(
-      ref_cols = lst_cnames_v3$p1,
-      not_ref_cols = lst_cnames_v3$p2,
-      not_ref_df = npx_data2 |>
-        dplyr::rename(
-          "Panel_Lot_Nr" = "Panel_Version"
-        ) |>
-        dplyr::mutate(
-          Normalization = "Intensity",
-          Assay_Warning = "Pass"
-        ) |>
-        arrow::as_arrow_table()
+      ref_cols = ref_df_v3_check$col_names,
+      not_ref_cols = not_ref_df_v3_check$col_names,
+      not_ref_df = not_ref_df_v3
     ) |>
       names()
 
@@ -1846,39 +2004,38 @@ test_that(
 
     # AssayQC in reference only ----
 
-    lst_cnames_v1 <- olink_norm_input_check_df_cols(
-      lst_df = list(
-        "p1" = npx_data1 |>
-          dplyr::rename(
-            "SampleQC" = "QC_Warning"
-          ) |>
-          dplyr::mutate(
-            Normalization = "Intensity",
-            AssayQC = "Pass"
-          ) |>
-          arrow::as_arrow_table(),
-        "p2" = npx_data2 |>
-          dplyr::rename(
-            "Panel_Lot_Nr" = "Panel_Version"
-          ) |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ) |>
-          arrow::as_arrow_table()
-      )
-    )
+    ref_df <- npx_data1 |>
+      dplyr::rename(
+        "SampleQC" = "QC_Warning"
+      ) |>
+      dplyr::mutate(
+        Normalization = "Intensity",
+        AssayQC = "Pass"
+      ) |>
+      arrow::as_arrow_table()
+
+    not_ref_df <- npx_data2 |>
+      dplyr::rename(
+        "Panel_Lot_Nr" = "Panel_Version"
+      ) |>
+      dplyr::mutate(
+        Normalization = "Intensity"
+      ) |>
+      arrow::as_arrow_table()
+
+    ref_df_check <- check_npx(df = ref_df) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    not_ref_df_check <- check_npx(df = not_ref_df) |>
+      suppressMessages() |>
+      suppressWarnings()
 
     update_cnames_v1 <- norm_internal_rename_cols(
-      ref_cols = lst_cnames_v1$p1,
-      not_ref_cols = lst_cnames_v1$p2,
-      not_ref_df = npx_data2 |>
-        dplyr::rename(
-          "Panel_Lot_Nr" = "Panel_Version"
-        ) |>
-        dplyr::mutate(
-          Normalization = "Intensity"
-        ) |>
-        arrow::as_arrow_table()
+      ref_cols = ref_df_check$col_names,
+      not_ref_cols = not_ref_df_check$col_names,
+      not_ref_df = not_ref_df |>
+        dplyr::slice_head(n = 10L)
     ) |>
       names()
 
@@ -1891,40 +2048,38 @@ test_that(
 
     # AssayQC in non-reference only ----
 
-    lst_cnames_v2 <- olink_norm_input_check_df_cols(
-      lst_df = list(
-        "p1" = npx_data1 |>
-          dplyr::rename(
-            "SampleQC" = "QC_Warning"
-          ) |>
-          dplyr::mutate(
-            Normalization = "Intensity",
-            AssayQC = "Pass"
-          ) |>
-          arrow::as_arrow_table(),
-        "p2" = npx_data2 |>
-          dplyr::rename(
-            "Panel_Lot_Nr" = "Panel_Version"
-          ) |>
-          dplyr::mutate(
-            Normalization = "Intensity"
-          ) |>
-          arrow::as_arrow_table()
-      )
-    )
+    ref_df_v2 <- npx_data2 |>
+      dplyr::rename(
+        "Panel_Lot_Nr" = "Panel_Version"
+      ) |>
+      dplyr::mutate(
+        Normalization = "Intensity"
+      ) |>
+      arrow::as_arrow_table()
+
+    not_ref_df_v2 <- npx_data1 |>
+      dplyr::rename(
+        "SampleQC" = "QC_Warning"
+      ) |>
+      dplyr::mutate(
+        Normalization = "Intensity",
+        AssayQC = "Pass"
+      ) |>
+      arrow::as_arrow_table()
+
+    ref_df_v2_check <- check_npx(df = ref_df_v2) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    not_ref_df_v2_check <- check_npx(df = not_ref_df_v2) |>
+      suppressMessages() |>
+      suppressWarnings()
 
     update_cnames_v2 <- norm_internal_rename_cols(
-      ref_cols = lst_cnames_v2$p2,
-      not_ref_cols = lst_cnames_v2$p1,
-      not_ref_df = npx_data1 |>
-        dplyr::rename(
-          "SampleQC" = "QC_Warning"
-        ) |>
-        dplyr::mutate(
-          Normalization = "Intensity",
-          AssayQC = "Pass"
-        ) |>
-        arrow::as_arrow_table()
+      ref_cols = ref_df_v2_check$col_names,
+      not_ref_cols = not_ref_df_v2_check$col_names,
+      not_ref_df = not_ref_df_v2 |>
+        dplyr::slice_head(n = 10L)
     ) |>
       names()
 
@@ -2033,9 +2188,6 @@ test_that(
 test_that(
   "Cross product normalization - works - correlation assays present",
   {
-    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
-
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
 
@@ -2058,24 +2210,34 @@ test_that(
         .data[["OlinkID_E3072"]]
       )
 
+    df_ht_mod <- data_ht |>
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% c("OID12345", "OID54321"))
+      )
+
+    df_3k_mod <- data_3k |>
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% c("OID12345", "OID54321"))
+      )
+
     # HT correlation is present
     expect_message(
       object = expect_message(
         object = expect_contains(
           object = olink_normalization(
-            df1 = data_ht |>
-              dplyr::filter(
-                !(.data[["OlinkID"]] %in% c("OID12345", "OID54321"))
-              ),
-            df2 = data_3k |>
-              dplyr::filter(
-                !(.data[["OlinkID"]] %in% c("OID12345", "OID54321"))
-              ),
+            df1 = df_ht_mod,
+            df2 = df_3k_mod,
             overlapping_samples_df1 = bridge_samples,
             df1_project_nr = "proj_ht",
             df2_project_nr = "proj_3k",
             reference_project = "proj_ht",
-            format = FALSE
+            format = FALSE,
+            df1_check_log = check_npx(df = df_ht_mod) |>
+              suppressMessages() |>
+              suppressWarnings(),
+            df2_check_log = check_npx(df = df_3k_mod) |>
+              suppressMessages() |>
+              suppressWarnings()
           ) |>
             dplyr::distinct(OlinkID) |>
             dplyr::pull(),
@@ -2091,19 +2253,19 @@ test_that(
       object = expect_message(
         object = expect_contains(
           object = olink_normalization(
-            df1 = data_ht |>
-              dplyr::filter(
-                !(.data[["OlinkID"]] %in% c("OID12345", "OID54321"))
-              ),
-            df2 = data_3k |>
-              dplyr::filter(
-                !(.data[["OlinkID"]] %in% c("OID12345", "OID54321"))
-              ),
+            df1 = df_ht_mod,
+            df2 = df_3k_mod,
             overlapping_samples_df1 = bridge_samples,
             df1_project_nr = "proj_ht",
             df2_project_nr = "proj_3k",
             reference_project = "proj_ht",
-            format = FALSE
+            format = FALSE,
+            df1_check_log = check_npx(df = df_ht_mod) |>
+              suppressMessages() |>
+              suppressWarnings(),
+            df2_check_log = check_npx(df = df_3k_mod) |>
+              suppressMessages() |>
+              suppressWarnings()
           ) |>
             dplyr::distinct(OlinkID_E3072) |>
             dplyr::pull(),
@@ -2119,54 +2281,77 @@ test_that(
 test_that(
   "norm_internal_cross_product missing counts - error",
   {
-
-    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
-
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
 
     ## error v1: reference/HT and new/3K DF missing count column ----
 
+    data_ht_mod_v1 <- data_ht |> dplyr::select(-dplyr::all_of("Count"))
+    data_3k_mod_v1 <- data_3k |> dplyr::select(-dplyr::all_of("Count"))
+
     expect_error(
       object = olink_normalization(
-        df1 = data_ht |> dplyr::select(-dplyr::all_of("Count")),
-        df2 = data_3k |> dplyr::select(-dplyr::all_of("Count")),
+        df1 = data_ht_mod_v1,
+        df2 = data_3k_mod_v1,
         overlapping_samples_df1 = intersect(data_ht$SampleID, data_3k$SampleID),
         df1_project_nr = "proj_ht",
         df2_project_nr = "proj_3k",
         reference_project = "proj_ht",
-        format = FALSE
+        format = FALSE,
+        df1_check_log = check_npx(df = data_ht_mod_v1) |>
+          suppressMessages() |>
+          suppressWarnings(),
+        df2_check_log = check_npx(df = data_3k_mod_v1) |>
+          suppressMessages() |>
+          suppressWarnings()
       ),
       regexp = "Column \"Count\" not found in datasets \"proj_ht\" and"
     )
 
     ## error v2: reference/HT DF missing count column ----
 
+    data_ht_mod_v2 <- data_ht |> dplyr::select(-dplyr::all_of("Count"))
+    data_3k_mod_v2 <- data_3k
+
     expect_error(
       object = olink_normalization(
-        df1 = data_ht |> dplyr::select(-dplyr::all_of("Count")),
-        df2 = data_3k,
+        df1 = data_ht_mod_v2,
+        df2 = data_3k_mod_v2,
         overlapping_samples_df1 = intersect(data_ht$SampleID, data_3k$SampleID),
         df1_project_nr = "proj_ht",
         df2_project_nr = "proj_3k",
         reference_project = "proj_ht",
-        format = FALSE
+        format = FALSE,
+        df1_check_log = check_npx(df = data_ht_mod_v2) |>
+          suppressMessages() |>
+          suppressWarnings(),
+        df2_check_log = check_npx(df = data_3k_mod_v2) |>
+          suppressMessages() |>
+          suppressWarnings()
       ),
       regexp = "Column \"Count\" not found in dataset \"proj_ht\"!"
     )
 
     ## error v3: new/3K DF missing count column ----
 
+    data_ht_mod_v3 <- data_ht
+    data_3k_mod_v3 <- data_3k |> dplyr::select(-dplyr::all_of("Count"))
+
     expect_error(
       object = olink_normalization(
-        df1 = data_ht,
-        df2 = data_3k |> dplyr::select(-dplyr::all_of("Count")),
+        df1 = data_ht_mod_v3,
+        df2 = data_3k_mod_v3,
         overlapping_samples_df1 = intersect(data_ht$SampleID, data_3k$SampleID),
         df1_project_nr = "proj_ht",
         df2_project_nr = "proj_3k",
         reference_project = "proj_ht",
-        format = FALSE
+        format = FALSE,
+        df1_check_log = check_npx(df = data_ht_mod_v3) |>
+          suppressMessages() |>
+          suppressWarnings(),
+        df2_check_log = check_npx(df = data_3k_mod_v3) |>
+          suppressMessages() |>
+          suppressWarnings()
       ),
       regexp = "Column \"Count\" not found in dataset \"proj_3k\"!"
     )
@@ -2177,10 +2362,6 @@ test_that(
 test_that(
   "olink_normalization - works - old3kformat-HT normalization",
   {
-
-    skip_if_not(file.exists(test_path("data", "example_3k_data.rds")))
-    skip_if_not(file.exists(test_path("data", "example_HT_data.rds")))
-
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
 
@@ -2205,7 +2386,13 @@ test_that(
             df1_project_nr = "df_ht",
             df2_project_nr = "df_3k",
             reference_project = "df_ht",
-            format = FALSE
+            format = FALSE,
+            df1_check_log = check_npx(df = data_ht) |>
+              suppressMessages() |>
+              suppressWarnings(),
+            df2_check_log = check_npx(df = data_3k_old) |>
+              suppressMessages() |>
+              suppressWarnings()
           ),
           regexp = "Cross-product normalization will be performed!"
         ),

@@ -54,25 +54,39 @@
 #' ) |>
 #'   (\(x) x[!grepl("CONTROL", x)])()
 #'
+#' # check_npx
+#' data_ht_small_check <- OlinkAnalyze::check_npx(
+#'   df = OlinkAnalyze:::data_ht_small
+#' )
+#'
+#' data_3k_small_check <- OlinkAnalyze::check_npx(
+#'   df = OlinkAnalyze:::data_3k_small
+#' )
+#'
 #' # run olink_normalization
-#' df_norm <- olink_normalization(
+#' df_norm <- OlinkAnalyze::olink_normalization(
 #'   df1 = OlinkAnalyze:::data_ht_small,
 #'   df2 = OlinkAnalyze:::data_3k_small,
 #'   overlapping_samples_df1 = bridge_samples,
 #'   df1_project_nr = "Explore HT",
 #'   df2_project_nr = "Explore 3072",
-#'   reference_project = "Explore HT"
+#'   reference_project = "Explore HT",
+#'   format = FALSE,
+#'   df1_check_log = data_ht_small_check,
+#'   df2_check_log = data_3k_small_check
 #' )
 #'
 #' # generate lst_check
 #' lst_check <- OlinkAnalyze:::olink_norm_input_check(
-#'   df1 = OlinkAnalyze:::data_3k_small,
-#'   df2 = OlinkAnalyze:::data_ht_small,
+#'   df1 = OlinkAnalyze:::data_ht_small,
+#'   df1_check_log = data_ht_small_check,
+#'   df2 = OlinkAnalyze:::data_3k_small,
+#'   df2_check_log = data_3k_small_check,
 #'   overlapping_samples_df1 = bridge_samples,
 #'   overlapping_samples_df2 = NULL,
-#'   df1_project_nr = "P1",
-#'   df2_project_nr = "P2",
-#'   reference_project = "P2",
+#'   df1_project_nr = "Explore HT",
+#'   df2_project_nr = "Explore 3072",
+#'   reference_project = "Explore HT",
 #'   reference_medians = NULL
 #' )
 #'
@@ -116,11 +130,11 @@ olink_normalization_format <- function(df_norm,
 
     # Extract data for assays = "NotBridgeable" ----
 
-    oid_col_name <- lst_check$ref_cols$olink_id
-    not_ref_oid_col_name <- paste0(lst_check$ref_cols$olink_id,
+    oid_col_name <- lst_check$ref_check_log$col_names$olink_id
+    not_ref_oid_col_name <- paste0(lst_check$ref_check_log$col_names$olink_id,
                                    "_", lst_check$not_ref_product)
 
-    quant_col_name <- lst_check$ref_cols$quant
+    quant_col_name <- lst_check$ref_check_log$col_names$quant
 
     df_not_bridgeable <- df_norm |>
       dplyr::filter(
@@ -189,14 +203,28 @@ olink_normalization_format <- function(df_norm,
     # reorder Panel to keep reference product first
     # then concatenate panels per OlinkID
     # NotBridgeable or NotOverlapping assays retain their original panel
-    df_combo  <- df_combo |>
+    df_combo <- df_combo |>
       dplyr::mutate(
-        Panel_order = forcats::fct_relevel(Panel, ref_product_panels[[ lst_check$ref_product]])) |> # nolint: line_length_linter
-      dplyr::group_by(.data[[oid_col_name]]) |>
+        Panel_order = forcats::fct_relevel(
+          .data[["Panel"]],
+          ref_product_panels[[lst_check$ref_product]]
+        )
+      ) |>
+      dplyr::group_by(
+        dplyr::across(
+          dplyr::all_of(
+            oid_col_name
+          )
+        )
+      ) |>
       dplyr::mutate(Panel = paste(sort(unique(.data[["Panel_order"]])),
                                   collapse = "_")) |>
-      dplyr::select(-.data[["Panel_order"]])
-
+      dplyr::ungroup() |>
+      dplyr::select(
+        -dplyr::all_of(
+          c("Panel_order")
+        )
+      )
 
     # clean up
     df_combo <- df_combo |>
@@ -211,7 +239,7 @@ olink_normalization_format <- function(df_norm,
   df_full <- df_combo |>
     olink_format_rm_ext_ctrl(lst_check = lst_check) |>
     dplyr::arrange(
-      .data[["Project"]], .data[[lst_check$ref_cols$sample_id]]
+      .data[["Project"]], .data[[lst_check$ref_check_log$col_names$sample_id]]
     )
 
   return(df_full)
@@ -239,8 +267,8 @@ olink_format_rm_ext_ctrl <- function(df,
 
   # if sample_type is present in data for both datasets, use it to
   # identify NCs and PCs
-  if (length(lst_check$ref_cols$sample_type) > 0L
-      && length(lst_check$not_ref_cols$sample_type) > 0L) {
+  if (length(lst_check$ref_check_log$col_names$sample_type) > 0L
+      && length(lst_check$not_ref_check_log$col_names$sample_type) > 0L) {
 
     exclude_ext_ctrl_sampletype <- function(df,
                                             lst_check,
@@ -249,14 +277,14 @@ olink_format_rm_ext_ctrl <- function(df,
         dplyr::filter(
           dplyr::if_any(
             dplyr::any_of(
-              c(lst_check$ref_cols$sample_type,
-                lst_check$not_ref_cols$sample_type)
+              c(lst_check$ref_check_log$col_names$sample_type,
+                lst_check$not_ref_check_log$col_names$sample_type)
             ),
             ~ .x %in% .env[["ext_ctrl_type"]]
           )
         ) |>
         dplyr::pull(
-          .data[[lst_check$ref_cols$sample_id]]
+          .data[[lst_check$ref_check_log$col_names$sample_id]]
         ) |>
         unique()
       return(ext_ctrl_sid)
@@ -285,16 +313,16 @@ olink_format_rm_ext_ctrl <- function(df,
                                           ext_ctrl_regex) {
       ext_ctrl_sid <- df |>
         dplyr::distinct(
-          .data[[lst_check$ref_cols$sample_id]]
+          .data[[lst_check$ref_check_log$col_names$sample_id]]
         ) |>
         dplyr::filter(
           stringr::str_detect(
-            string = .data[[lst_check$ref_cols$sample_id]],
+            string = .data[[lst_check$ref_check_log$col_names$sample_id]],
             pattern = ext_ctrl_regex
           )
         ) |>
         dplyr::pull(
-          .data[[lst_check$ref_cols$sample_id]]
+          .data[[lst_check$ref_check_log$col_names$sample_id]]
         )
       return(ext_ctrl_sid)
     }
@@ -312,7 +340,7 @@ olink_format_rm_ext_ctrl <- function(df,
     # remove NCs and PCs for the dataset
     df <- df |>
       dplyr::filter(
-        !(.data[[lst_check$ref_cols$sample_id]] %in% c(nc_sid, pc_sid))
+        !(.data[[lst_check$ref_check_log$col_names$sample_id]] %in% c(nc_sid, pc_sid)) # nolint: line_length_linter
       )
 
     if (length(nc_sid) > 0L) {
@@ -388,10 +416,10 @@ olink_format_oid_no_overlap <- function(lst_check) {
     ## Get non-overlapping assays for dataset
     df_no_overlap <- df |>
       dplyr::filter(
-        .data[[df_oid]] %in% df_assays
+        .data[[df_oid]] %in% .env[["df_assays"]]
       ) |>
       dplyr::mutate(
-        Project = df_name
+        Project = .env[["df_name"]]
       )
 
     return(df_no_overlap)
@@ -402,7 +430,7 @@ olink_format_oid_no_overlap <- function(lst_check) {
   ref_df_no_overlap <- extract_non_overlapping_df(
     df = lst_check$ref_original_df,
     df_name = lst_check$ref_name,
-    df_oid = lst_check$ref_cols$olink_id,
+    df_oid = lst_check$ref_check_log$col_names$olink_id,
     df_oid_no_overlap = lst_check$non_overlapping_oid
   )
 
@@ -411,9 +439,9 @@ olink_format_oid_no_overlap <- function(lst_check) {
   # Processing for reference median normalization
   if (lst_check$norm_mode == olink_norm_modes$ref_median) {
 
-    num_non_overlap <- ref_df_no_overlap |> # nolint object_usage_linter
+    num_non_overlap <- ref_df_no_overlap |> # nolint: object_usage_linter
       dplyr::pull(
-        .data[[lst_check$ref_cols$olink_id]]
+        .data[[lst_check$ref_check_log$col_names$olink_id]]
       ) |>
       unique()
 
@@ -437,7 +465,7 @@ olink_format_oid_no_overlap <- function(lst_check) {
     not_ref_df_no_overlap <- extract_non_overlapping_df(
       df = lst_check$not_ref_original_df,
       df_name = lst_check$not_ref_name,
-      df_oid = lst_check$ref_cols$olink_id,
+      df_oid = lst_check$ref_check_log$col_names$olink_id,
       df_oid_no_overlap = lst_check$non_overlapping_oid
     )
 

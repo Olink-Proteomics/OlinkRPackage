@@ -2,10 +2,12 @@
 % Please edit documentation in R/Olink_one_non_parametric.R
 \name{olink_one_non_parametric_posthoc}
 \alias{olink_one_non_parametric_posthoc}
-\title{Function which performs posthoc test per protein for the results from Friedman or Kruskal-Wallis Test.}
+\title{Function which performs posthoc test per protein for the results from
+Friedman or Kruskal-Wallis Test.}
 \usage{
 olink_one_non_parametric_posthoc(
   df,
+  check_log = NULL,
   olinkid_list = NULL,
   variable,
   test = "kruskal",
@@ -14,20 +16,29 @@ olink_one_non_parametric_posthoc(
 )
 }
 \arguments{
-\item{df}{NPX data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.}
+\item{df}{NPX data frame in long format with at least protein name (Assay),
+OlinkID, UniProt, Panel and a factor with at least 3 levels.}
 
-\item{olinkid_list}{Character vector of OlinkID's on which to perform post hoc analysis. If not specified, all assays in df are used.}
+\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+
+\item{olinkid_list}{Character vector of OlinkID's on which to perform post
+hoc analysis. If not specified, all assays in df are used.}
 
 \item{variable}{Single character value or character array.}
 
-\item{test}{Single character value indicates running the post hoc test for friedman or kruskal.}
+\item{test}{Single character value indicates running the post hoc test for
+friedman or kruskal.}
 
-\item{subject}{Group information for the repeated measurement. If (dependence = TRUE), this parameter need to be specified.}
+\item{subject}{Group information for the repeated measurement.
+If (dependence = TRUE), this parameter need to be specified.}
 
-\item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
+\item{verbose}{Boolean. Default: True. If information about removed samples,
+factor conversion and final model formula is to be printed to the console.}
 }
 \value{
-Tibble of posthoc tests for specified effect, arranged by ascending adjusted p-values.
+Tibble of posthoc tests for specified effect, arranged by ascending
+adjusted p-values.
 
 Columns include:
 \itemize{
@@ -37,40 +48,57 @@ Columns include:
 \item{Panel:} "character" Name of Olink Panel
 \item{term:} "character" term in model
 \item{contrast:} "character" the groups that were compared
-\item{estimate:} "numeric" the value of the test statistic with a name describing it
+\item{estimate:} "numeric" the value of the test statistic with a name
+describing it
 \item{Adjusted_pval:} "numeric" adjusted p-value for the test
-\item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+\item{Threshold:} "character" if adjusted p-value is significant or
+not (< 0.05)
 }
 }
 \description{
-Performs a posthoc test using rstatix::wilcox_test or FSA::dunnTest with Benjamini-Hochberg p-value adjustment per assay (by OlinkID) for each panel at confidence level 0.95.
+Performs a posthoc test using rstatix::wilcox_test or FSA::dunnTest with
+Benjamini-Hochberg p-value adjustment per assay (by OlinkID) for each panel
+at confidence level 0.95.
 See \code{olink_one_non_parametric} for details of input notation. \cr\cr
 The function handles both factor and numerical variables.
 }
 \examples{
 \donttest{
-library(dplyr)
+if (rlang::is_installed(pkg = c("FSA", "broom", "rstatix"))) {
 
-try({ # May fail if dependencies are not installed
-# One-way Kruskal-Wallis Test
-kruskal_results <- olink_one_non_parametric(df = npx_data1,
-                                            variable = "Site")
-})
+  check_log <- check_npx(df = npx_data1)
 
-#Friedman Test
-friedman_results <- olink_one_non_parametric(df = npx_data1,
-                                            variable = "Time",
-                                            subject = "Subject",
-                                            dependence = TRUE)
+  # One-way Kruskal-Wallis Test
+  kruskal_results <- OlinkAnalyze::olink_one_non_parametric(
+    df = npx_data1,
+    check_log = check_log,
+    variable = "Site"
+  )
 
-#Posthoc test for the results from Friedman Test
-friedman_posthoc_results <- olink_one_non_parametric_posthoc(npx_data1,
-                                                            variable = "Time",
-                                                            test = "friedman",
-                                                            olinkid_list = {friedman_results \%>\%
-                                                              filter(Threshold == 'Significant') \%>\%
-                                                              dplyr::select(OlinkID) \%>\%
-                                                              distinct() \%>\%
-                                                              pull()})}
+  # Friedman Test
+  friedman_results <- OlinkAnalyze::olink_one_non_parametric(
+    df = npx_data1,
+    check_log = check_log,
+    variable = "Time",
+    subject = "Subject",
+    dependence = TRUE
+  )
+
+  # Posthoc test for the results from Friedman Test
+  friedman_posthoc_results <- OlinkAnalyze::olink_one_non_parametric_posthoc(
+    df = npx_data1,
+    check_log = check_log,
+    variable = "Time",
+    test = "friedman",
+    olinkid_list = friedman_results |>
+      dplyr::filter(.data[["Threshold"]] == "Significant") |>
+      dplyr::select(
+        dplyr::all_of("OlinkID")
+      ) |>
+      dplyr::distinct() |>
+      dplyr::pull()
+  )
+}
+}
 
 }

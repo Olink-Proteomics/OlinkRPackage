@@ -16,13 +16,23 @@ test_that(
     ) |>
       (\(x) x[!grepl("CONTROL", x)])()
 
+    df_3k_check_log <- check_npx(df = data_3k) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df_ht_check_log <- check_npx(df = data_ht) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     # Warning that some assays are not overlapping and will be removed from
     # normalization.
     expect_warning(
       object = expect_message(
         object = olink_norm_input_check(
           df1 = data_3k,
+          df1_check_log = df_3k_check_log,
           df2 = data_ht,
+          df2_check_log = df_ht_check_log,
           overlapping_samples_df1 = bridge_samples_3k_ht,
           overlapping_samples_df2 = NULL,
           df1_project_nr = "P1",
@@ -35,16 +45,30 @@ test_that(
       regexp = "2 assays are not shared across products."
     )
 
+    data_3k_mod <- data_3k |>
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% c("OID12345", "OID54321"))
+      )
+
+    data_ht_mod <- data_ht |>
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% c("OID12345", "OID54321"))
+      )
+
+    df_3k_mod_check_log <- check_npx(df = data_3k_mod) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df_ht_mod_check_log <- check_npx(df = data_ht_mod) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     expect_message(
       object = data_explore_check <- olink_norm_input_check(
-        df1 = data_3k |>
-          dplyr::filter(
-            !(.data[["OlinkID"]] %in% c("OID12345", "OID54321"))
-          ),
-        df2 = data_ht |>
-          dplyr::filter(
-            !(.data[["OlinkID"]] %in% c("OID12345", "OID54321"))
-          ),
+        df1 = data_3k_mod,
+        df1_check_log = df_3k_mod_check_log,
+        df2 = data_ht_mod,
+        df2_check_log = df_ht_mod_check_log,
         overlapping_samples_df1 = bridge_samples_3k_ht,
         overlapping_samples_df2 = NULL,
         df1_project_nr = "P1",
@@ -62,8 +86,8 @@ test_that(
     names(lst_df) <- c(data_explore_check$ref_name,
                        data_explore_check$not_ref_name)
 
-    ref_cols <- data_explore_check$ref_cols
-    not_ref_cols <- data_explore_check$not_ref_cols
+    ref_cols <- data_explore_check$ref_check_log$col_names
+    not_ref_cols <- data_explore_check$not_ref_check_log$col_names
 
     is_bridgeable_result <- olink_normalization_bridgeable(
       lst_df = lst_df,
@@ -146,14 +170,6 @@ test_that(
 
     # load reference data ----
 
-    skip_if_not(file.exists(
-      testthat::test_path("data", "qq_normalization_reference_result.rds")
-    ))
-    skip_if_not(file.exists(
-      testthat::test_path("data",
-                          "qq_normalization_reference_result_reveal.rds")
-    ))
-
     ref_qs_norm <- get_example_data(
       filename = "qq_normalization_reference_result.rds"
     )
@@ -176,11 +192,25 @@ test_that(
     ) |>
       (\(x) x[!grepl("CONTROL", x)])()
 
+    df_ht_check_log <- check_npx(df = data_ht) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df_3k_check_log <- check_npx(df = data_3k) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df_reveal_check_log <- check_npx(df = data_reveal) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     # run the internal function that check input from olink_normalization
     expect_message(
       object = norm_input_check <- olink_norm_input_check(
         df1 = data_ht,
+        df1_check_log = df_ht_check_log,
         df2 = data_3k,
+        df2_check_log = df_3k_check_log,
         overlapping_samples_df1 = bridge_samples,
         overlapping_samples_df2 = NULL,
         df1_project_nr = "P1",
@@ -195,7 +225,9 @@ test_that(
       object = expect_message(
         object = norm_input_check_reveal <- olink_norm_input_check(
           df1 = data_reveal,
+          df1_check_log = df_reveal_check_log,
           df2 = data_3k,
+          df2_check_log = df_3k_check_log,
           overlapping_samples_df1 = bridge_samples_reveal,
           overlapping_samples_df2 = NULL,
           df1_project_nr = "P1",
@@ -213,9 +245,9 @@ test_that(
       norm_input_check$not_ref_df
     ) |>
       lapply(function(l_df) {
-        l_df |> # nolint return_linter
+        l_df |> # nolint: return_linter
           dplyr::filter(
-            .data[[norm_input_check$ref_cols$sample_id]] %in%
+            .data[[norm_input_check$ref_check_log$col_names$sample_id]] %in%
               .env[["bridge_samples"]]
           )
       })
@@ -228,9 +260,9 @@ test_that(
       norm_input_check_reveal$not_ref_df
     ) |>
       lapply(function(l_df) {
-        l_df |> # nolint return_linter
+        l_df |> # nolint: return_linter
           dplyr::filter(
-            .data[[norm_input_check$ref_cols$sample_id]] %in%
+            .data[[norm_input_check$ref_check_log$col_names$sample_id]] %in%
               .env[["bridge_samples"]]
           )
       })
@@ -244,8 +276,8 @@ test_that(
         object = expect_no_error(
           object = qs_norm <- olink_normalization_qs(
             lst_df = lst_df,
-            ref_cols = norm_input_check$ref_cols,
-            not_ref_cols = norm_input_check$not_ref_cols,
+            ref_cols = norm_input_check$ref_check_log$col_names,
+            not_ref_cols = norm_input_check$not_ref_check_log$col_names,
             bridge_samples = bridge_samples,
             prod_uniq = c(norm_input_check$not_ref_product,
                           norm_input_check$ref_product)
@@ -259,8 +291,8 @@ test_that(
         object = expect_no_error(
           object = qs_norm_reveal <- olink_normalization_qs(
             lst_df = lst_df_reveal,
-            ref_cols = norm_input_check_reveal$ref_cols,
-            not_ref_cols = norm_input_check_reveal$not_ref_cols,
+            ref_cols = norm_input_check_reveal$ref_check_log$col_names,
+            not_ref_cols = norm_input_check_reveal$not_ref_check_log$col_names,
             bridge_samples = bridge_samples_reveal,
             prod_uniq = c(norm_input_check_reveal$not_ref_product,
                           norm_input_check_reveal$ref_product)
@@ -272,8 +304,8 @@ test_that(
     expect_error(
       object = olink_normalization_qs(
         lst_df = lst_df,
-        ref_cols = norm_input_check$ref_cols,
-        not_ref_cols = norm_input_check$not_ref_cols,
+        ref_cols = norm_input_check$ref_check_log$col_names,
+        not_ref_cols = norm_input_check$not_ref_check_log$col_names,
         bridge_samples = bridge_samples,
         prod_uniq = "other"
       ),
@@ -293,13 +325,13 @@ test_that(
           )
         ) |>
         dplyr::arrange(
-          .data[[norm_input_check$ref_cols$sample_id]],
-          .data[[norm_input_check$ref_cols$olink_id]]
+          .data[[norm_input_check$not_ref_check_log$col_names$sample_id]],
+          .data[[norm_input_check$not_ref_check_log$col_names$olink_id]]
         ),
       expected = ref_qs_norm |>
         dplyr::arrange(
-          .data[[norm_input_check$ref_cols$sample_id]],
-          .data[[norm_input_check$ref_cols$olink_id]]
+          .data[[norm_input_check$not_ref_check_log$col_names$sample_id]],
+          .data[[norm_input_check$not_ref_check_log$col_names$olink_id]]
         ),
       tolerance = 1e-4
     )
@@ -315,13 +347,13 @@ test_that(
           )
         ) |>
         dplyr::arrange(
-          .data[[norm_input_check_reveal$ref_cols$sample_id]],
-          .data[[norm_input_check_reveal$ref_cols$olink_id]]
+          .data[[norm_input_check_reveal$not_ref_check_log$col_names$sample_id]], # nolint: line_length_linter
+          .data[[norm_input_check_reveal$not_ref_check_log$col_names$olink_id]]
         ),
       expected = ref_qs_norm_reveal |>
         dplyr::arrange(
-          .data[[norm_input_check_reveal$ref_cols$sample_id]],
-          .data[[norm_input_check_reveal$ref_cols$olink_id]]
+          .data[[norm_input_check_reveal$not_ref_check_log$col_names$sample_id]], # nolint: line_length_linter
+          .data[[norm_input_check_reveal$not_ref_check_log$col_names$olink_id]]
         ),
       tolerance = 1e-4
     )
@@ -352,11 +384,21 @@ test_that(
     ) |>
       (\(x) x[!grepl("CONTROL", x)])()
 
+    df_ht_check_log <- check_npx(df = data_ht) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df_3k_check_log <- check_npx(df = data_3k) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     # run the internal function that check input from olink_normalization
     expect_message(
       object = norm_input_check <- olink_norm_input_check(
         df1 = data_ht,
+        df1_check_log = df_ht_check_log,
         df2 = data_3k,
+        df2_check_log = df_3k_check_log,
         overlapping_samples_df1 = bridge_samples,
         overlapping_samples_df2 = NULL,
         df1_project_nr = "P1",
@@ -381,8 +423,8 @@ test_that(
         object = expect_no_error(
           object = qs_norm <- olink_normalization_qs(
             lst_df = lst_df,
-            ref_cols = norm_input_check$ref_cols,
-            not_ref_cols = norm_input_check$not_ref_cols,
+            ref_cols = norm_input_check$ref_check_log$col_names,
+            not_ref_cols = norm_input_check$not_ref_check_log$col_names,
             bridge_samples = bridge_samples,
             prod_uniq = c(norm_input_check$not_ref_product,
                           norm_input_check$ref_product)
@@ -395,15 +437,15 @@ test_that(
     expect_equal(
       object = qs_norm |>
         dplyr::filter(
-          .data[[norm_input_check$ref_cols$sample_id]] == "Sample_A"
+          .data[[norm_input_check$ref_check_log$col_names$sample_id]] == "Sample_A" # nolint: line_length_linter
           & .data[["Project"]] == norm_input_check$not_ref_name
-          & .data[[norm_input_check$ref_cols$olink_id]] %in%
+          & .data[[norm_input_check$ref_check_log$col_names$olink_id]] %in%
             c("OID40770_OID20117", "OID40835_OID31162", "OID40981_OID30796",
               "OID40986_OID20052", "OID41012_OID20054", "OID41032_OID20118")
         ) |>
         dplyr::arrange(
-          .data[[norm_input_check$ref_cols$sample_id]],
-          .data[[norm_input_check$ref_cols$olink_id]]
+          .data[[norm_input_check$ref_check_log$col_names$sample_id]],
+          .data[[norm_input_check$ref_check_log$col_names$olink_id]]
         ) |>
         dplyr::pull(
           .data[["QSNormalizedNPX"]]
@@ -416,9 +458,9 @@ test_that(
     expect_equal(
       object = qs_norm |>
         dplyr::filter(
-          .data[[norm_input_check$ref_cols$sample_id]] == "Sample_J"
+          .data[[norm_input_check$ref_check_log$col_names$sample_id]] == "Sample_J" # nolint: line_length_linter
           & .data[["Project"]] == norm_input_check$not_ref_name
-          & .data[[norm_input_check$ref_cols$olink_id]] == "OID42135_OID21255"
+          & .data[[norm_input_check$ref_check_log$col_names$olink_id]] == "OID42135_OID21255" # nolint: line_length_linter
         ) |>
         dplyr::pull(
           .data[["QSNormalizedNPX"]]
@@ -430,9 +472,9 @@ test_that(
     expect_equal(
       object = qs_norm |>
         dplyr::filter(
-          .data[[norm_input_check$ref_cols$sample_id]] == "Sample_AZ"
+          .data[[norm_input_check$ref_check_log$col_names$sample_id]] == "Sample_AZ" # nolint: line_length_linter
           & .data[["Project"]] == norm_input_check$not_ref_name
-          & .data[[norm_input_check$ref_cols$olink_id]] == "OID41486_OID31160"
+          & .data[[norm_input_check$ref_check_log$col_names$olink_id]] == "OID41486_OID31160" # nolint: line_length_linter
         ) |>
         dplyr::pull(
           .data[["QSNormalizedNPX"]]
@@ -479,12 +521,22 @@ test_that(
       sort() |>
       head(50L)
 
+    df_ht_check_log <- check_npx(df = data_ht) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df_3k_check_log <- check_npx(df = data_3k) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     # run the internal function that check input from olink_normalization
     expect_warning(
       object = expect_message(
         object = norm_input_check <- olink_norm_input_check(
           df1 = data_ht,
+          df1_check_log = df_ht_check_log,
           df2 = data_3k,
+          df2_check_log = df_3k_check_log,
           overlapping_samples_df1 = bridge_samples,
           overlapping_samples_df2 = NULL,
           df1_project_nr = "P1",
@@ -510,8 +562,8 @@ test_that(
         object = expect_no_error(
           object = qs_norm <- olink_normalization_qs(
             lst_df = lst_df,
-            ref_cols = norm_input_check$ref_cols,
-            not_ref_cols = norm_input_check$not_ref_cols,
+            ref_cols = norm_input_check$ref_check_log$col_names,
+            not_ref_cols = norm_input_check$not_ref_check_log$col_names,
             bridge_samples = bridge_samples,
             prod_uniq = c(norm_input_check$not_ref_product,
                           norm_input_check$ref_product)
@@ -524,15 +576,15 @@ test_that(
     expect_equal(
       object = qs_norm |>
         dplyr::filter(
-          .data[[norm_input_check$ref_cols$sample_id]] == "Sample_A"
+          .data[[norm_input_check$ref_check_log$col_names$sample_id]] == "Sample_A" # nolint: line_length_linter
           & .data[["Project"]] == norm_input_check$not_ref_name
-          & .data[[norm_input_check$ref_cols$olink_id]] %in%
+          & .data[[norm_input_check$ref_check_log$col_names$olink_id]] %in%
             c("OID40770_OID20117", "OID40835_OID31162", "OID40981_OID30796",
               "OID40986_OID20052", "OID41012_OID20054", "OID41032_OID20118")
         ) |>
         dplyr::arrange(
-          .data[[norm_input_check$ref_cols$sample_id]],
-          .data[[norm_input_check$ref_cols$olink_id]]
+          .data[[norm_input_check$ref_check_log$col_names$sample_id]],
+          .data[[norm_input_check$ref_check_log$col_names$olink_id]]
         ) |>
         dplyr::pull(
           .data[["QSNormalizedNPX"]]
@@ -545,9 +597,9 @@ test_that(
     expect_equal(
       object = qs_norm |>
         dplyr::filter(
-          .data[[norm_input_check$ref_cols$sample_id]] == "Sample_CT_3k"
+          .data[[norm_input_check$ref_check_log$col_names$sample_id]] == "Sample_CT_3k" # nolint: line_length_linter
           & .data[["Project"]] == norm_input_check$not_ref_name
-          & .data[[norm_input_check$ref_cols$olink_id]] == "OID42135_OID21255"
+          & .data[[norm_input_check$ref_check_log$col_names$olink_id]] == "OID42135_OID21255" # nolint: line_length_linter
         ) |>
         dplyr::pull(
           .data[["QSNormalizedNPX"]]
@@ -559,9 +611,9 @@ test_that(
     expect_equal(
       object = qs_norm |>
         dplyr::filter(
-          .data[[norm_input_check$ref_cols$sample_id]] == "Sample_EW_3k"
+          .data[[norm_input_check$ref_check_log$col_names$sample_id]] == "Sample_EW_3k" # nolint: line_length_linter
           & .data[["Project"]] == norm_input_check$not_ref_name
-          & .data[[norm_input_check$ref_cols$olink_id]] == "OID41486_OID31160"
+          & .data[[norm_input_check$ref_check_log$col_names$olink_id]] == "OID41486_OID31160" # nolint: line_length_linter
         ) |>
         dplyr::pull(
           .data[["QSNormalizedNPX"]]
@@ -609,12 +661,22 @@ test_that(
       (\(x) x[!grepl("CONTROL", x)])() |>
       sort()
 
+    df_ht_check_log <- check_npx(df = data_ht) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df_3k_check_log <- check_npx(df = data_3k) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     # run the internal function that check input from olink_normalization
     expect_warning(
       object = expect_message(
         object = norm_input_check <- olink_norm_input_check(
           df1 = data_ht,
+          df1_check_log = df_ht_check_log,
           df2 = data_3k,
+          df2_check_log = df_3k_check_log,
           overlapping_samples_df1 = head(x = bridge_samples, 38L),
           overlapping_samples_df2 = NULL,
           df1_project_nr = "P1",
@@ -638,8 +700,8 @@ test_that(
     expect_warning(
       object = olink_normalization_qs(
         lst_df = lst_df,
-        ref_cols = norm_input_check$ref_cols,
-        not_ref_cols = norm_input_check$not_ref_cols,
+        ref_cols = norm_input_check$ref_check_log$col_names,
+        not_ref_cols = norm_input_check$not_ref_check_log$col_names,
         bridge_samples = head(x = bridge_samples, 38L),
         prod_uniq = c(norm_input_check$not_ref_product,
                       norm_input_check$ref_product)
@@ -650,8 +712,8 @@ test_that(
     expect_warning(
       object = olink_normalization_qs(
         lst_df = lst_df,
-        ref_cols = norm_input_check$ref_cols,
-        not_ref_cols = norm_input_check$not_ref_cols,
+        ref_cols = norm_input_check$ref_check_log$col_names,
+        not_ref_cols = norm_input_check$not_ref_check_log$col_names,
         bridge_samples = head(x = bridge_samples, 40L),
         prod_uniq = c(norm_input_check$not_ref_product,
                       norm_input_check$ref_product)
@@ -680,12 +742,22 @@ test_that(
       (\(x) x[!grepl("CONTROL", x)])() |>
       sort()
 
+    df_ht_check_log <- check_npx(df = data_ht) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df_3k_check_log <- check_npx(df = data_3k) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     # run the internal function that check input from olink_normalization
     expect_warning(
       object = expect_message(
         object = norm_input_check <- olink_norm_input_check(
           df1 = data_ht,
+          df1_check_log = df_ht_check_log,
           df2 = data_3k,
+          df2_check_log = df_3k_check_log,
           overlapping_samples_df1 = head(x = bridge_samples, 40L),
           overlapping_samples_df2 = NULL,
           df1_project_nr = "P1",
@@ -709,8 +781,8 @@ test_that(
     expect_warning(
       object = norm_qs_40_bridge <- olink_normalization_qs(
         lst_df = lst_df,
-        ref_cols = norm_input_check$ref_cols,
-        not_ref_cols = norm_input_check$not_ref_cols,
+        ref_cols = norm_input_check$ref_check_log$col_names,
+        not_ref_cols = norm_input_check$not_ref_check_log$col_names,
         bridge_samples = head(x = bridge_samples, 40L),
         prod_uniq = c(norm_input_check$not_ref_product,
                       norm_input_check$ref_product)
@@ -722,7 +794,7 @@ test_that(
     norm_qs_oid_na <- norm_qs_40_bridge |>
       tidyr::drop_na() |>
       dplyr::pull(
-        .data[["OlinkID"]]
+        .data[[norm_input_check$not_ref_check_log$col_names$olink_id]]
       ) |>
       head(
         n = 2L
@@ -745,19 +817,25 @@ test_that(
     data_ht_v2 <- data_ht |>
       dplyr::mutate(
         NPX = dplyr::if_else(
-          .data[["SampleID"]] == bridge_samples[1L]
-          & .data[["OlinkID"]] %in% .env[["norm_qs_oid_ht_na"]],
+          .data[[df_ht_check_log$col_names$sample_id]] == bridge_samples[1L]
+          & .data[[df_ht_check_log$col_names$olink_id]] %in% .env[["norm_qs_oid_ht_na"]], # nolint: line_length_linter
           NA_real_,
           .data[["NPX"]]
         )
       )
+
+    df_ht_v2_check_log <- check_npx(df = data_ht_v2) |>
+      suppressMessages() |>
+      suppressWarnings()
 
     # run the internal function that check input from olink_normalization
     expect_warning(
       object = expect_message(
         object = norm_input_check_ht <- olink_norm_input_check(
           df1 = data_ht_v2,
+          df1_check_log = df_ht_v2_check_log,
           df2 = data_3k,
+          df2_check_log = df_3k_check_log,
           overlapping_samples_df1 = head(x = bridge_samples, 40L),
           overlapping_samples_df2 = NULL,
           df1_project_nr = "P1",
@@ -780,14 +858,16 @@ test_that(
     # run the function
     expect_warning(
       object = norm_qs_ht_na <-
-        olink_normalization_qs(lst_df = lst_df,
-                               ref_cols = norm_input_check_ht$ref_cols,
-                               not_ref_cols = norm_input_check_ht$not_ref_cols,
-                               bridge_samples = head(x = bridge_samples, 40L),
-                               prod_uniq = c(
-                                 norm_input_check_ht$not_ref_product,
-                                 norm_input_check_ht$ref_product
-                               )),
+        olink_normalization_qs(
+          lst_df = lst_df,
+          ref_cols = norm_input_check_ht$ref_check_log$col_names,
+          not_ref_cols = norm_input_check_ht$not_ref_check_log$col_names,
+          bridge_samples = head(x = bridge_samples, 40L),
+          prod_uniq = c(
+            norm_input_check_ht$not_ref_product,
+            norm_input_check_ht$ref_product
+          )
+        ),
       regexp = "There are 33 assays with fewer than 40 bridge samples for QS"
     )
 
@@ -795,7 +875,7 @@ test_that(
       object = norm_qs_ht_na |>
         dplyr::filter(
           .data[["Project"]] == norm_input_check_ht$not_ref_name
-          & .data[["OlinkID"]] %in% .env[["norm_qs_oid_na"]]
+          & .data[[norm_input_check_ht$ref_check_log$col_names$olink_id]] %in% .env[["norm_qs_oid_na"]] # nolint: line_length_linter
         ) |>
         dplyr::pull(
           .data[["QSNormalizedNPX"]]
@@ -809,19 +889,25 @@ test_that(
     data_3k_v2 <- data_3k |>
       dplyr::mutate(
         NPX = dplyr::if_else(
-          .data[["SampleID"]] %in% bridge_samples[1L:3L]
-          & .data[["OlinkID"]] %in% .env[["norm_qs_oid_3k_na"]],
+          .data[[df_3k_check_log$col_names$sample_id]] %in% bridge_samples[1L:3L] # nolint: line_length_linter
+          & .data[[df_3k_check_log$col_names$olink_id]] %in% .env[["norm_qs_oid_3k_na"]], # nolint: line_length_linter
           NA_real_,
           .data[["NPX"]]
         )
       )
+
+    df_3k_v2_check_log <- check_npx(df = data_3k_v2) |>
+      suppressMessages() |>
+      suppressWarnings()
 
     # run the internal function that check input from olink_normalization
     expect_warning(
       object = expect_message(
         object = norm_input_check_3k <- olink_norm_input_check(
           df1 = data_ht,
+          df1_check_log = df_ht_check_log,
           df2 = data_3k_v2,
+          df2_check_log = df_3k_v2_check_log,
           overlapping_samples_df1 = head(x = bridge_samples, 40L),
           overlapping_samples_df2 = NULL,
           df1_project_nr = "P1",
@@ -845,8 +931,8 @@ test_that(
     expect_warning(
       object = norm_qs_3k_na <- olink_normalization_qs(
         lst_df = lst_df,
-        ref_cols = norm_input_check_3k$ref_cols,
-        not_ref_cols = norm_input_check_3k$not_ref_cols,
+        ref_cols = norm_input_check_3k$ref_check_log$col_names,
+        not_ref_cols = norm_input_check_3k$not_ref_check_log$col_names,
         bridge_samples = head(x = bridge_samples, 40L),
         prod_uniq = c(
           norm_input_check_3k$not_ref_product,
@@ -860,7 +946,7 @@ test_that(
       object = norm_qs_3k_na |>
         dplyr::filter(
           .data[["Project"]] == norm_input_check_3k$not_ref_name
-          & .data[["OlinkID"]] %in% .env[["norm_qs_oid_na"]]
+          & .data[[norm_input_check_3k$not_ref_check_log$col_names$olink_id]] %in% .env[["norm_qs_oid_na"]] # nolint: line_length_linter
         ) |>
         dplyr::pull(
           .data[["QSNormalizedNPX"]]
@@ -893,12 +979,22 @@ test_that(
       (\(x) x[!grepl("CONTROL", x)])() |>
       sort()
 
+    df_ht_check_log <- check_npx(df = data_ht) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    df_reveal_check_log <- check_npx(df = data_reveal) |>
+      suppressMessages() |>
+      suppressWarnings()
+
     # run the internal function that check input from olink_normalization
     expect_warning(
       object = expect_message(
         object = norm_input_check <- olink_norm_input_check(
           df1 = data_ht,
+          df1_check_log = df_ht_check_log,
           df2 = data_reveal,
+          df2_check_log = df_reveal_check_log,
           overlapping_samples_df1 = bridge_samples,
           overlapping_samples_df2 = NULL,
           df1_project_nr = "P1",
@@ -922,8 +1018,8 @@ test_that(
     expect_no_warning(
       object = olink_normalization_qs(
         lst_df = lst_df,
-        ref_cols = norm_input_check$ref_cols,
-        not_ref_cols = norm_input_check$not_ref_cols,
+        ref_cols = norm_input_check$ref_check_log$col_names,
+        not_ref_cols = norm_input_check$not_ref_check_log$col_names,
         bridge_samples = bridge_samples,
         prod_uniq = c(norm_input_check$not_ref_product,
                       norm_input_check$ref_product)
@@ -934,8 +1030,8 @@ test_that(
     expect_warning(
       object = olink_normalization_qs(
         lst_df = lst_df,
-        ref_cols = norm_input_check$ref_cols,
-        not_ref_cols = norm_input_check$not_ref_cols,
+        ref_cols = norm_input_check$ref_check_log$col_names,
+        not_ref_cols = norm_input_check$not_ref_check_log$col_names,
         bridge_samples = head(x = bridge_samples, 18L),
         prod_uniq = c(norm_input_check$not_ref_product,
                       norm_input_check$ref_product)

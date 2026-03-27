@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release adds additional functionality to 4.4.0 including updates to support the new version of the ordinal package (fixing failing CRAN checks).
+This release adds bug fixes to Olink Analyze 4.3
 
 ## R CMD check results
 

@@ -464,6 +464,17 @@ references:
     orcid: https://orcid.org/0000-0002-6485-8781
   year: '2023'
 - type: software
+  title: extrafont
+  abstract: 'extrafont: Tools for Using Fonts'
+  notes: Suggests
+  url: https://github.com/wch/extrafont
+  repository: https://CRAN.R-project.org/package=extrafont
+  authors:
+  - family-names: Chang
+    given-names: Winston
+    email: winston@stdout.org
+  year: '2023'
+- type: software
   title: FSA
   abstract: 'FSA: Simple Fisheries Stock Assessment Methods'
   notes: Suggests
