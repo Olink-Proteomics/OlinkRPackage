@@ -621,6 +621,7 @@ than the difference in means (default). Note that no p-value is returned for
 mean_return = TRUE.
 -   verbose: Logical. Default: True. If information about removed samples,
 factor conversion and final model formula is to be printed to the console.
+-   check_log: Named list returned by `check_npx`. If `NULL`, `check_npx` is run internally.
 
 ```{r message=FALSE, eval=FALSE}
 # calculate the p-value for the ANOVA
@@ -1167,6 +1168,7 @@ and col_variable as color.
 point-range plots. Defaults to 6 plots per figure.
 -   verbose: Logical. Default: True. If information about removed samples,
 factor conversion and final model formula is to be printed to the console.
+-   check_log: Named list returned by `check_npx`. If `NULL`, `check_npx` is run internally.
 
 ```{r message=FALSE, eval=FALSE}
 plot <- OlinkAnalyze::olink_lmer_plot(
@@ -1503,6 +1505,7 @@ and corresponding figures. Default: 10.
 the two bridging projects. If this argument is not provided, the function will
 look for overlapping SampleID values between the two projects in the bridged
 dataframe. Default: NULL.
+-   check_log: Named list returned by `check_npx`. If `NULL`, `check_npx` is run internally.
 
 ```{r message=FALSE, eval=FALSE}
 npx_ht <- data_exploreht |>
