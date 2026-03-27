@@ -114,4 +114,5 @@ Suggests:
     umap,
     rstatix,
     FSA
-VignetteBuilder: knitr
+VignetteBuilder:
+    knitr
