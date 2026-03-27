@@ -109,4 +109,8 @@ Suggests:
     zip,
     umap,
     rstatix,
-    FSA
+    FSA,
+    kableExtra,
+    knitr
+VignetteBuilder: 
+    knitr
