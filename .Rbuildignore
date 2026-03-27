@@ -1,2 +1,3 @@
 ^LICENSE\.md$
 /revdep/
+^\.github$

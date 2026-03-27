@@ -10,7 +10,10 @@ olink_normalization_bridge(
   bridge_samples,
   project_1_name = "P1",
   project_2_name = "P2",
-  project_ref_name = "P1"
+  project_ref_name = "P1",
+  format = FALSE,
+  project_1_check_log = NULL,
+  project_2_check_log = NULL
 )
 }
 \arguments{
@@ -31,49 +34,83 @@ should correspond to the same sample. (required)}
 \item{project_ref_name}{Name of the project to be used as reference set.
 Needs to be one of the project_1_name or project_2_name. It marks the
 project to which the other project will be adjusted to (default: P1).}
+
+\item{format}{Boolean that controls whether the normalized dataset will be
+formatted for input to downstream analysis.}
+
+\item{project_1_check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If
+\code{NULL}, \code{\link[=check_npx]{check_npx()}} will be run internally using \code{project_1_df}.
+(default: \code{NULL})}
+
+\item{project_2_check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If
+\code{NULL}, \code{\link[=check_npx]{check_npx()}} will be run internally using \code{project_2_df}.
+(default: \code{NULL})}
 }
 \value{
 A "tibble" of NPX data in long format containing normalized NPX
 values, including adjustment factors and name of project.
 }
 \description{
-Normalizes two NPX projects (data frames) using shared samples.\cr\cr
+Normalizes two NPX projects (data frames) using shared samples.
+
+This function is a wrapper of olink_normalization.
 }
 \details{
-This function is a wrapper of olink_normalization.\cr\cr
-
 In bridging normalization one of the projects is adjusted to another using
 shared samples (bridge samples). It is not necessary for the shared
 samples to be named the same in each project. Adjustment between the two
 projects is made using the median of the paired differences between the
 shared samples. The two data frames are inputs project_1_df and project_2_df,
 the one being adjusted to is specified in the input project_ref_name and the
-shared samples are specified in bridge_samples.\cr\cr
+shared samples are specified in bridge_samples.
 }
 \examples{
 \donttest{
+# prepare datasets
 npx_df1 <- npx_data1 |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
-  dplyr::select(-Project) |>
-  dplyr::mutate(Normalization = "Intensity")
+  dplyr::filter(
+    !stringr::str_detect(string = .data[["SampleID"]],
+                         pattern = "CONTROL_")
+  ) |>
+  dplyr::select(
+    -dplyr::all_of("Project")
+  ) |>
+  dplyr::mutate(
+    Normalization = "Intensity"
+  )
 npx_df2 <- npx_data2 |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
-  dplyr::select(-Project) |>
-  dplyr::mutate(Normalization = "Intensity")
+  dplyr::filter(
+    !stringr::str_detect(string = .data[["SampleID"]],
+                         pattern = "CONTROL_")
+  ) |>
+  dplyr::select(
+    -dplyr::all_of("Project")
+  ) |>
+  dplyr::mutate(
+    Normalization = "Intensity"
+  )
 
 # Find overlapping samples, but exclude Olink control
-overlap_samples <- dplyr::intersect(unique(npx_df1$SampleID),
-                                    unique(npx_df2$SampleID))
+overlap_samples <- dplyr::intersect(x = unique(npx_df1[["SampleID"]]),
+                                    y = unique(npx_df2[["SampleID"]]))
 overlap_samples_list <- list("DF1" = overlap_samples,
                              "DF2" = overlap_samples)
 
+# check npx
+df1_check_log <- OlinkAnalyze::check_npx(df = npx_df1)
+df2_check_log <- OlinkAnalyze::check_npx(df = npx_df2)
+
 # Normalize
-olink_normalization_bridge(project_1_df = npx_df1,
-                           project_2_df = npx_df2,
-                           bridge_samples = overlap_samples_list,
-                           project_1_name = "P1",
-                           project_2_name = "P2",
-                           project_ref_name = "P1")
+OlinkAnalyze::olink_normalization_bridge(
+  project_1_df = npx_df1,
+  project_2_df = npx_df2,
+  bridge_samples = overlap_samples_list,
+  project_1_name = "P1",
+  project_2_name = "P2",
+  project_ref_name = "P1",
+  project_1_check_log = df1_check_log,
+  project_2_check_log = df2_check_log
+)
 }
 
 }

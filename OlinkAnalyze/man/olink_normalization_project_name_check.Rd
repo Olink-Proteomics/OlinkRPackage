@@ -32,3 +32,4 @@ function is expected to run all checks on project names to make sure that
 normalization can be performed smoothly. It should work independently of the
 function calling it.
 }
+\keyword{internal}

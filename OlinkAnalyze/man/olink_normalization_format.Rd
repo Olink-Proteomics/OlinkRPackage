@@ -65,25 +65,39 @@ bridge_samples <- intersect(
 ) |>
   (\(x) x[!grepl("CONTROL", x)])()
 
+# check_npx
+data_ht_small_check <- OlinkAnalyze::check_npx(
+  df = OlinkAnalyze:::data_ht_small
+)
+
+data_3k_small_check <- OlinkAnalyze::check_npx(
+  df = OlinkAnalyze:::data_3k_small
+)
+
 # run olink_normalization
-df_norm <- olink_normalization(
+df_norm <- OlinkAnalyze::olink_normalization(
   df1 = OlinkAnalyze:::data_ht_small,
   df2 = OlinkAnalyze:::data_3k_small,
   overlapping_samples_df1 = bridge_samples,
   df1_project_nr = "Explore HT",
   df2_project_nr = "Explore 3072",
-  reference_project = "Explore HT"
+  reference_project = "Explore HT",
+  format = FALSE,
+  df1_check_log = data_ht_small_check,
+  df2_check_log = data_3k_small_check
 )
 
 # generate lst_check
 lst_check <- OlinkAnalyze:::olink_norm_input_check(
-  df1 = OlinkAnalyze:::data_3k_small,
-  df2 = OlinkAnalyze:::data_ht_small,
+  df1 = OlinkAnalyze:::data_ht_small,
+  df1_check_log = data_ht_small_check,
+  df2 = OlinkAnalyze:::data_3k_small,
+  df2_check_log = data_3k_small_check,
   overlapping_samples_df1 = bridge_samples,
   overlapping_samples_df2 = NULL,
-  df1_project_nr = "P1",
-  df2_project_nr = "P2",
-  reference_project = "P2",
+  df1_project_nr = "Explore HT",
+  df2_project_nr = "Explore 3072",
+  reference_project = "Explore HT",
   reference_medians = NULL
 )
 

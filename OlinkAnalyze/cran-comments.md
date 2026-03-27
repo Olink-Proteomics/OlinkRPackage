@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release adds additional functionality to 4.4.0 including updates to support the new version of the ordinal package (fixing failing CRAN checks).
+This release includes major updates to the package, bug fixes, and performance improvements. The package has been thoroughly tested and is now available on CRAN for users to install and use.
 
 ## R CMD check results
 

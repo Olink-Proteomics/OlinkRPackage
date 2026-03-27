@@ -6,6 +6,7 @@
 \usage{
 olink_one_non_parametric(
   df,
+  check_log = NULL,
   variable,
   dependence = FALSE,
   subject = NULL,
@@ -13,18 +14,27 @@ olink_one_non_parametric(
 )
 }
 \arguments{
-\item{df}{NPX or Quantified_value data frame in long format with at least protein name (Assay), OlinkID, UniProt, Panel and a factor with at least 3 levels.}
+\item{df}{NPX data frame in long format with at least protein name (Assay),
+OlinkID, UniProt, Panel and a factor with at least 3 levels.}
+
+\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
 
 \item{variable}{Single character value.}
 
-\item{dependence}{Boolean. Default: FALSE. When the groups are independent, the kruskal-Wallis will run, when the groups are dependent, the Friedman test will run.}
+\item{dependence}{Boolean. Default: FALSE. When the groups are independent,
+the kruskal-Wallis will run, when the groups are dependent, the Friedman
+test will run.}
 
-\item{subject}{Group information for the repeated measurement. If (dependence = TRUE), this parameter need to be specified.}
+\item{subject}{Group information for the repeated measurement. If
+(dependence = TRUE), this parameter need to be specified.}
 
-\item{verbose}{Boolean. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.}
+\item{verbose}{Boolean. Default: True. If information about removed samples,
+factor conversion and final model formula is to be printed to the console.}
 }
 \value{
-A tibble containing the Kruskal-Wallis Test or Friedman Test results for every protein.
+A tibble containing the Kruskal-Wallis Test or Friedman Test results
+for every protein.
 
 Columns include:
 \itemize{
@@ -35,40 +45,57 @@ Columns include:
 \item{term:} "character" term in model
 \item{df:} "numeric" degrees of freedom
 \item{method:} "character" which method was used
-\item{statistic:} "named numeric" the value of the test statistic with a name describing it
+\item{statistic:} "named numeric" the value of the test statistic with a
+name describing it
 \item{p.value:} "numeric" p-value for the test
-\item{Adjusted_pval:} "numeric" adjusted p-value for the test (Benjamini&Hochberg)
-\item{Threshold:} "character" if adjusted p-value is significant or not (< 0.05)
+\item{Adjusted_pval:} "numeric" adjusted p-value for the test
+(Benjamini&Hochberg)
+\item{Threshold:} "character" if adjusted p-value is significant or
+not (< 0.05)
 }
 }
 \description{
-Performs an Kruskal-Wallis Test for each assay (by OlinkID) in every panel using stats::kruskal.test.
-Performs an Friedman Test for each assay (by OlinkID) in every panel using rstatix::friedman_test.
-The function handles factor variable. \cr\cr
-Samples that have no variable information or missing factor levels are automatically removed from the analysis (specified in a message if verbose = TRUE).
-Character columns in the input dataframe are automatically converted to factors (specified in a message if verbose = T).
+Performs an Kruskal-Wallis Test for each assay (by OlinkID) in every panel
+using stats::kruskal.test.
+Performs an Friedman Test for each assay (by OlinkID) in every panel
+using rstatix::friedman_test. The function handles factor variable. \cr\cr
+Samples that have no variable information or missing factor levels are
+automatically removed from the analysis (specified in a message
+if verbose = TRUE).
+Character columns in the input dataframe are automatically converted to
+factors (specified in a message if verbose = T).
 Numerical variables are not converted to factors.
-If a numerical variable is to be used as a factor, this conversion needs to be done on the dataframe before the function call. \cr\cr
+If a numerical variable is to be used as a factor, this conversion needs to
+be done on the dataframe before the function call. \cr\cr
 Inference is specified in a message if verbose = TRUE. \cr
-The formula notation of the final model is specified in a message if verbose = TRUE. \cr\cr
-Adjusted p-values are calculated by stats::p.adjust according to the Benjamini & Hochberg (1995) method (“fdr”).
+The formula notation of the final model is specified in a message if
+verbose = TRUE. \cr\cr
+Adjusted p-values are calculated by stats::p.adjust according to the
+Benjamini & Hochberg (1995) method (“fdr”).
 The threshold is determined by logic evaluation of Adjusted_pval < 0.05.
 }
 \examples{
 \donttest{
+if (rlang::is_installed(pkg = c("broom", "rstatix"))) {
 
-library(dplyr)
+ check_log <- check_npx(df = npx_data1)
 
-# One-way Kruskal-Wallis Test
-try({ # May fail if dependencies are not installed
-kruskal_results <- olink_one_non_parametric(df = npx_data1,
-                                            variable = "Site")
-})
+ # One-way Kruskal-Wallis Test
+ kruskal_results <- OlinkAnalyze::olink_one_non_parametric(
+    df = npx_data1,
+    check_log = check_log,
+    variable = "Site"
+  )
 
-#Friedman Test
-friedman_results <- olink_one_non_parametric(df = npx_data1,
-                                             variable = "Time",
-                                             subject = "Subject",
-                                             dependence = TRUE)}
+  # Friedman Test
+  friedman_results <- OlinkAnalyze::olink_one_non_parametric(
+    df = npx_data1,
+    check_log = check_log,
+    variable = "Time",
+    subject = "Subject",
+    dependence = TRUE
+  )
+}
+}
 
 }

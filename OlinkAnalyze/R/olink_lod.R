@@ -1,89 +1,149 @@
 #' Calculate LOD using Negative Controls or Fixed LOD
 #'
+#' @inherit .downstream_fun_args params
 #' @param data npx data file
 #' @param lod_file_path location of lod file from Olink. Only needed if
 #' lod_method = "FixedLOD" or "Both". Default `NULL`.
 #' @param lod_method method for calculating LOD using either "FixedLOD" or
 #' negative controls ("NCLOD"), or both ("Both"). Default `NCLOD`.
 #'
-#' @return A dataframe with 2 additional columns, LOD and PCNormalizedLOD if `lod_method` is FixedLOD or NCLOD. When `Normalization = "Plate Control"`, LOD and PCNormalizedLOD are identical.
+#' @return A dataframe with 2 additional columns, LOD and PCNormalizedLOD if
+#' `lod_method` is FixedLOD or NCLOD. When `Normalization = "Plate Control"`,
+#' LOD and PCNormalizedLOD are identical.
 #'
 #' If `lod_method` is "Both", 4 additional columns will be added:
-#'  \itemize{
-#'    \item NCLOD - LOD calculated from negative controls and normalized based on normalization column
-#'    \item NCPCNormalizedLOD - PC Normalized LOD calculated from negative controls
-#'    \item FixedLOD - LOD calculated from fixed LOD file and normalized based on normalization column
-#'    \item FixedPCNormalizedLOD - PC Normalized LOD calculated from fixed LOD file
-#'    }
-#'
+#' \itemize{
+#'   \item NCLOD - LOD calculated from negative controls and normalized based
+#'   on normalization column
+#'   \item NCPCNormalizedLOD - PC Normalized LOD calculated from negative
+#'   controls
+#'   \item FixedLOD - LOD calculated from fixed LOD file and normalized based on
+#'   normalization column
+#'   \item FixedPCNormalizedLOD - PC Normalized LOD calculated from fixed LOD
+#'   file
+#' }
 #'
 #' @export
+#'
 #' @examples
 #' \dontrun{
-#'    \donttest{
-#'   try({ # This will fail if the files do not exist.
+#'   \donttest{
+#'   try(
+#'     {
+#'       # This will fail if the files do not exist.
 #'
-#'   # Import NPX data
-#'     npx_data <- read_NPX("path/to/npx_file")
+#'       # Import NPX data
+#'       npx_data <- read_npx(filename = "path/to/npx_file")
 #'
-#'   # Estimate LOD from negative controls
-#'     npx_data_lod_NC <- olink_lod(data = npx_data,  lod_method = "NCLOD")
+#'       # Check NPX data
+#'       check_log <- check_npx(df = npx_data)
 #'
-#'   # Estimate LOD from fixed LOD
-#'   ## Locate the fixed LOD file
-#'     lod_file_path <- "path/to/lod_file"
+#'       # Clean NPX data
+#'       npx_data_clean <- clean_npx(
+#'         df = npx_data,
+#'         check_log = check_log
+#'       )
 #'
-#'     npx_data_lod_Fixed <- olink_lod(data = npx_data,
-#'                                     lod_file_path = lod_file_path,
-#'                                     lod_method = "FixedLOD")
-#'      })
+#'       # Re-check NPX data
+#'       check_log_clean <- check_npx(df = npx_data_clean)
+#'
+#'       # Estimate LOD from negative controls
+#'       npx_data_lod_nc <- olink_lod(
+#'         data = npx_data_clean,
+#'         check_log = check_log_clean,
+#'         lod_method = "NCLOD"
+#'       )
+#'
+#'       # Estimate LOD from fixed LOD
+#'       ## Locate the fixed LOD file
+#'       lod_file_path <- "path/to/lod_file"
+#'
+#'       npx_data_lod_Fixed <- olink_lod(
+#'         data = npx_data,
+#'         check_log = check_log_clean,
+#'         lod_file_path = lod_file_path,
+#'         lod_method = "FixedLOD"
+#'       )
+#'
+#'       # Estimate LOD from both negative controls and fixed LOD
+#'       npx_data_lod_both <- olink_lod(
+#'         data = npx_data,
+#'         check_log = check_log_clean,
+#'         lod_file_path = lod_file_path,
+#'         lod_method = "Both"
+#'       )
+#'     }
+#'   )
 #'   }
 #' }
 #'
-olink_lod <- function(data, lod_file_path = NULL, lod_method = "NCLOD"){
-  #Check data format
-  npxCheck <- npxCheck(data)
-  # Rename duplicate UniProts
-  data <- uniprot_replace(data, npxCheck)
+olink_lod <- function(data,
+                      check_log = NULL,
+                      lod_file_path = NULL,
+                      lod_method = "NCLOD") {
+  # check if check_log is correct
+  check_log <- run_check_npx(df = data, check_log = check_log)
+  # make sure data is a tibble
+  data <- convert_read_npx_output(df = data, out_df = "tibble")
 
   # lod_method must be one of options
-  if(!lod_method %in% c("NCLOD", "FixedLOD", "Both")){
+  if (!(lod_method %in% c("NCLOD", "FixedLOD", "Both"))) {
     stop("`lod_method` must be one of \"NCLOD\", \"FixedLOD\", or \"Both\"")
   }
 
   # If lod method is both or fixed you need the file
-  if(missing(lod_file_path) & lod_method %in% c("Both", "FixedLOD")) {
+  if (missing(lod_file_path) && (lod_method %in% c("Both", "FixedLOD"))) {
     stop(paste0("`lod_file_path` must be specified for lod_method = \"",
                 lod_method, "\""))
   }
 
-  req_columns <- c("SampleType", "OlinkID", "DataAnalysisRefID", "SampleQC", "AssayType", "NPX")
+  req_columns <- c("SampleType", "OlinkID", "DataAnalysisRefID",
+                   "SampleQC", "AssayType", "NPX")
   missingcols <- setdiff(req_columns, names(data))
-  if (length(missingcols) != 0){
-    stop(paste0("Required column(s) not found: ", paste0(missingcols, collapse = ", ")))
+  if (length(missingcols) != 0) {
+    stop(paste0("Required column(s) not found: ",
+                paste0(missingcols, collapse = ", ")))
   }
 
+  if (lod_method == "Both") {
+    data_nc <- olink_lod_internal(
+      data = data,
+      check_log = check_log,
+      lod_file_path = lod_file_path,
+      lod_method = "NCLOD"
+    ) |>
+      dplyr::rename(
+        "NCLOD" = "LOD",
+        "NCPCNormalizedLOD" = "PCNormalizedLOD"
+      )
+    data_fixed <- olink_lod_internal(
+      data = data,
+      check_log = check_log,
+      lod_file_path = lod_file_path,
+      lod_method = "FixedLOD"
+    ) |>
+      dplyr::rename(
+        "FixedLOD" = "LOD",
+        "FixedPCNormalizedLOD" = "PCNormalizedLOD"
+      )
 
-  if (lod_method == "Both"){
-    data_nc <- olink_lod_internal(data, lod_file_path, lod_method = "NCLOD") |>
-      rename("NCLOD" = "LOD",
-             "NCPCNormalizedLOD" = "PCNormalizedLOD")
-    data_fixed <- olink_lod_internal(data, lod_file_path, lod_method = "FixedLOD") |>
-      rename("FixedLOD" = "LOD",
-             "FixedPCNormalizedLOD" = "PCNormalizedLOD")
+    data <- dplyr::full_join(data_nc, data_fixed, by = names(data))
 
-    data <- dplyr::full_join(data_nc, data_fixed,by =  names(data))
-
-  }else{
-    data<- olink_lod_internal(data = data,
-                              lod_file_path = lod_file_path,
-                              lod_method = lod_method)
+  } else {
+    data <- olink_lod_internal(
+      data = data,
+      check_log = check_log,
+      lod_file_path = lod_file_path,
+      lod_method = lod_method
+    )
   }
   return(data)
 }
 
-
-olink_lod_internal <- function(data, lod_file_path = NULL, lod_method = "NCLOD"){
+olink_lod_internal <- function(data,
+                               check_log,
+                               lod_file_path = NULL,
+                               lod_method = "NCLOD") {
 
   # store original column names of `data` to restore them later
   original_columns <- names(data)
@@ -96,9 +156,15 @@ olink_lod_internal <- function(data, lod_file_path = NULL, lod_method = "NCLOD")
 
   if (lod_method == lod_methods$fix_lod) {
 
-    lod_file <- read.table(file = lod_file_path, sep = ";", header = TRUE)
+    lod_file <- utils::read.table(
+      file = lod_file_path,
+      sep = ";",
+      header = TRUE
+    )
 
-    check_lod_darid(lod_file, data)
+    # check for outdated fixed LOD file for Explore HT panels
+    check_ht_fixed_lod_version(check_log = check_log,
+                               lod_file = lod_file)
 
     lod_data <- olink_fixed_lod(data_analysis_ref_id = data$DataAnalysisRefID,
                                 lod_file = lod_file)
@@ -141,22 +207,23 @@ olink_lod_internal <- function(data, lod_file_path = NULL, lod_method = "NCLOD")
 }
 
 # extract LODNPX, LODCount and LODMethods from reference file
-olink_fixed_lod <- function(data_analysis_ref_id, lod_file) {
-
-  lod_file |>
+olink_fixed_lod <- function(data_analysis_ref_id,
+                            lod_file) {
+  lod_cols <- lod_file |>
     dplyr::filter(
-      .data[["DataAnalysisRefID"]] %in% data_analysis_ref_id
+      .data[["DataAnalysisRefID"]] %in% .env[["data_analysis_ref_id"]]
     ) |>
     dplyr::select(
       dplyr::all_of(
         c("OlinkID", "DataAnalysisRefID", "LODNPX", "LODCount", "LODMethod")
       )
     )
-
+  return(lod_cols)
 }
 
 # compute LODNPX, LODCount and LODMethods from NCs
-olink_nc_lod <- function(data, min_num_nc = 10L) {
+olink_nc_lod <- function(data,
+                         min_num_nc = 10L) {
   # Calculate LOD in counts and NPX
 
   # rows from NC
@@ -169,7 +236,7 @@ olink_nc_lod <- function(data, min_num_nc = 10L) {
     )
 
   # check that we have at least `min_num_nc` NCs
-  if(length(unique(lod_data$SampleID)) < min_num_nc){
+  if (length(unique(lod_data$SampleID)) < min_num_nc) {
     stop(paste("At least", min_num_nc, "Negative Controls are required to",
                "calculate LOD from Negative Controls."))
   }
@@ -178,13 +245,13 @@ olink_nc_lod <- function(data, min_num_nc = 10L) {
   lod_data <- lod_data |>
     # LOD is comnputed per assay and lot of reagents
     dplyr::group_by(
-      OlinkID, DataAnalysisRefID
+      .data[["OlinkID"]], .data[["DataAnalysisRefID"]]
     ) |>
     # compute LOD on counts and NPX
     dplyr::summarise(
       MaxCount = max(.data[["Count"]], na.rm = TRUE),
-      LODNPX = median(.data[["PCNormalizedNPX"]], na.rm = TRUE) +
-        max(0.2, 3L * sd(.data[["PCNormalizedNPX"]], na.rm = TRUE)),
+      LODNPX = stats::median(.data[["PCNormalizedNPX"]], na.rm = TRUE) +
+        max(0.2, 3L * stats::sd(.data[["PCNormalizedNPX"]], na.rm = TRUE)),
       LODCount = max(150L, max(.data[["Count"]] * 2L, na.rm = TRUE))
     ) |>
     dplyr::mutate(
@@ -203,16 +270,19 @@ olink_nc_lod <- function(data, min_num_nc = 10L) {
 
 }
 
-pc_norm_count <- function(data, lod_data){
+pc_norm_count <- function(data,
+                          lod_data) {
   # Calculate PC median for normalization
 
   pc_median <- data |>
     dplyr::group_by(
-      OlinkID, PlateID
+      .data[["OlinkID"]], .data[["PlateID"]]
     ) |>
     dplyr::summarise(
-      PCMedian = median(.data[["ExtNPX"]][.data[["SampleType"]] == "PLATE_CONTROL"],
-                        na.rm = TRUE)
+      PCMedian = stats::median(
+        x = .data[["ExtNPX"]][.data[["SampleType"]] == "PLATE_CONTROL"],
+        na.rm = TRUE
+      )
     ) |>
     dplyr::select(
       dplyr::all_of(
@@ -220,7 +290,7 @@ pc_norm_count <- function(data, lod_data){
       )
     )
 
-  if(nrow(pc_median) == 0L){
+  if (nrow(pc_median) == 0L) {
     stop("Insufficient Plate Control data for normalization of LOD.")
   }
 
@@ -258,37 +328,42 @@ pc_norm_count <- function(data, lod_data){
         is.na(.data[["NPX"]]) ~ NA_real_,
         !is.na(.data[["NPX"]]) & .data[["LODMethod"]] == "lod_npx" ~
           .data[["LODNPX"]],
-        TRUE ~ log2(.data[["LODCount"]] / .data[["ExtCount"]]) - .data[["PCMedian"]],
+        TRUE ~ log2(.data[["LODCount"]] / .data[["ExtCount"]]) - .data[["PCMedian"]], # nolint: line_length_linter
         .default = NA_real_
       )
     ) |>
-    dplyr::mutate(LOD = PCNormalizedLOD)
+    dplyr::mutate(
+      LOD = .data[["PCNormalizedLOD"]]
+    )
 
   return(data)
 }
 
-int_norm_count <- function(data, lod_data){
+int_norm_count <- function(data,
+                           lod_data) {
 
   data <- pc_norm_count(data, lod_data)
 
-  if(any(data[["Normalization"]]=="Intensity")){
+  if (any(data[["Normalization"]] == "Intensity")) {
     plate_median <- data |>
       dplyr::filter(
-        .data[["SampleType"]] =="SAMPLE"
+        .data[["SampleType"]] == "SAMPLE"
       ) |>
       dplyr::group_by(
-        OlinkID, PlateID
+        .data[["OlinkID"]], .data[["PlateID"]]
       ) |>
       dplyr::summarise(
-        PlateMedianNPX = median(.data[["PCNormalizedNPX"]], na.rm = TRUE)
+        PlateMedianNPX = stats::median(x = .data[["PCNormalizedNPX"]],
+                                       na.rm = TRUE)
       ) |>
       dplyr::ungroup() |>
       dplyr::select(
         dplyr::all_of(
-          c("OlinkID", "PlateID", "PlateMedianNPX"))
+          c("OlinkID", "PlateID", "PlateMedianNPX")
+        )
       )
 
-    if(nrow(plate_median) == 0L){
+    if (nrow(plate_median) == 0L) {
       stop("Insufficient data for intensity normalization of LOD.")
     }
 
@@ -306,23 +381,86 @@ int_norm_count <- function(data, lod_data){
 
 }
 
-#' Check fixed LOD file version vs DarID
-#' Check for old Fixed LOD when using D.07, 08, 10, and 14
-#' @param lod_file df with fixed LOD data
-#' @param data df with NPX data
+#' Help function to check Explore HT Fixed LOD file version
 #'
-#' @return warning messages
+#' @description
+#' When invalid `DARID` / `PanelDataArchiveVersion` combinations are detected
+#' in an Explore HT NPX file (`darid_invalid` entries in `check_log`),
+#' this helper checks that the Explore HT Fixed LOD file used for LOD
+#' calculation meets a minimum version requirement (default: \code{"6.0.0"}).
+#'
+#' @author
+#' Kathleen Nevola
+#' Kang Dong
 #'
 #' @keywords internal
-check_lod_darid <- function(lod_file, data){
-  if("DataAnalysisRefID" %in% names(data) &&
-     any(stringr::str_detect(data[["DataAnalysisRefID"]],
-                             "D.*0007|D.*0008|D.*0010|D.*0014"))&&
-     !("Version" %in% names(lod_file))&&
-     any(sapply(data[["PanelDataArchiveVersion"]], function(x){
-       utils::compareVersion("1.5", x)
-     }) != 1)){
-    cli::cli_alert_info("Outdated version of Fixed LOD file detected.")
-    cli::cli_alert("Please download the newest version from Olink.com.")
+#'
+#' @param lod_file A data frame (or tibble) representing the Fixed LOD file.
+#'   It must contain a \code{Panel} column. If present, a \code{Version}
+#'   column (character) is used to determine whether the file meets the
+#'   \code{min_version} requirement.
+#'
+#' @return A logical scalar returned invisibly:
+#'   \itemize{
+#'     \item \code{TRUE} — the Fixed LOD file is missing/invalid/outdated (and
+#'           a message or warning has been emitted).
+#'     \item \code{FALSE} — the check is not relevant or the Fixed LOD file
+#'           meets the minimum version requirement.
+#'   }
+#'
+check_ht_fixed_lod_version <- function(check_log,
+                                       lod_file) {
+
+  # Only relevant if darid_invalid exists and Explore HT panel is used
+  is_relevant <-
+    nrow(check_log[["darid_invalid"]]) > 0L &&
+    all(lod_file[["Panel"]] == "Explore_HT")
+
+  if (!is_relevant) {
+    return(invisible(FALSE))
   }
+
+  # Case 1: Version column missing
+  if (!("Version" %in% names(lod_file))) {
+
+    cli::cli_warn(
+      c(
+        "i" = "Outdated version of Fixed LOD file detected.",
+        ">" = "Please download the newest version from Olink.com."
+      )
+    )
+
+    return(invisible(TRUE))
+  }
+
+  # Case 2: Version column present but < version "6.0.0"
+  version <- unique(as.character(lod_file[["Version"]]))
+
+  # Defensive: multiple versions in one file
+  if (length(version) != 1L) {
+
+    cli::cli_warn(
+      c(
+        "i" = "Multiple versions detected: {.val {version}}.",
+        ">" = "Please verify that the correct Fixed LOD file is used."
+      )
+    )
+
+    return(invisible(TRUE))
+  }
+
+  if (utils::compareVersion(version, "6.0.0") == -1L) {
+
+    cli::cli_warn(
+      c(
+        "i" = "Outdated version of Fixed LOD file detected. Detected version
+        {.val {version}}. Minimum required version 6.0.0",
+        ">" = "Please download the newest version from Olink.com."
+      )
+    )
+
+    return(invisible(TRUE))
+  }
+
+  return(invisible(FALSE))
 }
