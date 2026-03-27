@@ -1237,7 +1237,6 @@ OlinkAnalyze::olink_pathway_heatmap(
   method = "ORA",
   keyword = "immune"
 )
-}
 ```
 
 ```{r message=FALSE, echo=FALSE}
