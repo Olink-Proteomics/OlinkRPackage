@@ -613,7 +613,7 @@ Alternative statistical results can be used as input as long as they include the
 -   ontology: String of database to query. Must be either "MSigDb", "KEGG", "GO", and "Reactome"
 -   organism: String of name of organism. Must be either "human" or "mouse"
 
-```{r message=FALSE}
+```{r message=FALSE, eval=FALSE}
 npx_df <- npx_data1 |>
   dplyr::filter(!grepl("control", SampleID, ignore.case = TRUE))
 
