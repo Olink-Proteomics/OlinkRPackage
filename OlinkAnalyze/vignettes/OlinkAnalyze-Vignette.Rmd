@@ -20,7 +20,8 @@ knitr::opts_chunk$set(
   fig.height = 3,
   fig.align = "center",
   collapse = TRUE,
-  comment = "#>")
+  comment = "#>"
+)
 
 options(tibble.print_min = 4L, tibble.print_max = 4L)
 ```
@@ -82,18 +83,6 @@ install.packages("OlinkAnalyze")
 
 # Usage
 
-## Load the library
-
-```{r message=FALSE, warning=FALSE}
-# Load OlinkAnalyze
-library(OlinkAnalyze)
-
-# Load other libraries used in Vignette
-library(dplyr)
-library(ggplot2)
-library(stringr)
-```
-
 ## Introduction to Olink NPX data format
 
 The package contains two test data files named npx_data1 and npx_data2. These are synthetic datasets that resemble OlinkÂ® data accompanied by clinical variables. OlinkÂ® data that is delivered in long format or imported with the function *read_NPX* (that converts the data into a long format) contain the following columns:
@@ -151,30 +140,41 @@ In order to import multiple NPX data files at once, the read_NPX function can be
 
 ```{r message=FALSE, eval=FALSE}
 # Read in multiple NPX files in .csv format
-data <-  list.files(path = "path/to/dir/with/NPX/files",
-                    pattern = "csv$",
-                    full.names = TRUE) |>
-         lapply(FUN = function(x){
-    OlinkAnalyze::read_NPX(x) |> 
+data <- list.files(
+  path = "path/to/dir/with/NPX/files",
+  pattern = "csv$",
+  full.names = TRUE
+) |>
+  lapply(FUN = function(x) {
+    df_tmp <- OlinkAnalyze::read_NPX(x) |>
       # Optionally add additional columns to add file identifiers
-      dplyr::mutate(File = x) 
-      }  |>
-         # optional to return a single data frame of all files instead of a list of data frames
-         dplyr::bind_rows() 
+      dplyr::mutate(File = x)
+    return(df_tmp)
+  })  |>
+  # optional to return a single data frame of all files instead of a list of dfs
+  dplyr::bind_rows()
 
 # Read in multiple NPX files in .parquet format
-data <-  list.files(path = "path/to/dir/with/NPX/files",
-                    pattern = "parquet$",
-                    full.names = TRUE) |>
-         lapply(OlinkAnalyze::read_NPX)  |>
-         dplyr::bind_rows()
+data <- list.files(
+  path = "path/to/dir/with/NPX/files",
+  pattern = "parquet$",
+  full.names = TRUE
+) |>
+  lapply(
+    OlinkAnalyze::read_NPX
+  )  |>
+  dplyr::bind_rows()
 
 # Read in multiple NPX files in either format
-data <-  list.files(path = "path/to/dir/with/NPX/files",  
-                    pattern = "parquet$|csv$",          
-                    full.names = TRUE) |>
-         lapply(OlinkAnalyze::read_NPX)  |>
-         dplyr::bind_rows()
+data <- list.files(
+  path = "path/to/dir/with/NPX/files",
+  pattern = "parquet$|csv$",
+  full.names = TRUE
+) |>
+  lapply(
+    OlinkAnalyze::read_NPX
+  )  |>
+  dplyr::bind_rows()
 ```
 
 ## Randomize samples on plate (olink_plate_randomizer)
@@ -219,8 +219,10 @@ The olink_ttest function performs a Welch 2-sample t-test or paired t-test at co
 -   pair_id: Character value indicating which column contains the paired sample identifier. Only used for paired t-tests.
 
 ```{r message=FALSE, eval=FALSE}
-olink_ttest(df = npx_data1,
-            variable = 'Treatment')
+OlinkAnalyze::olink_ttest(
+  df = OlinkAnalyze::npx_data1,
+  variable = "Treatment"
+)
 ```
 
 ### Function output
@@ -253,8 +255,10 @@ The olink_wilcox function performs a 2-sample Mann-Whitney U test or paired Mann
 -   pair_id: Character value indicating which column contains the paired sample identifier. Only used for paired Mann-Whitney U tests.
 
 ```{r message=FALSE, eval=FALSE}
-olink_wilcox(df = npx_data1,
-             variable = 'Treatment')
+OlinkAnalyze::olink_wilcox(
+  df = OlinkAnalyze::npx_data1,
+  variable = "Treatment"
+)
 ```
 
 ### Function output
@@ -301,24 +305,36 @@ Adjusted p-values are calculated using the Benjamini & Hochberg (1995) method (â
 
 ```{r message=FALSE, eval=FALSE}
 # Remove control samples and assays
-npx_data1_no_controls <- npx_data1 |>
-  dplyr::filter(!stringr::str_detect(SampleID,
-                                     regex("control|ctrl", 
-                                           ignore_case = TRUE))) |>
-  dplyr::filter(!stringr::str_detect(Assay, 
-                                     regex("control|ctrl",
-                                           ignore_case = TRUE)))
-  
+npx_data1_no_controls <- OlinkAnalyze::npx_data1 |>
+  dplyr::filter(
+    !stringr::str_detect(
+      string = .data[["SampleID"]],
+      pattern = regex("control|ctrl", ignore_case = TRUE)
+    )
+  ) |>
+  dplyr::filter(
+    !stringr::str_detect(
+      string = .data[["Assay"]],
+      pattern = regex("control|ctrl", ignore_case = TRUE)
+    )
+  )
+
 # One-way ANOVA, no covariates
-anova_results_oneway <- olink_anova(df = npx_data1_no_controls, 
-                                    variable = 'Site')
+anova_results_oneway <- OlinkAnalyze::olink_anova(
+  df = npx_data1_no_controls,
+  variable = "Site"
+)
 # Two-way ANOVA, no covariates
-anova_results_twoway <- olink_anova(df = npx_data1_no_controls, 
-                                    variable = c('Site', 'Time'))
+anova_results_twoway <- OlinkAnalyze::olink_anova(
+  df = npx_data1_no_controls,
+  variable = c("Site", "Time")
+)
 # One-way ANOVA, Treatment as covariates
-anova_results_oneway <- olink_anova(df = npx_data1_no_controls, 
-                                    variable = 'Site',
-                                    covariates = 'Treatment')
+anova_results_oneway <- OlinkAnalyze::olink_anova(
+  df = npx_data1_no_controls,
+  variable = "Site",
+  covariates = "Treatment"
+)
 ```
 
 ### Function output
@@ -359,18 +375,26 @@ Control samples and control assays (AssayType is not "assay", or Assay contains 
 
 ```{r message=FALSE, eval=FALSE}
 # calculate the p-value for the ANOVA
-anova_results_oneway <- olink_anova(df = npx_data1_no_controls, 
-                                    variable = 'Site')
+anova_results_oneway <- OlinkAnalyze::olink_anova(
+  df = npx_data1_no_controls,
+  variable = "Site"
+)
 
 # extracting the significant proteins
-anova_results_oneway_significant <- anova_results_oneway %>%
-  dplyr::filter(Threshold == 'Significant') %>%
-  dplyr::pull(OlinkID)
+anova_results_oneway_sign <- anova_results_oneway |>
+  dplyr::filter(
+    .data[["Threshold"]] == "Significant"
+  ) |>
+  dplyr::pull(
+    .data[["OlinkID"]]
+  )
 
-anova_posthoc_oneway_results <- olink_anova_posthoc(df = npx_data1_no_controls,
-                                                    olinkid_list = anova_results_oneway_significant,
-                                                    variable = 'Site',
-                                                    effect = 'Site')
+anova_posthoc_oneway_results <- OlinkAnalyze::olink_anova_posthoc(
+  df = npx_data1_no_controls,
+  olinkid_list = anova_results_oneway_sign,
+  variable = "Site",
+  effect = "Site"
+)
 ```
 
 ### Function output
@@ -416,15 +440,20 @@ Adjusted p-values are calculated using the Benjamini & Hochberg (1995) method (â
 -   verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 
 ```{r message=FALSE, eval=FALSE}
-if (requireNamespace("lme4", quietly = TRUE) & requireNamespace("lmerTest", quietly = TRUE)){
-# Linear mixed model with one variable.
-  lmer_results_oneway <- olink_lmer(df = npx_data1, 
-                                    variable = 'Site',
-                                    random = 'Subject')
-# Linear mixed model with two variables.
-  lmer_results_twoway <- olink_lmer(df = npx_data1, 
-                                    variable = c('Site', 'Treatment'),
-                                    random = 'Subject')
+if (rlang::is_installed(pkg = c("lme4", "lmerTest"))) {
+  # Linear mixed model with one variable.
+  lmer_results_oneway <- OlinkAnalyze::olink_lmer(
+    df = OlinkAnalyze::npx_data1,
+    variable = "Site",
+    random = "Subject"
+  )
+
+  # Linear mixed model with two variables.
+  lmer_results_twoway <- OlinkAnalyze::olink_lmer(
+    df = OlinkAnalyze::npx_data1,
+    variable = c("Site", "Treatment"),
+    random = "Subject"
+  )
 }
 ```
 
@@ -463,21 +492,32 @@ The olink_lmer_posthoc function is similar to olink_lmer but performs a post-hoc
 -   verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 
 ```{r message=FALSE, eval=FALSE}
-if (requireNamespace("lme4", quietly = TRUE) & requireNamespace("lmerTest", quietly = TRUE)){
+if (rlang::is_installed(pkg = c("lme4", "lmerTest"))) {
   # Linear mixed model with two variables.
-  lmer_results_twoway <- olink_lmer(df = npx_data1, 
-                                    variable = c('Site', 'Treatment'),
-                                    random = 'Subject')
+  lmer_results_twoway <- OlinkAnalyze::olink_lmer(
+    df = OlinkAnalyze::npx_data1,
+    variable = c("Site", "Treatment"),
+    random = "Subject"
+  )
+
   # extracting the significant proteins
-  lmer_results_twoway_significant <- lmer_results_twoway %>%
-    dplyr::filter(Threshold == 'Significant', term == 'Treatment') %>%
-    dplyr::pull(OlinkID)
+  lmer_results_twoway_sign <- lmer_results_twoway |>
+    dplyr::filter(
+      .data[["Threshold"]] == "Significant" &
+        .data[["term"]] == "Treatment"
+    ) |>
+    dplyr::pull(
+      .data[["OlinkID"]]
+    )
+
   # performing post-hoc analysis
-  lmer_posthoc_twoway_results <- olink_lmer_posthoc(df = npx_data1,
-                                                    olinkid_list = lmer_results_twoway_significant,
-                                                    variable = c('Site', 'Treatment'),
-                                                    random = 'Subject',
-                                                    effect = 'Treatment') 
+  lmer_posthoc_twoway_results <- OlinkAnalyze::olink_lmer_posthoc(
+    df = OlinkAnalyze::npx_data1,
+    olinkid_list = lmer_results_twoway_sign,
+    variable = c("Site", "Treatment"),
+    random = "Subject",
+    effect = "Treatment"
+  )
 }
 ```
 
@@ -523,20 +563,33 @@ Alternative statistical results can be used as input as long as they include the
 -   organism: String of name of organism. Must be either "human" or "mouse"
 
 ```{r message=FALSE}
-npx_df <- npx_data1 |>
-  dplyr::filter(!grepl("control", SampleID, ignore.case = TRUE))
+npx_df <- OlinkAnalyze::npx_data1 |>
+  dplyr::filter(
+    !grepl(
+      pattern = "control",
+      x = .data[["SampleID"]],
+      ignore.case = TRUE
+    )
+  )
 
-ttest_results <- olink_ttest(
+ttest_results <- OlinkAnalyze::olink_ttest(
   df = npx_df,
   variable = "Treatment",
-  alternative = "two.sided")
+  alternative = "two.sided"
+)
 
-try({ # This expression might fail if dependencies are not installed
-gsea_results <- olink_pathway_enrichment(data = npx_data1, test_results = ttest_results)
-ora_results <- olink_pathway_enrichment(
-  data = npx_data1,
-  test_results = ttest_results, method = "ORA")
-}, silent = TRUE)
+if (rlang::is_installed(pkg = c("msigdbr", "clusterProfiler"))) {
+  gsea_results <- OlinkAnalyze::olink_pathway_enrichment(
+    df = OlinkAnalyze::npx_data1,
+    test_results = ttest_results
+  )
+
+  ora_results <- OlinkAnalyze::olink_pathway_enrichment(
+    df = OlinkAnalyze::npx_data1,
+    test_results = ttest_results,
+    method = "ORA"
+  )
+}
 ```
 
 ### Function Output
@@ -600,25 +653,41 @@ NOTE: UMAP is a non-linear data transformation that might not accurately preserv
 -   verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 -   quiet: Logical. Default: False. If TRUE, the resulting plot is not printed.
 
-```{r message=FALSE, eval = FALSE}
-if (requireNamespace("umap", quietly = TRUE) ){
-npx_data1 %>% 
-  dplyr::filter(!stringr::str_detect(SampleID, 'CONTROL_SAMPLE')) %>% 
-  olink_umap_plot(df = .,
-                 color_g = "QC_Warning", byPanel = TRUE)  
-  }
+```{r message=FALSE, eval=FALSE}
+if (rlang::is_installed(pkg = c("umap"))) {
+  OlinkAnalyze::npx_data1 |>
+    dplyr::filter(
+      !stringr::str_detect(
+        string = .data[["SampleID"]],
+        pattern = "CONTROL_SAMPLE"
+      )
+    ) |>
+    OlinkAnalyze::olink_umap_plot(
+      color_g = "QC_Warning",
+      byPanel = TRUE
+    )
+}
 ```
 
 ```{r message=FALSE, echo = FALSE}
-knitr::include_graphics(normalizePath("../man/figures/olink_umap_plot.png"),
-                        error = FALSE)
+knitr::include_graphics(
+  path = normalizePath("../man/figures/olink_umap_plot.png"),
+  error = FALSE
+)
 ```
 
 ```{r message=FALSE, eval =FALSE}
-npx_data1 %>% 
-  dplyr::filter(!stringr::str_detect(SampleID, 'CONTROL_SAMPLE')) %>% 
-  olink_umap_plot(df = .,
-                 color_g = "QC_Warning", byPanel = TRUE)  
+OlinkAnalyze::npx_data1 |>
+  dplyr::filter(
+    !stringr::str_detect(
+      string = .data[["SampleID"]],
+      pattern = "CONTROL_SAMPLE"
+    )
+  ) |>
+  OlinkAnalyze::olink_umap_plot(
+    color_g = "QC_Warning",
+    byPanel = TRUE
+  )
 ```
 
 ### Function output
@@ -641,50 +710,67 @@ The olink_boxplot function is used to generate boxplots of NPX values stratified
 -   verbose: Logical. Default: False. Flag indicating if plots shall be printed additionally to assigned to a list variable.
 -   number_of_proteins_per_plot: Number of boxplots to include in the facets plot. Default 6.
 
-```{r message=FALSE, eval = FALSE}
+```{r message=FALSE, eval=FALSE}
 # Remove control samples and assays
-npx_data1_no_controls <- npx_data1 |>
-  dplyr::filter(!stringr::str_detect(SampleID,
-                                     regex("control|ctrl", 
-                                           ignore_case = TRUE))) |>
-  dplyr::filter(!stringr::str_detect(Assay,
-                                     regex("control|ctrl", 
-                                           ignore_case = TRUE)))
+npx_data1_no_controls <- OlinkAnalyze::npx_data1 |>
+  dplyr::filter(
+    !stringr::str_detect(
+      string = .data[["SampleID"]],
+      pattern = regex("control|ctrl", ignore_case = TRUE)
+    )
+  ) |>
+  dplyr::filter(
+    !stringr::str_detect(
+      string = .data[["Assay"]],
+      pattern = regex("control|ctrl", ignore_case = TRUE)
+    )
+  )
 
 plot <- npx_data1_no_controls |>
-  dplyr::filter(!is.na(Site)) |> # removing missing values which exist for Site
-  olink_boxplot(variable = "Site", 
-                olinkid_list = c("OID00488", "OID01276"),
-                number_of_proteins_per_plot  = 2)
+  dplyr::filter(
+    !is.na(.data[["Site"]])
+  ) |> # removing missing values which exist for Site
+  OlinkAnalyze::olink_boxplot(
+    variable = "Site",
+    olinkid_list = c("OID00488", "OID01276"),
+    number_of_proteins_per_plot = 2L
+  )
 
-plot[[1]]
+plot[[1L]]
 ```
 
 ```{r message=FALSE, echo = FALSE}
-knitr::include_graphics(normalizePath("../man/figures/olink_boxplot.png"),
-                        error = FALSE)
+knitr::include_graphics(
+  path = normalizePath("../man/figures/olink_boxplot.png"),
+  error = FALSE
+)
 ```
 
 ```{r message=FALSE, eval = FALSE}
-anova_posthoc_results<-npx_data1_no_controls %>% 
-  olink_anova_posthoc(olinkid_list = c("OID00488", "OID01276"),
-                      variable = 'Site',
-                      effect = 'Site')
+anova_posthoc_results <- npx_data1_no_controls |>
+  OlinkAnalyze::olink_anova_posthoc(
+    olinkid_list = c("OID00488", "OID01276"),
+    variable = "Site",
+    effect = "Site"
+  )
 
-plot2 <- npx_data1_no_controls %>%
-  na.omit() %>% # removing missing values which exists for Site
-  olink_boxplot(variable = "Site", 
-                olinkid_list = c("OID00488", "OID01276"),
-                number_of_proteins_per_plot  = 2,
-                posthoc_results = anova_posthoc_results)
+plot2 <- npx_data1_no_controls |>
+  stats::na.omit() |> # removing missing values which exists for Site
+  OlinkAnalyze::olink_boxplot(
+    variable = "Site",
+    olinkid_list = c("OID00488", "OID01276"),
+    number_of_proteins_per_plot = 2L,
+    posthoc_results = anova_posthoc_results
+  )
 
-plot2[[1]]
-
+plot2[[1L]]
 ```
 
-```{r message=FALSE, echo = FALSE}
-knitr::include_graphics(normalizePath("../man/figures/olink_boxplot_anova_posthoc.png"),
-                        error = FALSE)
+```{r message=FALSE, echo=FALSE}
+knitr::include_graphics(
+  path = normalizePath("../man/figures/olink_boxplot_anova_posthoc.png"),
+  error = FALSE
+)
 ```
 
 ### Function output
@@ -715,21 +801,25 @@ The function olink_lmer_plot generates a point-range plot for a given list of pr
 -   number_of_proteins_per_plot: Number plots to include in the list of point-range plots. Defaults to 6 plots per figure.
 -   verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 
-```{r message=FALSE, eval = FALSE}
-if (requireNamespace("lme4", quietly = TRUE) & requireNamespace("lmerTest", quietly = TRUE)){
-  plot <- olink_lmer_plot(df = npx_data1, 
-                          olinkid_list = c("OID01216", "OID01217"), 
-                          variable = c('Site', 'Treatment'), 
-                          x_axis_variable =  'Site',
-                          col_variable = 'Treatment',
-                          random = 'Subject')
-  plot[[1]]
+```{r message=FALSE, eval=FALSE}
+if (rlang::is_installed(pkg = c("lme4", "lmerTest"))) {
+  plot <- olink_lmer_plot(
+    df = OlinkAnalyze::npx_data1,
+    olinkid_list = c("OID01216", "OID01217"),
+    variable = c("Site", "Treatment"),
+    x_axis_variable =  "Site",
+    col_variable = "Treatment",
+    random = "Subject"
+  )
+  plot[[1L]]
 }
 ```
 
-```{r message=FALSE, fig.width = 8, echo = FALSE}
-knitr::include_graphics(normalizePath("../man/figures/olink_lmer_plot.png"),
-                        error = FALSE)
+```{r message=FALSE, fig.width=8, echo=FALSE}
+knitr::include_graphics(
+  path = normalizePath("../man/figures/olink_lmer_plot.png"),
+  error = FALSE
+)
 ```
 
 ### Function output
@@ -753,26 +843,40 @@ The olink_pathway_heatmap function generates a heatmap of proteins related to pa
 ```{r  message=FALSE, eval = FALSE}
 # GSEA Heatmap from t-test results
 try({ # This expression might fail if dependencies are not installed
-olink_pathway_heatmap(enrich_results = gsea_results, 
-                      test_results = ttest_results)
+  OlinkAnalyze::olink_pathway_heatmap(
+    enrich_results = gsea_results,
+    test_results = ttest_results
+  )
 })
 ```
 
-```{r message=FALSE, echo = FALSE}
-knitr::include_graphics(normalizePath("../man/figures/olink_pathway_heatmap_gsea.png"), error = FALSE)
+```{r message=FALSE, echo=FALSE}
+knitr::include_graphics(
+  path = normalizePath("../man/figures/olink_pathway_heatmap_gsea.png"),
+  error = FALSE
+)
 ```
 
-```{r message = FALSE, fig.height=4, fig.width=8, eval = FALSE}
+```{r message=FALSE, fig.height=4, fig.width=8, eval=FALSE}
 # ORA Heatmap from t-test results with cell keyword
-try({ # This expression might fail if dependencies are not installed
-olink_pathway_heatmap(enrich_results = ora_results, 
-                      test_results = ttest_results,
-                      method = "ORA", keyword = "immune")
-})
+try(
+  { # This expression might fail if dependencies are not installed
+    # volcano plot
+    OlinkAnalyze::olink_pathway_heatmap(
+      enrich_results = ora_results,
+      test_results = ttest_results,
+      method = "ORA",
+      keyword = "immune"
+    )
+  }
+)
 ```
 
-```{r message=FALSE, echo = FALSE}
-knitr::include_graphics(normalizePath("../man/figures/olink_pathway_heatmap_ora.png"), error = FALSE)
+```{r message=FALSE, echo=FALSE}
+knitr::include_graphics(
+  path = normalizePath("../man/figures/olink_pathway_heatmap_ora.png"),
+  error = FALSE
+)
 ```
 
 ### Function output
@@ -820,28 +924,48 @@ The grouping variable(s) are annotated and colored in the left side of the heatm
 -   fontsize. Default: 10. Fontsize for all text.
 -   na_col. Default: Black. Color of the cells with NA.
 
-```{r message=FALSE,  eval = FALSE}
-first10 <- npx_data1 %>%
-  dplyr::pull(OlinkID) %>% 
-  unique() %>% 
-  head(10)
+```{r message=FALSE, eval=FALSE}
+first10 <- OlinkAnalyze::npx_data1 |>
+  dplyr::pull(
+    .data[["OlinkID"]]
+  ) |>
+  unique() |>
+  utils::head(n = 10L)
 
-first15samples <- npx_data1$SampleID %>% 
-  unique() %>% 
-  head(15)
+first15samples <- OlinkAnalyze::npx_data1 |>
+  dplyr::pull(
+    .data[["SampleID"]]
+  ) |>
+  unique() |>
+  utils::head(n = 15L)
 
-npx_data_small <- npx_data1 %>% 
-  dplyr::filter(!str_detect(SampleID, 'CONT')) %>% 
-  dplyr::filter(OlinkID %in% first10) %>% 
-  dplyr::filter(SampleID %in% first15samples)
+npx_data_small <- OlinkAnalyze::npx_data1 |>
+  dplyr::filter(
+    !stringr::str_detect(
+      string = .data[["SampleID"]],
+      pattern = "CONT"
+    )
+  ) |>
+  dplyr::filter(
+    .data[["OlinkID"]] %in% .env[["first10"]]
+  ) |>
+  dplyr::filter(
+    .data[["SampleID"]] %in% .env[["first15samples"]]
+  )
 
-try({ #This statement might fail if dependencies are not installed
-  olink_heatmap_plot(npx_data_small, variable_row_list =  'Treatment')
-  })
+if (rlang::is_installed(pkg = c("ggplotify", "pheatmap"))) {
+  OlinkAnalyze::olink_heatmap_plot(
+    df = npx_data_small,
+    variable_row_list = "Treatment"
+  )
+}
 ```
 
-```{r message=FALSE, fig.height=4, echo = FALSE}
-knitr::include_graphics(normalizePath("../man/figures/olink_heatmap_plot.png"), error = FALSE)
+```{r message=FALSE, fig.height=4, echo=FALSE}
+knitr::include_graphics(
+  path = normalizePath("../man/figures/olink_heatmap_plot.png"),
+  error = FALSE
+)
 ```
 
 ### Function output
@@ -858,22 +982,37 @@ The olink_volcano_plot function generates a volcano plot using results from the 
 -   x_lab: Optional. Character value to use as the x-axis label.
 -   olinkid_list: Optional. Character vector of proteins (OlinkID) to label in the plot. If not provided, by default the function will label all significant proteins.
 
-```{r message=FALSE, eval = FALSE}
+```{r message=FALSE, eval=FALSE}
 # perform t-test
-ttest_results <- olink_ttest(df = npx_data1,
-                             variable = 'Treatment')
+ttest_results <- OlinkAnalyze::olink_ttest(
+  df = OlinkAnalyze::npx_data1,
+  variable = "Treatment"
+)
+
 # select names of proteins to show
-top_10_name <- ttest_results %>%
-  dplyr::slice_head(n = 10) %>%
-  dplyr::pull(OlinkID)
-# volcano plot
-olink_volcano_plot(p.val_tbl = ttest_results,
-                   x_lab = 'Treatment',
-                   olinkid_list = top_10_name)
+top_10_name <- ttest_results |>
+  dplyr::slice_head(
+    n = 10L
+  ) |>
+  dplyr::pull(
+    .data[["OlinkID"]]
+  )
+
+if (rlang::is_installed(pkg = c("ggrepel"))) {
+  # volcano plot
+  OlinkAnalyze::olink_volcano_plot(
+    p.val_tbl = ttest_results,
+    x_lab = "Treatment",
+    olinkid_list = top_10_name
+  )
+}
 ```
 
-```{r message=FALSE, echo = FALSE}
-knitr::include_graphics(normalizePath("../man/figures/olink_volcano_plot.png"), error = FALSE)
+```{r message=FALSE, echo=FALSE}
+knitr::include_graphics(
+  path = normalizePath("../man/figures/olink_volcano_plot.png"),
+  error = FALSE
+)
 ```
 
 ### Function output
@@ -884,35 +1023,61 @@ An object of class *ggplot*.
 
 This function sets a coherent plot theme for plots by adding it to a ggplot object. It is mainly used for aesthetic reasons.
 
-```{r message=FALSE, eval = FALSE}
-npx_data1 %>% 
-  dplyr::filter(!is.na(Treatment)) |>
-  dplyr::filter(OlinkID == 'OID01216') %>% 
-  ggplot(aes(x = Treatment, y = NPX, fill = Treatment)) +
-  geom_boxplot() +
-  set_plot_theme()
+```{r message=FALSE, eval=FALSE}
+OlinkAnalyze::npx_data1 |>
+  dplyr::filter(
+    !is.na(.data[["Treatment"]])
+  ) |>
+  dplyr::filter(
+    .data[["OlinkID"]] == "OID01216"
+  ) |>
+  ggplot2::ggplot(
+    ggplot2::aes(
+      x = .data[["Treatment"]],
+      y = .data[["NPX"]],
+      fill = .data[["Treatment"]]
+    )
+  ) +
+  ggplot2::geom_boxplot() +
+  OlinkAnalyze::set_plot_theme()
 ```
 
-```{r message=FALSE, echo = FALSE}
-knitr::include_graphics(normalizePath("../man/figures/set_plot_theme_boxplot.png"), error = FALSE)
+```{r message=FALSE, echo=FALSE}
+knitr::include_graphics(
+  path = normalizePath("../man/figures/set_plot_theme_boxplot.png"),
+  error = FALSE
+)
 ```
 
 ## Color theming (olink_color_discrete, olink_color_gradient, olink_fill_discrete, olink_fill_gradient)
 
 These functions sets a coherent coloring theme for the plots by adding it to a ggplot object. It is mainly used for aesthetic reasons.
 
-```{r message=FALSE, eval = FALSE}
-npx_data1 %>% 
-  dplyr::filter(!is.na(Treatment)) |>
-  dplyr::filter(OlinkID == 'OID01216') %>% 
-  ggplot(aes(x = Treatment, y = NPX, fill = Treatment)) +
-  geom_boxplot() +
-  set_plot_theme() +
-  olink_fill_discrete()
+```{r message=FALSE, eval=FALSE}
+OlinkAnalyze::npx_data1 |>
+  dplyr::filter(
+    !is.na(.data[["Treatment"]])
+  ) |>
+  dplyr::filter(
+    .data[["OlinkID"]] == "OID01216"
+  ) |>
+  ggplot2::ggplot(
+    mapping = ggplot2::aes(
+      x = .data[["Treatment"]],
+      y = .data[["NPX"]],
+      fill = .data[["Treatment"]]
+    )
+  ) +
+  ggplot2::geom_boxplot() +
+  OlinkAnalyze::set_plot_theme() +
+  OlinkAnalyze::olink_fill_discrete()
 ```
 
-```{r message=FALSE, echo = FALSE}
-knitr::include_graphics(normalizePath("../man/figures/olink_fill_discrete_boxplot.png"), error = FALSE)
+```{r message=FALSE, echo=FALSE}
+knitr::include_graphics(
+  path = normalizePath("../man/figures/olink_fill_discrete_boxplot.png"),
+  error = FALSE
+)
 ```
 
 ## Visualizing bridgeability criteria for between-product normalization (olink_bridgeability_plot)
@@ -926,22 +1091,29 @@ The olink_bridgeability_plot function generates a series of plots on a per-assay
 -   min_counts: Integer indicating minimum counts allowed for a data point. If any data point in the bridge normalized dataframe contains fewer than the defined minimum count cutoff, it is excluded from the bridgeability assessment and corresponding figures. Default: 10.
 -   bridge_sampleid: Character vector containing overlapping SampleIDs between the two bridging projects. If this argument is not provided, the function will look for overlapping SampleID values between the two projects in the bridged dataframe. Default: NULL.
 
-```{r message=FALSE, eval = FALSE}
-
+```{r message=FALSE, eval=FALSE}
 npx_ht <- data_exploreht |>
-  dplyr::filter(SampleType == "SAMPLE") |>
-  dplyr::mutate(Project = "data1")
+  dplyr::filter(
+    .data[["SampleType"]] == "SAMPLE"
+  ) |>
+  dplyr::mutate(
+    Project = "data1"
+  )
 
 npx_3072 <- data_explore3072 |>
-  dplyr::filter(SampleType == "SAMPLE") |>
-  dplyr::mutate(Project = "data2")
+  dplyr::filter(
+    .data[["SampleType"]] == "SAMPLE"
+  ) |>
+  dplyr::mutate(
+    Project = "data2"
+  )
 
-overlapping_samples <- unique(intersect(npx_ht |>
-                                          dplyr::distinct(SampleID) |>
-                                          dplyr::pull(),
-                                        npx_3072 |>
-                                          dplyr::distinct(SampleID) |>
-                                          dplyr::pull()))
+overlapping_samples <- unique(
+  intersect(
+    x = npx_ht |> dplyr::distinct(.data[["SampleID"]]) |> dplyr::pull(),
+    y = npx_3072 |> dplyr::distinct(.data[["SampleID"]]) |> dplyr::pull()
+  )
+)
 
 npx_br_data <- OlinkAnalyze::olink_normalization(
   df1 = npx_ht,
@@ -950,20 +1122,22 @@ npx_br_data <- OlinkAnalyze::olink_normalization(
   df1_project_nr = "Explore HT",
   df2_project_nr = "Explore 3072",
   reference_project = "Explore HT"
-  )
+)
 
+npx_br_data_bridgeable_plt <- OlinkAnalyze::olink_bridgeability_plot(
+  df = npx_br_data,
+  median_counts_threshold = 150L,
+  min_count = 10L
+)
 
-npx_br_data_bridgeable_plt <- olink_bridgeability_plot(
-  data = npx_br_data,
-  median_counts_threshold = 150,
-  min_count = 10
-  )
-
-npx_br_data_bridgeable_plt[[1]]
+npx_br_data_bridgeable_plt[[1L]]
 ```
 
-```{r message=FALSE, echo = FALSE, out.width = "600px"}
-knitr::include_graphics(normalizePath("../man/figures/bridgeable_plt_MedianCenter.png"), error = FALSE)
+```{r message=FALSE, echo=FALSE, out.width="600px"}
+knitr::include_graphics(
+  path = normalizePath("../man/figures/bridgeable_plt_MedianCenter.png"),
+  error = FALSE
+)
 ```
 
 ### Function output
