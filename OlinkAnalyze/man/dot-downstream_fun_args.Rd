@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{.downstream_fun_args}
 \alias{.downstream_fun_args}
-\title{Common parameters for downstream anaysis functions.}
+\title{Common parameters for downstream analysis functions.}
 \usage{
 .downstream_fun_args(df, check_log)
 }
@@ -14,7 +14,7 @@ from \code{\link{read_npx}}.}
 \code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
 }
 \description{
-Common parameters for downstream anaysis functions.
+Common parameters for downstream analysis functions.
 }
 \author{
 Klev Diamanti
