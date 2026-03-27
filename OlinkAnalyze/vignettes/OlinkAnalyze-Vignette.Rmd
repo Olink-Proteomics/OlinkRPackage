@@ -28,6 +28,8 @@ options(tibble.print_min = 4L, tibble.print_max = 4L)
 
 Olink® Analyze is an R package that provides a versatile toolbox to enable fast and easy handling of Olink® NPX data for your proteomics research. Olink® Analyze provides functions for using Olink data, including functions for importing Olink® NPX datasets, as well as quality control (QC) plot functions and functions for various statistical tests. This package is meant to provide a convenient pipeline for your Olink NPX data analysis.
 
+> **Note:** Starting with OlinkAnalyze v5.0, detailed analysis workflow vignettes have been moved to the new **OlinkAnalyzeVignettes** package, which will be published on CRAN soon. This vignette provides an overview of the main functions in OlinkAnalyze and introduces the new v5.0 preprocessing functions `check_npx` and `clean_npx`.
+
 # Installation
 
 You can install Olink® Analyze from CRAN.
@@ -41,6 +43,8 @@ install.packages("OlinkAnalyze")
 **Preprocessing**
 
 -   *read_NPX* Function to read NPX data into long format
+-   *check_npx* Function to check the quality and format of NPX data
+-   *clean_npx* Function to clean NPX data based on the output of check_npx
 -   *olink_plate_randomizer* Randomize samples on plate
 -   *olink_bridgeselector* Select bridge samples
 -   *olink_normalization* Normalization of all proteins (by OlinkID)
@@ -177,6 +181,105 @@ data <- list.files(
   dplyr::bind_rows()
 ```
 
+## Check NPX data quality (check_npx)
+
+The `check_npx` function performs various quality and format checks on NPX data
+imported with `read_npx`. It is recommended to run this function after reading
+in NPX data and before downstream analysis. The result can be passed as the
+`check_log` argument to `clean_npx` and all downstream OlinkAnalyze functions,
+allowing each function to skip its own internal check and improve performance.
+
+### Function arguments
+
+-   df: NPX data frame in long format (as returned by `read_npx`).
+-   preferred_names: Optional named character vector to resolve column name
+    ambiguities or to map custom column names to internally expected ones.
+
+```{r message=FALSE, warning=FALSE}
+# Read NPX file from package example data
+npx_file <- system.file(
+  "extdata",
+  "npx_data_ext.parquet",
+  package = "OlinkAnalyze"
+)
+npx_df <- OlinkAnalyze::read_npx(filename = npx_file)
+
+# Check NPX data quality and format
+check_npx_result <- OlinkAnalyze::check_npx(df = npx_df)
+```
+
+### Function output
+
+A named list with the following elements:
+
+-   **col_names** *\<list\>*: Column names from the input data frame to be used
+    in downstream analyses.
+-   **oid_invalid** *\<chr\>*: OlinkID values that do not follow the expected
+    format (OID#####).
+-   **assay_na** *\<chr\>*: OlinkIDs of assays where all samples have NA
+    quantification values.
+-   **sample_id_dups** *\<chr\>*: Duplicate SampleID values detected in the
+    data.
+-   **sample_id_na** *\<chr\>*: SampleIDs of samples with NA quantification
+    values for all assays.
+-   **col_class** *\<data.frame\>*: Columns with incorrect data types, including
+    the column key, column name, detected type, and expected type.
+-   **assay_qc** *\<chr\>*: OlinkIDs of assays with at least one assay QC
+    warning.
+-   **non_unique_uniprot** *\<chr\>*: OlinkIDs mapped to more than one UniProt
+    ID.
+-   **darid_invalid** *\<data.frame\>*: Invalid combinations of
+    DataAnalysisRefID and PanelDataArchiveVersion.
+
+## Clean NPX data (clean_npx)
+
+The `clean_npx` function cleans an NPX data frame by applying a series of
+filtering and conversion steps. It removes invalid or problematic assays and
+samples identified by `check_npx`, and optionally converts column data types.
+Passing the output of `check_npx` via the `check_log` argument avoids
+re-running the internal checks and improves performance.
+
+### Function arguments
+
+-   df: NPX data frame in long format as returned by `read_npx`.
+-   check_log: Named list returned by `check_npx`. If `NULL`, `check_npx` is
+    run internally.
+-   remove_assay_na: Logical. Remove assays where all samples have NA values.
+    Default: `TRUE`.
+-   remove_invalid_oid: Logical. Remove assays with invalid OlinkIDs. Default:
+    `TRUE`.
+-   remove_dup_sample_id: Logical. Remove samples with duplicate IDs. Default:
+    `TRUE`.
+-   remove_control_assay: Logical. Remove internal control assays. Default:
+    `TRUE`.
+-   remove_control_sample: Logical. Remove external control samples based on
+    SampleType. Default: `TRUE`.
+-   remove_qc_warning: Logical. Remove samples with QC status 'FAIL'. Default:
+    `TRUE`.
+-   remove_assay_warning: Logical. Remove assays flagged with assay warnings.
+    Default: `TRUE`.
+-   control_sample_ids: Character vector of additional SampleIDs to remove.
+    Default: `NULL`.
+-   convert_df_cols: Logical. Convert columns to their expected data types.
+    Default: `TRUE`.
+-   convert_nonunique_uniprot: Logical. Resolve non-unique OlinkID–UniProt
+    mappings. Default: `TRUE`.
+-   verbose: Logical. Print progress messages. Default: `FALSE`.
+
+```{r message=FALSE, warning=FALSE}
+# Clean the NPX data using the check_npx output
+npx_clean <- OlinkAnalyze::clean_npx(
+  df = npx_df,
+  check_log = check_npx_result
+)
+```
+
+### Function output
+
+A tibble (or data.frame) in long format containing the cleaned NPX data, with
+invalid assays, control samples, QC-failing samples, and problematic entries
+removed according to the chosen arguments.
+
 ## Randomize samples on plate (olink_plate_randomizer)
 
 The olink_plate_randomizer function randomly assigns samples to a plate well with the option to keep the same individuals on the same plate. Olink® does not recommend to force balance based on other clinical variables.
@@ -217,11 +320,20 @@ The olink_ttest function performs a Welch 2-sample t-test or paired t-test at co
 -   df: NPX data frame in long format should minimally contain protein name (Assay), OlinkID, UniProt, Panel and an outcome factor with 2 levels.
 -   variable: Character value that should represent a column in the df to be used as a grouping variable. Needs to have exactly 2 levels.
 -   pair_id: Character value indicating which column contains the paired sample identifier. Only used for paired t-tests.
+-   check_log: Named list returned by `check_npx`. If `NULL`, `check_npx` is run internally.
 
 ```{r message=FALSE, eval=FALSE}
-OlinkAnalyze::olink_ttest(
+# Run check_npx and clean_npx before analysis
+check_npx_result <- OlinkAnalyze::check_npx(df = OlinkAnalyze::npx_data1)
+npx_clean <- OlinkAnalyze::clean_npx(
   df = OlinkAnalyze::npx_data1,
-  variable = "Treatment"
+  check_log = check_npx_result
+)
+
+OlinkAnalyze::olink_ttest(
+  df = npx_clean,
+  variable = "Treatment",
+  check_log = check_npx_result
 )
 ```
 
@@ -253,11 +365,20 @@ The olink_wilcox function performs a 2-sample Mann-Whitney U test or paired Mann
 -   df: NPX data frame in long format should minimally contain protein name (Assay), OlinkID, UniProt, Panel and an outcome factor with 2 levels.
 -   variable: Character value that should represent a column in the df to be used as a grouping variable. Needs to have exactly 2 levels.
 -   pair_id: Character value indicating which column contains the paired sample identifier. Only used for paired Mann-Whitney U tests.
+-   check_log: Named list returned by `check_npx`. If `NULL`, `check_npx` is run internally.
 
 ```{r message=FALSE, eval=FALSE}
-OlinkAnalyze::olink_wilcox(
+# Run check_npx and clean_npx before analysis
+check_npx_result <- OlinkAnalyze::check_npx(df = OlinkAnalyze::npx_data1)
+npx_clean <- OlinkAnalyze::clean_npx(
   df = OlinkAnalyze::npx_data1,
-  variable = "Treatment"
+  check_log = check_npx_result
+)
+
+OlinkAnalyze::olink_wilcox(
+  df = npx_clean,
+  variable = "Treatment",
+  check_log = check_npx_result
 )
 ```
 
@@ -302,38 +423,34 @@ Adjusted p-values are calculated using the Benjamini & Hochberg (1995) method (�
 -   covariates: Single character value or character array. Default: NULL. Confounding factors to include in the analysis. In case of single character then that should represent a column in the df. It can also accept the notations ':' or '\*', while crossed analysis will not be inferred from main effects.
 -   return.covariates: Logical. Default: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for covariates.
 -   verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+-   check_log: Named list returned by `check_npx`. If `NULL`, `check_npx` is run internally.
 
 ```{r message=FALSE, eval=FALSE}
-# Remove control samples and assays
-npx_data1_no_controls <- OlinkAnalyze::npx_data1 |>
-  dplyr::filter(
-    !stringr::str_detect(
-      string = .data[["SampleID"]],
-      pattern = regex("control|ctrl", ignore_case = TRUE)
-    )
-  ) |>
-  dplyr::filter(
-    !stringr::str_detect(
-      string = .data[["Assay"]],
-      pattern = regex("control|ctrl", ignore_case = TRUE)
-    )
-  )
+# Run check_npx and clean_npx before analysis (removes control samples/assays)
+check_npx_result <- OlinkAnalyze::check_npx(df = OlinkAnalyze::npx_data1)
+npx_clean <- OlinkAnalyze::clean_npx(
+  df = OlinkAnalyze::npx_data1,
+  check_log = check_npx_result
+)
 
 # One-way ANOVA, no covariates
 anova_results_oneway <- OlinkAnalyze::olink_anova(
-  df = npx_data1_no_controls,
-  variable = "Site"
+  df = npx_clean,
+  variable = "Site",
+  check_log = check_npx_result
 )
 # Two-way ANOVA, no covariates
 anova_results_twoway <- OlinkAnalyze::olink_anova(
-  df = npx_data1_no_controls,
-  variable = c("Site", "Time")
+  df = npx_clean,
+  variable = c("Site", "Time"),
+  check_log = check_npx_result
 )
 # One-way ANOVA, Treatment as covariates
 anova_results_oneway <- OlinkAnalyze::olink_anova(
-  df = npx_data1_no_controls,
+  df = npx_clean,
   variable = "Site",
-  covariates = "Treatment"
+  covariates = "Treatment",
+  check_log = check_npx_result
 )
 ```
 
@@ -374,10 +491,18 @@ Control samples and control assays (AssayType is not "assay", or Assay contains 
 -   verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 
 ```{r message=FALSE, eval=FALSE}
+# Run check_npx and clean_npx before analysis
+check_npx_result <- OlinkAnalyze::check_npx(df = OlinkAnalyze::npx_data1)
+npx_clean <- OlinkAnalyze::clean_npx(
+  df = OlinkAnalyze::npx_data1,
+  check_log = check_npx_result
+)
+
 # calculate the p-value for the ANOVA
 anova_results_oneway <- OlinkAnalyze::olink_anova(
-  df = npx_data1_no_controls,
-  variable = "Site"
+  df = npx_clean,
+  variable = "Site",
+  check_log = check_npx_result
 )
 
 # extracting the significant proteins
@@ -390,10 +515,11 @@ anova_results_oneway_sign <- anova_results_oneway |>
   )
 
 anova_posthoc_oneway_results <- OlinkAnalyze::olink_anova_posthoc(
-  df = npx_data1_no_controls,
+  df = npx_clean,
   olinkid_list = anova_results_oneway_sign,
   variable = "Site",
-  effect = "Site"
+  effect = "Site",
+  check_log = check_npx_result
 )
 ```
 
@@ -438,21 +564,31 @@ Adjusted p-values are calculated using the Benjamini & Hochberg (1995) method (�
 -   covariates: Single character value or character array. Default: NULL. Confounding factors to include in the analysis. In case of single character then that should represent a column in the df. It can also accept the notations ':' or '\*', while crossed analysis will not be inferred from main effects.
 -   return.covariates: Logical. Default: False. Returns F-test results for the covariates. Note: Adjusted p-values will be NA for covariates.
 -   verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+-   check_log: Named list returned by `check_npx`. If `NULL`, `check_npx` is run internally.
 
 ```{r message=FALSE, eval=FALSE}
+# Run check_npx and clean_npx before analysis
+check_npx_result <- OlinkAnalyze::check_npx(df = OlinkAnalyze::npx_data1)
+npx_clean <- OlinkAnalyze::clean_npx(
+  df = OlinkAnalyze::npx_data1,
+  check_log = check_npx_result
+)
+
 if (rlang::is_installed(pkg = c("lme4", "lmerTest"))) {
   # Linear mixed model with one variable.
   lmer_results_oneway <- OlinkAnalyze::olink_lmer(
-    df = OlinkAnalyze::npx_data1,
+    df = npx_clean,
     variable = "Site",
-    random = "Subject"
+    random = "Subject",
+    check_log = check_npx_result
   )
 
   # Linear mixed model with two variables.
   lmer_results_twoway <- OlinkAnalyze::olink_lmer(
-    df = OlinkAnalyze::npx_data1,
+    df = npx_clean,
     variable = c("Site", "Treatment"),
-    random = "Subject"
+    random = "Subject",
+    check_log = check_npx_result
   )
 }
 ```
@@ -490,14 +626,23 @@ The olink_lmer_posthoc function is similar to olink_lmer but performs a post-hoc
 -   covariates: Single character value or character array. Default: NULL. Confounding factors to include in the analysis. In case of single character then that should represent a column in the df. It can also accept the notations ':' or '\*', while crossed analysis will not be inferred from main effects.
 -   mean_return: Logical. If true, returns the mean of each factor level rather than the difference in means (default). Note that no p-value is returned for mean_return = TRUE and no adjustment is performed.
 -   verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
+-   check_log: Named list returned by `check_npx`. If `NULL`, `check_npx` is run internally.
 
 ```{r message=FALSE, eval=FALSE}
+# Run check_npx and clean_npx before analysis
+check_npx_result <- OlinkAnalyze::check_npx(df = OlinkAnalyze::npx_data1)
+npx_clean <- OlinkAnalyze::clean_npx(
+  df = OlinkAnalyze::npx_data1,
+  check_log = check_npx_result
+)
+
 if (rlang::is_installed(pkg = c("lme4", "lmerTest"))) {
   # Linear mixed model with two variables.
   lmer_results_twoway <- OlinkAnalyze::olink_lmer(
-    df = OlinkAnalyze::npx_data1,
+    df = npx_clean,
     variable = c("Site", "Treatment"),
-    random = "Subject"
+    random = "Subject",
+    check_log = check_npx_result
   )
 
   # extracting the significant proteins
@@ -512,11 +657,12 @@ if (rlang::is_installed(pkg = c("lme4", "lmerTest"))) {
 
   # performing post-hoc analysis
   lmer_posthoc_twoway_results <- OlinkAnalyze::olink_lmer_posthoc(
-    df = OlinkAnalyze::npx_data1,
+    df = npx_clean,
     olinkid_list = lmer_results_twoway_sign,
     variable = c("Site", "Treatment"),
     random = "Subject",
-    effect = "Treatment"
+    effect = "Treatment",
+    check_log = check_npx_result
   )
 }
 ```
@@ -562,7 +708,7 @@ Alternative statistical results can be used as input as long as they include the
 -   ontology: String of database to query. Must be either "MSigDb", "KEGG", "GO", and "Reactome"
 -   organism: String of name of organism. Must be either "human" or "mouse"
 
-```{r message=FALSE}
+```{r message=FALSE, eval=FALSE}
 npx_df <- OlinkAnalyze::npx_data1 |>
   dplyr::filter(
     !grepl(
@@ -572,20 +718,28 @@ npx_df <- OlinkAnalyze::npx_data1 |>
     )
   )
 
-ttest_results <- OlinkAnalyze::olink_ttest(
+# Run check_npx and clean_npx before statistical analysis
+check_npx_result <- OlinkAnalyze::check_npx(df = npx_df)
+npx_df_clean <- OlinkAnalyze::clean_npx(
   df = npx_df,
+  check_log = check_npx_result
+)
+
+ttest_results <- OlinkAnalyze::olink_ttest(
+  df = npx_df_clean,
   variable = "Treatment",
-  alternative = "two.sided"
+  alternative = "two.sided",
+  check_log = check_npx_result
 )
 
 if (rlang::is_installed(pkg = c("msigdbr", "clusterProfiler"))) {
   gsea_results <- OlinkAnalyze::olink_pathway_enrichment(
-    df = OlinkAnalyze::npx_data1,
+    df = npx_df_clean,
     test_results = ttest_results
   )
 
   ora_results <- OlinkAnalyze::olink_pathway_enrichment(
-    df = OlinkAnalyze::npx_data1,
+    df = npx_df_clean,
     test_results = ttest_results,
     method = "ORA"
   )
@@ -652,20 +806,23 @@ NOTE: UMAP is a non-linear data transformation that might not accurately preserv
 -   OutlierLines: Logical. Draw dashed lines at +/-outlierDef[X,Y] standard deviations from the mean of the plotted UMAP dimensions (default FALSE)
 -   verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 -   quiet: Logical. Default: False. If TRUE, the resulting plot is not printed.
+-   check_log: Named list returned by `check_npx`. If `NULL`, `check_npx` is run internally.
 
 ```{r message=FALSE, eval=FALSE}
+# Run check_npx and clean_npx before analysis
+check_npx_result <- OlinkAnalyze::check_npx(df = OlinkAnalyze::npx_data1)
+npx_clean <- OlinkAnalyze::clean_npx(
+  df = OlinkAnalyze::npx_data1,
+  check_log = check_npx_result
+)
+
 if (rlang::is_installed(pkg = c("umap"))) {
-  OlinkAnalyze::npx_data1 |>
-    dplyr::filter(
-      !stringr::str_detect(
-        string = .data[["SampleID"]],
-        pattern = "CONTROL_SAMPLE"
-      )
-    ) |>
-    OlinkAnalyze::olink_umap_plot(
-      color_g = "QC_Warning",
-      byPanel = TRUE
-    )
+  OlinkAnalyze::olink_umap_plot(
+    df = npx_clean,
+    color_g = "QC_Warning",
+    byPanel = TRUE,
+    check_log = check_npx_result
+  )
 }
 ```
 
@@ -674,20 +831,6 @@ knitr::include_graphics(
   path = normalizePath("../man/figures/olink_umap_plot.png"),
   error = FALSE
 )
-```
-
-```{r message=FALSE, eval =FALSE}
-OlinkAnalyze::npx_data1 |>
-  dplyr::filter(
-    !stringr::str_detect(
-      string = .data[["SampleID"]],
-      pattern = "CONTROL_SAMPLE"
-    )
-  ) |>
-  OlinkAnalyze::olink_umap_plot(
-    color_g = "QC_Warning",
-    byPanel = TRUE
-  )
 ```
 
 ### Function output
@@ -709,31 +852,25 @@ The olink_boxplot function is used to generate boxplots of NPX values stratified
 -   ttest_results: Data frame from ttest analysis. This data frame need to be generated using the olink_ttest() function.
 -   verbose: Logical. Default: False. Flag indicating if plots shall be printed additionally to assigned to a list variable.
 -   number_of_proteins_per_plot: Number of boxplots to include in the facets plot. Default 6.
+-   check_log: Named list returned by `check_npx`. If `NULL`, `check_npx` is run internally.
 
 ```{r message=FALSE, eval=FALSE}
-# Remove control samples and assays
-npx_data1_no_controls <- OlinkAnalyze::npx_data1 |>
-  dplyr::filter(
-    !stringr::str_detect(
-      string = .data[["SampleID"]],
-      pattern = regex("control|ctrl", ignore_case = TRUE)
-    )
-  ) |>
-  dplyr::filter(
-    !stringr::str_detect(
-      string = .data[["Assay"]],
-      pattern = regex("control|ctrl", ignore_case = TRUE)
-    )
-  )
+# Run check_npx and clean_npx before analysis (removes control samples/assays)
+check_npx_result <- OlinkAnalyze::check_npx(df = OlinkAnalyze::npx_data1)
+npx_clean <- OlinkAnalyze::clean_npx(
+  df = OlinkAnalyze::npx_data1,
+  check_log = check_npx_result
+)
 
-plot <- npx_data1_no_controls |>
+plot <- npx_clean |>
   dplyr::filter(
     !is.na(.data[["Site"]])
   ) |> # removing missing values which exist for Site
   OlinkAnalyze::olink_boxplot(
     variable = "Site",
     olinkid_list = c("OID00488", "OID01276"),
-    number_of_proteins_per_plot = 2L
+    number_of_proteins_per_plot = 2L,
+    check_log = check_npx_result
   )
 
 plot[[1L]]
@@ -747,20 +884,22 @@ knitr::include_graphics(
 ```
 
 ```{r message=FALSE, eval = FALSE}
-anova_posthoc_results <- npx_data1_no_controls |>
+anova_posthoc_results <- npx_clean |>
   OlinkAnalyze::olink_anova_posthoc(
     olinkid_list = c("OID00488", "OID01276"),
     variable = "Site",
-    effect = "Site"
+    effect = "Site",
+    check_log = check_npx_result
   )
 
-plot2 <- npx_data1_no_controls |>
+plot2 <- npx_clean |>
   stats::na.omit() |> # removing missing values which exists for Site
   OlinkAnalyze::olink_boxplot(
     variable = "Site",
     olinkid_list = c("OID00488", "OID01276"),
     number_of_proteins_per_plot = 2L,
-    posthoc_results = anova_posthoc_results
+    posthoc_results = anova_posthoc_results,
+    check_log = check_npx_result
   )
 
 plot2[[1L]]
@@ -802,14 +941,22 @@ The function olink_lmer_plot generates a point-range plot for a given list of pr
 -   verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 
 ```{r message=FALSE, eval=FALSE}
+# Run check_npx and clean_npx before analysis
+check_npx_result <- OlinkAnalyze::check_npx(df = OlinkAnalyze::npx_data1)
+npx_clean <- OlinkAnalyze::clean_npx(
+  df = OlinkAnalyze::npx_data1,
+  check_log = check_npx_result
+)
+
 if (rlang::is_installed(pkg = c("lme4", "lmerTest"))) {
-  plot <- olink_lmer_plot(
-    df = OlinkAnalyze::npx_data1,
+  plot <- OlinkAnalyze::olink_lmer_plot(
+    df = npx_clean,
     olinkid_list = c("OID01216", "OID01217"),
     variable = c("Site", "Treatment"),
-    x_axis_variable =  "Site",
+    x_axis_variable = "Site",
     col_variable = "Treatment",
-    random = "Subject"
+    random = "Subject",
+    check_log = check_npx_result
   )
   plot[[1L]]
 }
@@ -923,29 +1070,31 @@ The grouping variable(s) are annotated and colored in the left side of the heatm
 -   annotation_legend: Logical. Default: True. Determining if legend for annotations should be shown.
 -   fontsize. Default: 10. Fontsize for all text.
 -   na_col. Default: Black. Color of the cells with NA.
+-   check_log: Named list returned by `check_npx`. If `NULL`, `check_npx` is run internally.
 
 ```{r message=FALSE, eval=FALSE}
-first10 <- OlinkAnalyze::npx_data1 |>
+# Run check_npx and clean_npx before analysis
+check_npx_result <- OlinkAnalyze::check_npx(df = OlinkAnalyze::npx_data1)
+npx_clean <- OlinkAnalyze::clean_npx(
+  df = OlinkAnalyze::npx_data1,
+  check_log = check_npx_result
+)
+
+first10 <- npx_clean |>
   dplyr::pull(
     .data[["OlinkID"]]
   ) |>
   unique() |>
   utils::head(n = 10L)
 
-first15samples <- OlinkAnalyze::npx_data1 |>
+first15samples <- npx_clean |>
   dplyr::pull(
     .data[["SampleID"]]
   ) |>
   unique() |>
   utils::head(n = 15L)
 
-npx_data_small <- OlinkAnalyze::npx_data1 |>
-  dplyr::filter(
-    !stringr::str_detect(
-      string = .data[["SampleID"]],
-      pattern = "CONT"
-    )
-  ) |>
+npx_data_small <- npx_clean |>
   dplyr::filter(
     .data[["OlinkID"]] %in% .env[["first10"]]
   ) |>
@@ -956,7 +1105,8 @@ npx_data_small <- OlinkAnalyze::npx_data1 |>
 if (rlang::is_installed(pkg = c("ggplotify", "pheatmap"))) {
   OlinkAnalyze::olink_heatmap_plot(
     df = npx_data_small,
-    variable_row_list = "Treatment"
+    variable_row_list = "Treatment",
+    check_log = check_npx_result
   )
 }
 ```
@@ -983,10 +1133,18 @@ The olink_volcano_plot function generates a volcano plot using results from the 
 -   olinkid_list: Optional. Character vector of proteins (OlinkID) to label in the plot. If not provided, by default the function will label all significant proteins.
 
 ```{r message=FALSE, eval=FALSE}
+# Run check_npx and clean_npx before analysis
+check_npx_result <- OlinkAnalyze::check_npx(df = OlinkAnalyze::npx_data1)
+npx_clean <- OlinkAnalyze::clean_npx(
+  df = OlinkAnalyze::npx_data1,
+  check_log = check_npx_result
+)
+
 # perform t-test
 ttest_results <- OlinkAnalyze::olink_ttest(
-  df = OlinkAnalyze::npx_data1,
-  variable = "Treatment"
+  df = npx_clean,
+  variable = "Treatment",
+  check_log = check_npx_result
 )
 
 # select names of proteins to show
