@@ -1,3 +1,76 @@
+# Olink Analyze 5.0.0
+
+## Major Changes
+
+### Complete rewrite of `read_npx()`
+* `read_npx()` (and its alias `read_NPX()`) has been fully rewritten with improved
+  architecture, splitting the monolithic reader into dedicated sub-readers for each
+  file format: Excel, delimited (CSV/TSV), Parquet, ZIP archives, and wide-format
+  qPCR exports (#718, @klevdiamanti)
+* New parameters have been added for greater control over data import: `out_df`
+  (output format), `long_format`, `olink_platform`, `data_type`, `.ignore_files`,
+  `quiet`, and `legacy`
+* A `legacy` mode is available to use the previous parsing logic for backward
+  compatibility with older Olink software exports
+* Automatic detection of file format, Olink platform, and data type
+
+### New `check_npx()` function
+* A new exported function `check_npx()` validates NPX data for correctness and
+  completeness before downstream analysis (#718, @klevdiamanti, @KangD-dev)
+* Checks include: column name standardization, OlinkID validity, assays with
+  all-NA values, duplicate sample identifiers, column data types, assay QC
+  warnings, UniProt mapping consistency, and DarID validity
+* Returns a structured list with detailed diagnostics that can be used as input
+  to `clean_npx()`
+
+### New `clean_npx()` function
+* A new exported function `clean_npx()` applies an automated quality-control
+  cleaning pipeline to remove unsuitable data records before statistical
+  analysis (#718, @klevdiamanti, @KangD-dev)
+* Cleaning steps include: removing assays with invalid OlinkIDs, removing
+  assays with all-NA quantification values, removing duplicate samples,
+  removing external control samples, removing QC-failing samples, removing
+  internal control assays, removing assays with QC warnings, correcting
+  column data types, and resolving non-unique UniProt mappings
+* Each cleaning step can be individually toggled on or off
+
+### Vignettes moved to OlinkAnalyzeVignettes
+* All vignettes (main tutorial, LOD, outlier exclusion, bridging introduction,
+  cross-product bridging, and plate randomizer) have been moved to the sibling
+  package
+  [OlinkAnalyzeVignettes](https://github.com/Olink-Proteomics/OlinkAnalyzeVignettes)
+  to reduce package size and installation time
+
+### Function naming standardization
+* Functions have been renamed from camelCase to snake_case for consistency:
+  `olink_anova()`, `olink_boxplot()`, `olink_bridge_selector()`, `olink_color()`,
+  `olink_lmer()`, `olink_ordinal_regression()`, `olink_plate_randomizer()`,
+  `olink_ttest()`, `olink_wilcox()`, among others
+* Previous function names are retained as aliases for backward compatibility
+* Plotting functions have been reorganized under a `plot_*` naming scheme:
+  `plot_volcano()`, `plot_umap()`, `plot_heatmap()`, `plot_is_bridgeable()`,
+  `plot_point_range()`
+
+## Minor Changes
+* `arrow`, `duckdb`, and `dbplyr` are now imported for enhanced Parquet file
+  support and efficient data processing (#718, @klevdiamanti)
+* `cli` is now used for user-facing messages, warnings, and error reporting
+* The `magrittr` pipe (`%>%`) has been replaced by the native R pipe (`|>`)
+  throughout the package; `magrittr` is no longer a dependency
+* A new `olink_osi_dist_plot()` function has been added for visualizing Olink
+  Sample Index (OSI) score distributions
+* Internal input validation has been improved with a suite of type-checking
+  helper functions (`check_is_boolean()`, `check_is_character()`,
+  `check_is_numeric()`, `check_is_integer()`, `check_is_dataset()`,
+  `check_is_list()`, `check_columns()`, `check_file_exists()`,
+  `check_library_installed()`)
+* Sample data (`npx_data1`, `npx_data2`) has been updated
+* Test infrastructure has been expanded with parallel test execution enabled
+  via `testthat` edition 3
+* Several dependencies have been moved from Imports to Suggests (`broom`,
+  `car`, `emmeans`, `ggpubr`, `ggrepel`, `readxl`, `rstatix`, `FSA`)
+  to reduce the package's installation footprint
+
 # Olink Analyze 4.5.0
 ## Minor Changes
 * Added section to LOD vignette about how to handle LOD in bridged data (#656, @KangD-dev)
