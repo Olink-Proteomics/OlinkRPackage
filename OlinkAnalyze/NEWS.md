@@ -1,3 +1,32 @@
+# Olink Analyze 4.5.0
+## Minor Changes
+* Added section to LOD vignette about how to handle LOD in bridged data (#656, @KangD-dev)
+* Support for NPX files from NPX Map 2.0 was added to read_NPX (#660, @kathy-nevola)
+* Continuous color scale was added to PCA for graphing Olink Sample Index (OSI) continuous columns (#659, @amrita-kar)
+* Function for formatting bridged data was updated to work with other types of normalization (#643, @dtopouza, #644, @klevdiamanti) 
+
+## Bug Fixes
+* olink_ordinalRegression changed from type = 3 to type = "marginal" to work with newest version of ordinal package (#657, @kathy-nevola)
+* Regex fixed for DarID detection in olink_lod and read_NPX (#658, @kathy-nevola)
+
+# Olink Analyze 4.4.0
+## Minor Changes
+* Added support for bridging Olink Explore HT and Olink Reveal (#645, #636, #639, @boxizhang, @amrita-kar, @kathy-nevola, @dtopouza, @klev-diamanti)
+* Add warning message for specific DarID-SW export combinations that require re-export (#635, @kathy-nevola)
+* Added instructions for how to add LOD data to cross product bridging (#642, @KangD-dev)
+
+## Bug Fixes
+* Fix wording of bridgeable assays in cross-product bridging tutorial (#632, #630, @kathy-nevola)
+* Fixed warning message in case of duplicate samples so that samples with control assays did not count as duplicated samples (#634, @amrita-kar) 
+* QS Normalization will now exclude bridge samples with NA with warning, preventing error (#640, @klev-diamanti)
+
+# Olink Analyze 4.3.2
+## Bug Fixes
+* Tests for `olink_wilcox()` are now arranged by Assay name to handle ties (#616, @boxizhang)
+* The `extrafont` package has been removed as a dependency as it is archived on CRAN (#619, @klevdiamanti)
+* Regex in `olink_lmer()` has been improved to better capture the warning message (#618, @klevdiamanti)
+* Handling for when `AssayQC` is not present in both data sets for normalization (#620, @klevdiamanti)
+
 # Olink Analyze 4.3.1
 ## Bug Fixes
 * `olink_lod()` call to `checkNPX()` now correctly uses data instead of df, allowing the function to run without error (#579, @klevdiamanti)
