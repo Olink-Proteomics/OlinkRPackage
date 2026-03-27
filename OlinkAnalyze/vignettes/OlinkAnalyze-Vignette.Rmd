@@ -892,25 +892,6 @@ Adjusted_pval and estimate columns.
 -   organism: String of name of organism. Must be either "human" or "mouse".
 
 ```{r message=FALSE, eval=FALSE}
-npx_df <- OlinkAnalyze::npx_data1 |>
-  dplyr::filter(
-    !grepl(
-      pattern = "control",
-      x = .data[["SampleID"]],
-      ignore.case = TRUE
-    )
-  )
-
-# Run check_npx and clean_npx before statistical analysis
-check_npx_result <- OlinkAnalyze::check_npx(df = npx_df)
-npx_df_clean <- OlinkAnalyze::clean_npx(
-  df = npx_df,
-  check_log = check_npx_result
-)
-check_npx_clean <- OlinkAnalyze::check_npx(
-  df = npx_df_clean
-)
-
 ttest_results <- OlinkAnalyze::olink_ttest(
   df = npx_df_clean,
   variable = "Treatment",
