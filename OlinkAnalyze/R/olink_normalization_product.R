@@ -56,10 +56,21 @@
 #'
 #' @examples
 #' \donttest{
+#' # check_npx
+#' data_ht_small_check <- OlinkAnalyze::check_npx(
+#'   df = OlinkAnalyze:::data_ht_small
+#' )
+#'
+#' data_3k_small_check <- OlinkAnalyze::check_npx(
+#'   df = OlinkAnalyze:::data_3k_small
+#' )
+#'
 #' # check input datasets
 #' data_explore_check <- OlinkAnalyze:::olink_norm_input_check(
 #'   df1 = OlinkAnalyze:::data_3k_small,
+#'   df1_check_log = data_3k_small_check,
 #'   df2 = OlinkAnalyze:::data_ht_small,
+#'   df2_check_log = data_ht_small_check,
 #'   overlapping_samples_df1 = intersect(
 #'     x = unique(OlinkAnalyze:::data_3k_small$SampleID),
 #'     y = unique(OlinkAnalyze:::data_ht_small$SampleID)
@@ -82,8 +93,8 @@
 #'                    data_explore_check$not_ref_name)
 #'
 #' # create ref_cols
-#' ref_cols <- data_explore_check$ref_cols
-#' not_ref_cols <- data_explore_check$not_ref_cols
+#' ref_cols <- data_explore_check$ref_check_log$col_names
+#' not_ref_cols <- data_explore_check$not_ref_check_log$col_names
 #'
 #' # run olink_normalization_bridgeable
 #' is_bridgeable_result <- OlinkAnalyze:::olink_normalization_bridgeable(
@@ -103,9 +114,9 @@ olink_normalization_bridgeable <- function(lst_df,
   set.seed(seed = seed)
 
   # variables to mark outliers, filter counts and calculate outlier limits
-  iqr_sd <- 3L # nolint object_usage_linter
-  min_datapoint_cnt <- 10L # nolint object_usage_linter
-  med_cnt <- 150L # nolint object_usage_linter
+  iqr_sd <- 3L # nolint: object_usage_linter
+  min_datapoint_cnt <- 10L # nolint: object_usage_linter
+  med_cnt <- 150L # nolint: object_usage_linter
 
   # column names from each product quantification to allow computations
   quant_names <- paste(ref_cols$quant, names(lst_df), sep = "_")
@@ -115,7 +126,7 @@ olink_normalization_bridgeable <- function(lst_df,
   lst_df_clean <- lapply(
     lst_df,
     function(l_df) {
-      l_df |> # nolint return_linter
+      l_df |> # nolint: return_linter
         dplyr::filter(
           # only customer samples
           dplyr::if_any(
@@ -125,9 +136,15 @@ olink_normalization_bridgeable <- function(lst_df,
             ~ . == "SAMPLE"
           )
           # remove interal control assays
-          & .data[["AssayType"]] == "assay"
+          & dplyr::if_any(
+            dplyr::any_of(
+              c(ref_cols$assay_type, not_ref_cols$assay_type)
+            ),
+            ~ . == "assay"
+          )
           # remove datapoints with very few counts
-          & .data[["Count"]] > .env[["min_datapoint_cnt"]]
+          # note that counts column name has to be identical
+          & .data[[ref_cols$count]] > .env[["min_datapoint_cnt"]]
         ) |>
         # keep only relevant columns (e.g. SampleID, OlinkID, NPX, Count)
         dplyr::select(
@@ -136,7 +153,7 @@ olink_normalization_bridgeable <- function(lst_df,
               ref_cols$sample_id,
               ref_cols$olink_id,
               ref_cols$quant,
-              "Count"
+              ref_cols$count
             )
           )
         )
@@ -159,7 +176,7 @@ olink_normalization_bridgeable <- function(lst_df,
       values_from = dplyr::all_of(
         c(
           ref_cols$quant,
-          "Count"
+          ref_cols$count
         )
       )
     ) |>
@@ -192,7 +209,7 @@ olink_normalization_bridgeable <- function(lst_df,
       ),
       # median counts
       dplyr::across(
-        dplyr::starts_with("Count"),
+        dplyr::starts_with(ref_cols$count),
         list(
           low_cnt = ~ median(x = .x, na.rm = TRUE) < .env[["med_cnt"]]
         ),
@@ -356,7 +373,6 @@ olink_normalization_bridgeable <- function(lst_df,
 #' steps: \cr
 #'
 #' \itemize{
-#'
 #'  \item An empirical cumulative distribution function is used to map
 #'  datapoints for the bridging samples from one product to the equivalent
 #'  space in the other product.
@@ -365,7 +381,6 @@ olink_normalization_bridgeable <- function(lst_df,
 #'  quantiles defined above.
 #'  \item The spline regression model is used to predict the normalized
 #'  NPX values for all datapoints
-#'
 #' }
 #'
 #' More information on quantile smoothing and between product normalization
@@ -387,7 +402,6 @@ olink_normalization_bridgeable <- function(lst_df,
 #'
 #' @keywords Normalization Quantile Smoothing
 #'
-#'
 #' @examples
 #' \donttest{
 #' # Bridge samples
@@ -397,10 +411,21 @@ olink_normalization_bridgeable <- function(lst_df,
 #' ) |>
 #'   (\(x) x[!grepl("CONTROL", x)])()
 #'
+#' # check_npx
+#' data_ht_small_check <- OlinkAnalyze::check_npx(
+#'   df = OlinkAnalyze:::data_ht_small
+#' )
+#'
+#' data_3k_small_check <- OlinkAnalyze::check_npx(
+#'   df = OlinkAnalyze:::data_3k_small
+#' )
+#'
 #' # Run the internal function olink_norm_input_check
 #' check_norm <- OlinkAnalyze:::olink_norm_input_check(
 #'   df1 = OlinkAnalyze:::data_ht_small,
+#'   df1_check_log = data_ht_small_check,
 #'   df2 = OlinkAnalyze:::data_3k_small,
+#'   df2_check_log = data_3k_small_check,
 #'   overlapping_samples_df1 = bridge_samples,
 #'   overlapping_samples_df2 = NULL,
 #'   df1_project_nr = "P1",
@@ -416,15 +441,15 @@ olink_normalization_bridgeable <- function(lst_df,
 #' )
 #' names(lst_df) <- c(check_norm$ref_name, check_norm$not_ref_name)
 #'
-#' ref_cols <- check_norm$ref_cols
-#' not_ref_cols <- check_norm$not_ref_cols
+#' ref_cols <- check_norm$ref_check_log$col_names
+#' not_ref_cols <- check_norm$not_ref_check_log$col_names
 #'
 #' qs_result <- OlinkAnalyze:::olink_normalization_qs(
-#'  lst_df = lst_df,
-#'  ref_cols = ref_cols,
-#'  not_ref_cols = not_ref_cols,
-#'  bridge_samples = bridge_samples,
-#'  prod_uniq = c("E3072","HT")
+#'   lst_df = lst_df,
+#'   ref_cols = ref_cols,
+#'   not_ref_cols = not_ref_cols,
+#'   bridge_samples = bridge_samples,
+#'   prod_uniq = c("E3072", "HT")
 #' )
 #' }
 #'
@@ -434,13 +459,16 @@ olink_normalization_qs <- function(lst_df,
                                    bridge_samples,
                                    prod_uniq) {
 
-  if (identical(prod_uniq, c("E3072", "HT"))) {
-    num_samples <- 40L
-  } else if (identical(prod_uniq, c("E3072", "Reveal"))) {
-    num_samples <- 32L
-  } else if (all(prod_uniq %in% c("HT", "Reveal"))) {
-    num_samples <- 24L
-  } else {
+  num_samples <- olink_norm_product_n_samples |>
+    dplyr::filter(
+      .data[["product_1"]] == prod_uniq[1L]
+      & .data[["product_2"]] == prod_uniq[2L]
+    ) |>
+    dplyr::pull(
+      .data[["num_samples"]]
+    )
+
+  if (length(num_samples) == 0L) {
     cli::cli_abort(
       c("i" = "Cross product bridging is only supported in the
       following cases:",
@@ -486,7 +514,7 @@ olink_normalization_qs <- function(lst_df,
         stats::ecdf()
     )
     # the inverse if the ECDF are the quantiles
-    notref_map_quantiles <- model_data_joined |> # nolint object_usage_linter
+    notref_map_quantiles <- model_data_joined |> # nolint: object_usage_linter
       dplyr::pull(
         .data[[quant_col$ref]]
       ) |>
@@ -510,7 +538,7 @@ olink_normalization_qs <- function(lst_df,
       sort()
 
     # quantile points used for adapting the non linear spline
-    notref_knots <- stats::quantile( # nolint object_usage_linter
+    notref_knots <- stats::quantile( # nolint: object_usage_linter
       x = notref_quant,
       probs = c(0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95),
       names = FALSE
@@ -546,9 +574,9 @@ olink_normalization_qs <- function(lst_df,
   lst_df_clean <- lapply(
     lst_df,
     function(l_df) {
-      l_df |> # nolint return_linter
+      l_df |> # nolint: return_linter
         dplyr::filter(
-          # only customer samples
+          # only user samples
           dplyr::if_any(
             dplyr::any_of(
               c(ref_cols$sample_type, not_ref_cols$sample_type)
@@ -556,7 +584,12 @@ olink_normalization_qs <- function(lst_df,
             ~ . == "SAMPLE"
           )
           # remove internal control assays
-          & .data[["AssayType"]] == "assay"
+          & dplyr::if_any(
+            dplyr::any_of(
+              c(ref_cols$assay_type, not_ref_cols$assay_type)
+            ),
+            ~ . == "assay"
+          )
         ) |>
         # keep only relevant columns (e.g. SampleID, OlinkID, NPX, Count)
         dplyr::select(
@@ -565,7 +598,7 @@ olink_normalization_qs <- function(lst_df,
               ref_cols$sample_id,
               ref_cols$olink_id,
               ref_cols$quant,
-              "Count"
+              ref_cols$count
             )
           )
         )
@@ -589,7 +622,7 @@ olink_normalization_qs <- function(lst_df,
       values_from = dplyr::all_of(
         c(
           ref_cols$quant,
-          "Count"
+          ref_cols$count
         )
       )
     ) |>
@@ -620,7 +653,7 @@ olink_normalization_qs <- function(lst_df,
   quant_col <- paste(ref_cols$quant, names(lst_df), sep = "_") |>
     as.list()
   names(quant_col) <- c("ref", "notref")
-  cnt_ref_col <- paste("Count", names(lst_df[1L]), sep = "_")
+  cnt_ref_col <- paste(ref_cols$count, names(lst_df[1L]), sep = "_")
 
   # transform the data
   ecdf_transform <- df_combo |>
@@ -694,13 +727,15 @@ olink_normalization_qs <- function(lst_df,
   df_ref_output <- lst_df[[1L]] |>
     dplyr::filter(
       # only customer samples
-      .data[["SampleType"]] == "SAMPLE"
+      .data[[ref_cols$sample_type]] == "SAMPLE"
       # remove internal control assays
-      & .data[["AssayType"]] == "assay"
+      & .data[[ref_cols$assay_type]] == "assay"
     ) |>
     dplyr::select(
       dplyr::all_of(
-        c("SampleID", "OlinkID", "QSNormalizedNPX" = "NPX")
+        c(ref_cols$sample_id,
+          ref_cols$olink_id,
+          "QSNormalizedNPX" = ref_cols$quant)
       )
     ) |>
     dplyr::mutate(

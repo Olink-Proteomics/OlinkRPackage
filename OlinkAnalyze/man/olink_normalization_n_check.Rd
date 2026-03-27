@@ -21,3 +21,4 @@ otherwise an error message will be printed.
 An internal function to perform checks on the input of the function
 olink_normalization_n.
 }
+\keyword{internal}

@@ -19,12 +19,12 @@ values, including adjustment factors and name of project.
 }
 \description{
 This function normalizes pairs of NPX projects (data frames) using shared
-samples or subsets of samples.\cr\cr
+samples or subsets of samples.
+
+This function is a wrapper of olink_normalization_bridge and
+olink_normalization_subset.
 }
 \details{
-This function is a wrapper of olink_normalization_bridge and
-olink_normalization_subset.\cr\cr
-
 The input of this function is a tibble that contains all the necessary
 information to normalize multiple NPX projects. This tibble is called the
 normalization schema. The basic idea is that every row of the data frame is
@@ -85,23 +85,37 @@ comma-separated if the project is to be normalized to multiple projects.
 
 # prepare datasets
 npx_df1 <- npx_data1 |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
-  dplyr::select(-Project) |>
-  dplyr::mutate(Normalization = "Intensity")
+  dplyr::filter(
+    !stringr::str_detect(string = .data[["SampleID"]],
+                         pattern = "CONTROL_")
+  ) |>
+  dplyr::select(
+    -dplyr::all_of("Project")
+  ) |>
+  dplyr::mutate(
+    Normalization = "Intensity"
+  )
 npx_df2 <- npx_data2 |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
-  dplyr::select(-Project) |>
-  dplyr::mutate(Normalization = "Intensity")
+  dplyr::filter(
+    !stringr::str_detect(string = .data[["SampleID"]],
+                         pattern = "CONTROL_")
+  ) |>
+  dplyr::select(
+    -dplyr::all_of("Project")
+  ) |>
+  dplyr::mutate(
+    Normalization = "Intensity"
+  )
 
 # Find overlapping samples, but exclude Olink control
-overlap_samples <- dplyr::intersect(unique(npx_df1$SampleID),
-                                    unique(npx_df2$SampleID))
+overlap_samples <- dplyr::intersect(x = unique(npx_df1[["SampleID"]]),
+                                    y = unique(npx_df2[["SampleID"]]))
 overlap_samples_list <- list("DF1" = overlap_samples,
                              "DF2" = overlap_samples)
 
 # create tibble for input
 norm_schema_bridge <- dplyr::tibble(
-  order              = c(1, 2),
+  order              = c(1L, 2L),
   name               = c("NPX_DF1", "NPX_DF2"),
   data               = list("NPX_DF1" = npx_df1,
                             "NPX_DF2" = npx_df2),
@@ -112,36 +126,80 @@ norm_schema_bridge <- dplyr::tibble(
 )
 
 # normalize
-olink_normalization_n(norm_schema = norm_schema_bridge)
+OlinkAnalyze::olink_normalization_n(
+  norm_schema = norm_schema_bridge
+)
 
 #### Subset normalization of two projects
 
 # datasets
 npx_df1 <- npx_data1 |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
-  dplyr::select(-Project) |>
-  dplyr::mutate(Normalization = "Intensity")
+  dplyr::filter(
+    !stringr::str_detect(string = .data[["SampleID"]],
+                         pattern = "CONTROL_")
+  ) |>
+  dplyr::select(
+    -dplyr::all_of("Project")
+  ) |>
+  dplyr::mutate(
+    Normalization = "Intensity"
+  )
 npx_df2 <- npx_data2 |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
-  dplyr::select(-Project) |>
-  dplyr::mutate(Normalization = "Intensity")
+  dplyr::filter(
+    !stringr::str_detect(string = .data[["SampleID"]],
+                         pattern = "CONTROL_")
+  ) |>
+  dplyr::select(
+    -dplyr::all_of("Project")
+  ) |>
+  dplyr::mutate(
+    Normalization = "Intensity"
+  )
 
 # Find a suitable subset of samples from both projects, but exclude Olink
 # controls and samples that fail QC.
 df1_samples <- npx_df1 |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
-  dplyr::group_by(SampleID) |>
-  dplyr::filter(all(QC_Warning == 'Pass')) |>
-  dplyr::pull(SampleID) |>
+  dplyr::filter(
+    !stringr::str_detect(string = .data[["SampleID"]],
+                         pattern = "CONTROL_")
+  ) |>
+  dplyr::group_by(
+    dplyr::across(
+      dplyr::all_of("SampleID")
+    )
+  ) |>
+  dplyr::filter(
+    all(.data[["QC_Warning"]] == "Pass")
+  ) |>
+  dplyr::pull(
+    .data[["SampleID"]]
+  ) |>
   unique() |>
-  sample(size = 16, replace = FALSE)
+  sample(
+    size = 16L,
+    replace = FALSE
+  )
 df2_samples <- npx_df2 |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
-  dplyr::group_by(SampleID) |>
-  dplyr::filter(all(QC_Warning == 'Pass')) |>
-  dplyr::pull(SampleID) |>
+  dplyr::filter(
+    !stringr::str_detect(string = .data[["SampleID"]],
+                         pattern = "CONTROL_")
+  ) |>
+  dplyr::group_by(
+    dplyr::across(
+      dplyr::all_of("SampleID")
+    )
+  ) |>
+  dplyr::filter(
+    all(.data[["QC_Warning"]] == "Pass")
+  ) |>
+  dplyr::pull(
+    .data[["SampleID"]]
+  ) |>
   unique() |>
-  sample(size = 16, replace = FALSE)
+  sample(
+    size = 16L,
+    replace = FALSE
+  )
 
 # create named list
 subset_samples_list <- list("DF1" = df1_samples,
@@ -149,7 +207,7 @@ subset_samples_list <- list("DF1" = df1_samples,
 
 # create tibble for input
 norm_schema_subset <- dplyr::tibble(
-  order              = c(1, 2),
+  order              = c(1L, 2L),
   name               = c("NPX_DF1", "NPX_DF2"),
   data               = list("NPX_DF1" = npx_df1,
                             "NPX_DF2" = npx_df2),
@@ -160,33 +218,71 @@ norm_schema_subset <- dplyr::tibble(
 )
 
 # Normalize
-olink_normalization_n(norm_schema = norm_schema_subset)
+OlinkAnalyze::olink_normalization_n(
+  norm_schema = norm_schema_subset
+)
 
 #### Subset normalization  of two projects using all samples
 
 # datasets
 npx_df1 <- npx_data1 |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
-  dplyr::select(-Project) |>
-  dplyr::mutate(Normalization = "Intensity")
+  dplyr::filter(
+    !stringr::str_detect(string = .data[["SampleID"]],
+                         pattern = "CONTROL_")
+  ) |>
+  dplyr::select(
+    -dplyr::all_of("Project")
+  ) |>
+  dplyr::mutate(
+    Normalization = "Intensity"
+  )
 npx_df2 <- npx_data2 |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
-  dplyr::select(-Project) |>
-  dplyr::mutate(Normalization = "Intensity")
+  dplyr::filter(
+    !stringr::str_detect(string = .data[["SampleID"]],
+                         pattern = "CONTROL_")
+  ) |>
+  dplyr::select(
+    -dplyr::all_of("Project")
+  ) |>
+  dplyr::mutate(
+    Normalization = "Intensity"
+  )
 
 # Find a suitable subset of samples from both projects, but exclude Olink
 # controls and samples that fail QC.
 df1_samples_all <- npx_df1 |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
-  dplyr::group_by(SampleID) |>
-  dplyr::filter(all(QC_Warning == 'Pass')) |>
-  dplyr::pull(SampleID) |>
+  dplyr::filter(
+    !stringr::str_detect(string = .data[["SampleID"]],
+                         pattern = "CONTROL_")
+  ) |>
+  dplyr::group_by(
+    dplyr::across(
+      dplyr::all_of("SampleID")
+    )
+  ) |>
+  dplyr::filter(
+    all(.data[["QC_Warning"]] == "Pass")
+  ) |>
+  dplyr::pull(
+    .data[["SampleID"]]
+  ) |>
   unique()
 df2_samples_all <- npx_df2 |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
-  dplyr::group_by(SampleID) |>
-  dplyr::filter(all(QC_Warning == 'Pass')) |>
-  dplyr::pull(SampleID) |>
+  dplyr::filter(
+    !stringr::str_detect(string = .data[["SampleID"]],
+                         pattern = "CONTROL_")
+  ) |>
+  dplyr::group_by(
+    dplyr::across(
+      dplyr::all_of("SampleID")
+    )
+  ) |>
+  dplyr::filter(
+    all(.data[["QC_Warning"]] == "Pass")
+  ) |>
+  dplyr::pull(
+    .data[["SampleID"]]
+  ) |>
   unique()
 
 # create named list
@@ -195,7 +291,7 @@ subset_samples_all_list <- list("DF1" = df1_samples_all,
 
 # create tibble for input
 norm_schema_subset_all <- dplyr::tibble(
-  order              = c(1, 2),
+  order              = c(1L, 2L),
   name               = c("NPX_DF1", "NPX_DF2"),
   data               = list("NPX_DF1" = npx_df1,
                             "NPX_DF2" = npx_df2),
@@ -206,68 +302,109 @@ norm_schema_subset_all <- dplyr::tibble(
 )
 
 # Normalize
-olink_normalization_n(norm_schema = norm_schema_subset_all)
+OlinkAnalyze::olink_normalization_n(
+  norm_schema = norm_schema_subset_all
+)
 
 #### Multi-project normalization using bridge and subset samples
 
 ## NPX data frames to bridge
 npx_df1 <- npx_data1 |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
-  dplyr::select(-Project) |>
-  dplyr::mutate(Normalization = "Intensity")
-
+  dplyr::filter(
+    !stringr::str_detect(string = .data[["SampleID"]],
+                         pattern = "CONTROL_")
+  ) |>
+  dplyr::select(
+    -dplyr::all_of("Project")
+  ) |>
+  dplyr::mutate(
+    Normalization = "Intensity"
+  )
 npx_df2 <- npx_data2 |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
-  dplyr::select(-Project) |>
-  dplyr::mutate(Normalization = "Intensity")
+  dplyr::filter(
+    !stringr::str_detect(string = .data[["SampleID"]],
+                         pattern = "CONTROL_")
+  ) |>
+  dplyr::select(
+    -dplyr::all_of("Project")
+  ) |>
+  dplyr::mutate(
+    Normalization = "Intensity"
+  )
 
 # manipulating the sample NPX datasets to create another two random ones
 npx_df3 <- npx_data2 |>
-  dplyr::mutate(SampleID = paste(SampleID, "_mod", sep = ""),
-                PlateID = paste(PlateID, "_mod", sep = ""),
-                NPX = sample(x = NPX, size = dplyr::n(), replace = FALSE)) |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
-  dplyr::select(-Project) |>
-  dplyr::mutate(Normalization = "Intensity")
+  dplyr::mutate(
+    SampleID = paste(.data[["SampleID"]], "_mod", sep = ""),
+    PlateID = paste(.data[["PlateID"]], "_mod", sep = ""),
+    NPX = sample(x = .data[["NPX"]], size = dplyr::n(), replace = FALSE)
+  ) |>
+  dplyr::filter(
+    !stringr::str_detect(string = .data[["SampleID"]],
+                         pattern = "CONTROL_")
+  ) |>
+  dplyr::select(
+    -dplyr::all_of("Project")
+  ) |>
+  dplyr::mutate(
+    Normalization = "Intensity"
+  )
 
 npx_df4 <- npx_data1 |>
-  dplyr::mutate(SampleID = paste(SampleID, "_mod2", sep = ""),
-                PlateID = paste(PlateID, "_mod2", sep = ""),
-                NPX = sample(x = NPX, size = dplyr::n(), replace = FALSE)) |>
-  dplyr::filter(!stringr::str_detect(SampleID, "CONTROL_")) |>
-  dplyr::select(-Project) |>
-  dplyr::mutate(Normalization = "Intensity")
+  dplyr::mutate(
+    SampleID = paste(.data[["SampleID"]], "_mod2", sep = ""),
+    PlateID = paste(.data[["PlateID"]], "_mod2", sep = ""),
+    NPX = sample(x = .data[["NPX"]], size = dplyr::n(), replace = FALSE)
+  ) |>
+  dplyr::filter(
+    !stringr::str_detect(string = .data[["SampleID"]],
+                         pattern = "CONTROL_")
+  ) |>
+  dplyr::select(
+    -dplyr::all_of("Project")
+  ) |>
+  dplyr::mutate(
+    Normalization = "Intensity"
+  )
 
 ## samples to use for normalization
 # Bridge samples with same identifiers between npx_df1 and npx_df2
-overlap_samples <- dplyr::intersect(unique(npx_df1$SampleID),
-                                    unique(npx_df2$SampleID))
+overlap_samples <- dplyr::intersect(unique(npx_df1[["SampleID"]]),
+                                    unique(npx_df2[["SampleID"]]))
 overlap_samples_df1_df2 <- list("DF1" = overlap_samples,
                                 "DF2" = overlap_samples)
-rm(overlap_samples)
 
 # Bridge samples with different identifiers between npx_df2 and npx_df3
-overlap_samples_df2_df3 <- list("DF1" = sample(x = unique(npx_df2$SampleID),
-                                               size = 10,
-                                               replace = FALSE),
-                                "DF2" = sample(x = unique(npx_df3$SampleID),
-                                               size = 10,
-                                               replace = FALSE))
+overlap_samples_df2_df3 <- list(
+  "DF1" = sample(x = setdiff(x = unique(npx_df2[["SampleID"]]),
+                             y = overlap_samples),
+                 size = 10L,
+                 replace = FALSE),
+  "DF2" = sample(x = setdiff(x = unique(npx_df3[["SampleID"]]),
+                             y = overlap_samples),
+                 size = 10L,
+                 replace = FALSE)
+)
 
 # Samples to use for intensity normalization between npx_df4 and the
 # normalized dataset of npx_df1 and npx_df2
-overlap_samples_df12_df4 <- list("DF1" = sample(x = c(unique(npx_df1$SampleID),
-                                                      unique(npx_df2$SampleID)),
-                                                size = 100,
-                                                replace = FALSE) |>
-                                   unique(),
-                                 "DF2" = sample(x = unique(npx_df4$SampleID),
-                                                size = 40,
-                                                replace = FALSE))
+overlap_samples_df12_df4 <- list(
+  "DF1" = sample(
+    x = c(unique(npx_df1[["SampleID"]]), unique(npx_df2[["SampleID"]])),
+    size = 100L,
+    replace = FALSE
+  ) |>
+    unique(),
+  "DF2" = sample(
+    x = unique(npx_df4[["SampleID"]]),
+    size = 40L,
+    replace = FALSE
+  )
+)
 
 # create tibble for input
 norm_schema_n <- dplyr::tibble(
-  order              = c(1, 2, 3, 4),
+  order              = c(1L, 2L, 3L, 4L),
   name               = c("NPX_DF1", "NPX_DF2", "NPX_DF3", "NPX_DF4"),
   data               = list("NPX_DF1" = npx_df1,
                             "NPX_DF2" = npx_df2,
@@ -281,8 +418,9 @@ norm_schema_n <- dplyr::tibble(
   normalize_to       = c(NA_character_, "1", "2", "1,2")
 )
 
-olink_normalization_n(norm_schema = norm_schema_n)
-
+OlinkAnalyze::olink_normalization_n(
+  norm_schema = norm_schema_n
+)
 }
 
 }
