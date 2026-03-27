@@ -89,15 +89,8 @@ npx_clean
 ```
 
 You can customise which cleaning steps are applied through the function
-arguments. For example, to keep QC-warned samples:
-
-```{r clean-npx-custom}
-npx_keep_qc <- clean_npx(
-  df = npx_data1,
-  check_log = check_results,
-  remove_qc_warning = FALSE
-)
-```
+arguments (e.g. `remove_qc_warning`, `remove_control_sample`). See
+`?clean_npx` for the full list of options.
 
 ## Downstream Analysis
 
