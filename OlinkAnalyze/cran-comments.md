@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release includes major updates to the package, including new features, bug fixes, and performance improvements. The package has been thoroughly tested and is now available on CRAN for users to install and use.
+This release includes major updates to the package, bug fixes, and performance improvements. The package has been thoroughly tested and is now available on CRAN for users to install and use.
 
 ## R CMD check results
 
