@@ -581,7 +581,7 @@ calculation. The ":" between variables indicates interaction between variables.
 -   p.value *\<dbl\>*: P-value for the test.
 -   Adjusted_pval *\<dbl\>*: Adjusted p-value for the test (Benjamini &
 Hochberg).
--   Threshold *\<chr\>*: Text indication if assay is significant (adjuste
+-   Threshold *\<chr\>*: Text indication if assay is significant (adjusted
 p-value \< 0.05).
 
 ## Post-hoc ANOVA analysis (olink_anova_posthoc)

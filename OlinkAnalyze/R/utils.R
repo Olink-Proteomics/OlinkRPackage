@@ -282,7 +282,7 @@ check_osi <- function(df,
                            quiet,
                            legacy) {}
 
-#' Common parameters for downstream anaysis functions.
+#' Common parameters for downstream analysis functions.
 #'
 #' @author
 #'   Klev Diamanti
