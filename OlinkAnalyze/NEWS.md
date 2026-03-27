@@ -34,7 +34,7 @@
   column data types, and resolving non-unique UniProt mappings.
 * Each cleaning step can be individually toggled on or off.
 
-### Vignettes moved to OlinkAnalyzeVignettes
+### Vignettes moved to OlinkAnalyzeVignettes (@klevdiamanti & @dtopouza)
 * All vignettes except from the main guide-Vignette (LOD, outlier exclusion,
   bridging introduction, cross-product bridging, and plate randomizer) have been
   moved to the sibling package OlinkAnalyzeVignettes that will be online soon,
