@@ -27,6 +27,11 @@ options(tibble.print_min = 4L, tibble.print_max = 4L)
 
 Olink® Analyze is an R package that provides a versatile toolbox to enable fast and easy handling of Olink® NPX data for your proteomics research. Olink® Analyze provides functions for using Olink data, including functions for importing Olink® NPX datasets, as well as quality control (QC) plot functions and functions for various statistical tests. This package is meant to provide a convenient pipeline for your Olink NPX data analysis.
 
+> **Note:** Detailed tutorial vignettes from OlinkAnalyze are now hosted in the
+> **OlinkAnalyzeVignettes** package, which will be published on CRAN soon. Please
+> look for **OlinkAnalyzeVignettes** for in-depth tutorials on topics such as
+> plate randomization, bridging, LOD calculation, outlier exclusion, and more.
+
 # Installation
 
 You can install Olink® Analyze from CRAN.
@@ -40,6 +45,8 @@ install.packages("OlinkAnalyze")
 **Preprocessing**
 
 -   *read_NPX* Function to read NPX data into long format
+-   *check_npx* Function to check NPX data format and identify potential issues
+-   *clean_npx* Function to clean NPX data based on checks from check_npx
 -   *olink_plate_randomizer* Randomize samples on plate
 -   *olink_bridgeselector* Select bridge samples
 -   *olink_normalization* Normalization of all proteins (by OlinkID)
@@ -177,17 +184,76 @@ data <-  list.files(path = "path/to/dir/with/NPX/files",
          dplyr::bind_rows()
 ```
 
+## Check NPX data (check_npx)
+
+The check_npx function performs various checks on NPX data, including checking column names, validating Olink identifiers, identifying assays with *NA* values for all samples and detecting duplicate sample identifiers. OlinkAnalyze uses pre-defined names of columns to perform downstream analyses, and different Olink platforms export data with different column names. This function aims to instruct each function of OlinkAnalyze on the column it should be using for the downstream analysis.
+
+The output of check_npx (referred to as `check_log`) can be passed to all subsequent OlinkAnalyze functions that accept the `check_log` parameter. This avoids redundant checks and improves performance when running multiple analyses on the same data.
+
+### Function arguments
+
+-   df: NPX data frame in long format (e.g. as returned by read_NPX).
+-   preferred_names: (Optional) Named character vector to map custom column names to internal names (e.g. `c("quant" = "PCNormalizedNPX")`).
+
+```{r message=FALSE, eval=FALSE}
+# Run check_npx on the data
+npx_check <- check_npx(df = npx_data1)
+```
+
+### Function output
+
+A named list containing:
+
+-   col_names: Mapped column names from the input data.
+-   oid_invalid: Invalid OlinkID values.
+-   assay_na: Assays with all NA quantification values.
+-   sample_id_dups: Duplicate SampleIDs.
+-   sample_id_na: Samples with all NA quantification values.
+-   col_class: Columns with incorrect data types.
+-   assay_qc: Assays with QC warnings.
+-   non_unique_uniprot: OlinkIDs mapping to multiple UniProt IDs.
+-   darid_invalid: Outdated DataAnalysisRefID/PanelDataArchiveVersion combinations.
+
+## Clean NPX data (clean_npx)
+
+The clean_npx function applies a series of cleaning steps to a data set exported by Olink Software and imported in R by read_NPX. Some of the steps rely on results from check_npx (passed via `check_log`). This function removes samples and assays that are not suitable for downstream statistical analysis.
+
+### Function arguments
+
+-   df: NPX data frame in long format.
+-   check_log: (Optional) A named list returned by check_npx. If NULL, check_npx will be run internally.
+-   remove_assay_na: Logical. Remove assays with all NA quantification values. Default: TRUE.
+-   remove_invalid_oid: Logical. Remove assays with invalid OlinkIDs. Default: TRUE.
+-   remove_dup_sample_id: Logical. Remove duplicate SampleIDs. Default: TRUE.
+-   remove_control_sample: Logical. Remove external control samples. Default: TRUE.
+-   remove_control_assay: Logical. Remove internal control assays. Default: TRUE.
+-   remove_qc_warning: Logical. Remove samples failing QC. Default: TRUE.
+-   remove_assay_warning: Logical. Remove assays with QC warnings. Default: TRUE.
+-   convert_df_cols: Logical. Correct column data types. Default: TRUE.
+-   convert_nonunique_uniprot: Logical. Resolve multiple UniProt mappings per assay. Default: TRUE.
+-   verbose: Logical. Print information about cleaning steps. Default: FALSE.
+
+```{r message=FALSE, eval=FALSE}
+# Clean NPX data using the check_log from check_npx
+npx_clean <- clean_npx(df = npx_data1,
+                        check_log = npx_check)
+```
+
+### Function output
+
+A tibble with cleaned NPX data, where problematic samples and assays have been removed and column types corrected according to the specified cleaning parameters.
+
 ## Randomize samples on plate (olink_plate_randomizer)
 
 The olink_plate_randomizer function randomly assigns samples to a plate well with the option to keep the same individuals on the same plate. Olink® does not recommend to force balance based on other clinical variables.
 
-For more information on plate randomization, consult the [Plate Randomization Vignette](plate_randomizer.html).
+For more information on plate randomization, consult the Plate Randomization Vignette in the **OlinkAnalyzeVignettes** package.
 
 ## Select bridge samples (olink_bridgeselector)
 
 The bridge selection function selects a number of bridge samples based on the input data. Bridge samples are used to normalize two dataframes/projects that have been ran at different time points, hence, a batch effect is expected. It selects samples that have good detectability (if applicable), pass quality control, and cover a wide range of data points.
 
-For more information on bridge sample selection, consult the [Introduction to bridging Olink® NPX datasets tutorial](bridging_introduction.html).
+For more information on bridge sample selection, consult the Introduction to bridging Olink® NPX datasets tutorial in the **OlinkAnalyzeVignettes** package.
 
 ## Normalizing NPX data (olink_normalization)
 
@@ -195,16 +261,16 @@ The Olink® normalization function normalizes NPX values between two different d
 
 The function handles four different types of normalization:
 
--   **Bridging normalization**: One of the dataframes is adjusted to another using overlapping samples (bridge samples). The overlapping samples should have the same IDs between dataframes. Adjustment is made using the median of the paired differences between the bridge samples. For more information on bridging, consult the [Introduction to bridging Olink® NPX datasets tutorial](bridging_introduction.html).
+-   **Bridging normalization**: One of the dataframes is adjusted to another using overlapping samples (bridge samples). The overlapping samples should have the same IDs between dataframes. Adjustment is made using the median of the paired differences between the bridge samples. For more information on bridging, consult the Introduction to bridging Olink® NPX datasets tutorial in the **OlinkAnalyzeVignettes** package.
 -   **Subset normalization**: A subset of samples is used to normalize two dataframes, one of which is used as a reference_project. Adjustment is made using the differences of medians between the sample subsets from the two dataframes. Subset normalization is useful if no bridge samples were included and one can assume that the distribution of the two datasets is very similar.
 -   **Reference median normalization**: Works only on one dataframe. This is effectively subset normalization, but using difference of medians to pre-recorded median values. df1, overlapping_samples_df1 and reference_medians need to be specified.
--   **Cross-product bridging**: Similar to bridging normalization but bridging across products, for example bridging Explore 3072 data to Explore HT data. Overlapping samples are run on both products and used to determine which assays are bridgeable and what method should be used to bridge each assay. For more information on the between-product bridging methodology, consult the [Bridging across NGS-based Olink^®^ products Tutorial](bridging_crossproduct.html).
+-   **Cross-product bridging**: Similar to bridging normalization but bridging across products, for example bridging Explore 3072 data to Explore HT data. Overlapping samples are run on both products and used to determine which assays are bridgeable and what method should be used to bridge each assay. For more information on the between-product bridging methodology, consult the Bridging across NGS-based Olink^®^ products Tutorial in the **OlinkAnalyzeVignettes** package.
 
 ## Integrating Explore NPX LOD (olink_lod)
 
 The olink_lod function adds LOD information to an Explore HT or Explore 3072 NPX dataframe. This function can incorporate LOD based on either an Explore dataset's negative controls or using predetermined fixed LOD values, which can be downloaded from the Document Download Center at [olink.com](https://olink.com/knowledge/documents), or using both methods. The default LOD calculation method is based off of the negative controls. If an NPX file is intensity normalized, both intensity normalized and PC normalized LODs are provided.
 
-For more information on calculating LOD, consult the [Calculating LOD from Olink® Explore data tutorial](LOD.html).
+For more information on calculating LOD, consult the Calculating LOD from Olink® Explore data tutorial in the **OlinkAnalyzeVignettes** package.
 
 # Statistical analysis
 
@@ -219,8 +285,11 @@ The olink_ttest function performs a Welch 2-sample t-test or paired t-test at co
 -   pair_id: Character value indicating which column contains the paired sample identifier. Only used for paired t-tests.
 
 ```{r message=FALSE, eval=FALSE}
+npx_check <- check_npx(df = npx_data1)
+
 olink_ttest(df = npx_data1,
-            variable = 'Treatment')
+            variable = 'Treatment',
+            check_log = npx_check)
 ```
 
 ### Function output
@@ -253,8 +322,11 @@ The olink_wilcox function performs a 2-sample Mann-Whitney U test or paired Mann
 -   pair_id: Character value indicating which column contains the paired sample identifier. Only used for paired Mann-Whitney U tests.
 
 ```{r message=FALSE, eval=FALSE}
+npx_check <- check_npx(df = npx_data1)
+
 olink_wilcox(df = npx_data1,
-             variable = 'Treatment')
+             variable = 'Treatment',
+             check_log = npx_check)
 ```
 
 ### Function output
@@ -308,17 +380,23 @@ npx_data1_no_controls <- npx_data1 |>
   dplyr::filter(!stringr::str_detect(Assay, 
                                      regex("control|ctrl",
                                            ignore_case = TRUE)))
-  
+
+# Run check_npx on cleaned data
+npx_check <- check_npx(df = npx_data1_no_controls)
+
 # One-way ANOVA, no covariates
 anova_results_oneway <- olink_anova(df = npx_data1_no_controls, 
-                                    variable = 'Site')
+                                    variable = 'Site',
+                                    check_log = npx_check)
 # Two-way ANOVA, no covariates
 anova_results_twoway <- olink_anova(df = npx_data1_no_controls, 
-                                    variable = c('Site', 'Time'))
+                                    variable = c('Site', 'Time'),
+                                    check_log = npx_check)
 # One-way ANOVA, Treatment as covariates
 anova_results_oneway <- olink_anova(df = npx_data1_no_controls, 
                                     variable = 'Site',
-                                    covariates = 'Treatment')
+                                    covariates = 'Treatment',
+                                    check_log = npx_check)
 ```
 
 ### Function output
@@ -358,9 +436,13 @@ Control samples and control assays (AssayType is not "assay", or Assay contains 
 -   verbose: Logical. Default: True. If information about removed samples, factor conversion and final model formula is to be printed to the console.
 
 ```{r message=FALSE, eval=FALSE}
+# Run check_npx on the data
+npx_check <- check_npx(df = npx_data1_no_controls)
+
 # calculate the p-value for the ANOVA
 anova_results_oneway <- olink_anova(df = npx_data1_no_controls, 
-                                    variable = 'Site')
+                                    variable = 'Site',
+                                    check_log = npx_check)
 
 # extracting the significant proteins
 anova_results_oneway_significant <- anova_results_oneway %>%
@@ -370,7 +452,8 @@ anova_results_oneway_significant <- anova_results_oneway %>%
 anova_posthoc_oneway_results <- olink_anova_posthoc(df = npx_data1_no_controls,
                                                     olinkid_list = anova_results_oneway_significant,
                                                     variable = 'Site',
-                                                    effect = 'Site')
+                                                    effect = 'Site',
+                                                    check_log = npx_check)
 ```
 
 ### Function output
@@ -417,14 +500,18 @@ Adjusted p-values are calculated using the Benjamini & Hochberg (1995) method (�
 
 ```{r message=FALSE, eval=FALSE}
 if (requireNamespace("lme4", quietly = TRUE) & requireNamespace("lmerTest", quietly = TRUE)){
+  npx_check <- check_npx(df = npx_data1)
+
 # Linear mixed model with one variable.
   lmer_results_oneway <- olink_lmer(df = npx_data1, 
                                     variable = 'Site',
-                                    random = 'Subject')
+                                    random = 'Subject',
+                                    check_log = npx_check)
 # Linear mixed model with two variables.
   lmer_results_twoway <- olink_lmer(df = npx_data1, 
                                     variable = c('Site', 'Treatment'),
-                                    random = 'Subject')
+                                    random = 'Subject',
+                                    check_log = npx_check)
 }
 ```
 
@@ -464,10 +551,13 @@ The olink_lmer_posthoc function is similar to olink_lmer but performs a post-hoc
 
 ```{r message=FALSE, eval=FALSE}
 if (requireNamespace("lme4", quietly = TRUE) & requireNamespace("lmerTest", quietly = TRUE)){
+  npx_check <- check_npx(df = npx_data1)
+
   # Linear mixed model with two variables.
   lmer_results_twoway <- olink_lmer(df = npx_data1, 
                                     variable = c('Site', 'Treatment'),
-                                    random = 'Subject')
+                                    random = 'Subject',
+                                    check_log = npx_check)
   # extracting the significant proteins
   lmer_results_twoway_significant <- lmer_results_twoway %>%
     dplyr::filter(Threshold == 'Significant', term == 'Treatment') %>%
@@ -477,7 +567,8 @@ if (requireNamespace("lme4", quietly = TRUE) & requireNamespace("lmerTest", quie
                                                     olinkid_list = lmer_results_twoway_significant,
                                                     variable = c('Site', 'Treatment'),
                                                     random = 'Subject',
-                                                    effect = 'Treatment') 
+                                                    effect = 'Treatment',
+                                                    check_log = npx_check) 
 }
 ```
 
@@ -526,16 +617,22 @@ Alternative statistical results can be used as input as long as they include the
 npx_df <- npx_data1 |>
   dplyr::filter(!grepl("control", SampleID, ignore.case = TRUE))
 
+npx_df_check <- check_npx(df = npx_df)
+
 ttest_results <- olink_ttest(
   df = npx_df,
   variable = "Treatment",
-  alternative = "two.sided")
+  alternative = "two.sided",
+  check_log = npx_df_check)
 
 try({ # This expression might fail if dependencies are not installed
-gsea_results <- olink_pathway_enrichment(data = npx_data1, test_results = ttest_results)
+gsea_results <- olink_pathway_enrichment(data = npx_data1,
+                                         test_results = ttest_results,
+                                         check_log = npx_df_check)
 ora_results <- olink_pathway_enrichment(
   data = npx_data1,
-  test_results = ttest_results, method = "ORA")
+  test_results = ttest_results, method = "ORA",
+  check_log = npx_df_check)
 }, silent = TRUE)
 ```
 
@@ -573,7 +670,7 @@ Columns for GSEA:
 
 Generates PCA projection of all samples from NPX data along two principal components (default PC2 vs PC1) colored by the variable specified by color_g (default QC_Warning) and including the percentage of explained variance. By default, the values are scaled and centered in the PCA and proteins with missing NPX values removed from the corresponding assay(s). Unique sample names are required. Imputation by median value is done for assays with missingness \<10% and for multi-plate projects, and for missingness \<5% for single plate projects.
 
-More information about `olink_pca()` can be found in the [Outlier Exclusion Vignette](OutlierExclusion.html).
+More information about `olink_pca()` can be found in the Outlier Exclusion Vignette in the **OlinkAnalyzeVignettes** package.
 
 ## Uniform Manifold Approximation and Projection for Dimension Reduction (UMAP) (olink_umap_plot)
 
@@ -602,10 +699,15 @@ NOTE: UMAP is a non-linear data transformation that might not accurately preserv
 
 ```{r message=FALSE, eval = FALSE}
 if (requireNamespace("umap", quietly = TRUE) ){
-npx_data1 %>% 
-  dplyr::filter(!stringr::str_detect(SampleID, 'CONTROL_SAMPLE')) %>% 
+npx_umap_df <- npx_data1 %>% 
+  dplyr::filter(!stringr::str_detect(SampleID, 'CONTROL_SAMPLE'))
+
+npx_umap_check <- check_npx(df = npx_umap_df)
+
+npx_umap_df %>% 
   olink_umap_plot(df = .,
-                 color_g = "QC_Warning", byPanel = TRUE)  
+                 color_g = "QC_Warning", byPanel = TRUE,
+                 check_log = npx_umap_check)  
   }
 ```
 
@@ -615,10 +717,15 @@ knitr::include_graphics(normalizePath("../man/figures/olink_umap_plot.png"),
 ```
 
 ```{r message=FALSE, eval =FALSE}
-npx_data1 %>% 
-  dplyr::filter(!stringr::str_detect(SampleID, 'CONTROL_SAMPLE')) %>% 
+npx_umap_df <- npx_data1 %>% 
+  dplyr::filter(!stringr::str_detect(SampleID, 'CONTROL_SAMPLE'))
+
+npx_umap_check <- check_npx(df = npx_umap_df)
+
+npx_umap_df %>% 
   olink_umap_plot(df = .,
-                 color_g = "QC_Warning", byPanel = TRUE)  
+                 color_g = "QC_Warning", byPanel = TRUE,
+                 check_log = npx_umap_check)  
 ```
 
 ### Function output
@@ -651,11 +758,14 @@ npx_data1_no_controls <- npx_data1 |>
                                      regex("control|ctrl", 
                                            ignore_case = TRUE)))
 
+npx_check <- check_npx(df = npx_data1_no_controls)
+
 plot <- npx_data1_no_controls |>
   dplyr::filter(!is.na(Site)) |> # removing missing values which exist for Site
   olink_boxplot(variable = "Site", 
                 olinkid_list = c("OID00488", "OID01276"),
-                number_of_proteins_per_plot  = 2)
+                number_of_proteins_per_plot  = 2,
+                check_log = npx_check)
 
 plot[[1]]
 ```
@@ -669,14 +779,16 @@ knitr::include_graphics(normalizePath("../man/figures/olink_boxplot.png"),
 anova_posthoc_results<-npx_data1_no_controls %>% 
   olink_anova_posthoc(olinkid_list = c("OID00488", "OID01276"),
                       variable = 'Site',
-                      effect = 'Site')
+                      effect = 'Site',
+                      check_log = npx_check)
 
 plot2 <- npx_data1_no_controls %>%
   na.omit() %>% # removing missing values which exists for Site
   olink_boxplot(variable = "Site", 
                 olinkid_list = c("OID00488", "OID01276"),
                 number_of_proteins_per_plot  = 2,
-                posthoc_results = anova_posthoc_results)
+                posthoc_results = anova_posthoc_results,
+                check_log = npx_check)
 
 plot2[[1]]
 
@@ -697,7 +809,7 @@ A list of objects of class *ggplot*.
 
 The olink_dist_plot function generates boxplots of NPX values for each sample, faceted by Olink panel. This is used as an initial QC step to identify potential outliers.
 
-More information about `olink_dist_plot()` can be found in the [Outlier Exclusion Vignette](OutlierExclusion.html).
+More information about `olink_dist_plot()` can be found in the Outlier Exclusion Vignette in the **OlinkAnalyzeVignettes** package.
 
 ## Point-range plot for LMER (olink_lmer_plot)
 
@@ -717,12 +829,15 @@ The function olink_lmer_plot generates a point-range plot for a given list of pr
 
 ```{r message=FALSE, eval = FALSE}
 if (requireNamespace("lme4", quietly = TRUE) & requireNamespace("lmerTest", quietly = TRUE)){
+  npx_check <- check_npx(df = npx_data1)
+
   plot <- olink_lmer_plot(df = npx_data1, 
                           olinkid_list = c("OID01216", "OID01217"), 
                           variable = c('Site', 'Treatment'), 
                           x_axis_variable =  'Site',
                           col_variable = 'Treatment',
-                          random = 'Subject')
+                          random = 'Subject',
+                          check_log = npx_check)
   plot[[1]]
 }
 ```
@@ -798,7 +913,7 @@ A bar graph as a **ggplot** object.
 
 The olink_qc_plot function generates a plot faceted by Panel, plotting IQR vs. median for all samples. This is a good first check to find out if any samples have a tendency to be classified as outliers. Horizontal dashed lines indicate +/-3 standard deviations from the mean IQR. Vertical dashed lines indicate +/-3 standard deviations from the mean sample median.
 
-More information about `olink_qc_plot()` can be found in the [Outlier Exclusion Vignette](OutlierExclusion.html).
+More information about `olink_qc_plot()` can be found in the Outlier Exclusion Vignette in the **OlinkAnalyzeVignettes** package.
 
 ## Heatmap (olink_heatmap_plot)
 
@@ -835,8 +950,11 @@ npx_data_small <- npx_data1 %>%
   dplyr::filter(OlinkID %in% first10) %>% 
   dplyr::filter(SampleID %in% first15samples)
 
+npx_small_check <- check_npx(df = npx_data_small)
+
 try({ #This statement might fail if dependencies are not installed
-  olink_heatmap_plot(npx_data_small, variable_row_list =  'Treatment')
+  olink_heatmap_plot(npx_data_small, variable_row_list =  'Treatment',
+                     check_log = npx_small_check)
   })
 ```
 
@@ -859,9 +977,12 @@ The olink_volcano_plot function generates a volcano plot using results from the 
 -   olinkid_list: Optional. Character vector of proteins (OlinkID) to label in the plot. If not provided, by default the function will label all significant proteins.
 
 ```{r message=FALSE, eval = FALSE}
+# run check_npx
+npx_check <- check_npx(df = npx_data1)
 # perform t-test
 ttest_results <- olink_ttest(df = npx_data1,
-                             variable = 'Treatment')
+                             variable = 'Treatment',
+                             check_log = npx_check)
 # select names of proteins to show
 top_10_name <- ttest_results %>%
   dplyr::slice_head(n = 10) %>%
@@ -917,7 +1038,7 @@ knitr::include_graphics(normalizePath("../man/figures/olink_fill_discrete_boxplo
 
 ## Visualizing bridgeability criteria for between-product normalization (olink_bridgeability_plot)
 
-The olink_bridgeability_plot function generates a series of plots on a per-assay basis for a data frame generated from between-product bridging. The coloration of the figure headers indicate whether that assay has been defined as bridgeable or not bridgeable. The correlation plot, violin plot, and bar chart figures illustrate the three criteria for determining whether an assay is bridgeable. For assays determined to be bridgeable, the ECDF curve and corresponding KS statistic are used to determine which normalization approach (median centering or quantile smoothing) is most suitable for between-product normalization. For more information on the between-product bridging methodology and bridgeability criteria, consult the [Bridging across NGS-based Olink^®^ products Tutorial](bridging_crossproduct.Rmd).
+The olink_bridgeability_plot function generates a series of plots on a per-assay basis for a data frame generated from between-product bridging. The coloration of the figure headers indicate whether that assay has been defined as bridgeable or not bridgeable. The correlation plot, violin plot, and bar chart figures illustrate the three criteria for determining whether an assay is bridgeable. For assays determined to be bridgeable, the ECDF curve and corresponding KS statistic are used to determine which normalization approach (median centering or quantile smoothing) is most suitable for between-product normalization. For more information on the between-product bridging methodology and bridgeability criteria, consult the Bridging across NGS-based Olink^®^ products Tutorial in the **OlinkAnalyzeVignettes** package.
 
 ### Function arguments
 
