@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release adds bug fixes to Olink Analyze 4.3
+This release includes major updates to the package, including new features, bug fixes, and performance improvements. The package has been thoroughly tested and is now available on CRAN for users to install and use.
 
 ## R CMD check results
 
