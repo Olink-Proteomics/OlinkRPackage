@@ -2,7 +2,7 @@
 #' gene set enrichment analysis (GSEA)
 #'
 #' @author
-#'   Kathleen Nevola;
+#'   Kathleen Nevola
 #'   Klev Diamanti
 #'
 #' @description

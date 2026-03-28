@@ -39,8 +39,8 @@ files exported from Olink software in R.
 \code{\link{read_npx_delim}}
 }
 \author{
-Klev Diamanti;
-Christoffer Cambronero;
+Klev Diamanti
+Christoffer Cambronero
 Kathleen Nevola
 }
 \keyword{internal}

@@ -375,7 +375,7 @@ run_check_npx <- function(df,
 #' `r cli::ansi_collapse(x = column_name_dict$col_key)`
 #'
 #' @author
-#'  Klev Diamanti;
+#'  Klev Diamanti
 #'  Masoumeh Sheikhi
 #'
 #' @inheritParams check_npx

@@ -31,9 +31,9 @@ The function can handle delimited files in long format.
 \code{\link{read_npx_delim}}
 }
 \author{
-Klev Diamanti;
-Christoffer Cambronero;
-Kathleen Nevola;
+Klev Diamanti
+Christoffer Cambronero
+Kathleen Nevola
 Ola Caster
 }
 \keyword{internal}

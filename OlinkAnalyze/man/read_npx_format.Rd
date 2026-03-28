@@ -81,12 +81,12 @@ platform, respectively.
 \code{\link{read_npx_legacy}}
 }
 \author{
-Klev Diamanti;
-Kathleen Nevola;
-Pascal Pucholt;
-Christoffer Cambronero;
-Boxi Zhang;
-Olof Mansson;
+Klev Diamanti
+Kathleen Nevola
+Pascal Pucholt
+Christoffer Cambronero
+Boxi Zhang
+Olof Mansson
 Marianne Sandin
 }
 \keyword{internal}

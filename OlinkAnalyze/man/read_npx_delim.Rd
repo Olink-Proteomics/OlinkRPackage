@@ -38,8 +38,8 @@ The function can handle delimited files in long and wide format.
 \code{\link{read_npx_format}}
 }
 \author{
-Klev Diamanti;
-Christoffer Cambronero;
+Klev Diamanti
+Christoffer Cambronero
 Kathleen Nevola
 }
 \keyword{internal}

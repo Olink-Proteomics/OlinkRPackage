@@ -24,12 +24,12 @@
 #' platform, respectively.
 #'
 #' @author
-#'   Klev Diamanti;
-#'   Kathleen Nevola;
-#'   Pascal Pucholt;
-#'   Christoffer Cambronero;
-#'   Boxi Zhang;
-#'   Olof Mansson;
+#'   Klev Diamanti
+#'   Kathleen Nevola
+#'   Pascal Pucholt
+#'   Christoffer Cambronero
+#'   Boxi Zhang
+#'   Olof Mansson
 #'   Marianne Sandin
 #'
 #' @inherit .read_npx_args params return
