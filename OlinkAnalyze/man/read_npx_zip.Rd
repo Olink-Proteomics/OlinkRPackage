@@ -79,8 +79,8 @@ named as a character vector in the argument \var{.ignore_files}.
 \code{\link{read_npx_delim}}
 }
 \author{
-Klev Diamanti;
-Kathleen Nevola;
+Klev Diamanti
+Kathleen Nevola
 Pascal Pucholt
 }
 \keyword{internal}

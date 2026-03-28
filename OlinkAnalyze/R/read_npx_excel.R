@@ -5,8 +5,8 @@
 #' files exported from Olink software in R.
 #'
 #' @author
-#'   Klev Diamanti;
-#'   Christoffer Cambronero;
+#'   Klev Diamanti
+#'   Christoffer Cambronero
 #'   Kathleen Nevola
 #'
 #' @inherit .read_npx_args params

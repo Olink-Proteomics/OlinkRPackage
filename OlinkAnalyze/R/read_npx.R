@@ -8,31 +8,23 @@
 #' importing it with \code{\link{read_npx}} as it might fail.
 #'
 #' @author
-#'   Klev Diamanti;
-#'   Kathleen Nevola;
-#'   Pascal Pucholt;
-#'   Christoffer Cambronero;
-#'   Boxi Zhang;
-#'   Olof Mansson;
-#'   Marianne Sandin
+#' Klev Diamanti
+#' Kathleen Nevola
+#' Pascal Pucholt
+#' Christoffer Cambronero
+#' Boxi Zhang
+#' Olof Mansson
+#' Marianne Sandin
 #'
 #' @inherit .read_npx_args params return
 #'
 #' @keywords
-#'   NPX;
-#'   parquet;
-#'   csv;
-#'   zip;
-#'   xlsx;
-#'   Olink;
-#'   Olink Explore;
-#'   Olink Explore 1536;
-#'   Olink Explore 3072;
-#'   Olink Explore HT;
-#'   Olink Target 96;
-#'   Olink Target 48;
-#'   Olink Flex;
-#'   Olink Focus
+#' NPX
+#' parquet
+#' csv
+#' zip
+#' xlsx
+#' xls
 #'
 #' @export
 #'

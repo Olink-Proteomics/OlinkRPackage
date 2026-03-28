@@ -21,6 +21,6 @@ Check \var{datasets} and \var{reference_medians} for Olink identifiers not
 shared across datasets.
 }
 \author{
-Klev Diamanti;
+Klev Diamanti
 Kathleen Nevola
 }

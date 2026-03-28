@@ -8,8 +8,8 @@
 #' The function can handle delimited files in long and wide format.
 #'
 #' @author
-#'   Klev Diamanti;
-#'   Christoffer Cambronero;
+#'   Klev Diamanti
+#'   Christoffer Cambronero
 #'   Kathleen Nevola
 #'
 #' @inherit .read_npx_args params
@@ -189,9 +189,9 @@ read_npx_csv <- read_npx_delim
 #' The function can handle delimited files in long format.
 #'
 #' @author
-#'   Klev Diamanti;
-#'   Christoffer Cambronero;
-#'   Kathleen Nevola;
+#'   Klev Diamanti
+#'   Christoffer Cambronero
+#'   Kathleen Nevola
 #'   Ola Caster
 #'
 #' @inherit read_npx_delim params

@@ -175,6 +175,6 @@ Wu, T. et al. (2021). \emph{clusterProfiler 4.0: A universal enrichment tool for
 doi: 10.1016/j.xinn.2021.100141.
 }
 \author{
-Kathleen Nevola;
+Kathleen Nevola
 Klev Diamanti
 }
