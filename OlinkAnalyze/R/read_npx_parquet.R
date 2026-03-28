@@ -2,8 +2,8 @@
 #' file in R.
 #'
 #' @author
-#'   Klev Diamanti;
-#'   Kathleen Nevola;
+#'   Klev Diamanti
+#'   Kathleen Nevola
 #'   Pascal Pucholt
 #'
 #' @inherit .read_npx_args params return

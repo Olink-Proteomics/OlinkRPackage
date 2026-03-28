@@ -1898,7 +1898,7 @@ olink_norm_input_assay_overlap <- function(lst_df,
 #' shared across datasets.
 #'
 #' @author
-#'   Klev Diamanti;
+#'   Klev Diamanti
 #'   Kathleen Nevola
 #'
 #' @param lst_df Named list of datasets to be normalized.

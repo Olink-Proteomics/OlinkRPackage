@@ -68,12 +68,12 @@ Signature 1.7.1 or earlier, or NPX Manager.
 \code{\link{read_npx_format_get_quant}}
 }
 \author{
-Klev Diamanti;
-Kathleen Nevola;
-Pascal Pucholt;
-Christoffer Cambronero;
-Boxi Zhang;
-Olof Mansson;
+Klev Diamanti
+Kathleen Nevola
+Pascal Pucholt
+Christoffer Cambronero
+Boxi Zhang
+Olof Mansson
 Marianne Sandin
 }
 \keyword{internal}
