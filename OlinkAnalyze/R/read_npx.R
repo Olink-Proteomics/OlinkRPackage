@@ -18,13 +18,7 @@
 #'
 #' @inherit .read_npx_args params return
 #'
-#' @keywords
-#' NPX
-#' parquet
-#' csv
-#' zip
-#' xlsx
-#' xls
+#' @keywords NPX parquet csv zip xlsx xls
 #'
 #' @export
 #'
