@@ -252,6 +252,75 @@ clean_npx <- function(df,
 
 # Help Functions ----------------------------------------------------------
 
+#' Quietly clean proteomics data quantified with Olink's PEA technology
+#'
+#' @description
+#' Internal wrapper around [`clean_npx()`] that runs the same cleaning pipeline
+#' while suppressing messages and warnings emitted during processing.
+#'
+#' Unlike [`clean_npx()`], this function is intended for internal use in cases
+#' where a quiet cleaning step is needed. If rows are removed, a single
+#' [`cli::cli_alert()`] message is shown. If no rows are removed, no output is
+#' printed.
+#'
+#' @details
+#' This function forwards all arguments to [`clean_npx()`] and forces
+#' `verbose = FALSE`.
+#'
+#' If any rows are removed during cleaning, the function prints a single alert
+#' indicating how many entries were removed and instructing the user to run
+#' [`clean_npx()`] directly to inspect which rows were removed.
+#'
+#' @inheritParams clean_npx
+#' @inherit clean_npx params return
+#'
+#' @author
+#'   Kang Dong
+#'   Klev Diamanti
+#'
+#' @keywords internal
+#' @noRd
+#'
+run_clean_npx <- function(df, ...) {
+
+  dots <- list(...)
+
+  valid_args <- names(formals(clean_npx))
+  unknown_args <- setdiff(x = names(dots), y = valid_args)
+
+  if (length(unknown_args) > 0L) {
+    cli::cli_abort(
+      c(
+        "x" = "{cli::qty(unknown_args)} Unknown argument{?s}:
+        {.val {unknown_args}}.",
+        "i" = "Check the documentation of {.fn clean_npx} for valid arguments."
+      ),
+      call = rlang::caller_env(),
+      wrap = TRUE
+    )
+  }
+
+  n_before <- nrow(df)
+
+  cleaned_df <- withCallingHandlers(
+    expr = do.call(clean_npx, c(list(df = df), dots, list(verbose = FALSE))),
+    message = function(m) invokeRestart("muffleMessage"),
+    warning = function(w) invokeRestart("muffleWarning")
+  )
+
+  n_after <- nrow(cleaned_df)
+
+  if (n_after != n_before) {
+    n_removed <- n_before - n_after
+    cli::cli_alert(
+      "{.val {n_removed}} entr{?y/ies} removed by {.fn clean_npx}. Run
+      {.fn clean_npx} directly to inspect which rows were removed."
+    )
+  }
+
+  return(cleaned_df)
+}
+
 #' Help function removing assays with all quantified values `NA`.
 #'
 #' @description
