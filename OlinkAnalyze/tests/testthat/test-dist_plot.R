@@ -1,4 +1,3 @@
-
 test_that("olink_dist_plot works", {
   skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
 
