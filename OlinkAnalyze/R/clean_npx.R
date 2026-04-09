@@ -285,6 +285,9 @@ run_clean_npx <- function(df, ...) {
 
   dots <- list(...)
 
+  # remove user-supplied verbose if present
+  dots$verbose <- NULL
+
   valid_args <- names(formals(clean_npx))
   unknown_args <- setdiff(x = names(dots), y = valid_args)
 
