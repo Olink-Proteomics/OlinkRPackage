@@ -314,7 +314,7 @@ run_clean_npx <- function(df, ...) {
   n_after <- nrow(cleaned_df)
 
   if (n_after != n_before) {
-    n_removed <- n_before - n_after
+    n_removed <- n_before - n_after # nolint: object_usage_linter
     cli::cli_inform(
       c("{.val {n_removed}} entr{?y/ies} removed by {.fn clean_npx} from the
       input dataset {.arg df}. Run {.fn clean_npx} on your dataset with
