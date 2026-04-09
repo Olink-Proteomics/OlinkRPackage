@@ -315,9 +315,10 @@ run_clean_npx <- function(df, ...) {
 
   if (n_after != n_before) {
     n_removed <- n_before - n_after
-    cli::cli_alert(
-      "{.val {n_removed}} entr{?y/ies} removed by {.fn clean_npx}. Run
-      {.fn clean_npx} directly to inspect which rows were removed."
+    cli::cli_inform(
+      c("{.val {n_removed}} entr{?y/ies} removed by {.fn clean_npx} from the
+      input dataset {.arg df}. Run {.fn clean_npx} on your dataset with
+      {.arg verbose = TRUE} to inspect which rows were removed.")
     )
   }
 
