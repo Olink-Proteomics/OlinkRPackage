@@ -361,20 +361,18 @@ data_prep <- function(df,
 
   nrow_df_original <- nrow(df)
 
-  df <- clean_npx(df = df,
-                  check_log = check_log,
-                  remove_assay_na = TRUE,
-                  remove_invalid_oid = TRUE,
-                  remove_dup_sample_id = FALSE,
-                  remove_control_assay = TRUE,
-                  remove_control_sample = FALSE,
-                  remove_qc_warning = FALSE,
-                  remove_assay_warning = FALSE,
-                  convert_df_cols = TRUE,
-                  convert_nonunique_uniprot = FALSE,
-                  verbose = FALSE) |>
-    suppressMessages() |>
-    suppressWarnings()
+  df <- run_clean_npx(df = df,
+                      check_log = check_log,
+                      remove_assay_na = TRUE,
+                      remove_invalid_oid = TRUE,
+                      remove_dup_sample_id = FALSE,
+                      remove_control_assay = TRUE,
+                      remove_control_sample = FALSE,
+                      remove_qc_warning = FALSE,
+                      remove_assay_warning = FALSE,
+                      convert_df_cols = TRUE,
+                      convert_nonunique_uniprot = FALSE,
+                      verbose = FALSE)
 
   if (nrow(df) != nrow_df_original) {
     cli::cli_inform(
