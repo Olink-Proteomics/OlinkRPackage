@@ -97,7 +97,7 @@ olink_bridge_selector <- function(df,
     suppressMessages() |>
     suppressWarnings()
 
-  check_log_clean <- check_npx(df = df_clean) |>
+  check_log_clean <- run_check_npx(df = df_clean, check_log = NULL) |>
     suppressMessages() |>
     suppressWarnings()
 
