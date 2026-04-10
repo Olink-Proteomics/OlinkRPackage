@@ -120,8 +120,11 @@ test_that(
                   regexp = paste("The sets of assays in `df` and",
                                  "`test_results` do not match!")
                 ),
-                regexp = paste("Removed 1530 entries from `df` containing",
-                               "invalid assay identifiers")
+                regexp = paste("1530 entries removed by `clean_npx()` from the",
+                               "input dataset `df`. Run `clean_npx()` on your",
+                               "dataset with `verbose = TRUE` to inspect which",
+                               "rows were removed."),
+                fixed = TRUE
               ),
               regexp = paste("1 assay in `df` is not represented in",
                              "`test_results` and will be removed from",
@@ -786,10 +789,10 @@ test_that(
           suppressWarnings() |>
           suppressMessages()
       ),
-      regexp = paste("Removed 468 entries from `df` containing invalid assay",
-                     "identifiers, control assays, and/or 'NA' assays. Run",
-                     "function `clean_npx()` to get details on removed",
-                     "entries."),
+      regexp = paste("468 entries removed by `clean_npx()` from the",
+                     "input dataset `df`. Run `clean_npx()` on your",
+                     "dataset with `verbose = TRUE` to inspect which",
+                     "rows were removed."),
       fixed = TRUE
     )
 
