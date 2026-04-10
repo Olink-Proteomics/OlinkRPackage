@@ -36,7 +36,7 @@ test_that(
 )
 
 test_that(
-  "olink_boxplot works - vdiffr",
+  "olink_boxplot - works - vdiffr",
   {
     skip_on_cran()
     skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
