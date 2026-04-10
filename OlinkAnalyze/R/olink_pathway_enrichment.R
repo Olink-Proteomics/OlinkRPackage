@@ -359,8 +359,6 @@ data_prep <- function(df,
                       check_log) {
   # clean up data from invalid entries ----
 
-  nrow_df_original <- nrow(df)
-
   df <- run_clean_npx(df = df,
                       check_log = check_log,
                       remove_assay_na = TRUE,
@@ -373,15 +371,6 @@ data_prep <- function(df,
                       convert_df_cols = TRUE,
                       convert_nonunique_uniprot = FALSE,
                       verbose = FALSE)
-
-  if (nrow(df) != nrow_df_original) {
-    cli::cli_inform(
-      "{cli::qty(nrow_df_original - nrow(df))} Removed
-      {.val {nrow_df_original - nrow(df)}} entr{?y/ies} from {.arg df}
-      containing invalid assay identifiers, control assays, and/or 'NA'
-      assays. Run function {.fun clean_npx} to get details on removed entries."
-    )
-  }
 
   # remove non-overlapping assays between df and test_results ----
 
