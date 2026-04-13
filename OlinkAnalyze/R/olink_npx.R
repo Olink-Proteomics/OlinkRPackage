@@ -175,6 +175,51 @@ olink_check_log <- function(x) {
 
 }
 
+#' Convert an `olink_npx` object to a plain tibble
+#'
+#' @description
+#' Strips the `olink_npx` class and removes the attached check log, returning a
+#' plain tibble. This is useful for testing or when the user wants to remove the
+#' extra metadata carried by the `olink_npx` class.
+#'
+#' @param x An `olink_npx` object.
+#' @param ... Additional arguments (currently ignored).
+#'
+#' @return A tibble (`tbl_df`) without the `olink_npx` class or the check log
+#' attribute.
+#'
+#' @exportS3Method tibble::as_tibble
+#'
+#' @examples
+#' \dontrun{
+#' # read NPX data (returns olink_npx object)
+#' npx_file <- system.file("extdata",
+#'                         "npx_data_ext.parquet",
+#'                         package = "OlinkAnalyze")
+#' npx_obj <- read_npx(filename = npx_file)
+#'
+#' # class includes olink_npx
+#' class(npx_obj)
+#'
+#' # convert to plain tibble
+#' npx_tbl <- tibble::as_tibble(npx_obj)
+#'
+#' # class is now a plain tibble
+#' class(npx_tbl)
+#'
+#' # check_log attribute is gone
+#' olink_check_log(npx_tbl)
+#' }
+#'
+as_tibble.olink_npx <- function(x, ...) { # nolint: object_name_linter
+
+  attr(x = x, which = "check_log") <- NULL
+  class(x) <- setdiff(x = class(x), y = "olink_npx")
+
+  x
+
+}
+
 # Arrow metadata helpers ----
 
 #' Attach check log to an ArrowObject via schema metadata
