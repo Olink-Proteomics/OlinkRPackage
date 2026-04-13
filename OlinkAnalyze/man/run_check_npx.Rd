@@ -8,7 +8,7 @@ run_check_npx(df, check_log = NULL)
 }
 \arguments{
 \item{df}{A "tibble" or "ArrowObject"
-from \code{\link{read_npx}}. The output of \code{\link[=read_npx]{read_npx()}} is an \code{olink_npx}
+from \code{\link{read_npx}}. The output of \code{\link[=read_npx]{read_npx()}} is an \code{olink_class}
 object that carries the check log as an attribute. If the check log
 indicates that the data still needs cleaning (e.g. invalid identifiers,
 duplicate samples), the downstream function will automatically clean the
@@ -47,7 +47,7 @@ Check and run \code{\link[=check_npx]{check_npx()}} if not provided.
 }
 \details{
 This function has been deprecated. Use \code{\link{run_clean_npx}} for downstream
-functions, or access the check log from an \code{olink_npx} object via
+functions, or access the check log from an \code{olink_class} object via
 \code{\link{olink_check_log}}. The check log is now automatically attached by
 \code{\link{read_npx}} and updated by \code{\link{clean_npx}}.
 }

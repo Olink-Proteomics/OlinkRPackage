@@ -60,9 +60,9 @@ convert_read_npx_output <- function(df,
 
       result <- dplyr::as_tibble(df)
 
-      # re-attach check_log as olink_npx if available
+      # re-attach check_log as olink_class if available
       if (!is.null(check_log)) {
-        result <- new_olink_npx(data = result, check_log = check_log)
+        result <- new_olink_class(data = result, check_log = check_log)
       }
 
       return(result)

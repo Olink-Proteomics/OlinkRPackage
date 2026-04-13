@@ -160,7 +160,7 @@ read_npx <- function(filename,
   check_log <- check_npx(df = df_olink, preferred_names = preferred_names)
 
   if (check_is_tibble(x = df_olink, error = FALSE)) {
-    df_olink <- new_olink_npx(data = df_olink, check_log = check_log)
+    df_olink <- new_olink_class(data = df_olink, check_log = check_log)
   } else if (check_is_arrow_object(x = df_olink, error = FALSE)) {
     df_olink <- attach_check_log_arrow(data = df_olink,
                                        check_log = check_log)

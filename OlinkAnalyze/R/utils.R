@@ -288,7 +288,7 @@ check_osi <- function(df,
 #'   Klev Diamanti
 #'
 #' @param df A `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")`
-#' from \code{\link{read_npx}}. The output of [`read_npx()`] is an `olink_npx`
+#' from \code{\link{read_npx}}. The output of [`read_npx()`] is an `olink_class`
 #' object that carries the check log as an attribute. If the check log
 #' indicates that the data still needs cleaning (e.g. invalid identifiers,
 #' duplicate samples), the downstream function will automatically clean the

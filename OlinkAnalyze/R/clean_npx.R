@@ -292,7 +292,7 @@ clean_npx <- function(df,
 
   # Attach the updated check_log to the output
   if (check_is_tibble(x = df, error = FALSE)) {
-    df <- new_olink_npx(data = df, check_log = updated_check_log)
+    df <- new_olink_class(data = df, check_log = updated_check_log)
   } else if (check_is_arrow_object(x = df, error = FALSE)) {
     df <- attach_check_log_arrow(data = df, check_log = updated_check_log)
   }

@@ -1,7 +1,7 @@
 #' S3 class for Olink NPX data with attached check log
 #'
 #' @description
-#' The `olink_npx` class is a tibble subclass that carries the output of
+#' The `olink_class` class is a tibble subclass that carries the output of
 #' [`check_npx()`] as an attribute. This allows downstream functions to
 #' automatically access the check log without the user having to pass it
 #' explicitly.
@@ -16,30 +16,30 @@
 #' check log from the data object itself. If not found, they fall back to the
 #' existing behavior of running [`check_npx()`] internally.
 #'
-#' The `olink_npx` class survives most dplyr operations (e.g.
+#' The `olink_class` class survives most dplyr operations (e.g.
 #' [`dplyr::filter()`], [`dplyr::mutate()`], [`dplyr::select()`]) through the
 #' [`dplyr::dplyr_reconstruct()`] mechanism. Note that operations that combine
 #' multiple data frames (e.g. [`dplyr::bind_rows()`]) may strip the class and
 #' check log.
 #'
-#' @name olink_npx
+#' @name olink_class
 #' @keywords internal
 #'
 NULL
 
 # Constructor ----
 
-#' Create an `olink_npx` object from a tibble and a check log
+#' Create an `olink_class` object from a tibble and a check log
 #'
 #' @description
 #' Attaches the result of [`check_npx()`] to a tibble as an attribute,
-#' creating an `olink_npx` subclass. This allows downstream functions to
+#' creating an `olink_class` subclass. This allows downstream functions to
 #' automatically extract the check log from the data.
 #'
 #' @param data A tibble containing Olink NPX data.
 #' @param check_log A named list returned by [`check_npx()`].
 #'
-#' @return An object of class `olink_npx`, which inherits from
+#' @return An object of class `olink_class`, which inherits from
 #' `tbl_df`, `tbl`, and `data.frame`, with the check log stored as an
 #' attribute.
 #'
@@ -47,14 +47,14 @@ NULL
 #'
 #' @keywords internal
 #'
-new_olink_npx <- function(data,
+new_olink_class <- function(data,
                           check_log) {
 
   # validate inputs
   if (!inherits(x = data, what = "tbl_df")) {
     cli::cli_abort(
       c(
-        "x" = "{.arg data} must be a tibble to create an {.cls olink_npx}
+        "x" = "{.arg data} must be a tibble to create an {.cls olink_class}
         object."
       ),
       call = rlang::caller_env()
@@ -67,7 +67,7 @@ new_olink_npx <- function(data,
   tibble::new_tibble(
     x = data,
     check_log = check_log,
-    class = "olink_npx"
+    class = "olink_class"
   )
 
 }
@@ -125,7 +125,7 @@ validate_check_log <- function(check_log) {
 #' Retrieve the check log from an Olink data object
 #'
 #' @description
-#' Extracts the check log from an `olink_npx` tibble or an ArrowObject with
+#' Extracts the check log from an `olink_class` tibble or an ArrowObject with
 #' embedded metadata. Returns `NULL` if no check log is found.
 #'
 #' @param x A data object, typically from [`read_npx()`] or [`clean_npx()`].
@@ -144,7 +144,7 @@ validate_check_log <- function(check_log) {
 #' check_log <- check_npx(df = npx_df)
 #'
 #' # attach check_log to the data
-#' npx_obj <- new_olink_npx(data = npx_df, check_log = check_log)
+#' npx_obj <- new_olink_class(data = npx_df, check_log = check_log)
 #'
 #' # retrieve check_log
 #' olink_check_log(npx_obj)
@@ -152,7 +152,7 @@ validate_check_log <- function(check_log) {
 #'
 olink_check_log <- function(x) {
 
-  if (inherits(x = x, what = "olink_npx")) {
+  if (inherits(x = x, what = "olink_class")) {
 
     return(attr(x = x, which = "check_log", exact = TRUE))
 
@@ -175,30 +175,30 @@ olink_check_log <- function(x) {
 
 }
 
-#' Convert an `olink_npx` object to a plain tibble
+#' Convert an `olink_class` object to a plain tibble
 #'
 #' @description
-#' Strips the `olink_npx` class and removes the attached check log, returning a
+#' Strips the `olink_class` class and removes the attached check log, returning a
 #' plain tibble. This is useful for testing or when the user wants to remove the
-#' extra metadata carried by the `olink_npx` class.
+#' extra metadata carried by the `olink_class` class.
 #'
-#' @param x An `olink_npx` object.
+#' @param x An `olink_class` object.
 #' @param ... Additional arguments (currently ignored).
 #'
-#' @return A tibble (`tbl_df`) without the `olink_npx` class or the check log
+#' @return A tibble (`tbl_df`) without the `olink_class` class or the check log
 #' attribute.
 #'
 #' @exportS3Method tibble::as_tibble
 #'
 #' @examples
 #' \dontrun{
-#' # read NPX data (returns olink_npx object)
+#' # read NPX data (returns olink_class object)
 #' npx_file <- system.file("extdata",
 #'                         "npx_data_ext.parquet",
 #'                         package = "OlinkAnalyze")
 #' npx_obj <- read_npx(filename = npx_file)
 #'
-#' # class includes olink_npx
+#' # class includes olink_class
 #' class(npx_obj)
 #'
 #' # convert to plain tibble
@@ -211,10 +211,10 @@ olink_check_log <- function(x) {
 #' olink_check_log(npx_tbl)
 #' }
 #'
-as_tibble.olink_npx <- function(x, ...) { # nolint: object_name_linter
+as_tibble.olink_class <- function(x, ...) { # nolint: object_name_linter
 
   attr(x = x, which = "check_log") <- NULL
-  class(x) <- setdiff(x = class(x), y = "olink_npx")
+  class(x) <- setdiff(x = class(x), y = "olink_class")
 
   x
 
@@ -475,37 +475,37 @@ base64_decode <- function(encoded_str) {
 
 # dplyr compatibility ----
 
-#' Reconstruct an `olink_npx` object after dplyr operations
+#' Reconstruct an `olink_class` object after dplyr operations
 #'
 #' @description
 #' This method is called by dplyr after every verb (e.g. `filter`, `mutate`,
-#' `select`) to preserve the `olink_npx` class and its check log attribute.
+#' `select`) to preserve the `olink_class` class and its check log attribute.
 #'
 #' @param data The result of the dplyr operation (a tibble).
-#' @param template The original `olink_npx` object.
+#' @param template The original `olink_class` object.
 #'
-#' @return An `olink_npx` object with the check log from `template`.
+#' @return An `olink_class` object with the check log from `template`.
 #'
 #' @keywords internal
 #' @exportS3Method dplyr::dplyr_reconstruct
 #'
-dplyr_reconstruct.olink_npx <- function(data, template) {
+dplyr_reconstruct.olink_class <- function(data, template) {
 
   check_log <- attr(x = template, which = "check_log", exact = TRUE)
 
   tibble::new_tibble(
     x = data,
     check_log = check_log,
-    class = "olink_npx"
+    class = "olink_class"
   )
 
 }
 
 # Print method ----
 
-#' Provide a custom header for `olink_npx` objects
+#' Provide a custom header for `olink_class` objects
 #'
-#' @param x An `olink_npx` object.
+#' @param x An `olink_class` object.
 #' @param ... Additional arguments passed to the tibble method.
 #'
 #' @return A named character vector of summary items.
@@ -513,7 +513,7 @@ dplyr_reconstruct.olink_npx <- function(data, template) {
 #' @keywords internal
 #' @exportS3Method pillar::tbl_sum
 #'
-tbl_sum.olink_npx <- function(x, ...) {
+tbl_sum.olink_class <- function(x, ...) {
 
   default_header <- NextMethod()
 

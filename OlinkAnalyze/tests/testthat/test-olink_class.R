@@ -1,4 +1,4 @@
-# Test olink_npx S3 class --------------------------------------------------
+# Test olink_class S3 class --------------------------------------------------
 
 # Test data ----
 
@@ -18,14 +18,14 @@ check_log_result <- check_npx(df = df_tbl) |>
   suppressWarnings() |>
   suppressMessages()
 
-# Test new_olink_npx ----
+# Test new_olink_class ----
 
 test_that(
-  "new_olink_npx - works - creates an olink_npx from tibble and check_log",
+  "new_olink_class - works - creates an olink_class from tibble and check_log",
   {
-    result <- new_olink_npx(data = df_tbl, check_log = check_log_result)
+    result <- new_olink_class(data = df_tbl, check_log = check_log_result)
 
-    expect_s3_class(object = result, class = "olink_npx")
+    expect_s3_class(object = result, class = "olink_class")
     expect_s3_class(object = result, class = "tbl_df")
     expect_equal(object = nrow(result), expected = 4L)
     expect_equal(object = ncol(result), expected = 9L)
@@ -37,10 +37,10 @@ test_that(
 )
 
 test_that(
-  "new_olink_npx - error - non-tibble input",
+  "new_olink_class - error - non-tibble input",
   {
     expect_error(
-      object = new_olink_npx(data = as.data.frame(df_tbl),
+      object = new_olink_class(data = as.data.frame(df_tbl),
                              check_log = check_log_result),
       regexp = "must be a tibble"
     )
@@ -48,16 +48,16 @@ test_that(
 )
 
 test_that(
-  "new_olink_npx - error - invalid check_log",
+  "new_olink_class - error - invalid check_log",
   {
     expect_error(
-      object = new_olink_npx(data = df_tbl,
+      object = new_olink_class(data = df_tbl,
                              check_log = list(a = 1L)),
       regexp = "missing from"
     )
 
     expect_error(
-      object = new_olink_npx(data = df_tbl,
+      object = new_olink_class(data = df_tbl,
                              check_log = "not_a_list"),
       regexp = "is not a list"
     )
@@ -67,9 +67,9 @@ test_that(
 # Test olink_check_log ----
 
 test_that(
-  "olink_check_log - works - extracts check_log from olink_npx",
+  "olink_check_log - works - extracts check_log from olink_class",
   {
-    obj <- new_olink_npx(data = df_tbl, check_log = check_log_result)
+    obj <- new_olink_class(data = df_tbl, check_log = check_log_result)
 
     result <- olink_check_log(x = obj)
 
@@ -170,13 +170,13 @@ test_that(
 # Test dplyr_reconstruct ----
 
 test_that(
-  "dplyr_reconstruct.olink_npx - works - preserves class through filter",
+  "dplyr_reconstruct.olink_class - works - preserves class through filter",
   {
-    obj <- new_olink_npx(data = df_tbl, check_log = check_log_result)
+    obj <- new_olink_class(data = df_tbl, check_log = check_log_result)
 
     result <- dplyr::filter(obj, .data[["SampleID"]] == "A")
 
-    expect_s3_class(object = result, class = "olink_npx")
+    expect_s3_class(object = result, class = "olink_class")
     expect_identical(
       object = olink_check_log(x = result),
       expected = check_log_result
@@ -186,13 +186,13 @@ test_that(
 )
 
 test_that(
-  "dplyr_reconstruct.olink_npx - works - preserves class through mutate",
+  "dplyr_reconstruct.olink_class - works - preserves class through mutate",
   {
-    obj <- new_olink_npx(data = df_tbl, check_log = check_log_result)
+    obj <- new_olink_class(data = df_tbl, check_log = check_log_result)
 
     result <- dplyr::mutate(obj, new_col = 1L)
 
-    expect_s3_class(object = result, class = "olink_npx")
+    expect_s3_class(object = result, class = "olink_class")
     expect_identical(
       object = olink_check_log(x = result),
       expected = check_log_result
@@ -202,13 +202,13 @@ test_that(
 )
 
 test_that(
-  "dplyr_reconstruct.olink_npx - works - preserves class through select",
+  "dplyr_reconstruct.olink_class - works - preserves class through select",
   {
-    obj <- new_olink_npx(data = df_tbl, check_log = check_log_result)
+    obj <- new_olink_class(data = df_tbl, check_log = check_log_result)
 
     result <- dplyr::select(obj, "SampleID", "OlinkID")
 
-    expect_s3_class(object = result, class = "olink_npx")
+    expect_s3_class(object = result, class = "olink_class")
     expect_identical(
       object = olink_check_log(x = result),
       expected = check_log_result
@@ -217,13 +217,13 @@ test_that(
 )
 
 test_that(
-  "dplyr_reconstruct.olink_npx - works - preserves class through arrange",
+  "dplyr_reconstruct.olink_class - works - preserves class through arrange",
   {
-    obj <- new_olink_npx(data = df_tbl, check_log = check_log_result)
+    obj <- new_olink_class(data = df_tbl, check_log = check_log_result)
 
     result <- dplyr::arrange(obj, dplyr::desc(.data[["SampleID"]]))
 
-    expect_s3_class(object = result, class = "olink_npx")
+    expect_s3_class(object = result, class = "olink_class")
     expect_identical(
       object = olink_check_log(x = result),
       expected = check_log_result
@@ -234,9 +234,9 @@ test_that(
 # Test tbl_sum ----
 
 test_that(
-  "tbl_sum.olink_npx - works - shows check log status",
+  "tbl_sum.olink_class - works - shows check log status",
   {
-    obj <- new_olink_npx(data = df_tbl, check_log = check_log_result)
+    obj <- new_olink_class(data = df_tbl, check_log = check_log_result)
 
     header <- tbl_sum(obj)
 
@@ -292,14 +292,14 @@ test_that(
 # Test run_clean_npx ----
 
 test_that(
-  "run_clean_npx - works - passes through clean olink_npx data",
+  "run_clean_npx - works - passes through clean olink_class data",
   {
     # clean data has no issues
-    obj <- new_olink_npx(data = df_tbl, check_log = check_log_result)
+    obj <- new_olink_class(data = df_tbl, check_log = check_log_result)
 
     result <- run_clean_npx(df = obj)
 
-    expect_s3_class(object = result, class = "olink_npx")
+    expect_s3_class(object = result, class = "olink_class")
     expect_identical(
       object = olink_check_log(x = result),
       expected = check_log_result
@@ -310,11 +310,11 @@ test_that(
 test_that(
   "run_clean_npx - works - cleans plain tibble without errors",
   {
-    # plain tibble without olink_npx class — run_clean_npx delegates to
+    # plain tibble without olink_class class — run_clean_npx delegates to
     # clean_npx which will auto-run check_npx if needed
     result <- run_clean_npx(df = df_tbl)
 
-    expect_s3_class(object = result, class = "olink_npx")
+    expect_s3_class(object = result, class = "olink_class")
     expect_false(object = is.null(olink_check_log(x = result)))
   }
 )
@@ -342,8 +342,8 @@ test_that(
     # verify there are duplicates in the check_log
     expect_true(object = length(check_log_dups$sample_id_dups) > 0L)
 
-    # create olink_npx with the dirty check_log
-    obj <- new_olink_npx(data = df_with_dups, check_log = check_log_dups)
+    # create olink_class with the dirty check_log
+    obj <- new_olink_class(data = df_with_dups, check_log = check_log_dups)
 
     expect_message(
       object = {
@@ -361,7 +361,7 @@ test_that(
 test_that(
   "run_clean_npx - works - forwards custom args to clean_npx",
   {
-    obj <- new_olink_npx(data = df_tbl, check_log = check_log_result)
+    obj <- new_olink_class(data = df_tbl, check_log = check_log_result)
 
     # call with custom args (keep controls, skip QC warnings)
     result <- run_clean_npx(
@@ -370,7 +370,7 @@ test_that(
       remove_qc_warning = FALSE
     )
 
-    expect_s3_class(object = result, class = "olink_npx")
+    expect_s3_class(object = result, class = "olink_class")
     expect_false(object = is.null(olink_check_log(x = result)))
   }
 )
@@ -378,7 +378,7 @@ test_that(
 test_that(
   "run_clean_npx - works - rejects unknown arguments",
   {
-    obj <- new_olink_npx(data = df_tbl, check_log = check_log_result)
+    obj <- new_olink_class(data = df_tbl, check_log = check_log_result)
 
     expect_error(
       object = run_clean_npx(df = obj, fake_arg = TRUE),
@@ -408,11 +408,11 @@ test_that(
 test_that(
   "convert_read_npx_output - works - preserves check_log on tibble",
   {
-    obj <- new_olink_npx(data = df_tbl, check_log = check_log_result)
+    obj <- new_olink_class(data = df_tbl, check_log = check_log_result)
 
     result <- convert_read_npx_output(df = obj, out_df = "tibble")
 
-    expect_s3_class(object = result, class = "olink_npx")
+    expect_s3_class(object = result, class = "olink_class")
     expect_identical(
       object = olink_check_log(x = result),
       expected = check_log_result
@@ -423,7 +423,7 @@ test_that(
 test_that(
   "convert_read_npx_output - works - preserves check_log to arrow",
   {
-    obj <- new_olink_npx(data = df_tbl, check_log = check_log_result)
+    obj <- new_olink_class(data = df_tbl, check_log = check_log_result)
 
     result <- convert_read_npx_output(df = obj, out_df = "arrow")
 
@@ -446,7 +446,7 @@ test_that(
 
     result <- convert_read_npx_output(df = arrow_with_log, out_df = "tibble")
 
-    expect_s3_class(object = result, class = "olink_npx")
+    expect_s3_class(object = result, class = "olink_class")
     expect_identical(
       object = olink_check_log(x = result),
       expected = check_log_result
@@ -454,16 +454,16 @@ test_that(
   }
 )
 
-# Test clean_npx returns olink_npx with updated check_log ----
+# Test clean_npx returns olink_class with updated check_log ----
 
 test_that(
-  "clean_npx - works - returns olink_npx object with updated check_log",
+  "clean_npx - works - returns olink_class object with updated check_log",
   {
     result <- suppressWarnings(suppressMessages(
       clean_npx(df = df_tbl, check_log = check_log_result)
     ))
 
-    expect_s3_class(object = result, class = "olink_npx")
+    expect_s3_class(object = result, class = "olink_class")
     expect_false(object = is.null(olink_check_log(x = result)))
   }
 )
@@ -515,16 +515,16 @@ test_that(
 )
 
 test_that(
-  "clean_npx - works - extracts check_log from olink_npx without explicit arg",
+  "clean_npx - works - extracts check_log from olink_class without explicit arg",
   {
-    obj <- new_olink_npx(data = df_tbl, check_log = check_log_result)
+    obj <- new_olink_class(data = df_tbl, check_log = check_log_result)
 
     # should not need to pass check_log explicitly
     result <- suppressWarnings(suppressMessages(
       clean_npx(df = obj)
     ))
 
-    expect_s3_class(object = result, class = "olink_npx")
+    expect_s3_class(object = result, class = "olink_class")
     expect_false(object = is.null(olink_check_log(x = result)))
   }
 )
@@ -544,12 +544,12 @@ test_that(
 )
 
 test_that(
-  "backward compat - run_clean_npx returns olink_npx with check_log",
+  "backward compat - run_clean_npx returns olink_class with check_log",
   {
-    # run_clean_npx returns an olink_npx object with check_log attached
+    # run_clean_npx returns an olink_class object with check_log attached
     result <- run_clean_npx(df = df_tbl)
 
-    expect_s3_class(object = result, class = "olink_npx")
+    expect_s3_class(object = result, class = "olink_class")
     expect_false(object = is.null(olink_check_log(x = result)))
   }
 )
