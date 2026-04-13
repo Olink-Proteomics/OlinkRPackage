@@ -173,10 +173,23 @@ olink_pca_plot <- function(df,
     }
   }
 
-  # Check if check_log is correct
-  .clean_result <- ensure_clean_npx(df = df, check_log = check_log)
-  df <- .clean_result$df
-  check_log <- .clean_result$check_log
+  # Remove invalid OlinkID, assays with all NA values, and convert non-unique
+  # Uniprot IDs. Note that we do not remove samples with duplicate SampleID,
+  # control samples or assays, or samples/assays with QC warnings, as this
+  # would be the user's decision.
+  df <- run_clean_npx(
+    df = df,
+    remove_assay_na = TRUE,
+    remove_invalid_oid = TRUE,
+    remove_dup_sample_id = FALSE,
+    remove_control_assay = FALSE,
+    remove_control_sample = FALSE,
+    remove_qc_warning = FALSE,
+    remove_assay_warning = FALSE,
+    convert_nonunique_uniprot = TRUE,
+    out_df = "tibble"
+  )
+  check_log <- olink_check_log(x = df)
 
   # other checks
   check_is_dataset(x = df, error = TRUE)
@@ -199,26 +212,6 @@ olink_pca_plot <- function(df,
       each sample has a unique identifier."
     )
   }
-
-  # Remove invalid OlinkID, assays with all NA values, and convert non-unique
-  # Uniprot IDs. Note that we do not remove samples with duplicate SampleID,
-  # control samples or assays, or samples/assays with QC warnings, as this
-  # would be the user's decision.
-  df <- clean_npx(
-    df = df,
-    check_log = check_log,
-    remove_assay_na = TRUE,
-    remove_invalid_oid = TRUE,
-    remove_dup_sample_id = FALSE,
-    remove_control_assay = FALSE,
-    remove_control_sample = FALSE,
-    remove_qc_warning = FALSE,
-    remove_assay_warning = FALSE,
-    convert_nonunique_uniprot = TRUE,
-    out_df = "tibble",
-    verbose = FALSE
-  ) |>
-    suppressMessages()
 
   # OSI checks - ran only if OSI columns selected to color
   osi_cat_cols <- c("OSICategory")
@@ -440,9 +433,8 @@ olink_pca_plot.internal <- function(df, # nolint: object_name_linter
                                     verbose = verbose,
                                     ...) {
   # Check if check_log is correct
-  .clean_result <- ensure_clean_npx(df = df, check_log = check_log)
-  df <- .clean_result$df
-  check_log <- .clean_result$check_log
+  df <- run_clean_npx(df = df)
+  check_log <- olink_check_log(x = df)
 
   # Ensure one unique color value per SampleID (required by
   # npxProcessing_forDimRed)

@@ -185,7 +185,7 @@ check_npx <- function(df,
 #' @details
 #' \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
 #'
-#' This function has been deprecated. Use [`ensure_clean_npx()`] for downstream
+#' This function has been deprecated. Use [`run_clean_npx()`] for downstream
 #' functions, or access the check log from an `olink_npx` object via
 #' [`olink_check_log()`]. The check log is now automatically attached by
 #' [`read_npx()`] and updated by [`clean_npx()`].

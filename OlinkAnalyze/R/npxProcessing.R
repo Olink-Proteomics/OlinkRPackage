@@ -7,9 +7,8 @@ npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
                                     drop_samples = FALSE,
                                     verbose = FALSE) {
   # Check if check_log is correct
-  .clean_result <- ensure_clean_npx(df = df, check_log = check_log)
-  df <- .clean_result$df
-  check_log <- .clean_result$check_log
+  df <- run_clean_npx(df = df)
+  check_log <- olink_check_log(x = df)
 
   # other checks
   check_is_dataset(x = df, error = TRUE)

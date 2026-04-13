@@ -63,19 +63,18 @@ plot_heatmap_check_inputs <- function(colnames, ...) {
 #' @keywords internal
 #'
 plot_heatmap_clean_df <- function(df, check_log, colnames) {
-  df <- clean_npx(df = df,
-                  check_log = check_log,
-                  remove_assay_na = TRUE,
-                  remove_invalid_oid = TRUE,
-                  remove_control_assay = TRUE,
-                  remove_control_sample = TRUE,
-                  remove_dup_sample_id = TRUE,
-                  remove_assay_warning = FALSE,
-                  remove_qc_warning = FALSE,
-                  convert_df_cols = TRUE,
-                  convert_nonunique_uniprot = TRUE,
-                  out_df = "tibble",
-                  verbose = FALSE)
+  df <- run_clean_npx(df = df,
+                      remove_assay_na = TRUE,
+                      remove_invalid_oid = TRUE,
+                      remove_control_assay = TRUE,
+                      remove_control_sample = TRUE,
+                      remove_dup_sample_id = TRUE,
+                      remove_assay_warning = FALSE,
+                      remove_qc_warning = FALSE,
+                      convert_df_cols = TRUE,
+                      convert_nonunique_uniprot = TRUE,
+                      out_df = "tibble")
+  check_log <- olink_check_log(x = df)
   #Remove assays with no variance
   df <- df |>
     dplyr::group_by(

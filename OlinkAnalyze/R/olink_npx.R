@@ -429,127 +429,75 @@ tbl_sum.olink_npx <- function(x, ...) {
 
 # Downstream helper ----
 
-#' Check if data needs cleaning and auto-clean if necessary
+#' Quietly clean proteomics data quantified with Olink's PEA technology
 #'
 #' @description
-#' Inspects the check log attached to an `olink_npx` object (or an
-#' ArrowObject with embedded metadata) to determine whether the data still
-#' contains issues that need cleaning. If the check log is missing or the data
-#' has not been cleaned, a minimal cleaning pass is performed automatically via
-#' [`clean_npx()`].
+#' Internal wrapper around [`clean_npx()`] that runs the same cleaning pipeline
+#' while suppressing messages and warnings emitted during processing.
 #'
-#' This function is called at the top of every downstream analysis function
-#' (e.g. [`olink_ttest()`], [`olink_anova()`]) to ensure the data is in a
-#' usable state. Users who have already called [`clean_npx()`] will see no
-#' additional processing.
+#' Unlike [`clean_npx()`], this function is intended for internal use in cases
+#' where a quiet cleaning step is needed. If rows are removed, a single
+#' [`cli::cli_alert()`] message is shown. If no rows are removed, no output is
+#' printed.
 #'
 #' @details
-#' The function checks whether the attached check log reports any of the
-#' following issues:
-#' - Invalid Olink identifiers (`oid_invalid`)
-#' - Assays with all `NA` quantification (`assay_na`)
-#' - Duplicate sample identifiers (`sample_id_dups`)
+#' This function forwards all arguments to [`clean_npx()`] and forces
+#' `verbose = FALSE`.
 #'
-#' If any of these are non-empty, the function calls [`clean_npx()`]
-#' with conservative defaults (keeping control samples, QC warnings, and
-#' assay warnings). If no check log is found, it runs [`check_npx()`] first
-#' and then [`clean_npx()`].
+#' If any rows are removed during cleaning, the function prints a single alert
+#' indicating how many entries were removed and instructing the user to run
+#' [`clean_npx()`] directly to inspect which rows were removed.
 #'
-#' @param df A dataset, ideally an `olink_npx` object from [`read_npx()`]
-#' or [`clean_npx()`].
-#' @param check_log **Deprecated.** A named list returned by [`check_npx()`].
-#' Retained for backward compatibility. If provided, it is used directly
-#' instead of extracting from `df`.
+#' @inheritParams clean_npx
+#' @inherit clean_npx params return
 #'
-#' @return A named list with two elements:
-#' \itemize{
-#'   \item \strong{df} The (possibly cleaned) dataset as an `olink_npx` object.
-#'   \item \strong{check_log} The check log for the returned dataset.
-#' }
-#'
-#' @seealso [clean_npx()], [check_npx()], [olink_check_log()]
+#' @author
+#'   Kang Dong
+#'   Klev Diamanti
 #'
 #' @keywords internal
+#' @noRd
 #'
-ensure_clean_npx <- function(df,
-                             check_log = NULL) {
+run_clean_npx <- function(df, ...) {
 
-  # ---- handle deprecated check_log argument ----
-  if (!is.null(check_log)) {
-    # backward compat: user passed check_log explicitly
-    # validate it and return as-is
-    validate_check_log(check_log = check_log)
-    return(
-      list(
-        df = df,
-        check_log = check_log
-      )
-    )
-  }
+  dots <- list(...)
 
-  # ---- extract check_log from the data object ----
-  check_log <- olink_check_log(x = df)
+  # remove user-supplied verbose if present
+  dots$verbose <- NULL
 
-  if (is.null(check_log)) {
-    # no check_log attached — need to run check_npx
-    cli::cli_inform(
+  valid_args <- names(formals(clean_npx))
+  unknown_args <- setdiff(x = names(dots), y = valid_args)
+
+  if (length(unknown_args) > 0L) {
+    cli::cli_abort(
       c(
-        "No check log found on {.arg df}. Running {.fn check_npx}.",
-        "i" = "For best performance, use {.fn read_npx} which attaches the
-        check log automatically."
-      )
+        "x" = "{cli::qty(unknown_args)} Unknown argument{?s}:
+        {.val {unknown_args}}.",
+        "i" = "Check the documentation of {.fn clean_npx} for valid arguments."
+      ),
+      call = rlang::caller_env(),
+      wrap = TRUE
     )
-    check_log <- check_npx(df = df)
-
-    # attach it
-    if (check_is_tibble(x = df, error = FALSE)) {
-      df <- new_olink_npx(data = df, check_log = check_log)
-    } else if (check_is_arrow_object(x = df, error = FALSE)) {
-      df <- attach_check_log_arrow(data = df, check_log = check_log)
-    }
   }
 
-  # ---- check if data still needs cleaning ----
-  needs_clean <- (
-    length(check_log$oid_invalid) > 0L ||
-    length(check_log$assay_na) > 0L ||
-    length(check_log$sample_id_dups) > 0L
+  n_before <- nrow(df)
+
+  cleaned_df <- withCallingHandlers(
+    expr = do.call(clean_npx, c(list(df = df), dots, list(verbose = FALSE))),
+    message = function(m) invokeRestart("muffleMessage"),
+    warning = function(w) invokeRestart("muffleWarning")
   )
 
-  if (needs_clean) {
+  n_after <- nrow(cleaned_df)
+
+  if (n_after != n_before) {
+    n_removed <- n_before - n_after # nolint: object_usage_linter
     cli::cli_inform(
-      c(
-        "Data contains issues that require cleaning. Running {.fn clean_npx}
-        automatically.",
-        "i" = "To avoid automatic cleaning, call {.fn clean_npx} explicitly
-        before downstream analysis."
-      )
+      c("{.val {n_removed}} entr{?y/ies} removed by {.fn clean_npx} from the
+      input dataset {.arg df}. Run {.fn clean_npx} on your dataset with
+      {.arg verbose = TRUE} to inspect which rows were removed.")
     )
-
-    df <- clean_npx(
-      df = df,
-      check_log = check_log,
-      remove_assay_na = TRUE,
-      remove_invalid_oid = TRUE,
-      remove_dup_sample_id = TRUE,
-      remove_control_assay = FALSE,
-      remove_control_sample = FALSE,
-      remove_qc_warning = FALSE,
-      remove_assay_warning = FALSE,
-      convert_nonunique_uniprot = TRUE,
-      out_df = "tibble",
-      verbose = FALSE
-    ) |>
-      suppressMessages()
-
-    check_log <- olink_check_log(x = df)
   }
 
-  return(
-    list(
-      df = df,
-      check_log = check_log
-    )
-  )
-
+  return(cleaned_df)
 }

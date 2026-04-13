@@ -159,9 +159,9 @@ olink_ordinal_regression <- function(df,
       }
 
       # check data format
-      .clean_result <- ensure_clean_npx(df = df, check_log = check_log)
-      df <- .clean_result$df
-      check_log <- .clean_result$check_log
+      df <- run_clean_npx(df = df)
+      check_log <- olink_check_log(x = df)
+      
       data_type <- check_log$col_names$quant
 
       # Convert outcome to factor
@@ -538,9 +538,9 @@ olink_ordinal_regression_posthoc <- function(df, # nolint: object_length_linter
       }
 
       # check data format
-      .clean_result <- ensure_clean_npx(df = df, check_log = check_log)
-      df <- .clean_result$df
-      check_log <- .clean_result$check_log
+      df <- run_clean_npx(df = df)
+      check_log <- olink_check_log(x = df)
+      
       data_type <- check_log$col_names$quant
 
       # Allow for :/* notation in covariates

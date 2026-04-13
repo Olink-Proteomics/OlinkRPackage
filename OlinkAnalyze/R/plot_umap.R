@@ -178,22 +178,13 @@ olink_umap_plot <- function(df,
     }
   }
 
-  # Check data format
-  .clean_result <- ensure_clean_npx(df = df, check_log = check_log)
-  df <- .clean_result$df
-  check_log <- .clean_result$check_log
-
-  # input checks
-
-  check_is_dataset(x = df, error = TRUE)
-
+  # Check data format and clean
   # Remove invalid OlinkID, assays with all NA values, and convert non-unique
   # Uniprot IDs. Note that we do not remove samples with duplicate SampleID,
   # control samples or assays, or samples/assays with QC warnings, as this
   # would be the user's decision.
-  df <- clean_npx(
-    df,
-    check_log = check_log,
+  df <- run_clean_npx(
+    df = df,
     remove_assay_na = TRUE,
     remove_invalid_oid = TRUE,
     remove_dup_sample_id = FALSE,
@@ -202,10 +193,13 @@ olink_umap_plot <- function(df,
     remove_qc_warning = FALSE,
     remove_assay_warning = FALSE,
     convert_nonunique_uniprot = TRUE,
-    out_df = "tibble",
-    verbose = FALSE
-  ) |>
-    suppressMessages()
+    out_df = "tibble"
+  )
+  check_log <- olink_check_log(x = df)
+
+  # input checks
+
+  check_is_dataset(x = df, error = TRUE)
 
   # Check that the user didn't specify just one of outlierDefX and outlierDefY
   if (sum(c(is.numeric(outlierDefX), is.numeric(outlierDefY))) == 1L) {

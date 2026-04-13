@@ -48,9 +48,8 @@
 olink_osi_dist_plot <- function(df,
                                 check_log = NULL,
                                 osi_score = NULL) {
-  .clean_result <- ensure_clean_npx(df = df, check_log = check_log)
-  df <- .clean_result$df
-  check_log <- .clean_result$check_log
+  df <- run_clean_npx(df = df)
+  check_log <- olink_check_log(x = df)
 
   # General OSI checks
   df <- check_osi(

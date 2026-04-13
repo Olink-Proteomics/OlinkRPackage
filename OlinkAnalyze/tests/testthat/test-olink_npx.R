@@ -289,51 +289,38 @@ test_that(
   }
 )
 
-# Test ensure_clean_npx ----
+# Test run_clean_npx ----
 
 test_that(
-  "ensure_clean_npx - works - passes through clean olink_npx data",
+  "run_clean_npx - works - passes through clean olink_npx data",
   {
     # clean data has no issues
     obj <- new_olink_npx(data = df_tbl, check_log = check_log_result)
 
-    result <- ensure_clean_npx(df = obj)
+    result <- run_clean_npx(df = obj)
 
-    expect_s3_class(object = result$df, class = "olink_npx")
-    expect_identical(object = result$check_log, expected = check_log_result)
-  }
-)
-
-test_that(
-  "ensure_clean_npx - works - explicit check_log takes precedence",
-  {
-    result <- ensure_clean_npx(df = df_tbl, check_log = check_log_result)
-
-    # should use the explicit check_log (backward compat)
-    expect_identical(object = result$check_log, expected = check_log_result)
-    # df should not be changed
-    expect_identical(object = result$df, expected = df_tbl)
-  }
-)
-
-test_that(
-  "ensure_clean_npx - works - generates check_log for plain tibble",
-  {
-    # plain tibble without olink_npx class
-    expect_message(
-      object = {
-        result <- ensure_clean_npx(df = df_tbl)
-      },
-      regexp = "No check log found"
+    expect_s3_class(object = result, class = "olink_npx")
+    expect_identical(
+      object = olink_check_log(x = result),
+      expected = check_log_result
     )
-
-    expect_s3_class(object = result$df, class = "olink_npx")
-    expect_false(object = is.null(result$check_log))
   }
 )
 
 test_that(
-  "ensure_clean_npx - works - auto-cleans data with issues",
+  "run_clean_npx - works - cleans plain tibble without errors",
+  {
+    # plain tibble without olink_npx class — run_clean_npx delegates to
+    # clean_npx which will auto-run check_npx if needed
+    result <- run_clean_npx(df = df_tbl)
+
+    expect_s3_class(object = result, class = "olink_npx")
+    expect_false(object = is.null(olink_check_log(x = result)))
+  }
+)
+
+test_that(
+  "run_clean_npx - works - auto-cleans data with issues",
   {
     # create data with a duplicate SampleID to trigger cleaning
     df_with_dups <- dplyr::tibble(
@@ -360,27 +347,59 @@ test_that(
 
     expect_message(
       object = {
-        result <- ensure_clean_npx(df = obj)
+        result <- run_clean_npx(df = obj)
       },
-      regexp = "require cleaning"
+      regexp = "removed by"
     )
 
     # after cleaning, duplicates should be removed
-    updated_log <- result$check_log
+    updated_log <- olink_check_log(x = result)
     expect_equal(object = length(updated_log$sample_id_dups), expected = 0L)
   }
 )
 
 test_that(
-  "ensure_clean_npx - works - auto-extracts from arrow with metadata",
+  "run_clean_npx - works - forwards custom args to clean_npx",
+  {
+    obj <- new_olink_npx(data = df_tbl, check_log = check_log_result)
+
+    # call with custom args (keep controls, skip QC warnings)
+    result <- run_clean_npx(
+      df = obj,
+      remove_control_sample = FALSE,
+      remove_qc_warning = FALSE
+    )
+
+    expect_s3_class(object = result, class = "olink_npx")
+    expect_false(object = is.null(olink_check_log(x = result)))
+  }
+)
+
+test_that(
+  "run_clean_npx - works - rejects unknown arguments",
+  {
+    obj <- new_olink_npx(data = df_tbl, check_log = check_log_result)
+
+    expect_error(
+      object = run_clean_npx(df = obj, fake_arg = TRUE),
+      regexp = "Unknown argument"
+    )
+  }
+)
+
+test_that(
+  "run_clean_npx - works - auto-extracts from arrow with metadata",
   {
     arrow_tbl <- arrow::as_arrow_table(x = df_tbl)
     arrow_with_log <- attach_check_log_arrow(data = arrow_tbl,
                                              check_log = check_log_result)
 
-    result <- ensure_clean_npx(df = arrow_with_log)
+    result <- run_clean_npx(df = arrow_with_log)
 
-    expect_identical(object = result$check_log, expected = check_log_result)
+    expect_identical(
+      object = olink_check_log(x = result),
+      expected = check_log_result
+    )
   }
 )
 
@@ -525,12 +544,12 @@ test_that(
 )
 
 test_that(
-  "backward compat - explicit check_log passed to downstream is accepted",
+  "backward compat - run_clean_npx returns olink_npx with check_log",
   {
-    # when user passes check_log explicitly, ensure_clean_npx accepts it
-    result <- ensure_clean_npx(df = df_tbl, check_log = check_log_result)
+    # run_clean_npx returns an olink_npx object with check_log attached
+    result <- run_clean_npx(df = df_tbl)
 
-    expect_identical(object = result$df, expected = df_tbl)
-    expect_identical(object = result$check_log, expected = check_log_result)
+    expect_s3_class(object = result, class = "olink_npx")
+    expect_false(object = is.null(olink_check_log(x = result)))
   }
 )

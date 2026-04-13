@@ -274,9 +274,9 @@ olink_anova <- function(df,
       }
 
       # Check data format
-      .clean_result <- ensure_clean_npx(df = df, check_log = check_log)
-      df <- .clean_result$df
-      check_log <- .clean_result$check_log
+      df <- run_clean_npx(df = df)
+      check_log <- olink_check_log(x = df)
+      
 
       # Convert character vars to factor
       converted.vars <- NULL # nolint: object_name_linter
@@ -859,9 +859,9 @@ olink_anova_posthoc <- function(df,
       }
 
       # Check data format
-      .clean_result <- ensure_clean_npx(df = df, check_log = check_log)
-      df <- .clean_result$df
-      check_log <- .clean_result$check_log
+      df <- run_clean_npx(df = df)
+      check_log <- olink_check_log(x = df)
+      
 
       # Convert character vars to factor
       converted.vars <- NULL # nolint: object_name_linter

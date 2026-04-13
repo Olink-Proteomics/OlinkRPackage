@@ -85,9 +85,8 @@ olink_bridgeability_plot <- function(df,
   set.seed(seed = 1L)
 
   # Check data format
-  .clean_result <- ensure_clean_npx(df = df, check_log = check_log)
-  df <- .clean_result$df
-  check_log <- .clean_result$check_log
+  df <- run_clean_npx(df = df)
+  check_log <- olink_check_log(x = df)
 
   # check that check_log$col_names$count exists
   check_log_colname(check_log = check_log, col_key = "count")

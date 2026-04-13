@@ -230,9 +230,8 @@ check_pe_inputs <- function(df,
                             ontology,
                             organism) {
 
-  .clean_result <- ensure_clean_npx(df = df, check_log = check_log)
-  df <- .clean_result$df
-  check_log <- .clean_result$check_log
+  df <- run_clean_npx(df = df)
+  check_log <- olink_check_log(x = df)
 
   check_columns(df = test_results,
                 col_list = list("OlinkID", "estimate", "Assay"))
@@ -359,31 +358,17 @@ data_prep <- function(df,
                       check_log) {
   # clean up data from invalid entries ----
 
-  nrow_df_original <- nrow(df)
-
-  df <- clean_npx(df = df,
-                  check_log = check_log,
-                  remove_assay_na = TRUE,
-                  remove_invalid_oid = TRUE,
-                  remove_dup_sample_id = FALSE,
-                  remove_control_assay = TRUE,
-                  remove_control_sample = FALSE,
-                  remove_qc_warning = FALSE,
-                  remove_assay_warning = FALSE,
-                  convert_df_cols = TRUE,
-                  convert_nonunique_uniprot = FALSE,
-                  verbose = FALSE) |>
-    suppressMessages() |>
-    suppressWarnings()
-
-  if (nrow(df) != nrow_df_original) {
-    cli::cli_inform(
-      "{cli::qty(nrow_df_original - nrow(df))} Removed
-      {.val {nrow_df_original - nrow(df)}} entr{?y/ies} from {.arg df}
-      containing invalid assay identifiers, control assays, and/or 'NA'
-      assays. Run function {.fun clean_npx} to get details on removed entries."
-    )
-  }
+  df <- run_clean_npx(df = df,
+                      remove_assay_na = TRUE,
+                      remove_invalid_oid = TRUE,
+                      remove_dup_sample_id = FALSE,
+                      remove_control_assay = TRUE,
+                      remove_control_sample = FALSE,
+                      remove_qc_warning = FALSE,
+                      remove_assay_warning = FALSE,
+                      convert_df_cols = TRUE,
+                      convert_nonunique_uniprot = FALSE)
+  check_log <- olink_check_log(x = df)
 
   # remove non-overlapping assays between df and test_results ----
 
