@@ -289,53 +289,98 @@ test_that(
   }
 )
 
-# Test run_check_npx auto-extraction ----
+# Test ensure_clean_npx ----
 
 test_that(
-  "run_check_npx - works - auto-extracts check_log from olink_npx",
+  "ensure_clean_npx - works - passes through clean olink_npx data",
   {
+    # clean data has no issues
     obj <- new_olink_npx(data = df_tbl, check_log = check_log_result)
 
-    # should NOT produce the "not provided" message
-    expect_no_message(
-      object = {
-        result <- run_check_npx(df = obj, check_log = NULL)
-      },
-      message = "not provided"
-    )
+    result <- ensure_clean_npx(df = obj)
 
-    expect_identical(object = result, expected = check_log_result)
+    expect_s3_class(object = result$df, class = "olink_npx")
+    expect_identical(object = result$check_log, expected = check_log_result)
   }
 )
 
 test_that(
-  "run_check_npx - works - auto-extracts check_log from arrow with metadata",
+  "ensure_clean_npx - works - explicit check_log takes precedence",
+  {
+    result <- ensure_clean_npx(df = df_tbl, check_log = check_log_result)
+
+    # should use the explicit check_log (backward compat)
+    expect_identical(object = result$check_log, expected = check_log_result)
+    # df should not be changed
+    expect_identical(object = result$df, expected = df_tbl)
+  }
+)
+
+test_that(
+  "ensure_clean_npx - works - generates check_log for plain tibble",
+  {
+    # plain tibble without olink_npx class
+    expect_message(
+      object = {
+        result <- ensure_clean_npx(df = df_tbl)
+      },
+      regexp = "No check log found"
+    )
+
+    expect_s3_class(object = result$df, class = "olink_npx")
+    expect_false(object = is.null(result$check_log))
+  }
+)
+
+test_that(
+  "ensure_clean_npx - works - auto-cleans data with issues",
+  {
+    # create data with a duplicate SampleID to trigger cleaning
+    df_with_dups <- dplyr::tibble(
+      SampleID = c("A", "A", "C", "D"),
+      OlinkID = paste0("OID1234", seq(1L:4L)),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L)
+    )
+
+    check_log_dups <- check_npx(df = df_with_dups) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    # verify there are duplicates in the check_log
+    expect_true(object = length(check_log_dups$sample_id_dups) > 0L)
+
+    # create olink_npx with the dirty check_log
+    obj <- new_olink_npx(data = df_with_dups, check_log = check_log_dups)
+
+    expect_message(
+      object = {
+        result <- ensure_clean_npx(df = obj)
+      },
+      regexp = "require cleaning"
+    )
+
+    # after cleaning, duplicates should be removed
+    updated_log <- result$check_log
+    expect_equal(object = length(updated_log$sample_id_dups), expected = 0L)
+  }
+)
+
+test_that(
+  "ensure_clean_npx - works - auto-extracts from arrow with metadata",
   {
     arrow_tbl <- arrow::as_arrow_table(x = df_tbl)
     arrow_with_log <- attach_check_log_arrow(data = arrow_tbl,
                                              check_log = check_log_result)
 
-    # should NOT produce the "not provided" message
-    expect_no_message(
-      object = {
-        result <- run_check_npx(df = arrow_with_log, check_log = NULL)
-      },
-      message = "not provided"
-    )
+    result <- ensure_clean_npx(df = arrow_with_log)
 
-    expect_identical(object = result, expected = check_log_result)
-  }
-)
-
-test_that(
-  "run_check_npx - works - explicit check_log takes precedence",
-  {
-    obj <- new_olink_npx(data = df_tbl, check_log = check_log_result)
-
-    # passing check_log explicitly should use the explicit one
-    result <- run_check_npx(df = obj, check_log = check_log_result)
-
-    expect_identical(object = result, expected = check_log_result)
+    expect_identical(object = result$check_log, expected = check_log_result)
   }
 )
 
@@ -390,10 +435,10 @@ test_that(
   }
 )
 
-# Test clean_npx returns olink_npx ----
+# Test clean_npx returns olink_npx with updated check_log ----
 
 test_that(
-  "clean_npx - works - returns olink_npx object",
+  "clean_npx - works - returns olink_npx object with updated check_log",
   {
     result <- suppressWarnings(suppressMessages(
       clean_npx(df = df_tbl, check_log = check_log_result)
@@ -415,5 +460,77 @@ test_that(
       object = inherits(x = result, what = "ArrowObject")
     )
     expect_false(object = is.null(olink_check_log(x = result)))
+  }
+)
+
+test_that(
+  "clean_npx - works - re-runs check_npx so check_log reflects cleaned state",
+  {
+    # create data with duplicates
+    df_with_dups <- dplyr::tibble(
+      SampleID = c("A", "A", "C", "D"),
+      OlinkID = paste0("OID1234", seq(1L:4L)),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L)
+    )
+
+    check_log_dups <- check_npx(df = df_with_dups) |>
+      suppressWarnings() |>
+      suppressMessages()
+    expect_true(object = length(check_log_dups$sample_id_dups) > 0L)
+
+    # clean the data
+    result <- suppressWarnings(suppressMessages(
+      clean_npx(df = df_with_dups, check_log = check_log_dups)
+    ))
+
+    # the updated check_log should show no duplicates
+    updated_log <- olink_check_log(x = result)
+    expect_equal(object = length(updated_log$sample_id_dups), expected = 0L)
+  }
+)
+
+test_that(
+  "clean_npx - works - extracts check_log from olink_npx without explicit arg",
+  {
+    obj <- new_olink_npx(data = df_tbl, check_log = check_log_result)
+
+    # should not need to pass check_log explicitly
+    result <- suppressWarnings(suppressMessages(
+      clean_npx(df = obj)
+    ))
+
+    expect_s3_class(object = result, class = "olink_npx")
+    expect_false(object = is.null(olink_check_log(x = result)))
+  }
+)
+
+# Test backward compatibility ----
+
+test_that(
+  "backward compat - run_check_npx still works",
+  {
+    # run_check_npx should still function
+    result <- suppressWarnings(suppressMessages(
+      run_check_npx(df = df_tbl, check_log = check_log_result)
+    ))
+
+    expect_identical(object = result, expected = check_log_result)
+  }
+)
+
+test_that(
+  "backward compat - explicit check_log passed to downstream is accepted",
+  {
+    # when user passes check_log explicitly, ensure_clean_npx accepts it
+    result <- ensure_clean_npx(df = df_tbl, check_log = check_log_result)
+
+    expect_identical(object = result$df, expected = df_tbl)
+    expect_identical(object = result$check_log, expected = check_log_result)
   }
 )

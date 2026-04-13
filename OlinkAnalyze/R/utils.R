@@ -288,14 +288,15 @@ check_osi <- function(df,
 #'   Klev Diamanti
 #'
 #' @param df A `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")`
-#' from \code{\link{read_npx}}. If `df` is an `olink_npx` object (from
-#' [`clean_npx()`]) or an ArrowObject with embedded metadata, the check log
-#' will be extracted automatically and `check_log` does not need to be
-#' provided.
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' the function will first attempt to extract the check log from `df` (if it
-#' is an `olink_npx` object or ArrowObject with metadata). If no check log is
-#' found, [`check_npx()`] will be run internally.
+#' from \code{\link{read_npx}}. The output of [`read_npx()`] is an `olink_npx`
+#' object that carries the check log as an attribute. If the check log
+#' indicates that the data still needs cleaning (e.g. invalid identifiers,
+#' duplicate samples), the downstream function will automatically clean the
+#' data before proceeding.
+#' @param check_log **Deprecated.** A named list returned by [`check_npx()`].
+#' This argument is retained for backward compatibility. In new code, there
+#' is no need to pass `check_log` explicitly — [`read_npx()`] attaches it
+#' automatically and [`clean_npx()`] updates it after cleaning.
 #'
 #' @keywords internal
 #'

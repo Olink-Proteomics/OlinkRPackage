@@ -249,10 +249,11 @@ data <- list.files(
 ## Check NPX data quality (check_npx)
 
 The `check_npx` function performs various quality and format checks on NPX data
-imported with `read_npx`. It is recommended to run this function after reading
-in NPX data and before downstream analysis. The result can be passed as the
-`check_log` argument to `clean_npx` and all downstream OlinkAnalyze functions,
-allowing each function to skip its own internal check and improve performance.
+imported with `read_npx`. Starting from v5.0, `read_npx` automatically runs
+`check_npx` and attaches the results to the returned `olink_npx` object. This
+means you no longer need to call `check_npx` separately for routine workflows.
+However, you can still call it explicitly to inspect the results or to pass
+custom `preferred_names`.
 
 ### Function arguments
 
@@ -261,7 +262,15 @@ allowing each function to skip its own internal check and improve performance.
     ambiguities or to map custom column names to internally expected ones.
 
 ```{r message=FALSE, eval=FALSE}
-# Check NPX data quality and format
+# read_npx now returns an olink_npx object with check_log attached
+npx_data <- OlinkAnalyze::read_npx(
+  filename = "path/to/npx_file.parquet"
+)
+
+# Access the check log
+check_log <- OlinkAnalyze::olink_check_log(npx_data)
+
+# Or run check_npx explicitly for inspection or with preferred_names
 check_npx_result <- OlinkAnalyze::check_npx(
   df = OlinkAnalyze::npx_data1
 )
@@ -295,14 +304,22 @@ A named list with the following elements:
 The `clean_npx` function cleans an NPX data frame by applying a series of
 filtering and conversion steps. It removes invalid or problematic assays and
 samples identified by `check_npx`, and optionally converts column data types.
-Passing the output of `check_npx` via the `check_log` argument avoids
-re-running the internal checks and improves performance.
+After cleaning, `clean_npx` automatically re-runs `check_npx` on the output
+to produce an updated check log, ensuring the attached metadata reflects the
+cleaned state of the data.
+
+**Note:** Downstream analysis functions (e.g., `olink_ttest`, `olink_anova`)
+now automatically detect if the data needs cleaning and will run `clean_npx`
+internally if necessary. If you prefer to control the cleaning process,
+call `clean_npx` explicitly before analysis.
 
 ### Function arguments
 
 -   df: NPX data frame in long format as returned by `read_npx`.
--   check_log: Named list returned by `check_npx`. If `NULL`, `check_npx` is
-    run internally.
+-   check_log: **Deprecated.** Named list returned by `check_npx`. The check
+    log is now automatically extracted from the `olink_npx` object returned
+    by `read_npx`. You only need to pass this if working with a plain tibble
+    or data frame that is not an `olink_npx` object.
 -   remove_assay_na: Logical. Remove assays where all samples have NA values.
     Default: `TRUE`.
 -   remove_invalid_oid: Logical. Remove assays with invalid OlinkIDs. Default:
@@ -326,7 +343,12 @@ re-running the internal checks and improves performance.
 -   verbose: Logical. Print progress messages. Default: `FALSE`.
 
 ```{r message=FALSE, eval=FALSE}
-# Clean the NPX data using the check_npx output
+# Clean the NPX data — check_log is extracted automatically from olink_npx
+npx_clean <- OlinkAnalyze::clean_npx(
+  df = npx_data
+)
+
+# Or with explicit check_log for backward compatibility
 npx_clean <- OlinkAnalyze::clean_npx(
   df = OlinkAnalyze::npx_data1,
   check_log = check_npx_result
@@ -335,20 +357,11 @@ npx_clean <- OlinkAnalyze::clean_npx(
 
 ### Function output
 
-A tibble (or ArrowObject) in long format containing the cleaned NPX data, with
-invalid assays, control samples, QC-failing samples, and problematic entries
-removed according to the chosen arguments.
-
-**Note:** We recommend running `check_npx` once again after cleaning the data to
-confirm that all issues have been resolved and that the data is ready for
-downstream analysis.
-
-```{r message=FALSE, eval=FALSE}
-# Check NPX data quality and format
-check_npx_clean <- OlinkAnalyze::check_npx(
-  df = npx_clean
-)
-```
+A tibble (or ArrowObject) of class `olink_npx` in long format containing the
+cleaned NPX data, with invalid assays, control samples, QC-failing samples,
+and problematic entries removed according to the chosen arguments. The attached
+check log reflects the state of the cleaned data (i.e., `check_npx` is
+automatically re-run on the output).
 
 ## Randomize samples on plate (olink_plate_randomizer)
 
@@ -432,15 +445,15 @@ variable. It corrects for multiple testing using the Benjamini-Hochberg method
 used as a grouping variable. Needs to have exactly 2 levels.
 -   pair_id: Character value indicating which column contains the paired sample
 identifier. Only used for paired t-tests.
--   check_log: Named list returned by `check_npx`. If `NULL`, `check_npx` is run
-internally.
+-   check_log: **Deprecated.** Named list returned by `check_npx`. The check
+log is now automatically extracted from the `olink_npx` object. Passing this
+explicitly is supported for backward compatibility but no longer necessary.
 
 ```{r message=FALSE, eval=FALSE}
-# Run check_npx and clean_npx before analysis
+# New workflow: just pass the cleaned data — check_log is attached
 OlinkAnalyze::olink_ttest(
   df = npx_clean,
-  variable = "Treatment",
-  check_log = check_npx_clean
+  variable = "Treatment"
 )
 ```
 
