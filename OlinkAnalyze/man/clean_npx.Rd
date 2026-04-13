@@ -7,6 +7,7 @@
 clean_npx(
   df,
   check_log = NULL,
+  preferred_names = NULL,
   remove_assay_na = TRUE,
   remove_invalid_oid = TRUE,
   remove_dup_sample_id = TRUE,
@@ -23,10 +24,20 @@ clean_npx(
 }
 \arguments{
 \item{df}{A "tibble" or "ArrowObject"
-from \code{\link{read_npx}}.}
+from \code{\link{read_npx}}. The output of \code{\link[=read_npx]{read_npx()}} is an \code{olink_npx}
+object that carries the check log as an attribute. If the check log
+indicates that the data still needs cleaning (e.g. invalid identifiers,
+duplicate samples), the downstream function will automatically clean the
+data before proceeding.}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{\strong{Deprecated.} A named list returned by \code{\link[=check_npx]{check_npx()}}.
+This argument is retained for backward compatibility. In new code, there
+is no need to pass \code{check_log} explicitly — \code{\link[=read_npx]{read_npx()}} attaches it
+automatically and \code{\link[=clean_npx]{clean_npx()}} updates it after cleaning.}
+
+\item{preferred_names}{A named character vector where names are internal
+column names and values are column names to be selected from the input data
+frame. Read the \emph{description} for further information.}
 
 \item{remove_assay_na}{Logical. If \code{FALSE}, skips filtering assays with all
 quantified values \code{NA}. Defaults to \code{TRUE}.}
@@ -149,6 +160,27 @@ clean_npx(
   check_log = check_log,
   verbose = TRUE
 )
+
+# run clean_npx using a different quantification column
+npx_file <- system.file("extdata",
+                        "npx_data_ext.parquet",
+                        package = "OlinkAnalyze")
+npx_df <- read_npx(filename = npx_file)
+clean_npx(
+  df = npx_df,
+  preferred_names = c("quant" = "PCNormalizedNPX")
+)
+
+# run clean_npx specifying preferred column for LOD
+npx_df |>
+  dplyr::mutate(
+    LOD = 1L,
+    PlateLOD = 2L
+  ) |>
+  clean_npx(
+    preferred_names = c("quant" = "PCNormalizedNPX",
+                        "lod" = "PlateLOD")
+  )
 }
 
 }

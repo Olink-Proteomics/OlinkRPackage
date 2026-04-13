@@ -13,10 +13,16 @@ clean_control_sample_id(
 }
 \arguments{
 \item{df}{A "tibble" or "ArrowObject"
-from \code{\link{read_npx}}.}
+from \code{\link{read_npx}}. The output of \code{\link[=read_npx]{read_npx()}} is an \code{olink_npx}
+object that carries the check log as an attribute. If the check log
+indicates that the data still needs cleaning (e.g. invalid identifiers,
+duplicate samples), the downstream function will automatically clean the
+data before proceeding.}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{\strong{Deprecated.} A named list returned by \code{\link[=check_npx]{check_npx()}}.
+This argument is retained for backward compatibility. In new code, there
+is no need to pass \code{check_log} explicitly — \code{\link[=read_npx]{read_npx()}} attaches it
+automatically and \code{\link[=clean_npx]{clean_npx()}} updates it after cleaning.}
 
 \item{control_sample_ids}{character vector of sample identifiers of control
 samples. Default \code{NULL}, to mark no samples to be removed.}
