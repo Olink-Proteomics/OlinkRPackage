@@ -220,6 +220,63 @@ as_tibble.olink_npx <- function(x, ...) { # nolint: object_name_linter
 
 }
 
+#' Remove the check log metadata from an ArrowObject
+#'
+#' @description
+#' Strips the `olink_check_log` key from the schema-level metadata of an
+#' ArrowObject, returning a plain Arrow table without any attached check log.
+#' This is useful for testing or when the user wants to remove the extra
+#' metadata.
+#'
+#' @param data An ArrowObject (e.g. `arrow::Table` or `arrow::Dataset`).
+#'
+#' @return The ArrowObject with the `olink_check_log` metadata removed.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # read NPX data as Arrow
+#' npx_file <- system.file("extdata",
+#'                         "npx_data_ext.parquet",
+#'                         package = "OlinkAnalyze")
+#' npx_arrow <- arrow::read_parquet(npx_file, as_data_frame = FALSE)
+#' check_log <- check_npx(df = npx_arrow)
+#' npx_arrow <- attach_check_log_arrow(data = npx_arrow,
+#'                                     check_log = check_log)
+#'
+#' # check_log is present
+#' olink_check_log(npx_arrow)
+#'
+#' # strip it
+#' npx_arrow_clean <- strip_check_log_arrow(npx_arrow)
+#'
+#' # check_log is gone
+#' olink_check_log(npx_arrow_clean)
+#' }
+#'
+strip_check_log_arrow <- function(data) {
+
+  if (!inherits(x = data, what = c("ArrowObject", "arrow_dplyr_query"))) {
+    cli::cli_abort(
+      c(
+        "x" = "{.arg data} must be an ArrowObject."
+      ),
+      call = rlang::caller_env()
+    )
+  }
+
+  existing_metadata <- data$metadata
+
+  if ("olink_check_log" %in% names(existing_metadata)) {
+    existing_metadata[["olink_check_log"]] <- NULL
+    data$metadata <- existing_metadata
+  }
+
+  return(data)
+
+}
+
 # Arrow metadata helpers ----
 
 #' Attach check log to an ArrowObject via schema metadata
