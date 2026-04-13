@@ -147,15 +147,21 @@ test_that(
     expect_warning(
       object = expect_message(
         object = expect_message(
-          object = olink_umap_plot(
-            df = dt_edge_case,
-            quiet = TRUE
+          object = expect_message(
+            object = olink_umap_plot(
+              df = dt_edge_case,
+              quiet = TRUE
+            ),
+            regexp = "`check_log` not provided. Running `check_npx()`",
+            fixed = TRUE
           ),
-          regexp = "`check_log` not provided. Running `check_npx()`",
-          fixed = TRUE
+          regexp = paste("8 assays exhibited assay QC warnings in column",
+                         "`Assay_Warning` of the dataset")
         ),
-        regexp = paste("8 assays exhibited assay QC warnings in column",
-                       "`Assay_Warning` of the dataset")
+        regexp = paste("1530 entries removed by `clean_npx()` from the input",
+                       "dataset `df`. Run `clean_npx()` on your dataset with",
+                       "`verbose = TRUE` to inspect which rows were removed."),
+        fixed = TRUE
       ),
       regexp = paste("\"OID30136\", \"OID30144\", \"OID30166\", \"OID30168\",",
                      "\"OID30438\", \"OID30544\", \"OID30626\", \"OID30695\",",
