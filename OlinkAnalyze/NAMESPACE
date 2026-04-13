@@ -2,6 +2,7 @@
 
 S3method(dplyr::dplyr_reconstruct,olink_npx)
 S3method(pillar::tbl_sum,olink_npx)
+S3method(tibble::as_tibble,olink_npx)
 export(check_npx)
 export(clean_npx)
 export(olink_anova)
