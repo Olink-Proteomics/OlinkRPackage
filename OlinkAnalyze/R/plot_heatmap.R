@@ -95,8 +95,9 @@ olink_heatmap_plot <- function(df,
   plot_heatmap_check_inputs(colnames = colnames,
                             ...)
 
-  check_log <- run_check_npx(df = df,
-                             check_log = check_log)
+  .clean_result <- ensure_clean_npx(df = df, check_log = check_log)
+  df <- .clean_result$df
+  check_log <- .clean_result$check_log
 
   df <- plot_heatmap_clean_df(df = df,
                               check_log = check_log,

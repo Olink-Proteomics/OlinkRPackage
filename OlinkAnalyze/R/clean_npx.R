@@ -126,7 +126,23 @@ clean_npx <- function(df,
   # Validate input dataset
   check_is_dataset(x = df, error = TRUE)
   check_is_scalar_boolean(x = verbose, error = TRUE)
-  check_log <- run_check_npx(df = df, check_log = check_log)
+
+  # obtain check_log: from argument, from df attribute, or by running check_npx
+  if (is.null(check_log)) {
+    check_log <- olink_check_log(x = df)
+  }
+  if (is.null(check_log)) {
+    cli::cli_inform(
+      c(
+        "No {.arg check_log} found. Running {.fn check_npx}.",
+        "i" = "For best performance, use {.fn read_npx} which attaches the
+        check log automatically."
+      )
+    )
+    check_log <- check_npx(df = df)
+  } else {
+    validate_check_log(check_log = check_log)
+  }
 
   if (verbose) cli::cli_h2("Starting {.fn clean_npx} pipeline.")
 
@@ -242,20 +258,23 @@ clean_npx <- function(df,
     cli::cli_h2("Completed {.fn clean_npx}. Returning clean dataset.")
   }
 
-  # Attach check_log to the output for downstream use
-  if (inherits(x = df, what = "tbl_df")) {
-    df <- new_olink_npx(data = df, check_log = check_log)
-  } else if (inherits(x = df,
-                       what = c("ArrowObject", "arrow_dplyr_query"))) {
-    df <- attach_check_log_arrow(data = df, check_log = check_log)
+  # Convert to requested output format
+  df <- convert_read_npx_output(
+    df = df,
+    out_df = out_df
+  )
+
+  # Re-run check_npx on the clean dataset to update the check_log
+  updated_check_log <- check_npx(df = df)
+
+  # Attach the updated check_log to the output
+  if (check_is_tibble(x = df, error = FALSE)) {
+    df <- new_olink_npx(data = df, check_log = updated_check_log)
+  } else if (check_is_arrow_object(x = df, error = FALSE)) {
+    df <- attach_check_log_arrow(data = df, check_log = updated_check_log)
   }
 
-  return(
-    convert_read_npx_output(
-      df = df,
-      out_df = out_df
-    )
-  )
+  return(df)
 }
 
 # Help Functions ----------------------------------------------------------

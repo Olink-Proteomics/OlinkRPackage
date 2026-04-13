@@ -115,7 +115,9 @@ olink_qc_plot <- function(df,
   check_is_dataset(x = df, error = TRUE)
 
   # Check if check_log is correct
-  check_log <- run_check_npx(df = df, check_log = check_log)
+  .clean_result <- ensure_clean_npx(df = df, check_log = check_log)
+  df <- .clean_result$df
+  check_log <- .clean_result$check_log
 
   # Remove invalid OlinkID, assays with all NA values, and convert non-unique
   # Uniprot IDs. Note that we do not remove samples with duplicate SampleID,

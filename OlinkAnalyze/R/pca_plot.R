@@ -174,7 +174,9 @@ olink_pca_plot <- function(df,
   }
 
   # Check if check_log is correct
-  check_log <- run_check_npx(df = df, check_log = check_log)
+  .clean_result <- ensure_clean_npx(df = df, check_log = check_log)
+  df <- .clean_result$df
+  check_log <- .clean_result$check_log
 
   # other checks
   check_is_dataset(x = df, error = TRUE)
@@ -438,7 +440,9 @@ olink_pca_plot.internal <- function(df, # nolint: object_name_linter
                                     verbose = verbose,
                                     ...) {
   # Check if check_log is correct
-  check_log <- run_check_npx(df = df, check_log = check_log)
+  .clean_result <- ensure_clean_npx(df = df, check_log = check_log)
+  df <- .clean_result$df
+  check_log <- .clean_result$check_log
 
   # Ensure one unique color value per SampleID (required by
   # npxProcessing_forDimRed)

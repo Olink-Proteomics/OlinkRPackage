@@ -109,9 +109,13 @@ olink_norm_input_check <- function(df1,
   # Validate the normalization input ----
 
   # Check data format
-  df1_check_log <- run_check_npx(df = df1, check_log = df1_check_log)
+  .clean_result1 <- ensure_clean_npx(df = df1, check_log = df1_check_log)
+  df1 <- .clean_result1$df
+  df1_check_log <- .clean_result1$check_log
   if (!is.null(df2)) {
-    df2_check_log <- run_check_npx(df = df2, check_log = df2_check_log)
+    .clean_result2 <- ensure_clean_npx(df = df2, check_log = df2_check_log)
+    df2 <- .clean_result2$df
+    df2_check_log <- .clean_result2$check_log
   }
 
   norm_valid <- olink_norm_input_validate(

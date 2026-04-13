@@ -82,7 +82,9 @@ olink_lod <- function(data,
                       lod_file_path = NULL,
                       lod_method = "NCLOD") {
   # check if check_log is correct
-  check_log <- run_check_npx(df = data, check_log = check_log)
+  .clean_result <- ensure_clean_npx(df = data, check_log = check_log)
+  data <- .clean_result$df
+  check_log <- .clean_result$check_log
   # make sure data is a tibble
   data <- convert_read_npx_output(df = data, out_df = "tibble")
 

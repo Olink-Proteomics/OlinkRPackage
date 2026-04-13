@@ -104,11 +104,23 @@ read_npx <- function(filename,
 
   }
 
-  # convert and return ----
+  # convert ----
 
   # if needed convert the object to the requested output
   df_olink <- convert_read_npx_output(df = df_olink,
                                       out_df = out_df)
+
+  # check and attach check_log ----
+
+  # run check_npx and attach results as an attribute
+  check_log <- check_npx(df = df_olink)
+
+  if (check_is_tibble(x = df_olink, error = FALSE)) {
+    df_olink <- new_olink_npx(data = df_olink, check_log = check_log)
+  } else if (check_is_arrow_object(x = df_olink, error = FALSE)) {
+    df_olink <- attach_check_log_arrow(data = df_olink,
+                                       check_log = check_log)
+  }
 
   return(df_olink)
 }
