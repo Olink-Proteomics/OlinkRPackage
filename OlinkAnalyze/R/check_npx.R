@@ -183,16 +183,15 @@ check_npx <- function(df,
 #' Check and run [`check_npx()`] if not provided.
 #'
 #' @details
-#' \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
-#'
-#' This function has been deprecated. Use [`run_clean_npx()`] for downstream
+#' This function has been deprecated. Use [`run_clean_npx`] for downstream
 #' functions, or access the check log from an `olink_npx` object via
-#' [`olink_check_log()`]. The check log is now automatically attached by
-#' [`read_npx()`] and updated by [`clean_npx()`].
+#' [`olink_check_log`]. The check log is now automatically attached by
+#' [`read_npx`] and updated by [`clean_npx`].
 #'
 #' @inherit .downstream_fun_args params author
 #' @inherit check_npx return
 #'
+#' @family lifecycle
 #' @keywords internal
 #'
 run_check_npx <- function(df,
