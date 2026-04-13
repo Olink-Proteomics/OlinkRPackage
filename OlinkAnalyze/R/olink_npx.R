@@ -158,14 +158,14 @@ olink_check_log <- function(x) {
 
   } else if (inherits(x = x, what = c("ArrowObject", "arrow_dplyr_query"))) {
 
-    check_log_json <- x$metadata[["olink_check_log"]]
+    check_log_encoded <- x$metadata[["olink_check_log"]]
 
-    if (is.null(check_log_json)) {
+    if (is.null(check_log_encoded)) {
       return(NULL)
     }
 
-    # deserialize the JSON string back to a list
-    check_log <- deserialize_check_log(check_log_json)
+    # deserialize the base64-encoded string back to a list
+    check_log <- deserialize_check_log(check_log_encoded)
 
     return(check_log)
 
@@ -180,8 +180,8 @@ olink_check_log <- function(x) {
 #' Attach check log to an ArrowObject via schema metadata
 #'
 #' @description
-#' Serializes the check log to JSON and stores it in the Arrow table's
-#' schema-level metadata.
+#' Serializes the check log to a base64-encoded string and stores it in the
+#' Arrow table's schema-level metadata.
 #'
 #' @param data An ArrowObject (e.g. `arrow::Table`).
 #' @param check_log A named list returned by [`check_npx()`].
@@ -204,12 +204,12 @@ attach_check_log_arrow <- function(data,
 
   validate_check_log(check_log = check_log)
 
-  # serialize check_log to JSON
-  check_log_json <- serialize_check_log(check_log)
+  # serialize check_log to base64
+  check_log_encoded <- serialize_check_log(check_log)
 
   # attach to the Arrow table metadata
   existing_metadata <- data$metadata
-  existing_metadata[["olink_check_log"]] <- check_log_json
+  existing_metadata[["olink_check_log"]] <- check_log_encoded
   data$metadata <- existing_metadata
 
   return(data)
