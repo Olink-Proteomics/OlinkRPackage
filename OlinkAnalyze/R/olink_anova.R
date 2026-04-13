@@ -276,7 +276,6 @@ olink_anova <- function(df,
       # Check data format
       df <- run_clean_npx(df = df)
       check_log <- olink_check_log(x = df)
-      
 
       # Convert character vars to factor
       converted.vars <- NULL # nolint: object_name_linter
@@ -384,8 +383,6 @@ olink_anova <- function(df,
       #Get factors
       fact.vars <- sapply(variable_testers, function(x) is.factor(df[[x]])) # nolint: object_name_linter
       fact.vars <- names(fact.vars)[fact.vars] # nolint: object_name_linter
-
-
       #Print verbose message
       if (verbose) {
         if (!is.null(add.main.effects) & length(add.main.effects) > 0L) {
@@ -861,7 +858,6 @@ olink_anova_posthoc <- function(df,
       # Check data format
       df <- run_clean_npx(df = df)
       check_log <- olink_check_log(x = df)
-      
 
       # Convert character vars to factor
       converted.vars <- NULL # nolint: object_name_linter
