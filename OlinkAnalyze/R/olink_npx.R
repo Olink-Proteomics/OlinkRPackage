@@ -297,18 +297,18 @@ base64_encode <- function(raw_bytes) {
 
   result <- character(0L)
   for (i in seq(from = 1L, to = length(int_vals), by = 3L)) {
-    b1 <- int_vals[i]
-    b2 <- int_vals[i + 1L]
-    b3 <- int_vals[i + 2L]
+    byte1 <- int_vals[i]
+    byte2 <- int_vals[i + 1L]
+    byte3 <- int_vals[i + 2L]
 
     result <- c(
       result,
-      base64_chars[bitwShiftR(b1, 2L) + 1L],
-      base64_chars[bitwOr(bitwShiftL(bitwAnd(b1, 3L), 4L),
-                          bitwShiftR(b2, 4L)) + 1L],
-      base64_chars[bitwOr(bitwShiftL(bitwAnd(b2, 15L), 2L),
-                          bitwShiftR(b3, 6L)) + 1L],
-      base64_chars[bitwAnd(b3, 63L) + 1L]
+      base64_chars[bitwShiftR(byte1, 2L) + 1L],
+      base64_chars[bitwOr(bitwShiftL(bitwAnd(byte1, 3L), 4L),
+                          bitwShiftR(byte2, 4L)) + 1L],
+      base64_chars[bitwOr(bitwShiftL(bitwAnd(byte2, 15L), 2L),
+                          bitwShiftR(byte3, 6L)) + 1L],
+      base64_chars[bitwAnd(byte3, 63L) + 1L]
     )
   }
 
@@ -348,16 +348,17 @@ base64_decode <- function(encoded_str) {
 
   result <- raw(0L)
   for (i in seq(from = 1L, to = length(vals), by = 4L)) {
-    v1 <- vals[i]
-    v2 <- vals[i + 1L]
-    v3 <- vals[i + 2L]
-    v4 <- vals[i + 3L]
+    val1 <- vals[i]
+    val2 <- vals[i + 1L]
+    val3 <- vals[i + 2L]
+    val4 <- vals[i + 3L]
 
     result <- c(
       result,
-      as.raw(bitwOr(bitwShiftL(v1, 2L), bitwShiftR(v2, 4L))),
-      as.raw(bitwOr(bitwShiftL(bitwAnd(v2, 15L), 4L), bitwShiftR(v3, 2L))),
-      as.raw(bitwOr(bitwShiftL(bitwAnd(v3, 3L), 6L), v4))
+      as.raw(bitwOr(bitwShiftL(val1, 2L), bitwShiftR(val2, 4L))),
+      as.raw(bitwOr(bitwShiftL(bitwAnd(val2, 15L), 4L),
+                     bitwShiftR(val3, 2L))),
+      as.raw(bitwOr(bitwShiftL(bitwAnd(val3, 3L), 6L), val4))
     )
   }
 
