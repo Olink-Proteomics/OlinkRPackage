@@ -9,7 +9,11 @@ read_npx_format_colnames(df, file)
 }
 \arguments{
 \item{df}{A "tibble" or "ArrowObject"
-from \code{\link{read_npx}}.}
+from \code{\link{read_npx}}. The output of \code{\link[=read_npx]{read_npx()}} is an \code{olink_npx}
+object that carries the check log as an attribute. If the check log
+indicates that the data still needs cleaning (e.g. invalid identifiers,
+duplicate samples), the downstream function will automatically clean the
+data before proceeding.}
 
 \item{file}{Path to Olink software output file in wide or long format.
 Expecting extensions "xls" or "xlsx" for excel files, "csv" or "txt" for delim files, "parquet" for parquet files, and "zip" for compressed files.}

@@ -8,10 +8,16 @@ run_check_npx(df, check_log = NULL)
 }
 \arguments{
 \item{df}{A "tibble" or "ArrowObject"
-from \code{\link{read_npx}}.}
+from \code{\link{read_npx}}. The output of \code{\link[=read_npx]{read_npx()}} is an \code{olink_npx}
+object that carries the check log as an attribute. If the check log
+indicates that the data still needs cleaning (e.g. invalid identifiers,
+duplicate samples), the downstream function will automatically clean the
+data before proceeding.}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{\strong{Deprecated.} A named list returned by \code{\link[=check_npx]{check_npx()}}.
+This argument is retained for backward compatibility. In new code, there
+is no need to pass \code{check_log} explicitly — \code{\link[=read_npx]{read_npx()}} attaches it
+automatically and \code{\link[=clean_npx]{clean_npx()}} updates it after cleaning.}
 }
 \value{
 A list containing the following elements:
@@ -40,13 +46,13 @@ combinations of \var{DataAnalysisRefID} and \var{PanelDataArchiveVersion}.
 Check and run \code{\link[=check_npx]{check_npx()}} if not provided.
 }
 \details{
-This function acts as a wrapper for \code{\link[=check_npx]{check_npx()}}. It will check if the
-input \code{check_log} provided by the user is valid. If not, it will throw
-relevant errors or warnings. Alternatively, if \code{check_log} was not provided
-by the user, it will run \code{\link[=check_npx]{check_npx()}} to provide \code{check_log} to enable
-downstream functions to run.#'
+This function has been deprecated. Use \code{\link{run_clean_npx}} for downstream
+functions, or access the check log from an \code{olink_npx} object via
+\code{\link{olink_check_log}}. The check log is now automatically attached by
+\code{\link{read_npx}} and updated by \code{\link{clean_npx}}.
 }
 \author{
 Klev Diamanti
 }
+\concept{lifecycle}
 \keyword{internal}

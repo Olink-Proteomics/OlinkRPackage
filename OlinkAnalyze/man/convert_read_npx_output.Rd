@@ -9,7 +9,11 @@ convert_read_npx_output(df, out_df)
 }
 \arguments{
 \item{df}{A "tibble" or "ArrowObject"
-from \code{\link{read_npx}}.}
+from \code{\link{read_npx}}. The output of \code{\link[=read_npx]{read_npx()}} is an \code{olink_npx}
+object that carries the check log as an attribute. If the check log
+indicates that the data still needs cleaning (e.g. invalid identifiers,
+duplicate samples), the downstream function will automatically clean the
+data before proceeding.}
 
 \item{out_df}{The class of the output dataset. One of
 "tibble" or "arrow". Defaults to

@@ -13,7 +13,8 @@ read_npx(
   data_type = NULL,
   .ignore_files = c("README.txt"),
   quiet = TRUE,
-  legacy = FALSE
+  legacy = FALSE,
+  preferred_names = NULL
 )
 
 read_NPX(
@@ -24,7 +25,8 @@ read_NPX(
   data_type = NULL,
   .ignore_files = c("README.txt"),
   quiet = TRUE,
-  legacy = FALSE
+  legacy = FALSE,
+  preferred_names = NULL
 )
 }
 \arguments{
@@ -58,6 +60,10 @@ message, and \code{FALSE} otherwise.}
 \item{legacy}{Boolean to run the legacy version of the read_npx function.
 \strong{Important: should be used only to wide format files from Target 96 or
 Target 48 with NPX Software version earlier than 1.8!} (default \code{FALSE}).}
+
+\item{preferred_names}{A named character vector where names are internal
+column names and values are column names to be selected from the input data
+frame. Read the \emph{description} for further information.}
 }
 \value{
 Dataset,
@@ -77,6 +83,21 @@ file <- system.file("extdata",
                     "npx_data_ext.parquet",
                     package = "OlinkAnalyze")
 read_npx(filename = file)
+}
+
+\dontrun{
+# read NPX data using a different quantification column
+read_npx(
+  filename = file,
+  preferred_names = c("quant" = "PCNormalizedNPX")
+)
+
+# read NPX data specifying preferred column for LOD
+read_npx(
+  filename = file,
+  preferred_names = c("quant" = "PCNormalizedNPX",
+                      "lod" = "PlateLOD")
+)
 }
 
 }

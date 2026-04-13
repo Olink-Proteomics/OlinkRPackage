@@ -7,8 +7,10 @@
 check_log_colname(check_log, col_key)
 }
 \arguments{
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{\strong{Deprecated.} A named list returned by \code{\link[=check_npx]{check_npx()}}.
+This argument is retained for backward compatibility. In new code, there
+is no need to pass \code{check_log} explicitly — \code{\link[=read_npx]{read_npx()}} attaches it
+automatically and \code{\link[=clean_npx]{clean_npx()}} updates it after cleaning.}
 
 \item{col_key}{Column key for which to retrieve alternative column names. One
 of "sample_id", "sample_type", "assay_type", "olink_id", "uniprot", "assay", "panel", "block", "plate_id", "panel_version", "lod", "quant", "ext_npx", "count", "qc_warning", "assay_warn", "normalization", and "qc_version".}

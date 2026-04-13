@@ -456,7 +456,6 @@ tbl_sum.olink_npx <- function(x, ...) {
 #'   Klev Diamanti
 #'
 #' @keywords internal
-#' @noRd
 #'
 run_clean_npx <- function(df, ...) {
 
