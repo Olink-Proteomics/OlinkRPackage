@@ -9,8 +9,10 @@ olink_lod(data, check_log = NULL, lod_file_path = NULL, lod_method = "NCLOD")
 \arguments{
 \item{data}{npx data file}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{\strong{Deprecated.} A named list returned by \code{\link[=check_npx]{check_npx()}}.
+This argument is retained for backward compatibility. In new code, there
+is no need to pass \code{check_log} explicitly — \code{\link[=read_npx]{read_npx()}} attaches it
+automatically and \code{\link[=clean_npx]{clean_npx()}} updates it after cleaning.}
 
 \item{lod_file_path}{location of lod file from Olink. Only needed if
 lod_method = "FixedLOD" or "Both". Default \code{NULL}.}
