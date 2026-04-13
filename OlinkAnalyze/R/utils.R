@@ -288,9 +288,14 @@ check_osi <- function(df,
 #'   Klev Diamanti
 #'
 #' @param df A `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")`
-#' from \code{\link{read_npx}}.
+#' from \code{\link{read_npx}}. If `df` is an `olink_npx` object (from
+#' [`clean_npx()`]) or an ArrowObject with embedded metadata, the check log
+#' will be extracted automatically and `check_log` does not need to be
+#' provided.
 #' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' the function will first attempt to extract the check log from `df` (if it
+#' is an `olink_npx` object or ArrowObject with metadata). If no check log is
+#' found, [`check_npx()`] will be run internally.
 #'
 #' @keywords internal
 #'

@@ -242,6 +242,14 @@ clean_npx <- function(df,
     cli::cli_h2("Completed {.fn clean_npx}. Returning clean dataset.")
   }
 
+  # Attach check_log to the output for downstream use
+  if (inherits(x = df, what = "tbl_df")) {
+    df <- new_olink_npx(data = df, check_log = check_log)
+  } else if (inherits(x = df,
+                       what = c("ArrowObject", "arrow_dplyr_query"))) {
+    df <- attach_check_log_arrow(data = df, check_log = check_log)
+  }
+
   return(
     convert_read_npx_output(
       df = df,

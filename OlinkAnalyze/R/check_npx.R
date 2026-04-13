@@ -196,6 +196,11 @@ check_npx <- function(df,
 #'
 run_check_npx <- function(df,
                           check_log = NULL) {
+  # attempt to extract check_log from df if not provided ----
+  if (is.null(check_log)) {
+    check_log <- olink_check_log(x = df)
+  }
+
   # generate check_log if not provided ----
   if (is.null(check_log)) {
     cli::cli_inform(

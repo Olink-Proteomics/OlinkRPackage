@@ -51,15 +51,33 @@ convert_read_npx_output <- function(df,
   # check that out_df is ok
   check_out_df_arg(out_df = out_df)
 
+  # extract check_log before conversion (may be on either type)
+  check_log <- olink_check_log(x = df)
+
   if (check_is_dataset(x = df, error = FALSE)) {
 
     if (out_df == "tibble") {
 
-      return(dplyr::as_tibble(df))
+      result <- dplyr::as_tibble(df)
+
+      # re-attach check_log as olink_npx if available
+      if (!is.null(check_log)) {
+        result <- new_olink_npx(data = result, check_log = check_log)
+      }
+
+      return(result)
 
     } else if (out_df == "arrow") {
 
-      return(arrow::as_arrow_table(df))
+      result <- arrow::as_arrow_table(df)
+
+      # re-attach check_log in Arrow metadata if available
+      if (!is.null(check_log)) {
+        result <- attach_check_log_arrow(data = result,
+                                         check_log = check_log)
+      }
+
+      return(result)
 
     }
 
