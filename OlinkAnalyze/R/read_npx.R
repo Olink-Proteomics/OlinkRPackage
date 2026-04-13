@@ -17,6 +17,7 @@
 #' Marianne Sandin
 #'
 #' @inherit .read_npx_args params return
+#' @inheritParams check_npx
 #'
 #' @keywords NPX parquet csv zip xlsx xls
 #'
@@ -30,6 +31,21 @@
 #' read_npx(filename = file)
 #' }
 #'
+#' \dontrun{
+#' # read NPX data using a different quantification column
+#' read_npx(
+#'   filename = file,
+#'   preferred_names = c("quant" = "PCNormalizedNPX")
+#' )
+#'
+#' # read NPX data specifying preferred column for LOD
+#' read_npx(
+#'   filename = file,
+#'   preferred_names = c("quant" = "PCNormalizedNPX",
+#'                       "lod" = "PlateLOD")
+#' )
+#' }
+#'
 read_npx <- function(filename,
                      out_df = "tibble",
                      long_format = NULL,
@@ -37,7 +53,8 @@ read_npx <- function(filename,
                      data_type = NULL,
                      .ignore_files = c("README.txt"),
                      quiet = TRUE,
-                     legacy = FALSE) {
+                     legacy = FALSE,
+                     preferred_names = NULL) {
 
   # check input ----
 
@@ -113,7 +130,7 @@ read_npx <- function(filename,
   # check and attach check_log ----
 
   # run check_npx and attach results as an attribute
-  check_log <- check_npx(df = df_olink)
+  check_log <- check_npx(df = df_olink, preferred_names = preferred_names)
 
   if (check_is_tibble(x = df_olink, error = FALSE)) {
     df_olink <- new_olink_npx(data = df_olink, check_log = check_log)

@@ -57,6 +57,7 @@
 #'
 #' @inherit .downstream_fun_args params
 #' @inherit .read_npx_args params return
+#' @inheritParams check_npx
 #' @param remove_assay_na Logical. If `FALSE`, skips filtering assays with all
 #' quantified values `NA`. Defaults to `TRUE`.
 #' @param remove_invalid_oid Logical. If `FALSE`, skips filtering assays with
@@ -106,10 +107,32 @@
 #'   check_log = check_log,
 #'   verbose = TRUE
 #' )
+#'
+#' # run clean_npx using a different quantification column
+#' npx_file <- system.file("extdata",
+#'                         "npx_data_ext.parquet",
+#'                         package = "OlinkAnalyze")
+#' npx_df <- read_npx(filename = npx_file)
+#' clean_npx(
+#'   df = npx_df,
+#'   preferred_names = c("quant" = "PCNormalizedNPX")
+#' )
+#'
+#' # run clean_npx specifying preferred column for LOD
+#' npx_df |>
+#'   dplyr::mutate(
+#'     LOD = 1L,
+#'     PlateLOD = 2L
+#'   ) |>
+#'   clean_npx(
+#'     preferred_names = c("quant" = "PCNormalizedNPX",
+#'                         "lod" = "PlateLOD")
+#'   )
 #' }
 #'
 clean_npx <- function(df,
                       check_log = NULL,
+                      preferred_names = NULL,
                       remove_assay_na = TRUE,
                       remove_invalid_oid = TRUE,
                       remove_dup_sample_id = TRUE,
@@ -139,7 +162,7 @@ clean_npx <- function(df,
         check log automatically."
       )
     )
-    check_log <- check_npx(df = df)
+    check_log <- check_npx(df = df, preferred_names = preferred_names)
   } else {
     validate_check_log(check_log = check_log)
   }
@@ -265,7 +288,7 @@ clean_npx <- function(df,
   )
 
   # Re-run check_npx on the clean dataset to update the check_log
-  updated_check_log <- check_npx(df = df)
+  updated_check_log <- check_npx(df = df, preferred_names = preferred_names)
 
   # Attach the updated check_log to the output
   if (check_is_tibble(x = df, error = FALSE)) {

@@ -81,6 +81,7 @@ Imports:
     forcats,
     ggplot2,
     grDevices,
+    pillar,
     rlang,
     stringr,
     tibble,

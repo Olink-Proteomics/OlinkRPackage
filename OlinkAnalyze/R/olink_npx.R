@@ -385,7 +385,7 @@ base64_decode <- function(encoded_str) {
 #' @return An `olink_npx` object with the check log from `template`.
 #'
 #' @keywords internal
-#' @export
+#' @exportS3Method dplyr::dplyr_reconstruct
 #'
 dplyr_reconstruct.olink_npx <- function(data, template) {
 
@@ -409,7 +409,7 @@ dplyr_reconstruct.olink_npx <- function(data, template) {
 #' @return A named character vector of summary items.
 #'
 #' @keywords internal
-#' @export
+#' @exportS3Method pillar::tbl_sum
 #'
 tbl_sum.olink_npx <- function(x, ...) {
 
