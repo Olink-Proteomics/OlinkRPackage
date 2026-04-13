@@ -7,6 +7,33 @@
 #' \strong{Note:} Do not modify the Olink software output file prior to
 #' importing it with \code{\link{read_npx}} as it might fail.
 #'
+#' @details
+#' OlinkAnalyze uses pre-defined names of columns of data frames to perform
+#' downstream analyses. At the same time, different Olink platforms export data
+#' with different column names (e.g. different protein quantification metric).
+#' This function aims to instruct each function of OlinkAnalyze on the column it
+#' should be using for the downstream analysis. This should be seamless for data
+#' exported from Olink Software and imported to R using the read_npx function.
+#'
+#' However, in certain cases the columns of interest might be named differently.
+#' This function allows assigning custom-named columns of a data frame to
+#' internally expected variables that will in turn instruct Olink Analyze
+#' functions to use them for downstream analysis. For example, if one wished to
+#' use the column \var{PCNormalizedNPX} for their analysis instead of the
+#' column \var{NPX}, then they can assign this new name to the internal
+#' variable \var{quant} to inform the package that in the downstream analysis
+#' \var{PCNormalizedNPX} should be used. See example 3.
+#'
+#' Similarly, in case of multiple matches (e.g. the data frame contains both
+#' columns \var{LOD} and \var{PlateLOD}) the ties will need to be resolved by
+#' the user using the argument \var{preferred_names} from this function.  See
+#' example 4.
+#'
+#' The argument \var{preferred_names} is a named character vector with internal
+#' column names as names and column names of the current data set as values.
+#' Names of the input vector can be one or more of the following:
+#' `r ansi_collapse_quot(x = column_name_dict$col_key)`
+#'
 #' @author
 #' Klev Diamanti
 #' Kathleen Nevola
