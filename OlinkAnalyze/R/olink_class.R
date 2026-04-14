@@ -277,6 +277,41 @@ strip_check_log_arrow <- function(data) {
 
 }
 
+#' Strip check log from an Olink data object
+#'
+#' @description
+#' Internal convenience function that removes the attached check log from either
+#' an `olink_class` tibble or an ArrowObject. For tibbles this delegates to
+#' [`as_tibble.olink_class()`][tibble::as_tibble], and for ArrowObjects it
+#' delegates to [`strip_check_log_arrow()`].
+#'
+#' @param data An `olink_class` tibble or an ArrowObject with
+#' `olink_check_log` metadata.
+#'
+#' @return The data without the check log: a plain tibble (`tbl_df`) when given
+#' a tibble, or the ArrowObject with the `olink_check_log` metadata key
+#' removed when given an ArrowObject. If the input carries no check log, it
+#' is returned unchanged.
+#'
+#' @keywords internal
+#'
+strip_check_log <- function(data) {
+
+  if (inherits(x = data, what = "olink_class")) {
+
+    return(as_tibble.olink_class(x = data))
+
+  } else if (inherits(x = data,
+                       what = c("ArrowObject", "arrow_dplyr_query"))) {
+
+    return(strip_check_log_arrow(data = data))
+
+  }
+
+  return(data)
+
+}
+
 # Arrow metadata helpers ----
 
 #' Attach check log to an ArrowObject via schema metadata

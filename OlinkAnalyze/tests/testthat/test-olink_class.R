@@ -246,6 +246,57 @@ test_that(
   }
 )
 
+# Test strip_check_log ----
+
+test_that(
+  "strip_check_log - works - strips check_log from olink_class tibble",
+  {
+    obj <- new_olink_class(data = df_tbl, check_log = check_log_result)
+
+    result <- strip_check_log(data = obj)
+
+    expect_false(object = inherits(x = result, what = "olink_class"))
+    expect_s3_class(object = result, class = "tbl_df")
+    expect_null(object = olink_check_log(x = result))
+  }
+)
+
+test_that(
+  "strip_check_log - works - strips check_log from ArrowObject",
+  {
+    arrow_tbl <- arrow::as_arrow_table(x = df_tbl)
+    arrow_with_log <- attach_check_log_arrow(data = arrow_tbl,
+                                             check_log = check_log_result)
+
+    result <- strip_check_log(data = arrow_with_log)
+
+    expect_true(object = inherits(x = result, what = "ArrowObject"))
+    expect_null(object = olink_check_log(x = result))
+  }
+)
+
+test_that(
+  "strip_check_log - works - returns plain tibble unchanged",
+  {
+    result <- strip_check_log(data = df_tbl)
+
+    expect_s3_class(object = result, class = "tbl_df")
+    expect_identical(object = result, expected = df_tbl)
+  }
+)
+
+test_that(
+  "strip_check_log - works - returns ArrowObject without metadata unchanged",
+  {
+    arrow_tbl <- arrow::as_arrow_table(x = df_tbl)
+
+    result <- strip_check_log(data = arrow_tbl)
+
+    expect_true(object = inherits(x = result, what = "ArrowObject"))
+    expect_null(object = olink_check_log(x = result))
+  }
+)
+
 # Test base64 round-trip ----
 
 test_that(
