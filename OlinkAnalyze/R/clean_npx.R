@@ -260,16 +260,17 @@ clean_npx <- function(df,
 #'
 #' Unlike [`clean_npx()`], this function is intended for internal use in cases
 #' where a quiet cleaning step is needed. If rows are removed, a single
-#' [`cli::cli_alert()`] message is shown. If no rows are removed, no output is
+#' [`cli::cli_inform()`] message is shown. If no rows are removed, no output is
 #' printed.
 #'
 #' @details
 #' This function forwards all arguments to [`clean_npx()`] and forces
 #' `verbose = FALSE`.
 #'
-#' If any rows are removed during cleaning, the function prints a single alert
-#' indicating how many entries were removed and instructing the user to run
-#' [`clean_npx()`] directly to inspect which rows were removed.
+#' If any rows are removed during cleaning, the function prints a single
+#' informational message indicating how many entries were removed and
+#' instructing the user to run [`clean_npx()`] directly to inspect which rows
+#' were removed.
 #'
 #' @inheritParams clean_npx
 #' @inherit clean_npx params return
@@ -318,7 +319,8 @@ run_clean_npx <- function(df, ...) {
     cli::cli_inform(
       c("{.val {n_removed}} entr{?y/ies} removed by {.fn clean_npx} from the
       input dataset {.arg df}. Run {.fn clean_npx} on your dataset with
-      {.arg verbose = TRUE} to inspect which rows were removed.")
+      {.arg verbose = TRUE} to inspect which rows were removed."),
+      wrap = FALSE
     )
   }
 

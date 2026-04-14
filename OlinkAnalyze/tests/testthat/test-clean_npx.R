@@ -2161,7 +2161,7 @@ test_that(
 )
 
 test_that(
-  "run_clean_npx - error - unexoected arguments",
+  "run_clean_npx - error - unexpected arguments",
   {
     expect_error(
       object = run_clean_npx(df = df,
