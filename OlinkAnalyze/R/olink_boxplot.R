@@ -217,7 +217,7 @@ olink_boxplot <- function(df,
           rp = mapply(function(x) my_round(x), .data[["Adjusted_pval"]]),
           p_value = paste0(.data[["rp"]], " Contrast: ", .data[["contrast"]])
         ) |>
-        dplyr::group_by(.data[["Name_OID"]], .data[["contrast"]]) |>
+        dplyr::group_by(.data[["Name_OID"]]) |>
         dplyr::arrange(pmin(.data[["C1"]], .data[["C2"]])) |>
         dplyr::mutate(
           rowNum = dplyr::row_number(),
