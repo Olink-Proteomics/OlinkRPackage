@@ -324,24 +324,31 @@ attach_check_log_arrow <- function(data,
 
 }
 
-#' Run check_npx and attach the result to an Olink data object
+#' Convert output format, run check_npx, and attach the result to an Olink
+#' data object
 #'
 #' @description
-#' Convenience helper that calls [`check_npx()`] on `data` and then attaches
+#' Convenience helper that first converts `data` to the requested output format
+#' (via [`convert_read_npx_output()`]), then calls [`check_npx()`] and attaches
 #' the resulting check log to the object.  For tibbles the result is an
 #' [`olink_class`] object (via [`new_olink_class()`]); for ArrowObjects the
 #' check log is stored as schema metadata (via [`attach_check_log_arrow()`]).
 #' Any other type is returned unchanged.
 #'
 #' @param data A tibble or ArrowObject containing Olink NPX data.
+#' @param out_df A string specifying the desired output format. Forwarded to
+#'   [`convert_read_npx_output()`]. Defaults to `"tibble"`.
 #' @param preferred_names An optional named character vector forwarded to
 #'   [`check_npx()`].
 #'
-#' @return `data` with the check log attached.
+#' @return `data` converted to `out_df` format with the check log attached.
 #'
 #' @keywords internal
 #'
-attach_check_log <- function(data, preferred_names = NULL) {
+attach_check_log <- function(data, out_df = "tibble", preferred_names = NULL) {
+
+  # if needed convert the object to the requested output
+  data <- convert_read_npx_output(df = data, out_df = out_df)
 
   check_log <- check_npx(df = data, preferred_names = preferred_names)
 
@@ -548,6 +555,7 @@ dplyr_reconstruct.olink_class <- function(data, template) {
 #' @return A named character vector of summary items.
 #'
 #' @keywords internal
+#' @importFrom pillar tbl_sum
 #' @exportS3Method pillar::tbl_sum
 #'
 tbl_sum.olink_class <- function(x, ...) {

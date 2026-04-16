@@ -281,14 +281,9 @@ clean_npx <- function(df,
     cli::cli_h2("Completed {.fn clean_npx}. Returning clean dataset.")
   }
 
-  # Convert to requested output format
-  df <- convert_read_npx_output(
-    df = df,
-    out_df = out_df
-  )
-
-  # Re-run check_npx on the clean dataset to update the check_log
-  df <- attach_check_log(data = df, preferred_names = preferred_names)
+  # Convert to requested output format, re-run check_npx, and attach check_log
+  df <- attach_check_log(data = df, out_df = out_df,
+                         preferred_names = preferred_names)
 
   return(df)
 }

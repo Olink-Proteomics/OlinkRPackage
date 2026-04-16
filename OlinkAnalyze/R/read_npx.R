@@ -148,16 +148,12 @@ read_npx <- function(filename,
 
   }
 
-  # convert ----
+  # convert, check and attach check_log ----
 
-  # if needed convert the object to the requested output
-  df_olink <- convert_read_npx_output(df = df_olink,
-                                      out_df = out_df)
-
-  # check and attach check_log ----
-
-  # run check_npx and attach results as an attribute
+  # if needed convert the object to the requested output, run check_npx and
+  # attach results as an attribute
   df_olink <- attach_check_log(data = df_olink,
+                               out_df = out_df,
                                preferred_names = preferred_names)
 
   return(df_olink)
