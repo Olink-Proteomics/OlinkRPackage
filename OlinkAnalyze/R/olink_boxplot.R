@@ -220,9 +220,9 @@ olink_boxplot <- function(df,
         dplyr::group_by(.data[["Name_OID"]], .data[["contrast"]]) |>
         dplyr::arrange(pmin(.data[["C1"]], .data[["C2"]])) |>
         dplyr::mutate(
-          rowNum = rev(seq_len(dplyr::n())),
+          rowNum = dplyr::row_number(),
           y_anchor = .data[["maxNPX"]] + .data[["rowNum"]] *
-            .data[["rangeNPX"]] * 0.5 / max(.data[["rowNum"]])
+            .data[["rangeNPX"]] * 0.2 / max(.data[["rowNum"]])
         ) |>
         dplyr::ungroup() |>
         tidyr::pivot_longer(

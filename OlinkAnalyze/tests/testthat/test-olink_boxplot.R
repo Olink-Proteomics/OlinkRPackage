@@ -57,8 +57,10 @@ boxplot_time <- npx_data1 |>
   ) |>
   suppressMessages()
 
-ref_results$anova_time_posthoc[1, "Threshold"] <- "Significant"
-ref_results$anova_time_posthoc[1, "Adjusted_pval"] <- 0.0003
+ref_results$anova_time_posthoc[1:6, "Threshold"] <- "Significant"
+ref_results$anova_time_posthoc[1:4, "Adjusted_pval"] <- 0.0003
+ref_results$anova_time_posthoc[5, "Adjusted_pval"] <- 0.049
+ref_results$anova_time_posthoc[6, "Adjusted_pval"] <- 0.01
 
 boxplot_time_posthoc <- npx_data1 |>
   olink_boxplot(
