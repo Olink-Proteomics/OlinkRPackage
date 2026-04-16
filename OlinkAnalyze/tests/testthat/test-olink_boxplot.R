@@ -219,7 +219,7 @@ test_that("olink_boxplot works - vdiffr", {
   )
   vdiffr::expect_doppelganger(
     boxplot_time_posthoc_name,
-    boxplot_time_posthoc[[2L]]
+    boxplot_time_posthoc[[1L]]
   )
   # ---- Treatment + ttest ----
   boxplot_treatment_ttest_name <- "boxplot treatment and ttest"
