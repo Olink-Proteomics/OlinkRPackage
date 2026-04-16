@@ -319,7 +319,7 @@ run_clean_npx <- function(df, ...) {
     cli::cli_inform(
       c("{.val {n_removed}} entr{?y/ies} removed by {.fn clean_npx} from the
       input dataset {.arg df}. Run {.fn clean_npx} on your dataset with
-      {.arg verbose = TRUE} to inspect which rows were removed."),
+        {.arg verbose = TRUE} to inspect which rows were removed."),
       wrap = FALSE
     )
   }
