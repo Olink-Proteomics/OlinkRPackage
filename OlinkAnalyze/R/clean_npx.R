@@ -288,14 +288,7 @@ clean_npx <- function(df,
   )
 
   # Re-run check_npx on the clean dataset to update the check_log
-  updated_check_log <- check_npx(df = df, preferred_names = preferred_names)
-
-  # Attach the updated check_log to the output
-  if (check_is_tibble(x = df, error = FALSE)) {
-    df <- new_olink_class(data = df, check_log = updated_check_log)
-  } else if (check_is_arrow_object(x = df, error = FALSE)) {
-    df <- attach_check_log_arrow(data = df, check_log = updated_check_log)
-  }
+  df <- attach_check_log(data = df, preferred_names = preferred_names)
 
   return(df)
 }

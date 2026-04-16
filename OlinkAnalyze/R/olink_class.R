@@ -324,6 +324,37 @@ attach_check_log_arrow <- function(data,
 
 }
 
+#' Run check_npx and attach the result to an Olink data object
+#'
+#' @description
+#' Convenience helper that calls [`check_npx()`] on `data` and then attaches
+#' the resulting check log to the object.  For tibbles the result is an
+#' [`olink_class`] object (via [`new_olink_class()`]); for ArrowObjects the
+#' check log is stored as schema metadata (via [`attach_check_log_arrow()`]).
+#' Any other type is returned unchanged.
+#'
+#' @param data A tibble or ArrowObject containing Olink NPX data.
+#' @param preferred_names An optional named character vector forwarded to
+#'   [`check_npx()`].
+#'
+#' @return `data` with the check log attached.
+#'
+#' @keywords internal
+#'
+attach_check_log <- function(data, preferred_names = NULL) {
+
+  check_log <- check_npx(df = data, preferred_names = preferred_names)
+
+  if (check_is_tibble(x = data, error = FALSE)) {
+    data <- new_olink_class(data = data, check_log = check_log)
+  } else if (check_is_arrow_object(x = data, error = FALSE)) {
+    data <- attach_check_log_arrow(data = data, check_log = check_log)
+  }
+
+  return(data)
+
+}
+
 #' Serialize check log to a base64-encoded raw string
 #'
 #' @description
