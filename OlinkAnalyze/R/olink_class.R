@@ -179,8 +179,7 @@ olink_check_log <- function(x) {
 #'
 #' @description
 #' Strips the `olink_class` class and removes the attached check log, returning a
-#' plain tibble. This is useful for testing or when the user wants to remove the
-#' extra metadata carried by the `olink_class` class.
+#' plain tibble.
 #'
 #' @param x An `olink_class` object.
 #' @param ... Additional arguments (currently ignored).
@@ -188,28 +187,8 @@ olink_check_log <- function(x) {
 #' @return A tibble (`tbl_df`) without the `olink_class` class or the check log
 #' attribute.
 #'
+#' @keywords internal
 #' @exportS3Method tibble::as_tibble
-#'
-#' @examples
-#' \dontrun{
-#' # read NPX data (returns olink_class object)
-#' npx_file <- system.file("extdata",
-#'                         "npx_data_ext.parquet",
-#'                         package = "OlinkAnalyze")
-#' npx_obj <- read_npx(filename = npx_file)
-#'
-#' # class includes olink_class
-#' class(npx_obj)
-#'
-#' # convert to plain tibble
-#' npx_tbl <- tibble::as_tibble(npx_obj)
-#'
-#' # class is now a plain tibble
-#' class(npx_tbl)
-#'
-#' # check_log attribute is gone
-#' olink_check_log(npx_tbl)
-#' }
 #'
 as_tibble.olink_class <- function(x, ...) { # nolint: object_name_linter
 
@@ -225,35 +204,12 @@ as_tibble.olink_class <- function(x, ...) { # nolint: object_name_linter
 #' @description
 #' Strips the `olink_check_log` key from the schema-level metadata of an
 #' ArrowObject, returning a plain Arrow table without any attached check log.
-#' This is useful for testing or when the user wants to remove the extra
-#' metadata.
 #'
 #' @param data An ArrowObject (e.g. `arrow::Table` or `arrow::Dataset`).
 #'
 #' @return The ArrowObject with the `olink_check_log` metadata removed.
 #'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' # read NPX data as Arrow
-#' npx_file <- system.file("extdata",
-#'                         "npx_data_ext.parquet",
-#'                         package = "OlinkAnalyze")
-#' npx_arrow <- arrow::read_parquet(npx_file, as_data_frame = FALSE)
-#' check_log <- check_npx(df = npx_arrow)
-#' npx_arrow <- attach_check_log_arrow(data = npx_arrow,
-#'                                     check_log = check_log)
-#'
-#' # check_log is present
-#' olink_check_log(npx_arrow)
-#'
-#' # strip it
-#' npx_arrow_clean <- strip_check_log_arrow(npx_arrow)
-#'
-#' # check_log is gone
-#' olink_check_log(npx_arrow_clean)
-#' }
+#' @keywords internal
 #'
 strip_check_log_arrow <- function(data) {
 
@@ -280,20 +236,35 @@ strip_check_log_arrow <- function(data) {
 #' Strip check log from an Olink data object
 #'
 #' @description
-#' Internal convenience function that removes the attached check log from either
-#' an `olink_class` tibble or an ArrowObject. For tibbles this delegates to
-#' [`as_tibble.olink_class()`][tibble::as_tibble], and for ArrowObjects it
-#' delegates to [`strip_check_log_arrow()`].
+#' Removes the attached check log from either an `olink_class` tibble or an
+#' ArrowObject. For tibbles this converts the object to a plain tibble (removing
+#' the `olink_class` class and the `check_log` attribute). For ArrowObjects it
+#' removes the `olink_check_log` metadata key. If the input carries no check
+#' log, it is returned unchanged.
 #'
 #' @param data An `olink_class` tibble or an ArrowObject with
 #' `olink_check_log` metadata.
 #'
 #' @return The data without the check log: a plain tibble (`tbl_df`) when given
-#' a tibble, or the ArrowObject with the `olink_check_log` metadata key
-#' removed when given an ArrowObject. If the input carries no check log, it
-#' is returned unchanged.
+#' an `olink_class` tibble, or the ArrowObject with the `olink_check_log`
+#' metadata key removed when given an ArrowObject. Other inputs are returned
+#' unchanged.
 #'
-#' @keywords internal
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' # read NPX data (returns olink_class object)
+#' npx_file <- system.file("extdata",
+#'                         "npx_data_ext.parquet",
+#'                         package = "OlinkAnalyze")
+#' npx_obj <- read_npx(filename = npx_file)
+#'
+#' # strip check log, returning a plain tibble
+#' npx_tbl <- strip_check_log(npx_obj)
+#' class(npx_tbl)
+#' olink_check_log(npx_tbl)
+#' }
 #'
 strip_check_log <- function(data) {
 
