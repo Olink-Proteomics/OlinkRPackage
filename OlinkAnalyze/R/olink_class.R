@@ -58,12 +58,13 @@ new_olink_class <- function(df,
   validate_check_log(check_log = check_log)
 
   # construct the subclass
-  tibble::new_tibble(
+  df_olink <- tibble::new_tibble(
     x = data,
     check_log = check_log,
     class = "olink_class"
   )
 
+  return(df_olink)
 }
 
 # Validator ----
@@ -194,7 +195,7 @@ validate_check_log <- function(check_log) {
     )
   }
 
-  invisible(TRUE)
+  return(invisible(TRUE))
 
 }
 
@@ -445,8 +446,9 @@ attach_check_log_arrow <- function(df,
 serialize_check_log <- function(check_log) {
 
   raw_bytes <- serialize(object = check_log, connection = NULL)
-  base64_encode(raw_bytes)
+  ser_check_log <- base64_encode(raw_bytes)
 
+  return(ser_check_log)
 }
 
 #' Deserialize check log from a base64-encoded raw string
@@ -468,9 +470,9 @@ deserialize_check_log <- function(encoded_str) {
       if (is.list(result)) {
         return(result)
       }
-    },
+    }, # nolint: return_linter
     error = function(e) {
-      NULL
+      NULL # nolint: return_linter
     }
   )
 
@@ -533,7 +535,9 @@ base64_encode <- function(raw_bytes) {
     result[(length(result) - pad + 1L):length(result)] <- "="
   }
 
-  paste0(result, collapse = "")
+  result <- paste0(result, collapse = "")
+
+  return(result)
 
 }
 
@@ -584,7 +588,7 @@ base64_decode <- function(encoded_str) {
     result <- result[seq_len(length(result) - pad)]
   }
 
-  result
+  return(result)
 
 }
 
@@ -610,12 +614,13 @@ dplyr_reconstruct.olink_class <- function(df, template) {
 
   check_log <- attr(x = template, which = "check_log", exact = TRUE)
 
-  tibble::new_tibble(
+  df_olink <- tibble::new_tibble(
     x = df,
     check_log = check_log,
     class = "olink_class"
   )
 
+  return(df_olink)
 }
 
 # Print method ----
@@ -639,11 +644,12 @@ tbl_sum.olink_class <- function(df, ...) {
   check_log <- attr(x = df, which = "check_log", exact = TRUE)
 
   if (!is.null(check_log)) {
-    c(default_header,
-      "Check log" = "attached")
+    olink_class_name <- c(default_header,
+                          "Check log" = "attached")
   } else {
-    c(default_header,
-      "Check log" = "missing")
+    olink_class_name <- c(default_header,
+                          "Check log" = "missing")
   }
 
+  return(olink_class_name)
 }
