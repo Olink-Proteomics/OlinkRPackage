@@ -270,7 +270,7 @@ olink_check_log <- function(df) {
 
     return(attr(x = df, which = "check_log", exact = TRUE))
 
-  } else if (inherits(x = df, what = c("ArrowObject", "arrow_dplyr_query"))) {
+  } else if (check_is_arrow_object(x = df, error = FALSE)) {
 
     check_log_encoded <- df$metadata[["olink_check_log"]]
 
@@ -329,14 +329,7 @@ as_tibble.olink_class <- function(x) { # nolint: object_name_linter
 #'
 strip_check_log_arrow <- function(df) {
 
-  if (!inherits(x = df, what = c("ArrowObject", "arrow_dplyr_query"))) {
-    cli::cli_abort(
-      c(
-        "x" = "{.arg df} must be an ArrowObject."
-      ),
-      call = rlang::caller_env()
-    )
-  }
+  check_is_arrow_object(x = df, error = TRUE)
 
   existing_metadata <- df$metadata
 
@@ -399,8 +392,7 @@ strip_check_log <- function(df) {
 
     return(as_tibble.olink_class(x = df))
 
-  } else if (inherits(x = df,
-                      what = c("ArrowObject", "arrow_dplyr_query"))) {
+  } else if (check_is_arrow_object(x = df, error = FALSE)) {
 
     return(strip_check_log_arrow(df = df))
 
@@ -428,14 +420,7 @@ strip_check_log <- function(df) {
 attach_check_log_arrow <- function(df,
                                    check_log) {
 
-  if (!inherits(x = df, what = c("ArrowObject", "arrow_dplyr_query"))) {
-    cli::cli_abort(
-      c(
-        "x" = "{.arg df} must be an ArrowObject."
-      ),
-      call = rlang::caller_env()
-    )
-  }
+  check_is_arrow_object(x = df, error = TRUE)
 
   validate_check_log(df = df, check_log = check_log)
 
