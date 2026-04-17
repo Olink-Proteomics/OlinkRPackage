@@ -4,9 +4,11 @@
 \alias{validate_check_log}
 \title{Validate a check log list}
 \usage{
-validate_check_log(check_log)
+validate_check_log(df, check_log)
 }
 \arguments{
+\item{df}{A tibble or ArrowObject containing Olink NPX data.}
+
 \item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}.}
 }
 \value{
