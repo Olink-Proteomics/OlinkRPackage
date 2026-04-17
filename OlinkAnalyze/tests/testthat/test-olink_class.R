@@ -246,6 +246,21 @@ test_that(
   }
 )
 
+test_that(
+  "tbl_sum.olink_class - works - shows 'missing' when check_log is NULL",
+  {
+    obj <- new_olink_class(data = df_tbl, check_log = check_log_result)
+    # forcibly remove the check_log attribute to exercise the 'missing' branch
+    attr(obj, "check_log") <- NULL
+
+    header <- tbl_sum(obj)
+
+    expect_true(object = "Check log" %in% names(header))
+    expect_equal(object = header[["Check log"]],
+                 expected = "missing")
+  }
+)
+
 # Test strip_check_log ----
 
 test_that(
@@ -337,6 +352,61 @@ test_that(
 
     decoded <- deserialize_check_log(encoded_str = encoded)
     expect_identical(object = decoded, expected = check_log_result)
+  }
+)
+
+test_that(
+  "deserialize_check_log - warns and returns NULL for corrupted input",
+  {
+    # A string that is valid base64 but not a serialized R object
+    corrupted <- base64_encode(raw_bytes = charToRaw("not_an_R_object"))
+
+    expect_warning(
+      object = {
+        result <- deserialize_check_log(encoded_str = corrupted)
+      },
+      regexp = "Could not deserialize"
+    )
+
+    expect_null(object = result)
+  }
+)
+
+# Test attach_check_log ----
+
+test_that(
+  "attach_check_log - works - tibble path returns olink_class with check_log",
+  {
+    result <- attach_check_log(data = df_tbl, out_df = "tibble")
+
+    expect_s3_class(object = result, class = "olink_class")
+    expect_false(object = is.null(olink_check_log(x = result)))
+  }
+)
+
+test_that(
+  "attach_check_log - works - arrow path returns ArrowObject with check_log",
+  {
+    result <- attach_check_log(data = df_tbl, out_df = "arrow")
+
+    expect_true(object = inherits(x = result, what = "ArrowObject"))
+    expect_false(object = is.null(olink_check_log(x = result)))
+  }
+)
+
+test_that(
+  "attach_check_log - works - forwards preferred_names to check_npx",
+  {
+    # preferred_names allows renaming columns; passing a valid mapping should
+    # not cause an error and the result should still carry a check_log
+    result <- attach_check_log(
+      data = df_tbl,
+      out_df = "tibble",
+      preferred_names = NULL
+    )
+
+    expect_s3_class(object = result, class = "olink_class")
+    expect_false(object = is.null(olink_check_log(x = result)))
   }
 )
 
