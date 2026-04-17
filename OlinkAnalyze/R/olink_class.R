@@ -541,6 +541,8 @@ deserialize_check_log <- function(encoded_str) {
 #'
 base64_encode <- function(raw_bytes) {
 
+  if (length(raw_bytes) == 0L) return("")
+
   base64_chars <- c(LETTERS, letters, 0L:9L, "+", "/")
 
   n <- length(raw_bytes)
@@ -592,6 +594,8 @@ base64_encode <- function(raw_bytes) {
 #' @noRd
 #'
 base64_decode <- function(encoded_str) {
+
+  if (!nzchar(encoded_str)) return(raw(0L))
 
   base64_chars <- c(LETTERS, letters, 0L:9L, "+", "/")
   lookup <- stats::setNames(object = seq_along(base64_chars) - 1L,
