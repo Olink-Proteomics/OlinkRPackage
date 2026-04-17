@@ -59,7 +59,7 @@ new_olink_class <- function(df,
 
   # construct the subclass
   df_olink <- tibble::new_tibble(
-    x = data,
+    x = df,
     check_log = check_log,
     class = "olink_class"
   )
@@ -274,7 +274,7 @@ olink_check_log <- function(df) {
 #' Strips the `olink_class` class and removes the attached check log, returning
 #' a plain tibble.
 #'
-#' @param df An `olink_class` object.
+#' @param x An `olink_class` object.
 #'
 #' @return A tibble (`tbl_df`) without the `olink_class` class or the check log
 #' attribute.
@@ -284,12 +284,12 @@ olink_check_log <- function(df) {
 #' @keywords internal
 #' @noRd
 #'
-as_tibble.olink_class <- function(df) { # nolint: object_name_linter
+as_tibble.olink_class <- function(x) { # nolint: object_name_linter
 
-  attr(x = df, which = "check_log") <- NULL
-  class(df) <- setdiff(x = class(df), y = "olink_class")
+  attr(x = x, which = "check_log") <- NULL
+  class(x) <- setdiff(x = class(x), y = "olink_class")
 
-  return(df)
+  return(x)
 
 }
 
@@ -376,7 +376,7 @@ strip_check_log <- function(df) {
 
   if (inherits(x = df, what = "olink_class")) {
 
-    return(as_tibble.olink_class(df = df))
+    return(as_tibble.olink_class(x = df))
 
   } else if (inherits(x = df,
                       what = c("ArrowObject", "arrow_dplyr_query"))) {
@@ -403,7 +403,6 @@ strip_check_log <- function(df) {
 #' @return The ArrowObject with check log metadata attached.
 #'
 #' @keywords internal
-#' @noRd
 #'
 attach_check_log_arrow <- function(df,
                                    check_log) {
@@ -426,6 +425,44 @@ attach_check_log_arrow <- function(df,
   existing_metadata <- df$metadata
   existing_metadata[["olink_check_log"]] <- check_log_encoded
   df$metadata <- existing_metadata
+
+  return(df)
+
+}
+
+#' Convert output format, run check_npx, and attach the result to an Olink
+#' data object
+#'
+#' @description
+#' Convenience helper that first converts `data` to the requested output format
+#' (via [`convert_read_npx_output()`]), then calls [`check_npx()`] and attaches
+#' the resulting check log to the object.  For tibbles the result is an
+#' [`olink_class`] object (via [`new_olink_class()`]); for ArrowObjects the
+#' check log is stored as schema metadata (via [`attach_check_log_arrow()`]).
+#' Any other type is returned unchanged.
+#'
+#' @param df A tibble or ArrowObject containing Olink NPX data.
+#' @param out_df A string specifying the desired output format. Forwarded to
+#'   [`convert_read_npx_output()`]. Defaults to `"tibble"`.
+#' @param preferred_names An optional named character vector forwarded to
+#'   [`check_npx()`].
+#'
+#' @return `df` converted to `out_df` format with the check log attached.
+#'
+#' @keywords internal
+#'
+attach_check_log <- function(df, out_df = "tibble", preferred_names = NULL) {
+
+  # if needed convert the object to the requested output
+  df <- convert_read_npx_output(df = df, out_df = out_df)
+
+  check_log <- check_npx(df = df, preferred_names = preferred_names)
+
+  if (check_is_tibble(x = df, error = FALSE)) {
+    df <- new_olink_class(df = df, check_log = check_log)
+  } else if (check_is_arrow_object(x = df, error = FALSE)) {
+    df <- attach_check_log_arrow(df = df, check_log = check_log)
+  }
 
   return(df)
 
@@ -600,7 +637,7 @@ base64_decode <- function(encoded_str) {
 #' This method is called by dplyr after every verb (e.g. `filter`, `mutate`,
 #' `select`) to preserve the `olink_class` class and its check log attribute.
 #'
-#' @param df The result of the dplyr operation (a tibble).
+#' @param data The result of the dplyr operation (a tibble).
 #' @param template The original `olink_class` object.
 #'
 #' @return An `olink_class` object with the check log from `template`.
@@ -610,12 +647,12 @@ base64_decode <- function(encoded_str) {
 #' @keywords internal
 #' @noRd
 #'
-dplyr_reconstruct.olink_class <- function(df, template) {
+dplyr_reconstruct.olink_class <- function(data, template) {
 
   check_log <- attr(x = template, which = "check_log", exact = TRUE)
 
   df_olink <- tibble::new_tibble(
-    x = df,
+    x = data,
     check_log = check_log,
     class = "olink_class"
   )
@@ -627,7 +664,7 @@ dplyr_reconstruct.olink_class <- function(df, template) {
 
 #' Provide a custom header for `olink_class` objects
 #'
-#' @param df An `olink_class` object.
+#' @param x An `olink_class` object.
 #' @param ... Additional arguments passed to the tibble method.
 #'
 #' @return A named character vector of summary items.
@@ -637,11 +674,13 @@ dplyr_reconstruct.olink_class <- function(df, template) {
 #' @keywords internal
 #' @noRd
 #'
-tbl_sum.olink_class <- function(df, ...) {
+#' @importFrom pillar tbl_sum
+#'
+tbl_sum.olink_class <- function(x, ...) {
 
   default_header <- NextMethod()
 
-  check_log <- attr(x = df, which = "check_log", exact = TRUE)
+  check_log <- attr(x = x, which = "check_log", exact = TRUE)
 
   if (!is.null(check_log)) {
     olink_class_name <- c(default_header,
