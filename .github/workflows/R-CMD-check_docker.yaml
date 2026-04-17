@@ -36,5 +36,5 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@main
         with:
-          name: docker-r${{ matrix.config.r }}-check-results
+          name: docker-r${{ matrix.r_version }}-check-results
           path: check
