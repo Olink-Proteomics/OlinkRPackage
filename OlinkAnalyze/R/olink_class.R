@@ -196,6 +196,26 @@ validate_check_log <- function(df, check_log) {
     )
   }
 
+  # check that actual column names are in place - sort of security check that
+  # check_log corresponds to the current df
+  check_log_cols_miss <- setdiff(
+    x = unlist(x = check_log$col_names,
+               recursive = TRUE,
+               use.names = FALSE),
+    y = names(df)
+  )
+  if (length(check_log_cols_miss) > 0L) {
+    cli::cli_abort(
+      c(
+        "x" = "Column name{?s} {.val {check_log_cols_miss}} from
+        {.arg check_log} {?is/are} missing from the dataset {.arg df}!",
+        "i" = "Ensure that {.arg check_log} is the output of {.fn check_npx}
+        for dataset {.arg df}!"),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+  }
+
   return(invisible(TRUE))
 
 }
