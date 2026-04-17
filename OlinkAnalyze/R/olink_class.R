@@ -55,7 +55,7 @@ new_olink_class <- function(df,
   # validate inputs
   check_is_tibble(x = df, error = TRUE)
 
-  validate_check_log(check_log = check_log)
+  validate_check_log(df = df, check_log = check_log)
 
   # construct the subclass
   df_olink <- tibble::new_tibble(
@@ -75,13 +75,14 @@ new_olink_class <- function(df,
 #' Checks that `check_log` is a named list with all elements expected by
 #' the package internals.
 #'
+#' @param df A tibble or ArrowObject containing Olink NPX data.
 #' @param check_log A named list returned by [`check_npx()`].
 #'
 #' @return `TRUE` invisibly if validation passes, otherwise throws an error.
 #'
 #' @keywords internal
 #'
-validate_check_log <- function(check_log) {
+validate_check_log <- function(df, check_log) {
 
   check_is_list(x = check_log, error = TRUE)
 
@@ -416,7 +417,7 @@ attach_check_log_arrow <- function(df,
     )
   }
 
-  validate_check_log(check_log = check_log)
+  validate_check_log(df = df, check_log = check_log)
 
   # serialize check_log to base64
   check_log_encoded <- serialize_check_log(check_log)
