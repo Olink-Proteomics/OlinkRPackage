@@ -103,7 +103,7 @@ convert_read_npx_output <- function(df,
 
   } else {
 
-    # if nont of the above throw an error
+    # if none of the above throw an error
     cli::cli_abort( # nolint: return_linter
       message = c(
         "x" = "Unexpected input dataset {.arg df}!",
