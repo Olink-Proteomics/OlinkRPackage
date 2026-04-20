@@ -264,6 +264,7 @@ clean_npx <- function(df,
 #' @inherit clean_npx params return author
 #'
 #' @keywords internal
+#' @noRd
 #'
 clean_assay_na <- function(df,
                            check_log,
@@ -329,6 +330,7 @@ clean_assay_na <- function(df,
 #' @inherit clean_npx params return author
 #'
 #' @keywords internal
+#' @noRd
 #'
 clean_invalid_oid <- function(df,
                               check_log,
@@ -394,6 +396,7 @@ clean_invalid_oid <- function(df,
 #' @inherit clean_npx params return author
 #'
 #' @keywords internal
+#' @noRd
 #'
 clean_duplicate_sample_id <- function(df,
                                       check_log,
@@ -460,6 +463,7 @@ clean_duplicate_sample_id <- function(df,
 #' @inherit clean_npx params return author
 #'
 #' @keywords internal
+#' @noRd
 #'
 clean_sample_type <- function(df,
                               check_log,
@@ -593,6 +597,7 @@ clean_sample_type <- function(df,
 #' @inherit clean_npx params return author
 #'
 #' @keywords internal
+#' @noRd
 #'
 clean_assay_type <- function(df,
                              check_log,
@@ -724,6 +729,7 @@ clean_assay_type <- function(df,
 #' @inherit clean_npx params return author
 #'
 #' @keywords internal
+#' @noRd
 #'
 clean_qc_warning <- function(df,
                              check_log,
@@ -814,6 +820,7 @@ clean_qc_warning <- function(df,
 #' @inherit clean_npx params return author
 #'
 #' @keywords internal
+#' @noRd
 #'
 clean_assay_warning <- function(df,
                                 check_log,
@@ -919,6 +926,7 @@ clean_assay_warning <- function(df,
 #' @inherit clean_npx params return author
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @examples
 #' \dontrun{
@@ -1015,6 +1023,7 @@ clean_control_sample_id <- function(df,
 #' @inherit clean_npx params return author
 #'
 #' @keywords internal
+#' @noRd
 #'
 clean_col_class <- function(df,
                             check_log,
@@ -1101,6 +1110,7 @@ clean_col_class <- function(df,
 #' @inherit clean_npx params return author
 #'
 #' @keywords internal
+#' @noRd
 #'
 clean_nonunique_uniprot <- function(df,
                                     check_log,
