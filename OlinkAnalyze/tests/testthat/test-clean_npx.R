@@ -805,6 +805,67 @@ test_that(
       ),
       regexp = "Excluding 1 control sample: \"ControlType\"."
     )
+
+    # v5 ----
+
+    df_calibrator <- dplyr::bind_rows(
+      df,
+      df |>
+        dplyr::slice(1L) |>
+        dplyr::mutate(
+          SampleID = "CalibratorType",
+          SampleType = "CALIBRATOR"
+        )
+    )
+
+    expected_result <- df_calibrator |>
+      dplyr::filter(
+        .data[["SampleID"]] != "CalibratorType"
+      )
+
+    expect_message(
+      object = expect_equal(
+        object = clean_sample_type(
+          df = df_calibrator,
+          check_log = log,
+          remove_control_sample = c("calibrator"),
+          verbose = FALSE
+        ),
+        expected = expected_result
+      ),
+      regexp = "Excluding 1 control sample: \"CalibratorType\"."
+    )
+
+    # v6 ----
+
+    df_other <- dplyr::bind_rows(
+      df,
+      df |>
+        dplyr::slice(1) |>
+        dplyr::mutate(
+          SampleID = "InterplateControlType",
+          SampleType = "INTERPLATE_CONTROL"
+        )
+    )
+
+    expected_result <- df_other |>
+      dplyr::filter(
+        .data[["SampleID"]] != "ControlType",
+        .data[["SampleID"]] != "InterplateControlType"
+      )
+
+    expect_message(
+      object = expect_equal(
+        object = clean_sample_type(
+          df = df_other,
+          check_log = log,
+          remove_control_sample = TRUE,
+          verbose = FALSE
+        ),
+        expected = expected_result
+      ),
+      regexp = "InterplateControlType"
+    )
   }
 )
 
