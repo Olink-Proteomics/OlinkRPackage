@@ -453,9 +453,9 @@ clean_duplicate_sample_id <- function(df,
 #' This function filters out rows from a dataset where the sample type column
 #' matches known control sample types:
 #' `r ansi_collapse_quot(unique(unlist(tail(olink_sample_types, -1))), "or")`.
-#' If `keep_control_sample` is set to `TRUE`, or if the
-#' sample type column is present in the `check_log`, the function returns
-#' the original data unchanged.
+#' If `remove_control_sample` is set to `FALSE`, or if the sample type column is
+#' not present in the `check_log`, the function returns the original data
+#' unchanged.
 #'
 #' @inherit clean_npx params return author
 #'
