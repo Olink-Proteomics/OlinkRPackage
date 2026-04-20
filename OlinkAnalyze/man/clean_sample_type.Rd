@@ -15,7 +15,7 @@ from \code{\link{read_npx}}.}
 
 \item{remove_control_sample}{If \code{FALSE}, all control samples are retained. If
 \code{TRUE}, all control samples are removed. Alternatively, a character vector
-with one or more of "sample", "sc", "pc", and "nc"
+with one or more of "sample", "sc", "pc", "nc", "calibrator", and "other"
 indicating the sample types to remove.}
 
 \item{verbose}{Logical. If \code{FALSE} (default), silences step-wise messages.}

@@ -800,8 +800,8 @@ test_that(
           expected = expected_result
         ),
         regexp = paste("Unexpected entries \"pc2\" in `remove_control_sample`.",
-                       "Expected values: \"sample\", \"sc\", \"pc\",",
-                       "and \"nc\".")
+                       "Expected values: \"sample\", \"sc\", \"pc\", \"nc\",",
+                       "\"calibrator\", and \"other\".")
       ),
       regexp = "Excluding 1 control sample: \"ControlType\"."
     )
