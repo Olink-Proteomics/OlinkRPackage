@@ -26,6 +26,11 @@ readme <- readLines("README.Rmd")
 
 # Extract the current badge value
 badge_line <- which(grepl(pattern = "^\\[\\!\\[Coverage\\]", x = readme))
+if (length(badge_line) == 0L) {
+  stop("No coverage badge found in README.Rmd!")
+} else if (length(badge_line) > 1L) {
+  stop("Multiple coverage badges found in README.Rmd!")
+}
 current_badge_url <- stringr::str_extract(string = readme[badge_line],
                                           pattern = "(?<=\\().+?(?=\\))")
 
