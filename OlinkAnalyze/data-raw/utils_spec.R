@@ -64,7 +64,7 @@ olink_sample_types <- list(
 
 olink_assay_types <- list(
   "assay" = c("assay"),
-  "inc" = c("inc_ctrl"),
+  "inc" = c("inc_ctrl", "inc_ctrl_1", "inc_ctrl_2"),
   "det" = c("det_ctrl"),
   "ext" = c("ext_ctrl"),
   "amp" = c("amp_ctrl")
