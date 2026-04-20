@@ -27,8 +27,9 @@ data in long format.
 }
 \description{
 This function filters out rows from a dataset where the sample type column
-matches known control sample types: \code{"SAMPLE_CONTROL"}, \code{"PLATE_CONTROL"} or
-\code{"NEGATIVE_CONTROL"}. If \code{keep_control_sample} is set to \code{TRUE}, or if the
+matches known control sample types:
+"CONTROL", "SAMPLE_CONTROL", "SAMPLE_CONTROL_1", "SAMPLE_CONTROL_2", "SAMPLE_CONTROL_3", "SAMPLE_CONTROL_4", "PLATE_CONTROL", "INTERPLATE_CONTROL", "NEGATIVE_CONTROL", "CALIBRATOR", "CALIBRATOR_A", "CALIBRATOR_B", "CALIBRATOR_C", "NOT_USED", or "EMPTY".
+If \code{keep_control_sample} is set to \code{TRUE}, or if the
 sample type column is present in the \code{check_log}, the function returns
 the original data unchanged.
 }
