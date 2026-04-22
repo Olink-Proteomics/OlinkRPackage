@@ -297,6 +297,7 @@ run_clean_npx <- function(df, ...) {
 
   # remove user-supplied verbose if present
   dots$verbose <- NULL
+  dots$preferred_names <- NULL
 
   valid_args <- names(formals(clean_npx))
   unknown_args <- setdiff(x = names(dots), y = valid_args)
@@ -316,7 +317,12 @@ run_clean_npx <- function(df, ...) {
   n_before <- nrow(df)
 
   cleaned_df <- withCallingHandlers(
-    expr = do.call(clean_npx, c(list(df = df), dots, list(verbose = FALSE))),
+    expr = do.call(
+      what = clean_npx,
+      args = c(list(df = df),
+               dots,
+               list(preferred_names = NULL,
+                    verbose = FALSE))),
     message = function(m) invokeRestart("muffleMessage"),
     warning = function(w) invokeRestart("muffleWarning")
   )
