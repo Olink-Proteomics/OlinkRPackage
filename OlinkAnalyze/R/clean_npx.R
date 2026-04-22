@@ -127,7 +127,9 @@ clean_npx <- function(df,
   # Validate input dataset
   check_is_dataset(x = df, error = TRUE)
   check_is_scalar_boolean(x = verbose, error = TRUE)
-  check_log <- run_check_npx(df = df, check_log = check_log)
+
+  # obtain check_log: from df attribute, from argument, or by running check_npx
+  check_log <- get_check_npx(df = df, check_log = check_log)
 
   if (verbose) cli::cli_h2("Starting {.fn clean_npx} pipeline.")
 
