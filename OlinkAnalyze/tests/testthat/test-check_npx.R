@@ -368,6 +368,217 @@ test_that(
   }
 )
 
+# Test get_check_npx ----
+
+
+test_that(
+  "get_check_npx - works - extracts check_log from olink_class",
+  {
+    df_tbl <- dplyr::tibble(
+      SampleID = LETTERS[1L:4L],
+      OlinkID = paste0("OID1234", seq(1L:4L)),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L)
+    )
+
+    check_log_result <- check_npx(df = df_tbl) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    obj <- new_olink_class(df = df_tbl,
+                           check_log = check_log_result)
+
+    result <- get_check_npx(df = obj,
+                            check_log = NULL)
+
+    expect_identical(object = result,
+                     expected = check_log_result)
+  }
+)
+
+test_that(
+  "get_check_npx - works - extracts check_log from ArrowObject",
+  {
+    df_tbl <- dplyr::tibble(
+      SampleID = LETTERS[1L:4L],
+      OlinkID = paste0("OID1234", seq(1L:4L)),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L)
+    )
+
+    check_log_result <- check_npx(df = df_tbl) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    arrow_tbl <- arrow::as_arrow_table(x = df_tbl)
+    arrow_with_log <- attach_check_log_arrow(df = arrow_tbl,
+                                             check_log = check_log_result)
+
+    result <- get_check_npx(df = arrow_with_log,
+                            check_log = NULL)
+
+    expect_identical(object = result,
+                     expected = check_log_result)
+  }
+)
+
+test_that(
+  "get_check_npx - works - uses provided check_log when df has none",
+  {
+    df_tbl <- dplyr::tibble(
+      SampleID = LETTERS[1L:4L],
+      OlinkID = paste0("OID1234", seq(1L:4L)),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L)
+    )
+
+    check_log_result <- check_npx(df = df_tbl) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    result <- get_check_npx(df = df_tbl,
+                            check_log = check_log_result)
+
+    expect_identical(object = result,
+                     expected = check_log_result)
+  }
+)
+
+test_that(
+  "get_check_npx - works - uses provided check_log when ArrowObject has none",
+  {
+    df_tbl <- dplyr::tibble(
+      SampleID = LETTERS[1L:4L],
+      OlinkID = paste0("OID1234", seq(1L:4L)),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L)
+    )
+
+    check_log_result <- check_npx(df = df_tbl) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    arrow_tbl <- arrow::as_arrow_table(x = df_tbl)
+
+    result <- get_check_npx(df = arrow_tbl,
+                            check_log = check_log_result)
+
+    expect_identical(object = result,
+                     expected = check_log_result)
+  }
+)
+
+test_that(
+  "get_check_npx - works - runs check_npx when no check_log provided",
+  {
+    df_tbl <- dplyr::tibble(
+      SampleID = LETTERS[1L:4L],
+      OlinkID = paste0("OID1234", seq(1L:4L)),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L)
+    )
+
+    expect_message(
+      object = {
+        result <- get_check_npx(df = df_tbl)
+      },
+      regexp = "`check_log` not provided. Running `check_npx()`.",
+      fixed = TRUE
+    )
+
+    check_log_result <- check_npx(df = df_tbl) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_identical(object = result,
+                     expected = check_log_result)
+  }
+)
+
+test_that(
+  "get_check_npx - error - invalid check_log provided for plain tibble",
+  {
+    df_tbl <- dplyr::tibble(
+      SampleID = LETTERS[1L:4L],
+      OlinkID = paste0("OID1234", seq(1L:4L)),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L)
+    )
+
+    expect_error(
+      object = get_check_npx(df = df_tbl,
+                             check_log = list(a = 1L)),
+      regexp = paste("Elements \"col_names\", \"oid_invalid\", \"assay_na\",",
+                     "\"sample_id_dups\", \"sample_id_na\", \"col_class\",",
+                     "\"assay_qc\", \"non_unique_uniprot\", and",
+                     "\"darid_invalid\" are missing from `check_log`!"),
+      fixed = TRUE
+    )
+  }
+)
+
+test_that(
+  "get_check_npx - prefers embedded check_log over provided check_log argument",
+  {
+    df_tbl <- dplyr::tibble(
+      SampleID = LETTERS[1L:4L],
+      OlinkID = paste0("OID1234", seq(1L:4L)),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L)
+    )
+
+    check_log_result <- check_npx(df = df_tbl) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    obj <- new_olink_class(df = df_tbl,
+                           check_log = check_log_result)
+
+    # pass a deliberately different (invalid) check_log argument; the embedded
+    # one should be used instead without raising an error
+    result <- get_check_npx(df = obj,
+                            check_log = list(a = 1L))
+
+    expect_identical(object = result,
+                     expected = check_log_result)
+  }
+)
+
 # Test run_check_npx ----
 
 test_that(
