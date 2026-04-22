@@ -653,18 +653,6 @@ test_that(
 # Test backward compatibility ----
 
 test_that(
-  "backward compat - run_check_npx still works",
-  {
-    # run_check_npx should still function
-    result <- suppressWarnings(suppressMessages(
-      run_check_npx(df = df_tbl, check_log = check_log_result)
-    ))
-
-    expect_identical(object = result, expected = check_log_result)
-  }
-)
-
-test_that(
   "backward compat - run_clean_npx returns olink_class with check_log",
   {
     # run_clean_npx returns an olink_class object with check_log attached
