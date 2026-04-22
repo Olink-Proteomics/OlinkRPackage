@@ -370,7 +370,6 @@ test_that(
 
 # Test get_check_npx ----
 
-
 test_that(
   "get_check_npx - works - extracts check_log from olink_class",
   {
@@ -493,6 +492,7 @@ test_that(
   {
     df_tbl <- dplyr::tibble(
       SampleID = LETTERS[1L:4L],
+      SampleType = LETTERS[1L:4L],
       OlinkID = paste0("OID1234", seq(1L:4L)),
       UniProt = LETTERS[1L:4L],
       Assay = LETTERS[1L:4L],
@@ -502,6 +502,8 @@ test_that(
       PlateID = rep("plate1", 4L),
       QC_Warning = rep("Pass", 4L)
     )
+
+    # no preferred names ----
 
     expect_message(
       object = {
@@ -517,6 +519,75 @@ test_that(
 
     expect_identical(object = result,
                      expected = check_log_result)
+
+    # one column name ----
+
+    df_tbl_v1 <- df_tbl |>
+      dplyr::rename(
+        "IamSampleName" = "SampleID"
+      )
+
+    expect_message(
+      object = {
+        result_v1 <- get_check_npx(
+          df = df_tbl_v1,
+          preferred_names = c("sample_id" = "IamSampleName")
+        )
+      },
+      regexp = "`check_log` not provided. Running `check_npx()`.",
+      fixed = TRUE
+    )
+
+    check_log_result_v1 <- check_npx(
+      df = df_tbl_v1,
+      preferred_names = c("sample_id" = "IamSampleName")
+    ) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_identical(
+      object = result_v1,
+      expected = check_log_result_v1
+    )
+
+    # multiple column names ----
+
+    df_tbl_v2 <- df_tbl |>
+      dplyr::rename(
+        "IamSampleName" = "SampleID",
+        "IamSampleType" = "SampleType",
+        "IamPlateIdentifier" = "PlateID",
+        "IamOlinkIdentifier" = "OlinkID"
+      )
+
+    expect_message(
+      object = {
+        result_v2 <- get_check_npx(
+          df = df_tbl_v2,
+          preferred_names = c("sample_id" = "IamSampleName",
+                              "sample_type" = "IamSampleType",
+                              "plate_id" = "IamPlateIdentifier",
+                              "olink_id" = "IamOlinkIdentifier")
+        )
+      },
+      regexp = "`check_log` not provided. Running `check_npx()`.",
+      fixed = TRUE
+    )
+
+    check_log_result_v2 <- check_npx(
+      df = df_tbl_v2,
+      preferred_names = c("sample_id" = "IamSampleName",
+                          "sample_type" = "IamSampleType",
+                          "plate_id" = "IamPlateIdentifier",
+                          "olink_id" = "IamOlinkIdentifier")
+    ) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_identical(
+      object = result_v2,
+      expected = check_log_result_v2
+    )
   }
 )
 

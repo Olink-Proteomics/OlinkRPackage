@@ -196,13 +196,15 @@ check_npx <- function(df,
 #' [`check_npx()`] on the input `df` and returns the output.
 #'
 #' @inherit .downstream_fun_args params author
+#' @inherit .read_npx_args params
 #' @inherit check_npx return
 #'
 #' @keywords internal
 #' @noRd
 #'
 get_check_npx <- function(df,
-                          check_log = NULL) {
+                          check_log = NULL,
+                          preferred_names = NULL) {
   tmp_check_log <- olink_check_log(df = df)
 
   if (!is.null(tmp_check_log)) {
@@ -217,7 +219,7 @@ get_check_npx <- function(df,
         full picture of the results from the data validity check!"
       )
     )
-    check_log <- check_npx(df = df)
+    check_log <- check_npx(df = df, preferred_names = preferred_names)
   }
 
   return(check_log)
