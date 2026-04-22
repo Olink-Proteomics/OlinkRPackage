@@ -129,7 +129,11 @@ clean_npx <- function(df,
   check_is_scalar_boolean(x = verbose, error = TRUE)
 
   # obtain check_log: from df attribute, from argument, or by running check_npx
-  check_log <- get_check_npx(df = df, check_log = check_log)
+  check_log <- get_check_npx(
+    df = df,
+    check_log = check_log,
+    preferred_names = preferred_names
+  )
 
   if (verbose) cli::cli_h2("Starting {.fn clean_npx} pipeline.")
 
@@ -245,12 +249,14 @@ clean_npx <- function(df,
     cli::cli_h2("Completed {.fn clean_npx}. Returning clean dataset.")
   }
 
-  return(
-    convert_read_npx_output(
-      df = df,
-      out_df = out_df
-    )
+  # Convert to requested output format, re-run check_npx, and attach check_log
+  df <- attach_check_log(
+    df = df,
+    out_df = out_df,
+    preferred_names = preferred_names
   )
+
+  return(df)
 }
 
 # Help Functions ----------------------------------------------------------

@@ -2248,7 +2248,8 @@ test_that(
                          check_log = log,
                          control_sample_ids = c("ControlID"),
                          verbose = TRUE) |>
-        suppressMessages(),
+        suppressMessages() |>
+        strip_check_log(),
       expected = expected_result
     )
   }
@@ -2361,7 +2362,8 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_npx(df = test_result,
-                           check_log = log_test),
+                           check_log = log_test) |>
+          strip_check_log(),
         expected = test_result
       ),
       regexp = paste("Detected data in absolute quantification in column",
