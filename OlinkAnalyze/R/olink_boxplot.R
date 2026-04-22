@@ -217,12 +217,12 @@ olink_boxplot <- function(df,
           rp = mapply(function(x) my_round(x), .data[["Adjusted_pval"]]),
           p_value = paste0(.data[["rp"]], " Contrast: ", .data[["contrast"]])
         ) |>
-        dplyr::group_by(.data[["Name_OID"]], .data[["contrast"]]) |>
+        dplyr::group_by(.data[["Name_OID"]]) |>
         dplyr::arrange(pmin(.data[["C1"]], .data[["C2"]])) |>
         dplyr::mutate(
-          rowNum = rev(seq_len(dplyr::n())),
+          rowNum = dplyr::row_number(),
           y_anchor = .data[["maxNPX"]] + .data[["rowNum"]] *
-            .data[["rangeNPX"]] * 0.5 / max(.data[["rowNum"]])
+            .data[["rangeNPX"]] * 0.2 / max(.data[["rowNum"]])
         ) |>
         dplyr::ungroup() |>
         tidyr::pivot_longer(
