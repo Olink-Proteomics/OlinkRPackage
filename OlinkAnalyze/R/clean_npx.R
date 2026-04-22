@@ -110,6 +110,7 @@
 #'
 clean_npx <- function(df,
                       check_log = NULL,
+                      preferred_names = NULL,
                       remove_assay_na = TRUE,
                       remove_invalid_oid = TRUE,
                       remove_dup_sample_id = TRUE,

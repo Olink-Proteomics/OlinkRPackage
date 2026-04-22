@@ -7,6 +7,7 @@
 clean_npx(
   df,
   check_log = NULL,
+  preferred_names = NULL,
   remove_assay_na = TRUE,
   remove_invalid_oid = TRUE,
   remove_dup_sample_id = TRUE,
@@ -27,6 +28,10 @@ from \code{\link{read_npx}}.}
 
 \item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
 \code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+
+\item{preferred_names}{A named character vector where names are internal
+column names and values are column names to be selected from the input data
+frame. Read the \emph{description} of \code{\link[=check_npx]{check_npx()}}for further information.}
 
 \item{remove_assay_na}{Logical. If \code{FALSE}, skips filtering assays with all
 quantified values \code{NA}. Defaults to \code{TRUE}.}

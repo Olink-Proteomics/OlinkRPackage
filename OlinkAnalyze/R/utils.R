@@ -328,6 +328,9 @@ check_osi <- function(df,
 #' @param out_df The class of the output dataset. One of
 #' `r ansi_collapse_quot(x = read_npx_df_output, sep = "or")`. Defaults to
 #' "tibble".
+#' @param preferred_names A named character vector where names are internal
+#' column names and values are column names to be selected from the input data
+#' frame. Read the \emph{description} of [`check_npx()`]for further information.
 #' @param long_format Boolean marking format of input file. One of `TRUE` for
 #' long format and `FALSE` for wide format files. Defaults to `NULL` for
 #' auto-detection.
@@ -356,6 +359,7 @@ check_osi <- function(df,
 .read_npx_args <- function(filename,
                            file,
                            out_df,
+                           preferred_names,
                            long_format,
                            olink_platform,
                            data_type,
