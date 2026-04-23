@@ -23,3 +23,5 @@
 ^inst/extdata/.*original[.]csv
 ^inst/extdata/npx_data2_meta[.]csv
 ^inst/extdata/npx_data2[.]xlsx
+^\.positai$
+^\.claude$
