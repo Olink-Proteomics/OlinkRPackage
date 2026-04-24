@@ -45,7 +45,7 @@ types to remove.}
 
 \item{remove_control_sample}{If \code{FALSE}, all control samples are retained. If
 \code{TRUE}, all control samples are removed. Alternatively, a character vector
-with one or more of "sample", "sc", "pc", and "nc"
+with one or more of "sample", "sc", "pc", "nc", "calibrator", and "other"
 indicating the sample types to remove.}
 
 \item{remove_qc_warning}{Logical. If \code{FALSE}, retains samples flagged as
