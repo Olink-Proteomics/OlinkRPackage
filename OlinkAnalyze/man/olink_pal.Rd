@@ -10,7 +10,7 @@ olink_pal(alpha = 1, coloroption = NULL)
 \item{alpha}{transparency (optional)}
 
 \item{coloroption}{string, one or more of the following:
-c("red", "orange", "yellow", "green", "teal", "turqoise", "lightblue",
+c("red", "orange", "yellow", "green", "teal", "turquoise", "lightblue",
 "darkblue", "purple", "pink")}
 }
 \value{
