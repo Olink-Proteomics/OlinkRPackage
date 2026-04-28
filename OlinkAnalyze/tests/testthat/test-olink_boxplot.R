@@ -79,7 +79,7 @@ boxplot_time_coloroption <- npx_data1 |>
     olinkid_list = ref_results$anova_time |>
       head(10) |>
       dplyr::pull(OlinkID),
-    coloroption = c("teal", "pink", "orange", "turqoise"),
+    coloroption = c("teal", "pink", "orange", "turquoise"),
     check_log = npx_data1_check
   ) |>
   suppressMessages()
