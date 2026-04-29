@@ -73,7 +73,7 @@ test_that(
 
     expect_identical(
       object = dim(tt_gsea),
-      expected = c(573L, 11L)
+      expected = c(6992L, 12L)
     )
 
   }
@@ -163,7 +163,7 @@ test_that(
 
     expect_identical(
       object = dim(tt_gsea_na),
-      expected = c(62L, 11L)
+      expected = c(4626L, 12L)
     )
 
   }
@@ -210,7 +210,7 @@ test_that(
 
     expect_equal(
       object = dim(tt_gsea_reactome),
-      expected = c(20L, 11L)
+      expected = c(320L, 12L)
     )
   }
 )
@@ -256,7 +256,7 @@ test_that(
 
     expect_equal(
       object = dim(tt_gsea_msigdb_com),
-      expected = c(568L, 11L)
+      expected = c(6862L, 12L)
     )
   }
 )
@@ -305,7 +305,7 @@ test_that(
 
     expect_equal(
       object = dim(tt_gsea_kegg),
-      expected = c(0L, 8L)
+      expected = c(53L, 12L)
     )
   }
 )
@@ -351,7 +351,7 @@ test_that(
 
     expect_equal(
       object = dim(tt_gsea_go),
-      expected = c(356L, 11L)
+      expected = c(2946L, 12L)
     )
   }
 )
@@ -399,7 +399,7 @@ test_that(
 
     expect_equal(
       object = dim(tt_ora),
-      expected = c(345L, 12L)
+      expected = c(573L, 12L)
     )
   }
 )
@@ -445,7 +445,7 @@ test_that(
 
     expect_equal(
       object = dim(tt_ora_reactome),
-      expected = c(15L, 12L)
+      expected = c(20L, 12L)
     )
   }
 )
@@ -542,7 +542,7 @@ test_that(
 
     expect_equal(
       object = dim(tt_ora_go),
-      expected = c(212L, 12L)
+      expected = c(356L, 12L)
     )
   }
 )
