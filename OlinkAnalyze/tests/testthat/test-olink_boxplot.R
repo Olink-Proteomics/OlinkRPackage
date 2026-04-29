@@ -226,6 +226,11 @@ test_that(
 
     # ---- Time + Posthoc ----
 
+    ref_results$anova_time_posthoc[1:6, "Threshold"] <- "Significant"
+    ref_results$anova_time_posthoc[1:4, "Adjusted_pval"] <- 0.0003
+    ref_results$anova_time_posthoc[5, "Adjusted_pval"] <- 0.049
+    ref_results$anova_time_posthoc[6, "Adjusted_pval"] <- 0.01
+
     expect_no_error(
       object = expect_no_warning(
         object = expect_message(
@@ -259,7 +264,7 @@ test_that(
     )
     vdiffr::expect_doppelganger(
       boxplot_time_posthoc_name,
-      boxplot_time_posthoc[[2L]]
+      boxplot_time_posthoc[[1L]]
     )
 
     # ---- Treatment + ttest ----
