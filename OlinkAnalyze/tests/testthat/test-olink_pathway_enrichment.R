@@ -547,6 +547,101 @@ test_that(
   }
 )
 
+# Test check_test_mode ----
+
+test_that(
+  "check_test_mode - works",
+  {
+    # test_mode is FALSE ----
+
+    expect_identical(
+      object = check_test_mode(
+        method = "GSEA",
+        ontology = "MSigDb",
+        organism = "human"
+      ),
+      expected = list(
+        method = "GSEA",
+        ontology = "MSigDb",
+        organism = "human",
+        test_mode = FALSE
+      )
+    )
+
+    expect_identical(
+      object = check_test_mode(
+        method = "ORA",
+        ontology = "Reactome",
+        organism = "mouse"
+      ),
+      expected = list(
+        method = "ORA",
+        ontology = "Reactome",
+        organism = "mouse",
+        test_mode = FALSE
+      )
+    )
+
+    expect_identical(
+      object = check_test_mode(
+        method = "A",
+        ontology = "B",
+        organism = "C"
+      ),
+      expected = list(
+        method = "A",
+        ontology = "B",
+        organism = "C",
+        test_mode = FALSE
+      )
+    )
+
+    # test_mode is TRUE ----
+
+    expect_identical(
+      object = check_test_mode(
+        method = "TEST#GSEA",
+        ontology = "TEST#MSigDb",
+        organism = "TEST#human"
+      ),
+      expected = list(
+        method = "GSEA",
+        ontology = "MSigDb",
+        organism = "human",
+        test_mode = TRUE
+      )
+    )
+
+    expect_identical(
+      object = check_test_mode(
+        method = "TEST#ORA",
+        ontology = "TEST#Reactome",
+        organism = "TEST#mouse"
+      ),
+      expected = list(
+        method = "ORA",
+        ontology = "Reactome",
+        organism = "mouse",
+        test_mode = TRUE
+      )
+    )
+
+    expect_identical(
+      object = check_test_mode(
+        method = "TEST#A",
+        ontology = "TEST#B",
+        organism = "TEST#C"
+      ),
+      expected = list(
+        method = "A",
+        ontology = "B",
+        organism = "C",
+        test_mode = TRUE
+      )
+    )
+  }
+)
+
 # Test check_pe_inputs ----
 
 test_that(
