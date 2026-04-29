@@ -47,7 +47,7 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           working-directory: OlinkAnalyze
-          extra-packages: any::rcmdcheck, pillar, any::devtools, any::cli, any::rhub, any::revdepcheck, github::r-lib/revdepcheck, any::spelling
+          extra-packages: any::rcmdcheck, any::pillar, any::devtools, any::cli, any::rhub, any::revdepcheck, github::r-lib/revdepcheck, any::spelling
 
       - name: Install Matrix from source
         run: |
@@ -63,14 +63,17 @@ jobs:
           results <- devtools::check(error_on = "never", 
                                      env_vars = c(NOT_CRAN = "false"))
 
-          cat("::group::Errors")
+          cat("::group::Errors\n")
           cli::cli_alert_danger(results$errors)
+          cat("::endgroup::\n")
           
-          cat("::group::Warnings")
+          cat("::group::Warnings\n")
           cli::cli_alert_warning(results$warnings)
+          cat("::endgroup::\n")
           
-          cat("::group::Notes")
+          cat("::group::Notes\n")
           cli::cli_alert_info(results$notes)
+          cat("::endgroup::\n")
         shell: Rscript {0}
 
       - name: Spellcheck
@@ -86,7 +89,7 @@ jobs:
         run: |
           setwd("OlinkAnalyze")
         
-          devtools::check(remote = T, incoming = T, env_vars = c(NOT_CRAN = "false"))
+          devtools::check(remote = TRUE, incoming = TRUE, env_vars = c(NOT_CRAN = "false"))
         shell: Rscript {0}
         
       - name: Check if package is on CRAN
