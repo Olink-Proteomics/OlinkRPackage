@@ -50,16 +50,21 @@ read_npx_df_output <- c(
 
 olink_sample_types <- list(
   "sample" = c("SAMPLE"),
-  "sc" = c("CONTROL", "SAMPLE_CONTROL"),
-  "pc" = c("PLATE_CONTROL"),
-  "nc" = c("NEGATIVE_CONTROL")
+  "sc" = c("CONTROL", "SAMPLE_CONTROL",
+           "SAMPLE_CONTROL_1", "SAMPLE_CONTROL_2",
+           "SAMPLE_CONTROL_3", "SAMPLE_CONTROL_4"),
+  "pc" = c("PLATE_CONTROL", "INTERPLATE_CONTROL"),
+  "nc" = c("NEGATIVE_CONTROL"),
+  "calibrator" = c("CALIBRATOR", "CALIBRATOR_A",
+                   "CALIBRATOR_B", "CALIBRATOR_C"),
+  "other" = c("NOT_USED", "EMPTY")
 )
 
 ## Acceptable samples types ----
 
 olink_assay_types <- list(
   "assay" = c("assay"),
-  "inc" = c("inc_ctrl"),
+  "inc" = c("inc_ctrl", "inc_ctrl_1", "inc_ctrl_2"),
   "det" = c("det_ctrl"),
   "ext" = c("ext_ctrl"),
   "amp" = c("amp_ctrl")
