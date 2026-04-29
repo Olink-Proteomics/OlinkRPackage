@@ -179,6 +179,15 @@ olink_pathway_enrichment <- function(df,
     cli::cli_abort("Arguments {.arg df} and {.arg test_results} are required!")
   }
 
+  # check if test mode is activated and update arguments accordingly
+  test_mode_results <- check_test_mode(method = method,
+                                       ontology = ontology,
+                                       organism = organism)
+  method <- test_mode_results$method
+  ontology <- test_mode_results$ontology
+  organism <- test_mode_results$organism
+  test_mode <- test_mode_results$test_mode
+
   check_log <- check_pe_inputs(df = df,
                                check_log = check_log,
                                test_results = test_results,
