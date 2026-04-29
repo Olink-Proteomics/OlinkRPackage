@@ -47,15 +47,22 @@ test_that(
     expect_message(
       object = expect_message(
         object = expect_message(
-          object = tt_gsea <- olink_pathway_enrichment(
-            df = npx_data1 |>
-              dplyr::filter(
-                !grepl(pattern = "control",
-                       x = .data[["SampleID"]],
-                       ignore.case = TRUE)
-              ),
-            check_log = check_log,
-            test_results = reference_results$t_test
+          object = expect_message(
+            object = tt_gsea <- olink_pathway_enrichment(
+              df = npx_data1 |>
+                dplyr::filter(
+                  !grepl(pattern = "control",
+                         x = .data[["SampleID"]],
+                         ignore.case = TRUE)
+                ),
+              check_log = check_log,
+              test_results = reference_results$t_test,
+              method = "TEST#GSEA",
+              ontology = "TEST#MSigDb",
+              organism = "TEST#human"
+            ),
+            regexp = paste("Test mode activated: using fixed version of MSigDB",
+                           "for human")
           ),
           regexp = "Using MSigDB..."
         ),
@@ -109,30 +116,37 @@ test_that(
           object = expect_message(
             object = expect_message(
               object = expect_message(
-                object = expect_warning(
-                  object = tt_gsea_na <- olink_pathway_enrichment(
-                    df = npx_data_format22,
-                    test_results = ttest_na,
-                    check_log = check_npx(npx_data_format22) |>
-                      suppressWarnings() |>
-                      suppressMessages()
+                object = expect_message(
+                  object = expect_warning(
+                    object = tt_gsea_na <- olink_pathway_enrichment(
+                      df = npx_data_format22,
+                      test_results = ttest_na,
+                      check_log = check_npx(npx_data_format22) |>
+                        suppressWarnings() |>
+                        suppressMessages(),
+                      method = "TEST#GSEA",
+                      ontology = "TEST#MSigDb",
+                      organism = "TEST#human"
+                    ),
+                    regexp = paste("The sets of assays in `df` and",
+                                   "`test_results` do not match!")
                   ),
-                  regexp = paste("The sets of assays in `df` and",
-                                 "`test_results` do not match!")
+                  regexp = paste("1530 entries removed by `clean_npx()` from",
+                                 "the input dataset `df`. Run `clean_npx()` on",
+                                 "your dataset with `verbose = TRUE` to",
+                                 "inspect which rows were removed."),
+                  fixed = TRUE
                 ),
-                regexp = paste("1530 entries removed by `clean_npx()` from the",
-                               "input dataset `df`. Run `clean_npx()` on your",
-                               "dataset with `verbose = TRUE` to inspect which",
-                               "rows were removed."),
-                fixed = TRUE
+                regexp = paste("1 assay in `df` is not represented in",
+                               "`test_results` and will be removed from",
+                               "`df`: \"OID12345\"")
               ),
-              regexp = paste("1 assay in `df` is not represented in",
-                             "`test_results` and will be removed from",
-                             "`df`: \"OID12345\"")
+              regexp = paste("1 assay in `test_results` is not represented in",
+                             "`df` and will be removed from `test_results`:",
+                             "\"OID30646\"")
             ),
-            regexp = paste("1 assay in `test_results` is not represented in",
-                           "`df` and will be removed from `test_results`:",
-                           "\"OID30646\"")
+            regexp = paste("Test mode activated: using fixed version of MSigDB",
+                           "for human")
           ),
           regexp = "Using MSigDB..."
         ),
@@ -168,16 +182,22 @@ test_that(
     expect_message(
       object = expect_message(
         object = expect_message(
-          object = tt_gsea_reactome <- olink_pathway_enrichment(
-            df = npx_data1 |>
-              dplyr::filter(
-                !grepl(pattern = "control",
-                       x = .data[["SampleID"]],
-                       ignore.case = TRUE)
-              ),
-            check_log = check_log,
-            test_results = reference_results$t_test,
-            ontology = "Reactome"
+          object = expect_message(
+            object = tt_gsea_reactome <- olink_pathway_enrichment(
+              df = npx_data1 |>
+                dplyr::filter(
+                  !grepl(pattern = "control",
+                         x = .data[["SampleID"]],
+                         ignore.case = TRUE)
+                ),
+              check_log = check_log,
+              test_results = reference_results$t_test,
+              ontology = "TEST#Reactome",
+              method = "TEST#GSEA",
+              organism = "TEST#human"
+            ),
+            regexp = paste("Test mode activated: using fixed version of MSigDB",
+                           "for human")
           ),
           regexp = "Extracting Reactome Database from MSigDB..."
         ),
@@ -208,16 +228,22 @@ test_that(
     expect_message(
       object = expect_message(
         object = expect_message(
-          object = tt_gsea_msigdb_com <- olink_pathway_enrichment(
-            df = npx_data1 |>
-              dplyr::filter(
-                !grepl(pattern = "control",
-                       x = .data[["SampleID"]],
-                       ignore.case = TRUE)
-              ),
-            check_log = check_log,
-            test_results = reference_results$t_test,
-            ontology = "MSigDb_com"
+          object = expect_message(
+            object = tt_gsea_msigdb_com <- olink_pathway_enrichment(
+              df = npx_data1 |>
+                dplyr::filter(
+                  !grepl(pattern = "control",
+                         x = .data[["SampleID"]],
+                         ignore.case = TRUE)
+                ),
+              check_log = check_log,
+              test_results = reference_results$t_test,
+              ontology = "TEST#MSigDb_com",
+              method = "TEST#GSEA",
+              organism = "TEST#human"
+            ),
+            regexp = paste("Test mode activated: using fixed version of MSigDB",
+                           "for human")
           ),
           regexp = "Using MSigDB without KEGG subcollections..."
         ),
@@ -249,16 +275,22 @@ test_that(
       object = expect_message(
         object = expect_message(
           object = expect_message(
-            object = tt_gsea_kegg <- olink_pathway_enrichment(
-              df = npx_data1 |>
-                dplyr::filter(
-                  !grepl(pattern = "control",
-                         x = .data[["SampleID"]],
-                         ignore.case = TRUE)
-                ),
-              check_log = check_log,
-              test_results = reference_results$t_test,
-              ontology = "KEGG"
+            object = expect_message(
+              object = tt_gsea_kegg <- olink_pathway_enrichment(
+                df = npx_data1 |>
+                  dplyr::filter(
+                    !grepl(pattern = "control",
+                           x = .data[["SampleID"]],
+                           ignore.case = TRUE)
+                  ),
+                check_log = check_log,
+                test_results = reference_results$t_test,
+                ontology = "TEST#KEGG",
+                method = "TEST#GSEA",
+                organism = "TEST#human"
+              ),
+              regexp = paste("Test mode activated: using fixed version of",
+                             "MSigDB for human")
             ),
             regexp = "Extracting KEGG Database from MSigDB..."
           ),
@@ -291,16 +323,22 @@ test_that(
     expect_message(
       object = expect_message(
         object = expect_message(
-          object = tt_gsea_go <- olink_pathway_enrichment(
-            df = npx_data1 |>
-              dplyr::filter(
-                !grepl(pattern = "control",
-                       x = .data[["SampleID"]],
-                       ignore.case = TRUE)
-              ),
-            check_log = check_log,
-            test_results = reference_results$t_test,
-            ontology = "GO"
+          object = expect_message(
+            object = tt_gsea_go <- olink_pathway_enrichment(
+              df = npx_data1 |>
+                dplyr::filter(
+                  !grepl(pattern = "control",
+                         x = .data[["SampleID"]],
+                         ignore.case = TRUE)
+                ),
+              check_log = check_log,
+              test_results = reference_results$t_test,
+              ontology = "TEST#GO",
+              method = "TEST#GSEA",
+              organism = "TEST#human"
+            ),
+            regexp = paste("Test mode activated: using fixed version of MSigDB",
+                           "for human")
           ),
           regexp = "Extracting GO Database from MSigDB..."
         ),
@@ -333,17 +371,22 @@ test_that(
     expect_message(
       object = expect_message(
         object = expect_message(
-          object = tt_ora <- olink_pathway_enrichment(
-            df = npx_data1 |>
-              dplyr::filter(
-                !grepl(pattern = "control",
-                       x = .data[["SampleID"]],
-                       ignore.case = TRUE)
-              ),
-            check_log = check_log,
-            test_results = reference_results$t_test,
-            method = "ORA",
-            ontology = "MSigDb"
+          object = expect_message(
+            object = tt_ora <- olink_pathway_enrichment(
+              df = npx_data1 |>
+                dplyr::filter(
+                  !grepl(pattern = "control",
+                         x = .data[["SampleID"]],
+                         ignore.case = TRUE)
+                ),
+              check_log = check_log,
+              test_results = reference_results$t_test,
+              method = "TEST#ORA",
+              ontology = "TEST#MSigDb",
+              organism = "TEST#human"
+            ),
+            regexp = paste("Test mode activated: using fixed version of MSigDB",
+                           "for human")
           ),
           regexp = "Using MSigDB..."
         ),
@@ -374,17 +417,22 @@ test_that(
     expect_message(
       object = expect_message(
         object = expect_message(
-          object = tt_ora_reactome <- olink_pathway_enrichment(
-            df = npx_data1 |>
-              dplyr::filter(
-                !grepl(pattern = "control",
-                       x = .data[["SampleID"]],
-                       ignore.case = TRUE)
-              ),
-            check_log = check_log,
-            test_results = reference_results$t_test,
-            method = "ORA",
-            ontology = "Reactome"
+          object = expect_message(
+            object = tt_ora_reactome <- olink_pathway_enrichment(
+              df = npx_data1 |>
+                dplyr::filter(
+                  !grepl(pattern = "control",
+                         x = .data[["SampleID"]],
+                         ignore.case = TRUE)
+                ),
+              check_log = check_log,
+              test_results = reference_results$t_test,
+              method = "TEST#ORA",
+              ontology = "TEST#Reactome",
+              organism = "TEST#human"
+            ),
+            regexp = paste("Test mode activated: using fixed version of MSigDB",
+                           "for human")
           ),
           regexp = "Extracting Reactome Database from MSigDB..."
         ),
@@ -417,17 +465,22 @@ test_that(
         object = expect_message(
           object = expect_message(
             object = expect_message(
-              object = tt_ora_kegg <- olink_pathway_enrichment(
-                df = npx_data1 |>
-                  dplyr::filter(
-                    !grepl(pattern = "control",
-                           x = .data[["SampleID"]],
-                           ignore.case = TRUE)
-                  ),
-                check_log = check_log,
-                test_results = reference_results$t_test,
-                method = "ORA",
-                ontology = "KEGG"
+              object = expect_message(
+                object = tt_ora_kegg <- olink_pathway_enrichment(
+                  df = npx_data1 |>
+                    dplyr::filter(
+                      !grepl(pattern = "control",
+                             x = .data[["SampleID"]],
+                             ignore.case = TRUE)
+                    ),
+                  check_log = check_log,
+                  test_results = reference_results$t_test,
+                  method = "TEST#ORA",
+                  ontology = "TEST#KEGG",
+                  organism = "TEST#human"
+                ),
+                regexp = paste("Test mode activated: using fixed version of",
+                               "MSigDB for human")
               ),
               regexp = "Extracting KEGG Database from MSigDB..."
             ),
@@ -461,17 +514,22 @@ test_that(
     expect_message(
       object = expect_message(
         object = expect_message(
-          object = tt_ora_go <- olink_pathway_enrichment(
-            df = npx_data1 |>
-              dplyr::filter(
-                !grepl(pattern = "control",
-                       x = .data[["SampleID"]],
-                       ignore.case = TRUE)
-              ),
-            check_log = check_log,
-            test_results = reference_results$t_test,
-            method = "ORA",
-            ontology = "GO"
+          object = expect_message(
+            object = tt_ora_go <- olink_pathway_enrichment(
+              df = npx_data1 |>
+                dplyr::filter(
+                  !grepl(pattern = "control",
+                         x = .data[["SampleID"]],
+                         ignore.case = TRUE)
+                ),
+              check_log = check_log,
+              test_results = reference_results$t_test,
+              method = "TEST#ORA",
+              ontology = "TEST#GO",
+              organism = "TEST#human"
+            ),
+            regexp = paste("Test mode activated: using fixed version of MSigDB",
+                           "for human")
           ),
           regexp = "Extracting GO Database from MSigDB..."
         ),
@@ -944,10 +1002,14 @@ test_that(
 # Test select_ont ----
 
 test_that(
-  "test_prep works",
+  "select_ont - works",
   {
     skip_on_cran()
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    # no need to test the fixed version standalone files, as they have been
+    # manually extracted. We test that they are used when test_mode is TRUE and
+    # that the correct messages are printed when test_mode is TRUE.
 
     # human & MSigDb ----
 
@@ -955,6 +1017,7 @@ test_that(
       object = ont_hs_msigdb <- select_ont(
         ontology = "MSigDb",
         organism = "human",
+        test_mode = FALSE,
         only_relevant = FALSE
       ),
       regexp = "Using MSigDB..."
@@ -983,6 +1046,7 @@ test_that(
       object = ont_hs_msigdbcom <- select_ont(
         ontology = "MSigDb_com",
         organism = "human",
+        test_mode = FALSE,
         only_relevant = FALSE
       ),
       regexp = "Using MSigDB without KEGG subcollections..."
@@ -1011,6 +1075,7 @@ test_that(
         object = ont_hs_kegg <- select_ont(
           ontology = "KEGG",
           organism = "human",
+          test_mode = FALSE,
           only_relevant = FALSE
         ),
         regexp = "Extracting KEGG Database from MSigDB..."
@@ -1039,6 +1104,7 @@ test_that(
       object = ont_hs_go <- select_ont(
         ontology = "GO",
         organism = "human",
+        test_mode = FALSE,
         only_relevant = FALSE
       ),
       regexp = "Extracting GO Database from MSigDB..."
@@ -1065,6 +1131,7 @@ test_that(
       object = ont_hs_reactome <- select_ont(
         ontology = "Reactome",
         organism = "human",
+        test_mode = FALSE,
         only_relevant = FALSE
       ),
       regexp = "Extracting Reactome Database from MSigDB..."
@@ -1107,6 +1174,7 @@ test_that(
       object = ont_mm_msigdb <- select_ont(
         ontology = "MSigDb",
         organism = "mouse",
+        test_mode = FALSE,
         only_relevant = FALSE
       ),
       regexp = "Using MSigDB..."
@@ -1135,6 +1203,7 @@ test_that(
       object = ont_mm_msigdbcom <- select_ont(
         ontology = "MSigDb_com",
         organism = "mouse",
+        test_mode = FALSE,
         only_relevant = FALSE
       ),
       regexp = "Using MSigDB without KEGG subcollections..."
@@ -1163,6 +1232,7 @@ test_that(
         object = ont_mm_kegg <- select_ont(
           ontology = "KEGG",
           organism = "mouse",
+          test_mode = FALSE,
           only_relevant = FALSE
         ),
         regexp = "Extracting KEGG Database from MSigDB..."
@@ -1191,6 +1261,7 @@ test_that(
       object = ont_mm_go <- select_ont(
         ontology = "GO",
         organism = "mouse",
+        test_mode = FALSE,
         only_relevant = FALSE
       ),
       regexp = "Extracting GO Database from MSigDB..."
@@ -1217,6 +1288,7 @@ test_that(
       object = ont_mm_reactome <- select_ont(
         ontology = "Reactome",
         organism = "mouse",
+        test_mode = FALSE,
         only_relevant = FALSE
       ),
       regexp = "Extracting Reactome Database from MSigDB..."
