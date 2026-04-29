@@ -246,7 +246,7 @@ check_test_mode <- function(method,
   if (all(
     stringr::str_starts(string = c(method, ontology, organism),
                         pattern = "TEST#")
-  )) {
+  ) == TRUE) {
     test_mode <- TRUE
     method <- stringr::str_remove(string = method, pattern = "TEST#")
     ontology <- stringr::str_remove(string = ontology, pattern = "TEST#")
