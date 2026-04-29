@@ -207,7 +207,8 @@ olink_pathway_enrichment <- function(df,
                             check_log = check_log)
 
   msig_df <- select_ont(ontology = ontology,
-                        organism = organism)
+                        organism = organism,
+                        test_mode = test_mode)
 
   # perform pathway enrichment ----
 
@@ -506,6 +507,7 @@ test_prep <- function(df,
 
 select_ont <- function(ontology,
                        organism,
+                       test_mode,
                        only_relevant = TRUE) {
   # Is Package installed
   rlang::check_installed(pkg = c("msigdbr"),
