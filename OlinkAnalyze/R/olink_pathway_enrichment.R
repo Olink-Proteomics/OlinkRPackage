@@ -521,16 +521,32 @@ select_ont <- function(ontology,
       cli::cli_inform(
         "Test mode activated: using fixed version of MSigDB for human..."
       )
-      msig_df <- arrow::open_dataset(
-        sources = system.file(
-          "tests",
-          "testthat",
-          "data",
-          "msidbr_v26.1.0_hs.parquet",
-          package = "OlinkAnalyze"
+
+      msig_fixture_path <- system.file(
+        "tests",
+        "testthat",
+        "data",
+        "msidbr_v26.1.0_hs.parquet",
+        package = "OlinkAnalyze"
+      )
+
+      if (identical(msig_fixture_path, "") || !file.exists(msig_fixture_path)) {
+        cli::cli_abort(
+          c(
+            "x" = "Fixed MSigDB test file not found for {.arg test_mode} =
+            {.val {test_mode}}.",
+            "i" = "Expected file
+            {.val {\"tests/testthat/data/msidbr_v26.1.0_hs.parquet\"}} to be
+            present."
+          )
         )
+      }
+
+      msig_df <- arrow::open_dataset(
+        sources = msig_fixture_path
       ) |>
         dplyr::collect()
+
     } else {
       msig_df <- msigdbr::msigdbr(
         species = "Homo sapiens",
@@ -548,14 +564,29 @@ select_ont <- function(ontology,
       cli::cli_inform(
         "Test mode activated: using fixed version of MSigDB for mouse..."
       )
-      msig_df <- arrow::open_dataset(
-        sources = system.file(
-          "tests",
-          "testthat",
-          "data",
-          "msidbr_v26.1.0_mm.parquet",
-          package = "OlinkAnalyze"
+
+      msig_fixture_path <- system.file(
+        "tests",
+        "testthat",
+        "data",
+        "msidbr_v26.1.0_mm.parquet",
+        package = "OlinkAnalyze"
+      )
+
+      if (identical(msig_fixture_path, "") || !file.exists(msig_fixture_path)) {
+        cli::cli_abort(
+          c(
+            "x" = "Fixed MSigDB test file not found for {.arg test_mode} =
+            {.val {test_mode}}.",
+            "i" = "Expected file
+            {.val {\"tests/testthat/data/msidbr_v26.1.0_mm.parquet\"}} to be
+            present."
+          )
         )
+      }
+
+      msig_df <- arrow::open_dataset(
+        sources = msig_fixture_path
       ) |>
         dplyr::collect()
     } else {
