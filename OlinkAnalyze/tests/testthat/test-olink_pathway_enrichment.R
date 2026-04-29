@@ -44,6 +44,9 @@ test_that(
     suppressMessages(skip_if_not_installed("clusterProfiler"))
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
+    skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_hs.parquet")))
+    skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_mm.parquet")))
+
     expect_message(
       object = expect_message(
         object = expect_message(
@@ -88,6 +91,9 @@ test_that(
     skip_on_cran()
     suppressMessages(skip_if_not_installed("clusterProfiler"))
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_hs.parquet")))
+    skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_mm.parquet")))
 
     # prepare data
 
@@ -179,6 +185,9 @@ test_that(
     suppressMessages(skip_if_not_installed("clusterProfiler"))
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
+    skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_hs.parquet")))
+    skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_mm.parquet")))
+
     expect_message(
       object = expect_message(
         object = expect_message(
@@ -225,6 +234,9 @@ test_that(
     suppressMessages(skip_if_not_installed("clusterProfiler"))
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
+    skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_hs.parquet")))
+    skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_mm.parquet")))
+
     expect_message(
       object = expect_message(
         object = expect_message(
@@ -270,6 +282,9 @@ test_that(
     skip_on_cran()
     suppressMessages(skip_if_not_installed("clusterProfiler"))
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_hs.parquet")))
+    skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_mm.parquet")))
 
     expect_message(
       object = expect_message(
@@ -320,6 +335,9 @@ test_that(
     suppressMessages(skip_if_not_installed("clusterProfiler"))
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
+    skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_hs.parquet")))
+    skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_mm.parquet")))
+
     expect_message(
       object = expect_message(
         object = expect_message(
@@ -368,6 +386,9 @@ test_that(
     suppressMessages(skip_if_not_installed("clusterProfiler"))
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
+    skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_hs.parquet")))
+    skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_mm.parquet")))
+
     expect_message(
       object = expect_message(
         object = expect_message(
@@ -414,6 +435,9 @@ test_that(
     suppressMessages(skip_if_not_installed("clusterProfiler"))
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
 
+    skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_hs.parquet")))
+    skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_mm.parquet")))
+
     expect_message(
       object = expect_message(
         object = expect_message(
@@ -459,6 +483,9 @@ test_that(
     skip_on_cran()
     suppressMessages(skip_if_not_installed("clusterProfiler"))
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_hs.parquet")))
+    skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_mm.parquet")))
 
     expect_warning(
       object = expect_message(
@@ -510,6 +537,9 @@ test_that(
     skip_on_cran()
     suppressMessages(skip_if_not_installed("clusterProfiler"))
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+
+    skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_hs.parquet")))
+    skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_mm.parquet")))
 
     expect_message(
       object = expect_message(
