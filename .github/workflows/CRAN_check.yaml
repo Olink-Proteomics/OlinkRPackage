@@ -99,7 +99,7 @@ jobs:
         shell: Rscript {0}
         
       - name: revdep_check
-        if: success() || failure()      
+        if: (success() || failure()) && steps.check-cran.outputs.on_cran == 'true'
         run: |
           setwd("OlinkAnalyze")
         
