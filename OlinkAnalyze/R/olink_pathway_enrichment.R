@@ -656,7 +656,8 @@ gsea_pathwayenrichment <- function(gene_list,
                                 pvalueCutoff = 1,
                                 verbose = FALSE) |>
     suppressPackageStartupMessages() |>
-    suppressMessages()
+    suppressMessages() |>
+    suppressWarnings()
 
   if (is.null(gsea)) {
     cli::cli_warn(
