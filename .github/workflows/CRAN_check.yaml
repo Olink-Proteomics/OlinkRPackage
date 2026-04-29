@@ -63,14 +63,17 @@ jobs:
           results <- devtools::check(error_on = "never", 
                                      env_vars = c(NOT_CRAN = "false"))
 
-          cat("::group::Errors")
+          cat("::group::Errors\n")
           cli::cli_alert_danger(results$errors)
+          cat("::endgroup::\n")
           
-          cat("::group::Warnings")
+          cat("::group::Warnings\n")
           cli::cli_alert_warning(results$warnings)
+          cat("::endgroup::\n")
           
-          cat("::group::Notes")
+          cat("::group::Notes\n")
           cli::cli_alert_info(results$notes)
+          cat("::endgroup::\n")
         shell: Rscript {0}
 
       - name: Spellcheck
