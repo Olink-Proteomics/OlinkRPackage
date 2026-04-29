@@ -517,27 +517,59 @@ select_ont <- function(ontology,
   # select MSigDB collection based on organism ----
 
   if (organism == "human") {
-    msig_df <- msigdbr::msigdbr(
-      species = "Homo sapiens",
-      collection = "C2"
-    ) |>
-      dplyr::bind_rows(
-        msigdbr::msigdbr(
-          species = "Homo sapiens",
-          collection = "C5"
-        )
+    if (test_mode == TRUE) {
+      cli::cli_inform(
+        "Test mode activated: using fixed version of MSigDB for human..."
       )
+      msig_df <- arrow::open_dataset(
+        sources = system.file(
+          "tests",
+          "testthat",
+          "data",
+          "msidbr_v26.1.0_hs.parquet",
+          package = "OlinkAnalyze"
+        )
+      ) |>
+        dplyr::collect()
+    } else {
+      msig_df <- msigdbr::msigdbr(
+        species = "Homo sapiens",
+        collection = "C2"
+      ) |>
+        dplyr::bind_rows(
+          msigdbr::msigdbr(
+            species = "Homo sapiens",
+            collection = "C5"
+          )
+        )
+    }
   } else if (organism == "mouse") {
-    msig_df <- msigdbr::msigdbr(
-      species = "Mus musculus",
-      collection = "C2"
-    ) |>
-      dplyr::bind_rows(
-        msigdbr::msigdbr(
-          species = "Mus musculus",
-          collection = "C5"
-        )
+    if (test_mode == TRUE) {
+      cli::cli_inform(
+        "Test mode activated: using fixed version of MSigDB for mouse..."
       )
+      msig_df <- arrow::open_dataset(
+        sources = system.file(
+          "tests",
+          "testthat",
+          "data",
+          "msidbr_v26.1.0_mm.parquet",
+          package = "OlinkAnalyze"
+        )
+      ) |>
+        dplyr::collect()
+    } else {
+      msig_df <- msigdbr::msigdbr(
+        species = "Mus musculus",
+        collection = "C2"
+      ) |>
+        dplyr::bind_rows(
+          msigdbr::msigdbr(
+            species = "Mus musculus",
+            collection = "C5"
+          )
+        )
+    }
   }
 
   # select annotation based on ontology ----
