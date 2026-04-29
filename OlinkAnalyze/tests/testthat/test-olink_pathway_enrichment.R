@@ -1101,10 +1101,41 @@ test_that(
   {
     skip_on_cran()
     skip_if_not_installed("msigdbr", minimum_version = "24.1.0")
+    skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_hs.parquet")))
+    skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_mm.parquet")))
 
-    # no need to test the fixed version standalone files, as they have been
-    # manually extracted. We test that they are used when test_mode is TRUE and
-    # that the correct messages are printed when test_mode is TRUE.
+    # human & MSigDb in test mode ----
+
+    expect_message(
+      object = expect_message(
+        object = ont_hs_msigdb_test <- select_ont(
+          ontology = "MSigDb",
+          organism = "human",
+          test_mode = TRUE,
+          only_relevant = FALSE
+        ),
+        regexp = "Using MSigDB..."
+      ),
+      regexp = paste("Test mode activated: using fixed version of MSigDB",
+                     "for human")
+    )
+
+    expect_identical(
+      object = ont_hs_msigdb_test[["gs_collection"]] |> unique() |> sort(),
+      expected = c("C2", "C5")
+    )
+
+    expect_identical(
+      object = ont_hs_msigdb_test[["gs_subcollection"]] |> unique() |> sort(),
+      expected = c("CGP", "CP", "CP:BIOCARTA", "CP:KEGG_LEGACY",
+                   "CP:KEGG_MEDICUS", "CP:PID", "CP:REACTOME",
+                   "CP:WIKIPATHWAYS", "GO:BP", "GO:CC", "GO:MF", "HPO")
+    )
+
+    expect_identical(
+      object = ont_hs_msigdb_test[["db_target_species"]] |> unique() |> sort(),
+      expected = "HS"
+    )
 
     # human & MSigDb ----
 
@@ -1244,6 +1275,39 @@ test_that(
 
     expect_identical(
       object = ont_hs_reactome[["db_target_species"]] |> unique() |> sort(),
+      expected = "HS"
+    )
+
+    # mouse & MSigDB test mode ----
+
+    expect_message(
+      object = expect_message(
+        object = ont_mm_msigdb_test <- select_ont(
+          ontology = "MSigDb",
+          organism = "mouse",
+          test_mode = TRUE,
+          only_relevant = FALSE
+        ),
+        regexp = "Using MSigDB..."
+      ),
+      regexp = paste("Test mode activated: using fixed version of MSigDB",
+                     "for mouse")
+    )
+
+    expect_identical(
+      object = ont_mm_msigdb_test[["gs_collection"]] |> unique() |> sort(),
+      expected = c("C2", "C5")
+    )
+
+    expect_identical(
+      object = ont_mm_msigdb_test[["gs_subcollection"]] |> unique() |> sort(),
+      expected = c("CGP", "CP", "CP:BIOCARTA", "CP:KEGG_LEGACY",
+                   "CP:KEGG_MEDICUS", "CP:PID", "CP:REACTOME",
+                   "CP:WIKIPATHWAYS", "GO:BP", "GO:CC", "GO:MF", "HPO")
+    )
+
+    expect_identical(
+      object = ont_mm_msigdb_test[["db_target_species"]] |> unique() |> sort(),
       expected = "HS"
     )
 
