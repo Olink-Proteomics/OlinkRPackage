@@ -223,6 +223,37 @@ olink_pathway_enrichment <- function(df,
   return(results)
 }
 
+check_test_mode <- function(method,
+                            ontology,
+                            organism) {
+  # set test_mode to FALSE by default
+  test_mode <- FALSE
+
+  # only if all of the arguments method, ontology, and organism start with
+  # "TEST#", then test_mode will be set to TRUE and the "TEST#" prefix will be
+  # removed from the arguments. This is used for internal testing purposes and
+  # is not intended for user use.
+  if (all(
+    stringr::str_starts(string = c(method, ontology, organism),
+                        pattern = "TEST#")
+  )) {
+    test_mode <- TRUE
+    method <- stringr::str_remove(string = method, pattern = "TEST#")
+    ontology <- stringr::str_remove(string = ontology, pattern = "TEST#")
+    organism <- stringr::str_remove(string = organism, pattern = "TEST#")
+  }
+
+  # return the arguments as a list, including test_mode
+  return(
+    list(
+      method = method,
+      ontology = ontology,
+      organism = organism,
+      test_mode = test_mode
+    )
+  )
+}
+
 check_pe_inputs <- function(df,
                             check_log,
                             test_results,
