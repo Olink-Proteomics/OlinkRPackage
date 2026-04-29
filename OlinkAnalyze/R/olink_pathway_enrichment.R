@@ -664,7 +664,7 @@ gsea_pathwayenrichment <- function(gene_list,
     )
     return(NULL)
   } else {
-    return(gsea@result)
+    return(dplyr::filter(gsea@result, !is.na(.data[["ID"]])))
   }
 }
 
