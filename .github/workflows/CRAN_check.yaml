@@ -94,6 +94,7 @@ jobs:
         if: success() || failure()
         id: check-cran
         run: |
+          setwd("OlinkAnalyze")
           pkg <- read.dcf("DESCRIPTION")[, "Package"]
           on_cran <- pkg %in% rownames(available.packages(repos = "https://cran.r-project.org"))
           cat(sprintf("on_cran=%s\n", tolower(on_cran)), file = Sys.getenv("GITHUB_OUTPUT"), append = TRUE)
