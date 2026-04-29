@@ -507,7 +507,7 @@ test_prep <- function(df,
 
 select_ont <- function(ontology,
                        organism,
-                       test_mode,
+                       test_mode = FALSE,
                        only_relevant = TRUE) {
   # Is Package installed
   rlang::check_installed(pkg = c("msigdbr"),
