@@ -167,7 +167,7 @@ test_that(
               olinkid_list = ref_results$anova_time |>
                 dplyr::slice_head(n = 10L) |>
                 dplyr::pull(.data[["OlinkID"]]),
-              coloroption = c("teal", "pink", "orange", "turqoise"),
+              coloroption = c("teal", "pink", "orange", "turquoise"),
               check_log = npx_data1_check
             ),
             regexp = paste("736 entries removed by `clean_npx()` from the",
