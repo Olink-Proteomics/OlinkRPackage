@@ -2159,6 +2159,80 @@ test_that(
   }
 )
 
+# Test run_clean_npx ----
+
+test_that(
+  "run_clean_npx - works - remove samples/assays identified by check_npx",
+  {
+    expected_result <- df |>
+      dplyr::filter(
+        .data[["SampleID"]] == "ValidSample"
+      )
+
+    expect_message(
+      object = curr_result <- run_clean_npx(
+        df = df,
+        check_log = log,
+        control_sample_ids = c("ControlID"),
+        verbose = FALSE
+      ),
+      regexp = paste("9 entries removed by `clean_npx()` from the input",
+                     "dataset `df`. Run `clean_npx()` on your dataset with",
+                     "`verbose = TRUE` to inspect which rows were removed."),
+      fixed = TRUE
+    )
+
+    expect_equal(
+      object = curr_result,
+      expected = expected_result
+    )
+  }
+)
+
+test_that(
+  "run_clean_npx - works - nothing to remove",
+  {
+    tmp_npx_data1 <- npx_data1 |>
+      dplyr::filter(
+        !grepl(pattern = "control",
+               x = .data[["SampleID"]],
+               ignore.case = TRUE)
+      )
+
+    tmp_check_log <- check_npx(df = tmp_npx_data1) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_no_message(
+      object = expect_no_warning(
+        object = expect_no_error(
+          object = curr_result <- run_clean_npx(
+            df = tmp_npx_data1,
+            check_log = tmp_check_log
+          )
+        )
+      )
+    )
+
+    expect_equal(
+      object = curr_result,
+      expected = tmp_npx_data1
+    )
+  }
+)
+
+test_that(
+  "run_clean_npx - error - unexpected arguments",
+  {
+    expect_error(
+      object = run_clean_npx(df = df,
+                             check_log = log,
+                             unexpected_arg = TRUE),
+      regexp = "Unknown argument: \"unexpected_arg\""
+    )
+  }
+)
+
 # Test clean_npx ----------------------------------------------------------
 
 test_that(

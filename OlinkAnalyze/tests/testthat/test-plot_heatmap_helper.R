@@ -7,6 +7,10 @@ npx_data_format <- clean_npx(df = npx_data_format_oct,
                              verbose = FALSE) |>
   suppressWarnings() |>
   suppressMessages()
+check_log_format <- check_npx(df = npx_data_format) |>
+  suppressWarnings() |>
+  suppressMessages()
+rm(npx_data_format_oct, check_log_oct)
 
 # Test plot_heatmap_check_inputs ----
 
@@ -58,16 +62,12 @@ test_that(
 
     expect_no_error(
       object = expect_no_warning(
-        object = expect_message(
-          object = expect_message(
-            object = df_both <- plot_heatmap_clean_df(
-              df = npx_data_format,
-              check_log = check_log_oct,
-              colnames = "both"
-            ),
-            regexp = "Excluding 17 assays with only \"NA\" values"
-          ),
-          regexp = "No column marking control assays in dataset"
+        object = expect_no_message(
+          object = df_both <- plot_heatmap_clean_df(
+            df = npx_data_format,
+            check_log = check_log_format,
+            colnames = "both"
+          )
         )
       )
     )
@@ -79,32 +79,24 @@ test_that(
 
     expect_no_error(
       object = expect_no_warning(
-        object = expect_message(
-          object = expect_message(
-            object = plot_heatmap_clean_df(
-              df = npx_data_format,
-              check_log = check_log_oct,
-              colnames = "oid"
-            ),
-            regexp = "Excluding 17 assays with only \"NA\" values"
-          ),
-          regexp = "No column marking control assays in dataset"
+        object = expect_no_message(
+          object = plot_heatmap_clean_df(
+            df = npx_data_format,
+            check_log = check_log_format,
+            colnames = "oid"
+          )
         )
       )
     )
 
     expect_no_error(
       object = expect_no_warning(
-        object = expect_message(
-          object = expect_message(
-            object = plot_heatmap_clean_df(
-              df = npx_data_format,
-              check_log = check_log_oct,
-              colnames = "assay"
-            ),
-            regexp = "Excluding 17 assays with only \"NA\" values"
-          ),
-          regexp = "No column marking control assays in dataset"
+        object = expect_no_message(
+          object = plot_heatmap_clean_df(
+            df = npx_data_format,
+            check_log = check_log_format,
+            colnames = "assay"
+          )
         )
       )
     )
@@ -121,11 +113,9 @@ test_that(
               .data[["NPX"]]
             )
           ),
-        check_log = check_log_oct,
+        check_log = check_log_format,
         colnames = "assay"
       ) |>
-        suppressMessages() |>
-        suppressWarnings() |>
         dplyr::pull(.data[["oid"]]) |>
         unique(),
       "OID30538"
@@ -140,18 +130,16 @@ test_that(
   {
     npx_data_format_clean <- plot_heatmap_clean_df(
       df = npx_data_format,
-      check_log = check_log_oct,
+      check_log = check_log_format,
       colnames = "assay"
-    ) |>
-      suppressMessages() |>
-      suppressWarnings()
+    )
 
     expect_no_error(
       object = expect_no_warning(
         object = expect_no_message(
           object = npx_data_format_wide <- plot_heatmap_df_to_wide(
             df = npx_data_format_clean,
-            check_log = check_log_oct,
+            check_log = check_log_format,
             colnames = "assay"
           )
         )
@@ -211,14 +199,12 @@ test_that(
   {
     npx_data_format_clean <- plot_heatmap_clean_df(
       df = npx_data_format,
-      check_log = check_log_oct,
+      check_log = check_log_format,
       colnames = "assay"
-    ) |>
-      suppressMessages() |>
-      suppressWarnings()
+    )
     npx_data_format_wide <- plot_heatmap_df_to_wide(
       df = npx_data_format_clean,
-      check_log = check_log_oct,
+      check_log = check_log_format,
       colnames = "assay"
     )
 
@@ -226,7 +212,7 @@ test_that(
       object = plot_heatmap_pheatmap_args(
         df_wide = npx_data_format_wide,
         df = npx_data_format_clean,
-        check_log = check_log_oct,
+        check_log = check_log_format,
         variable_col_list = NULL,
         variable_row_list = NULL,
         center_scale = TRUE,
@@ -257,7 +243,7 @@ test_that(
       object = plot_heatmap_pheatmap_args(
         df_wide = npx_data_format_wide,
         df = npx_data_format_clean,
-        check_log = check_log_oct,
+        check_log = check_log_format,
         variable_row_list = c("treatment2"),
         variable_col_list = c("Assay_Warning"),
         center_scale = TRUE,
@@ -312,7 +298,7 @@ test_that(
       object = plot_heatmap_pheatmap_args(
         df_wide = npx_data_format_wide,
         df = npx_data_format_clean,
-        check_log = check_log_oct,
+        check_log = check_log_format,
         variable_col_list = NULL,
         variable_row_list = NULL,
         center_scale = TRUE,
@@ -350,14 +336,12 @@ test_that(
   {
     npx_data_format_clean <- plot_heatmap_clean_df(
       df = npx_data_format,
-      check_log = check_log_oct,
+      check_log = check_log_format,
       colnames = "assay"
-    ) |>
-      suppressMessages() |>
-      suppressWarnings()
+    )
     npx_data_format_wide <- plot_heatmap_df_to_wide(
       df = npx_data_format_clean,
-      check_log = check_log_oct,
+      check_log = check_log_format,
       colnames = "assay"
     )
 
@@ -434,21 +418,19 @@ test_that(
   {
     npx_data_format_clean <- plot_heatmap_clean_df(
       df = npx_data_format,
-      check_log = check_log_oct,
+      check_log = check_log_format,
       colnames = "assay"
-    ) |>
-      suppressMessages() |>
-      suppressWarnings()
+    )
     npx_data_format_wide <- plot_heatmap_df_to_wide(
       df = npx_data_format_clean,
-      check_log = check_log_oct,
+      check_log = check_log_format,
       colnames = "assay"
     )
 
     expect_equal(
       object = pheatmap_annotate_heatmap(
         df = npx_data_format_clean,
-        check_log = check_log_oct,
+        check_log = check_log_format,
         colnames = "assay",
         pheatmap_args = list(
           mat = npx_data_format_wide,

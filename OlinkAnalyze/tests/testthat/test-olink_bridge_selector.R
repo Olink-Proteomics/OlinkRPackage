@@ -5,19 +5,33 @@ test_that(
       suppressMessages() |>
       suppressWarnings()
 
-    expect_message(
-      object = bridge_samples <- olink_bridgeselector(
-        df = npx_data1,
-        sampleMissingFreq = 0.1,
-        n = 8L,
-        check_log = check_log
-      ),
-      regexp = paste("No sample type column detected in the input dataset",
-                     "`df`! Ensure that control samples have been filtered",
-                     "out!")
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = expect_message(
+            object = bridge_samples <- olink_bridgeselector(
+              df = npx_data1,
+              sampleMissingFreq = 0.1,
+              n = 8L,
+              check_log = check_log
+            ),
+            regexp = paste("736 entries removed by `clean_npx()` from the",
+                           "input dataset `df`. Run `clean_npx()` on your",
+                           "dataset with `verbose = TRUE` to inspect which",
+                           "rows were removed."),
+            fixed = TRUE
+          ),
+          regexp = paste("No sample type column detected in the input dataset",
+                         "`df`! Ensure that control samples have been filtered",
+                         "out!")
+        )
+      )
     )
 
-    expect_identical(object = dim(bridge_samples), expected = c(8L, 3L))
+    expect_identical(
+      object = dim(bridge_samples),
+      expected = c(8L, 3L)
+    )
     expect_equal(
       object = bridge_samples |>
         dplyr::arrange(
@@ -44,20 +58,31 @@ test_that(
 
     # check maximum number of samples ----
 
-    expect_message(
-      object = expect_equal(
-        object = olink_bridgeselector(
-          df = npx_data1,
-          sampleMissingFreq = 0.1,
-          n = 150,
-          check_log = check_log
-        ) |>
-          nrow(),
-        expected = 150L
-      ),
-      regexp = paste("No sample type column detected in the input dataset",
-                     "`df`! Ensure that control samples have been filtered",
-                     "out!")
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = expect_message(
+            object = expect_equal(
+              object = olink_bridgeselector(
+                df = npx_data1,
+                sampleMissingFreq = 0.1,
+                n = 150L,
+                check_log = check_log
+              ) |>
+                nrow(),
+              expected = 150L
+            ),
+            regexp = paste("736 entries removed by `clean_npx()` from the",
+                           "input dataset `df`. Run `clean_npx()` on your",
+                           "dataset with `verbose = TRUE` to inspect which",
+                           "rows were removed."),
+            fixed = TRUE
+          ),
+          regexp = paste("No sample type column detected in the input dataset",
+                         "`df`! Ensure that control samples have been filtered",
+                         "out!")
+        )
+      )
     )
   }
 )
@@ -137,39 +162,61 @@ test_that(
 test_that(
   "olink_bridgeselector - works - alternative column names",
   {
-    expect_message(
-      object = ref_data <- olink_bridgeselector(
-        df = npx_data1,
-        sampleMissingFreq = 0.1,
-        n = 8L,
-        check_log = check_npx(df = npx_data1) |>
-          suppressMessages() |>
-          suppressWarnings()
-      ),
-      regexp = paste("No sample type column detected in the input dataset",
-                     "`df`! Ensure that control samples have been filtered",
-                     "out!")
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = expect_message(
+            object = ref_data <- olink_bridgeselector(
+              df = npx_data1,
+              sampleMissingFreq = 0.1,
+              n = 8L,
+              check_log = check_npx(df = npx_data1) |>
+                suppressMessages() |>
+                suppressWarnings()
+            ),
+            regexp = paste("736 entries removed by `clean_npx()` from the",
+                           "input dataset `df`. Run `clean_npx()` on your",
+                           "dataset with `verbose = TRUE` to inspect which",
+                           "rows were removed."),
+            fixed = TRUE
+          ),
+          regexp = paste("No sample type column detected in the input dataset",
+                         "`df`! Ensure that control samples have been filtered",
+                         "out!")
+        )
+      )
     )
 
     # Max LOD ----
 
-    expect_message(
-      object = ml_data <- olink_bridgeselector(
-        df = npx_data1 |>
-          dplyr::mutate(`Max LOD` = .data[["LOD"]]) |>
-          dplyr::select(-dplyr::all_of("LOD")),
-        sampleMissingFreq = 0.1,
-        n = 8,
-        check_log = npx_data1 |>
-          dplyr::mutate(`Max LOD` = .data[["LOD"]]) |>
-          dplyr::select(-dplyr::all_of("LOD")) |>
-          check_npx() |>
-          suppressMessages() |>
-          suppressWarnings()
-      ),
-      regexp = paste("No sample type column detected in the input dataset",
-                     "`df`! Ensure that control samples have been filtered",
-                     "out!")
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = expect_message(
+            object = ml_data <- olink_bridgeselector(
+              df = npx_data1 |>
+                dplyr::mutate(`Max LOD` = .data[["LOD"]]) |>
+                dplyr::select(-dplyr::all_of("LOD")),
+              sampleMissingFreq = 0.1,
+              n = 8,
+              check_log = npx_data1 |>
+                dplyr::mutate(`Max LOD` = .data[["LOD"]]) |>
+                dplyr::select(-dplyr::all_of("LOD")) |>
+                check_npx() |>
+                suppressMessages() |>
+                suppressWarnings()
+            ),
+            regexp = paste("736 entries removed by `clean_npx()` from the",
+                           "input dataset `df`. Run `clean_npx()` on your",
+                           "dataset with `verbose = TRUE` to inspect which",
+                           "rows were removed."),
+            fixed = TRUE
+          ),
+          regexp = paste("No sample type column detected in the input dataset",
+                         "`df`! Ensure that control samples have been filtered",
+                         "out!")
+        )
+      )
     )
 
     expect_length(
@@ -180,23 +227,34 @@ test_that(
 
     # Plate LOD ----
 
-    expect_message(
-      object = pl_data <- olink_bridgeselector(
-        df = npx_data1 |>
-          dplyr::mutate(`Plate LOD` = .data[["LOD"]]) |>
-          dplyr::select(-dplyr::all_of("LOD")),
-        sampleMissingFreq = 0.1,
-        n = 8,
-        check_log = npx_data1 |>
-          dplyr::mutate(`Plate LOD` = .data[["LOD"]]) |>
-          dplyr::select(-dplyr::all_of("LOD")) |>
-          check_npx() |>
-          suppressMessages() |>
-          suppressWarnings()
-      ),
-      regexp = paste("No sample type column detected in the input dataset",
-                     "`df`! Ensure that control samples have been filtered",
-                     "out!")
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = expect_message(
+            object = pl_data <- olink_bridgeselector(
+              df = npx_data1 |>
+                dplyr::mutate(`Plate LOD` = .data[["LOD"]]) |>
+                dplyr::select(-dplyr::all_of("LOD")),
+              sampleMissingFreq = 0.1,
+              n = 8,
+              check_log = npx_data1 |>
+                dplyr::mutate(`Plate LOD` = .data[["LOD"]]) |>
+                dplyr::select(-dplyr::all_of("LOD")) |>
+                check_npx() |>
+                suppressMessages() |>
+                suppressWarnings()
+            ),
+            regexp = paste("736 entries removed by `clean_npx()` from the",
+                           "input dataset `df`. Run `clean_npx()` on your",
+                           "dataset with `verbose = TRUE` to inspect which",
+                           "rows were removed."),
+            fixed = TRUE
+          ),
+          regexp = paste("No sample type column detected in the input dataset",
+                         "`df`! Ensure that control samples have been filtered",
+                         "out!")
+        )
+      )
     )
 
     expect_length(
@@ -207,23 +265,34 @@ test_that(
 
     # Plate_LOD ----
 
-    expect_message(
-      object = p_l_data <- olink_bridgeselector(
-        df = npx_data1 |>
-          dplyr::mutate(Plate_LOD = .data[["LOD"]]) |>
-          dplyr::select(-dplyr::all_of("LOD")),
-        sampleMissingFreq = 0.1,
-        n = 8,
-        check_log = npx_data1 |>
-          dplyr::mutate(Plate_LOD = .data[["LOD"]]) |>
-          dplyr::select(-dplyr::all_of("LOD")) |>
-          check_npx() |>
-          suppressMessages() |>
-          suppressWarnings()
-      ),
-      regexp = paste("No sample type column detected in the input dataset",
-                     "`df`! Ensure that control samples have been filtered",
-                     "out!")
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = expect_message(
+            object = p_l_data <- olink_bridgeselector(
+              df = npx_data1 |>
+                dplyr::mutate(Plate_LOD = .data[["LOD"]]) |>
+                dplyr::select(-dplyr::all_of("LOD")),
+              sampleMissingFreq = 0.1,
+              n = 8,
+              check_log = npx_data1 |>
+                dplyr::mutate(Plate_LOD = .data[["LOD"]]) |>
+                dplyr::select(-dplyr::all_of("LOD")) |>
+                check_npx() |>
+                suppressMessages() |>
+                suppressWarnings()
+            ),
+            regexp = paste("736 entries removed by `clean_npx()` from the",
+                           "input dataset `df`. Run `clean_npx()` on your",
+                           "dataset with `verbose = TRUE` to inspect which",
+                           "rows were removed."),
+            fixed = TRUE
+          ),
+          regexp = paste("No sample type column detected in the input dataset",
+                         "`df`! Ensure that control samples have been filtered",
+                         "out!")
+        )
+      )
     )
 
     expect_length(
@@ -234,23 +303,34 @@ test_that(
 
     # LODNPX ----
 
-    expect_message(
-      object = lodnpx_data <- olink_bridgeselector(
-        df = npx_data1 |>
-          dplyr::mutate(LODNPX = .data[["LOD"]]) |>
-          dplyr::select(-dplyr::all_of("LOD")),
-        sampleMissingFreq = 0.1,
-        n = 8,
-        check_log = npx_data1 |>
-          dplyr::mutate(LODNPX = .data[["LOD"]]) |>
-          dplyr::select(-dplyr::all_of("LOD")) |>
-          check_npx() |>
-          suppressMessages() |>
-          suppressWarnings()
-      ),
-      regexp = paste("No sample type column detected in the input dataset",
-                     "`df`! Ensure that control samples have been filtered",
-                     "out!")
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = expect_message(
+            object = lodnpx_data <- olink_bridgeselector(
+              df = npx_data1 |>
+                dplyr::mutate(LODNPX = .data[["LOD"]]) |>
+                dplyr::select(-dplyr::all_of("LOD")),
+              sampleMissingFreq = 0.1,
+              n = 8,
+              check_log = npx_data1 |>
+                dplyr::mutate(LODNPX = .data[["LOD"]]) |>
+                dplyr::select(-dplyr::all_of("LOD")) |>
+                check_npx() |>
+                suppressMessages() |>
+                suppressWarnings()
+            ),
+            regexp = paste("736 entries removed by `clean_npx()` from the",
+                           "input dataset `df`. Run `clean_npx()` on your",
+                           "dataset with `verbose = TRUE` to inspect which",
+                           "rows were removed."),
+            fixed = TRUE
+          ),
+          regexp = paste("No sample type column detected in the input dataset",
+                         "`df`! Ensure that control samples have been filtered",
+                         "out!")
+        )
+      )
     )
 
     testthat::expect_length(
@@ -261,30 +341,41 @@ test_that(
 
     # PlateLOD and MaxLOD ----
 
-    expect_message(
-      object = expect_message(
-        object = pl_ml_data <- olink_bridgeselector(
-          df = npx_data1 |>
-            dplyr::mutate(PlateLOD = .data[["LOD"]] - 0.1,
-                          MaxLOD = .data[["LOD"]]) |>
-            dplyr::select(-dplyr::all_of("LOD")),
-          sampleMissingFreq = 0.1,
-          n = 8,
-          check_log = npx_data1 |>
-            dplyr::mutate(PlateLOD = .data[["LOD"]] - 0.1,
-                          MaxLOD = .data[["LOD"]]) |>
-            dplyr::select(-dplyr::all_of("LOD")) |>
-            check_npx() |>
-            suppressMessages() |>
-            suppressWarnings()
-        ),
-        regexp = paste("No sample type column detected in the input dataset",
-                       "`df`! Ensure that control samples have been filtered",
-                       "out!")
-      ),
-      regexp = paste("Multiple LOD columns detected. Will be using \"MaxLOD\"",
-                     "as filter criteria."),
-      fixed = TRUE
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = expect_message(
+            object = expect_message(
+              object = pl_ml_data <- olink_bridgeselector(
+                df = npx_data1 |>
+                  dplyr::mutate(PlateLOD = .data[["LOD"]] - 0.1,
+                                MaxLOD = .data[["LOD"]]) |>
+                  dplyr::select(-dplyr::all_of("LOD")),
+                sampleMissingFreq = 0.1,
+                n = 8,
+                check_log = npx_data1 |>
+                  dplyr::mutate(PlateLOD = .data[["LOD"]] - 0.1,
+                                MaxLOD = .data[["LOD"]]) |>
+                  dplyr::select(-dplyr::all_of("LOD")) |>
+                  check_npx() |>
+                  suppressMessages() |>
+                  suppressWarnings()
+              ),
+              regexp = paste("736 entries removed by `clean_npx()` from the",
+                             "input dataset `df`. Run `clean_npx()` on your",
+                             "dataset with `verbose = TRUE` to inspect which",
+                             "rows were removed."),
+              fixed = TRUE
+            ),
+            regexp = paste("No sample type column detected in the input",
+                           "dataset `df`! Ensure that control samples have",
+                           "been filtered out!")
+          ),
+          regexp = paste("Multiple LOD columns detected. Will be using",
+                         "\"MaxLOD\" as filter criteria."),
+          fixed = TRUE
+        )
+      )
     )
 
     testthat::expect_length(
@@ -295,25 +386,36 @@ test_that(
 
     # no LOD ----
 
-    expect_message(
-      object = expect_message(
-        object = nolod_data <- olink_bridgeselector(
-          df = npx_data1 |>
-            dplyr::select(-dplyr::all_of("LOD")),
-          sampleMissingFreq = 0.1,
-          n = 8,
-          check_log = npx_data1 |>
-            dplyr::select(-dplyr::all_of("LOD")) |>
-            check_npx() |>
-            suppressMessages() |>
-            suppressWarnings()
-        ),
-        regexp = paste("No sample type column detected in the input dataset",
-                       "`df`! Ensure that control samples have been filtered",
-                       "out!")
-      ),
-      regexp = "LOD not available, hence not filtering by LOD.",
-      fixed = TRUE
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = expect_message(
+            object = expect_message(
+              object = nolod_data <- olink_bridgeselector(
+                df = npx_data1 |>
+                  dplyr::select(-dplyr::all_of("LOD")),
+                sampleMissingFreq = 0.1,
+                n = 8,
+                check_log = npx_data1 |>
+                  dplyr::select(-dplyr::all_of("LOD")) |>
+                  check_npx() |>
+                  suppressMessages() |>
+                  suppressWarnings()
+              ),
+              regexp = paste("736 entries removed by `clean_npx()` from the",
+                             "input dataset `df`. Run `clean_npx()` on your",
+                             "dataset with `verbose = TRUE` to inspect which",
+                             "rows were removed."),
+              fixed = TRUE
+            ),
+            regexp = paste("No sample type column detected in the input",
+                           "dataset `df`! Ensure that control samples have",
+                           "been filtered out!")
+          ),
+          regexp = "LOD not available, hence not filtering by LOD.",
+          fixed = TRUE
+        )
+      )
     )
 
     expect_identical(
@@ -345,23 +447,34 @@ test_that(
 
     # SampleQC ----
 
-    expect_message(
-      object = sampleqc_data <- olink_bridgeselector(
-        df = npx_data1 |>
-          dplyr::mutate(SampleQC = .data[["QC_Warning"]]) |>
-          dplyr::select(-dplyr::all_of("QC_Warning")),
-        sampleMissingFreq = 0.1,
-        n = 8,
-        check_log = npx_data1 |>
-          dplyr::mutate(SampleQC = .data[["QC_Warning"]]) |>
-          dplyr::select(-dplyr::all_of("QC_Warning")) |>
-          check_npx() |>
-          suppressMessages() |>
-          suppressWarnings()
-      ),
-      regexp = paste("No sample type column detected in the input dataset",
-                     "`df`! Ensure that control samples have been filtered",
-                     "out!")
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = expect_message(
+            object = sampleqc_data <- olink_bridgeselector(
+              df = npx_data1 |>
+                dplyr::mutate(SampleQC = .data[["QC_Warning"]]) |>
+                dplyr::select(-dplyr::all_of("QC_Warning")),
+              sampleMissingFreq = 0.1,
+              n = 8,
+              check_log = npx_data1 |>
+                dplyr::mutate(SampleQC = .data[["QC_Warning"]]) |>
+                dplyr::select(-dplyr::all_of("QC_Warning")) |>
+                check_npx() |>
+                suppressMessages() |>
+                suppressWarnings()
+            ),
+            regexp = paste("736 entries removed by `clean_npx()` from the",
+                           "input dataset `df`. Run `clean_npx()` on your",
+                           "dataset with `verbose = TRUE` to inspect which",
+                           "rows were removed."),
+            fixed = TRUE
+          ),
+          regexp = paste("No sample type column detected in the input dataset",
+                         "`df`! Ensure that control samples have been filtered",
+                         "out!")
+        )
+      )
     )
 
     expect_length(
@@ -375,34 +488,56 @@ test_that(
 test_that(
   "olink_bridgeselector - works - alternative argument names",
   {
-    expect_message(
-      object = ref_data <- olink_bridgeselector(
-        df = npx_data1,
-        sampleMissingFreq = 0.1,
-        n = 8L,
-        check_log = check_npx(df = npx_data1) |>
-          suppressMessages() |>
-          suppressWarnings()
-      ),
-      regexp = paste("No sample type column detected in the input dataset",
-                     "`df`! Ensure that control samples have been filtered",
-                     "out!")
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = expect_message(
+            object = ref_data <- olink_bridgeselector(
+              df = npx_data1,
+              sampleMissingFreq = 0.1,
+              n = 8L,
+              check_log = check_npx(df = npx_data1) |>
+                suppressMessages() |>
+                suppressWarnings()
+            ),
+            regexp = paste("736 entries removed by `clean_npx()` from the",
+                           "input dataset `df`. Run `clean_npx()` on your",
+                           "dataset with `verbose = TRUE` to inspect which",
+                           "rows were removed."),
+            fixed = TRUE
+          ),
+          regexp = paste("No sample type column detected in the input dataset",
+                         "`df`! Ensure that control samples have been filtered",
+                         "out!")
+        )
+      )
     )
 
     # alt data ----
 
-    expect_message(
-      object = alt_data <- olink_bridgeselector(
-        df = npx_data1,
-        sample_missing_freq = 0.1,
-        n = 8L,
-        check_log = check_npx(df = npx_data1) |>
-          suppressMessages() |>
-          suppressWarnings()
-      ),
-      regexp = paste("No sample type column detected in the input dataset",
-                     "`df`! Ensure that control samples have been filtered",
-                     "out!")
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = expect_message(
+            object = alt_data <- olink_bridgeselector(
+              df = npx_data1,
+              sample_missing_freq = 0.1,
+              n = 8L,
+              check_log = check_npx(df = npx_data1) |>
+                suppressMessages() |>
+                suppressWarnings()
+            ),
+            regexp = paste("736 entries removed by `clean_npx()` from the",
+                           "input dataset `df`. Run `clean_npx()` on your",
+                           "dataset with `verbose = TRUE` to inspect which",
+                           "rows were removed."),
+            fixed = TRUE
+          ),
+          regexp = paste("No sample type column detected in the input dataset",
+                         "`df`! Ensure that control samples have been filtered",
+                         "out!")
+        )
+      )
     )
 
     expect_identical(
@@ -442,11 +577,17 @@ test_that(
       suppressWarnings()
 
     expect_error(
-      object = olink_bridgeselector(
-        df = npx_data_format22,
-        sampleMissingFreq = 0.1,
-        n = 2L,
-        check_log = npx_data_format22_check_log
+      object = expect_message(
+        object = olink_bridgeselector(
+          df = npx_data_format22,
+          sampleMissingFreq = 0.1,
+          n = 2L,
+          check_log = npx_data_format22_check_log
+        ),
+        regexp = paste("2530 entries removed by `clean_npx()` from the input",
+                       "dataset `df`. Run `clean_npx()` on your dataset with",
+                       "`verbose = TRUE` to inspect which rows were removed."),
+        fixed = TRUE
       ),
       regexp = paste("Only 0 samples eligible. Increase `sample_missing_freq`",
                      "and/or decrease `n`."),
@@ -556,12 +697,18 @@ test_that(
 
     expect_warning(
       object = expect_message(
-        object = olink_bridgeselector(
-          df = npx_data1,
-          sampleMissingFreq = 0.1,
-          n = 8L,
-          check_log = npx_data1_check_log,
-          unexpected_arg = "unexpected"
+        object = expect_message(
+          object = olink_bridgeselector(
+            df = npx_data1,
+            sampleMissingFreq = 0.1,
+            n = 8L,
+            check_log = npx_data1_check_log,
+            unexpected_arg = "unexpected"
+          ),
+          regexp = paste("736 entries removed by `clean_npx()` from the input",
+                         "dataset `df`. Run `clean_npx()` on your dataset with",
+                         "`verbose = TRUE` to inspect which rows were removed"),
+          fixed = TRUE
         ),
         regexp = paste("No sample type column detected in the input dataset",
                        "`df`! Ensure that control samples have been filtered",
@@ -574,14 +721,20 @@ test_that(
 
     expect_warning(
       object = expect_message(
-        object = olink_bridgeselector(
-          df = npx_data1,
-          sampleMissingFreq = 0.1,
-          n = 8L,
-          check_log = npx_data1_check_log,
-          unexpected_arg = "unexpected",
-          unexpected_arg2 = "I_Should_Not_Be_Here",
-          unexpected_arg3 = "Me_Neither"
+        object = expect_message(
+          object = olink_bridgeselector(
+            df = npx_data1,
+            sampleMissingFreq = 0.1,
+            n = 8L,
+            check_log = npx_data1_check_log,
+            unexpected_arg = "unexpected",
+            unexpected_arg2 = "I_Should_Not_Be_Here",
+            unexpected_arg3 = "Me_Neither"
+          ),
+          regexp = paste("736 entries removed by `clean_npx()` from the input",
+                         "dataset `df`. Run `clean_npx()` on your dataset with",
+                         "`verbose = TRUE` to inspect which rows were removed"),
+          fixed = TRUE
         ),
         regexp = paste("No sample type column detected in the input dataset",
                        "`df`! Ensure that control samples have been filtered",
