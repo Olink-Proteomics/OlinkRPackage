@@ -202,7 +202,7 @@ olink_pca_plot <- function(df,
   # Uniprot IDs. Note that we do not remove samples with duplicate SampleID,
   # control samples or assays, or samples/assays with QC warnings, as this
   # would be the user's decision.
-  df <- clean_npx(
+  df <- run_clean_npx(
     df = df,
     check_log = check_log,
     remove_assay_na = TRUE,
@@ -215,8 +215,7 @@ olink_pca_plot <- function(df,
     convert_nonunique_uniprot = TRUE,
     out_df = "tibble",
     verbose = FALSE
-  ) |>
-    suppressMessages()
+  )
 
   # OSI checks - ran only if OSI columns selected to color
   osi_cat_cols <- c("OSICategory")
