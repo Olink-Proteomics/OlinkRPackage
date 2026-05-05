@@ -18,6 +18,8 @@ columns of choice for annotations.}
 
 \item{check_log}{output from check_npx on \code{df}}
 
+\item{pheatmap_args}{pheatmap argument list}
+
 \item{variable_row_list}{Columns in \code{df} to be annotated for rows in
 the heatmap.}
 

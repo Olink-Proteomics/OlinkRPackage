@@ -22,6 +22,8 @@ columns of choice for annotations.}
 \item{colnames}{Character. Determines how to label the columns.
 Must be 'assay', 'oid', or 'both' (default 'both').}
 
+\item{pheatmap_args}{pheatmap argument list}
+
 \item{variable_row_list}{Columns in \code{df} to be annotated for rows in
 the heatmap.}
 
