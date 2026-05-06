@@ -27,7 +27,7 @@ RUN install2.r --error \
 # Create the .Rprofile file to update packages from a Posit Public PM snapshot.
 # This is needed to update R libraries that are outdated in the original docker
 # image. The docker image for:
-# - R 4.1.3 has a snapshot from 2022-04-21 on Ubuntu 22.04 Focal.
+# - R 4.1.3 has a snapshot from 2022-04-21 on Ubuntu 20.04 Focal.
 # - R 4.2.3 has a snapshot from 2023-04-20 on Ubuntu 22.04 Jammy.
 # - R 4.3.3 has a snapshot from 2024-04-23 on Ubuntu 22.04 Jammy.
 # - R 4.4.3 has a snapshot from 2025-04-10 on Ubuntu 24.04 Noble.
@@ -43,9 +43,11 @@ RUN install2.r --error \
 # These are the snapshots when all packages satisfy the requiered versions for
 # OlinkAnalyze.
 #
-# In addition, different docker images are built on different Ubuntu versions
-# (see above in list). This is why we have the nested if statements below with
-# different Posit Public Package Manager snapshots.
+# Each rocker image is built on a specific Ubuntu release, so the Posit Public
+# Package Manager URL must match both the R version and the Ubuntu codename.
+#
+# These snapshots are chosen so that all packages satisfy the required versions
+# for OlinkAnalyze.
 #
 ARG r_profile=.Rprofile
 
