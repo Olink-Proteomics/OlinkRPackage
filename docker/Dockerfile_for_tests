@@ -121,9 +121,9 @@ RUN set -e; \
 RUN R -e "install.packages('BiocManager'); \
           BiocManager::install('clusterProfiler', ask = FALSE, update = FALSE)"
 
-# In R 4.5.3, devtools 2.5.0 is installed, in which devtools::install_dev_deps
-# is deprecated. Instead, pak::local_install_dev_deps is recommended to repalce
-# it.
+# In R 4.5.3, devtools 2.5.0 deprecates devtools::install_dev_deps(). Instead,
+# it recommends using pak::local_install_dev_deps. Use pak only for that version
+# and keep devtools for older legacy images.
 RUN set -e; \
   if [ "$R_VERSION" = "4.5.3" ]; then \
     R -e "pak::local_install_dev_deps(root = '/src', dependencies = TRUE)"; \
