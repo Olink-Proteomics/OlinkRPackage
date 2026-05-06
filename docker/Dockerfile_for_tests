@@ -25,9 +25,9 @@ RUN install2.r --error \
   bspm \
   && rm -rf /tmp/downloaded_packages
 
-# Create the .Rprofile file to update packages from Posit Publi Package Manager
-# (PPPM) snapshots. This is needed to update R libraries that are outdated in
-# the original docker image.
+# Create the .Rprofile file to install packages from a snapshot of Posit Public
+# Package Manager (PPPM). This is needed to keep R libraries in sync with the
+# Bioc version and the original docker image.
 #
 # Each rocker image is built on a specific Ubuntu release, so the PPPM CRAN URL
 # must match both the R version and the Ubuntu codename:
@@ -48,8 +48,8 @@ RUN install2.r --error \
 # - R 4.4.3: CRAN 2026-02-04, Ubuntu 24.04 Noble, Bioconductor 3.20 2025-04-10.
 # - R 4.5.3: CRAN 2026-04-23, Ubuntu 24.04 Noble, Bioconductor 3.22 2026-04-09.
 #
-# These snapshots are chosen so that all packages satisfy the required versions
-# for OlinkAnalyze.
+# These snapshots are chosen so that packages satisfy the required versions for
+# OlinkAnalyze.
 # 
 # Even after selecting snapshots, some of them do not host the latest version of
 # certain packages (e.g. cli or dplyr), which we update manually.
