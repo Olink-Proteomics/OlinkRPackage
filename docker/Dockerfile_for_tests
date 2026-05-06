@@ -74,11 +74,11 @@ RUN set -e; \
     "))" \
     "" \
     "# Bioconductor via Posit Package Manager" \
-    "options(BioC_mirror = \"https://packagemanager.posit.co/bioconductor/$bioc\")" \
-    "options(BIOCONDUCTOR_CONFIG_FILE = \"https://packagemanager.posit.co/bioconductor/$bioc/config.yaml\")" \
+    "options(BioC_mirror = \"https://packagemanager.posit.co/bioconductor/latest\")" \
+    "options(BIOCONDUCTOR_CONFIG_FILE = \"https://packagemanager.posit.co/bioconductor/latest/config.yaml\")" \
     "Sys.setenv(R_BIOC_VERSION = \"$bioc\")" \
     > "$r_profile"
-
+    
 ENV _R_CHECK_FORCE_SUGGESTS_=FALSE
 
 COPY OlinkAnalyze/DESCRIPTION /src/DESCRIPTION
