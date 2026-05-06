@@ -40,7 +40,7 @@ RUN install2.r --error \
 # - R 4.4.3 has a snapshot from 2025-04-10 on Ubuntu 24.04 Noble.
 # - R 4.5.3 has a snapshot from 2026-04-23 on Ubuntu 24.04 Noble.
 #
-# Bioconductor is also served through PPM. Both the Bioconductor release and
+# Bioconductor is also served through PPPM. Both the Bioconductor release and
 # snapshot date are pinned per R version to avoid drift across legacy builds.
 #
 # The CRAN snapshot below is dictated by the Bioconductor version on PPPM
