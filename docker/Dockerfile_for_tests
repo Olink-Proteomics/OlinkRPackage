@@ -117,6 +117,10 @@ RUN set -e; \
       exit 1 ;; \
   esac
 
+# Install clusterProfiler from Bioconductor
+RUN R -e "install.packages('BiocManager'); \
+          BiocManager::install('clusterProfiler', ask = FALSE, update = FALSE)"
+
 RUN R -e "devtools::install_dev_deps(pkg = '/src', dependencies = TRUE)"
 
 ENTRYPOINT ["R", "--vanilla"]
