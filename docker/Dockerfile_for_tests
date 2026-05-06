@@ -1,4 +1,5 @@
-ARG  R_VERSION=4.4.0
+# Default used for local builds; CI overrides via build args
+ARG R_VERSION=4.5.3
 FROM ghcr.io/rocker-org/tidyverse:${R_VERSION}
 
 # System libs
