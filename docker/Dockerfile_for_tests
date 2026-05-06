@@ -20,6 +20,7 @@ RUN install2.r --error \
   --skipinstalled \
   devtools \
   remotes \
+  pak \
   rcmdcheck \
   lintr \
   lme4 \
