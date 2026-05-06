@@ -19,6 +19,7 @@ RUN install2.r --error \
   --deps TRUE \
   --skipinstalled \
   devtools \
+  remotes \
   rcmdcheck \
   lintr \
   lme4 \
