@@ -25,31 +25,35 @@ RUN install2.r --error \
   bspm \
   && rm -rf /tmp/downloaded_packages
 
-# Create the .Rprofile file to update packages from a Posit Public PM snapshot.
-# This is needed to update R libraries that are outdated in the original docker
-# image. The docker image for:
+# Create the .Rprofile file to update packages from Posit Publi Package Manager
+# (PPPM) snapshots. This is needed to update R libraries that are outdated in
+# the original docker image.
+#
+# Each rocker image is built on a specific Ubuntu release, so the PPPM CRAN URL
+# must match both the R version and the Ubuntu codename:
 # - R 4.1.3 has a snapshot from 2022-04-21 on Ubuntu 20.04 Focal.
 # - R 4.2.3 has a snapshot from 2023-04-20 on Ubuntu 22.04 Jammy.
 # - R 4.3.3 has a snapshot from 2024-04-23 on Ubuntu 22.04 Jammy.
 # - R 4.4.3 has a snapshot from 2025-04-10 on Ubuntu 24.04 Noble.
 # - R 4.5.3 has a snapshot from 2026-04-23 on Ubuntu 24.04 Noble.
-# 
-# Some of these snapshots do not host the latest version of certain packages
-# (e.g. cli or dplyr). We will be using the following snapshots:
-# - For R 4.1.3 snapshot from 2023-12-12.
-# - For R 4.2.3 snapshot from 2023-12-12.
-# - For R 4.3.3 snapshot from 2026-02-04. 
-# - For R 4.4.3 snapshot from 2026-02-04. 
-# - For R 4.5.3 snapshot from 2026-04-23 (unchanged).
-# These are the snapshots when all packages satisfy the requiered versions for
-# OlinkAnalyze.
 #
-# Each rocker image is built on a specific Ubuntu release, so the Posit Public
-# Package Manager URL must match both the R version and the Ubuntu codename.
+# Bioconductor is configured through PPPM as well. The Bioconductor version is
+# pinned per R version to avoid BiocManager defaulting to a newer release than
+# the selected R version supports.
+#
+# Selected CRAN snapshots and Bioconductor versions:
+# - R 4.1.3: CRAN 2023-12-12, Ubuntu 20.04 Focal, Bioconductor 3.14.
+# - R 4.2.3: CRAN 2023-12-12, Ubuntu 22.04 Jammy, Bioconductor 3.16.
+# - R 4.3.3: CRAN 2026-02-04, Ubuntu 22.04 Jammy, Bioconductor 3.18.
+# - R 4.4.3: CRAN 2026-02-04, Ubuntu 24.04 Noble, Bioconductor 3.20.
+# - R 4.5.3: CRAN 2026-04-23, Ubuntu 24.04 Noble, Bioconductor 3.22. (unchanged)
 #
 # These snapshots are chosen so that all packages satisfy the required versions
 # for OlinkAnalyze.
-#
+# 
+# Even after selecting snapshots, some of them do not host the latest version of
+# certain packages (e.g. cli or dplyr), which we update manually.
+
 ARG r_profile=.Rprofile
 
 RUN set -e; \
