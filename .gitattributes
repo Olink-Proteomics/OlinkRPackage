@@ -1,0 +1,16 @@
+# Binary file types — must not be touched by line-ending normalization
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.ico    binary
+*.pdf    binary
+*.rda    binary
+*.rds    binary
+*.xlsx   binary
+*.xls    binary
+*.zip    binary
+*.parquet binary
+
+# All text files: normalize to LF
+* text=auto eol=lf
