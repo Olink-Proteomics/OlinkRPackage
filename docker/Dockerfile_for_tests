@@ -20,6 +20,7 @@ RUN install2.r --error \
   --skipinstalled \
   devtools \
   remotes \
+  pak \
   rcmdcheck \
   lintr \
   lme4 \
@@ -121,5 +122,15 @@ RUN R -e "install.packages('BiocManager'); \
           BiocManager::install('clusterProfiler', ask = FALSE, update = FALSE)"
 
 RUN R -e "devtools::install_dev_deps(pkg = '/src', dependencies = TRUE)"
+
+# In R 4.5.3, devtools 2.5.0 is installed, in which devtools::install_dev_deps
+# is deprecated. Instead, pak::local_install_dev_deps is recommended to repalce
+# it.
+RUN set -e; \
+  if [ "$R_VERSION" = "4.5.3" ]; then \
+    R -e "pak::local_install_dev_deps(root = '/src', dependencies = TRUE)"; \
+  else \
+    R -e "devtools::install_dev_deps(pkg = '/src', dependencies = TRUE)"; \
+  fi
 
 ENTRYPOINT ["R", "--vanilla"]
