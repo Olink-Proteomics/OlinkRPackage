@@ -67,7 +67,7 @@ RUN set -e; \
       echo "Unsupported R_VERSION: $R_VERSION. Please update docker/Dockerfile_for_tests snapshots accordingly." >&2; \
       exit 1 ;; \
   esac; \
-  echo "Setting up snapshot for R $R_VERSION on $ubuntu_label from $snapshot"; \
+  echo "Setting up CRAN snapshot $snapshot and Bioconductor $bioc for R $R_VERSION on $ubuntu_label"; \
   printf '%s\n' \
     "options(repos = c(" \
     "  CRAN = \"https://packagemanager.posit.co/cran/__linux__/$ubuntu/$snapshot\"" \
