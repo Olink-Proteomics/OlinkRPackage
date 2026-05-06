@@ -72,6 +72,11 @@ RUN set -e; \
     "options(repos = c(" \
     "  CRAN = \"https://packagemanager.posit.co/cran/__linux__/$ubuntu/$snapshot\"" \
     "))" \
+    "" \
+    "# Bioconductor via Posit Package Manager" \
+    "options(BioC_mirror = \"https://packagemanager.posit.co/bioconductor/$bioc\")" \
+    "options(BIOCONDUCTOR_CONFIG_FILE = \"https://packagemanager.posit.co/bioconductor/$bioc/config.yaml\")" \
+    "Sys.setenv(R_BIOC_VERSION = \"$bioc\")" \
     > "$r_profile"
 
 ENV _R_CHECK_FORCE_SUGGESTS_=FALSE
