@@ -41,7 +41,10 @@ RUN install2.r --error \
 # pinned per R version to avoid BiocManager defaulting to a newer release than
 # the selected R version supports.
 #
-# Selected CRAN snapshots, Bioconductor versions and Bioconductor snapshots:
+# The CRAN snapshot below is suggested by the Biocundor version on PPPM. When
+# selecting the Bioc version compatible with the R version in question, there is
+# the latest compatible R version. Selected CRAN snapshots, Bioconductor
+# versions and Bioconductor snapshots:
 # - R 4.1.3: CRAN 2022-04-27, Ubuntu 20.04 Focal, Bioconductor 3.14 2022-04-14.
 # - R 4.2.3: CRAN 2023-04-26, Ubuntu 22.04 Jammy, Bioconductor 3.16 2023-04-13.
 # - R 4.3.3: CRAN 2024-05-01, Ubuntu 22.04 Jammy, Bioconductor 3.18 2024-04-19.
@@ -51,8 +54,8 @@ RUN install2.r --error \
 # These snapshots are chosen so that packages satisfy the required versions for
 # OlinkAnalyze.
 # 
-# Even after selecting snapshots, some of them do not host the latest version of
-# certain packages (e.g. cli or dplyr), which we update manually.
+# After selecting snapshots, some of them do not host the latest version of
+# certain packages (e.g. dplyr), which we update manually in the next step.
 
 ARG r_profile=.Rprofile
 
