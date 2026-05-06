@@ -89,6 +89,10 @@ RUN if [ "$R_VERSION" = "4.1.3" ] || [ "$R_VERSION" = "4.2.3" ]; then \
       R -q -e 'remotes::install_version("dplyr", version = "1.2.0", repos = "https://cloud.r-project.org")'; \
     fi
 
+# Install clusterProfiler from Bioconductor
+RUN R -e "install.packages('BiocManager'); \
+          BiocManager::install('clusterProfiler', ask = FALSE, update = FALSE)"
+
 RUN R -e "devtools::install_dev_deps(pkg = '/src', dependencies = TRUE)"
 
 ENTRYPOINT ["R", "--vanilla"]
