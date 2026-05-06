@@ -54,7 +54,7 @@ RUN install2.r --error \
 # - R 4.2.3: CRAN 2023-04-26, Ubuntu 22.04 Jammy, Bioconductor 3.16 2023-04-13.
 # - R 4.3.3: CRAN 2024-05-01, Ubuntu 22.04 Jammy, Bioconductor 3.18 2024-04-19.
 # - R 4.4.3: CRAN 2025-04-16, Ubuntu 24.04 Noble, Bioconductor 3.20 2025-04-10.
-# - R 4.5.3: CRAN 2026-04-23, Ubuntu 24.04 Noble, Bioconductor 3.22 2026-04-09.
+# - R 4.5.3: CRAN 2026-04-29, Ubuntu 24.04 Noble, Bioconductor 3.22 2026-04-09.
 #
 # These snapshots are chosen so that packages satisfy the required versions for
 # OlinkAnalyze.
@@ -70,7 +70,7 @@ RUN set -e; \
     "4.2.3") ubuntu="jammy"; snapshot="2023-04-26"; ubuntu_label="Ubuntu 22.04 Jammy"; bioc="3.16"; bioc_snapshot="2023-04-13" ;; \
     "4.3.3") ubuntu="jammy"; snapshot="2024-05-01"; ubuntu_label="Ubuntu 22.04 Jammy"; bioc="3.18"; bioc_snapshot="2024-04-19" ;; \
     "4.4.3") ubuntu="noble"; snapshot="2025-04-16"; ubuntu_label="Ubuntu 24.04 Noble"; bioc="3.20"; bioc_snapshot="2025-04-10" ;; \
-    "4.5.3") ubuntu="noble"; snapshot="2026-04-23"; ubuntu_label="Ubuntu 24.04 Noble"; bioc="3.22"; bioc_snapshot="2026-04-09" ;; \
+    "4.5.3") ubuntu="noble"; snapshot="2026-04-29"; ubuntu_label="Ubuntu 24.04 Noble"; bioc="3.22"; bioc_snapshot="2026-04-09" ;; \
     *) \
       echo "Unsupported R_VERSION: $R_VERSION. Please update docker/Dockerfile_for_tests snapshots accordingly." >&2; \
       exit 1 ;; \
