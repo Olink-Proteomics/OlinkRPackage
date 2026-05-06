@@ -83,11 +83,22 @@ ENV _R_CHECK_FORCE_SUGGESTS_=FALSE
 
 COPY OlinkAnalyze/DESCRIPTION /src/DESCRIPTION
 
-# Force dplyr 1.2.0 only for legacy R 4.1.3 and 4.2.3.
-# dplyr for R 4.3.3 and above is set correctly through PPPM
-RUN if [ "$R_VERSION" = "4.1.3" ] || [ "$R_VERSION" = "4.2.3" ]; then \
-      R -q -e 'remotes::install_version("dplyr", version = "1.2.0", repos = "https://cloud.r-project.org")'; \
-    fi
+# Version specific package pins needed for legacy R/Bioc combinations.
+RUN set -e; \
+  case "$R_VERSION" in \
+    "4.1.3") \
+      R -q -e 'remotes::install_version("dplyr", version = "1.2.0", repos = "https://packagemanager.posit.co/cran/2026-02-03")'; \
+      R -q -e 'remotes::install_version("arrow", version = "14.0.0", repos = "https://packagemanager.posit.co/cran/2023-08-16")' ;; \
+    "4.2.3") \
+      R -q -e 'remotes::install_version("dplyr", version = "1.2.0", repos = getOption("repos")["CRAN"])' ;; \
+    "4.3.3") \
+      echo "No extra CRAN package pins for R $R_VERSION" ;; \
+    "4.4.3"|"4.5.3") \
+      echo "No extra CRAN package pins for R $R_VERSION" ;; \
+    *) \
+      echo "Unsupported R_VERSION: $R_VERSION" >&2; \
+      exit 1 ;; \
+  esac
 
 # Install clusterProfiler from Bioconductor
 RUN R -e "install.packages('BiocManager'); \
