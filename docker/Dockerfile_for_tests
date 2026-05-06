@@ -87,8 +87,8 @@ COPY OlinkAnalyze/DESCRIPTION /src/DESCRIPTION
 RUN set -e; \
   case "$R_VERSION" in \
     "4.1.3") \
-      R -q -e 'remotes::install_version("dplyr", version = "1.2.0", repos = "https://packagemanager.posit.co/cran/2026-02-03")'; \
-      R -q -e 'remotes::install_version("arrow", version = "14.0.0", repos = "https://packagemanager.posit.co/cran/2023-08-16")' ;; \
+      R -q -e 'remotes::install_version("dplyr", version = "1.2.0", repos = "https://packagemanager.posit.co/cran/2026-02-04")'; \
+      R -q -e 'remotes::install_version("arrow", version = "14.0.0", repos = "https://packagemanager.posit.co/cran/2023-11-17")' ;; \
     "4.2.3") \
       R -q -e 'remotes::install_version("dplyr", version = "1.2.0", repos = getOption("repos")["CRAN"])' ;; \
     "4.3.3") \
