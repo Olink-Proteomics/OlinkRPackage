@@ -15,7 +15,7 @@ jobs:
       # Required as the JSON input file needs to be read
       - uses: actions/checkout@v6
       - id: set-matrix
-        uses: JoshuaTheMiller/conditional-build-matrix@main
+        uses: JoshuaTheMiller/conditional-build-matrix@v2.0.1
         with:
           inputFile: '.github/workflows/matrix_config_check.json'
           filter: '[?runOn==`${{ github.event_name }}` || runOn==`always`]'
