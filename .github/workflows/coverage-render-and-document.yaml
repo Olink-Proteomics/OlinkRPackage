@@ -4,7 +4,7 @@
 #   push:
 #     branches-ignore:
 #       - 'main'
-on: pull_request
+on: push
 
 name: coverage-render-and-document
 
