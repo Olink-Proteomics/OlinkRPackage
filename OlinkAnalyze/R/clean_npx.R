@@ -252,6 +252,81 @@ clean_npx <- function(df,
 
 # Help Functions ----------------------------------------------------------
 
+#' Quietly clean proteomics data quantified with Olink's PEA technology
+#'
+#' @description
+#' Internal wrapper around [`clean_npx()`] that runs the same cleaning pipeline
+#' while suppressing messages and warnings emitted during processing.
+#'
+#' Unlike [`clean_npx()`], this function is intended for internal use in cases
+#' where a quiet cleaning step is needed. If rows are removed, a single
+#' [`cli::cli_inform()`] message is shown. If no rows are removed, no output is
+#' printed.
+#'
+#' @details
+#' This function forwards all arguments to [`clean_npx()`] and forces
+#' `verbose = FALSE`.
+#'
+#' If any rows are removed during cleaning, the function prints a single
+#' informational message indicating how many entries were removed and
+#' instructing the user to run [`clean_npx()`] directly to inspect which rows
+#' were removed.
+#'
+#' @inheritParams clean_npx
+#' @inherit clean_npx params return
+#'
+#' @author
+#'   Kang Dong
+#'   Klev Diamanti
+#'
+#' @keywords internal
+#' @noRd
+#'
+run_clean_npx <- function(df, ...) {
+
+  dots <- list(...)
+
+  # remove user-supplied verbose if present
+  dots$verbose <- NULL
+
+  valid_args <- names(formals(clean_npx))
+  unknown_args <- setdiff(x = names(dots), y = valid_args)
+
+  if (length(unknown_args) > 0L) {
+    cli::cli_abort(
+      c(
+        "x" = "{cli::qty(unknown_args)} Unknown argument{?s}:
+        {.val {unknown_args}}.",
+        "i" = "Check the documentation of {.fn clean_npx} for valid arguments."
+      ),
+      call = rlang::caller_env(),
+      wrap = TRUE
+    )
+  }
+
+  n_before <- nrow(df)
+
+  cleaned_df <- withCallingHandlers(
+    expr = do.call(clean_npx, c(list(df = df), dots, list(verbose = FALSE))),
+    message = function(m) invokeRestart("muffleMessage"),
+    warning = function(w) invokeRestart("muffleWarning")
+  )
+
+  n_after <- nrow(cleaned_df)
+
+  if (n_after != n_before) {
+    n_removed <- n_before - n_after # nolint: object_usage_linter
+    cli::cli_inform(
+      c("{.val {n_removed}} entr{?y/ies} removed by {.fn clean_npx} from the
+      input dataset {.arg df}. Run {.fn clean_npx} on your dataset with
+      {.arg verbose = TRUE} to inspect which rows were removed."),
+      wrap = FALSE
+    )
+  }
+
+  return(cleaned_df)
+}
+
 #' Help function removing assays with all quantified values `NA`.
 #'
 #' @description
@@ -264,6 +339,7 @@ clean_npx <- function(df,
 #' @inherit clean_npx params return author
 #'
 #' @keywords internal
+#' @noRd
 #'
 clean_assay_na <- function(df,
                            check_log,
@@ -329,6 +405,7 @@ clean_assay_na <- function(df,
 #' @inherit clean_npx params return author
 #'
 #' @keywords internal
+#' @noRd
 #'
 clean_invalid_oid <- function(df,
                               check_log,
@@ -394,6 +471,7 @@ clean_invalid_oid <- function(df,
 #' @inherit clean_npx params return author
 #'
 #' @keywords internal
+#' @noRd
 #'
 clean_duplicate_sample_id <- function(df,
                                       check_log,
@@ -451,14 +529,16 @@ clean_duplicate_sample_id <- function(df,
 #'
 #' @description
 #' This function filters out rows from a dataset where the sample type column
-#' matches known control sample types: `"SAMPLE_CONTROL"`, `"PLATE_CONTROL"` or
-#' `"NEGATIVE_CONTROL"`. If `keep_control_sample` is set to `TRUE`, or if the
-#' sample type column is present in the `check_log`, the function returns
-#' the original data unchanged.
+#' matches known control sample types:
+#' `r ansi_collapse_quot(x = unlist(olink_sample_types[names(olink_sample_types) != "sample"]), sep = "or")`. # nolint: line_length_linter
+#' If `remove_control_sample` is set to `FALSE`, or if the sample type column is
+#' not present in the `check_log`, the function returns the original data
+#' unchanged.
 #'
 #' @inherit clean_npx params return author
 #'
 #' @keywords internal
+#' @noRd
 #'
 clean_sample_type <- function(df,
                               check_log,
@@ -592,6 +672,7 @@ clean_sample_type <- function(df,
 #' @inherit clean_npx params return author
 #'
 #' @keywords internal
+#' @noRd
 #'
 clean_assay_type <- function(df,
                              check_log,
@@ -723,6 +804,7 @@ clean_assay_type <- function(df,
 #' @inherit clean_npx params return author
 #'
 #' @keywords internal
+#' @noRd
 #'
 clean_qc_warning <- function(df,
                              check_log,
@@ -813,6 +895,7 @@ clean_qc_warning <- function(df,
 #' @inherit clean_npx params return author
 #'
 #' @keywords internal
+#' @noRd
 #'
 clean_assay_warning <- function(df,
                                 check_log,
@@ -918,6 +1001,7 @@ clean_assay_warning <- function(df,
 #' @inherit clean_npx params return author
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @examples
 #' \dontrun{
@@ -1014,6 +1098,7 @@ clean_control_sample_id <- function(df,
 #' @inherit clean_npx params return author
 #'
 #' @keywords internal
+#' @noRd
 #'
 clean_col_class <- function(df,
                             check_log,
@@ -1100,6 +1185,7 @@ clean_col_class <- function(df,
 #' @inherit clean_npx params return author
 #'
 #' @keywords internal
+#' @noRd
 #'
 clean_nonunique_uniprot <- function(df,
                                     check_log,

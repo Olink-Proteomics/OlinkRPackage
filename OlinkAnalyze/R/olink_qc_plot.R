@@ -121,8 +121,8 @@ olink_qc_plot <- function(df,
   # Uniprot IDs. Note that we do not remove samples with duplicate SampleID,
   # control samples or assays, or samples/assays with QC warnings, as this
   # would be the user's decision.
-  df <- clean_npx(
-    df,
+  df <- run_clean_npx(
+    df = df,
     check_log = check_log,
     remove_assay_na = TRUE,
     remove_invalid_oid = TRUE,
@@ -134,8 +134,7 @@ olink_qc_plot <- function(df,
     convert_nonunique_uniprot = TRUE,
     out_df = "tibble",
     verbose = FALSE
-  ) |>
-    suppressMessages()
+  )
 
   # check IQR_outlierDef and median_outlierDef
   check_is_scalar_numeric(x = IQR_outlierDef, error = TRUE)
@@ -214,7 +213,6 @@ olink_qc_plot <- function(df,
         1L
       )
     )
-
 
   qc_plot <- df_qr |>
     dplyr::mutate(Panel = .data[["Panel"]] |>

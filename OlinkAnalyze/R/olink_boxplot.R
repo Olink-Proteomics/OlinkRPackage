@@ -104,16 +104,14 @@ olink_boxplot <- function(df,
   }
   # ---- QC & CLEANING --------------------------------------------------------
   check_log <- run_check_npx(df = df, check_log = check_log)
-  df <- clean_npx(
+  df <- run_clean_npx(
     df = df,
     check_log = check_log,
     remove_qc_warning = FALSE,
     remove_assay_warning = FALSE,
     verbose = FALSE
-  ) |>
-    suppressMessages() |>
-    suppressWarnings()
-  check_log_clean <- check_npx(df = df) |>
+  )
+  check_log_clean <- run_check_npx(df = df, check_log = NULL) |>
     suppressMessages() |>
     suppressWarnings()
   if (!("sample_type" %in% names(check_log_clean$col_names))) {
@@ -217,12 +215,12 @@ olink_boxplot <- function(df,
           rp = mapply(function(x) my_round(x), .data[["Adjusted_pval"]]),
           p_value = paste0(.data[["rp"]], " Contrast: ", .data[["contrast"]])
         ) |>
-        dplyr::group_by(.data[["Name_OID"]], .data[["contrast"]]) |>
+        dplyr::group_by(.data[["Name_OID"]]) |>
         dplyr::arrange(pmin(.data[["C1"]], .data[["C2"]])) |>
         dplyr::mutate(
-          rowNum = rev(seq_len(dplyr::n())),
+          rowNum = dplyr::row_number(),
           y_anchor = .data[["maxNPX"]] + .data[["rowNum"]] *
-            .data[["rangeNPX"]] * 0.5 / max(.data[["rowNum"]])
+            .data[["rangeNPX"]] * 0.2 / max(.data[["rowNum"]])
         ) |>
         dplyr::ungroup() |>
         tidyr::pivot_longer(
