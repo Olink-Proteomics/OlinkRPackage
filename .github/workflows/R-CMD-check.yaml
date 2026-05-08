@@ -1,7 +1,7 @@
 # For help debugging build failures open an issue on the RStudio community with the 'github-actions' tag.
 # https://community.rstudio.com/new-topic?category=Package%20development&tags=github-actions
 # on: [push, pull_request]
-on: pull_request
+on: push
 
 name: R-CMD-check
 
@@ -15,7 +15,7 @@ jobs:
       # Required as the JSON input file needs to be read
       - uses: actions/checkout@v6
       - id: set-matrix
-        uses: JoshuaTheMiller/conditional-build-matrix@v2
+        uses: JoshuaTheMiller/conditional-build-matrix@v2.0.1
         with:
           inputFile: '.github/workflows/matrix_config_check.json'
           filter: '[?runOn==`${{ github.event_name }}` || runOn==`always`]'
