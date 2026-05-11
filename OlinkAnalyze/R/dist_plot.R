@@ -126,7 +126,7 @@ olink_dist_plot <- function(df,
 
   # If QC selected to plot
   # If not all are Pass, the QC_Warning is set as warning for plotting purposes
-  if (color_g %in% column_name_dict$col_names$qc_warning) {
+  if (color_g %in% check_log$col_names$qc_warning) {
 
     df <- df |>
       dplyr::group_by(
