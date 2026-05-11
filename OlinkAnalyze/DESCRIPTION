@@ -62,7 +62,10 @@ Description: A collection of functions to facilitate analysis of proteomic
     data run on the Olink platform.
 License: AGPL (>= 3)
 Contact: biostattools@olink.com
-URL: https://olink.com/ https://github.com/Olink-Proteomics/OlinkRPackage
+URL:
+    https://olink.com/
+    https://github.com/Olink-Proteomics/OlinkRPackage
+    https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/01-User%20Manuals%20for%20website/1494-Olink-Analyze-Cheatsheet.pdf
 Config/testthat/edition: 3
 Config/testthat/parallel: true
 Config/testthat/start-first: read_npx_l*, read_npx_w*
