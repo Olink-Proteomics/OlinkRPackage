@@ -398,25 +398,26 @@ check_log_clean <- OlinkAnalyze::check_npx(
 )
 ```
 
-## Randomize samples on plate (olink_plate_randomizer)
+## Randomize samples on plate (`olink_plate_randomizer()`)
 
-The `olink_plate_randomizer` function randomly assigns samples to a plate well
+The `olink_plate_randomizer()` function randomly assigns samples to a plate well
 with the option to keep the same individuals on the same plate. Olink® does not
 recommend to force balance based on other clinical variables.
 
 For more information on plate randomization, consult the **Plate Randomization**
-**Vignette** in OlinkAnalyzeVignettes.
+**Vignette** in the R package `OlinkAnalyzeVignettes`.
 
-## Select bridge samples (olink_bridgeselector)
+## Select bridge samples (`olink_bridgeselector()`)
 
 The bridge selection function selects a number of bridge samples based on the
-input data. Bridge samples are used to normalize two dataframes/projects that
+input data. Bridge samples are used to normalize two data sets or projects that
 have been ran at different time points, hence, a batch effect is expected. It
 selects samples that have good detectability (if applicable), pass quality
 control, and cover a wide range of data points.
 
 For more information on bridge sample selection, consult the **Introduction to**
-**bridging Olink® NPX datasets tutorial** in OlinkAnalyzeVignettes.
+**bridging Olink® NPX datasets tutorial** in the R package
+`OlinkAnalyzeVignettes`.
 
 ## Normalizing NPX data (olink_normalization)
 
