@@ -307,40 +307,40 @@ A named list with the following elements:
 
 ## Clean NPX data (clean_npx)
 
-The `clean_npx` function cleans an NPX data frame by applying a series of
+The `clean_npx()` function cleans an NPX data frame by applying a series of
 filtering and conversion steps. It removes invalid or problematic assays and
-samples identified by `check_npx`, and optionally converts column data types.
-Passing the output of `check_npx` via the `check_log` argument avoids
+samples identified by `check_npx()`, and optionally converts column data types.
+Passing the output of `check_npx()` via the `check_log` argument avoids
 re-running the internal checks and improves performance.
 
 ### Function arguments
 
--   df: NPX data frame in long format as returned by `read_npx`.
--   check_log: Named list returned by `check_npx`. If `NULL`, `check_npx` is
-    run internally.
--   remove_assay_na: Logical. Remove assays where all samples have NA values.
-    Default: `TRUE`.
--   remove_invalid_oid: Logical. Remove assays with invalid OlinkIDs. Default:
-    `TRUE`.
--   remove_dup_sample_id: Logical. Remove samples with duplicate IDs. Default:
-    `TRUE`.
--   remove_control_assay: Logical. Remove internal control assays. Default:
-    `TRUE`.
--   remove_control_sample: Logical. Remove external control samples based on
-    SampleType. Default: `TRUE`.
--   remove_qc_warning: Logical. Remove samples with QC status 'FAIL'. Default:
-    `TRUE`.
--   remove_assay_warning: Logical. Remove assays flagged with assay warnings.
-    Default: `TRUE`.
--   control_sample_ids: Character vector of additional SampleIDs to remove.
-    Default: `NULL`.
--   convert_df_cols: Logical. Convert columns to their expected data types.
-    Default: `TRUE`.
--   convert_nonunique_uniprot: Logical. Resolve non-unique OlinkID–UniProt
-    mappings. Default: `TRUE`.
--   verbose: Logical. Print progress messages. Default: `FALSE`.
+-   `df`: NPX data frame in long format as returned by `read_npx()`.
+-   `check_log`: Named list returned by `check_npx()`. If `NULL`, `check_npx()`
+    is run internally.
+-   `remove_assay_na`: Logical. Remove assays where all samples have NA values.
+    Default: "TRUE".
+-   `remove_invalid_oid`: Logical. Remove assays with invalid OlinkIDs. Default:
+    "TRUE".
+-   `remove_dup_sample_id`: Logical. Remove samples with duplicate IDs. Default:
+    "TRUE".
+-   `remove_control_assay`: Logical. Remove internal control assays. Default:
+    "TRUE".
+-   `remove_control_sample`: Logical. Remove external control samples based on
+    "SampleType". Default: "TRUE".
+-   `remove_qc_warning`: Logical. Remove samples with QC status "FAIL". Default:
+    "TRUE".
+-   `remove_assay_warning`: Logical. Remove assays flagged with assay warnings.
+    Default: "TRUE".
+-   `control_sample_ids`: Character vector of identifiers of samples that should
+    be removed. Default: "NULL".
+-   `convert_df_cols`: Logical. Convert columns to their expected data types.
+    Default: "TRUE".
+-   `convert_nonunique_uniprot`: Logical. Resolve non-unique "OlinkID"-"UniProt"
+    mappings. Default: "TRUE".
+-   `verbose`: Logical. Print progress messages. Default: "FALSE".
 
-```{r message=FALSE, eval=FALSE}
+```{r, message = FALSE, eval = FALSE}
 # Clean the NPX data using the check_npx output
 npx_clean <- OlinkAnalyze::clean_npx(
   df = OlinkAnalyze::npx_data1,
@@ -350,13 +350,14 @@ npx_clean <- OlinkAnalyze::clean_npx(
 
 ### Function output
 
-A tibble (or ArrowObject) in long format containing the cleaned NPX data, with
-invalid assays, control samples, QC-failing samples, and problematic entries
-removed according to the chosen arguments.
+A "tibble" (or "ArrowObject") in long format containing the cleaned NPX data,
+with invalid assays, control samples, QC-failing samples, and problematic
+entries removed according to the chosen arguments.
 
-**Note:** We recommend running `check_npx` once again after cleaning the data to
-confirm that all issues have been resolved and that the data is ready for
-downstream analysis.
+**Note:** We recommend running `check_npx()` once again after cleaning the data
+to confirm that all issues have been resolved and that the data is ready for
+downstream analysis. An schematic illustration of the described workflow is
+provided ["Olink Analyze v5.0 example workflow"](#usage).
 
 ```{r message=FALSE, eval=FALSE}
 # Check NPX data quality and format
