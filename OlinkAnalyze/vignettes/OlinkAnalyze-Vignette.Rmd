@@ -57,61 +57,62 @@ install.packages("OlinkAnalyze")
 
 **Preprocessing**
 
--   *read_npx* or *read_NPX* Function to read NPX data into long format
--   *check_npx* Function to check the quality and format of NPX data
--   *clean_npx* Function to clean NPX data based on the output of check_npx
--   *olink_plate_randomizer* Randomize samples on plate
--   *olink_bridgeselector* Select bridge samples
--   *olink_normalization* Normalization of all proteins (by OlinkID)
--   *olink_lod* Calculation of Limit of Detection for Explore data
+-   `read_npx()` or `read_NPX()` Function to read NPX data into long format
+-   `check_npx()` Function to check the quality and format of NPX data
+-   `clean_npx()` Function to clean NPX data based on the output of
+    `check_npx()`
+-   `olink_plate_randomizer()` Randomize samples on plates
+-   `olink_bridgeselector()` Select bridge samples
+-   `olink_normalization()` Normalization of all proteins
+-   `olink_lod()` Calculation of Limit of Detection (LOD) for Olink NGS data
 
 **Statistical analysis**
 
--   *olink_ttest* Function which performs a t-test per protein
--   *olink_wilcox* Function which performs a Mann-Whitney U Test per protein
--   *olink_anova* Function which performs an ANOVA per protein
--   *olink_anova_posthoc* Function which performs an ANOVA post-hoc test per
-protein
--   *olink_one_non_parametric* Function which performs a Kruskal-Wallis Test or
-Friedman Test per protein
--   *olink_one_non_parametric_posthoc* Function which performs post-hoc test for
-one way non-parametric test
--   *olink_ordinalRegression* Function which performs an ordinal regression per
-protein
--   *olink_ordinalRegression_posthoc* Function which performs an ordinal
-regression post-hoc test per protein
--   *olink_lmer* Function which performs a linear mixed model per protein
--   *olink_lmer_posthoc* Function which performs a linear mixed model post-hoc
-per protein
--   *olink_pathway_enrichment* Function which performs GSEA or ORA pathway
-enrichment using outcome from other statistical tests
+-   `olink_ttest()` Function which performs a t-test per protein
+-   `olink_wilcox()` Function which performs a Mann-Whitney U Test per protein
+-   `olink_anova()` Function which performs an ANOVA per protein
+-   `olink_anova_posthoc()` Function which performs an ANOVA post-hoc test per
+     protein
+-   `olink_one_non_parametric()` Function which performs a Kruskal-Wallis Test
+    or Friedman Test per protein
+-   `olink_one_non_parametric_posthoc()` Function which performs post-hoc test
+    for one way non-parametric test
+-   `olink_ordinalRegression()` Function which performs an ordinal regression
+    per protein
+-   `olink_ordinalRegression_posthoc()` Function which performs an ordinal
+    regression post-hoc test per protein
+-   `olink_lmer()` Function which performs a linear mixed model per protein
+-   `olink_lmer_posthoc()` Function which performs a linear mixed model post-hoc
+    per protein
+-   `olink_pathway_enrichment()` Function which performs GSEA or ORA pathway
+    enrichment using outcome from other statistical tests
 
 **Visualization**
 
--   *olink_boxplot* Function which plots boxplots of a selected variable
--   *olink_dist_plot* Function to plot the NPX distribution by panel
--   *olink_lmer_plot* Function which performs a point-range plot per protein on
-a linear mixed model
--   *olink_pathway_visualization* Function which plots a bar graph for pathways
-of interest
--   *olink_pathway_heatmap* Function which plots estimates of proteins
-associated with pathways of interest
--   *olink_pca_plot* Function to plot a PCA of the data
--   *olink_qc_plot* Function to plot an overview of a sample cohort per Panel
--   *olink_umap_plot* Function to plot a UMAP of the data
--   *olink_volcano_plot* Easy volcano plot with Olink theme
--   *olink_heatmap_plot* Function which generates a heatmap over all proteins
--   *set_plot_theme* Function to set plot theme
--   *olink_bridgeability_plot* Function which generates plots that illustrate
-the three criteria for determining whether an assay is bridgeable in
-cross-product bridge normalization.
+-   `olink_boxplot()` Function which plots boxplots of a selected variable
+-   `olink_dist_plot()` Function to plot the NPX distribution by panel
+-   `olink_lmer_plot()` Function which performs a point-range plot per protein
+    on a linear mixed model
+-   `olink_pathway_visualization()` Function which plots a bar graph for
+    pathways of interest
+-   `olink_pathway_heatmap()` Function which plots estimates of proteins
+    associated with pathways of interest
+-   `olink_pca_plot()` Function to plot a PCA of the data
+-   `olink_qc_plot()` Function to plot an overview of a sample cohort per Panel
+-   `olink_umap_plot()` Function to plot a UMAP of the data
+-   `olink_volcano_plot()` Easy volcano plot with Olink theme
+-   `olink_heatmap_plot()` Function which generates a heatmap over all proteins
+-   `set_plot_theme()` Function to set `ggplot2` plot theme
+-   `olink_bridgeability_plot()` Function which generates plots that illustrate
+    the three criteria for determining whether an assay is bridgeable in
+    cross-product bridge normalization
 
 **Sample datasets**
 
--   *npx_data1* NPX Data in Long format
--   *npx_data2* NPX Data in Long format, Follow-up
--   *manifest* A sample manifest including Sample ID, Subject ID and clinical
-variables
+-   `npx_data1` NPX Data in Long format
+-   `npx_data2` NPX Data in Long format, follow-up
+-   `manifest` A sample manifest including Sample ID, Subject ID and clinical
+    variables
 
 # Usage
 
