@@ -118,42 +118,42 @@ install.packages("OlinkAnalyze")
 
 ## Introduction to Olink NPX data format
 
-The package contains two test data files named npx_data1 and npx_data2. These
-are synthetic datasets that resemble Olink® data accompanied by clinical
+The package contains two test data files named `npx_data1` and `npx_data2`.
+These are synthetic datasets that resemble Olink® data accompanied by clinical
 variables. Olink® data that is delivered in long format or imported with the
-function *read_NPX* (that converts the data into a long format) contain the
-following columns:
+function `read_npx()` contain the following columns:
 
--   **SampleID** *\<chr\>*: Sample names or IDs.
--   **OlinkID** *\<chr\>*: Unique ID for each assay assigned by Olink. In case
-the assay is included in more than one panels it will have a different OlinkID
-in each one.
--   **UniProt** *\<chr\>*: UniProt ID.
--   **Assay** *\<chr\>*: Common gene name for the assay.
--   **MissingFreq** *\<dbl\>*: Missing frequency for the OlinkID, i.e. frequency
-of samples with NPX value below limit of detection (LOD).
--   **Panel** *\<chr\>*: Olink Panel that samples ran on. Read more about Olink
-Panels here: <https://olink.com/products/compare>.
--   **Panel_Version** *\<chr\>*: Version of the panel. A new panel version might
-include some different or improved assays.
--   **PlateID** *\<chr\>*: Name of the plate.
--   **QC_Warning** or **SampleQC** *\<chr\>*: Indication whether the sample
-passed Olink QC. More information about Olink quality control metrics can be
-found in our [FAQ](https://olink.com/knowledge/faq?query=quality%20control) by
-searching "Quality control".
--   **LOD** *\<dbl\>*: Limit of detection (LOD) is the minimum level of an
-individual protein that can be measured. LOD is defined as 3 times the standard
-deviation over background.
--   **NPX** *\<dbl\>*: Normalized Protein eXpression, is Olink®’s unit of 
-protein expression level in a log<sub>2</sub> scale. The majority of the
-functions of this package use NPX values for calculations. Read more about NPX
-in the Olink [FAQ](https://olink.com/knowledge/faq?query=what%20is%20npx)
-(Search "What is NPX?") or in Olink's Data normalization and standardization
-[white paper](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/05-white%20paper%20for%20website/1096-olink-data-normalization-white-paper.pdf).
+-   `SampleID` *\<chr\>*: Sample names or IDs.
+-   `OlinkID` *\<chr\>*: Unique ID for each assay assigned by Olink. In case
+    the assay is included in more than one panels it will have a different
+    `OlinkID` in each one.
+-   `UniProt` *\<chr\>*: UniProt ID.
+-   `Assay` *\<chr\>*: Common gene name for the assay.
+-   `MissingFreq` *\<dbl\>*: Missing frequency for the `OlinkID`, i.e. frequency
+    of samples with `NPX` value below limit of detection (LOD).
+-   `Panel` *\<chr\>*: Olink Panel that samples ran on. Read more about Olink
+    Panels here: <https://olink.com/products/compare>.
+-   `Panel_Version` *\<chr\>*: Version of the panel. A new panel version might
+    include some different or improved assays.
+-   `PlateID` *\<chr\>*: Name of the plate.
+-   `QC_Warning` or `SampleQC` *\<chr\>*: Indication whether the sample passed
+    Olink QC. More information about Olink quality control metrics can be
+    found in our [FAQ](https://olink.com/knowledge/faq?query=quality%20control)
+    by searching for the term "Quality control".
+-   `LOD` *\<dbl\>*: Limit of detection (LOD) is the minimum level of an
+    individual protein that can be measured. LOD is defined as 3 times the
+    standard deviation over background.
+-   `NPX` *\<dbl\>*: Normalized Protein eXpression (NPX), is Olink®’s unit of
+    protein expression level in a log~2~ scale. The majority of the functions of
+    this package use NPX values for calculations. Read more about NPX in the
+    Olink [FAQ](https://olink.com/knowledge/faq?query=what%20is%20npx) (Search
+    "What is NPX?") or in Olink's Data normalization and standardization
+    [white paper](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/05-white%20paper%20for%20website/1096-olink-data-normalization-white-paper.pdf).
 
-**Note:** There are 5 additional variables in the sample datasets npx_data1 and
-npx_data2 that include clinical or other information, namely: Subject *\<chr\>*,
-Treatment *\<chr\>*, Site *\<chr\>*, Time *\<chr\>*, Project *\<chr\>*.
+**Note:** There are 5 additional variables in the sample datasets `npx_data1`
+and `npx_data2` that include clinical or other information, namely: Subject
+*\<chr\>*, Treatment *\<chr\>*, Site *\<chr\>*, Time *\<chr\>*, Project
+*\<chr\>*.
 
 The columns found in an Olink data set may vary based on the version and
 product.
