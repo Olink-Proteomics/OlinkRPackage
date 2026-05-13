@@ -311,8 +311,8 @@ upcoming releases.
 
 ```{r, message = FALSE, eval = FALSE}
 # Check NPX data quality and format
-check_npx_result <- OlinkAnalyze::check_npx(
-  df = OlinkAnalyze::npx_data1
+check_log <- OlinkAnalyze::check_npx(
+  df = data
 )
 ```
 
@@ -320,23 +320,20 @@ check_npx_result <- OlinkAnalyze::check_npx(
 
 A named list with the following elements:
 
--   **col_names** *\<list\>*: Column names from the input data frame to be used
-    in downstream analyses.
--   **oid_invalid** *\<chr\>*: OlinkID values that do not follow the expected
+-   `col_names` *\<list\>*: Column names from the input data frame to be used in
+    downstream analyses.
+-   `oid_invalid` *\<chr\>*: OlinkID values that do not follow the expected
     format (OID#####).
--   **assay_na** *\<chr\>*: OlinkIDs of assays where all samples have NA
+-   `assay_na` *\<chr\>*: OlinkIDs of assays where all samples have NA
     quantification values.
--   **sample_id_dups** *\<chr\>*: Duplicate SampleID values detected in the
-    data.
--   **sample_id_na** *\<chr\>*: SampleIDs of samples with NA quantification
-    values for all assays.
--   **col_class** *\<data.frame\>*: Columns with incorrect data types, including
+-   `sample_id_dups` *\<chr\>*: Duplicate SampleID values detected in the data.
+-   `sample_id_na` *\<chr\>*: SampleIDs of samples with NA quantification values
+    for all assays.
+-   `col_class` *\<data.frame\>*: Columns with incorrect data types, including
     the column key, column name, detected type, and expected type.
--   **assay_qc** *\<chr\>*: OlinkIDs of assays with at least one assay QC
-    warning.
--   **non_unique_uniprot** *\<chr\>*: OlinkIDs mapped to more than one UniProt
-    ID.
--   **darid_invalid** *\<data.frame\>*: Invalid combinations of
+-   `assay_qc` *\<chr\>*: OlinkIDs of assays with at least one assay QC warning.
+-   `non_unique_uniprot` *\<chr\>*: OlinkIDs mapped to more than one UniProt ID.
+-   `darid_invalid` *\<data.frame\>*: Invalid combinations of
     "DataAnalysisRefID" and "PanelDataArchiveVersion".
 
 ## Clean NPX data (clean_npx)
