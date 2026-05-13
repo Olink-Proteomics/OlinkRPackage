@@ -336,7 +336,7 @@ A named list with the following elements:
 -   `darid_invalid` *\<data.frame\>*: Invalid combinations of
     "DataAnalysisRefID" and "PanelDataArchiveVersion".
 
-## Clean NPX data (clean_npx)
+## Clean NPX data (`clean_npx()`)
 
 The `clean_npx()` function cleans an NPX data frame by applying a series of
 filtering and conversion steps. It removes invalid or problematic assays and
@@ -373,9 +373,9 @@ re-running the internal checks and improves performance.
 
 ```{r, message = FALSE, eval = FALSE}
 # Clean the NPX data using the check_npx output
-npx_clean <- OlinkAnalyze::clean_npx(
-  df = OlinkAnalyze::npx_data1,
-  check_log = check_npx_result
+data_clean <- OlinkAnalyze::clean_npx(
+  df = data,
+  check_log = check_log
 )
 ```
 
@@ -383,7 +383,8 @@ npx_clean <- OlinkAnalyze::clean_npx(
 
 A "tibble" (or "ArrowObject") in long format containing the cleaned NPX data,
 with invalid assays, control samples, QC-failing samples, and problematic
-entries removed according to the chosen arguments.
+entries removed according to the chosen arguments. Output matches that of the
+function `read_npx()`.
 
 **Note:** We recommend running `check_npx()` once again after cleaning the data
 to confirm that all issues have been resolved and that the data is ready for
@@ -392,8 +393,8 @@ provided ["Olink Analyze v5.0 example workflow"](#usage).
 
 ```{r message=FALSE, eval=FALSE}
 # Check NPX data quality and format
-check_npx_clean <- OlinkAnalyze::check_npx(
-  df = npx_clean
+check_log_clean <- OlinkAnalyze::check_npx(
+  df = data_clean
 )
 ```
 
