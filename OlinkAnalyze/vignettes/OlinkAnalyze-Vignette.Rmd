@@ -37,7 +37,7 @@ convenient pipeline for your Olink NPX data analysis.
 > vignettes have been moved to the new **OlinkAnalyzeVignettes** package, which
 > will be published on CRAN soon. This vignette provides an overview of the main
 > functions in OlinkAnalyze and introduces the new v5.0 preprocessing functions
-> `check_npx` and `clean_npx`.
+> `check_npx()` and `clean_npx()`.
 
 # Installation
 
@@ -111,6 +111,18 @@ cross-product bridge normalization.
 variables
 
 # Usage
+
+```{r oa_v5_workflow, echo = FALSE, eval = TRUE, message = FALSE, out.width = "690px", fig.cap = fcap}
+knitr::include_graphics(
+  path = normalizePath(
+    path = "../man/figures/OA_v5.0_flowchart.png"
+  ),
+  error = FALSE
+)
+fcap <- paste("Schematic overview illustrating how the newly introduced",
+              "functions `check_npx()` and `clean_npx()` in Olink Analyze v5.0",
+              "can be used together in a typical Olink data analysis workflow.")
+```
 
 ## Introduction to Olink NPX data format
 
