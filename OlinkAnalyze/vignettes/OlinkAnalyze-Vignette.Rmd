@@ -283,7 +283,7 @@ data <- list.files(
   dplyr::bind_rows()
 ```
 
-## Check NPX data quality (check_npx)
+## Check NPX data quality (`check_npx()`)
 
 The `check_npx()` function performs various quality and format checks on NPX
 data imported with `read_npx()`. It is recommended to run this function after
