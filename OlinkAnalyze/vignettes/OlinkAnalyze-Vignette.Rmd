@@ -120,7 +120,7 @@ knitr::include_graphics(
   error = FALSE
 )
 fcap <- paste("Schematic overview illustrating how the newly introduced",
-              "functions `check_npx()` and `clean_npx` in Olink Analyze v5.0",
+              "functions `check_npx()` and `clean_npx()` in Olink Analyze v5.0",
               "can be used together in a typical Olink data analysis workflow.")
 ```
 
