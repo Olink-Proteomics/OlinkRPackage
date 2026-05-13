@@ -449,19 +449,19 @@ The function handles four different types of normalization:
     methodology, consult the **Bridging across NGS-based Olink^®^ products**
     **Tutorial** in the R package `OlinkAnalyzeVignettes`.
 
-## Integrating Explore NPX LOD (olink_lod)
+## Integrating Explore NPX LOD (`olink_lod()`)
 
-The olink_lod function adds LOD information to an Explore HT or Explore 3072 NPX
-dataframe. This function can incorporate LOD based on either an Explore
-dataset's negative controls or using predetermined fixed LOD values, which can
-be downloaded from the Document Download Center at
+The `olink_lod()` function adds LOD information to an Olink next generation
+sequencing (NGS) data set. This function can incorporate LOD based on either an
+Olink NGS data set's negative controls or using predetermined fixed LOD values,
+which can be downloaded from the Document Download Center at
 [olink.com](https://olink.com/knowledge/documents), or using both methods. The
-default LOD calculation method is based off of the negative controls. If an NPX
-file is intensity normalized, both intensity normalized and PC normalized LODs
-are provided.
+default LOD calculation method is based on the negative controls. If an NPX file
+is intensity normalized, both intensity normalized and PC normalized LODs are
+provided.
 
 For more information on calculating LOD, consult the **Calculating LOD from**
-**Olink® Explore data tutorial** in OlinkAnalyzeVignettes.
+**Olink® Explore data tutorial** in the R package `OlinkAnalyzeVignettes`.
 
 # Statistical analysis
 
