@@ -419,35 +419,35 @@ For more information on bridge sample selection, consult the **Introduction to**
 **bridging Olink® NPX datasets tutorial** in the R package
 `OlinkAnalyzeVignettes`.
 
-## Normalizing NPX data (olink_normalization)
+## Normalizing NPX data (`olink_normalization()`)
 
 The Olink® normalization function normalizes NPX values between two different
 datasets or one Olink® dataset to a set of reference medians.
 
 The function handles four different types of normalization:
 
--   **Bridging normalization**: One of the dataframes is adjusted to another
-using overlapping samples (bridge samples). The overlapping samples should have
-the same IDs between dataframes. Adjustment is made using the median of the
-paired differences between the bridge samples. For more information on bridging,
-consult the **Introduction to bridging Olink® NPX datasets tutorial** in
-OlinkAnalyzeVignettes.
--   **Subset normalization**: A subset of samples is used to normalize two
-dataframes, one of which is used as a reference_project. Adjustment is made
-using the differences of medians between the sample subsets from the two
-dataframes. Subset normalization is useful if no bridge samples were included
-and one can assume that the distribution of the two datasets is very similar.
--   **Reference median normalization**: Works only on one dataframe. This is
-effectively subset normalization, but using difference of medians to
-pre-recorded median values. df1, overlapping_samples_df1 and reference_medians
-need to be specified.
+-   **Bridging normalization**: One of the data sets is adjusted to another
+    using overlapping samples (bridge samples). The overlapping samples should
+    have the same IDs between data sets. Adjustment is made using the median of
+    the paired differences between the bridge samples. For more information on
+    bridging, consult the **Introduction to bridging Olink® NPX datasets**
+    **tutorial** in the R package `OlinkAnalyzeVignettes`.
+-   **Subset normalization**: A subset of samples is used to normalize two data
+    sets, one of which is used as a `reference_project`. Adjustment is made
+    using the differences of medians between the sample subsets from the two
+    data sets. Subset normalization is useful if no bridge samples were included
+    and one can assume that the distribution of the two datasets is very similar.
+-   **Reference median normalization**: Works only on one data set. This is
+    effectively subset normalization, but using difference of medians to
+    pre-recorded median values. `df1`, `overlapping_samples_df1` and
+    `reference_medians` need to be specified.
 -   **Cross-product bridging**: Similar to bridging normalization but bridging
-across products, for example bridging Explore 3072 data to Explore HT data.
-Overlapping samples are run on both products and used to determine which assays
-are bridgeable and what method should be used to bridge each assay. For more
-information on the between-product bridging methodology, consult the
-**Bridging across NGS-based Olink^®^ products Tutorial** in
-OlinkAnalyzeVignettes.
+    across products, for example bridging "Olink Explore 3072" data to "Olink
+    Explore HT" data. Overlapping samples are run on both products and used to
+    determine which assays are bridgeable and what method should be used to
+    bridge each assay. For more information on the between-product bridging
+    methodology, consult the **Bridging across NGS-based Olink^®^ products**
+    **Tutorial** in the R package `OlinkAnalyzeVignettes`.
 
 ## Integrating Explore NPX LOD (olink_lod)
 
