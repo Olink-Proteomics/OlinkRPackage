@@ -190,6 +190,11 @@ should be made for this function to work as expected.
 
 
 ```{r, message = FALSE, eval = FALSE}
+data <- OlinkAnalyze::read_npx(
+  filename = "~/NPX_file_location.xlsx"
+)
+
+# OR
 data <- OlinkAnalyze::read_NPX(
   filename = "~/NPX_file_location.xlsx"
 )
