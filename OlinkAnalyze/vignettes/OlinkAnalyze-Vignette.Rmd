@@ -251,19 +251,31 @@ data <- list.files(
 
 ## Check NPX data quality (check_npx)
 
-The `check_npx` function performs various quality and format checks on NPX data
-imported with `read_npx`. It is recommended to run this function after reading
-in NPX data and before downstream analysis. The result can be passed as the
-`check_log` argument to `clean_npx` and all downstream OlinkAnalyze functions,
-allowing each function to skip its own internal check and improve performance.
+The `check_npx()` function performs various quality and format checks on NPX
+data imported with `read_npx()`. It is recommended to run this function after
+reading in NPX data and before downstream analysis. The result can be passed as
+the `check_log` argument to `clean_npx()` and all downstream Olink Analyze
+functions, allowing each function to skip its own internal check and improve
+performance.
+
+`check_npx()` also allows for alternative column names to be used in the
+downstream analysis, both standard and non-standard. If the user wishes to
+analyze data with non-standard column names, or to resolve column name
+ambiguities, they can pass a named character vector to the `preferred_names`
+argument. For example, one might wish to use the column "PCNormalizedNPX"
+instead of "NPX" for downstream analysis, or they might have log~2~ transformed
+the values reported in "Quantified_value" and wish to use that column to analyze 
+their data. **Note** that for the time being, not all functions utilize the full
+capacity of the `preferred_names` argument, but we aim to expand this in the
+upcoming releases.
 
 ### Function arguments
 
--   df: NPX data frame in long format (as returned by `read_npx`).
--   preferred_names: Optional named character vector to resolve column name
+-   `df`: NPX data frame in long format, as returned by `read_npx()`.
+-   `preferred_names`: Optional named character vector to resolve column name
     ambiguities or to map custom column names to internally expected ones.
 
-```{r message=FALSE, eval=FALSE}
+```{r, message = FALSE, eval = FALSE}
 # Check NPX data quality and format
 check_npx_result <- OlinkAnalyze::check_npx(
   df = OlinkAnalyze::npx_data1
@@ -291,7 +303,7 @@ A named list with the following elements:
 -   **non_unique_uniprot** *\<chr\>*: OlinkIDs mapped to more than one UniProt
     ID.
 -   **darid_invalid** *\<data.frame\>*: Invalid combinations of
-    DataAnalysisRefID and PanelDataArchiveVersion.
+    "DataAnalysisRefID" and "PanelDataArchiveVersion".
 
 ## Clean NPX data (clean_npx)
 
