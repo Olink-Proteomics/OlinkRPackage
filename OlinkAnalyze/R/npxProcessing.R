@@ -197,7 +197,7 @@ npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
 
     if (verbose) {
       cli::cli_warn(
-        "There are {length(dropped_assays.missingness)} assay{?s} dropped due
+        "{length(dropped_assays.missingness)} assay{?s} were dropped due
         to high missingness (>{round(PERCENT_CUTOFF * 100)}%)."
       )
     }
@@ -228,7 +228,7 @@ npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
 
     if (verbose) {
       cli::cli_warn(
-        "There are {length(imputed_assays)} assay{?s} were imputed using
+        "{length(imputed_assays)} assay{?s} were imputed using
         their median values."
       )
     }
