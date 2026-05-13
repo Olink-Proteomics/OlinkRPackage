@@ -745,10 +745,10 @@ A tibble with the following columns:
 -   `Threshold` *\<chr\>*: Text indication if assay is significant (adjusted
     p-value \< 0.05).
 
-## Linear mixed effects model analysis (olink_lmer)
+## Linear mixed effects model analysis (`olink_lmer()`)
 
-The `olink_lmer` fits a linear mixed effects model for every protein (by
-OlinkID) in every panel. The function handles both factor and numerical
+The `olink_lmer()` function fits a linear mixed effects model for every protein
+(by `OlinkID`) in every panel. The function handles both factor and numerical
 variables and/or covariates.
 
 Samples with missing variable information or factor levels are excluded from the
@@ -757,13 +757,13 @@ analysis. Character columns in the input data frame are converted to factors.
 Crossed/interaction analysis, i.e. A\*B formula notation, is inferred from the
 variable argument in the following cases:
 
--   c('A','B')
+-   c('A', 'B')
 -   c('A:B')
 -   c('A:B', 'B') or c('A:B', 'A')
 
 For covariates, crossed analyses need to be specified explicitly, i.e. two main
-effects will not be expanded with a c('A','B') notation. Main effects present in
-the variable take precedence.
+effects will not be expanded with a c('A', 'B') notation. Main effects present
+in the variable take precedence.
 
 Adjusted p-values are calculated using the Benjamini & Hochberg (1995) method
 ("fdr"). The threshold is determined by logic evaluation of Adjusted_pval \<
@@ -771,42 +771,43 @@ Adjusted p-values are calculated using the Benjamini & Hochberg (1995) method
 
 ### Function arguments
 
--   df: NPX data frame in long format should minimally contain protein name
-(Assay), OlinkID, UniProt, Panel and 1-2 variables with at least 2 levels and
-subject ID.
--   variable: Single character value or character array. In case of single
-character then that should represent a column in the df. Otherwise, if length \>
-1, the included variable names will be used in crossed analyses. It can also
-accept the notations ':' or '\*'.
--   outcome: Name of the column from df that contains the dependent variable.
-Default: NPX.
--   random: Single character value or character array with random effects.
--   covariates: Single character value or character array. Default: NULL.
-Confounding factors to include in the analysis. In case of single character then
-that should represent a column in the df. It can also accept the notations ':'
-or '\*', while crossed analysis will not be inferred from main effects.
--   return.covariates: Logical. Default: False. Returns F-test results for the
-covariates. Note: Adjusted p-values will be NA for covariates.
--   verbose: Logical. Default: True. If information about removed samples,
-factor conversion and final model formula is to be printed to the console.
--   check_log: Named list returned by `check_npx`. If `NULL`, `check_npx` is run
-internally.
+-   `df`: NPX data frame in long format should minimally contain protein name
+    (`Assay`), `OlinkID`, `UniProt`, `Panel` and 1-2 variables with at least 2
+    levels and subject identifiers (`SubjectID`).
+-   `variable`: Single character value or character array. In case of single
+    character then that should represent a column in the `df`. Otherwise, if
+    length \> 1, the included variable names will be used in crossed analyses.
+    It can also accept the notations ':' or '\*'.
+-   `outcome`: Name of the column from `df` that contains the dependent
+    variable. Default: "NPX".
+-   `random`: Single character value or character array with random effects.
+-   `covariates`: Single character value or character array. Default: `NULL`.
+    Confounding factors to include in the analysis. In case of single character
+    then that should represent a column in the `df`. It can also accept the
+    notations ':' or '\*', while crossed analysis will not be inferred from main
+    effects.
+-   `return.covariates`: Logical. Returns F-test results for the covariates.
+    Note: Adjusted p-values will be NA for covariates. Default: `FALSE`.
+-   `verbose`: Logical. If information about removed samples, factor conversion
+    and final model formula is to be printed to the console. Default: `TRUE`.
+-   `check_log`: Named list returned by `check_npx()`. If `NULL`, `check_npx()`
+    is run internally.
 
-```{r message=FALSE, eval=FALSE}
+```{r, message = FALSE, eval = FALSE}
 # Linear mixed model with one variable.
 lmer_results_oneway <- OlinkAnalyze::olink_lmer(
-  df = npx_clean,
+  df = data_clean,
   variable = "Site",
   random = "Subject",
-  check_log = check_npx_clean
+  check_log = check_log_clean
 )
 
 # Linear mixed model with two variables.
 lmer_results_twoway <- OlinkAnalyze::olink_lmer(
-  df = npx_clean,
+  df = data_clean,
   variable = c("Site", "Treatment"),
   random = "Subject",
-  check_log = check_npx_clean
+  check_log = check_log_clean
 )
 ```
 
@@ -814,22 +815,23 @@ lmer_results_twoway <- OlinkAnalyze::olink_lmer(
 
 A tibble with the following columns:
 
--   Assay *\<chr\>*: Assay name.
--   OlinkID *\<chr\>*: Unique Olink ID.
--   UniProt *\<chr\>*: UniProt ID.
--   Panel *\<chr\>*: Olink Panel.
--   term *\<chr\>*: Name of the variable that was used for the p-value
-calculation. The ":" between variables indicates interaction between variables.
--   sumsq *\<dbl\>*: Sum of squares.
--   meansq *\<dbl\>*: Mean of squares.
--   NumDF *\<dbl\>*: Numerator of degrees of freedom.
--   DenDF *\<dbl\>*: Denominator of degrees of freedom.
--   statistic *\<dbl\>*: Value of F-statistic.
--   p.value *\<dbl\>*: P-value for the test.
--   Adjusted_pval *\<dbl\>*: Adjusted p-value for the test (Benjamini &
-Hochberg).
--   Threshold *\<chr\>*: Text indication if assay is significant (adjusted
-p-value \< 0.05).
+-   `Assay` *\<chr\>*: Assay name.
+-   `OlinkID` *\<chr\>*: Unique Olink ID.
+-   `UniProt` *\<chr\>*: UniProt ID.
+-   `Panel` *\<chr\>*: Olink Panel.
+-   `term` *\<chr\>*: Name of the variable that was used for the p-value
+    calculation. The ":" between variables indicates interaction between
+    variables.
+-   `sumsq` *\<dbl\>*: Sum of squares.
+-   `meansq` *\<dbl\>*: Mean of squares.
+-   `NumDF` *\<dbl\>*: Numerator of degrees of freedom.
+-   `DenDF` *\<dbl\>*: Denominator of degrees of freedom.
+-   `statistic` *\<dbl\>*: Value of F-statistic.
+-   `p.value` *\<dbl\>*: P-value for the test.
+-   `Adjusted_pval` *\<dbl\>*: Adjusted p-value for the test (Benjamini &
+    Hochberg).
+-   `Threshold` *\<chr\>*: Text indication if assay is significant (adjusted
+    p-value \< 0.05).
 
 ## Post-hoc linear mixed effects model analysis (olink_lmer_posthoc)
 
