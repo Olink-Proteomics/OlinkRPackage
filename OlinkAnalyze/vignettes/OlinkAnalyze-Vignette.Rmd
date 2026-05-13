@@ -930,14 +930,14 @@ A tibble with the following columns:
 
 Many other statistical functions can be found within Olink Analyze, including:
 
--   *olink_one_non_parametric* Function which performs a Kruskal-Wallis Test or
-Friedman Test per protein.
--   *olink_one_non_parametric_posthoc* Function which performs post-hoc test for
-one way non-parametric test.
--   *olink_ordinalRegression* Function which performs an ordinal regression per
-protein.
--   *olink_ordinalRegression_posthoc* Function which performs an ordinal
-regression post-hoc test per protein.
+-   `olink_one_non_parametric()` Function which performs a Kruskal-Wallis Test
+    or Friedman Test per protein.
+-   `olink_one_non_parametric_posthoc()` Function which performs post-hoc test
+    for one way non-parametric test.
+-   `olink_ordinalRegression()` Function which performs an ordinal regression
+    per protein.
+-   `olink_ordinalRegression_posthoc()` Function which performs an ordinal
+    regression post-hoc test per protein.
 
 To learn more about these function, consult their help documentation using the
 `help()` function.
