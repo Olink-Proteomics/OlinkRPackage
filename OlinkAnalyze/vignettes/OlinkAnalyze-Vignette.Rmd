@@ -112,7 +112,7 @@ variables
 
 # Usage
 
-```{r oa_v5_workflow, echo = FALSE, eval = TRUE, message = FALSE, out.width="650px", fig.cap = fcap}
+```{r oa_v5_workflow, echo = FALSE, eval = TRUE, message = FALSE, out.width = "690px", fig.cap = fcap}
 knitr::include_graphics(
   path = normalizePath(
     path = "../man/figures/OA_v5.0_flowchart.png"
