@@ -16,14 +16,17 @@ vignette: >
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
-  fig.width = 6,
-  fig.height = 3,
+  fig.width = 6L,
+  fig.height = 3L,
   fig.align = "center",
   collapse = TRUE,
   comment = "#>"
 )
 
-options(tibble.print_min = 4L, tibble.print_max = 4L)
+options(
+  tibble.print_min = 4L,
+  tibble.print_max = 4L
+)
 ```
 
 Olink® Analyze is an R package that provides a versatile toolbox to enable fast
