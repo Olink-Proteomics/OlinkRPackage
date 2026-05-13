@@ -833,54 +833,55 @@ A tibble with the following columns:
 -   `Threshold` *\<chr\>*: Text indication if assay is significant (adjusted
     p-value \< 0.05).
 
-## Post-hoc linear mixed effects model analysis (olink_lmer_posthoc)
+## Post-hoc linear mixed effects model analysis (`olink_lmer_posthoc()`)
 
-The olink_lmer_posthoc function is similar to olink_lmer but performs a post-hoc
-analysis based on a linear mixed model effects model. The function handles both
-factor and numerical variables and/or covariates. Differences in estimated
-marginal means are calculated for all pairwise levels of a given output
-variable. Degrees of freedom are estimated using Satterthwaite’s approximation.
-The post-hoc test for a numerical variable compares the difference in means of
-the outcome variable (default: NPX) for 1 standard deviation difference in the
-numerical variable, e.g. mean NPX at mean(numerical variable) versus mean NPX at
-mean(numerical variable) + 1\*SD(numerical variable). The output tibble is
-arranged by ascending adjusted p-values.
+The `olink_lmer_posthoc()` function is similar to `olink_lmer()` but performs a
+post-hoc analysis based on a linear mixed model effects model. The function
+handles both factor and numerical variables and/or covariates. Differences in
+estimated marginal means are calculated for all pairwise levels of a given
+output variable. Degrees of freedom are estimated using Satterthwaite’s
+approximation. The post-hoc test for a numerical variable compares the
+difference in means of the outcome variable (default: `NPX`) for 1 standard
+deviation difference in the numerical variable, e.g. mean NPX at mean(numerical
+variable) versus mean NPX at mean(numerical variable) + 1\*SD(numerical
+variable). The output tibble is arranged by ascending adjusted p-values.
 
 ### Function arguments
 
--   df: NPX data frame in long format should minimally contain protein name
-(Assay), OlinkID, UniProt, Panel and 1-2 variables with at least 2 levels and
-subject ID.
--   variable: Single character value or character array. In case of single
-character then that should represent a column in the df. Otherwise, if length \>
-1, the included variable names will be used in crossed analyses. It can also
-accept the notations ':' or '\*'.
--   olinkid_list: Character vector of OlinkID's on which to perform the post-hoc
-analysis. If not specified, all assays in df are used.
--   effect: Term on which to perform the post-hoc analysis. Character vector.
-Must be subset of or identical to the variable.
--   outcome: Name of the column from df that contains the dependent variable.
-Default: NPX.
--   random: Single character value or character array with random effects.
--   covariates: Single character value or character array. Default: NULL.
-Confounding factors to include in the analysis. In case of single character then
-that should represent a column in the df. It can also accept the notations ':'
-or '\*', while crossed analysis will not be inferred from main effects.
--   mean_return: Logical. If true, returns the mean of each factor level rather
-than the difference in means (default). Note that no p-value is returned for
-mean_return = TRUE and no adjustment is performed.
--   verbose: Logical. Default: True. If information about removed samples,
-factor conversion and final model formula is to be printed to the console.
--   check_log: Named list returned by `check_npx`. If `NULL`, `check_npx` is run
-internally.
+-   `df`: NPX data frame in long format should minimally contain protein name
+    (`Assay`), `OlinkID`, `UniProt`, `Panel` and 1-2 variables with at least 2
+    levels and subject identifiers (`SubjectID`).
+-   `variable`: Single character value or character array. In case of single
+    character then that should represent a column in the `df`. Otherwise, if
+    length \> 1, the included variable names will be used in crossed analyses.
+    It can also accept the notations ':' or '\*'.
+-   `olinkid_list`: Character vector of `OlinkID`'s on which to perform the
+    post-hoc analysis. If not specified, all assays in `df` are used.
+-   `effect`: Character vector. Term on which to perform the post-hoc analysis.
+    Must be subset of or identical to the variable.
+-   `outcome`: Name of the column from `df` that contains the dependent
+    variable. Default: "NPX".
+-   `random`: Single character value or character array with random effects.
+-   `covariates`: Single character value or character array. Default: `NULL`.
+    Confounding factors to include in the analysis. In case of single character
+    then that should represent a column in the `df`. It can also accept the
+    notations ':' or '\*', while crossed analysis will not be inferred from main
+    effects.
+-   `mean_return`: Logical. If true, returns the mean of each factor level
+    rather than the difference in means (default). Note that no p-value is
+    returned for `mean_return = TRUE` and no adjustment is performed.
+-   `verbose`: Logical. If information about removed samples, factor conversion
+    and final model formula is to be printed to the console. Default: `TRUE`.
+-   `check_log`: Named list returned by `check_npx()`. If `NULL`, `check_npx()`
+    is run internally.
 
-```{r message=FALSE, eval=FALSE}
+```{r, message = FALSE, eval = FALSE}
 # Linear mixed model with two variables.
 lmer_results_twoway <- OlinkAnalyze::olink_lmer(
-  df = npx_clean,
+  df = data_clean,
   variable = c("Site", "Treatment"),
   random = "Subject",
-  check_log = check_npx_clean
+  check_log = check_log_clean
 )
 
 # extracting the significant proteins
@@ -895,12 +896,12 @@ lmer_results_twoway_sign <- lmer_results_twoway |>
 
 # performing post-hoc analysis
 lmer_posthoc_twoway_results <- OlinkAnalyze::olink_lmer_posthoc(
-  df = npx_clean,
+  df = data_clean,
   olinkid_list = lmer_results_twoway_sign,
   variable = c("Site", "Treatment"),
   random = "Subject",
   effect = "Treatment",
-  check_log = check_npx_clean
+  check_log = check_log_clean
 )
 ```
 
@@ -908,21 +909,22 @@ lmer_posthoc_twoway_results <- OlinkAnalyze::olink_lmer_posthoc(
 
 A tibble with the following columns:
 
--   Assay *\<chr\>*: Assay name.
--   OlinkID *\<chr\>*: Unique Olink ID.
--   UniProt *\<chr\>*: UniProt ID.
--   Panel *\<chr\>*: Olink Panel.
--   term *\<chr\>*: Name of the variable that was used for the p-value
-calculation. The ":" between variables indicates interaction between variables.
--   contrast *\<chr\>*: Variables (in term) that are compared.\
--   estimate *\<dbl\>*: Difference in mean NPX between variables (from
-contrast).
--   conf.low *\<dbl\>*: Low bound of the confidence interval for the mean.
--   conf.high *\<dbl\>*: High bound of the confidence interval for the mean.
--   Adjusted_pval *\<dbl\>*: Adjusted p-value for the test (Benjamini &
-Hochberg).
--   Threshold *\<chr\>*: Text indication if assay is significant (adjusted
-p-value \< 0.05).
+-   `Assay` *\<chr\>*: Assay name.
+-   `OlinkID` *\<chr\>*: Unique Olink ID.
+-   `UniProt` *\<chr\>*: UniProt ID.
+-   `Panel` *\<chr\>*: Olink Panel.
+-   `term` *\<chr\>*: Name of the variable that was used for the p-value
+    calculation. The ":" between variables indicates interaction between
+    variables.
+-   `contrast` *\<chr\>*: Variables (in term) that are compared.
+-   `estimate` *\<dbl\>*: Difference in mean NPX between variables (from
+    contrast).
+-   `conf.low` *\<dbl\>*: Low bound of the confidence interval for the mean.
+-   `conf.high` *\<dbl\>*: High bound of the confidence interval for the mean.
+-   `Adjusted_pval` *\<dbl\>*: Adjusted p-value for the test (Benjamini &
+    Hochberg).
+-   `Threshold` *\<chr\>*: Text indication if assay is significant (adjusted
+    p-value \< 0.05).
 
 ## Additional Statistical Tests
 
