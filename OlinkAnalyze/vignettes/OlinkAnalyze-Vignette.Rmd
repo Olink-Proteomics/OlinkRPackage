@@ -46,7 +46,7 @@ convenient pipeline for your Olink NPX data analysis.
 
 You can install Olink® Analyze from CRAN.
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 install.packages("OlinkAnalyze")
 ```
 
