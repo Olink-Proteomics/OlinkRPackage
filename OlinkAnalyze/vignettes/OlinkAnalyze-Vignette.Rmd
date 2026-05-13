@@ -467,29 +467,30 @@ For more information on calculating LOD, consult the **Calculating LOD from**
 
 ## T-test analysis (olink_ttest)
 
-The `olink_ttest` function performs a Welch 2-sample t-test or paired t-test at
-confidence level 0.95 for every protein (by OlinkID) for a given grouping
+The `olink_ttest()` function performs a Welch 2-sample t-test or paired t-test
+at confidence level 0.95 for every protein (by `OlinkID`) for a given grouping
 variable. It corrects for multiple testing using the Benjamini-Hochberg method
-(“fdr”). Adjusted p-values are logically evaluated towards adjusted p-value
-\< 0.05. The resulting t-test table is arranged by ascending p-values.
+("fdr"). Adjusted p-values are logically evaluated towards adjusted p-value \<
+0.05. The resulting t-test table is arranged by ascending p-values.
 
 ### Function arguments
 
--   df: NPX data frame in long format should minimally contain protein name
-(Assay), OlinkID, UniProt, Panel and an outcome factor with 2 levels.
--   variable: Character value that should represent a column in the df to be
-used as a grouping variable. Needs to have exactly 2 levels.
--   pair_id: Character value indicating which column contains the paired sample
-identifier. Only used for paired t-tests.
--   check_log: Named list returned by `check_npx`. If `NULL`, `check_npx` is run
-internally.
+-   `df`: NPX data frame in long format should minimally contain protein name
+    (`Assay`), `OlinkID`, `UniProt`, `Panel` and an outcome factor with 2
+    levels.
+-   `variable`: Character value that should represent a column in the `df` to be
+    used as a grouping variable. Needs to have exactly 2 levels.
+-   `pair_id`: Character value indicating which column contains the paired
+    sample identifier. Only used for paired t-tests.
+-   `check_log`: Named list returned by `check_npx()`. If `NULL`, `check_npx()`
+    is run internally.
 
-```{r message=FALSE, eval=FALSE}
-# Run check_npx and clean_npx before analysis
+```{r, message = FALSE, eval = FALSE}
+# Run check_npx() and clean_npx() before analysis
 OlinkAnalyze::olink_ttest(
-  df = npx_clean,
+  df = data_clean,
   variable = "Treatment",
-  check_log = check_npx_clean
+  check_log = check_log_clean
 )
 ```
 
