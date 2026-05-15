@@ -1041,19 +1041,19 @@ Columns for GSEA:
 
 # Exploratory analysis
 
-## Principal components analysis (PCA) plot (olink_pca_plot)
+## Principal components analysis (PCA) plot (`olink_pca_plot()`)
 
 Generates PCA projection of all samples from NPX data along two principal
-components (default PC2 vs PC1) colored by the variable specified by color_g
-(default QC_Warning) and including the percentage of explained variance. By
-default, the values are scaled and centered in the PCA and proteins with missing
-NPX values removed from the corresponding assay(s). Unique sample names are
-required. Imputation by median value is done for assays with missingness \<10%
-and for multi-plate projects, and for missingness \<5% for single plate
-projects.
+components (default 'PC1' vs 'PC2') colored by the variable specified by
+`color_g` (default 'QC_Warning') and including the percentage of explained
+variance. By default, the values are scaled and centered in the PCA and proteins
+with missing NPX values removed from the corresponding assays. Unique sample
+names are required. Imputation by median value is performed for assays with
+missingness \<10% and for multi-plate projects, and for missingness \<5% for
+single plate projects.
 
 More information about `olink_pca()` can be found in the **Outlier Exclusion**
-**Vignette** in OlinkAnalyzeVignettes.
+**Vignette** in the R package `OlinkAnalyzeVignettes`.
 
 ## Uniform Manifold Approximation and Projection for Dimension Reduction (UMAP) (olink_umap_plot)
 
