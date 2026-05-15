@@ -1055,70 +1055,74 @@ single plate projects.
 More information about `olink_pca()` can be found in the **Outlier Exclusion**
 **Vignette** in the R package `OlinkAnalyzeVignettes`.
 
-## Uniform Manifold Approximation and Projection for Dimension Reduction (UMAP) (olink_umap_plot)
+## Uniform Manifold Approximation and Projection for Dimension Reduction (UMAP) (`olink_umap_plot()`)
 
 Computes a manifold approximation and projection and plots the two specified
 components. Unique sample names are required and imputation by the median is
 done for assays with missingness \<10% for multi-plate projects and \<5% for
 single plate projects.
 
-The arguments outlierDefX and outlierDefY can be used to identify outliers in
-the UMAP results. Sample outliers will be labelled.
+The arguments `outlierDefX` and `outlierDefY` can be used to identify outliers
+in the UMAP results. Sample outliers will be labelled.
 
 NOTE: UMAP is a non-linear data transformation that might not accurately
 preserve the properties of the data. Distances in the UMAP plane should
-therefore be interpreted with caution
+therefore be interpreted with caution.
 
 ### Function arguments (selection)
 
--   df: NPX data frame in long format should minimally contain SampleID, NPX and
-column that will be used for grouping/coloring.
--   color_g: Character value indicating the column name that should be used as
-fill color. Default QC_Warning.
--   x_val: Integer indicating which principal component to plot along the
-x-axis. Default 1.
--   y_val: Integer indicating which principal component to plot along the
-y-axis. Default 2.
--   config: Object of class umap.config, specifying the parameters for the UMAP
-algorithm.
--   label_samples: Logical. If TRUE, points are replaced with SampleID. Default
-FALSE.
--   drop_assays: Logical. All assays with any missing values will be dropped.
-Takes precedence over sample drop.
--   drop_samples: Logical. All samples with any missing values will be dropped.
--   byPanel: Logical. Perform the UMAP per panel (default FALSE)
--   outlierDefX: (Optional) The number standard deviations along the UMAP
-dimension plotted on the x-axis that defines an outlier.
--   outlierDefY: (Optional) The number standard deviations along the UMAP
-dimension plotted on the y-axis that defines an outlier.
--   OutlierLines: Logical. Draw dashed lines at +/-outlierDef[X,Y] standard
-deviations from the mean of the plotted UMAP dimensions (default FALSE)
--   verbose: Logical. Default: True. If information about removed samples,
-factor conversion and final model formula is to be printed to the console.
--   quiet: Logical. Default: False. If TRUE, the resulting plot is not printed.
--   check_log: Named list returned by `check_npx`. If `NULL`, `check_npx` is run
-internally.
+-   `df`: NPX data frame in long format should minimally contain `SampleID`,
+    `NPX` and column that will be used for grouping/coloring.
+-   `color_g`: Character value indicating the column name that should be used as
+    fill color. Default `QC_Warning`.
+-   `x_val`: Integer indicating which principal component to plot along the
+    x-axis. Default 1.
+-   `y_val`: Integer indicating which principal component to plot along the
+    y-axis. Default 2.
+-   `config`: Object of class `umap.config`, specifying the parameters for the
+    UMAP algorithm.
+-   `label_samples`: Logical. If `TRUE`, points are replaced with `SampleID`.
+    Default `FALSE`.
+-   `drop_assays`: Logical. All assays with any missing values will be dropped.
+    Takes precedence over sample drop.
+-   `drop_samples`: Logical. All samples with any missing values will be
+    dropped.
+-   `byPanel`: Logical. Perform the UMAP per panel. Default `FALSE`.
+-   `outlierDefX`: (Optional) The number standard deviations along the UMAP
+    dimension plotted on the x-axis that defines an outlier.
+-   `outlierDefY`: (Optional) The number standard deviations along the UMAP
+    dimension plotted on the y-axis that defines an outlier.
+-   `OutlierLines`: Logical. Draw dashed lines at `+/-outlierDef[X,Y]` standard
+    deviations from the mean of the plotted UMAP dimensions. Default `FALSE`.
+-   `verbose`: Logical. If information about removed samples, factor conversion
+    and final model formula is to be printed to the console. Default: `TRUE`.
+-   `quiet`: Logical. If `TRUE`, the resulting plot is not printed. Default:
+    `FALSE`.
+-   `check_log`: Named list returned by `check_npx()`. If `NULL`, `check_npx()`
+    is run internally.
 
-```{r message=FALSE, eval=FALSE}
+```{r, message = FALSE, eval = FALSE}
 OlinkAnalyze::olink_umap_plot(
-  df = npx_clean,
+  df = data_clean,
   color_g = "QC_Warning",
   byPanel = TRUE,
-  check_log = check_npx_clean
+  check_log = check_log_clean
 )
 ```
 
-```{r message=FALSE, echo = FALSE}
+```{r, message = FALSE, echo = FALSE}
 knitr::include_graphics(
-  path = normalizePath("../man/figures/olink_umap_plot.png"),
+  path = normalizePath(
+    path = "../man/figures/olink_umap_plot.png"
+  ),
   error = FALSE
 )
 ```
 
 ### Function output
 
-A list of objects of class *ggplot* (silently returned). Plots are also printed
-unless option `quiet = TRUE` is set.
+A list of objects of class `ggplot2` is silently returned. Plots are also
+printed unless option `quiet = TRUE` is set.
 
 # Visualization
 
