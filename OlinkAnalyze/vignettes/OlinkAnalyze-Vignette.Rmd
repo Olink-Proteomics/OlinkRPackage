@@ -1386,54 +1386,58 @@ indicate +/-3 standard deviations from the mean sample median.
 More information about `olink_qc_plot()` can be found in the **Outlier**
 **Exclusion Vignette** in the R package `OlinkAnalyzeVignettes`.
 
-## Heatmap (olink_heatmap_plot)
+## Heatmap (`olink_heatmap_plot()`)
 
-The olink_heatmap_plot function generates a heatmap for all samples and
-proteins. By default, the heatmap centers and scales NPX across all proteins and
-clusters samples and proteins using a dendrogram. Unique sample names are
-required.
+The `olink_heatmap_plot()` function generates a heatmap for a specfied set of
+samples and proteins. By default, the heatmap centers and scales NPX across
+proteins and clusters samples and proteins using a dendrogram. Unique sample
+names are required.
 
 The grouping variable(s) are annotated and colored in the left side of the
 heatmap.
 
 ### Function arguments
 
--   df: NPX data frame in long format which should minimally contain SampleID,
-NPX, OlinkID, Assay. Optionally columns of choice for annotations.
--   variable_row_list: Columns in df to be annotated for rows in the heatmap.
--   variable_col_list: Columns in df to be annotated for columns in the heatmap.
--   center_scale: Logical. Default: True. If data should be centered and scaled
-across assays.
--   cluster_rows: Logical. Default: True. Determining if rows should be
-clustered.
--   cluster_cols: Logical. Default: True. Determining if columns should be
-clustered.
--   show_rownames: Logical. Default: True. Determining if row names are shown.
--   show_colnames: Logical. Default: True. Determining if column names are
-shown.
--   annotation_legend: Logical. Default: True. Determining if legend for
-annotations should be shown.
--   fontsize. Default: 10. Fontsize for all text.
--   na_col. Default: Black. Color of the cells with NA.
--   check_log: Named list returned by `check_npx`. If `NULL`, `check_npx` is run
-internally.
+-   `df`: NPX data frame in long format which should minimally contain
+    `SampleID`, `NPX`, `OlinkID`, `Assay.` Optionally columns of choice for
+    annotations.
+-   `variable_row_list`: Columns in `df` to be annotated for rows in the
+    heatmap.
+-   `variable_col_list`: Columns in `df` to be annotated for columns in the
+    heatmap.
+-   `center_scale`: Logical. If data should be centered and scaled across 
+    assays. Default: `TRUE`.
+-   `cluster_rows`: Logical. Determining if rows should be clustered. Default:
+    `TRUE`.
+-   `cluster_cols`: Logical. Determining if columns should be clustered.
+    Default: `TRUE`.
+-   `show_rownames`: Logical. Determining if row names are shown. Default:
+    `TRUE`.
+-   `show_colnames`: Logical. Determining if column names are shown. Default:
+    `TRUE`.
+-   `annotation_legend`: Logical. Determining if legend for annotations should
+    be shown. Default: `TRUE`.
+-   `fontsize`: Fontsize for all text. Default: 10.
+-   `na_col`: Color of the cells with NA values. Default: "Black".
+-   `check_log`: Named list returned by `check_npx()`. If `NULL`, `check_npx()`
+    is run internally.
 
-```{r message=FALSE, eval=FALSE}
-first10 <- npx_clean |>
+```{r, message = FALSE, eval = FALSE}
+first10 <- data_clean |>
   dplyr::pull(
     .data[["OlinkID"]]
   ) |>
   unique() |>
   utils::head(n = 10L)
 
-first15samples <- npx_clean |>
+first15samples <- data_clean |>
   dplyr::pull(
     .data[["SampleID"]]
   ) |>
   unique() |>
   utils::head(n = 15L)
 
-npx_data_small <- npx_clean |>
+data_clean_small <- data_clean |>
   dplyr::filter(
     .data[["OlinkID"]] %in% .env[["first10"]]
   ) |>
@@ -1442,22 +1446,24 @@ npx_data_small <- npx_clean |>
   )
 
 OlinkAnalyze::olink_heatmap_plot(
-  df = npx_data_small,
+  df = data_clean_small,
   variable_row_list = "Treatment",
-  check_log = check_npx_clean
+  check_log = check_log_clean
 )
 ```
 
-```{r message=FALSE, fig.height=4, echo=FALSE}
+```{r, message = FALSE, fig.height = 4, echo = FALSE}
 knitr::include_graphics(
-  path = normalizePath("../man/figures/olink_heatmap_plot.png"),
+  path = normalizePath(
+    path = "../man/figures/olink_heatmap_plot.png"
+  ),
   error = FALSE
 )
 ```
 
 ### Function output
 
-An object of class *ggplot*.
+An object of class `ggplot2`.
 
 ## Plot results of t-test (olink_volcano_plot)
 
