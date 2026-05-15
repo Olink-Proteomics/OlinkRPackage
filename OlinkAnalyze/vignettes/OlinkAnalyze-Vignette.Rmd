@@ -1275,7 +1275,7 @@ plot <- OlinkAnalyze::olink_lmer_plot(
 plot[[1L]]
 ```
 
-```{r,m message = FALSE, fig.width = 8, echo = FALSE}
+```{r, message = FALSE, fig.width = 8, echo = FALSE}
 knitr::include_graphics(
   path = normalizePath(
     path = "../man/figures/olink_lmer_plot.png"
@@ -1291,42 +1291,45 @@ A list of objects of class `ggplot2`.
 **Note:** Please note that plots will not appear in the *Viewer* panel of
 *RStudio* if not assigned to a variable and printing it (see sample code above).
 
-## Heatmap for visualizing pathway enrichment (olink_pathway_heatmap)
+## Heatmap for visualizing pathway enrichment (`olink_pathway_heatmap()`)
 
-The olink_pathway_heatmap function generates a heatmap of proteins related to
-pathways using the enrichment results from the olink_pathway_enrichment
+The `olink_pathway_heatmap()` function generates a heatmap of proteins related
+to pathways using the enrichment results from the `olink_pathway_enrichment()`
 function. Either the top terms can be visualized or terms containing a certain
-keyword. For each term, the proteins in the test_result data frame that are
+keyword. For each term, the proteins in the `test_result` data frame that are
 related to that term will be visualized by their estimate. This visualization
 can be used to determining how many proteins of interest are involved in a
 particular pathway and in which direction their estimates are.
 
 ### Function arguments
 
--   enrich_results: data frame of enrichment results from
-`olink_pathway_enrichment()`
--   test_results: filtered results from statistical test with Assay, OlinkID,
-and estimate columns
--   method: method used in olink_pathway_enrichment ("GSEA" (default) or "ORA")
--   keyword: (optional) keyword to filter enrichment results on, if not
-specified, displays top terms
--   number_of_terms: number of terms to display, default is 20
+-   `enrich_results`: data frame of enrichment results from
+    `olink_pathway_enrichment()`.
+-   `test_results`: filtered results from statistical test with `Assay`,
+    `OlinkID`, and `estimate` columns.
+-   `method`: method used in `olink_pathway_enrichment()`, "GSEA" or "ORA".
+    Default is "GSEA".
+-   `keyword`: (optional) keyword to filter enrichment results on, if not
+    specified, displays top terms.
+-   `number_of_terms`: number of terms to display, default is 20.
 
-```{r  message=FALSE, eval=FALSE}
+```{r, message = FALSE, eval = FALSE}
 OlinkAnalyze::olink_pathway_heatmap(
   enrich_results = gsea_results,
   test_results = ttest_results
 )
 ```
 
-```{r message=FALSE, echo=FALSE}
+```{r, message = FALSE, echo = FALSE}
 knitr::include_graphics(
-  path = normalizePath("../man/figures/olink_pathway_heatmap_gsea.png"),
+  path = normalizePath(
+    path = "../man/figures/olink_pathway_heatmap_gsea.png"
+  ),
   error = FALSE
 )
 ```
 
-```{r message=FALSE, fig.height=4, fig.width=8, eval=FALSE}
+```{r, message = FALSE, fig.height = 4, fig.width = 8, eval = FALSE}
 OlinkAnalyze::olink_pathway_heatmap(
   enrich_results = ora_results,
   test_results = ttest_results,
@@ -1335,9 +1338,11 @@ OlinkAnalyze::olink_pathway_heatmap(
 )
 ```
 
-```{r message=FALSE, echo=FALSE}
+```{r, message = FALSE, echo = FALSE}
 knitr::include_graphics(
-  path = normalizePath("../man/figures/olink_pathway_heatmap_ora.png"),
+  path = normalizePath(
+    path = "../man/figures/olink_pathway_heatmap_ora.png"
+  ),
   error = FALSE
 )
 ```
