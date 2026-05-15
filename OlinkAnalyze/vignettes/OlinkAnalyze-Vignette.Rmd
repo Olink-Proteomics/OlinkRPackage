@@ -1224,66 +1224,72 @@ potential outliers.
 More information about `olink_dist_plot()` can be found in the **Outlier**
 **Exclusion Vignette** in the R package `OlinkAnalyzeVignettes`.
 
-## Point-range plot for LMER (olink_lmer_plot)
+## Point-range plot for LMER (`olink_lmer_plot()`)
 
-The function olink_lmer_plot generates a point-range plot for a given list of
-proteins based on linear mixed effect model. The points illustrate the mean NPX
-level for each group and the error bars illustrate 95% confidence intervals.
+The function `olink_lmer_plot()` generates a point-range plot for a given list
+of proteins based on linear mixed effect model. The points illustrate the mean
+NPX level for each group and the error bars illustrate 95% confidence intervals.
 Facets are labeled by the protein name and corresponding OlinkID for the
 protein.
 
 ### Function arguments
 
--   df: NPX data frame in long format should minimally contain protein name
-(Assay), OlinkID, UniProt, Panel and 1-2 variables with at least 2 levels and
-subject ID.
--   variable: Single character value or character array. In case of single
-character then that should represent a column in the df. Otherwise, if length \>
-1, the included variable names will be used in crossed analyses. It can also
-accept the notations ':' or '\*'.
--   outcome: Name of the column from df that contains the dependent variable.
-Default: NPX.
--   random: Single character value or character array with random effects.
--   covariates: Single character value or character array. Default: NULL.
-Confounding factors to include in the analysis. In case of single character then
-that should represent a column in the df. It can also accept the notations ':'
-or '\*', while crossed analysis will not be inferred from main effects.
--   x_axis_variable: Character. Which main effect to use as x-axis in the plot.
--   col_variable: Character. If provided, the interaction effect
-col_variable:x_axis_variable will be plotted with x_axis_variable on the x-axis
-and col_variable as color.
--   number_of_proteins_per_plot: Number plots to include in the list of
-point-range plots. Defaults to 6 plots per figure.
--   verbose: Logical. Default: True. If information about removed samples,
-factor conversion and final model formula is to be printed to the console.
--   check_log: Named list returned by `check_npx`. If `NULL`, `check_npx` is run internally.
+-   `df`: NPX data frame in long format should minimally contain protein name
+    (`Assay`), `OlinkID`, `UniProt`, `Panel` and 1-2 variables with at least 2
+    levels and subject ID (`SubjectID`).
+-   `variable`: Single character value or character array. In case of single
+    character then that should represent a column in the `df.` Otherwise, if
+    length \> 1, the included variable names will be used in crossed analyses.
+    It can also accept the notations ':' or '\*'.
+-   `outcome`: Name of the column from `df` that contains the dependent
+    variable. Default: "NPX".
+-   `random`: Single character value or character array with random effects.
+-   `covariates`: Single character value or character array. Default: `NULL.`
+    Confounding factors to include in the analysis. In case of single character
+    then that should represent a column in the `df`. It can also accept the
+    notations ':' or '\*', while crossed analysis will not be inferred from main
+    effects.
+-   `x_axis_variable`: Character. Which main effect to use as x-axis in the
+    plot.
+-   `col_variable`: Character. If provided, the interaction effect
+    `col_variable:x_axis_variable` will be plotted with `x_axis_variable` on the
+    x-axis and `col_variable` as color.
+-   `number_of_proteins_per_plot`: Number plots to include in the list of
+    point-range plots. Defaults to 6 plots per figure.
+-   `verbose`: Logical. If information about removed samples, factor conversion
+    and final model formula is to be printed to the console. Default: `TRUE`.
+-   `check_log`: Named list returned by `check_npx()`. If `NULL`, `check_npx()`
+    is run internally.
 
-```{r message=FALSE, eval=FALSE}
+```{r, message = FALSE, eval = FALSE}
 plot <- OlinkAnalyze::olink_lmer_plot(
-  df = npx_clean,
+  df = data_clean,
   olinkid_list = c("OID01216", "OID01217"),
   variable = c("Site", "Treatment"),
   x_axis_variable = "Site",
   col_variable = "Treatment",
   random = "Subject",
-  check_log = check_npx_clean
+  check_log = check_log_clean
 )
+
 plot[[1L]]
 ```
 
-```{r message=FALSE, fig.width=8, echo=FALSE}
+```{r,m message = FALSE, fig.width = 8, echo = FALSE}
 knitr::include_graphics(
-  path = normalizePath("../man/figures/olink_lmer_plot.png"),
+  path = normalizePath(
+    path = "../man/figures/olink_lmer_plot.png"
+  ),
   error = FALSE
 )
 ```
 
 ### Function output
 
-A list of objects of class *ggplot*.
+A list of objects of class `ggplot2`.
 
-**Note:** Please note that plots will not appear in the *plots* panel of
-*Rstudio* if not assigned to a variable and printing it (see sample code above).
+**Note:** Please note that plots will not appear in the *Viewer* panel of
+*RStudio* if not assigned to a variable and printing it (see sample code above).
 
 ## Heatmap for visualizing pathway enrichment (olink_pathway_heatmap)
 
