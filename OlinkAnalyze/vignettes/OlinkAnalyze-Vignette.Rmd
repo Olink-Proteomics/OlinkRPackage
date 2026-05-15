@@ -1215,14 +1215,14 @@ A list of objects of class `ggplot2`.
 **Note:** Please note that plots will not appear in the *Viewer* panel of
 *RStudio* if not assigned to a variable and printing it (see sample code above).
 
-## Boxplots for QC (olink_dist_plot)
+## Boxplots for QC (`olink_dist_plot()`)
 
-The olink_dist_plot function generates boxplots of NPX values for each sample,
-faceted by Olink panel. This is used as an initial QC step to identify potential
-outliers.
+The `olink_dist_plot()` function generates boxplots of NPX values for each
+sample, faceted by Olink panel. This is used as an initial QC step to identify
+potential outliers.
 
 More information about `olink_dist_plot()` can be found in the **Outlier**
-**Exclusion Vignette** in OlinkAnalyzeVignettes.
+**Exclusion Vignette** in the R package `OlinkAnalyzeVignettes`.
 
 ## Point-range plot for LMER (olink_lmer_plot)
 
