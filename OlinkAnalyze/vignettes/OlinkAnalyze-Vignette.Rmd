@@ -1553,12 +1553,12 @@ knitr::include_graphics(
 )
 ```
 
-## Color theming (olink_color_discrete, olink_color_gradient, olink_fill_discrete, olink_fill_gradient)
+## Color theming (`olink_color_discrete()`, `olink_color_gradient()`, `olink_fill_discrete()`, `olink_fill_gradient()`)
 
 These functions sets a coherent coloring theme for the plots by adding it to a
-ggplot object. It is mainly used for aesthetic reasons.
+`ggplot` object. It is mainly used for aesthetic reasons.
 
-```{r message=FALSE, eval=FALSE}
+```{r, message = FALSE, eval = FALSE}
 OlinkAnalyze::npx_data1 |>
   dplyr::filter(
     !is.na(.data[["Treatment"]])
@@ -1580,7 +1580,9 @@ OlinkAnalyze::npx_data1 |>
 
 ```{r message=FALSE, echo=FALSE}
 knitr::include_graphics(
-  path = normalizePath("../man/figures/olink_fill_discrete_boxplot.png"),
+  path = normalizePath(
+    path = "../man/figures/olink_fill_discrete_boxplot.png"
+  ),
   error = FALSE
 )
 ```
