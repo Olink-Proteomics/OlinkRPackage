@@ -1086,6 +1086,34 @@ test_that(
   }
 )
 
+test_that(
+  "check_npx_olinkid - works - all OlinkID are valid - OID12345_OID54321",
+  {
+    df <- dplyr::tibble(
+      SampleID = c("A", "B", "C", "D"),
+      OlinkID = paste0(rep("OID12345", 4L), "_", rep("OID54321", 4L)),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L)
+    )
+
+    expect_no_condition(
+      object = col_names <- check_npx_col_names(df = df,
+                                                preferred_names = NULL)
+    )
+
+    expect_equal(
+      object = check_npx_olinkid(df = df,
+                                 col_names = col_names),
+      expected = character(0L)
+    )
+  }
+)
+
 # Test check_npx_all_na_assays ----
 
 test_that(
