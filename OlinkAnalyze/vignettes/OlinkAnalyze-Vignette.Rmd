@@ -1520,12 +1520,12 @@ knitr::include_graphics(
 
 An object of class `ggplot`.
 
-## Theming function (set_plot_theme)
+## Theming function (`set_plot_theme()`)
 
-This function sets a coherent plot theme for plots by adding it to a ggplot
+This function sets a coherent plot theme for plots by adding it to a `ggplot`
 object. It is mainly used for aesthetic reasons.
 
-```{r message=FALSE, eval=FALSE}
+```{r, message = FALSE, eval = FALSE}
 OlinkAnalyze::npx_data1 |>
   dplyr::filter(
     !is.na(.data[["Treatment"]])
@@ -1544,9 +1544,11 @@ OlinkAnalyze::npx_data1 |>
   OlinkAnalyze::set_plot_theme()
 ```
 
-```{r message=FALSE, echo=FALSE}
+```{r, message = FALSE, echo = FALSE}
 knitr::include_graphics(
-  path = normalizePath("../man/figures/set_plot_theme_boxplot.png"),
+  path = normalizePath(
+    path = "../man/figures/set_plot_theme_boxplot.png"
+  ),
   error = FALSE
 )
 ```
