@@ -1375,16 +1375,16 @@ proteins in that pathway as a ratio after the bar.
 
 A bar graph as a `ggplot2` object.
 
-## Scatterplot for QC (olink_qc_plot)
+## Scatterplot for QC (`olink_qc_plot()`)
 
-The olink_qc_plot function generates a plot faceted by Panel, plotting IQR vs.
-median for all samples. This is a good first check to find out if any samples
-have a tendency to be classified as outliers. Horizontal dashed lines indicate
-+/-3 standard deviations from the mean IQR. Vertical dashed lines indicate +/-3
-standard deviations from the mean sample median.
+The `olink_qc_plot()` function generates a plot faceted by `Panel`, plotting IQR
+vs. median NPX for all samples. This is a good first check to find out if any
+samples have a tendency to be classified as outliers. Horizontal dashed lines
+indicate +/-3 standard deviations from the mean IQR. Vertical dashed lines
+indicate +/-3 standard deviations from the mean sample median.
 
 More information about `olink_qc_plot()` can be found in the **Outlier**
-**Exclusion Vignette** in OlinkAnalyzeVignettes.
+**Exclusion Vignette** in the R package `OlinkAnalyzeVignettes`.
 
 ## Heatmap (olink_heatmap_plot)
 
