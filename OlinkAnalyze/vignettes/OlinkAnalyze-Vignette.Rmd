@@ -1121,8 +1121,8 @@ knitr::include_graphics(
 
 ### Function output
 
-A list of objects of class `ggplot2` is silently returned. Plots are also
-printed unless option `quiet = TRUE` is set.
+A list of objects of class `ggplot` is silently returned. Plots are also printed
+unless option `quiet = TRUE` is set.
 
 # Visualization
 
@@ -1210,7 +1210,7 @@ knitr::include_graphics(
 
 ### Function output
 
-A list of objects of class `ggplot2`.
+A list of objects of class `ggplot`.
 
 **Note:** Please note that plots will not appear in the *Viewer* panel of
 *RStudio* if not assigned to a variable and printing it (see sample code above).
@@ -1286,7 +1286,7 @@ knitr::include_graphics(
 
 ### Function output
 
-A list of objects of class `ggplot2`.
+A list of objects of class `ggplot`.
 
 **Note:** Please note that plots will not appear in the *Viewer* panel of
 *RStudio* if not assigned to a variable and printing it (see sample code above).
@@ -1349,7 +1349,7 @@ knitr::include_graphics(
 
 ### Function output
 
-A heatmap as a `ggplot2` object.
+A heatmap as a `ggplot` object.
 
 ## Bargraph for visualizing pathway enrichment (`olink_pathway_visualization()`)
 
@@ -1373,7 +1373,7 @@ proteins in that pathway as a ratio after the bar.
 
 ### Function output
 
-A bar graph as a `ggplot2` object.
+A bar graph as a `ggplot` object.
 
 ## Scatterplot for QC (`olink_qc_plot()`)
 
@@ -1463,7 +1463,7 @@ knitr::include_graphics(
 
 ### Function output
 
-An object of class `ggplot2`.
+An object of class `ggplot`.
 
 ## Plot results of t-test (`olink_volcano_plot()`)
 
@@ -1705,7 +1705,8 @@ We are always happy to help. Email us with any questions:
 
 ## Legal Disclaimer
 
-© 2025 Olink Proteomics AB, part of Thermo Fisher Scientific.
+© `r format(Sys.Date(), "%Y")` Olink Proteomics AB, part of Thermo Fisher
+Scientific.
 
 Olink products and services are For Research Use Only. Not for use in diagnostic
 procedures.
