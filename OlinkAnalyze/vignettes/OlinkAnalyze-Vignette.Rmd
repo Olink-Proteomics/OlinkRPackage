@@ -1126,71 +1126,74 @@ printed unless option `quiet = TRUE` is set.
 
 # Visualization
 
-## Boxplots for outcomes (olink_boxplot)
+## Boxplots for outcomes (`olink_boxplot()`)
 
-The `olink_boxplot` function is used to generate boxplots of NPX values
+The `olink_boxplot()` function is used to generate boxplots of NPX values
 stratified on a variable for a given list of proteins. In order to annotate the
 plot with ANOVA posthoc analysis results (i.e. include statistical asterisks in
 the plot), control samples and control assays should be removed from the data.
 
 ### Function arguments
 
--   df: NPX data frame in long format should minimally contain protein name
-(Assay), OlinkID, UniProt and a grouping variable.
--   variable: Single character value indicating the column name to use as a
-grouping variable in the x axis.
--   olinkid_list: Character vector of OlinkID's that should be used for the
-boxplot. If not specified, all assays in df are used.
--   posthoc_results: Data frame from ANOVA posthoc analysis. This data frame
-need to be generated using the olink_anova_posthoc() function.
--   ttest_results: Data frame from ttest analysis. This data frame need to be
-generated using the olink_ttest() function.
--   verbose: Logical. Default: False. Flag indicating if plots shall be printed
-additionally to assigned to a list variable.
--   number_of_proteins_per_plot: Number of boxplots to include in the facets
-plot. Default 6.
--   check_log: Named list returned by `check_npx`. If `NULL`, `check_npx` is run
-internally.
+-   `df`: NPX data frame in long format should minimally contain protein name
+    (`Assay`), `OlinkID`, `UniProt` and a grouping variable.
+-   `variable`: Single character value indicating the column name to use as a
+    grouping variable in the x axis.
+-   `olinkid_list`: Character vector of OlinkID's that should be used for the
+    boxplot. If not specified, all assays in `df` are used.
+-   `posthoc_results`: Data frame from ANOVA posthoc analysis. This data frame
+    need to be generated using the `olink_anova_posthoc()` function.
+-   `ttest_results`: Data frame from t-test analysis. This data frame need to be
+    generated using the `olink_ttest()` function.
+-   `verbose`: Logical. Flag indicating if plots shall be printed additionally
+    to assigned to a list variable. Default: `FALSE`.
+-   `number_of_proteins_per_plot`: Number of boxplots to include in the facets
+    plot. Default 6.
+-   `check_log`: Named list returned by `check_npx()`. If `NULL`, `check_npx()`
+    is run internally.
 
-```{r message=FALSE, eval=FALSE}
-plot <- npx_clean |>
+```{r, message = FALSE, eval = FALSE}
+plot <- data_clean |>
+  # removing missing values which exist for Site
   dplyr::filter(
     !is.na(.data[["Site"]])
-  ) |> # removing missing values which exist for Site
+  ) |>
   OlinkAnalyze::olink_boxplot(
     variable = "Site",
     olinkid_list = c("OID00488", "OID01276"),
     number_of_proteins_per_plot = 2L,
-    check_log = check_npx_clean
+    check_log = check_log_clean
   )
 
 plot[[1L]]
 ```
 
-```{r message=FALSE, echo = FALSE}
+```{r, message = FALSE, echo = FALSE}
 knitr::include_graphics(
-  path = normalizePath("../man/figures/olink_boxplot.png"),
+  path = normalizePath(
+    path = "../man/figures/olink_boxplot.png"
+  ),
   error = FALSE
 )
 ```
 
-```{r message=FALSE, eval=FALSE}
-anova_posthoc_results <- npx_clean |>
-  OlinkAnalyze::olink_anova_posthoc(
-    olinkid_list = c("OID00488", "OID01276"),
-    variable = "Site",
-    effect = "Site",
-    check_log = check_npx_clean
-  )
+```{r, message = FALSE, eval = FALSE}
+anova_posthoc_results <- OlinkAnalyze::olink_anova_posthoc(
+  df = data_clean,
+  olinkid_list = c("OID00488", "OID01276"),
+  variable = "Site",
+  effect = "Site",
+  check_log = check_log_clean
+)
 
-plot2 <- npx_clean |>
-  stats::na.omit() |> # removing missing values which exists for Site
+plot2 <- data_clean |>
+  tidyr::drop_na() |> # removing missing values which exists for Site
   OlinkAnalyze::olink_boxplot(
     variable = "Site",
     olinkid_list = c("OID00488", "OID01276"),
     number_of_proteins_per_plot = 2L,
     posthoc_results = anova_posthoc_results,
-    check_log = check_npx_clean
+    check_log = check_log_clean
   )
 
 plot2[[1L]]
@@ -1198,17 +1201,19 @@ plot2[[1L]]
 
 ```{r message=FALSE, echo=FALSE}
 knitr::include_graphics(
-  path = normalizePath("../man/figures/olink_boxplot_anova_posthoc.png"),
+  path = normalizePath(
+    path = "../man/figures/olink_boxplot_anova_posthoc.png"
+  ),
   error = FALSE
 )
 ```
 
 ### Function output
 
-A list of objects of class *ggplot*.
+A list of objects of class `ggplot2`.
 
-**Note:** Please note that plots will not appear in the *plots* panel of
-*Rstudio* if not assigned to a variable and printing it (see sample code above).
+**Note:** Please note that plots will not appear in the *Viewer* panel of
+*RStudio* if not assigned to a variable and printing it (see sample code above).
 
 ## Boxplots for QC (olink_dist_plot)
 
