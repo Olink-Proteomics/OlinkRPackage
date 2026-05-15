@@ -1587,9 +1587,9 @@ knitr::include_graphics(
 )
 ```
 
-## Visualizing bridgeability criteria for between-product normalization (olink_bridgeability_plot)
+## Visualizing bridgeability criteria for between-product normalization (`olink_bridgeability_plot()`)
 
-The `olink_bridgeability_plot` function generates a series of plots on a
+The `olink_bridgeability_plot()` function generates a series of plots on a
 per-assay basis for a data frame generated from between-product bridging. The
 coloration of the figure headers indicate whether that assay has been defined as
 bridgeable or not bridgeable. The correlation plot, violin plot, and bar chart
@@ -1599,28 +1599,30 @@ corresponding KS statistic are used to determine which normalization approach
 (median centering or quantile smoothing) is most suitable for between-product
 normalization. For more information on the between-product bridging methodology
 and bridgeability criteria, consult the **Bridging across NGS-based Olink^®^**
-**products Tutorial** in OlinkAnalyzeVignettes.
+**products Tutorial** in the R package `OlinkAnalyzeVignettes`.
 
 ### Function arguments
 
--   df: NPX data frame generated from between-product bridging in long format.
-Should minimally contain Assay, OlinkID, OlinkID_E3072, and all data points
-corresponding to bridging samples from the reference project and the new
-project.
--   median_counts_threshold: Integer indicating minimum median counts allowed
-for each platform. If either platform has median counts below 150 for an assay,
-the assay fails the counts criteria when evaluating bridgeability. Default: 150.
--   min_counts: Integer indicating minimum counts allowed for a data point. If
-any data point in the bridge normalized dataframe contains fewer than the
-defined minimum count cutoff, it is excluded from the bridgeability assessment
-and corresponding figures. Default: 10.
--   bridge_sampleid: Character vector containing overlapping SampleIDs between
-the two bridging projects. If this argument is not provided, the function will
-look for overlapping SampleID values between the two projects in the bridged
-dataframe. Default: NULL.
--   check_log: Named list returned by `check_npx`. If `NULL`, `check_npx` is run internally.
+-   `df`: NPX data frame generated from between-product bridging in long format.
+    Should minimally contain `Assay`, `OlinkID`, `OlinkID_E3072`, and all data
+    points corresponding to bridging samples from the reference project and the
+    new project.
+-   `median_counts_threshold`: Integer indicating minimum median counts allowed
+    for each platform. If either platform has median counts below 150 for an
+    assay, the assay fails the counts criteria when evaluating bridgeability.
+    Default: 150.
+-   `min_counts`: Integer indicating minimum counts allowed for a data point. If
+    any data point in the bridge normalized dataframe contains fewer than the
+    defined minimum count cutoff, it is excluded from the bridgeability
+    assessment and corresponding figures. Default: 10.
+-   `bridge_sampleid`: Character vector containing overlapping SampleIDs between
+    the two bridging projects. If this argument is not provided, the function
+    will look for overlapping `SampleID` values between the two projects in the
+    bridged dataframe. Default: `NULL`.
+-   `check_log`: Named list returned by `check_npx()`. If `NULL`, `check_npx()`
+    is run internally.
 
-```{r message=FALSE, eval=FALSE}
+```{r, message = FALSE, eval = FALSE}
 npx_ht <- data_exploreht |>
   dplyr::filter(
     .data[["SampleType"]] == "SAMPLE"
@@ -1680,14 +1682,16 @@ npx_br_data_bridgeable_plt[[1L]]
 
 ```{r message=FALSE, echo=FALSE, out.width="600px"}
 knitr::include_graphics(
-  path = normalizePath("../man/figures/bridgeable_plt_MedianCenter.png"),
+  path = normalizePath(
+    path = "../man/figures/bridgeable_plt_MedianCenter.png"
+  ),
   error = FALSE
 )
 ```
 
 ### Function output
 
-A list of objects of class *ggplot*.
+A list of objects of class `ggplot`.
 
 ## Contact Us
 
