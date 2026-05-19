@@ -99,6 +99,15 @@ normalization_utilities_file <- system.file("data-raw",
 source(normalization_utilities_file)
 rm(normalization_utilities_file)
 
+## norm_cross-product.R ----
+
+norm_cross_product_file <- system.file("data-raw",
+                                       "norm_cross-product.R",
+                                       package = "OlinkAnalyze",
+                                       mustWork = TRUE)
+source(norm_cross_product_file)
+rm(norm_cross_product_file)
+
 # save to R/syssata.rda ----
 
 usethis::use_data(accepted_olink_platforms,
@@ -124,6 +133,7 @@ usethis::use_data(accepted_olink_platforms,
                   olink_norm_modes,
                   olink_norm_product_n_samples,
                   outdated_darid_panel_archive,
+                  bridge_recommendations,
                   overwrite = TRUE,
                   internal = TRUE,
                   compress = "xz",
@@ -151,4 +161,5 @@ rm(accepted_olink_platforms,
    olink_norm_ref_median_cols,
    olink_norm_modes,
    olink_norm_product_n_samples,
-   outdated_darid_panel_archive)
+   outdated_darid_panel_archive,
+   bridge_recommendations)
