@@ -1,7 +1,7 @@
 # Test olink_bridgeability_plot ----
 
 test_that(
-  "olink_bridgeability_plot - works",
+  "olink_bridgeability_plot - works - small data",
   {
     skip_on_cran()
     skip_if_not_installed("ggpubr")
