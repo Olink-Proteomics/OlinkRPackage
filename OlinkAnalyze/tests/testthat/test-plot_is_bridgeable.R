@@ -68,7 +68,7 @@ test_that(
           suppressMessages() |>
           suppressWarnings(),
         olink_id = c("OID40770_OID20117", "OID40835_OID31162",
-                     "OID40981_OID30796","OID40986_OID20052",
+                     "OID40981_OID30796", "OID40986_OID20052",
                      "OID41032_OID20118", "OID41054_OID20055"),
         median_counts_threshold = 150L,
         min_count = 10L
