@@ -721,3 +721,80 @@ test_that(
     )
   }
 )
+
+test_that(
+  "olink_bridgeability_plot - works - full data",
+  {
+    skip_on_cran()
+    skip_if_not_installed("ggpubr")
+
+    npx_3072 <- get_example_data(filename = "example_3k_data.rds")
+    npx_ht <- get_example_data(filename = "example_HT_data.rds")
+
+    npx_ht <- npx_ht |>
+      dplyr::filter(
+        .data[["SampleType"]] == "SAMPLE"
+      )
+
+    npx_3072 <- npx_3072 |>
+      dplyr::filter(
+        .data[["SampleType"]] == "SAMPLE"
+      )
+
+    overlapping_samples <- intersect(
+      x = npx_ht$SampleID,
+      y = npx_3072$SampleID
+    )
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = expect_warning(
+              data_norm <- OlinkAnalyze::olink_normalization(
+                df1 = npx_ht,
+                df2 = npx_3072,
+                overlapping_samples_df1 = overlapping_samples,
+                df1_project_nr = "Explore HT",
+                df2_project_nr = "Explore 3072",
+                reference_project = "Explore HT",
+                # setting format = TRUE to test that function works for when
+                # BridgingRecommendation is "NotOverlapping"
+                format = TRUE,
+                df1_check_log = check_npx(df = npx_ht) |>
+                  suppressMessages() |>
+                  suppressWarnings(),
+                df2_check_log = check_npx(df = npx_3072) |>
+                  suppressMessages() |>
+                  suppressWarnings()
+              ),
+              regexp = "2 assays are not shared across products"
+            ),
+            regexp = "Cross-product normalization will be performed!"
+          ),
+          regexp = "Output includes two sets of bridging samples"
+        ),
+        regexp = paste("2 non-overlapping assays are included in the",
+                       "normalized dataset without adjustment. Assays found in",
+                       "only one project will have decreased statistical power",
+                       "due to the lower number of samples.")
+      ),
+      regexp = paste("2 not bridgeable assays are included in the bridged",
+                     "dataset without adjustment.")
+    )
+
+    expect_error(
+      object = OlinkAnalyze::olink_bridgeability_plot(
+        df = data_norm,
+        check_log = check_npx(df = data_norm) |>
+          suppressMessages() |>
+          suppressWarnings(),
+        olink_id = c("OID12345"),
+        median_counts_threshold = 150L,
+        min_count = 10L
+      ),
+      regexp = paste("Value in column `BridgingRecommendation` for assay",
+                     "\"OID12345\" is \"NotOverlapping\".")
+    )
+  }
+)
