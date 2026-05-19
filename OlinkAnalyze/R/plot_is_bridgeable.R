@@ -145,19 +145,17 @@ olink_bridgeability_plot <- function(df,
   # check that all BridgingRecommendation are either "MedianCentering",
   # "QuantileSmoothing" or "NotBridgeable"
   bridge_recommend_all <- unique(df[["BridgingRecommendation"]])
-  expected_recommendations <- c("MedianCentering",
-                                "QuantileSmoothing",
-                                "NotBridgeable")
-  if (!all(bridge_recommend_all %in% expected_recommendations)) {
+
+  if (!all(bridge_recommend_all %in% bridge_recommendations)) {
     invalid_recommendation <- setdiff(x = bridge_recommend_all, # nolint: object_usage_linter
-                                      y = expected_recommendations)
+                                      y = bridge_recommendations)
 
     cli::cli_abort(
       c(
         "x" = "{cli::qty(invalid_recommendation)}Identified invalid bridging
         recommendation{?s} in column {.arg {\"BridgingRecommendation\"}}:
         {.val {invalid_recommendation}}.",
-        "i" = "Expected values are {.val {expected_recommendations}}."
+        "i" = "Expected values are {.val {bridge_recommendations}}."
       )
     )
   }
