@@ -214,6 +214,19 @@ olink_bridgeability_plot <- function(df,
         )
       }
 
+      # check that BridgingRecommendation is not NotOverlapping
+      if (bridge_suggest %in% bridge_recommendations[c("not_overlapping")]) {
+        cli::cli_abort(
+          c(
+            "x" = "Value in column {.arg {\"BridgingRecommendation\"}} for
+            assay {.val {oid}} is {.val {bridge_suggest}}.",
+            "i" = "Only assays with bridging recommendations
+            {.val {bridge_recommendations[!(names(bridge_recommendations) %in% c(\"not_overlapping\"))]}} # nolint: line_length_linter
+            can be plotted!"
+          )
+        )
+      }
+
       # iqr plot
       iqr_p <- bridgeability_iqr_range_plt(
         df = data_tmp,
@@ -236,7 +249,7 @@ olink_bridgeability_plot <- function(df,
         check_log = check_log
       )
 
-      # copmbine plots
+      # combine plots
 
       out_plot <- bridgeability_combine_plots(
         iqr = iqr_p,
