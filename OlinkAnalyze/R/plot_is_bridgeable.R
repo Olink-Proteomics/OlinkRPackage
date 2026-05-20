@@ -139,7 +139,7 @@ olink_bridgeability_plot <- function(df,
       check_log = check_log,
       min_count = min_count
     )
-    if (nrowd(df) != nrow_df) {
+    if (nrow(df) != nrow_df) {
       cli::cli_inform(
         "Removed .val {nrow_df - nrow(df)}} rows with counts below
       {.val {min_count}} from dataset {.arg df}!"
