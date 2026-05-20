@@ -200,18 +200,18 @@ olink_bridgeability_plot <- function(df,
 
   # Drop BridgingRecommendation not relevant for plotting (NotOverlapping) ----
 
-  accepted_br <- unname(bridge_recommendations[
+  accepted_br <- unname(bridge_recommendations[ # nolint: object_usage_linter
     !(names(bridge_recommendations) %in% c("not_overlapping"))
   ])
   non_accepted_br <- unname(bridge_recommendations[
     names(bridge_recommendations) %in% c("not_overlapping")
   ])
 
-  if (nrow(df) > 0L &
-      any(unique(df[["BridgingRecommendation"]]) %in%
-          bridge_recommendations[c("not_overlapping")])) {
+  if (nrow(df) > 0L &&
+        any(unique(df[["BridgingRecommendation"]]) %in%
+              bridge_recommendations[c("not_overlapping")])) {
 
-    df_br_no_overlap <- df |>
+    df_br_no_overlap <- df |> # nolint: object_usage_linter
       dplyr::filter(
         .data[["BridgingRecommendation"]] %in% .env[["non_accepted_br"]]
       ) |>
