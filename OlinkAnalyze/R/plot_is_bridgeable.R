@@ -236,41 +236,62 @@ olink_bridgeability_plot <- function(df,
       )
   }
 
+  # Check there are exactly 2 projects for each assay ----
 
-  # Check there are exactly 2 projects in the dataset for bridging comparison
-  if (length(unique(df[["Project"]])) != 2L) {
-    cli::cli_abort(
-      c(
-        "x" = "Identified {length(unique(df[[\"Project\"]]))} project{?s}.",
-        "i" = "Expected 2!"
+  if (nrow(df) > 0L) {
+    df_proj <- df |>
+      dplyr::distinct(
+        .data[[check_log$col_names$olink_id]],
+        .data[["Project"]]
+      ) |>
+      dplyr::count(
+        .data[[check_log$col_names$olink_id]]
+      ) |>
+      dplyr::filter(
+        .data[["n"]] != 2L
+      ) |>
+      dplyr::pull(
+        .data[[check_log$col_names$olink_id]]
       )
-    )
+
+    if (length(df_proj) > 0L) {
+      cli::cli_abort(
+        c(
+          "x" = "{cli::qty(df_proj)}Identified {length(df_proj)} assay{?s} with
+          not exactly 2 projects: {.val {df_proj}}.",
+          "i" = "Each assay should have exactly 2 projects for plotting!"
+        )
+      )
+    }
   }
 
-  # check that there are not duplicate samples, to ensure that the pivot
-  # functions do not fail.
-  df_dups <- df |>
-    dplyr::count(
-      .data[[check_log$col_names$sample_id]],
-      .data[[check_log$col_names$olink_id]],
-      .data[["Project"]]
-    ) |>
-    dplyr::filter(
-      .data[["n"]] > 1L
-    ) |>
-    dplyr::pull(
-      .data[[check_log$col_names$sample_id]]
-    ) |>
-    unique()
-  if (length(df_dups) > 0L) {
-    cli::cli_abort(
-      c(
-        "x" = "{cli::qty(df_dups)}Identified {.val {length(df_dups)}} duplicate
-        sample{?s} in dataset {.arg df}: {.val {df_dups}}.",
-        "i" = "There should be entry one sample per combination of sample
-        identifier, Olink assay identifier and project!"
+  # Check that there are no duplicate samples ----
+
+  if (nrow(df) > 0L) {
+    df_dups <- df |>
+      dplyr::count(
+        .data[[check_log$col_names$sample_id]],
+        .data[[check_log$col_names$olink_id]],
+        .data[["Project"]]
+      ) |>
+      dplyr::filter(
+        .data[["n"]] > 1L
+      ) |>
+      dplyr::pull(
+        .data[[check_log$col_names$sample_id]]
+      ) |>
+      unique()
+
+    if (length(df_dups) > 0L) {
+      cli::cli_abort(
+        c(
+          "x" = "{cli::qty(df_dups)}Identified {.val {length(df_dups)}}
+          duplicate sample{?s} in dataset {.arg df}: {.val {df_dups}}.",
+          "i" = "There should be exactly one sample per combination of sample
+          identifier, Olink assay identifier and project!"
+        )
       )
-    )
+    }
   }
 
   # Bridgeable plot ----
