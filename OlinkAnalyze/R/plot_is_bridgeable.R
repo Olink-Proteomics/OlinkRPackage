@@ -130,13 +130,21 @@ olink_bridgeability_plot <- function(df,
       .data[[check_log$col_names$olink_id]] %in% .env[["olink_id"]]
     )
 
-  # clean up df to bridgeable assays only
+  # Clean up df to assays with sufficient counts for plotting ----
 
+  nrow_df <- nrow(df)
   df <- bridgeability_prep_data(
     df = df,
     check_log = check_log,
     min_count = min_count
   )
+  if (nrowd(df) != nrow_df) {
+    cli::cli_inform(
+      "Removed .val {nrow_df - nrow(df)}} rows with counts below
+      {.val {min_count}} from dataset {.arg df}!"
+    )
+  }
+  rm(nrow_df)
 
   # Check there are exactly 2 projects in the dataset for bridging comparison
   if (length(unique(df[["Project"]])) != 2L) {
