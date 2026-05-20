@@ -342,7 +342,11 @@ olink_bridgeability_plot <- function(df,
         counts = counts_p,
         ks = ks_p,
         title = ifelse(
-          bridge_suggest %in% c("MedianCentering", "QuantileSmoothing"),
+          bridge_suggest %in%
+            bridge_recommendations[
+              names(bridge_recommendations) %in%
+                c("median_centering", "quantile_smoothing")
+            ],
           paste0(unique(data_tmp[["oid_assay"]]), " (bridgeable)"),
           paste0(unique(data_tmp[["oid_assay"]]), " (non bridgeable)")
         )
