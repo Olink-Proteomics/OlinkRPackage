@@ -1692,6 +1692,7 @@ npx_br_data_bridgeable_plt <- OlinkAnalyze::olink_bridgeability_plot(
 npx_br_data_bridgeable_plt[[1L]]
 ```
 
+```{r, message = FALSE, echo = FALSE, out.width = "600px"}
 knitr::include_graphics(
   path = normalizePath(
     path = "../man/figures/bridgeable_plt_MedianCenter.png"
