@@ -113,15 +113,15 @@ olink_bridgeability_plot <- function(df,
 
     # check that all OlinkID are present in the df
     non_overlap_oid <- olink_id[!(olink_id %in% olink_id_set)] # nolint: object_usage_linter
-    cli::cli_abort(
+    cli::cli_warn(
       c(
-        "x" = "{.val {length(non_overlap_oid)}} Olink assay identifiers
-        {?is/are} not present in the dataset {.arg df}:
-        {.val {non_overlap_oid}}",
-        "i" = "All Olink assay identifiers in {.arg olink_id} should be
-          present!"
+        "{.val {length(non_overlap_oid)}} Olink assay identifiers {?is/are} not
+        present in the dataset {.arg df}: {.val {non_overlap_oid}}",
+        "i" = "Keeping only Olink assay identifiers present in the dataset:
+        {.val {olink_id[olink_id %in% olink_id_set]}}."
       )
     )
+    olink_id <- olink_id[olink_id %in% olink_id_set]
   }
 
   # keep only rows with OlinkIDs to be plotted
