@@ -309,6 +309,9 @@ olink_bridgeability_plot <- function(df,
                             sep = " - ")
         )
 
+      # unique bridging recommendation for assay
+      bridge_suggest <- unique(data_tmp[["BridgingRecommendation"]])
+
       # iqr plot
       iqr_p <- bridgeability_iqr_range_plt(
         df = data_tmp,
