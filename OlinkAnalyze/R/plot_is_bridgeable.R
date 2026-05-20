@@ -124,6 +124,12 @@ olink_bridgeability_plot <- function(df,
     )
   }
 
+  # keep only rows with OlinkIDs to be plotted
+  df <- df |>
+    dplyr::filter(
+      .data[[check_log$col_names$olink_id]] %in% .env[["olink_id"]]
+    )
+
   # clean up df to bridgeable assays only
 
   df <- bridgeability_prep_data(
