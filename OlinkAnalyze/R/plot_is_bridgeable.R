@@ -309,19 +309,6 @@ olink_bridgeability_plot <- function(df,
                             sep = " - ")
         )
 
-      # check that bridging recommendation is unique
-      bridge_suggest <- unique(data_tmp[["BridgingRecommendation"]])
-      if (length(bridge_suggest) != 1L) {
-        cli::cli_abort(
-          c(
-            "x" = "Identified {length(bridge_suggest)} bridging
-            recommendation{?s} in column {.arg {\"BridgingRecommendation\"}} for
-            assay {.val {oid}}.",
-            "i" = "Expected 1!"
-          )
-        )
-      }
-
       # iqr plot
       iqr_p <- bridgeability_iqr_range_plt(
         df = data_tmp,
