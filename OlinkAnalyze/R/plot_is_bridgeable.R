@@ -132,7 +132,7 @@ olink_bridgeability_plot <- function(df,
 
   # Clean up df to assays with sufficient counts for plotting ----
 
-  if (nrow(df) != 0L) {
+  if (nrow(df) > 0L) {
     nrow_df <- nrow(df)
     df <- bridgeability_prep_data(
       df = df,
@@ -150,7 +150,7 @@ olink_bridgeability_plot <- function(df,
 
   # Check that all BridgingRecommendation are valid ----
 
-  if (nrow(df) != 0L) {
+  if (nrow(df) > 0L) {
     bridge_recommend_all <- unique(df[["BridgingRecommendation"]])
 
     if (!all(bridge_recommend_all %in% bridge_recommendations)) {
