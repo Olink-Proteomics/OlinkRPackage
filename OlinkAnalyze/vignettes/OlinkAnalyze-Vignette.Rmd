@@ -197,7 +197,7 @@ the NPX output file should be made for this function to work as expected.
 -   `quiet`: Logical. Whether to suppress messages about the import process.
     Default: `TRUE`.
 -   `legacy`: Logical. Whether to use the legacy import method. Default:
-    "FALSE". The legacy method is less efficient and will be deprecated in
+    `FALSE`. The legacy method is less efficient and will be deprecated in
     future versions.
 
 
@@ -362,26 +362,26 @@ re-running the internal checks and improves performance.
 -   `check_log`: Named list returned by `check_npx()`. If `NULL`, `check_npx()`
     is run internally.
 -   `remove_assay_na`: Logical. Remove assays where all samples have NA values.
-    Default: "TRUE".
+    Default: `TRUE`.
 -   `remove_invalid_oid`: Logical. Remove assays with invalid OlinkIDs. Default:
-    "TRUE".
+    `TRUE`.
 -   `remove_dup_sample_id`: Logical. Remove samples with duplicate IDs. Default:
-    "TRUE".
+    `TRUE`.
 -   `remove_control_assay`: Logical. Remove internal control assays. Default:
-    "TRUE".
+    `TRUE`.
 -   `remove_control_sample`: Logical. Remove external control samples based on
-    "SampleType". Default: "TRUE".
+    "SampleType". Default: `TRUE`.
 -   `remove_qc_warning`: Logical. Remove samples with QC status "FAIL". Default:
-    "TRUE".
+    `TRUE`.
 -   `remove_assay_warning`: Logical. Remove assays flagged with assay warnings.
-    Default: "TRUE".
+    Default: `TRUE`.
 -   `control_sample_ids`: Character vector of identifiers of samples that should
-    be removed. Default: "NULL".
+    be removed. Default: `NULL`.
 -   `convert_df_cols`: Logical. Convert columns to their expected data types.
-    Default: "TRUE".
+    Default: `TRUE`.
 -   `convert_nonunique_uniprot`: Logical. Resolve non-unique "OlinkID"-"UniProt"
-    mappings. Default: "TRUE".
--   `verbose`: Logical. Print progress messages. Default: "FALSE".
+    mappings. Default: `TRUE`.
+-   `verbose`: Logical. Print progress messages. Default: `FALSE`.
 
 ```{r, message = FALSE, eval = FALSE}
 # Clean the NPX data using the check_npx output
