@@ -245,8 +245,8 @@ A `tibble` or `ArrowObject` in long format containing:
 
 ## Read multiple NPX data files (`read_NPX()` or `read_npx()`)
 
-In order to import multiple NPX data files at once, the `read_npx() function can`
-be used in combination with the functions `list.files()`, `lapply()` and
+In order to import multiple NPX data files at once, the `read_npx()` function
+can be used in combination with the functions `list.files()`, `lapply()` and
 `dplyr::bind_rows()`, as seen below. The `pattern` argument of the
 `list.files()` function specifies the NPX file format (*.csv*, *.xlsx*,
 *.parquet*, or any combination of these). This method requires that all NPX
