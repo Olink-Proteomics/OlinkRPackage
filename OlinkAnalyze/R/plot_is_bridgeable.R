@@ -148,14 +148,24 @@ olink_bridgeability_plot <- function(df,
     rm(nrow_df)
   }
 
-  # Check there are exactly 2 projects in the dataset for bridging comparison
-  if (length(unique(df[["Project"]])) != 2L) {
-    cli::cli_abort(
-      c(
-        "x" = "Identified {length(unique(df[[\"Project\"]]))} project{?s}.",
-        "i" = "Expected 2!"
+  # Check that all BridgingRecommendation are valid ----
+
+  if (nrow(df) != 0L) {
+    bridge_recommend_all <- unique(df[["BridgingRecommendation"]])
+
+    if (!all(bridge_recommend_all %in% bridge_recommendations)) {
+      invalid_recommendation <- setdiff(x = bridge_recommend_all, # nolint: object_usage_linter
+                                        y = bridge_recommendations)
+
+      cli::cli_abort(
+        c(
+          "x" = "{cli::qty(invalid_recommendation)}Identified invalid bridging
+        recommendation{?s} in column {.arg {\"BridgingRecommendation\"}}:
+        {.val {invalid_recommendation}}.",
+          "i" = "Expected values are {.val {bridge_recommendations}}."
+        )
       )
-    )
+    }
   }
 
   # check that all BridgingRecommendation are either "MedianCentering",
