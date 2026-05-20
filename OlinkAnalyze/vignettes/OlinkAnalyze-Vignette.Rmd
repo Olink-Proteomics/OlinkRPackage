@@ -1061,8 +1061,8 @@ components (default 'PC1' vs 'PC2') colored by the variable specified by
 variance. By default, the values are scaled and centered in the PCA and proteins
 with missing NPX values removed from the corresponding assays. Unique sample
 names are required. Imputation by median value is performed for assays with
-missingness \<10% for multi-plate projects, and for missingness \<5% for
-single plate projects.
+missingness \<10% for multi-plate projects, and for missingness \<5% for single
+plate projects.
 
 More information about `olink_pca()` can be found in the **Outlier Exclusion**
 **Vignette** in the R package `OlinkAnalyzeVignettes`.
