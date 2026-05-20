@@ -403,6 +403,7 @@ to confirm that all issues have been resolved and that the data is ready for
 downstream analysis. A schematic illustration of the described workflow is
 provided ([Olink Analyze v5.0 example workflow](#usage)).
 
+```{r, message = FALSE, eval = FALSE}
 # Check NPX data quality and format
 check_log_clean <- OlinkAnalyze::check_npx(
   df = data_clean
