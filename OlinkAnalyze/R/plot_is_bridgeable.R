@@ -168,20 +168,81 @@ olink_bridgeability_plot <- function(df,
     }
   }
 
-  # check that all BridgingRecommendation are either "MedianCentering",
-  # "QuantileSmoothing" or "NotBridgeable"
-  bridge_recommend_all <- unique(df[["BridgingRecommendation"]])
+  # Check that each assay has a unique BridgingRecommendation ----
 
-  if (!all(bridge_recommend_all %in% bridge_recommendations)) {
-    invalid_recommendation <- setdiff(x = bridge_recommend_all, # nolint: object_usage_linter
-                                      y = bridge_recommendations)
+  if (nrow(df) > 0L) {
+    df_br <- df |>
+      dplyr::distinct(
+        .data[[check_log$col_names$olink_id]],
+        .data[["BridgingRecommendation"]]
+      )
+    dplyr::count(
+      .data[[check_log$col_names$olink_id]]
+    ) |>
+      dplyr::filter(
+        .data[["n"]] > 1L
+      ) |>
+      dplyr::pull(
+        .data[[check_log$col_names$olink_id]]
+      )
 
+    if (length(df_br) > 0L) {
+      cli::cli_abort(
+        c(
+          "x" = "{cli::qty(df_br)}Identified {length(df_br)} assay{?s} with
+          multiple bridging recommendations in column
+          {.arg {\"BridgingRecommendation\"}}: {.val {df_br}}.",
+          "i" = "Each assay should have a unique bridging recommendation!"
+        )
+      )
+    }
+  }
+
+  # Drop BridgingRecommendation not relevant for plotting (NotOverlapping) ----
+
+  accepted_br <- unname(bridge_recommendations[
+    !(names(bridge_recommendations) %in% c("not_overlapping"))
+  ])
+  non_accepted_br <- unname(bridge_recommendations[
+    names(bridge_recommendations) %in% c("not_overlapping")
+  ])
+
+  if (nrow(df) > 0L &
+      any(unique(df[["BridgingRecommendation"]]) %in%
+          bridge_recommendations[c("not_overlapping")])) {
+
+    df_br_no_overlap <- df |>
+      dplyr::filter(
+        .data[["BridgingRecommendation"]] %in% .env[["non_accepted_br"]]
+      ) |>
+      dplyr::pull(
+        .data[[check_log$col_names$olink_id]]
+      ) |>
+      unique()
+
+    cli::cli_warn(
+      c(
+        "Identified {.val {length(df_br_no_overlap)}} assays with
+        {.arg {\"BridgingRecommendation\"}} equal to {.val {non_accepted_br}}:
+        {.val {df_br_no_overlap}}.",
+        "i" = "Only assays with bridging recommendations {.val {accepted_br}}
+        will be plotted!"
+      )
+    )
+
+    df <- df |>
+      dplyr::filter(
+        !(.data[["BridgingRecommendation"]] %in% .env[["non_accepted_br"]])
+      )
+  }
+
+
+  # Check there are exactly 2 projects in the dataset for bridging comparison
+  if (length(unique(df[["Project"]])) != 2L) {
     cli::cli_abort(
       c(
-        "x" = "{cli::qty(invalid_recommendation)}Identified invalid bridging
-        recommendation{?s} in column {.arg {\"BridgingRecommendation\"}}:
-        {.val {invalid_recommendation}}.",
-        "i" = "Expected values are {.val {bridge_recommendations}}."
+        "x" = "Identified {length(unique(df[[\"Project\"]]))} project{?s}.",
+        "i" = "Expected 2!"
       )
     )
   }
@@ -236,19 +297,6 @@ olink_bridgeability_plot <- function(df,
             recommendation{?s} in column {.arg {\"BridgingRecommendation\"}} for
             assay {.val {oid}}.",
             "i" = "Expected 1!"
-          )
-        )
-      }
-
-      # check that BridgingRecommendation is not NotOverlapping
-      if (bridge_suggest %in% bridge_recommendations[c("not_overlapping")]) {
-        cli::cli_abort(
-          c(
-            "x" = "Value in column {.arg {\"BridgingRecommendation\"}} for
-            assay {.val {oid}} is {.val {bridge_suggest}}.",
-            "i" = "Only assays with bridging recommendations
-            {.val {bridge_recommendations[!(names(bridge_recommendations) %in% c(\"not_overlapping\"))]}} # nolint: line_length_linter
-            can be plotted!"
           )
         )
       }
