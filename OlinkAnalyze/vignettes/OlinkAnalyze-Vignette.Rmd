@@ -335,7 +335,7 @@ A named list with the following elements:
 -   `col_names` *\<list\>*: Column names from the input data frame to be used in
     downstream analyses.
 -   `oid_invalid` *\<chr\>*: OlinkID values that do not follow the expected
-    format (OID#####).
+    formats (OID##### or OID#####_OID#####).
 -   `assay_na` *\<chr\>*: OlinkIDs of assays where all samples have NA
     quantification values.
 -   `sample_id_dups` *\<chr\>*: Duplicate SampleID values detected in the data.
