@@ -461,7 +461,7 @@ The function handles four different types of normalization:
     methodology, consult the **Bridging across NGS-based Olink^®^ products**
     **Tutorial** in the R package `OlinkAnalyzeVignettes`.
 
-## Integrating Explore NPX LOD (`olink_lod()`)
+## Integrating NGS NPX LOD (`olink_lod()`)
 
 The `olink_lod()` function adds LOD information to an Olink next generation
 sequencing (NGS) data set. This function can incorporate LOD based on either an
