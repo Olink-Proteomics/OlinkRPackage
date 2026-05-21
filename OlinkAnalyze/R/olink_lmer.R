@@ -122,6 +122,7 @@ olink_lmer <- function(df,
     call = rlang::caller_env()
   )
 
+
   if (!missing(model_formula)) {
     if ("formula" %in% class(model_formula)) {
       model_formula <- deparse(model_formula) # Convert to string if is formula
@@ -176,16 +177,19 @@ olink_lmer <- function(df,
     stop("The df and variable and random arguments need to be specified.")
   }
 
+  # Check data format
+  check_log <- run_check_npx(df = df, check_log = check_log)
+
   lmer_result <- withCallingHandlers(
     {
       # Filtering on valid OlinkID
-      df <- df |>
-        dplyr::filter(
-          stringr::str_detect(
-            string = .data[["OlinkID"]],
-            pattern = "OID[0-9]{5}"
+      if(length(check_log$oid_invalid > 0)) {
+        df <- df |>
+          dplyr::filter(
+            !OlinkID %in% check_log$oid_invalid
           )
-        )
+      }
+
 
       # Allow for :/* notation in covariates
       variable <- gsub(pattern = "\\*", replacement = ":", x = variable)
@@ -223,9 +227,6 @@ olink_lmer <- function(df,
           unique()
         df <- df[!is.na(df[[i]]), ]
       }
-
-      # Check data format
-      check_log <- run_check_npx(df = df, check_log = check_log)
 
       # Convert character vars to factor
       converted.vars <- NULL # nolint: object_name_linter
