@@ -186,7 +186,7 @@ olink_lmer <- function(df,
       if(length(check_log$oid_invalid > 0)) {
         df <- df |>
           dplyr::filter(
-            !OlinkID %in% check_log$oid_invalid
+            !(.data[["OlinkID"]] %in% check_log$oid_invalid)
           )
       }
 
