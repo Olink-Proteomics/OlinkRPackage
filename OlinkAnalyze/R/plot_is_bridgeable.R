@@ -302,8 +302,10 @@ olink_bridgeability_plot <- function(df,
     olink_id <- olink_id[olink_id %in% df[[check_log$col_names$olink_id]]]
   } else {
     cli::cli_abort(
-      "x" = "Dataset {.arg df} has {.val {0}} rows left!",
-      "i" = "No plots can be generated!"
+      c(
+        "x" = "Dataset {.arg df} has {.val {0}} rows left!",
+        "i" = "No plots can be generated!"
+      )
     )
   }
 
