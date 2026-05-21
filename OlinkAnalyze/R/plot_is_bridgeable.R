@@ -141,8 +141,8 @@ olink_bridgeability_plot <- function(df,
     )
     if (nrow(df) != nrow_df) {
       cli::cli_inform(
-        "Removed .val {nrow_df - nrow(df)}} rows with counts below
-      {.val {min_count}} from dataset {.arg df}!"
+        "Removed {.val {nrow_df - nrow(df)}} rows with less than
+        {.val {min_count}} counts from dataset {.arg df}!"
       )
     }
     rm(nrow_df)
@@ -175,10 +175,10 @@ olink_bridgeability_plot <- function(df,
       dplyr::distinct(
         .data[[check_log$col_names$olink_id]],
         .data[["BridgingRecommendation"]]
-      )
-    dplyr::count(
-      .data[[check_log$col_names$olink_id]]
-    ) |>
+      ) |>
+      dplyr::count(
+        .data[[check_log$col_names$olink_id]]
+      ) |>
       dplyr::filter(
         .data[["n"]] > 1L
       ) |>
