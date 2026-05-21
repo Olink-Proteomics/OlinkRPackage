@@ -61,23 +61,26 @@ test_that(
                      "dataset without adjustment.")
     )
 
-    withCallingHandlers({
-      data_norm_bridge_all <- OlinkAnalyze::olink_bridgeability_plot(
-        df = data_norm,
-        check_log = check_npx(df = data_norm) |>
-          suppressMessages() |>
-          suppressWarnings(),
-        olink_id = c("OID40770_OID20117", "OID40835_OID31162",
-                     "OID40981_OID30796", "OID40986_OID20052",
-                     "OID41032_OID20118", "OID41054_OID20055"),
-        median_counts_threshold = 150L,
-        min_count = 10L
-      )
-    }, warning = function(w) {
-      if (grepl(x = w, pattern = "not found in PostScript font database")
-          || grepl(x = w, pattern = "exhibited assay QC warning"))
-        invokeRestart("muffleWarning")
-    })
+    expect_message(
+      object = data_norm_bridge_all <- withCallingHandlers({
+        OlinkAnalyze::olink_bridgeability_plot(
+          df = data_norm,
+          check_log = check_npx(df = data_norm) |>
+            suppressMessages() |>
+            suppressWarnings(),
+          olink_id = c("OID40770_OID20117", "OID40835_OID31162",
+                       "OID40981_OID30796", "OID40986_OID20052",
+                       "OID41032_OID20118", "OID41054_OID20055"),
+          median_counts_threshold = 150L,
+          min_count = 10L
+        )
+      }, warning = function(w) {
+        if (grepl(x = w, pattern = "not found in PostScript font database")
+            || grepl(x = w, pattern = "exhibited assay QC warning"))
+          invokeRestart("muffleWarning")
+      }),
+      regexp = "Removed 21 rows with less than 10 counts from dataset `df`!"
+    )
 
     expect_identical(
       object = length(data_norm_bridge_all),
@@ -135,21 +138,24 @@ test_that(
       regexp = "Output includes two sets of bridging samples"
     )
 
-    withCallingHandlers({
-      data_norm_bridge_all <- OlinkAnalyze::olink_bridgeability_plot(
-        df = data_norm,
-        check_log = check_npx(df = data_norm) |>
-          suppressMessages() |>
-          suppressWarnings(),
-        olink_id = c("OID40770", "OID40835"),
-        median_counts_threshold = 150L,
-        min_count = 10L
-      )
-    }, warning = function(w) {
-      if (grepl(x = w, pattern = "not found in PostScript font database")
-          || grepl(x = w, pattern = "exhibited assay QC warning"))
-        invokeRestart("muffleWarning")
-    })
+    expect_message(
+      object = data_norm_bridge_all <- withCallingHandlers({
+        OlinkAnalyze::olink_bridgeability_plot(
+          df = data_norm,
+          check_log = check_npx(df = data_norm) |>
+            suppressMessages() |>
+            suppressWarnings(),
+          olink_id = c("OID40770", "OID40835"),
+          median_counts_threshold = 150L,
+          min_count = 10L
+        )
+      }, warning = function(w) {
+        if (grepl(x = w, pattern = "not found in PostScript font database")
+            || grepl(x = w, pattern = "exhibited assay QC warning"))
+          invokeRestart("muffleWarning")
+      }),
+      regexp = "Removed 2 rows with less than 10 counts from dataset `df`!"
+    )
 
     expect_identical(
       object = length(data_norm_bridge_all),
@@ -161,21 +167,24 @@ test_that(
       expected = c("OID40770", "OID40835")
     )
 
-    withCallingHandlers({
-      data_norm_bridge_pick1 <- OlinkAnalyze::olink_bridgeability_plot(
-        df = data_norm,
-        check_log = check_npx(df = data_norm) |>
-          suppressMessages() |>
-          suppressWarnings(),
-        olink_id = c("OID40770"),
-        median_counts_threshold = 150L,
-        min_count = 10L
-      )
-    }, warning = function(w) {
-      if (grepl(x = w, pattern = "not found in PostScript font database")
-          || grepl(x = w, pattern = "exhibited assay QC warning"))
-        invokeRestart("muffleWarning")
-    })
+    expect_message(
+      object = data_norm_bridge_pick1 <- withCallingHandlers({
+        OlinkAnalyze::olink_bridgeability_plot(
+          df = data_norm,
+          check_log = check_npx(df = data_norm) |>
+            suppressMessages() |>
+            suppressWarnings(),
+          olink_id = c("OID40770"),
+          median_counts_threshold = 150L,
+          min_count = 10L
+        )
+      }, warning = function(w) {
+        if (grepl(x = w, pattern = "not found in PostScript font database")
+            || grepl(x = w, pattern = "exhibited assay QC warning"))
+          invokeRestart("muffleWarning")
+      }),
+      regexp = "Removed 1 row with less than 10 counts from dataset `df`!"
+    )
 
     expect_identical(
       object = length(data_norm_bridge_pick1),
@@ -417,41 +426,54 @@ test_that(
       regexp = "Output includes two sets of bridging samples"
     )
 
-    # add one project
+    # 1 assay with three projects
     expect_error(
-      object = OlinkAnalyze::olink_bridgeability_plot(
-        df = data_norm |>
-          dplyr::mutate(
-            Project = dplyr::if_else(
-              .data[["Project"]] == "Explore HT"
-              & .data[["OlinkID"]] == "OID40770",
-              "I am a new proejct",
-              .data[["Project"]]
-            )
-          ),
-        check_log = check_npx(df = data_norm) |>
-          suppressMessages() |>
-          suppressWarnings(),
-        median_counts_threshold = 150L,
-        min_count = 10L
+      object = expect_message(
+        object = OlinkAnalyze::olink_bridgeability_plot(
+          df = data_norm |>
+            dplyr::mutate(
+              Project = dplyr::if_else(
+                .data[["Project"]] == "Explore HT"
+                & .data[["OlinkID"]] == "OID40770"
+                & grepl("^Sample_A", .data[["SampleID"]]),
+                "I am a new project",
+                .data[["Project"]]
+              )
+            ),
+          check_log = check_npx(df = data_norm) |>
+            suppressMessages() |>
+            suppressWarnings(),
+          median_counts_threshold = 150L,
+          min_count = 10L
+        ),
+        regexp = "Removed 2 rows with less than 10 counts from dataset `df`!"
       ),
-      regexp = "Identified 3 projects"
+      regexp = paste("Identified 1 assay not belonging to exactly 2 projects:",
+                     "\"OID40770\".")
     )
 
-    # remove one project
+    # 1 assay with one project
     expect_error(
-      object = OlinkAnalyze::olink_bridgeability_plot(
-        df = data_norm |>
-          dplyr::filter(
-            .data[["Project"]] == "Explore HT"
-          ),
-        check_log = check_npx(df = data_norm) |>
-          suppressMessages() |>
-          suppressWarnings(),
-        median_counts_threshold = 150L,
-        min_count = 10L
+      object = expect_message(
+        object = OlinkAnalyze::olink_bridgeability_plot(
+          df = data_norm |>
+            dplyr::mutate(
+              Project = dplyr::if_else(
+                .data[["OlinkID"]] == "OID40835",
+                "Explore HT",
+                .data[["Project"]]
+              )
+            ),
+          check_log = check_npx(df = data_norm) |>
+            suppressMessages() |>
+            suppressWarnings(),
+          median_counts_threshold = 150L,
+          min_count = 10L
+        ),
+        regexp = "Removed 2 rows with less than 10 counts from dataset `df`!"
       ),
-      regexp = "Identified 1 project"
+      regexp = paste("Identified 1 assay not belonging to exactly 2 projects:",
+                     "\"OID40835\".")
     )
   }
 )
@@ -500,24 +522,30 @@ test_that(
 
     # too many bridging recommendations
     expect_error(
-      object = OlinkAnalyze::olink_bridgeability_plot(
-        df = data_norm |>
-          dplyr::mutate(
-            BridgingRecommendation = dplyr::if_else(
-              .data[["Project"]] == "Explore HT"
-              & .data[["OlinkID"]] == "OID40770"
-              & .data[["SampleID"]] %in% c("Sample_A", "Sample_B", "Sample_C"),
-              "QuantileSmoothing",
-              .data[["BridgingRecommendation"]]
-            )
-          ),
-        check_log = check_npx(df = data_norm) |>
-          suppressMessages() |>
-          suppressWarnings(),
-        median_counts_threshold = 150L,
-        min_count = 10L
+      object = expect_message(
+        object = OlinkAnalyze::olink_bridgeability_plot(
+          df = data_norm |>
+            dplyr::mutate(
+              BridgingRecommendation = dplyr::if_else(
+                .data[["Project"]] == "Explore HT"
+                & .data[["OlinkID"]] == "OID40770"
+                & .data[["SampleID"]] %in% c("Sample_A", "Sample_B",
+                                             "Sample_C", "Sample_D"),
+                "QuantileSmoothing",
+                .data[["BridgingRecommendation"]]
+              )
+            ),
+          check_log = check_npx(df = data_norm) |>
+            suppressMessages() |>
+            suppressWarnings(),
+          median_counts_threshold = 150L,
+          min_count = 10L
+        ),
+        regexp = "Removed 2 rows with less than 10 counts from dataset `df`!"
       ),
-      regexp = "Identified 2 bridging recommendations"
+      regexp = paste("Identified 1 assay with multiple bridging",
+                     "recommendations in column `BridgingRecommendation`:",
+                     "\"OID40770\".")
     )
   }
 )
@@ -566,23 +594,27 @@ test_that(
 
     # check log with errors
     expect_error(
-      object = OlinkAnalyze::olink_bridgeability_plot(
-        df = data_norm |>
-          dplyr::mutate(
-            BridgingRecommendation = dplyr::if_else(
-              .data[["Project"]] == "Explore HT"
-              & .data[["OlinkID"]] == "OID40770"
-              & .data[["SampleID"]] %in% c("Sample_A", "Sample_B", "Sample_C"),
-              "I am a new bridging recommendation",
-              .data[["BridgingRecommendation"]]
-            )
-          ),
-        check_log = check_npx(df = data_norm) |>
-          suppressMessages() |>
-          suppressWarnings(),
-        olink_id = c("OID40770", "OID40835"),
-        median_counts_threshold = 150L,
-        min_count = 10L
+      object = expect_message(
+        object = OlinkAnalyze::olink_bridgeability_plot(
+          df = data_norm |>
+            dplyr::mutate(
+              BridgingRecommendation = dplyr::if_else(
+                .data[["Project"]] == "Explore HT"
+                & .data[["OlinkID"]] == "OID40770"
+                & .data[["SampleID"]] %in% c("Sample_A", "Sample_B",
+                                             "Sample_C", "Sample_D"),
+                "I am a new bridging recommendation",
+                .data[["BridgingRecommendation"]]
+              )
+            ),
+          check_log = check_npx(df = data_norm) |>
+            suppressMessages() |>
+            suppressWarnings(),
+          olink_id = c("OID40770", "OID40835"),
+          median_counts_threshold = 150L,
+          min_count = 10L
+        ),
+        regexp = "Removed 2 rows with less than 10 counts from dataset `df`!"
       ),
       regexp = paste("Identified invalid bridging recommendation in column",
                      "`BridgingRecommendation`: \"I am a new bridging",
@@ -635,31 +667,36 @@ test_that(
 
     # check log with errors
     expect_error(
-      object = OlinkAnalyze::olink_bridgeability_plot(
-        df = data_norm |>
-          dplyr::bind_rows(
-            data_norm |>
-              dplyr::filter(
-                .data[["Project"]] == "Explore HT"
-                & .data[["OlinkID"]] == "OID40770"
-                & .data[["SampleID"]] %in% c("Sample_A", "Sample_B", "Sample_C")
-              )
-          ),
-        check_log = check_npx(df = data_norm) |>
-          suppressMessages() |>
-          suppressWarnings(),
-        olink_id = c("OID40770", "OID40835"),
-        median_counts_threshold = 150L,
-        min_count = 10L
+      object = expect_message(
+        object = OlinkAnalyze::olink_bridgeability_plot(
+          df = data_norm |>
+            dplyr::bind_rows(
+              data_norm |>
+                dplyr::filter(
+                  .data[["Project"]] == "Explore HT"
+                  & .data[["OlinkID"]] == "OID40770"
+                  & .data[["SampleID"]] %in% c("Sample_A", "Sample_B",
+                                               "Sample_C", "Sample_D")
+                )
+            ),
+          check_log = check_npx(df = data_norm) |>
+            suppressMessages() |>
+            suppressWarnings(),
+          olink_id = c("OID40770", "OID40835"),
+          median_counts_threshold = 150L,
+          min_count = 10L
+        ),
+        regexp = "Removed 2 rows with less than 10 counts from dataset `df`!"
       ),
-      regexp = paste("Identified 3 duplicate samples in dataset `df`:",
-                     "\"Sample_A\", \"Sample_B\", and \"Sample_C\".")
+      regexp = paste("Identified 4 duplicate samples in dataset `df`:",
+                     "\"Sample_A\", \"Sample_B\", \"Sample_C\", and",
+                     "\"Sample_D\".")
     )
   }
 )
 
 test_that(
-  "olink_bridgeability_plot - error - OlinkID",
+  "olink_bridgeability_plot - warning - OlinkID",
   {
     skip_if_not_installed("ggpubr")
     skip_on_cran()
@@ -700,30 +737,43 @@ test_that(
       regexp = "Output includes two sets of bridging samples"
     )
 
-    # OlinkID not present in data
-    expect_error(
-      object = OlinkAnalyze::olink_bridgeability_plot(
-        df = data_norm |>
-          dplyr::mutate(
-            OlinkID = dplyr::if_else(
-              .data[["OlinkID"]] == "OID40770", "OID40771", .data[["OlinkID"]]
-            )
-          ),
-        check_log = check_npx(df = data_norm) |>
-          suppressMessages() |>
-          suppressWarnings(),
-        olink_id = c("OID40770", "OID40835"),
-        median_counts_threshold = 150L,
-        min_count = 10L
+    expect_warning(
+      object = expect_message(
+        object = data_norm_bridge_one <- withCallingHandlers({
+          OlinkAnalyze::olink_bridgeability_plot(
+            df = data_norm,
+            check_log = check_npx(df = data_norm) |>
+              suppressMessages() |>
+              suppressWarnings(),
+            olink_id = c("OID40771", "OID40835"),
+            median_counts_threshold = 150L,
+            min_count = 10L
+          )
+        }, warning = function(w) {
+          if (grepl(x = w, pattern = "not found in PostScript font database")
+              || grepl(x = w, pattern = "exhibited assay QC warning"))
+            invokeRestart("muffleWarning")
+        }),
+        regexp = "Removed 1 row with less than 10 counts from dataset `df`!"
       ),
-      regexp = paste("1 Olink assay identifiers is not present in the dataset",
-                     "`df`: \"OID40770\"")
+      regexp = paste("1 assay in `olink_id` is not present in the dataset",
+                     "`df`: \"OID40771\".")
+    )
+
+    expect_identical(
+      object = length(data_norm_bridge_one),
+      expected = 1L
+    )
+
+    expect_identical(
+      object = names(data_norm_bridge_one),
+      expected = c("OID40835")
     )
   }
 )
 
 test_that(
-  "olink_bridgeability_plot - works - full data",
+  "olink_bridgeability_plot - warning - NotOverlapping assays",
   {
     skip_on_cran()
     skip_if_not_installed("ggpubr")
@@ -783,18 +833,37 @@ test_that(
                      "dataset without adjustment.")
     )
 
-    expect_error(
-      object = OlinkAnalyze::olink_bridgeability_plot(
-        df = data_norm,
-        check_log = check_npx(df = data_norm) |>
-          suppressMessages() |>
-          suppressWarnings(),
-        olink_id = c("OID12345"),
-        median_counts_threshold = 150L,
-        min_count = 10L
+    expect_warning(
+      object = expect_message(
+        object = data_norm_bridge_one <- withCallingHandlers({
+          OlinkAnalyze::olink_bridgeability_plot(
+            df = data_norm,
+            check_log = check_npx(df = data_norm) |>
+              suppressMessages() |>
+              suppressWarnings(),
+            olink_id = c("OID12345", "OID40770_OID20117"),
+            median_counts_threshold = 150L,
+            min_count = 10L
+          )
+        }, warning = function(w) {
+          if (grepl(x = w, pattern = "not found in PostScript font database")
+              || grepl(x = w, pattern = "exhibited assay QC warning"))
+            invokeRestart("muffleWarning")
+        }),
+        regexp = "Removed 7 rows with less than 10 counts from dataset `df`!"
       ),
-      regexp = paste("Value in column `BridgingRecommendation` for assay",
-                     "\"OID12345\" is \"NotOverlapping\".")
+      regexp = paste("Identified 1 assay with `BridgingRecommendation` equal",
+                     "to \"NotOverlapping\": \"OID12345\".")
+    )
+
+    expect_identical(
+      object = length(data_norm_bridge_one),
+      expected = 1L
+    )
+
+    expect_identical(
+      object = names(data_norm_bridge_one),
+      expected = c("OID40770_OID20117")
     )
   }
 )
