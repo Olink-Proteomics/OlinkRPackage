@@ -115,8 +115,9 @@ olink_bridgeability_plot <- function(df,
     non_overlap_oid <- olink_id[!(olink_id %in% olink_id_set)] # nolint: object_usage_linter
     cli::cli_warn(
       c(
-        "{.val {length(non_overlap_oid)}} Olink assay identifiers {?is/are} not
-        present in the dataset {.arg df}: {.val {non_overlap_oid}}",
+        "{cli::qty(non_overlap_oid)}{.val {length(non_overlap_oid)}} assay{?s}
+        in {.arg olink_id} {?is/are} not present in the dataset {.arg df}:
+        {.val {non_overlap_oid}}.",
         "i" = "Keeping only Olink assay identifiers present in the dataset:
         {.val {olink_id[olink_id %in% olink_id_set]}}."
       )
@@ -141,8 +142,9 @@ olink_bridgeability_plot <- function(df,
     )
     if (nrow(df) != nrow_df) {
       cli::cli_inform(
-        "Removed {.val {nrow_df - nrow(df)}} rows with less than
-        {.val {min_count}} counts from dataset {.arg df}!"
+        "{cli::qty(nrow_df - nrow(df))}Removed {.val {nrow_df - nrow(df)}}
+        row{?s} with less than {.val {min_count}} counts from dataset
+        {.arg df}!"
       )
     }
     rm(nrow_df)
@@ -189,8 +191,8 @@ olink_bridgeability_plot <- function(df,
     if (length(df_br) > 0L) {
       cli::cli_abort(
         c(
-          "x" = "{cli::qty(df_br)}Identified {length(df_br)} assay{?s} with
-          multiple bridging recommendations in column
+          "x" = "{cli::qty(df_br)}Identified {.val {length(df_br)}} assay{?s}
+          with multiple bridging recommendations in column
           {.arg {\"BridgingRecommendation\"}}: {.val {df_br}}.",
           "i" = "Each assay should have a unique bridging recommendation!"
         )
@@ -222,7 +224,7 @@ olink_bridgeability_plot <- function(df,
 
     cli::cli_warn(
       c(
-        "Identified {.val {length(df_br_no_overlap)}} assays with
+        "Identified {.val {length(df_br_no_overlap)}} assay{?s} with
         {.arg {\"BridgingRecommendation\"}} equal to {.val {non_accepted_br}}:
         {.val {df_br_no_overlap}}.",
         "i" = "Only assays with bridging recommendations {.val {accepted_br}}
@@ -232,7 +234,7 @@ olink_bridgeability_plot <- function(df,
 
     df <- df |>
       dplyr::filter(
-        !(.data[["BridgingRecommendation"]] %in% .env[["non_accepted_br"]])
+        !(.data[[check_log$col_names$olink_id]] %in% .env[["df_br_no_overlap"]])
       )
   }
 
@@ -257,9 +259,9 @@ olink_bridgeability_plot <- function(df,
     if (length(df_proj) > 0L) {
       cli::cli_abort(
         c(
-          "x" = "{cli::qty(df_proj)}Identified {length(df_proj)} assay{?s} with
-          not exactly 2 projects: {.val {df_proj}}.",
-          "i" = "Each assay should have exactly 2 projects for plotting!"
+          "x" = "{cli::qty(df_proj)}Identified {.val {length(df_proj)}}
+          assay{?s} not belonging to exactly 2 projects: {.val {df_proj}}.",
+          "i" = "Each assay should appear in exactly 2 projects in {.arg {df}}!"
         )
       )
     }
@@ -288,7 +290,7 @@ olink_bridgeability_plot <- function(df,
           "x" = "{cli::qty(df_dups)}Identified {.val {length(df_dups)}}
           duplicate sample{?s} in dataset {.arg df}: {.val {df_dups}}.",
           "i" = "There should be exactly one sample per combination of sample
-          identifier, Olink assay identifier and project!"
+          identifier, assay identifier and project!"
         )
       )
     }
