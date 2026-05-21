@@ -296,6 +296,17 @@ olink_bridgeability_plot <- function(df,
     }
   }
 
+  # check if any rows are remaining ----
+
+  if (nrow(df) > 0L) {
+    olink_id <- olink_id[olink_id %in% df[[check_log$col_names$olink_id]]]
+  } else {
+    cli::cli_abort(
+      "x" = "Dataset {.arg df} has {.val {0}} rows left!",
+      "i" = "No plots can be generated!"
+    )
+  }
+
   # Bridgeable plot ----
 
   out_plts <- lapply(
