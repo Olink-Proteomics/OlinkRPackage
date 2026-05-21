@@ -94,11 +94,11 @@ npx_data1 <- npx_data1 |>
   # Panel_Version is NA from read_npx as it cannot be determined from the input
   # file, so we have to input it manually
   dplyr::mutate(
-    Panel_Version = dplyr::case_match(
+    Panel_Version = dplyr::recode_values(
       .data[["Panel"]],
       "Olink Cardiometabolic" ~ "v.1201",
       "Olink Inflammation" ~ "v.1002",
-      .default = NA_character_
+      default = NA_character_
     )
   ) |>
   # Convert NPX, LOD and MissingFreq to numeric and keep only 5 sign digits
@@ -125,7 +125,14 @@ npx_data1 <- npx_data1 |>
     manifest_data1,
     by = "SampleID",
     relationship = "many-to-one"
+  ) |>
+  tidyr::fill(
+    dplyr::all_of(
+      c("Project")
+    ),
+    .direction = "updown"
   )
+
 rm(manifest_data1)
 
 # compare to reference npx_data1 ----
