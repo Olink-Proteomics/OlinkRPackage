@@ -1,4 +1,5 @@
-ARG  R_VERSION=4.4.0
+# Default used for local builds; CI overrides via build args
+ARG R_VERSION=4.5.3
 FROM ghcr.io/rocker-org/tidyverse:${R_VERSION}
 
 # System libs
@@ -18,72 +19,116 @@ RUN install2.r --error \
   --deps TRUE \
   --skipinstalled \
   devtools \
+  remotes \
+  pak \
   rcmdcheck \
   lintr \
   lme4 \
   bspm \
   && rm -rf /tmp/downloaded_packages
 
-# Create the .Rprofile file to update packages from a Posit Public PM snapshot.
-# This is needed to update R libraries that are outdated in the original docker
-# image. The docker image for:
-# - R 4.1.3 has a snapshot from 2022-04-21 on Ubuntu 22.04 Focal.
+# Create the .Rprofile file to install packages from a snapshot of Posit Public
+# Package Manager (PPPM). This is needed to keep R libraries in sync with the
+# Bioc version and the original docker image.
+#
+# Each rocker image is built on a specific Ubuntu release, so the PPPM CRAN URL
+# must match both the R version and the Ubuntu codename. The PPPM snapshots to
+# which the docker image is built on is listed below:
+# - R 4.1.3 has a snapshot from 2022-04-21 on Ubuntu 20.04 Focal.
 # - R 4.2.3 has a snapshot from 2023-04-20 on Ubuntu 22.04 Jammy.
 # - R 4.3.3 has a snapshot from 2024-04-23 on Ubuntu 22.04 Jammy.
 # - R 4.4.3 has a snapshot from 2025-04-10 on Ubuntu 24.04 Noble.
-# These snapshots do not host the latest version of certain packages (e.g. cli
-# or dplyr). We will be using a snapshots from 2023-12-12 for R 4.1.3 and
-# R 4.2.3, and from 2026-02-04 for R 4.3.3 and R 4.4.3. These are the snapshots
-# when all packages satisfy the requiered versions of OlinkAnalyze.
+# - R 4.5.3 has a snapshot from 2026-04-23 on Ubuntu 24.04 Noble.
 #
-# In addition, different docker images are built on different Ubuntu versions
-# (see above in list). This is why we have the nested if statements below with
-# different Posit Public Package Manager snapshots.
+# Bioconductor is also served through PPPM. Both the Bioconductor release and
+# snapshot date are pinned per R version to avoid drift across legacy builds.
 #
+# The CRAN snapshot below is dictated by the Bioconductor version on PPPM
+# (https://packagemanager.posit.co/client/#/), when setting Repository:
+# Bioconductor, choosing Setup and selecting the corresponding Bioconductor
+# Version (e.g. 3.14). When switching to "Yes, always install packages from the
+# date I choose", then we can also get the latest Bioc snapshot compatible with
+# the CRAN snapshot version that we can use. When selecting the Bioc version
+# compatible with the R version in question, there is the latest compatible R
+# version. Selected CRAN snapshots, Bioconductor versions and Bioconductor
+# snapshots:
+# - R 4.1.3: CRAN 2022-04-27, Ubuntu 20.04 Focal, Bioconductor 3.14 2022-04-14.
+# - R 4.2.3: CRAN 2023-04-26, Ubuntu 22.04 Jammy, Bioconductor 3.16 2023-04-13.
+# - R 4.3.3: CRAN 2024-05-01, Ubuntu 22.04 Jammy, Bioconductor 3.18 2024-04-19.
+# - R 4.4.3: CRAN 2025-04-16, Ubuntu 24.04 Noble, Bioconductor 3.20 2025-04-10.
+# - R 4.5.3: CRAN 2026-04-29, Ubuntu 24.04 Noble, Bioconductor 3.22 2026-04-09.
+#
+# These snapshots are chosen so that packages satisfy the required versions for
+# OlinkAnalyze.
+# 
+# After selecting snapshots, some of them do not host the latest version of
+# certain packages (e.g. dplyr), which we pin manually in the next step.
+
 ARG r_profile=.Rprofile
-RUN if [ "$R_VERSION" = "4.2.3" ]; then \
-      # For R 4.2.3
-      echo "Setting up snapshot for R 4.2.3 on Ubuntu 22.04 Jammy from 2023-12-12"; \
-      echo "options(repos = c(" > "$r_profile"; \
-      echo "  CRAN = \"https://packagemanager.posit.co/cran/__linux__/jammy/2023-12-12\"" >> "$r_profile"; \
-      echo "))" >> "$r_profile"; \
-    else \
-      # For R 4.1.3
-      if [ "$R_VERSION" = "4.1.3" ]; then \
-        echo "Setting up snapshot for R 4.1.3 on Ubuntu 20.04 Focal from 2023-12-12"; \
-        echo "options(repos = c(" > "$r_profile"; \
-        echo "  CRAN = \"https://packagemanager.posit.co/cran/__linux__/focal/2023-12-12\"" >> "$r_profile"; \
-        echo "))" >> "$r_profile"; \
-      else \
-        # For R 4.3.3
-        if [ "$R_VERSION" = "4.3.3" ]; then \
-          echo "Setting up snapshot for R 4.3.3 on Ubuntu 22.04 Jammy from 2026-02-04"; \
-          echo "options(repos = c(" > "$r_profile"; \
-          echo "  CRAN = \"https://packagemanager.posit.co/cran/__linux__/jammy/2026-02-04\"" >> "$r_profile"; \
-          echo "))" >> "$r_profile"; \
-        elif [ "$R_VERSION" = "4.4.3" ]; then \
-          # For R 4.4.3
-          echo "Setting up snapshot for R 4.4.3 on Ubuntu 24.04 Noble Numbat from 2026-02-04"; \
-          echo "options(repos = c(" > "$r_profile"; \
-          echo "  CRAN = \"https://packagemanager.posit.co/cran/__linux__/noble/2026-02-04\"" >> "$r_profile"; \
-          echo "))" >> "$r_profile"; \
-        else \
-          echo "Unsupported R_VERSION: $R_VERSION. Please update docker/Dockerfile_for_tests snapshots accordingly." 1>&2; \
-          exit 1; \
-        fi \
-      fi \
-    fi
+
+RUN set -e; \
+  case "$R_VERSION" in \
+    "4.1.3") ubuntu="focal"; snapshot="2022-04-27"; ubuntu_label="Ubuntu 20.04 Focal"; bioc="3.14"; bioc_snapshot="2022-04-14" ;; \
+    "4.2.3") ubuntu="jammy"; snapshot="2023-04-26"; ubuntu_label="Ubuntu 22.04 Jammy"; bioc="3.16"; bioc_snapshot="2023-04-13" ;; \
+    "4.3.3") ubuntu="jammy"; snapshot="2024-05-01"; ubuntu_label="Ubuntu 22.04 Jammy"; bioc="3.18"; bioc_snapshot="2024-04-19" ;; \
+    "4.4.3") ubuntu="noble"; snapshot="2025-04-16"; ubuntu_label="Ubuntu 24.04 Noble"; bioc="3.20"; bioc_snapshot="2025-04-10" ;; \
+    "4.5.3") ubuntu="noble"; snapshot="2026-04-29"; ubuntu_label="Ubuntu 24.04 Noble"; bioc="3.22"; bioc_snapshot="2026-04-09" ;; \
+    *) \
+      echo "Unsupported R_VERSION: $R_VERSION. Please update docker/Dockerfile_for_tests snapshots accordingly." >&2; \
+      exit 1 ;; \
+  esac; \
+  echo "Setting up CRAN snapshot $snapshot and Bioconductor $bioc for R $R_VERSION on $ubuntu_label"; \
+  printf '%s\n' \
+    "options(repos = c(" \
+    "  CRAN = \"https://packagemanager.posit.co/cran/__linux__/$ubuntu/$snapshot\"" \
+    "))" \
+    "" \
+    "# Bioconductor via Posit Package Manager" \
+    "options(BioC_mirror = \"https://packagemanager.posit.co/bioconductor/$bioc_snapshot\")" \
+    "options(BIOCONDUCTOR_CONFIG_FILE = \"https://packagemanager.posit.co/bioconductor/$bioc_snapshot/config.yaml\")" \
+    "Sys.setenv(R_BIOC_VERSION = \"$bioc\")" \
+    > "$r_profile"
 
 ENV _R_CHECK_FORCE_SUGGESTS_=FALSE
 
 COPY OlinkAnalyze/DESCRIPTION /src/DESCRIPTION
 
-# Force dplyr 1.2.0 only for legacy R 4.1.3 and 4.2.3.
-# dplyr for R 4.3.3 and above is set correctly through PPM
-RUN if [ "$R_VERSION" = "4.1.3" ] || [ "$R_VERSION" = "4.2.3" ]; then \
-      R -q -e 'remotes::install_version("dplyr", version = "1.2.0", repos = "https://cloud.r-project.org")'; \
-    fi
+# CRAN snapshots are aligned to the Bioconductor release window for each R
+# version. Some newer CRAN packages are selectively pinned below when required
+# by OlinkAnalyze.
+RUN set -e; \
+  case "$R_VERSION" in \
+    "4.1.3"|"4.2.3") \
+      R -q -e 'remotes::install_version("dplyr", version = "1.2.0", repos = "https://packagemanager.posit.co/cran/2026-02-04")'; \
+      R -q -e 'remotes::install_version("arrow", version = "14.0.0", repos = "https://packagemanager.posit.co/cran/2023-11-17")' ; \
+      R -q -e 'remotes::install_version("testthat", version = "3.2.3", repos = "https://packagemanager.posit.co/cran/2025-01-14")' ; \
+      R -q -e 'remotes::install_version("msigdbr", version = "24.1.0", repos = "https://packagemanager.posit.co/cran/2025-05-14")' ;; \
+    "4.3.3") \
+      R -q -e 'remotes::install_version("dplyr", version = "1.2.0", repos = "https://packagemanager.posit.co/cran/2026-02-04")'; \
+      R -q -e 'remotes::install_version("testthat", version = "3.2.3", repos = "https://packagemanager.posit.co/cran/2025-01-14")' ; \
+      R -q -e 'remotes::install_version("msigdbr", version = "24.1.0", repos = "https://packagemanager.posit.co/cran/2025-05-14")' ;; \
+    "4.4.3") \
+      R -q -e 'remotes::install_version("dplyr", version = "1.2.0", repos = "https://packagemanager.posit.co/cran/2026-02-04")'; \
+      R -q -e 'remotes::install_version("msigdbr", version = "24.1.0", repos = "https://packagemanager.posit.co/cran/2025-05-14")' ;; \
+    "4.5.3") \
+      echo "No extra CRAN package pins for R $R_VERSION" ;; \
+    *) \
+      echo "Unsupported R_VERSION: $R_VERSION" >&2; \
+      exit 1 ;; \
+  esac
 
-RUN R -e "devtools::install_dev_deps(pkg = '/src', dependencies = TRUE)"
+# Install clusterProfiler from Bioconductor
+RUN R -e "install.packages('BiocManager'); \
+          BiocManager::install('clusterProfiler', ask = FALSE, update = FALSE)"
+
+# In R 4.5.3, devtools 2.5.0 deprecates devtools::install_dev_deps(). Instead,
+# it recommends using pak::local_install_dev_deps. Use pak only for that version
+# and keep devtools for older legacy images.
+RUN set -e; \
+  if [ "$R_VERSION" = "4.5.3" ]; then \
+    R -e "pak::local_install_dev_deps(root = '/src', dependencies = TRUE)"; \
+  else \
+    R -e "devtools::install_dev_deps(pkg = '/src', dependencies = TRUE)"; \
+  fi
 
 ENTRYPOINT ["R", "--vanilla"]
