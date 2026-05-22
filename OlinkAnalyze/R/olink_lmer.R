@@ -143,11 +143,11 @@ olink_lmer <- function(df,
       }
     )
 
-    # If variable, random or covariates were included, message that they will
+    # If variable or random were included, message that they will
     # not be used as model_formula is provided
     if (!missing(variable) || !missing(random)) {
       message(
-        paste("model_formula overriding variable, covariate and random",
+        paste("model_formula overriding variable and random",
               "arguments.")
       )
     }
@@ -730,11 +730,11 @@ olink_lmer_posthoc <- function(df,
       }
     )
 
-    # If variable and covariates were included, throw a message that they will
+    # If variable or random were included, throw a message that they will
     # not be used as model_formula is provided
     if (!missing(variable) || !missing(random)) {
       message(
-        paste("model_formula overriding variable and covariate and",
+        paste("model_formula overriding variable and",
               "random arguments.")
       )
     }
