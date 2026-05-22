@@ -5,7 +5,8 @@ updates:
     # Workflow files stored in the default location of `.github/workflows`
     # You don't need to specify `/.github/workflows` for `directory`. You can use `directory: "/"`.
     directory: "/"
-    target-branch: "develop"
+    target-branch: "OA-2581-Setup-dependabot-to-create-PRs-to-update-actions"
+    # target-branch: "develop"
     schedule:
       interval: "weekly"
 
@@ -13,6 +14,7 @@ updates:
   - package-ecosystem: "docker"
     # Directory containing the Dockerfile to monitor for base image updates
     directory: "/docker"
-    target-branch: "develop"
+    target-branch: "OA-2581-Setup-dependabot-to-create-PRs-to-update-actions"
+    # target-branch: "develop"
     schedule:
       interval: "weekly"
