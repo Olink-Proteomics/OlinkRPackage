@@ -125,7 +125,7 @@ test_that(
     reference_results <- get_example_data(filename = "reference_results.rds")
 
     expect_no_error(
-      object = expect_no_warning(
+      object = expect_warning(
         object = expect_message(
           lmer_plot <- olink_lmer_plot(
             df = npx_data1,
@@ -145,7 +145,9 @@ test_that(
           ),
           regexp = "`check_log` not provided. Running `check_npx()`.",
           fixed = TRUE
-        )
+        ),
+        regexp = paste("Duplicate SampleIDs detected:",
+                       "\"CONTROL_SAMPLE_AS 1\" and \"CONTROL_SAMPLE_AS 2\"")
       )
     )
 
