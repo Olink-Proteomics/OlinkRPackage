@@ -32,7 +32,15 @@
 #'
 #' Output p-values are adjusted by `stats::p.adjust` according to the
 #' Benjamini-Hochberg method (“fdr”). Adjusted p-values are logically evaluated
-#' towards adjusted `p-value<0.05`.
+#' towards adjusted `p-value<0.05`. Model terms specified as covariates are
+#' not included in the adjusted p-value calculation and are not evaluated
+#' towards the significance threshold, but are included in the output table
+#' if `return.covariates = TRUE`.
+#'
+#' If the `model_formula` argument is used, all model terms will be tested
+#' and included in the results. When using a model formula, the `covariates`
+#' argument can be set to specify terms that should be excluded from the
+#' adjusted p-value calculation and significance threshold evaluation.
 #'
 #' @param df NPX data frame in long format with at least protein name (Assay),
 #' OlinkID, UniProt, 1-2 variables with at least 2 levels.
@@ -574,6 +582,10 @@ single_lmer <- function(data, formula_string) {
 #' e.g. mean NPX at mean(numerical variable) versus mean NPX at mean(numerical
 #' variable) + 1*SD(numerical variable). The output tibble is arranged by
 #' ascending Tukey adjusted p-values.
+#'
+#' The `variable`, `covariates`, `random`, and/or `model_formula` arguments can
+#' be used in the same way as in `\code{\link{olink_lmer}} to specify the model
+#' to be fitted.
 #'
 #' @param df NPX data frame in long format with at least protein name (Assay),
 #' OlinkID, UniProt, 1-2 variables with at least 2 levels and subject
