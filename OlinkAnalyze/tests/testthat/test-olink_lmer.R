@@ -193,7 +193,7 @@ test_that(
       suppressMessages() |>
       suppressWarnings()
 
-    lmer_result_args <- olink_lmer(
+    lmer_args <- olink_lmer(
       df = npx_data1_small,
       check_log = npx_data1_check,
       variable = "Treatment",
@@ -202,35 +202,35 @@ test_that(
     ) |>
       suppressMessages()
 
-    lmer_result_formula <- olink_lmer(
+    lmer_formula <- olink_lmer(
       df = npx_data1_small,
       check_log = npx_data1_check,
       model_formula = "NPX~Treatment+Site+(1|Subject)"
-    )|>
+    ) |>
       suppressMessages()
 
-    lmer_result_formula_covariate <- olink_lmer(
+    lmer_formula_covariate <- olink_lmer(
       df = npx_data1_small,
       check_log = npx_data1_check,
       model_formula = "NPX~Treatment+Site+(1|Subject)",
       covariates = "Site"
-    )|>
+    ) |>
       suppressMessages()
 
     # Check that results are the same when covariate arg is included
     expect_equal(
-      object = lmer_result_formula_covariate,
-      expected = lmer_result_args
+      object = lmer_formula_covariate,
+      expected = lmer_args
     )
 
     # Check that covariate is included in results when not specified
     expect_true(
-      "Site" %in% unique(lmer_result_formula$term)
+      "Site" %in% unique(lmer_formula$term)
     )
 
     # Check that covariate is not included in results when specified
     expect_false(
-      "Site" %in% unique(lmer_result_formula_covariate$term)
+      "Site" %in% unique(lmer_formula_covariate$term)
     )
 
     # Check that error is thrown when covariate specified does not exist
@@ -238,7 +238,7 @@ test_that(
       object = expect_message(
         object = expect_message(
           object = expect_message(
-            object = lmer_result_error <- olink_lmer(
+            object = lmer_error <- olink_lmer(
               df = npx_data1_small,
               check_log = npx_data1_check,
               model_formula = "NPX~Treatment+(1|Subject)",
@@ -439,7 +439,7 @@ test_that(
       suppressMessages() |>
       suppressWarnings()
 
-    lmer_posthoc_result_args <- olink_lmer_posthoc(
+    lmer_posthoc_args <- olink_lmer_posthoc(
       df = npx_data1_small,
       check_log = npx_data1_check,
       variable = "Treatment",
@@ -449,51 +449,51 @@ test_that(
     ) |>
       suppressMessages()
 
-    lmer_posthoc_result_formula <- olink_lmer_posthoc(
+    lmer_posthoc_formula <- olink_lmer_posthoc(
       df = npx_data1_small,
       check_log = npx_data1_check,
       model_formula = "NPX~Treatment+Site+(1|Subject)",
       effect = "Treatment"
-    )|>
+    ) |>
       suppressMessages()
 
-    lmer_posthoc_result_formula_covariate <- olink_lmer_posthoc(
+    lmer_posthoc_formula_covariate <- olink_lmer_posthoc(
       df = npx_data1_small,
       check_log = npx_data1_check,
       model_formula = "NPX~Treatment+Site+(1|Subject)",
       covariates = "Site",
       effect = "Treatment"
-    )|>
+    ) |>
       suppressMessages()
 
     # Check that results are the same in all cases
     # Only the effect results are returned
     expect_equal(
-      object = lmer_posthoc_result_formula_covariate,
-      expected = lmer_posthoc_result_args
+      object = lmer_posthoc_formula_covariate,
+      expected = lmer_posthoc_args
     )
 
     expect_equal(
-      object = lmer_posthoc_result_formula_covariate,
-      expected = lmer_posthoc_result_formula
+      object = lmer_posthoc_formula_covariate,
+      expected = lmer_posthoc_formula
     )
 
     expect_equal(
-      object = lmer_posthoc_result_formula,
-      expected = lmer_posthoc_result_args
+      object = lmer_posthoc_formula,
+      expected = lmer_posthoc_args
     )
 
     # Check that covariate is not included in any results
     expect_false(
-      "Site" %in% unique(lmer_posthoc_result_args$term)
+      "Site" %in% unique(lmer_posthoc_args$term)
     )
 
     expect_false(
-      "Site" %in% unique(lmer_posthoc_result_formula$term)
+      "Site" %in% unique(lmer_posthoc_formula$term)
     )
 
     expect_false(
-      "Site" %in% unique(lmer_posthoc_result_formula_covariate$term)
+      "Site" %in% unique(lmer_posthoc_formula_covariate$term)
     )
 
     # Check that error is thrown when covariate specified does not exist
@@ -501,7 +501,7 @@ test_that(
       object = expect_message(
         object = expect_message(
           object = expect_message(
-            object = lmer_posthoc_result_error <- olink_lmer_posthoc(
+            object = lmer_posthoc_error <- olink_lmer_posthoc(
               df = npx_data1_small,
               check_log = npx_data1_check,
               model_formula = "NPX~Treatment+(1|Subject)",

@@ -187,12 +187,10 @@ olink_lmer <- function(df,
 
       } else {
 
-        missing_covariates <- setdiff(covariates,splt_form[-1L])
-
         cli::cli_abort(
           c(
-            "x" = "Covariate{?s} {.val {missing_covariates}} {?is/are} not present in the
-            model formula!",
+            "x" = "Covariate{?s} {.val {setdiff(covariates,splt_form[-1L])}}
+            {?is/are} not present in the model formula!",
             "i" = "Expected {.or {.val {splt_form[-1L]}}}."
           ),
           call = rlang::caller_env(),
@@ -220,7 +218,7 @@ olink_lmer <- function(df,
   lmer_result <- withCallingHandlers(
     {
       # Filtering on valid OlinkID
-      if(length(check_log$oid_invalid > 0)) {
+      if (length(check_log$oid_invalid > 0)) {
         df <- df |>
           dplyr::filter(
             !(.data[["OlinkID"]] %in% check_log$oid_invalid)
@@ -774,12 +772,10 @@ olink_lmer_posthoc <- function(df,
 
       } else {
 
-        missing_covariates <- setdiff(covariates,splt_form[-1L])
-
         cli::cli_abort(
           c(
-            "x" = "Covariate{?s} {.val {missing_covariates}} {?is/are} not present in the
-            model formula!",
+            "x" = "Covariate{?s} {.val {setdiff(covariates,splt_form[-1L])}}
+            {?is/are} not present in the model formula!",
             "i" = "Expected {.or {.val {splt_form[-1L]}}}."
           ),
           call = rlang::caller_env(),
@@ -847,7 +843,7 @@ olink_lmer_posthoc <- function(df,
   lmer_posthoc_result <- withCallingHandlers(
     {
       #Filtering on valid OlinkID
-      if(length(check_log$oid_invalid > 0)) {
+      if (length(check_log$oid_invalid > 0)) {
         df <- df |>
           dplyr::filter(
             !(.data[["OlinkID"]] %in% check_log$oid_invalid)
