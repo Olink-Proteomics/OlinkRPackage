@@ -1,0 +1,24 @@
+name: Release Drafter
+
+on:
+  push:
+    branches:
+      # Update the draft release whenever changes land on the release branch
+      - main
+
+permissions:
+  # Required so Release Drafter can create or update draft GitHub releases
+  contents: write
+
+  # Required so Release Drafter can read merged pull requests and labels
+  pull-requests: read
+
+jobs:
+  update_release_draft:
+    runs-on: ubuntu-latest
+    steps:
+      # Creates or updates a draft release on the GitHub Releases page
+      - uses: release-drafter/release-drafter@v7
+        env:
+          # Built in token provided by GitHub Actions
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

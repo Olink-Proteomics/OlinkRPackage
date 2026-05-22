@@ -1,0 +1,62 @@
+# Name shown for the draft release
+name-template: "v$RESOLVED_VERSION"
+
+# Tag that will be suggested when the draft release is published
+tag-template: "v$RESOLVED_VERSION"
+
+# Group pull requests in the release notes based on their labels
+categories:
+  - title: "Features"
+    labels:
+      - "feature"
+      - "enhancement"
+
+  - title: "Bug fixes"
+    labels:
+      - "bug"
+      - "fix"
+      - "bugfix"
+
+  - title: "Documentation"
+    labels:
+      - "documentation"
+      - "docs"
+
+  - title: "Maintenance"
+    labels:
+      - "chore"
+      - "maintenance"
+      - "dependencies"
+
+# Format used for each pull request listed in the draft release notes
+change-template: "- $TITLE @$AUTHOR (#$NUMBER)"
+
+# Escape characters that can otherwise interfere with Markdown rendering
+change-title-escapes: '\<*_&'
+
+# Decide the next version based on labels attached to merged pull requests
+version-resolver:
+  major:
+    labels:
+      - "major"
+  minor:
+    labels:
+      - "minor"
+      - "feature"
+      - "enhancement"
+  patch:
+    labels:
+      - "patch"
+      - "bug"
+      - "fix"
+      - "bugfix"
+      - "dependencies"
+
+  # Use a patch release if no version label is found
+  default: patch
+
+# Main body of the draft release notes
+template: |
+  ## Changes
+
+  $CHANGES
