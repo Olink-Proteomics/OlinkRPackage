@@ -172,6 +172,95 @@ test_that(
   }
 )
 
+test_that(
+  "olink_lmer - covariate provided with model formula",
+  {
+    skip_if_not_installed(pkg = "lme4") |> suppressPackageStartupMessages()
+    skip_if_not_installed(pkg = "lmerTest")
+    skip_if_not_installed(pkg = "broom")
+    skip_on_cran()
+
+    # Small version of dataset
+    oid_list <- npx_data1 |>
+      dplyr::distinct(.data[["OlinkID"]]) |>
+      utils::head(20) |>
+      dplyr::pull()
+
+    npx_data1_small <- npx_data1 |>
+      dplyr::filter(.data[["OlinkID"]] %in% .env[["oid_list"]])
+
+    npx_data1_check <- check_npx(df = npx_data1_small) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    lmer_result_args <- olink_lmer(
+      df = npx_data1_small,
+      check_log = npx_data1_check,
+      variable = "Treatment",
+      random = "Subject",
+      covariates = "Site"
+    ) |>
+      suppressMessages()
+
+    lmer_result_formula <- olink_lmer(
+      df = npx_data1_small,
+      check_log = npx_data1_check,
+      model_formula = "NPX~Treatment+Site+(1|Subject)"
+    )|>
+      suppressMessages()
+
+    lmer_result_formula_covariate <- olink_lmer(
+      df = npx_data1_small,
+      check_log = npx_data1_check,
+      model_formula = "NPX~Treatment+Site+(1|Subject)",
+      covariates = "Site"
+    )|>
+      suppressMessages()
+
+    # Check that results are the same when covariate arg is included
+    expect_equal(
+      object = lmer_result_formula_covariate,
+      expected = lmer_result_args
+    )
+
+    # Check that covariate is included in results when not specified
+    expect_true(
+      "Site" %in% unique(lmer_result_formula$term)
+    )
+
+    # Check that covariate is not included in results when specified
+    expect_false(
+      "Site" %in% unique(lmer_result_formula_covariate$term)
+    )
+
+    # Check that error is thrown when covariate specified does not exist
+    expect_error(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = lmer_result_error <- olink_lmer(
+              df = npx_data1_small,
+              check_log = npx_data1_check,
+              model_formula = "NPX~Treatment+(1|Subject)",
+              covariates = "Site"
+            ),
+            regexp = paste("Samples removed due to missing variable or",
+                           "covariate levels: CONTROL_SAMPLE_AS 1,",
+                           "CONTROL_SAMPLE_AS 2")
+          ),
+          regexp = paste("Variables and covariates converted from character",
+                         "to factors: Treatment, Subject")
+        ),
+        regexp = paste("Linear mixed effects model fit to each",
+                       "assay:NPX~Treatment+(1|Subject)"),
+        fixed = TRUE
+      ),
+      regexp = paste("Covariate \"Site\" is not present in the model formula!")
+    )
+
+  }
+)
+
 # Test olink_lmer_posthoc ----
 
 test_that(
@@ -326,5 +415,112 @@ test_that(
       regexp = paste("The df, variable, random and effect arguments need to be",
                      "specified.")
     )
+  }
+)
+
+test_that(
+  "olink_lmer_posthoc - covariate provided with model formula",
+  {
+    skip_if_not_installed(pkg = "lme4") |> suppressPackageStartupMessages()
+    skip_if_not_installed(pkg = "lmerTest")
+    skip_if_not_installed(pkg = "broom")
+    skip_on_cran()
+
+    # Small version of dataset
+    oid_list <- npx_data1 |>
+      dplyr::distinct(.data[["OlinkID"]]) |>
+      utils::head(20) |>
+      dplyr::pull()
+
+    npx_data1_small <- npx_data1 |>
+      dplyr::filter(.data[["OlinkID"]] %in% .env[["oid_list"]])
+
+    npx_data1_check <- check_npx(df = npx_data1_small) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    lmer_posthoc_result_args <- olink_lmer_posthoc(
+      df = npx_data1_small,
+      check_log = npx_data1_check,
+      variable = "Treatment",
+      random = "Subject",
+      covariates = "Site",
+      effect = "Treatment"
+    ) |>
+      suppressMessages()
+
+    lmer_posthoc_result_formula <- olink_lmer_posthoc(
+      df = npx_data1_small,
+      check_log = npx_data1_check,
+      model_formula = "NPX~Treatment+Site+(1|Subject)",
+      effect = "Treatment"
+    )|>
+      suppressMessages()
+
+    lmer_posthoc_result_formula_covariate <- olink_lmer_posthoc(
+      df = npx_data1_small,
+      check_log = npx_data1_check,
+      model_formula = "NPX~Treatment+Site+(1|Subject)",
+      covariates = "Site",
+      effect = "Treatment"
+    )|>
+      suppressMessages()
+
+    # Check that results are the same in all cases
+    # Only the effect results are returned
+    expect_equal(
+      object = lmer_posthoc_result_formula_covariate,
+      expected = lmer_posthoc_result_args
+    )
+
+    expect_equal(
+      object = lmer_posthoc_result_formula_covariate,
+      expected = lmer_posthoc_result_formula
+    )
+
+    expect_equal(
+      object = lmer_posthoc_result_formula,
+      expected = lmer_posthoc_result_args
+    )
+
+    # Check that covariate is not included in any results
+    expect_false(
+      "Site" %in% unique(lmer_posthoc_result_args$term)
+    )
+
+    expect_false(
+      "Site" %in% unique(lmer_posthoc_result_formula$term)
+    )
+
+    expect_false(
+      "Site" %in% unique(lmer_posthoc_result_formula_covariate$term)
+    )
+
+    # Check that error is thrown when covariate specified does not exist
+    expect_error(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = lmer_posthoc_result_error <- olink_lmer_posthoc(
+              df = npx_data1_small,
+              check_log = npx_data1_check,
+              model_formula = "NPX~Treatment+(1|Subject)",
+              covariates = "Site",
+              effect = "Treatment"
+            ),
+            regexp = paste("Samples removed due to missing variable or",
+                           "covariate levels: CONTROL_SAMPLE_AS 1,",
+                           "CONTROL_SAMPLE_AS 2")
+          ),
+          regexp = paste("Variables and covariates converted from character",
+                         "to factors: Treatment, Subject")
+        ),
+        regexp = paste("Linear mixed effects model fit to each",
+                       "assay:NPX~Treatment+(1|Subject)"),
+        fixed = TRUE
+      ),
+      regexp = paste("Covariate \"Site\" is not present in the model formula!"),
+    )
+
   }
 )
