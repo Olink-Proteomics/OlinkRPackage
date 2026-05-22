@@ -137,7 +137,7 @@ olink_lmer <- function(df,
 
     # If variable, random or covariates were included, message that they will
     # not be used as model_formula is provided
-    if (!missing(variable) || !is.null(covariates) || !missing(random)) {
+    if (!missing(variable) || !missing(random)) {
       message(
         paste("model_formula overriding variable, covariate and random",
               "arguments.")
@@ -168,9 +168,38 @@ olink_lmer <- function(df,
       splt_form <- splt_form[-which(splt_form == "-1")]
     }
 
-    outcome <- splt_form[1L]
-    variable <- splt_form[-1L]
-    covariates <- NULL
+    # Check if covariate was specified and remove from variables
+    if (!missing(covariates)) {
+
+      # Check if covariate exists in formula
+      if (all(covariates %in% splt_form[-1L])) {
+
+        outcome <- splt_form[1L]
+        variable <- setdiff(splt_form[-1L], covariates)
+
+      } else {
+
+        missing_covariates <- setdiff(covariates,splt_form[-1L])
+
+        cli::cli_abort(
+          c(
+            "x" = "Covariate{?s} {.val {missing_covariates}} {?is/are} not present in the
+            model formula!",
+            "i" = "Expected {.or {.val {splt_form[-1L]}}}."
+          ),
+          call = rlang::caller_env(),
+          wrap = FALSE
+        )
+      }
+
+    } else {
+      # If no covariate specified, treat all terms as variables
+      outcome <- splt_form[1L]
+      variable <- splt_form[-1L]
+      covariates <- NULL
+    }
+
+
   }
 
   if (missing(df) || missing(variable) || missing(random)) {
@@ -693,7 +722,7 @@ olink_lmer_posthoc <- function(df,
 
     # If variable and covariates were included, throw a message that they will
     # not be used as model_formula is provided
-    if (!missing(variable) || !is.null(covariates) || !missing(random)) {
+    if (!missing(variable) || !missing(random)) {
       message(
         paste("model_formula overriding variable and covariate and",
               "random arguments.")
@@ -721,9 +750,37 @@ olink_lmer_posthoc <- function(df,
     if ("-1" %in% splt_form) {
       splt_form <- splt_form[-which(splt_form == "-1")]
     }
-    outcome <- splt_form[1L]
-    variable <- splt_form[-1L]
-    covariates <- NULL
+
+    # Check if covariate was specified and remove from variables
+    if (!missing(covariates)) {
+
+      # Check if covariate exists in formula
+      if (all(covariates %in% splt_form[-1L])) {
+
+        outcome <- splt_form[1L]
+        variable <- setdiff(splt_form[-1L], covariates)
+
+      } else {
+
+        missing_covariates <- setdiff(covariates,splt_form[-1L])
+
+        cli::cli_abort(
+          c(
+            "x" = "Covariate{?s} {.val {missing_covariates}} {?is/are} not present in the
+            model formula!",
+            "i" = "Expected {.or {.val {splt_form[-1L]}}}."
+          ),
+          call = rlang::caller_env(),
+          wrap = FALSE
+        )
+      }
+
+    } else {
+      # If no covariate specified, treat all terms as variables
+      outcome <- splt_form[1L]
+      variable <- splt_form[-1L]
+      covariates <- NULL
+    }
   }
 
   if (!missing(effect_formula)) {
@@ -772,16 +829,18 @@ olink_lmer_posthoc <- function(df,
     stop("All effect terms must be included in the variable argument.")
   }
 
+  # Check data format
+  check_log <- run_check_npx(df = df, check_log = check_log)
+
   lmer_posthoc_result <- withCallingHandlers(
     {
       #Filtering on valid OlinkID
-      df <- df |>
-        dplyr::filter(
-          stringr::str_detect(
-            string = .data[["OlinkID"]],
-            pattern = "OID[0-9]{5}"
+      if(length(check_log$oid_invalid > 0)) {
+        df <- df |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% check_log$oid_invalid)
           )
-        )
+      }
 
       if (is.null(olinkid_list) || length(olinkid_list) == 0L) {
         olinkid_list <- df |>
@@ -908,8 +967,6 @@ olink_lmer_posthoc <- function(df,
         )
       }
 
-      # Check data format
-      check_log <- run_check_npx(df = df, check_log = check_log)
 
       output_df <- df |>
         dplyr::filter(
