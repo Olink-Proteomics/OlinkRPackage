@@ -9,6 +9,9 @@ updates:
     # target-branch: "develop"
     schedule:
       interval: "weekly"
+      day: "monday"
+      time: "10:00"
+      timezone: "Europe/Stockholm"
 
   # Enable version updates for Docker Actions
   - package-ecosystem: "docker"
@@ -18,3 +21,6 @@ updates:
     # target-branch: "develop"
     schedule:
       interval: "weekly"
+      day: "monday"
+      time: "10:30"
+      timezone: "Europe/Stockholm"
