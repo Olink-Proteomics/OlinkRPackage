@@ -113,77 +113,198 @@ olink_bridgeability_plot <- function(df,
 
     # check that all OlinkID are present in the df
     non_overlap_oid <- olink_id[!(olink_id %in% olink_id_set)] # nolint: object_usage_linter
-    cli::cli_abort(
+    cli::cli_warn(
       c(
-        "x" = "{.val {length(non_overlap_oid)}} Olink assay identifiers
-        {?is/are} not present in the dataset {.arg df}:
-        {.val {non_overlap_oid}}",
-        "i" = "All Olink assay identifiers in {.arg olink_id} should be
-          present!"
+        "{cli::qty(non_overlap_oid)}{.val {length(non_overlap_oid)}} assay{?s}
+        in {.arg olink_id} {?is/are} not present in the dataset {.arg df}:
+        {.val {non_overlap_oid}}.",
+        "i" = "Keeping only Olink assay identifiers present in the dataset:
+        {.val {olink_id[olink_id %in% olink_id_set]}}."
       )
     )
+    olink_id <- olink_id[olink_id %in% olink_id_set]
   }
 
-  # clean up df to bridgeable assays only
-
-  df <- bridgeability_prep_data(
-    df = df,
-    check_log = check_log,
-    min_count = min_count
-  )
-
-  # Check there are exactly 2 projects in the dataset for bridging comparison
-  if (length(unique(df[["Project"]])) != 2L) {
-    cli::cli_abort(
-      c(
-        "x" = "Identified {length(unique(df[[\"Project\"]]))} project{?s}.",
-        "i" = "Expected 2!"
-      )
+  # keep only rows with OlinkIDs to be plotted
+  df <- df |>
+    dplyr::filter(
+      .data[[check_log$col_names$olink_id]] %in% .env[["olink_id"]]
     )
+
+  # Clean up df to assays with sufficient counts for plotting ----
+
+  if (nrow(df) > 0L) {
+    nrow_df <- nrow(df)
+    df <- bridgeability_prep_data(
+      df = df,
+      check_log = check_log,
+      min_count = min_count
+    )
+    if (nrow(df) != nrow_df) {
+      cli::cli_inform(
+        "{cli::qty(nrow_df - nrow(df))}Removed {.val {nrow_df - nrow(df)}}
+        row{?s} with less than {.val {min_count}} counts from dataset
+        {.arg df}!"
+      )
+    }
+    rm(nrow_df)
   }
 
-  # check that all BridgingRecommendation are either "MedianCentering",
-  # "QuantileSmoothing" or "NotBridgeable"
-  bridge_recommend_all <- unique(df[["BridgingRecommendation"]])
-  expected_recommendations <- c("MedianCentering",
-                                "QuantileSmoothing",
-                                "NotBridgeable")
-  if (!all(bridge_recommend_all %in% expected_recommendations)) {
-    invalid_recommendation <- setdiff(x = bridge_recommend_all, # nolint: object_usage_linter
-                                      y = expected_recommendations)
+  # Check that all BridgingRecommendation are valid ----
 
-    cli::cli_abort(
-      c(
-        "x" = "{cli::qty(invalid_recommendation)}Identified invalid bridging
+  if (nrow(df) > 0L) {
+    bridge_recommend_all <- unique(df[["BridgingRecommendation"]])
+
+    if (!all(bridge_recommend_all %in% bridge_recommendations)) {
+      invalid_recommendation <- setdiff(x = bridge_recommend_all, # nolint: object_usage_linter
+                                        y = bridge_recommendations)
+
+      cli::cli_abort(
+        c(
+          "x" = "{cli::qty(invalid_recommendation)}Identified invalid bridging
         recommendation{?s} in column {.arg {\"BridgingRecommendation\"}}:
         {.val {invalid_recommendation}}.",
-        "i" = "Expected values are {.val {expected_recommendations}}."
+          "i" = "Expected values are {.val {bridge_recommendations}}."
+        )
       )
-    )
+    }
   }
 
-  # check that there are not duplicate samples, to ensure that the pivot
-  # functions do not fail.
-  df_dups <- df |>
-    dplyr::count(
-      .data[[check_log$col_names$sample_id]],
-      .data[[check_log$col_names$olink_id]],
-      .data[["Project"]]
-    ) |>
-    dplyr::filter(
-      .data[["n"]] > 1L
-    ) |>
-    dplyr::pull(
-      .data[[check_log$col_names$sample_id]]
-    ) |>
-    unique()
-  if (length(df_dups) > 0L) {
+  # Check that each assay has a unique BridgingRecommendation ----
+
+  if (nrow(df) > 0L) {
+    df_br <- df |>
+      dplyr::distinct(
+        .data[[check_log$col_names$olink_id]],
+        .data[["BridgingRecommendation"]]
+      ) |>
+      dplyr::count(
+        .data[[check_log$col_names$olink_id]]
+      ) |>
+      dplyr::filter(
+        .data[["n"]] > 1L
+      ) |>
+      dplyr::pull(
+        .data[[check_log$col_names$olink_id]]
+      )
+
+    if (length(df_br) > 0L) {
+      cli::cli_abort(
+        c(
+          "x" = "{cli::qty(df_br)}Identified {.val {length(df_br)}} assay{?s}
+          with multiple bridging recommendations in column
+          {.arg {\"BridgingRecommendation\"}}: {.val {df_br}}.",
+          "i" = "Each assay should have a unique bridging recommendation!"
+        )
+      )
+    }
+  }
+
+  # Drop BridgingRecommendation not relevant for plotting (NotOverlapping) ----
+
+  accepted_br <- unname(bridge_recommendations[ # nolint: object_usage_linter
+    !(names(bridge_recommendations) %in% c("not_overlapping"))
+  ])
+  non_accepted_br <- unname(bridge_recommendations[
+    names(bridge_recommendations) %in% c("not_overlapping")
+  ])
+
+  if (nrow(df) > 0L &&
+        any(unique(df[["BridgingRecommendation"]]) %in%
+              bridge_recommendations[c("not_overlapping")])) {
+
+    df_br_no_overlap <- df |> # nolint: object_usage_linter
+      dplyr::filter(
+        .data[["BridgingRecommendation"]] %in% .env[["non_accepted_br"]]
+      ) |>
+      dplyr::pull(
+        .data[[check_log$col_names$olink_id]]
+      ) |>
+      unique()
+
+    cli::cli_warn(
+      c(
+        "Identified {.val {length(df_br_no_overlap)}} assay{?s} with
+        {.arg {\"BridgingRecommendation\"}} equal to {.val {non_accepted_br}}:
+        {.val {df_br_no_overlap}}.",
+        "i" = "Only assays with bridging recommendations {.val {accepted_br}}
+        will be plotted!"
+      )
+    )
+
+    df <- df |>
+      dplyr::filter(
+        !(.data[[check_log$col_names$olink_id]] %in% .env[["df_br_no_overlap"]])
+      )
+  }
+
+  # Check there are exactly 2 projects for each assay ----
+
+  if (nrow(df) > 0L) {
+    df_proj <- df |>
+      dplyr::distinct(
+        .data[[check_log$col_names$olink_id]],
+        .data[["Project"]]
+      ) |>
+      dplyr::count(
+        .data[[check_log$col_names$olink_id]]
+      ) |>
+      dplyr::filter(
+        .data[["n"]] != 2L
+      ) |>
+      dplyr::pull(
+        .data[[check_log$col_names$olink_id]]
+      )
+
+    if (length(df_proj) > 0L) {
+      cli::cli_abort(
+        c(
+          "x" = "{cli::qty(df_proj)}Identified {.val {length(df_proj)}}
+          assay{?s} not belonging to exactly 2 projects: {.val {df_proj}}.",
+          "i" = "Each assay should appear in exactly 2 projects in {.arg {df}}!"
+        )
+      )
+    }
+  }
+
+  # Check that there are no duplicate samples ----
+
+  if (nrow(df) > 0L) {
+    df_dups <- df |>
+      dplyr::count(
+        .data[[check_log$col_names$sample_id]],
+        .data[[check_log$col_names$olink_id]],
+        .data[["Project"]]
+      ) |>
+      dplyr::filter(
+        .data[["n"]] > 1L
+      ) |>
+      dplyr::pull(
+        .data[[check_log$col_names$sample_id]]
+      ) |>
+      unique()
+
+    if (length(df_dups) > 0L) {
+      cli::cli_abort(
+        c(
+          "x" = "{cli::qty(df_dups)}Identified {.val {length(df_dups)}}
+          duplicate sample{?s} in dataset {.arg df}: {.val {df_dups}}.",
+          "i" = "There should be exactly one sample per combination of sample
+          identifier, assay identifier and project!"
+        )
+      )
+    }
+  }
+
+  # check if any rows are remaining ----
+
+  if (nrow(df) > 0L) {
+    olink_id <- olink_id[olink_id %in% df[[check_log$col_names$olink_id]]]
+  } else {
     cli::cli_abort(
       c(
-        "x" = "{cli::qty(df_dups)}Identified {.val {length(df_dups)}} duplicate
-        sample{?s} in dataset {.arg df}: {.val {df_dups}}.",
-        "i" = "There should be entry one sample per combination of sample
-        identifier, Olink assay identifier and project!"
+        "x" = "Dataset {.arg df} has {.val {0}} rows left!",
+        "i" = "No plots can be generated!"
       )
     )
   }
@@ -203,18 +324,8 @@ olink_bridgeability_plot <- function(df,
                             sep = " - ")
         )
 
-      # check that bridging recommendation is unique
+      # unique bridging recommendation for assay
       bridge_suggest <- unique(data_tmp[["BridgingRecommendation"]])
-      if (length(bridge_suggest) != 1L) {
-        cli::cli_abort(
-          c(
-            "x" = "Identified {length(bridge_suggest)} bridging
-            recommendation{?s} in column {.arg {\"BridgingRecommendation\"}} for
-            assay {.val {oid}}.",
-            "i" = "Expected 1!"
-          )
-        )
-      }
 
       # iqr plot
       iqr_p <- bridgeability_iqr_range_plt(
@@ -238,7 +349,7 @@ olink_bridgeability_plot <- function(df,
         check_log = check_log
       )
 
-      # copmbine plots
+      # combine plots
 
       out_plot <- bridgeability_combine_plots(
         iqr = iqr_p,
@@ -246,7 +357,11 @@ olink_bridgeability_plot <- function(df,
         counts = counts_p,
         ks = ks_p,
         title = ifelse(
-          bridge_suggest %in% c("MedianCentering", "QuantileSmoothing"),
+          bridge_suggest %in%
+            bridge_recommendations[
+              names(bridge_recommendations) %in%
+                c("median_centering", "quantile_smoothing")
+            ],
           paste0(unique(data_tmp[["oid_assay"]]), " (bridgeable)"),
           paste0(unique(data_tmp[["oid_assay"]]), " (non bridgeable)")
         )
