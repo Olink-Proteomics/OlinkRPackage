@@ -235,10 +235,16 @@ knitr::include_graphics(
 ```
 
 ## Learn more
-Please see the function specific help pages. Moreover, Olink® Analyze includes two simulated NPX datasets for your convenience to help you explore the package and its functions.
+
+Please see the function specific help pages. Moreover, Olink® Analyze includes
+two simulated NPX datasets for your convenience to help you explore the package
+and its functions.
 
 ## Issues
-Please report any issues (good or bad) to <biostattools[a]olink.com> or use the github [issue function](https://github.com/Olink-Proteomics/OlinkRPackage/issues).
+
+Please report any issues (good or bad) to <biostattools[a]olink.com> or use the
+github
+[issue function](https://github.com/Olink-Proteomics/OlinkRPackage/issues).
 
 ## Alternative install methods
 
@@ -246,16 +252,20 @@ To install directly from the github repository:
 
 ```{r, eval = FALSE}
 # install.packages("remotes")
-remotes::install_github(repo ='Olink-Proteomics/OlinkRPackage/OlinkAnalyze', ref = "main", build_vignettes = TRUE)
+remotes::install_github(
+  repo = "Olink-Proteomics/OlinkRPackage/OlinkAnalyze",
+  ref = "main",
+  build_vignettes = TRUE
+)
 ```
 
-To install Olink Analyze into a new [conda](https://docs.conda.io/en/latest/) environment:
+To install Olink Analyze into a new [conda](https://docs.conda.io/en/latest/)
+environment:
 
 ```{bash, eval = FALSE}
 conda create -n OlinkAnalyze -c conda-forge r-olinkanalyze
 ```
 
 ## Credits
-Olink® Analyze is developed and maintained by the Olink Proteomics Data Science Team.
-
-
+Olink® Analyze is developed and maintained by the Olink Proteomics Data Science
+Team.
