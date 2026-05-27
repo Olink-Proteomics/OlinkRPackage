@@ -173,7 +173,7 @@ test_that(
       filename = "npx_data_format-Oct-2022.rds"
     )
     npx_data_extended_format221121 <- get_example_data(
-      filename = "npx_data_extended_format221121.rds"
+      filename = "npx_data_extended_format-Nov-2022.rds"
     )
 
     # data with all NPX=NA for some assays
