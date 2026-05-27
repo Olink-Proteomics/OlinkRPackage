@@ -2162,6 +2162,100 @@ test_that(
 # Test run_clean_npx ----
 
 test_that(
+  "run_clean_npx - works - passes through clean olink_class data",
+  {
+    npx_data1_check_log <- check_npx(df = npx_data1) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    # clean data has no issues
+    obj <- new_olink_class(
+      df = npx_data1,
+      check_log = npx_data1_check_log
+    )
+
+    expect_no_message(
+      object = expect_no_error(
+        object = expect_no_warning(
+          object = result <- run_clean_npx(
+            df = obj,
+            check_log = npx_data1_check_log,
+            remove_dup_sample_id = FALSE
+          )
+        )
+      )
+    )
+
+    expect_s3_class(
+      object = result,
+      class = "olink_class"
+    )
+
+    expect_identical(
+      object = olink_check_log(df = result),
+      expected = npx_data1_check_log
+    )
+  }
+)
+
+test_that(
+  "run_clean_npx - works - cleans plain tibble without errors",
+  {
+    # plain tibble without olink_class class — run_clean_npx delegates to
+    # clean_npx which will auto-run check_npx if needed
+    expect_message(
+      object = result <- run_clean_npx(
+        df = npx_data1
+      ),
+      regexp = "736 entries removed by `clean_npx()` from the input dataset",
+      fixed = TRUE
+    )
+
+    expect_s3_class(
+      object = result,
+      class = "olink_class"
+    )
+
+    expect_false(
+      object = is.null(olink_check_log(df = result))
+    )
+  }
+)
+
+test_that(
+  "run_clean_npx - works - obj - remove samples/assays identified by check_npx",
+  {
+    expected_result <- df |>
+      dplyr::filter(
+        .data[["SampleID"]] == "ValidSample"
+      )
+
+    # create olink_class with the dirty check_log
+    obj <- new_olink_class(
+      df = df,
+      check_log = log
+    )
+
+    expect_message(
+      object = curr_result <- run_clean_npx(
+        df = obj,
+        control_sample_ids = c("ControlID"),
+        verbose = FALSE
+      ),
+      regexp = paste("9 entries removed by `clean_npx()` from the input",
+                     "dataset `df`. Run `clean_npx()` on your dataset with",
+                     "`verbose = TRUE` to inspect which rows were removed."),
+      fixed = TRUE
+    )
+
+    expect_equal(
+      object = strip_check_log(curr_result),
+      expected = expected_result
+    )
+  }
+)
+
+test_that(
   "run_clean_npx - works - remove samples/assays identified by check_npx",
   {
     expected_result <- df |>
@@ -2186,6 +2280,94 @@ test_that(
       object = strip_check_log(curr_result),
       expected = expected_result
     )
+  }
+)
+
+test_that(
+  "run_clean_npx - works - obj - alternative names are inherited",
+  {
+    npx_data1_tmp <- npx_data1 |>
+      dplyr::mutate(
+        "SampleID2" = .data[["SampleID"]],
+        "OlinkID2" = .data[["OlinkID"]],
+        "New_Panel" = .data[["Panel"]]
+      )
+
+    # approach 1 - use check_npx ----
+
+    check_log_tmp <- check_npx(
+      df = npx_data1_tmp,
+      preferred_names = c(
+        "sample_id" = "SampleID2",
+        "olink_id" = "OlinkID2",
+        "panel" = "New_Panel"
+      )
+    ) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    npx_data1_tmp_obj <- new_olink_class(
+      df = npx_data1_tmp,
+      check_log = check_log_tmp
+    )
+
+    expect_no_message(
+      object = curr_result_v1 <- run_clean_npx(
+        df = npx_data1_tmp_obj,
+        remove_dup_sample_id = FALSE
+      )
+    )
+
+    expect_identical(
+      object = olink_check_log(df = curr_result_v1)$col_names,
+      expected = check_log_tmp$col_names
+    )
+
+    # approach 2 - use check_log directly on run_clean_npx ----
+
+    expect_no_message(
+      object = curr_result_v2 <- run_clean_npx(
+        df = npx_data1_tmp,
+        check_log = check_log_tmp,
+        remove_dup_sample_id = FALSE
+      )
+    )
+
+    expect_identical(
+      object = olink_check_log(df = curr_result_v2)$col_names,
+      expected = check_log_tmp$col_names
+    )
+
+    # appraoch 3 - use preferred_names directly on run_clean_npx ----
+
+    # this does not apply to run_clean_npx but to clean_npx ONLY. run_clean_npx
+    # is an internal function and is not expected to alter the preferred_names,
+    # unlike clean_npx which is a user-facing function that can be used by the
+    # user to clean their data without necessarily running check_npx first.
+
+     expect_no_message(
+      object = curr_result_v3 <- run_clean_npx(
+        df = npx_data1_tmp,
+        preferred_names = c(
+          "sample_id" = "SampleID2",
+          "olink_id" = "OlinkID2",
+          "panel" = "New_Panel"
+        ),
+        remove_dup_sample_id = FALSE
+      )
+    )
+
+    expect_warning(
+      object = check_log_tmp_vanilla <- check_npx(df = npx_data1_tmp),
+      regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS 1\"",
+                     "and \"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_identical(
+      object = olink_check_log(df = curr_result_v3)$col_names,
+      expected = check_log_tmp_vanilla$col_names
+    )
+
   }
 )
 
