@@ -59,7 +59,7 @@ install.packages("OlinkAnalyzeVignettes")
 
 ### Reading Olink NPX data
 
-```{r read_data,eval = FALSE}
+```{r read_data, eval = FALSE}
 # open package
 library(OlinkAnalyze)
 
@@ -71,7 +71,7 @@ my_NPX_data <- read_NPX(filename = "path/to/my_NPX_data.xlsx")
 
 There are several plot functions, below follows two examples using the package provided npx_data1 dataset:
 
-```{r dist_plot, eval=FALSE}
+```{r dist_plot, eval = FALSE}
 # visualize the NPX distribution per sample per panel, example for one panel
 olink_dist_plot(npx_data1 %>% filter(Panel == 'Olink CARDIOMETABOLIC')) +
   theme(axis.text.x = element_blank(),
@@ -81,7 +81,7 @@ olink_dist_plot(npx_data1 %>% filter(Panel == 'Olink CARDIOMETABOLIC')) +
 
 ![dist_plot_example](figures/example_distplot.png)
 
-```{r qc_plot, eval=FALSE}
+```{r qc_plot, eval = FALSE}
 # visualize potential outliers by IQR vs. sample median per panel, example for one panel
 olink_qc_plot(npx_data1 %>% filter(Panel == 'Olink CARDIOMETABOLIC')) +
   scale_color_manual(values = c('turquoise3', 'red'))
@@ -93,7 +93,7 @@ olink_qc_plot(npx_data1 %>% filter(Panel == 'Olink CARDIOMETABOLIC')) +
 
 Olink® Analyze provides several means of normalization when analyzing multiple datasets. Below follows an example of reference sample (aka bridge) normalization using the two package provided npx_data1 and npx_data2 datasets:
 
-```{r norm_example,eval=FALSE}
+```{r norm_example, eval = FALSE}
 # identify bridge samples
 bridge_samples <- intersect(x = npx_data1$SampleID,
 			   y = npx_data2$SampleID)
@@ -111,7 +111,7 @@ bridge_normalized_data <- olink_normalization(df1 = npx_data1,
 
 Olink® Analyze provides several statistical tests and model tools. Below follows an example of how to perform a t-test and how to visualize the t-test output in a volcano plot using the package provided npx_data1 dataset:
 
-```{r stats, eval=FALSE}
+```{r stats, eval = FALSE}
 # t-test npx_data1
 ttest_results_NPX1 <- olink_ttest(df = npx_data1,
 				variable = "Treatment")
@@ -139,14 +139,14 @@ Please report any issues (good or bad) to <biostattools[a]olink.com> or use the 
 
 To install directly from the github repository:
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 # install.packages("remotes")
 remotes::install_github(repo ='Olink-Proteomics/OlinkRPackage/OlinkAnalyze', ref = "main", build_vignettes = TRUE)
 ```
 
 To install Olink Analyze into a new [conda](https://docs.conda.io/en/latest/) environment:
 
-```{bash, eval=FALSE}
+```{bash, eval = FALSE}
 conda create -n OlinkAnalyze -c conda-forge r-olinkanalyze
 ```
 
