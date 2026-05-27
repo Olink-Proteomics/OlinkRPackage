@@ -65,6 +65,8 @@ library(OlinkAnalyze)
 
 # reading Olink NPX data 
 my_NPX_data <- read_NPX(filename = "path/to/my_NPX_data.xlsx")
+# OR
+my_NPX_data <- read_npx(filename = "path/to/my_NPX_data.xlsx")
 ```
 
 ### QC plot functions
