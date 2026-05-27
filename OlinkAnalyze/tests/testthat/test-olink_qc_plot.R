@@ -170,7 +170,7 @@ test_that(
 
     # Load data with hidden/excluded assays (all NPX=NA)
     npx_data_format221010 <- get_example_data(
-      filename = "npx_data_format221010.rds"
+      filename = "npx_data_format-Oct-2022.rds"
     )
     npx_data_format221121 <- get_example_data(
       filename = "npx_data_format221121.rds"
