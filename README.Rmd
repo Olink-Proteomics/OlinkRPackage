@@ -28,13 +28,13 @@ The goal of Olink® Analyze is to provide a versatile toolbox to enable easy and
 
 Olink® Analyze is now available on CRAN: https://cran.r-project.org/web/packages/OlinkAnalyze/index.html  
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 install.packages("OlinkAnalyze")
 ```
 
 ## Vignette
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 browseVignettes("OlinkAnalyze")
 ```
 
