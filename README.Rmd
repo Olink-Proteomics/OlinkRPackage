@@ -194,7 +194,9 @@ bridge_normalized_data <- OlinkAnalyze::olink_normalization(
 
 ### Statistical tests and models
 
-Olink® Analyze provides several statistical tests and model tools. Below follows an example of how to perform a t-test and how to visualize the t-test output in a volcano plot using the package provided npx_data1 dataset:
+Olink® Analyze provides several statistical tests and model tools. Below follows
+an example of how to perform a t-test and how to visualize the t-test output in
+a volcano plot using the package provided `npx_data1` dataset:
 
 ```{r stats, eval = FALSE}
 # t-test npx_data1
