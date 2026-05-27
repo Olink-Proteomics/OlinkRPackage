@@ -19,6 +19,8 @@ jobs:
     steps:
       # Creates or updates a draft release on the GitHub Releases page
       - uses: release-drafter/release-drafter@v7
+        with:
+          config-name: release-drafter.yml # the default, loads '.github/release-drafter.yml'
         env:
           # Built in token provided by GitHub Actions
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
