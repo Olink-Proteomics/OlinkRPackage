@@ -23,7 +23,7 @@ internally.
 
 The \code{olink_class} class survives most dplyr operations (e.g.
 \code{\link[dplyr:filter]{dplyr::filter()}}, \code{\link[dplyr:mutate]{dplyr::mutate()}}, \code{\link[dplyr:select]{dplyr::select()}}) through the
-\code{\link[dplyr:dplyr_extending]{dplyr::dplyr_reconstruct()}} mechanism. Note that operations that combine
+\code{\link[dplyr:dplyr_reconstruct]{dplyr::dplyr_reconstruct()}} mechanism. Note that operations that combine
 multiple data frames (e.g. \code{\link[dplyr:bind_rows]{dplyr::bind_rows()}}) may strip the class and
 check log.
 }
