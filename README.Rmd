@@ -44,7 +44,19 @@ install.packages("OlinkAnalyze")
 browseVignettes("OlinkAnalyze")
 ```
 
+**Note:** Process-specific, practical vignettes for analysis of Olink®
+proteomics data hosted on OA have been moved to a newer package Olink® Analyze
+Vignettes, that is hosted on CRAN:
+https://cran.r-project.org/web/packages/OlinkAnalyzeVignettes/index.html. The
+new package complements this parent R package Olink® Analyze, which includes a
+master vignette and the core analysis functionality.
+
+```{r, eval = FALSE}
+install.packages("OlinkAnalyzeVignettes")
+```
+
 ## Usage
+
 ### Reading Olink NPX data
 
 ```{r read_data,eval = FALSE}
