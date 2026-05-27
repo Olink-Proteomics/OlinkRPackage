@@ -119,6 +119,16 @@ npx_data1_clean |>
     values = c("turquoise3", "red")
   )
 ```
+
+```{r example_dist_plot, echo = FALSE}
+knitr::include_graphics(
+  path = normalizePath(
+    path = "figures/example_distplot.png"
+  ),
+  error = FALSE
+)
+```
+
 ```{r qc_plot, eval = FALSE}
 # visualize potential outliers by IQR vs. sample median per panel, example for one panel
 olink_qc_plot(npx_data1 %>% filter(Panel == 'Olink CARDIOMETABOLIC')) +
