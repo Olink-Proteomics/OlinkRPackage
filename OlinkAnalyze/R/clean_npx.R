@@ -252,6 +252,7 @@ clean_npx <- function(df,
   # Convert to requested output format, re-run check_npx, and attach check_log
   df <- attach_check_log(
     df = df,
+    check_log = check_log,
     out_df = out_df,
     preferred_names = preferred_names
   )
