@@ -63,12 +63,12 @@ install.packages("OlinkAnalyzeVignettes")
 # open package
 library(OlinkAnalyze)
 
-# reading Olink NPX data 
-my_NPX_data <- OlinkAnalyze::read_NPX(
+# reading Olink NPX data
+my_npx_data <- OlinkAnalyze::read_NPX(
   filename = "path/to/my_NPX_data.xlsx"
 )
 # OR
-my_NPX_data <- OlinkAnalyze::read_npx(
+my_npx_data <- OlinkAnalyze::read_npx(
   filename = "path/to/my_NPX_data.xlsx"
 )
 ```
@@ -200,25 +200,25 @@ a volcano plot using the package provided `npx_data1` dataset:
 
 ```{r stats, eval = FALSE}
 # t-test npx_data1
-ttest_results_NPX1 <- OlinkAnalyze::olink_ttest(
+ttest_results_npx1 <- OlinkAnalyze::olink_ttest(
   df = npx_data1_clean,
   check_log = check_npx_data1_clean,
   variable = "Treatment"
 )
 
 # select names of the top #10 most significant proteins
-ttest_sign_NPX1 <- ttest_results_NPX1 |>
+ttest_sign_npx1 <- ttest_results_npx1 |>
   dplyr::slice_head(
     n = 10L
-  ) |> 
+  ) |>
   dplyr::pull(
     .data[["OlinkID"]]
   )
 
 # volcano plot with annotated top #10 most significant proteins
 OlinkAnalyze::olink_volcano_plot(
-  p.val_tbl = ttest_results_NPX1,
-  olinkid_list = ttest_sign_NPX1
+  p.val_tbl = ttest_results_npx1,
+  olinkid_list = ttest_sign_npx1
 ) +
   ggplot2::scale_color_manual(
     values = c("turquoise3", "red")
@@ -251,7 +251,7 @@ github
 To install directly from the github repository:
 
 ```{r, eval = FALSE}
-# install.packages("remotes")
+# Package remotes is required: install.packages("remotes")
 remotes::install_github(
   repo = "Olink-Proteomics/OlinkRPackage/OlinkAnalyze",
   ref = "main",
