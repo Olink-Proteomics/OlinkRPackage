@@ -2183,7 +2183,7 @@ test_that(
     )
 
     expect_equal(
-      object = curr_result,
+      object = strip_check_log(curr_result),
       expected = expected_result
     )
   }
@@ -2215,7 +2215,7 @@ test_that(
     )
 
     expect_equal(
-      object = curr_result,
+      object = strip_check_log(curr_result),
       expected = tmp_npx_data1
     )
   }
