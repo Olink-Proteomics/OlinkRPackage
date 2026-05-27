@@ -72,8 +72,29 @@ my_NPX_data <- OlinkAnalyze::read_npx(
   filename = "path/to/my_NPX_data.xlsx"
 )
 ```
+
+### Check and clean NPX data
+
+Olink® Analyze provides several functions to check and clean your NPX data.
+Below follows an example of how to check and clean the NPX data using the
+package provided `npx_data1` dataset:
+
+```{r check_clean, eval = FALSE}
+# check NPX data
+check_npx_data1 <- OlinkAnalyze::check_npx(
+  df = npx_data1
 )
 
+# clean NPX data
+npx_data1_clean <- OlinkAnalyze::clean_npx(
+  df = npx_data1,
+  check_log = check_npx_data1
+)
+
+# re-check cleaned NPX data
+check_npx_data1_clean <- OlinkAnalyze::check_npx(
+  df = npx_data1_clean
+)
 ```
 
 ### QC plot functions
