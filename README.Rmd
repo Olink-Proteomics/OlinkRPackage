@@ -82,12 +82,12 @@ package provided `npx_data1` dataset:
 ```{r check_clean, eval = FALSE}
 # check NPX data
 check_npx_data1 <- OlinkAnalyze::check_npx(
-  df = npx_data1
+  df = OlinkAnalyze::npx_data1
 )
 
 # clean NPX data
 npx_data1_clean <- OlinkAnalyze::clean_npx(
-  df = npx_data1,
+  df = OlinkAnalyze::npx_data1,
   check_log = check_npx_data1
 )
 
@@ -109,9 +109,6 @@ olink_dist_plot(npx_data1 %>% filter(Panel == 'Olink CARDIOMETABOLIC')) +
         axis.ticks.x = element_blank()) +
   scale_fill_manual(values = c('turquoise3', 'red'))
 ```
-
-![dist_plot_example](figures/example_distplot.png)
-
 ```{r qc_plot, eval = FALSE}
 # visualize potential outliers by IQR vs. sample median per panel, example for one panel
 olink_qc_plot(npx_data1 %>% filter(Panel == 'Olink CARDIOMETABOLIC')) +
