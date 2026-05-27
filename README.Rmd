@@ -99,7 +99,8 @@ check_npx_data1_clean <- OlinkAnalyze::check_npx(
 
 ### QC plot functions
 
-There are several plot functions, below follows two examples using the package provided npx_data1 dataset:
+There are several plot functions, below follow two examples using the package
+provided `npx_data1` dataset:
 
 ```{r dist_plot, eval = FALSE}
 # visualize the NPX distribution per sample per panel, example for one panel
