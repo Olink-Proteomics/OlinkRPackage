@@ -130,9 +130,18 @@ knitr::include_graphics(
 ```
 
 ```{r qc_plot, eval = FALSE}
-# visualize potential outliers by IQR vs. sample median per panel, example for one panel
-olink_qc_plot(npx_data1 %>% filter(Panel == 'Olink CARDIOMETABOLIC')) +
-  scale_color_manual(values = c('turquoise3', 'red'))
+# visualize potential outliers by IQR vs. sample median per panel
+# example for one panel
+npx_data1_clean |>
+  dplyr::filter(
+    .data[["Panel"]] == "Olink Cardiometabolic"
+  ) |>
+  OlinkAnalyze::olink_qc_plot(
+    check_log = check_npx_data1_clean
+  ) +
+  ggplot2::scale_color_manual(
+    values = c("turquoise3", "red")
+  )
 ```
 
 ![qc_plot_example](figures/example_qcplot.png)
