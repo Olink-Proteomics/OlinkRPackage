@@ -162,16 +162,34 @@ datasets:
 
 ```{r norm_example, eval = FALSE}
 # identify bridge samples
-bridge_samples <- intersect(x = npx_data1$SampleID,
-			   y = npx_data2$SampleID)
+bridge_samples <- intersect(
+  x = npx_data1[["SampleID"]],
+  y = npx_data2[["SampleID"]]
+)
+# remove control samples
+bridge_samples <- bridge_samples[!grepl(
+  pattern = "CONTROL",
+  x = bridge_samples
+)]
+
+# npx_data1 was checked earlier
+# we will check only npx_data2 before normalization
+
+check_npx_data2 <- OlinkAnalyze::check_npx(
+  df = npx_data2
+)
 
 # bridge normalize
-bridge_normalized_data <- olink_normalization(df1 = npx_data1,
-					    df2 = npx_data2,
-					    overlapping_samples_df1 = bridge_samples,
-					    df1_project_nr = "20200001",
-					    df2_project_nr = "20200002",
-					    reference_project = "20200001")
+bridge_normalized_data <- OlinkAnalyze::olink_normalization(
+  df1 = npx_data1,
+  df2 = npx_data2,
+  overlapping_samples_df1 = bridge_samples,
+  df1_project_nr = "20200001",
+  df2_project_nr = "20200002",
+  reference_project = "20200001",
+  df1_check_log = check_npx_data1,
+  df2_check_log = check_npx_data2
+)
 ```
 
 ### Statistical tests and models
