@@ -22,11 +22,17 @@ knitr::opts_chunk$set(
 
 # Olink® Analyze
 
-The goal of Olink® Analyze is to provide a versatile toolbox to enable easy and smooth handling of Olink NPX data to speed up your proteomic research. Olink® Analyze provides functions ranging from reading Olink NPX data as exported by NPX Manager to various statistical tests and modelling, via different QC plot functions. Thereby providing a convenient pipeline for your Olink NPX data analysis.
+The goal of Olink® Analyze is to provide a versatile toolbox to enable easy and
+smooth handling of Olink NPX data to speed up your proteomic research. Olink®
+Analyze provides functions ranging from reading Olink NPX data as exported by
+NPX Manager to various statistical tests and modelling, via different QC plot
+functions. Thereby providing a convenient pipeline for your Olink NPX data
+analysis.
 
 ## Installation
 
-Olink® Analyze is now available on CRAN: https://cran.r-project.org/web/packages/OlinkAnalyze/index.html  
+Olink® Analyze is available on CRAN:
+https://cran.r-project.org/web/packages/OlinkAnalyze/index.html.
 
 ```{r, eval = FALSE}
 install.packages("OlinkAnalyze")
