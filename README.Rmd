@@ -198,21 +198,39 @@ Olink® Analyze provides several statistical tests and model tools. Below follow
 
 ```{r stats, eval = FALSE}
 # t-test npx_data1
-ttest_results_NPX1 <- olink_ttest(df = npx_data1,
-				variable = "Treatment")
+ttest_results_NPX1 <- OlinkAnalyze::olink_ttest(
+  df = npx_data1_clean,
+  check_log = check_npx_data1_clean,
+  variable = "Treatment"
+)
 
 # select names of the top #10 most significant proteins
-ttest_sign_NPX1 <- ttest_results_NPX1 %>%
-	head(n=10) %>%
-	pull(OlinkID)
+ttest_sign_NPX1 <- ttest_results_NPX1 |>
+  dplyr::slice_head(
+    n = 10L
+  ) |> 
+  dplyr::pull(
+    .data[["OlinkID"]]
+  )
 
 # volcano plot with annotated top #10 most significant proteins
-olink_volcano_plot(p.val_tbl = ttest_results_NPX1,
-				olinkid_list = ttest_sign_NPX1) +
-  scale_color_manual(values = c('turquoise3', 'red'))
+OlinkAnalyze::olink_volcano_plot(
+  p.val_tbl = ttest_results_NPX1,
+  olinkid_list = ttest_sign_NPX1
+) +
+  ggplot2::scale_color_manual(
+    values = c("turquoise3", "red")
+  )
 ```
 
-![volcano_plot_example](figures/example_volcanoplot.png)
+```{r example_volcano_plot, echo = FALSE}
+knitr::include_graphics(
+  path = normalizePath(
+    path = "figures/example_volcanoplot.png"
+  ),
+  error = FALSE
+)
+```
 
 ## Learn more
 Please see the function specific help pages. Moreover, Olink® Analyze includes two simulated NPX datasets for your convenience to help you explore the package and its functions.
