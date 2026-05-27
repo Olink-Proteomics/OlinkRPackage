@@ -144,7 +144,14 @@ npx_data1_clean |>
   )
 ```
 
-![qc_plot_example](figures/example_qcplot.png)
+```{r example_qc_plot, echo = FALSE}
+knitr::include_graphics(
+  path = normalizePath(
+    path = "figures/example_qcplot.png"
+  ),
+  error = FALSE
+)
+```
 
 ### Normalization
 
