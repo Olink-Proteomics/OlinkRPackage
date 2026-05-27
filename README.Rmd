@@ -155,7 +155,10 @@ knitr::include_graphics(
 
 ### Normalization
 
-Olink® Analyze provides several means of normalization when analyzing multiple datasets. Below follows an example of reference sample (aka bridge) normalization using the two package provided npx_data1 and npx_data2 datasets:
+Olink® Analyze provides several means of normalization when analyzing multiple
+datasets. Below follows an example of reference sample (aka bridge)
+normalization using the two package provided `npx_data1` and `npx_data2`
+datasets:
 
 ```{r norm_example, eval = FALSE}
 # identify bridge samples
