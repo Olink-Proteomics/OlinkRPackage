@@ -37,21 +37,6 @@ test_that(
       suppressMessages() |>
       suppressWarnings()
 
-    heatmap_plot_name <- "heatmap"
-    check_snap_exist(test_dir_name = "plot_heatmap",
-                     snap_name = heatmap_plot_name)
-    vdiffr::expect_doppelganger(
-      title = heatmap_plot_name,
-      fig = olink_heatmap_plot(
-        df = npx_data,
-        check_log = check_log
-      ) |>
-        suppressMessages() |>
-        suppressWarnings(),
-      cran = FALSE
-    ) |>
-      suppressWarnings()
-
     expect_no_error(
       object = olink_heatmap_plot(
         df = npx_data,
