@@ -338,6 +338,13 @@ pheatmap_color_heatmap <- function(df,
     color_assignments <- with(data.frame(variable = rep_num, color = colors),
                               split(color, variable))
 
+    color_assignments <- lapply(vars_to_color, function(x) {
+      y <- color_assignments[[x]]
+      names(y) <- df |> dplyr::pull(.data[[x]]) |> sort() |> unique()
+      return(y)
+    })
+    names(color_assignments) <- vars_to_color
+
     pheatmap_args[["annot_col_int"]] <- append(pheatmap_args[["annot_col_int"]],
                                                color_assignments)
   }
