@@ -22,117 +22,250 @@ knitr::opts_chunk$set(
 
 # Olink® Analyze
 
-The goal of Olink® Analyze is to provide a versatile toolbox to enable easy and smooth handling of Olink NPX data to speed up your proteomic research. Olink® Analyze provides functions ranging from reading Olink NPX data as exported by NPX Manager to various statistical tests and modelling, via different QC plot functions. Thereby providing a convenient pipeline for your Olink NPX data analysis.
+The goal of Olink® Analyze is to provide a versatile toolbox to enable easy and
+smooth handling of Olink NPX data to speed up your proteomic research. Olink®
+Analyze provides functions ranging from reading Olink NPX data as exported by
+NPX Manager to various statistical tests and modelling, via different QC plot
+functions. Thereby providing a convenient pipeline for your Olink NPX data
+analysis.
 
 ## Installation
 
-Olink® Analyze is now available on CRAN: https://cran.r-project.org/web/packages/OlinkAnalyze/index.html  
+Olink® Analyze is available on CRAN:
+https://cran.r-project.org/package=OlinkAnalyze.
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 install.packages("OlinkAnalyze")
 ```
 
 ## Vignette
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 browseVignettes("OlinkAnalyze")
 ```
 
+**Note:** Process-specific, practical vignettes for analysis of Olink®
+proteomics data hosted on OA have been moved to a newer package Olink® Analyze
+Vignettes, that is hosted on CRAN:
+https://cran.r-project.org/package=OlinkAnalyzeVignettes. Olink® Analyze
+includes a master vignette and the core analysis functionality, and Olink®
+Analyze Vignettes serves to complement this package.
+
+```{r, eval = FALSE}
+install.packages("OlinkAnalyzeVignettes")
+```
+
 ## Usage
+
 ### Reading Olink NPX data
 
-```{r read_data,eval = FALSE}
+```{r read_data, eval = FALSE}
 # open package
 library(OlinkAnalyze)
 
-# reading Olink NPX data 
-my_NPX_data <- read_NPX(filename = "path/to/my_NPX_data.xlsx")
+# reading Olink NPX data
+my_npx_data <- OlinkAnalyze::read_NPX(
+  filename = "path/to/my_NPX_data.xlsx"
+)
+# OR
+my_npx_data <- OlinkAnalyze::read_npx(
+  filename = "path/to/my_NPX_data.xlsx"
+)
+```
+
+### Check and clean NPX data
+
+Olink® Analyze provides several functions to check and clean your NPX data.
+Below follows an example of how to check and clean the NPX data using the
+package provided `npx_data1` dataset:
+
+```{r check_clean, eval = FALSE}
+# check NPX data
+check_npx_data1 <- OlinkAnalyze::check_npx(
+  df = OlinkAnalyze::npx_data1
+)
+
+# clean NPX data
+npx_data1_clean <- OlinkAnalyze::clean_npx(
+  df = OlinkAnalyze::npx_data1,
+  check_log = check_npx_data1
+)
+
+# re-check cleaned NPX data
+check_npx_data1_clean <- OlinkAnalyze::check_npx(
+  df = npx_data1_clean
+)
 ```
 
 ### QC plot functions
 
-There are several plot functions, below follows two examples using the package provided npx_data1 dataset:
+There are several plot functions, below follow two examples using the package
+provided `npx_data1` dataset:
 
-```{r dist_plot, eval=FALSE}
+```{r dist_plot, eval = FALSE}
 # visualize the NPX distribution per sample per panel, example for one panel
-olink_dist_plot(npx_data1 %>% filter(Panel == 'Olink CARDIOMETABOLIC')) +
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank()) +
-  scale_fill_manual(values = c('turquoise3', 'red'))
+npx_data1_clean |>
+  dplyr::filter(
+    .data[["Panel"]] == "Olink Cardiometabolic"
+  ) |>
+  OlinkAnalyze::olink_dist_plot(
+    check_log = check_npx_data1_clean
+  ) +
+  ggplot2::theme(
+    axis.text.x = ggplot2::element_blank(),
+    axis.ticks.x = ggplot2::element_blank()
+  ) +
+  ggplot2::scale_fill_manual(
+    values = c("turquoise3", "red")
+  )
 ```
 
-![dist_plot_example](figures/example_distplot.png)
-
-```{r qc_plot, eval=FALSE}
-# visualize potential outliers by IQR vs. sample median per panel, example for one panel
-olink_qc_plot(npx_data1 %>% filter(Panel == 'Olink CARDIOMETABOLIC')) +
-  scale_color_manual(values = c('turquoise3', 'red'))
+```{r example_dist_plot, echo = FALSE}
+knitr::include_graphics(
+  path = normalizePath(
+    path = "figures/example_distplot.png"
+  ),
+  error = FALSE
+)
 ```
 
-![qc_plot_example](figures/example_qcplot.png)
+```{r qc_plot, eval = FALSE}
+# visualize potential outliers by IQR vs. sample median per panel
+# example for one panel
+npx_data1_clean |>
+  dplyr::filter(
+    .data[["Panel"]] == "Olink Cardiometabolic"
+  ) |>
+  OlinkAnalyze::olink_qc_plot(
+    check_log = check_npx_data1_clean
+  ) +
+  ggplot2::scale_color_manual(
+    values = c("turquoise3", "red")
+  )
+```
+
+```{r example_qc_plot, echo = FALSE}
+knitr::include_graphics(
+  path = normalizePath(
+    path = "figures/example_qcplot.png"
+  ),
+  error = FALSE
+)
+```
 
 ### Normalization
 
-Olink® Analyze provides several means of normalization when analyzing multiple datasets. Below follows an example of reference sample (aka bridge) normalization using the two package provided npx_data1 and npx_data2 datasets:
+Olink® Analyze provides several means of normalization when analyzing multiple
+datasets. Below follows an example of reference sample (aka bridge)
+normalization using the two package provided `npx_data1` and `npx_data2`
+datasets:
 
-```{r norm_example,eval=FALSE}
+```{r norm_example, eval = FALSE}
 # identify bridge samples
-bridge_samples <- intersect(x = npx_data1$SampleID,
-			   y = npx_data2$SampleID)
+bridge_samples <- intersect(
+  x = npx_data1[["SampleID"]],
+  y = npx_data2[["SampleID"]]
+)
+# remove control samples
+bridge_samples <- bridge_samples[!grepl(
+  pattern = "CONTROL",
+  x = bridge_samples
+)]
+
+# npx_data1 was checked earlier
+# we will check only npx_data2 before normalization
+
+check_npx_data2 <- OlinkAnalyze::check_npx(
+  df = npx_data2
+)
 
 # bridge normalize
-bridge_normalized_data <- olink_normalization(df1 = npx_data1,
-					    df2 = npx_data2,
-					    overlapping_samples_df1 = bridge_samples,
-					    df1_project_nr = "20200001",
-					    df2_project_nr = "20200002",
-					    reference_project = "20200001")
+bridge_normalized_data <- OlinkAnalyze::olink_normalization(
+  df1 = npx_data1,
+  df2 = npx_data2,
+  overlapping_samples_df1 = bridge_samples,
+  df1_project_nr = "20200001",
+  df2_project_nr = "20200002",
+  reference_project = "20200001",
+  df1_check_log = check_npx_data1,
+  df2_check_log = check_npx_data2
+)
 ```
 
 ### Statistical tests and models
 
-Olink® Analyze provides several statistical tests and model tools. Below follows an example of how to perform a t-test and how to visualize the t-test output in a volcano plot using the package provided npx_data1 dataset:
+Olink® Analyze provides several statistical tests and model tools. Below follows
+an example of how to perform a t-test and how to visualize the t-test output in
+a volcano plot using the `npx_data1`:
 
-```{r stats, eval=FALSE}
+```{r stats, eval = FALSE}
 # t-test npx_data1
-ttest_results_NPX1 <- olink_ttest(df = npx_data1,
-				variable = "Treatment")
+ttest_results_npx1 <- OlinkAnalyze::olink_ttest(
+  df = npx_data1_clean,
+  check_log = check_npx_data1_clean,
+  variable = "Treatment"
+)
 
 # select names of the top #10 most significant proteins
-ttest_sign_NPX1 <- ttest_results_NPX1 %>%
-	head(n=10) %>%
-	pull(OlinkID)
+ttest_sign_npx1 <- ttest_results_npx1 |>
+  dplyr::slice_head(
+    n = 10L
+  ) |>
+  dplyr::pull(
+    .data[["OlinkID"]]
+  )
 
 # volcano plot with annotated top #10 most significant proteins
-olink_volcano_plot(p.val_tbl = ttest_results_NPX1,
-				olinkid_list = ttest_sign_NPX1) +
-  scale_color_manual(values = c('turquoise3', 'red'))
+OlinkAnalyze::olink_volcano_plot(
+  p.val_tbl = ttest_results_npx1,
+  olinkid_list = ttest_sign_npx1
+) +
+  ggplot2::scale_color_manual(
+    values = c("turquoise3", "red")
+  )
 ```
 
-![volcano_plot_example](figures/example_volcanoplot.png)
+```{r example_volcano_plot, echo = FALSE}
+knitr::include_graphics(
+  path = normalizePath(
+    path = "figures/example_volcanoplot.png"
+  ),
+  error = FALSE
+)
+```
 
 ## Learn more
-Please see the function specific help pages. Moreover, Olink® Analyze includes two simulated NPX datasets for your convenience to help you explore the package and its functions.
+
+Please see the function specific help pages. Moreover, Olink® Analyze includes
+two simulated NPX datasets for your convenience to help you explore the package
+and its functions.
 
 ## Issues
-Please report any issues (good or bad) to <biostattools[a]olink.com> or use the github [issue function](https://github.com/Olink-Proteomics/OlinkRPackage/issues).
+
+Please report any issues (good or bad) to <biostattools[a]olink.com> or use the
+github
+[issue function](https://github.com/Olink-Proteomics/OlinkRPackage/issues).
 
 ## Alternative install methods
 
 To install directly from the github repository:
 
-```{r, eval=FALSE}
-# install.packages("remotes")
-remotes::install_github(repo ='Olink-Proteomics/OlinkRPackage/OlinkAnalyze', ref = "main", build_vignettes = TRUE)
+```{r, eval = FALSE}
+# Package remotes is required: install.packages("remotes")
+remotes::install_github(
+  repo = "Olink-Proteomics/OlinkRPackage/OlinkAnalyze",
+  ref = "main",
+  build_vignettes = TRUE
+)
 ```
 
-To install Olink Analyze into a new [conda](https://docs.conda.io/en/latest/) environment:
+To install Olink Analyze into a new [conda](https://docs.conda.io/en/latest/)
+environment:
 
-```{bash, eval=FALSE}
+```{bash, eval = FALSE}
 conda create -n OlinkAnalyze -c conda-forge r-olinkanalyze
 ```
 
 ## Credits
-Olink® Analyze is developed and maintained by the Olink Proteomics Data Science Team.
-
-
+Olink® Analyze is developed and maintained by the Olink Proteomics Data Science
+Team.
