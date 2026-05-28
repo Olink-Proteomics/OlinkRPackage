@@ -263,7 +263,7 @@ olink_lmer <- function(df,
           dplyr::pull()
 
         removed_sampleids <- c(removed_sampleids,
-                                sampleids_na) |>
+                               sampleids_na) |>
           unique()
         df <- df[!is.na(df[[i]]), ]
       }
@@ -905,7 +905,7 @@ olink_lmer_posthoc <- function(df,
           dplyr::pull()
 
         removed_sampleids <- c(removed_sampleids,
-                                sampleids_na) |>
+                               sampleids_na) |>
           unique()
         df <- df[!is.na(df[[i]]), ]
       }
