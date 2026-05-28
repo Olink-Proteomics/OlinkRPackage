@@ -1,6 +1,5 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Olink-Proteomics/OlinkRPackage/actions/workflows/R-CMD-check.yaml)
@@ -23,7 +22,7 @@ convenient pipeline for your Olink NPX data analysis.
 ## Installation
 
 Olink® Analyze is available on CRAN:
-<https://cran.r-project.org/web/packages/OlinkAnalyze/index.html>.
+<https://cran.r-project.org/package=OlinkAnalyze>.
 
 ``` r
 install.packages("OlinkAnalyze")
@@ -38,9 +37,9 @@ browseVignettes("OlinkAnalyze")
 **Note:** Process-specific, practical vignettes for analysis of Olink®
 proteomics data hosted on OA have been moved to a newer package Olink®
 Analyze Vignettes, that is hosted on CRAN:
-<https://cran.r-project.org/web/packages/OlinkAnalyzeVignettes/index.html>.
-The new package complements this parent R package Olink® Analyze, which
-includes a master vignette and the core analysis functionality.
+<https://cran.r-project.org/package=OlinkAnalyzeVignettes>. Olink®
+Analyze includes a master vignette and the core analysis functionality,
+and Olink® Analyze Vignettes serves to complement this package.
 
 ``` r
 install.packages("OlinkAnalyzeVignettes")
@@ -173,8 +172,7 @@ bridge_normalized_data <- OlinkAnalyze::olink_normalization(
 
 Olink® Analyze provides several statistical tests and model tools. Below
 follows an example of how to perform a t-test and how to visualize the
-t-test output in a volcano plot using the package provided `npx_data1`
-dataset:
+t-test output in a volcano plot using the `npx_data1`:
 
 ``` r
 # t-test npx_data1
