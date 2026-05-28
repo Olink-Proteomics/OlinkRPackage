@@ -221,7 +221,7 @@ olink_lmer <- function(df,
       if (length(check_log$oid_invalid > 0)) {
         df <- df |>
           dplyr::filter(
-            !(.data[["OlinkID"]] %in% check_log$oid_invalid)
+            !(.data[[check_log$col_names$olink_id]] %in% check_log$oid_invalid)
           )
       }
 
@@ -293,12 +293,12 @@ olink_lmer <- function(df,
 
         current_nas <- df |>
           dplyr::filter( # Exclude assays that have all NA:s
-            !(.data[["OlinkID"]] %in% check_log$assay_na)
+            !(.data[[check_log$col_names$olink_id]] %in% check_log$assay_na)
           ) |>
           dplyr::group_by(
             dplyr::across(
               dplyr::all_of(
-                c("OlinkID", effect)
+                c(check_log$col_names$olink_id, effect)
               )
             )
           ) |>
@@ -311,10 +311,10 @@ olink_lmer <- function(df,
             .data[["n"]] == .data[["n_na"]]
           ) |>
           dplyr::distinct(
-            .data[["OlinkID"]]
+            .data[[check_log$col_names$olink_id]]
           ) |>
           dplyr::pull(
-            .data[["OlinkID"]]
+            .data[[check_log$col_names$olink_id]]
           )
 
         if (length(current_nas) > 0L) {
@@ -335,7 +335,7 @@ olink_lmer <- function(df,
           dplyr::group_by(
             dplyr::across(
               dplyr::all_of(
-                c("SampleID")
+                c(check_log$col_names$sample_id)
               )
             )
           ) |>
@@ -429,15 +429,18 @@ olink_lmer <- function(df,
       lmer_model <- df |>
         # Exclude assays that have all NA:s
         dplyr::filter(
-          !(.data[["OlinkID"]] %in% check_log$assay_na)
+          !(.data[[check_log$col_names$olink_id]] %in% check_log$assay_na)
         ) |>
         dplyr::filter(
-          !(.data[["OlinkID"]] %in% .env[["nas_in_var"]])
+          !(.data[[check_log$col_names$olink_id]] %in% .env[["nas_in_var"]])
         ) |>
         dplyr::group_by(
           dplyr::across(
             dplyr::all_of(
-              c("Assay", "OlinkID", "UniProt", "Panel")
+              c(check_log$col_names$assay,
+                check_log$col_names$olink_id,
+                check_log$col_names$uniprot,
+                check_log$col_names$panel)
             )
           )
         ) |>
@@ -846,7 +849,7 @@ olink_lmer_posthoc <- function(df,
       if (length(check_log$oid_invalid > 0)) {
         df <- df |>
           dplyr::filter(
-            !(.data[["OlinkID"]] %in% check_log$oid_invalid)
+            !(.data[[check_log$col_names$olink_id]] %in% check_log$oid_invalid)
           )
       }
 
