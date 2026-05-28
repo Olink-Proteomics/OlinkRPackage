@@ -318,18 +318,20 @@ pheatmap_color_heatmap <- function(df,
                                dplyr::all_of(vars_to_color)),
                  function(x) length(unique(x))))
     )
+
+    variable_list <- as.list(sapply(dplyr::select(df,
+                                                  dplyr::all_of(vars_to_color)),
+                                    function(x) length(unique(x))))
+
+    rep_num <- rep(names(variable_list), times = variable_list)
+
+    color_assignments <- with(data.frame(variable = rep_num, color = colors),
+                              split(color, variable))
+
+    pheatmap_args[["annot_col_int"]] <- append(pheatmap_args[["annot_col_int"]],
+                                               color_assignments)
   }
-  variable_list <- as.list(sapply(dplyr::select(df,
-                                                dplyr::all_of(vars_to_color)),
-                                  function(x) length(unique(x))))
 
-  rep_num <- rep(names(variable_list), times = variable_list)
-
-  color_assignments <- with(data.frame(variable = rep_num, color = colors),
-                            split(color, variable))
-
-  pheatmap_args[["annot_col_int"]] <- append(pheatmap_args[["annot_col_int"]],
-                                             color_assignments)
   return(pheatmap_args)
 }
 
