@@ -103,6 +103,10 @@ compares the difference in means of the outcome variable (default:
 e.g. mean NPX at mean(numerical variable) versus mean NPX at mean(numerical
 variable) + 1*SD(numerical variable). The output tibble is arranged by
 ascending Tukey adjusted p-values.
+
+The \code{variable}, \code{covariates}, \code{random}, and/or \code{model_formula} arguments can
+be used in the same way as in `\code{\link{olink_lmer}} to specify the model
+to be fitted.
 }
 \examples{
 \donttest{
