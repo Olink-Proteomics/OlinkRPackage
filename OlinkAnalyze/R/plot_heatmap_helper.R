@@ -209,6 +209,7 @@ plot_heatmap_pheatmap_args <- function(df_wide,
   } else {
     # Use the created list
     pheatmap_args[["annotation_colors"]] <- pheatmap_args[["annot_col_int"]]
+    pheatmap_args[["annot_col_int"]] <- NULL
   }
 
   return(pheatmap_args)
