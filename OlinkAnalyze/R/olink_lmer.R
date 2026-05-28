@@ -255,10 +255,15 @@ olink_lmer <- function(df,
 
       # Remove rows where variables or covariate is NA (can't include in
       # analysis anyway)
-      removed.sampleids <- NULL # nolint: object_name_linter
+      removed_sampleids <- NULL
       for (i in variable_testers) {
-        removed.sampleids <- c(removed.sampleids, # nolint: object_name_linter
-                               df$SampleID[is.na(df[[i]])]) |>
+        sampleids_na <- df |>
+          dplyr::filter(is.na(.data[[i]])) |>
+          dplyr::distinct(.data[[check_log$col_names$sample_id]]) |>
+          dplyr::pull()
+
+        removed_sampleids <- c(removed_sampleids,
+                                sampleids_na) |>
           unique()
         df <- df[!is.na(df[[i]]), ]
       }
@@ -388,10 +393,10 @@ olink_lmer <- function(df,
             paste(add.main.effects, collapse = ", ")
           )
         }
-        if (!is.null(removed.sampleids) & length(removed.sampleids) > 0L) {
+        if (!is.null(removed_sampleids) & length(removed_sampleids) > 0L) {
           message(
             "Samples removed due to missing variable or covariate levels: ",
-            paste(removed.sampleids, collapse = ", ")
+            paste(removed_sampleids, collapse = ", ")
           )
         }
         if (!is.null(converted.vars)) {
@@ -856,7 +861,7 @@ olink_lmer_posthoc <- function(df,
       if (is.null(olinkid_list) || length(olinkid_list) == 0L) {
         olinkid_list <- df |>
           dplyr::select(
-            dplyr::all_of("OlinkID")
+            dplyr::all_of(check_log$col_names$olink_id)
           ) |>
           dplyr::distinct() |>
           dplyr::pull()
@@ -892,10 +897,15 @@ olink_lmer_posthoc <- function(df,
       variable_testers <- intersect(x = c(variable, covariates), y = names(df))
       # Remove rows where variables or covariate is NA (cant include in analysis
       # anyway)
-      removed.sampleids <- NULL # nolint: object_name_linter
+      removed_sampleids <- NULL
       for (i in variable_testers) {
-        removed.sampleids <- c(removed.sampleids, # nolint: object_name_linter
-                               df$SampleID[is.na(df[[i]])]) |>
+        sampleids_na <- df |>
+          dplyr::filter(is.na(.data[[i]])) |>
+          dplyr::distinct(.data[[check_log$col_names$sample_id]]) |>
+          dplyr::pull()
+
+        removed_sampleids <- c(removed_sampleids,
+                                sampleids_na) |>
           unique()
         df <- df[!is.na(df[[i]]), ]
       }
@@ -943,10 +953,10 @@ olink_lmer_posthoc <- function(df,
             paste(add.main.effects, collapse = ", ")
           )
         }
-        if (!is.null(removed.sampleids) & length(removed.sampleids) > 0L) {
+        if (!is.null(removed_sampleids) & length(removed_sampleids) > 0L) {
           message(
             "Samples removed due to missing variable or covariate levels: ",
-            paste(removed.sampleids, collapse = ", ")
+            paste(removed_sampleids, collapse = ", ")
           )
         }
         if (!is.null(converted.vars)) {
@@ -981,16 +991,19 @@ olink_lmer_posthoc <- function(df,
 
       output_df <- df |>
         dplyr::filter(
-          .data[["OlinkID"]] %in% .env[["olinkid_list"]]
+          .data[[check_log$col_names$olink_id]] %in% .env[["olinkid_list"]]
         ) |>
         # Exclude assays that have all NA:s
         dplyr::filter(
-          !(.data[["OlinkID"]] %in% check_log$assay_na)
+          !(.data[[check_log$col_names$olink_id]] %in% check_log$assay_na)
         ) |>
         dplyr::group_by(
           dplyr::across(
             dplyr::all_of(
-              c("Assay", "OlinkID", "UniProt", "Panel")
+              c(check_log$col_names$assay,
+                check_log$col_names$olink_id,
+                check_log$col_names$uniprot,
+                check_log$col_names$panel)
             )
           )
         ) |>
@@ -1009,7 +1022,11 @@ olink_lmer_posthoc <- function(df,
         ) |>
         dplyr::select(
           dplyr::all_of(
-            c("Assay", "OlinkID", "UniProt", "Panel", "term")
+            c(check_log$col_names$assay,
+              check_log$col_names$olink_id,
+              check_log$col_names$uniprot,
+              check_log$col_names$panel,
+              "term")
           ),
           dplyr::everything()
         )
