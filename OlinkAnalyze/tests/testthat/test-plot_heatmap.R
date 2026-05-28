@@ -94,8 +94,8 @@ test_that(
     )
 
     heatmap_plot_name_v1 <- "heatmap_v1"
-    # check_snap_exist(test_dir_name = "plot_heatmap",
-    #                  snap_name = heatmap_plot_name_v1)
+    check_snap_exist(test_dir_name = "plot_heatmap",
+                     snap_name = heatmap_plot_name_v1)
     withCallingHandlers({
       vdiffr::expect_doppelganger(
         title = heatmap_plot_name_v1,
@@ -116,8 +116,8 @@ test_that(
     )
 
     heatmap_plot_name_v2 <- "heatmap_v2"
-    # check_snap_exist(test_dir_name = "plot_heatmap",
-    #                  snap_name = heatmap_plot_name_v2)
+    check_snap_exist(test_dir_name = "plot_heatmap",
+                     snap_name = heatmap_plot_name_v2)
     withCallingHandlers({
       vdiffr::expect_doppelganger(
         title = heatmap_plot_name_v2,
@@ -144,8 +144,8 @@ test_that(
     )
 
     heatmap_plot_name_v3 <- "heatmap_v3"
-    # check_snap_exist(test_dir_name = "plot_heatmap",
-    #                  snap_name = heatmap_plot_name_v3)
+    check_snap_exist(test_dir_name = "plot_heatmap",
+                     snap_name = heatmap_plot_name_v3)
     withCallingHandlers({
       vdiffr::expect_doppelganger(
         title = heatmap_plot_name_v3,
@@ -172,8 +172,8 @@ test_that(
     )
 
     heatmap_plot_name_v4 <- "heatmap_v4"
-    # check_snap_exist(test_dir_name = "plot_heatmap",
-    #                  snap_name = heatmap_plot_name_v4)
+    check_snap_exist(test_dir_name = "plot_heatmap",
+                     snap_name = heatmap_plot_name_v4)
     withCallingHandlers({
       vdiffr::expect_doppelganger(
         title = heatmap_plot_name_v4,
@@ -207,8 +207,8 @@ test_that(
     )
 
     heatmap_plot_name_v5 <- "heatmap_v5"
-    # check_snap_exist(test_dir_name = "plot_heatmap",
-    #                  snap_name = heatmap_plot_name_v5)
+    check_snap_exist(test_dir_name = "plot_heatmap",
+                     snap_name = heatmap_plot_name_v5)
     withCallingHandlers({
       vdiffr::expect_doppelganger(
         title = heatmap_plot_name_v5,
