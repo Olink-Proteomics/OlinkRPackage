@@ -202,6 +202,16 @@ plot_heatmap_pheatmap_args <- function(df_wide,
     )
   }
 
+  # Add annotation colors to function call
+  if (is.null(pheatmap_args[["annot_col_int"]])) {
+    # NA is the default no-specification expected by pheatmap
+    pheatmap_args[["annotation_colors"]] <- NA
+  }
+  else {
+    # Use the created list
+    pheatmap_args[["annotation_colors"]] <- pheatmap_args[["annot_col_int"]]
+  }
+
   return(pheatmap_args)
 }
 
