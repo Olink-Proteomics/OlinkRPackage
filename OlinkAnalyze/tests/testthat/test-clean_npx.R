@@ -2199,8 +2199,56 @@ test_that(
 )
 
 test_that(
+  "run_clean_npx - works - passes through clean arrow data",
+  {
+    npx_data1_arrow <- arrow::as_arrow_table(npx_data1)
+
+    npx_data1_check_log <- check_npx(df = npx_data1_arrow) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    # clean data has no issues
+    obj <- attach_check_log(df = npx_data1_arrow,
+                            check_log = npx_data1_check_log,
+                            out_df = "arrow")
+
+    expect_no_message(
+      object = expect_no_error(
+        object = expect_no_warning(
+          object = result <- run_clean_npx(
+            df = obj,
+            out_df = "arrow",
+            check_log = npx_data1_check_log,
+            remove_dup_sample_id = FALSE
+          )
+        )
+      )
+    )
+
+    expect_true(
+      object = check_is_arrow_object(x = result, error = FALSE)
+    )
+
+    expect_identical(
+      object = get_check_npx(result),
+      expected = npx_data1_check_log
+    )
+  }
+)
+
+test_that(
   "run_clean_npx - works - cleans plain tibble without errors",
   {
+    npx_data1_check_log <- check_npx(df = npx_data1) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    npx_data1_clean <- clean_npx(
+      df = npx_data1,
+      check_log = npx_data1_check_log
+    ) |>
+      suppressMessages()
+
     # plain tibble without olink_class class — run_clean_npx delegates to
     # clean_npx which will auto-run check_npx if needed
     expect_message(
@@ -2216,8 +2264,49 @@ test_that(
       class = "olink_class"
     )
 
-    expect_false(
-      object = is.null(olink_check_log(df = result))
+    expect_equal(
+      object = result,
+      expected = npx_data1_clean,
+      tolerance = 1e-4
+    )
+  }
+)
+
+test_that(
+  "run_clean_npx - works - cleans plain arrow without errors",
+  {
+    npx_data1_arrow <- arrow::as_arrow_table(npx_data1)
+
+    npx_data1_check_log <- check_npx(df = npx_data1_arrow) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    npx_data1_arrow_clean <- clean_npx(
+      df = npx_data1_arrow,
+      check_log = npx_data1_check_log,
+      out_df = "arrow"
+    ) |>
+      suppressMessages()
+
+    # plain arrow without olink_class class — run_clean_npx delegates to
+    # clean_npx which will auto-run check_npx if needed
+    expect_message(
+      object = result <- run_clean_npx(
+        df = npx_data1_arrow,
+        out_df = "arrow"
+      ),
+      regexp = "736 entries removed by `clean_npx()` from the input dataset",
+      fixed = TRUE
+    )
+
+    expect_true(
+      object = check_is_arrow_object(x = result, error = FALSE)
+    )
+
+    expect_equal(
+      object = dplyr::collect(result),
+      expected = dplyr::collect(npx_data1_arrow_clean),
+      tolerance = 1e-4
     )
   }
 )
