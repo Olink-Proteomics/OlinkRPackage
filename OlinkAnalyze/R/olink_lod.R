@@ -81,8 +81,18 @@ olink_lod <- function(data,
                       check_log = NULL,
                       lod_file_path = NULL,
                       lod_method = "NCLOD") {
-  # check if check_log is correct
-  check_log <- run_check_npx(df = data, check_log = check_log)
+  # obtain check_log: from df attribute, from argument, or by running check_npx
+  check_log <- get_check_npx(
+    df = data,
+    check_log = check_log,
+    preferred_names = NULL # no need to specify preferred names here
+  )# get preferred column names to assign to output dataset
+  preferred_names <- get_preferred_names(
+    df = data,
+    check_log = check_log
+  )
+  # get data type to convert the output accordingly at the end of the function
+  out_df <- get_read_npx_output(df = data)
   # make sure data is a tibble
   data <- convert_read_npx_output(df = data, out_df = "tibble")
 
@@ -137,6 +147,14 @@ olink_lod <- function(data,
       lod_method = lod_method
     )
   }
+
+  # Convert to requested output format, re-run check_npx, and attach check_log
+  data <- attach_check_log(
+    df = data,
+    out_df = out_df,
+    preferred_names = preferred_names
+  )
+
   return(data)
 }
 
