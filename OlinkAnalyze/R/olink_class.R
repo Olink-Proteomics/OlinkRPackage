@@ -296,6 +296,7 @@ olink_check_log <- function(df) {
 #' a plain tibble.
 #'
 #' @param x An `olink_class` object.
+#' @param ... Additional arguments passed to `as_tibble()`.
 #'
 #' @return A tibble (`tbl_df`) without the `olink_class` class or the check log
 #' attribute.
@@ -305,10 +306,12 @@ olink_check_log <- function(df) {
 #' @keywords internal
 #' @noRd
 #'
-as_tibble.olink_class <- function(x) { # nolint: object_name_linter
+as_tibble.olink_class <- function(x, ...) { # nolint: object_name_linter
 
   attr(x = x, which = "check_log") <- NULL
   class(x) <- setdiff(x = class(x), y = "olink_class")
+
+  x <- tibble::as_tibble(x, ...)
 
   return(x)
 
