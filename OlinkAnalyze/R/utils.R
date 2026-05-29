@@ -6,6 +6,7 @@
 #' @param df An Olink dataset.
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @return The input Olink dataset without all-NA columns.
 #'
@@ -48,6 +49,7 @@ remove_all_na_cols <- function(df) {
 #' `r ansi_collapse_quot(x = read_npx_df_output, sep = "and")`.
 #'
 #' @keywords internal
+#' @noRd
 #'
 check_out_df_arg <- function(out_df) {
 
@@ -124,6 +126,7 @@ convert_read_npx_output <- function(df,
 #' @param sep One of "or" and "and".
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @return Scalar character vector collapsed by "and" or "or".
 #'
