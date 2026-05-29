@@ -225,6 +225,88 @@ get_check_npx <- function(df,
   return(check_log)
 }
 
+#' Get preferred column names from a check log
+#'
+#' Identifies preferred column names from a supplied check log by comparing the
+#' column name matches stored in `check_log` with the column name matches
+#' detected locally in `df`.
+#'
+#' Names are returned for keys that are either only present in `check_log`, or
+#' present in both `check_log` and the local check but have different matched
+#' values. Vector order is ignored when comparing matched values.
+#'
+#' The function only supports cases where each selected key maps to a single
+#' preferred name. If any selected key maps to multiple names, an error is
+#' thrown and preferred names must be supplied manually.
+#'
+#' @param df A data frame to check for NPX column names.
+#' @param check_log A check log object. Must pass [validate_check_log()].
+#'
+#' @return A named character vector. Names are column name keys and values are
+#'   the preferred column names selected from `check_log`.
+#'
+#' @keywords internal
+#' @noRd
+#'
+#' @examples
+#' \dontrun{
+#' check_log <- OlinkAnalyze::check_npx(
+#'   df = OlinkAnalyze::npx_data1
+#' )
+#'
+#' get_preferred_names(
+#'   df = OlinkAnalyze::npx_data1,
+#'   check_log = check_log
+#' )
+#' }
+get_preferred_names <- function(df,
+                                check_log) {
+  validate_check_log(df = df, check_log = check_log)
+  check_log_names <- check_log$col_names
+
+  check_log_local_names <- check_npx_col_names(df = df)
+
+  only_in_check_log <- setdiff(
+    x = names(check_log_names),
+    y = names(check_log_local_names)
+  )
+
+  shared_names <- intersect(
+    x = names(check_log_names),
+    y = names(check_log_local_names)
+  )
+
+  same_content <- function(x, y) {
+    identical(x = sort(x), y = sort(y))
+  }
+
+  different_content <- shared_names[
+    vapply(
+      shared_names,
+      function(nm) {
+        !same_content(
+          x = check_log_names[[nm]],
+          y = check_log_local_names[[nm]]
+        )
+      },
+      logical(1)
+    )
+  ]
+
+  result <- check_log_names[c(only_in_check_log, different_content)]
+
+  # result will never contain elements with length greater than 0. This can
+  # happen only in the case when `check_log_names` contains multiple matches,
+  # and `check_log_local_names` does not. However, this will never be the case
+  # as it is taken care of `validate_check_log()` which checks whether all
+  # columns with multiple matches in `check_log` are present in the `df`.
+
+  # if result has length 0, this return NULL
+  preferred_names <- unlist(result, use.names = TRUE)
+
+  return(preferred_names)
+}
+
 #' Check and run [`check_npx()`] if not provided.
 #'
 #' @details

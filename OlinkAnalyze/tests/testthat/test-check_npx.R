@@ -650,6 +650,130 @@ test_that(
   }
 )
 
+# Test get_preferred_names ----
+
+test_that(
+  "get_preferred_names - works - check_log match",
+  {
+    # v1 - all match - no multiple alt names ----
+
+    check_log <- check_npx(df = npx_data1) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_null(
+      object = get_preferred_names(df = npx_data1, check_log = check_log)
+    )
+
+    # v2 - all match - multiple alt names ----
+
+    npx_data1_v2 <- npx_data1 |>
+      dplyr::mutate(
+        "PlateLOD" = .data[["LOD"]],
+        "MaxLOD" = .data[["LOD"]]
+      )
+
+    check_log_v2 <- check_npx(
+      df = npx_data1_v2
+    ) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_null(
+      object = get_preferred_names(df = npx_data1_v2, check_log = check_log_v2)
+    )
+
+    # v3 - all match - multiple alt names - order is ignored ----
+
+    check_log_v3 <- check_log_v2
+    check_log_v3$col_names$lod <- sample(x = check_log_v3$col_names$lod,
+                                         size = 3L,
+                                         replace = FALSE)
+
+    expect_null(
+      object = get_preferred_names(df = npx_data1_v2, check_log = check_log_v3)
+    )
+  }
+)
+
+test_that(
+  "get_preferred_names - works - check_log match",
+  {
+    # v1 - 1 mismatched name ----
+
+    npx_data1_v1 <- npx_data1 |>
+      dplyr::mutate(
+        "SampleID2" = .data[["SampleID"]]
+      )
+
+    check_log_v1 <- check_npx(
+      df = npx_data1_v1,
+      preferred_names = c("sample_id" = "SampleID2")
+    ) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_identical(
+      object = get_preferred_names(df = npx_data1_v1, check_log = check_log_v1),
+      expected = c("sample_id" = "SampleID2")
+    )
+
+    # v2 - multiple mismatched names ----
+
+    npx_data1_v2 <- npx_data1 |>
+      dplyr::mutate(
+        "SampleID2" = .data[["SampleID"]],
+        "OlinkID2" = .data[["OlinkID"]],
+        "UniProt2" = .data[["UniProt"]]
+      )
+
+    check_log_v2 <- check_npx(
+      df = npx_data1_v2,
+      preferred_names = c("sample_id" = "SampleID2",
+                          "olink_id" = "OlinkID2",
+                          "uniprot" = "UniProt2")
+    ) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_identical(
+      object = get_preferred_names(df = npx_data1_v2, check_log = check_log_v2),
+      expected = c("sample_id" = "SampleID2",
+                   "olink_id" = "OlinkID2",
+                   "uniprot" = "UniProt2")
+    )
+
+    # v3 - multiple mismatched names ----
+
+    npx_data1_v3 <- npx_data1 |>
+      dplyr::mutate(
+        "SampleID2" = .data[["SampleID"]],
+        "OlinkID2" = .data[["OlinkID"]],
+        "UniProt2" = .data[["UniProt"]],
+        "PlateLOD" = .data[["LOD"]],
+        "MaxLOD" = .data[["LOD"]]
+      )
+
+    check_log_v3 <- check_npx(
+      df = npx_data1_v3,
+      preferred_names = c("sample_id" = "SampleID2",
+                          "olink_id" = "OlinkID2",
+                          "uniprot" = "UniProt2",
+                          "lod" = "LOD")
+    ) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_identical(
+      object = get_preferred_names(df = npx_data1_v3, check_log = check_log_v3),
+      expected = c("sample_id" = "SampleID2",
+                   "olink_id" = "OlinkID2",
+                   "uniprot" = "UniProt2",
+                   "lod" = "LOD")
+    )
+  }
+)
+
 # Test run_check_npx ----
 
 test_that(
