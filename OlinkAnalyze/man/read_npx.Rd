@@ -7,6 +7,7 @@
 \usage{
 read_npx(
   filename,
+  preferred_names = NULL,
   out_df = "tibble",
   long_format = NULL,
   olink_platform = NULL,
@@ -18,6 +19,7 @@ read_npx(
 
 read_NPX(
   filename,
+  preferred_names = NULL,
   out_df = "tibble",
   long_format = NULL,
   olink_platform = NULL,
@@ -30,6 +32,10 @@ read_NPX(
 \arguments{
 \item{filename}{Path to Olink software output file in wide or long format.
 Expecting extensions "xls" or "xlsx" for excel files, "csv" or "txt" for delim files, "parquet" for parquet files, and "zip" for compressed files.}
+
+\item{preferred_names}{A named character vector where names are internal
+column names and values are column names to be selected from the input data
+frame. Read the \emph{description} of \code{\link[=check_npx]{check_npx()}}for further information.}
 
 \item{out_df}{The class of the output dataset. One of
 "tibble" or "arrow". Defaults to
@@ -71,12 +77,43 @@ NPX, Ct or absolute quantification.
 \strong{Note:} Do not modify the Olink software output file prior to
 importing it with \code{\link{read_npx}} as it might fail.
 }
+\details{
+OlinkAnalyze uses pre-defined names of columns of data frames to perform
+downstream analyses. At the same time, different Olink platforms export data
+with different column names (e.g. different protein quantification metric).
+The output of this function aims to instruct each function of OlinkAnalyze on
+the column it should be using for the downstream analysis. This should be
+seamless for data exported from Olink Software and imported to R using the
+\code{read_npx()} or processed using the \code{clean_npx()} function.
+
+However, in certain cases the columns of interest might be named differently.
+The argument \var{preferred_names} allows assigning custom-named columns of a
+data frame to internally expected variables that will in turn instruct Olink
+Analyze functions to use them for downstream analysis. For example, if one
+wished to use the column \var{PCNormalizedNPX} for their analysis instead of
+the column \var{NPX}, then they can assign this new name to the internal
+variable \var{quant} to inform the package that in the downstream analysis
+\var{PCNormalizedNPX} should be used. See examples below.
+
+The argument \var{preferred_names} is a named character vector with internal
+column names as names and column names of the current data set as values.
+Names of the input vector can be one or more of the following:
+"sample_id", "sample_type", "assay_type", "olink_id", "uniprot", "assay", "panel", "block", "plate_id", "panel_version", "lod", "quant", "ext_npx", "count", "qc_warning", "assay_warn", "normalization", and "qc_version"
+}
 \examples{
 \donttest{
 file <- system.file("extdata",
                     "npx_data_ext.parquet",
                     package = "OlinkAnalyze")
-read_npx(filename = file)
+
+# use NPX by default as quantification
+OlinkAnalyze::read_npx(filename = file)
+
+# use PCNormalizedNPX as quantification
+OlinkAnalyze::read_npx(
+  filename = file,
+  preferred_names = c("quant" = "PCNormalizedNPX")
+)
 }
 
 }
