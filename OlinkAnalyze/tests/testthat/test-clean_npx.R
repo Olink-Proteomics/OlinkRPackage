@@ -2483,37 +2483,6 @@ test_that(
       object = olink_check_log(df = curr_result_v2)$col_names,
       expected = check_log_tmp$col_names
     )
-
-    # appraoch 3 - use preferred_names directly on run_clean_npx ----
-
-    # this does not apply to run_clean_npx but to clean_npx ONLY. run_clean_npx
-    # is an internal function and is not expected to alter the preferred_names,
-    # unlike clean_npx which is a user-facing function that can be used by the
-    # user to clean their data without necessarily running check_npx first.
-
-     expect_no_message(
-      object = curr_result_v3 <- run_clean_npx(
-        df = npx_data1_tmp,
-        preferred_names = c(
-          "sample_id" = "SampleID2",
-          "olink_id" = "OlinkID2",
-          "panel" = "New_Panel"
-        ),
-        remove_dup_sample_id = FALSE
-      )
-    )
-
-    expect_warning(
-      object = check_log_tmp_vanilla <- check_npx(df = npx_data1_tmp),
-      regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS 1\"",
-                     "and \"CONTROL_SAMPLE_AS 2\"")
-    )
-
-    expect_identical(
-      object = olink_check_log(df = curr_result_v3)$col_names,
-      expected = check_log_tmp_vanilla$col_names
-    )
-
   }
 )
 
@@ -3157,44 +3126,5 @@ test_that(
       object = olink_check_log(df = curr_result_v2)$col_names,
       expected = check_log_tmp$col_names
     )
-
-    # approach 3 - use preferred_names directly on run_clean_npx ----
-
-    expect_warning(
-      object = expect_warning(
-        object = expect_message(
-          object = expect_message(
-            object = expect_message(
-              object = expect_message(
-                object = curr_result_v3 <- clean_npx(
-                  df = npx_data1_tmp,
-                  preferred_names = c(
-                    "sample_id" = "SampleID2",
-                    "olink_id" = "OlinkID2",
-                    "panel" = "New_Panel"
-                  ),
-                  remove_dup_sample_id = FALSE
-                ),
-                regexp = "`check_log` not provided. Running `check_npx()`",
-                fixed = TRUE
-              ),
-              regexp = "No column marking control samples in dataset"
-            ),
-            regexp = "No column marking control assays in dataset"
-          ),
-          regexp = "No column marking assay warnings in dataset"
-        ),
-        regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS 1\"",
-                       "and \"CONTROL_SAMPLE_AS 2\"")
-      ),
-      regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS 1\"",
-                     "and \"CONTROL_SAMPLE_AS 2\"")
-    )
-
-    expect_identical(
-      object = olink_check_log(df = curr_result_v3)$col_names,
-      expected = check_log_tmp$col_names
-    )
-
   }
 )

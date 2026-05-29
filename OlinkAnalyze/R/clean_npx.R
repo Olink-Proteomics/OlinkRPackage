@@ -110,7 +110,6 @@
 #'
 clean_npx <- function(df,
                       check_log = NULL,
-                      preferred_names = NULL,
                       remove_assay_na = TRUE,
                       remove_invalid_oid = TRUE,
                       remove_dup_sample_id = TRUE,
@@ -132,16 +131,14 @@ clean_npx <- function(df,
   check_log <- get_check_npx(
     df = df,
     check_log = check_log,
-    preferred_names = preferred_names
+    preferred_names = NULL # no need to specify preferred names here
   )
 
   # get preferred column names to assign to output dataset
-  if (is.null(preferred_names)) {
-    preferred_names <- get_preferred_names(
-      df = df,
-      check_log = check_log
-    )
-  }
+  preferred_names <- get_preferred_names(
+    df = df,
+    check_log = check_log
+  )
 
   if (verbose) cli::cli_h2("Starting {.fn clean_npx} pipeline.")
 
@@ -305,7 +302,6 @@ run_clean_npx <- function(df, ...) {
 
   # remove user-supplied verbose if present
   dots$verbose <- NULL
-  dots$preferred_names <- NULL
 
   valid_args <- names(formals(clean_npx))
   unknown_args <- setdiff(x = names(dots), y = valid_args)
@@ -329,8 +325,7 @@ run_clean_npx <- function(df, ...) {
       what = clean_npx,
       args = c(list(df = df),
                dots,
-               list(preferred_names = NULL,
-                    verbose = FALSE))),
+               list(verbose = FALSE))),
     message = function(m) invokeRestart("muffleMessage"),
     warning = function(w) invokeRestart("muffleWarning")
   )
