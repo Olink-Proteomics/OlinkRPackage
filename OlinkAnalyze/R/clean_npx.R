@@ -135,6 +135,14 @@ clean_npx <- function(df,
     preferred_names = preferred_names
   )
 
+  # get preferred column names to assign to output dataset
+  if (is.null(preferred_names)) {
+    preferred_names <- get_preferred_names(
+      df = df,
+      check_log = check_log
+    )
+  }
+
   if (verbose) cli::cli_h2("Starting {.fn clean_npx} pipeline.")
 
   # Clean invalid Olink IDs
@@ -252,7 +260,6 @@ clean_npx <- function(df,
   # Convert to requested output format, re-run check_npx, and attach check_log
   df <- attach_check_log(
     df = df,
-    check_log = check_log,
     out_df = out_df,
     preferred_names = preferred_names
   )
