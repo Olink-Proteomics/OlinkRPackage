@@ -148,6 +148,154 @@ test_that(
   }
 )
 
+test_that(
+  "olink_lod - works - Reveal",
+  {
+    # input is tibble ----
+
+    df_r <- get_example_data("example_Reveal_data.rds")
+
+    # add missing column ExtNPX for olink_lod to work
+    df_r <- df_r |>
+      dplyr::mutate(
+        ExtNPX = .data[["NPX"]]
+      )
+
+    check_log <- check_npx(df = df_r) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    expect_message(
+      object = df_r_lod <- olink_lod(
+        data = df_r,
+        check_log = check_log,
+        lod_file_path = "https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/000-documents/10-excel%20file/Reveal%20Fixed%20LOD%20-%20csv%20file.csv", # nolint: line_length_linter
+        lod_method = "FixedLOD"
+      ),
+      regexp = paste("More than one column names in `df` was associated with",
+                     "certain key. One was selected based on an ordered list")
+    )
+
+    expect_true(object = check_is_tibble(x = df_r_lod, error = FALSE))
+    expect_s3_class(object = df_r_lod, class = "olink_class")
+    expect_true(object = { ncol(x = df_r_lod) == ncol(x = df_r) + 2L })
+    expect_false(object = all(c("LOD", "PCNormalizedLOD") %in% names(df_r)))
+    expect_true(object = all(c("LOD", "PCNormalizedLOD") %in% names(df_r_lod)))
+
+    # input is arrow ----
+
+    df_r_arrow <- arrow::arrow_table(df_r)
+
+    check_log_arrow <- check_npx(df = df_r_arrow) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    expect_message(
+      object = df_r_lod_arrow <- olink_lod(
+        data = df_r_arrow,
+        check_log = check_log_arrow,
+        lod_file_path = "https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/000-documents/10-excel%20file/Reveal%20Fixed%20LOD%20-%20csv%20file.csv", # nolint: line_length_linter
+        lod_method = "FixedLOD"
+      ),
+      regexp = paste("More than one column names in `df` was associated with",
+                     "certain key. One was selected based on an ordered list")
+    )
+
+    expect_true(object = check_is_arrow_object(x = df_r_lod_arrow,
+                                               error = FALSE))
+    expect_true(object = "olink_check_log" %in% names(df_r_lod_arrow$metadata))
+    expect_true(
+      object = { ncol(x = df_r_lod_arrow) == ncol(x = df_r_arrow) + 2L }
+    )
+    expect_false(
+      object = all(c("LOD", "PCNormalizedLOD") %in% names(df_r_arrow))
+    )
+    expect_true(
+      object = all(c("LOD", "PCNormalizedLOD") %in% names(df_r_lod_arrow))
+    )
+
+    # input is olink_class ----
+
+    expect_message(
+      object = df_r_obj <- attach_check_log(df = df_r, out_df = "tibble"),
+      regexp = paste("More than one column names in `df` was associated with",
+                     "certain key. One was selected based on an ordered list")
+    )
+
+    expect_message(
+      object = df_r_obj_lod <- olink_lod(
+        data = df_r_obj,
+        lod_file_path = "https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/000-documents/10-excel%20file/Reveal%20Fixed%20LOD%20-%20csv%20file.csv", # nolint: line_length_linter
+        lod_method = "FixedLOD"
+      ),
+      regexp = paste("More than one column names in `df` was associated with",
+                     "certain key. One was selected based on an ordered list")
+    )
+
+    expect_true(object = check_is_tibble(x = df_r_obj_lod, error = FALSE))
+    expect_s3_class(object = df_r_obj_lod, class = "olink_class")
+    expect_true(
+      object = { ncol(x = df_r_obj_lod) == ncol(x = df_r_obj) + 2L }
+    )
+    expect_false(
+      object = all(c("LOD", "PCNormalizedLOD") %in% names(df_r_obj))
+    )
+    expect_true(
+      object = all(c("LOD", "PCNormalizedLOD") %in% names(df_r_obj_lod))
+    )
+    expect_true(
+      object = all(
+        c( "LOD", "PCNormalizedLOD") %in%
+          olink_check_log(df = df_r_obj_lod)$col_names$lod
+      )
+    )
+
+    # input is arrow with check_npx metadata ----
+
+    expect_message(
+      object = df_r_arrow_obj <- attach_check_log(
+        df = df_r_arrow,
+        out_df = "arrow"
+      ),
+      regexp = paste("More than one column names in `df` was associated with",
+                     "certain key. One was selected based on an ordered list")
+    )
+
+    expect_message(
+      object = df_r_arrow_obj_lod <- olink_lod(
+        data = df_r_arrow_obj,
+        lod_file_path = "https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/000-documents/10-excel%20file/Reveal%20Fixed%20LOD%20-%20csv%20file.csv", # nolint: line_length_linter
+        lod_method = "FixedLOD"
+      ),
+      regexp = paste("More than one column names in `df` was associated with",
+                     "certain key. One was selected based on an ordered list")
+    )
+
+    expect_true(object = check_is_arrow_object(x = df_r_arrow_obj_lod,
+                                               error = FALSE))
+    expect_true(
+      object = "olink_check_log" %in% names(df_r_arrow_obj_lod$metadata)
+    )
+    expect_true(
+      object = {
+        ncol(x = df_r_arrow_obj_lod) == ncol(x = df_r_arrow_obj) + 2L
+      }
+    )
+    expect_false(
+      object = all(c("LOD", "PCNormalizedLOD") %in% names(df_r_arrow_obj))
+    )
+    expect_true(
+      object = all(c("LOD", "PCNormalizedLOD") %in% names(df_r_arrow_obj_lod))
+    )
+    expect_true(
+      object = all(
+        c( "LOD", "PCNormalizedLOD") %in%
+          olink_check_log(df = df_r_arrow_obj_lod)$col_names$lod
+      )
+    )
+  }
+)
+
 # Test check_ht_fixed_lod_version ----
 
 test_that(
