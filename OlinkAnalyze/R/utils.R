@@ -119,6 +119,29 @@ convert_read_npx_output <- function(df,
 
 }
 
+#' Get the output type for NPX data
+#'
+#' Determines whether a validated dataset is represented as a tibble or an
+#' Arrow object, and returns the corresponding output type.
+#'
+#' @param df A dataset object. Must pass [check_is_dataset()].
+#'
+#' @return A character string indicating the dataset output type:
+#' `"tibble"` if `df` is a tibble, or `"arrow"` if `df` is an Arrow object.
+#'
+#' @keywords internal
+#' @noRd
+#'
+get_read_npx_output <- function(df) {
+  check_is_dataset(x = df, error = TRUE)
+
+  if (check_is_tibble(x = df, error = FALSE)) {
+    return("tibble")
+  } else if (check_is_arrow_object(x = df, error = FALSE)) {
+    return("arrow")
+  }
+}
+
 #' Utility function that adds quotation marks on elements printed by
 #' ansi_collapse from cli.
 #'

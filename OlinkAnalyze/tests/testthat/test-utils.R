@@ -303,6 +303,42 @@ test_that(
   }
 )
 
+# Test get_read_npx_output ----
+
+test_that(
+  "get_read_npx_output - works - returns tibble for tibble input",
+  {
+    df <- tibble::tibble(
+      SampleID = "sample_1",
+      OlinkID = "OID001",
+      NPX = 1.2
+    )
+
+    expect_identical(
+      object = get_read_npx_output(df = df),
+      expected = "tibble"
+    )
+  }
+)
+
+test_that(
+  "get_read_npx_output - works - returns arrow for Arrow object input",
+  {
+    df <- arrow::as_arrow_table(
+      tibble::tibble(
+        SampleID = "sample_1",
+        OlinkID = "OID001",
+        NPX = 1.2
+      )
+    )
+
+    expect_identical(
+      object = get_read_npx_output(df = df),
+      expected = "arrow"
+    )
+  }
+)
+
 # Test ansi_collapse_quot ----
 
 test_that(
