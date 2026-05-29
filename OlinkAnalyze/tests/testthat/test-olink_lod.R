@@ -32,7 +32,9 @@ test_that(
 
     expect_true(object = check_is_tibble(x = df_ht_lod, error = FALSE))
     expect_s3_class(object = df_ht_lod, class = "olink_class")
-    expect_true(object = { ncol(x = df_ht_lod) == ncol(x = df_ht) + 2L })
+    expect_true(object = {
+      ncol(x = df_ht_lod) == ncol(x = df_ht) + 2L
+    })
     expect_false(object = all(c("LOD", "PCNormalizedLOD") %in% names(df_ht)))
     expect_true(object = all(c("LOD", "PCNormalizedLOD") %in% names(df_ht_lod)))
 
@@ -58,9 +60,9 @@ test_that(
     expect_true(object = check_is_arrow_object(x = df_ht_lod_arrow,
                                                error = FALSE))
     expect_true(object = "olink_check_log" %in% names(df_ht_lod_arrow$metadata))
-    expect_true(
-      object = { ncol(x = df_ht_lod_arrow) == ncol(x = df_ht_arrow) + 2L }
-    )
+    expect_true(object = {
+      ncol(x = df_ht_lod_arrow) == ncol(x = df_ht_arrow) + 2L
+    })
     expect_false(
       object = all(c("LOD", "PCNormalizedLOD") %in% names(df_ht_arrow))
     )
@@ -88,9 +90,9 @@ test_that(
 
     expect_true(object = check_is_tibble(x = df_ht_obj_lod, error = FALSE))
     expect_s3_class(object = df_ht_obj_lod, class = "olink_class")
-    expect_true(
-      object = { ncol(x = df_ht_obj_lod) == ncol(x = df_ht_obj) + 2L }
-    )
+    expect_true(object = {
+      ncol(x = df_ht_obj_lod) == ncol(x = df_ht_obj) + 2L
+    })
     expect_false(
       object = all(c("LOD", "PCNormalizedLOD") %in% names(df_ht_obj))
     )
@@ -99,7 +101,7 @@ test_that(
     )
     expect_true(
       object = all(
-        c( "LOD", "PCNormalizedLOD") %in%
+        c("LOD", "PCNormalizedLOD") %in%
           olink_check_log(df = df_ht_obj_lod)$col_names$lod
       )
     )
@@ -143,7 +145,7 @@ test_that(
     )
     expect_true(
       object = all(
-        c( "LOD", "PCNormalizedLOD") %in%
+        c("LOD", "PCNormalizedLOD") %in%
           olink_check_log(df = df_ht_arrow_obj_lod)$col_names$lod
       )
     )
@@ -182,7 +184,9 @@ test_that(
 
     expect_true(object = check_is_tibble(x = df_r_lod, error = FALSE))
     expect_s3_class(object = df_r_lod, class = "olink_class")
-    expect_true(object = { ncol(x = df_r_lod) == ncol(x = df_r) + 2L })
+    expect_true(object = {
+      ncol(x = df_r_lod) == ncol(x = df_r) + 2L
+    })
     expect_false(object = all(c("LOD", "PCNormalizedLOD") %in% names(df_r)))
     expect_true(object = all(c("LOD", "PCNormalizedLOD") %in% names(df_r_lod)))
 
@@ -208,9 +212,9 @@ test_that(
     expect_true(object = check_is_arrow_object(x = df_r_lod_arrow,
                                                error = FALSE))
     expect_true(object = "olink_check_log" %in% names(df_r_lod_arrow$metadata))
-    expect_true(
-      object = { ncol(x = df_r_lod_arrow) == ncol(x = df_r_arrow) + 2L }
-    )
+    expect_true(object = {
+      ncol(x = df_r_lod_arrow) == ncol(x = df_r_arrow) + 2L
+    })
     expect_false(
       object = all(c("LOD", "PCNormalizedLOD") %in% names(df_r_arrow))
     )
@@ -238,9 +242,9 @@ test_that(
 
     expect_true(object = check_is_tibble(x = df_r_obj_lod, error = FALSE))
     expect_s3_class(object = df_r_obj_lod, class = "olink_class")
-    expect_true(
-      object = { ncol(x = df_r_obj_lod) == ncol(x = df_r_obj) + 2L }
-    )
+    expect_true(object = {
+      ncol(x = df_r_obj_lod) == ncol(x = df_r_obj) + 2L
+    })
     expect_false(
       object = all(c("LOD", "PCNormalizedLOD") %in% names(df_r_obj))
     )
@@ -249,7 +253,7 @@ test_that(
     )
     expect_true(
       object = all(
-        c( "LOD", "PCNormalizedLOD") %in%
+        c("LOD", "PCNormalizedLOD") %in%
           olink_check_log(df = df_r_obj_lod)$col_names$lod
       )
     )
@@ -293,7 +297,7 @@ test_that(
     )
     expect_true(
       object = all(
-        c( "LOD", "PCNormalizedLOD") %in%
+        c("LOD", "PCNormalizedLOD") %in%
           olink_check_log(df = df_r_arrow_obj_lod)$col_names$lod
       )
     )
@@ -332,7 +336,9 @@ test_that(
 
     expect_true(object = check_is_tibble(x = df_3k_lod, error = FALSE))
     expect_s3_class(object = df_3k_lod, class = "olink_class")
-    expect_true(object = { ncol(x = df_3k_lod) == ncol(x = df_3k) + 2L })
+    expect_true(object = {
+      ncol(x = df_3k_lod) == ncol(x = df_3k) + 2L
+    })
     expect_false(
       object = all(c("LOD", "PCNormalizedLOD") %in% names(df_3k))
     )
@@ -360,9 +366,9 @@ test_that(
     expect_true(object = check_is_arrow_object(x = df_3k_lod_arrow,
                                                error = FALSE))
     expect_true(object = "olink_check_log" %in% names(df_3k_lod_arrow$metadata))
-    expect_true(
-      object = { ncol(x = df_3k_lod_arrow) == ncol(x = df_3k_arrow) + 2L }
-    )
+    expect_true(object = {
+      ncol(x = df_3k_lod_arrow) == ncol(x = df_3k_arrow) + 2L
+    })
     expect_false(
       object = all(c("LOD", "PCNormalizedLOD") %in% names(df_3k_arrow))
     )
@@ -390,9 +396,9 @@ test_that(
 
     expect_true(object = check_is_tibble(x = df_3k_obj_lod, error = FALSE))
     expect_s3_class(object = df_3k_obj_lod, class = "olink_class")
-    expect_true(
-      object = { ncol(x = df_3k_obj_lod) == ncol(x = df_3k_obj) + 2L }
-    )
+    expect_true(object = {
+      ncol(x = df_3k_obj_lod) == ncol(x = df_3k_obj) + 2L
+    })
     expect_false(
       object = all(c("LOD", "PCNormalizedLOD") %in% names(df_3k_obj))
     )
@@ -401,7 +407,7 @@ test_that(
     )
     expect_true(
       object = all(
-        c( "LOD", "PCNormalizedLOD") %in%
+        c("LOD", "PCNormalizedLOD") %in%
           olink_check_log(df = df_3k_obj_lod)$col_names$lod
       )
     )
@@ -445,7 +451,7 @@ test_that(
     )
     expect_true(
       object = all(
-        c( "LOD", "PCNormalizedLOD") %in%
+        c("LOD", "PCNormalizedLOD") %in%
           olink_check_log(df = df_3k_arrow_obj_lod)$col_names$lod
       )
     )

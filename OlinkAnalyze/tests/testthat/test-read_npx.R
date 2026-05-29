@@ -396,7 +396,7 @@ test_that(
         # making some harmless minor modifications to enable the match
         expect_equal(
           object = lst_df$df_expected |>
-          strip_check_log() |>
+            strip_check_log() |>
             dplyr::mutate(
               Panel = toupper(.data[["Panel"]])
             ),

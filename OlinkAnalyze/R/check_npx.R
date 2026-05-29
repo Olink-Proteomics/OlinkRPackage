@@ -279,14 +279,15 @@ get_preferred_names <- function(df,
   )
 
   same_content <- function(x, y) {
-    identical(x = sort(x), y = sort(y))
+    z <- identical(x = sort(x), y = sort(y))
+    return(z)
   }
 
   different_content <- shared_names[
     vapply(
       shared_names,
       function(nm) {
-        !same_content(
+        !same_content( # nolint: return_linter
           x = check_log_names[[nm]],
           y = check_log_local_names[[nm]]
         )

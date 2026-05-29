@@ -325,7 +325,8 @@ run_clean_npx <- function(df, ...) {
       what = clean_npx,
       args = c(list(df = df),
                dots,
-               list(verbose = FALSE))),
+               list(verbose = FALSE))
+    ),
     message = function(m) invokeRestart("muffleMessage"),
     warning = function(w) invokeRestart("muffleWarning")
   )
