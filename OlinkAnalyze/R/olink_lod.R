@@ -86,7 +86,8 @@ olink_lod <- function(data,
     df = data,
     check_log = check_log,
     preferred_names = NULL # no need to specify preferred names here
-  )# get preferred column names to assign to output dataset
+  )
+  # get preferred column names to assign to output dataset
   preferred_names <- get_preferred_names(
     df = data,
     check_log = check_log
