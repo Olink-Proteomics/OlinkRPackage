@@ -16,16 +16,29 @@ test_that(
         )
 
         # check that data can be loaded
-        expect_no_condition(
-          object = npx_df <- read_NPX(filename = tmp_long_parquet,
-                                      out_df = "tibble")
+        expect_no_error(
+          object = expect_no_warning(
+            object = expect_message(
+              object = npx_df <- read_NPX(filename = tmp_long_parquet,
+                                          out_df = "tibble"),
+              regexp = paste("More than one column names in `df` was",
+                             "associated with certain key. One was selected",
+                             "based on an ordered list")
+            )
+          )
         )
 
-        expect_no_condition(
-          object = npx_arrow <- read_NPX(filename = tmp_long_parquet,
-                                         out_df = "arrow")
+        expect_no_error(
+          object = expect_no_warning(
+            object = expect_message(
+              object = npx_arrow <- read_NPX(filename = tmp_long_parquet,
+                                             out_df = "arrow"),
+              regexp = paste("More than one column names in `df` was",
+                             "associated with certain key. One was selected",
+                             "based on an ordered list")
+            )
+          )
         )
-
         # check that data frame exists
         expect(ok = exists("npx_df"),
                failure_message = "failed to read long paruqet in tibble")
@@ -56,9 +69,28 @@ test_that(
                        "SampleQC", "ExploreVersion")
         )
 
+        # check that check_log was attached
+        expect_identical(
+          object = olink_check_log(df = npx_df),
+          expected = check_npx(df = npx_df) |>
+            suppressMessages() |>
+            suppressWarnings()
+        )
+        expect_identical(
+          object = olink_check_log(df = npx_arrow),
+          expected = check_npx(df = npx_arrow) |>
+            suppressMessages() |>
+            suppressWarnings()
+        )
+
         # check identical to reference
         expect_equal(
-          object = npx_df,
+          object = strip_check_log(df = npx_df),
+          expected = ref_res$npx_data_parquet,
+          tolerance = 1e-4
+        )
+        expect_equal(
+          object = strip_check_log(df = npx_arrow) |> dplyr::collect(),
           expected = ref_res$npx_data_parquet,
           tolerance = 1e-4
         )
@@ -85,13 +117,25 @@ test_that(
         )
 
         # check that data can be loaded
-        expect_no_condition(
-          object = npx_df <- read_NPX(filename = tmp_long_csv,
-                                      out_df = "tibble")
+        expect_no_error(
+          object = expect_no_warning(
+            object = expect_message(
+              object = npx_df <- read_NPX(filename = tmp_long_csv,
+                                          out_df = "tibble"),
+              regexp = paste("1 assay exhibited assay QC warnings in column",
+                             "`Assay_Warning` of the dataset: \"OID30358\".")
+            )
+          )
         )
-        expect_no_condition(
-          object = npx_arrow <- read_NPX(filename = tmp_long_csv,
-                                         out_df = "arrow")
+        expect_no_error(
+          object = expect_no_warning(
+            object = expect_message(
+              object = npx_arrow <- read_NPX(filename = tmp_long_csv,
+                                             out_df = "arrow"),
+              regexp = paste("1 assay exhibited assay QC warnings in column",
+                             "`Assay_Warning` of the dataset: \"OID30358\".")
+            )
+          )
         )
 
         # check that data frame exists
@@ -123,9 +167,28 @@ test_that(
           expected = expected_colnames
         )
 
+        # check that check_log was attached
+        expect_identical(
+          object = olink_check_log(df = npx_df),
+          expected = check_npx(df = npx_df) |>
+            suppressMessages() |>
+            suppressWarnings()
+        )
+        expect_identical(
+          object = olink_check_log(df = npx_arrow),
+          expected = check_npx(df = npx_arrow) |>
+            suppressMessages() |>
+            suppressWarnings()
+        )
+
         # check identical to reference
         expect_equal(
-          object = npx_df,
+          object = strip_check_log(df = npx_df),
+          expected = ref_res$npx_data_long_csv,
+          tolerance = 1e-4
+        )
+        expect_equal(
+          object = strip_check_log(df = npx_arrow) |> dplyr::collect(),
           expected = ref_res$npx_data_long_csv,
           tolerance = 1e-4
         )
@@ -154,13 +217,33 @@ test_that(
         )
 
         # check that data can be loaded
-        expect_no_condition(
-          object = npx_df <- read_NPX(filename = tmp_long_csv_zip,
-                                      out_df = "tibble")
+        expect_no_error(
+          object = expect_no_warning(
+            object = expect_message(
+              object = expect_message(
+                object = npx_df <- read_NPX(filename = tmp_long_csv_zip,
+                                            out_df = "tibble"),
+                regexp = paste("1 assay exhibited assay QC warnings in column",
+                               "`Assay_Warning` of the dataset: \"OID30358\".")
+              ),
+              regexp = paste("1 assay exhibited assay QC warnings in column",
+                             "`Assay_Warning` of the dataset: \"OID30358\".")
+            )
+          )
         )
-        expect_no_condition(
-          object = npx_arrow <- read_NPX(filename = tmp_long_csv_zip,
-                                         out_df = "arrow")
+        expect_no_error(
+          object = expect_no_warning(
+            object = expect_message(
+              object = expect_message(
+                object = npx_arrow <- read_NPX(filename = tmp_long_csv_zip,
+                                               out_df = "arrow"),
+                regexp = paste("1 assay exhibited assay QC warnings in column",
+                               "`Assay_Warning` of the dataset: \"OID30358\".")
+              ),
+              regexp = paste("1 assay exhibited assay QC warnings in column",
+                             "`Assay_Warning` of the dataset: \"OID30358\".")
+            )
+          )
         )
 
         # check that data frame exists
@@ -192,9 +275,28 @@ test_that(
           expected = expected_colnames
         )
 
+        # check that check_log was attached
+        expect_identical(
+          object = olink_check_log(df = npx_df),
+          expected = check_npx(df = npx_df) |>
+            suppressMessages() |>
+            suppressWarnings()
+        )
+        expect_identical(
+          object = olink_check_log(df = npx_arrow),
+          expected = check_npx(df = npx_arrow) |>
+            suppressMessages() |>
+            suppressWarnings()
+        )
+
         # check identical to reference
         expect_equal(
-          object = npx_df,
+          object = strip_check_log(df = npx_df),
+          expected = ref_res$npx_data_long_zip,
+          tolerance = 1e-4
+        )
+        expect_equal(
+          object = strip_check_log(df = npx_arrow) |> dplyr::collect(),
           expected = ref_res$npx_data_long_zip,
           tolerance = 1e-4
         )
@@ -223,15 +325,35 @@ test_that(
         )
 
         # check that data can be loaded
-        expect_message(
-          object = npx_df <- read_NPX(filename = tmp_wide_xlsx,
-                                      out_df = "tibble"),
-          regexp = "Identified 2 duplicates!"
+        expect_no_error(
+          object = expect_warning(
+            object = expect_warning(
+              object = expect_message(
+                object = npx_df <- read_NPX(filename = tmp_wide_xlsx,
+                                            out_df = "tibble"),
+                regexp = "Identified 2 duplicates!"
+              ),
+              regexp = paste("Duplicate SampleIDs detected:",
+                             "\"CONTROL_SAMPLE_AS 1\" and",
+                             "\"CONTROL_SAMPLE_AS 2\"")
+            ),
+            regexp = "Detected columns with incorrect data types"
+          )
         )
-        expect_message(
-          object = npx_arrow <- read_NPX(filename = tmp_wide_xlsx,
-                                         out_df = "arrow"),
-          regexp = "Identified 2 duplicates!"
+        expect_no_error(
+          object = expect_warning(
+            object = expect_warning(
+              object = expect_message(
+                object = npx_arrow <- read_NPX(filename = tmp_wide_xlsx,
+                                               out_df = "arrow"),
+                regexp = "Identified 2 duplicates!"
+              ),
+              regexp = paste("Duplicate SampleIDs detected:",
+                             "\"CONTROL_SAMPLE_AS 1\" and",
+                             "\"CONTROL_SAMPLE_AS 2\"")
+            ),
+            regexp = "Detected columns with incorrect data types"
+          )
         )
 
         # check that data frame exists
@@ -274,6 +396,7 @@ test_that(
         # making some harmless minor modifications to enable the match
         expect_equal(
           object = lst_df$df_expected |>
+          strip_check_log() |>
             dplyr::mutate(
               Panel = toupper(.data[["Panel"]])
             ),
@@ -283,6 +406,20 @@ test_that(
               Panel = toupper(.data[["Panel"]])
             ),
           tolerance = 1e-4
+        )
+
+        # check that check_log was attached
+        expect_identical(
+          object = olink_check_log(df = npx_df),
+          expected = check_npx(df = npx_df) |>
+            suppressMessages() |>
+            suppressWarnings()
+        )
+        expect_identical(
+          object = olink_check_log(df = npx_arrow),
+          expected = check_npx(df = npx_arrow) |>
+            suppressMessages() |>
+            suppressWarnings()
         )
       }
     )
@@ -316,23 +453,45 @@ test_that(
         )
 
         # check that data can be loaded
-        expect_message(
+        expect_no_error(
           object = expect_warning(
-            object = npx_df <- read_NPX(filename = tmp_wide_xlsx,
-                                        olink_platform = "Target 96",
-                                        out_df = "tibble"),
-            regexp = "Unable to recognize the Olink platform from the input"
-          ),
-          regexp = "Identified 2 duplicates!"
+            object = expect_warning(
+              expect_message(
+                object = expect_warning(
+                  object = npx_df <- read_NPX(filename = tmp_wide_xlsx,
+                                              olink_platform = "Target 96",
+                                              out_df = "tibble"),
+                  regexp = paste("Unable to recognize the Olink platform from",
+                                 "the input file")
+                ),
+                regexp = "Identified 2 duplicates!"
+              ),
+              regexp = paste("Duplicate SampleIDs detected:",
+                             "\"CONTROL_SAMPLE_AS 1\" and",
+                             "\"CONTROL_SAMPLE_AS 2\"")
+            ),
+            regexp = "Detected columns with incorrect data types"
+          )
         )
-        expect_message(
+        expect_no_error(
           object = expect_warning(
-            object = npx_arrow <- read_NPX(filename = tmp_wide_xlsx,
-                                           olink_platform = "Target 96",
-                                           out_df = "arrow"),
-            regexp = "Unable to recognize the Olink platform from the input"
-          ),
-          regexp = "Identified 2 duplicates!"
+            object = expect_warning(
+              expect_message(
+                object = expect_warning(
+                  object = npx_arrow <- read_NPX(filename = tmp_wide_xlsx,
+                                                 olink_platform = "Target 96",
+                                                 out_df = "arrow"),
+                  regexp = paste("Unable to recognize the Olink platform from",
+                                 "the input file")
+                ),
+                regexp = "Identified 2 duplicates!"
+              ),
+              regexp = paste("Duplicate SampleIDs detected:",
+                             "\"CONTROL_SAMPLE_AS 1\" and",
+                             "\"CONTROL_SAMPLE_AS 2\"")
+            ),
+            regexp = "Detected columns with incorrect data types"
+          )
         )
 
         # check that data frame exists
@@ -375,6 +534,7 @@ test_that(
         # making some harmless minor modifications to enable the match
         expect_equal(
           object = lst_df$df_expected |>
+            strip_check_log() |>
             dplyr::mutate(
               Panel = toupper(.data[["Panel"]])
             ),
@@ -384,6 +544,20 @@ test_that(
               Panel = toupper(.data[["Panel"]])
             ),
           tolerance = 1e-4
+        )
+
+        # check that check_log was attached
+        expect_identical(
+          object = olink_check_log(df = npx_df),
+          expected = check_npx(df = npx_df) |>
+            suppressMessages() |>
+            suppressWarnings()
+        )
+        expect_identical(
+          object = olink_check_log(df = npx_arrow),
+          expected = check_npx(df = npx_arrow) |>
+            suppressMessages() |>
+            suppressWarnings()
         )
       }
     )
@@ -415,23 +589,45 @@ test_that(
         )
 
         # check that data can be loaded
-        expect_message(
+        expect_no_error(
           object = expect_warning(
-            object = npx_df <- read_NPX(filename = tmp_wide_csv,
-                                        olink_platform = "Target 96",
-                                        out_df = "tibble"),
-            regexp = "Unable to recognize the Olink platform from the input"
-          ),
-          regexp = "Identified 2 duplicates!"
+            object = expect_warning(
+              expect_message(
+                object = expect_warning(
+                  object = npx_df <- read_NPX(filename = tmp_wide_csv,
+                                              olink_platform = "Target 96",
+                                              out_df = "tibble"),
+                  regexp = paste("Unable to recognize the Olink platform from",
+                                 "the input file")
+                ),
+                regexp = "Identified 2 duplicates!"
+              ),
+              regexp = paste("Duplicate SampleIDs detected:",
+                             "\"CONTROL_SAMPLE_AS 1\" and",
+                             "\"CONTROL_SAMPLE_AS 2\"")
+            ),
+            regexp = "Detected columns with incorrect data types"
+          )
         )
-        expect_message(
+        expect_no_error(
           object = expect_warning(
-            object = npx_arrow <- read_NPX(filename = tmp_wide_csv,
-                                           olink_platform = "Target 96",
-                                           out_df = "arrow"),
-            regexp = "Unable to recognize the Olink platform from the input"
-          ),
-          regexp = "Identified 2 duplicates!"
+            object = expect_warning(
+              expect_message(
+                object = expect_warning(
+                  object = npx_arrow <- read_NPX(filename = tmp_wide_csv,
+                                                 olink_platform = "Target 96",
+                                                 out_df = "arrow"),
+                  regexp = paste("Unable to recognize the Olink platform from",
+                                 "the input file")
+                ),
+                regexp = "Identified 2 duplicates!"
+              ),
+              regexp = paste("Duplicate SampleIDs detected:",
+                             "\"CONTROL_SAMPLE_AS 1\" and",
+                             "\"CONTROL_SAMPLE_AS 2\"")
+            ),
+            regexp = "Detected columns with incorrect data types"
+          )
         )
 
         # check that data frame exists
@@ -480,6 +676,7 @@ test_that(
         # making some harmless minor modifications to enable the match
         expect_equal(
           object = lst_df$df_expected |>
+            strip_check_log() |>
             dplyr::mutate(
               Panel = toupper(.data[["Panel"]])
             ),
@@ -489,6 +686,20 @@ test_that(
               Panel = toupper(.data[["Panel"]])
             ),
           tolerance = 1e-4
+        )
+
+        # check that check_log was attached
+        expect_identical(
+          object = olink_check_log(df = npx_df),
+          expected = check_npx(df = npx_df) |>
+            suppressMessages() |>
+            suppressWarnings()
+        )
+        expect_identical(
+          object = olink_check_log(df = npx_arrow),
+          expected = check_npx(df = npx_arrow) |>
+            suppressMessages() |>
+            suppressWarnings()
         )
       }
     )
@@ -517,16 +728,20 @@ test_that(
         # check that data can be loaded
         expect_warning(
           object = expect_warning(
-            object = npx_df <- read_NPX(filename = tmp_wide_xlsx,
-                                        olink_platform = "Target 96",
-                                        out_df = "tibble",
-                                        long_format = FALSE,
-                                        data_type = "NPX",
-                                        legacy = TRUE,
-                                        quiet = TRUE),
-            regexp = "You are using the function read_npx_legacy"
+            object = expect_warning(
+              object = npx_df <- read_NPX(filename = tmp_wide_xlsx,
+                                          olink_platform = "Target 96",
+                                          out_df = "tibble",
+                                          long_format = FALSE,
+                                          data_type = "NPX",
+                                          legacy = TRUE,
+                                          quiet = TRUE),
+              regexp = "You are using the function read_npx_legacy"
+            ),
+            regexp = "Unable to recognize the Olink platform from the input"
           ),
-          regexp = "Unable to recognize the Olink platform from the input"
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
         )
 
         # check that data frame exists
@@ -556,6 +771,7 @@ test_that(
 
         expect_equal(
           object = npx_df |>
+            strip_check_log() |>
             dplyr::arrange(
               .data[["OlinkID"]], .data[["Assay"]], .data[["SampleID"]]
             ),
@@ -567,6 +783,14 @@ test_that(
               .data[["OlinkID"]], .data[["Assay"]], .data[["SampleID"]]
             ),
           tolerance = 1e-4
+        )
+
+        # check that check_log was attached
+        expect_identical(
+          object = olink_check_log(df = npx_df),
+          expected = check_npx(df = npx_df) |>
+            suppressMessages() |>
+            suppressWarnings()
         )
       }
     )
