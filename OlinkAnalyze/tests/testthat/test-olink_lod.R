@@ -3,6 +3,8 @@
 test_that(
   "olink_lod - works - Explore HT",
   {
+    ht_fixed_lod_url <- "https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/000-documents/10-excel%20file/Explore%20HT_Fixed%20LOD.csv" # nolint: line_length_linter
+
     # input is tibble ----
 
     df_ht <- get_example_data("example_HT_data.rds")
@@ -21,7 +23,7 @@ test_that(
       object = df_ht_lod <- olink_lod(
         data = df_ht,
         check_log = check_log,
-        lod_file_path = "https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/000-documents/10-excel%20file/Explore%20HT_Fixed%20LOD.csv", # nolint: line_length_linter
+        lod_file_path = ht_fixed_lod_url,
         lod_method = "FixedLOD"
       ),
       regexp = paste("More than one column names in `df` was associated with",
@@ -46,7 +48,7 @@ test_that(
       object = df_ht_lod_arrow <- olink_lod(
         data = df_ht_arrow,
         check_log = check_log_arrow,
-        lod_file_path = "https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/000-documents/10-excel%20file/Explore%20HT_Fixed%20LOD.csv", # nolint: line_length_linter
+        lod_file_path = ht_fixed_lod_url,
         lod_method = "FixedLOD"
       ),
       regexp = paste("More than one column names in `df` was associated with",
@@ -77,7 +79,7 @@ test_that(
     expect_message(
       object = df_ht_obj_lod <- olink_lod(
         data = df_ht_obj,
-        lod_file_path = "https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/000-documents/10-excel%20file/Explore%20HT_Fixed%20LOD.csv", # nolint: line_length_linter
+        lod_file_path = ht_fixed_lod_url,
         lod_method = "FixedLOD"
       ),
       regexp = paste("More than one column names in `df` was associated with",
@@ -116,7 +118,7 @@ test_that(
     expect_message(
       object = df_ht_arrow_obj_lod <- olink_lod(
         data = df_ht_arrow_obj,
-        lod_file_path = "https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/000-documents/10-excel%20file/Explore%20HT_Fixed%20LOD.csv", # nolint: line_length_linter
+        lod_file_path = ht_fixed_lod_url,
         lod_method = "FixedLOD"
       ),
       regexp = paste("More than one column names in `df` was associated with",
@@ -151,6 +153,8 @@ test_that(
 test_that(
   "olink_lod - works - Reveal",
   {
+    reveal_fixed_lod_url <- "https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/000-documents/10-excel%20file/Reveal%20Fixed%20LOD%20-%20csv%20file.csv" # nolint: line_length_linter
+
     # input is tibble ----
 
     df_r <- get_example_data("example_Reveal_data.rds")
@@ -169,7 +173,7 @@ test_that(
       object = df_r_lod <- olink_lod(
         data = df_r,
         check_log = check_log,
-        lod_file_path = "https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/000-documents/10-excel%20file/Reveal%20Fixed%20LOD%20-%20csv%20file.csv", # nolint: line_length_linter
+        lod_file_path = reveal_fixed_lod_url,
         lod_method = "FixedLOD"
       ),
       regexp = paste("More than one column names in `df` was associated with",
@@ -194,7 +198,7 @@ test_that(
       object = df_r_lod_arrow <- olink_lod(
         data = df_r_arrow,
         check_log = check_log_arrow,
-        lod_file_path = "https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/000-documents/10-excel%20file/Reveal%20Fixed%20LOD%20-%20csv%20file.csv", # nolint: line_length_linter
+        lod_file_path = reveal_fixed_lod_url,
         lod_method = "FixedLOD"
       ),
       regexp = paste("More than one column names in `df` was associated with",
@@ -225,7 +229,7 @@ test_that(
     expect_message(
       object = df_r_obj_lod <- olink_lod(
         data = df_r_obj,
-        lod_file_path = "https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/000-documents/10-excel%20file/Reveal%20Fixed%20LOD%20-%20csv%20file.csv", # nolint: line_length_linter
+        lod_file_path = reveal_fixed_lod_url,
         lod_method = "FixedLOD"
       ),
       regexp = paste("More than one column names in `df` was associated with",
@@ -264,7 +268,7 @@ test_that(
     expect_message(
       object = df_r_arrow_obj_lod <- olink_lod(
         data = df_r_arrow_obj,
-        lod_file_path = "https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/000-documents/10-excel%20file/Reveal%20Fixed%20LOD%20-%20csv%20file.csv", # nolint: line_length_linter
+        lod_file_path = reveal_fixed_lod_url,
         lod_method = "FixedLOD"
       ),
       regexp = paste("More than one column names in `df` was associated with",
