@@ -264,7 +264,9 @@ get_preferred_names <- function(df,
   validate_check_log(df = df, check_log = check_log)
   check_log_names <- check_log$col_names
 
-  check_log_local_names <- check_npx_col_names(df = df)
+  check_log_local_names <- check_npx_col_names(df = df) |>
+    suppressMessages() |>
+    suppressWarnings()
 
   only_in_check_log <- setdiff(
     x = names(check_log_names),
