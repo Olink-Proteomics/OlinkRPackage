@@ -1,5 +1,5 @@
 test_that(
-  "olink_one_non_parametric - works - match reference results",
+  "olink_one_non_parametric - works - Friedman - match reference results",
   {
     # load reference results
     ref_results <- get_example_data(filename = "reference_results.rds")
@@ -26,39 +26,39 @@ test_that(
       suppressMessages() |>
       suppressWarnings()
 
-    # ---- test kruskal with reference file ----
-
+    # ---- test friedman with reference file ----
     expect_message(
       object = expect_message(
-        object = kruskal_results <- olink_one_non_parametric(
+        object = friedman_results <- olink_one_non_parametric(
           df = npx_data1_noctrl,
           check_log = check_log_noctrl,
-          variable = "Site"
+          variable = "Time",
+          subject = "Subject",
+          dependence = TRUE
         ),
-        regexp = "Variables converted from character to factors: \"Site\"",
+        regexp = "Variables converted from character to factors: \"Time\"",
         fixed = TRUE
       ),
-      regexp = "Kruskal model fit to each assay: `NPX~Site`",
+      regexp = "Friedman model fit to each assay: `NPX~Time`",
       fixed = TRUE
     )
 
     expect_equal(
-      object = kruskal_results,
-      expected = ref_results$kruskal
+      object = friedman_results,
+      expected = ref_results$friedman
     )
 
     expect_equal(
-      object = nrow(kruskal_results),
+      object = nrow(friedman_results),
       expected = 184
     )
-
     expect_equal(
-      object = ncol(kruskal_results),
+      object = ncol(friedman_results),
       expected = 11
     )
 
-    # ---- test posthoc test for the results from Kruskal-Wallis test ----
-    sig_oids <- kruskal_results |>
+    # ---- test posthoc test for the results from Friedman test ----
+    sig_oids <- friedman_results |>
       dplyr::filter(.data[["Threshold"]] == "Significant") |>
       dplyr::select(dplyr::all_of(c("OlinkID"))) |>
       dplyr::distinct() |>
@@ -66,47 +66,46 @@ test_that(
 
     expect_message(
       object = expect_message(
-        object = kruskal_posthoc_results <- olink_one_non_parametric_posthoc(
+        object = friedman_posthoc_results <- olink_one_non_parametric_posthoc(
           df = npx_data1_noctrl,
           check_log = check_log_noctrl,
-          variable = "Site",
-          test = "kruskal",
+          variable = "Time",
+          test = "friedman",
+          subject = "Subject",
           olinkid_list = sig_oids
         ) |>
           dplyr::mutate(id = as.character(.data[["OlinkID"]])) |>
           dplyr::arrange(id, contrast) |> # for consistency.
           dplyr::select(-id),
-        regexp = "Variables converted from character to factors: \"Site\"",
+        regexp = "Variables converted from character to factors: \"Time\"",
         fixed = TRUE
       ),
       regexp = paste0(
-        "Pairwise comparisons for Kruskal-Wallis test using ",
-        "Dunn test were performed"
+        "Pairwise comparisons for Friedman test using ",
+        "paired Wilcoxon signed-rank test were performed"
       ),
       fixed = TRUE
     )
 
     expect_equal(
-      object = kruskal_posthoc_results |>
-        # for consistency
-        dplyr::arrange(.data[["OlinkID"]], .data[["contrast"]]),
-      expected = ref_results$kruskal_posthoc |>
-        # for consistency
-        dplyr::arrange(.data[["OlinkID"]], .data[["contrast"]])
+      object = friedman_posthoc_results,
+      expected = ref_results$friedman_posthoc
     )
 
     expect_equal(
-      object = nrow(kruskal_posthoc_results),
-      expected = 190
+      object = nrow(friedman_posthoc_results),
+      expected = 3
     )
 
     expect_equal(
-      object = kruskal_posthoc_results |>
+      object = friedman_posthoc_results |>
         dplyr::select(contrast) |>
         unique() |>
         nrow(),
-      expected = 10
+      expected = 3
     )
+  }
+)
 
     # ---- test friedman with reference file ----
     expect_message(
