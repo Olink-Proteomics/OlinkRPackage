@@ -1,4 +1,4 @@
-# olink_one_non_parametric - works - KW - ref results - legacy dunn.test
+# olink_one_non_parametric - works - KW - match reference results
 
     Code
       kruskal_posthoc_results
