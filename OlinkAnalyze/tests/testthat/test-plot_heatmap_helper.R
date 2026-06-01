@@ -235,7 +235,8 @@ test_that(
         show_rownames = TRUE,
         show_colnames = TRUE,
         annotation_legend = TRUE,
-        fontsize = 10
+        fontsize = 10,
+        annotation_colors = NA
       )
     )
 
@@ -287,9 +288,11 @@ test_that(
           tibble::column_to_rownames(
             var = "assay"
           ),
-        annot_col_int = list(
-          Assay_Warning = olink_pal()(5L)[1L:2L],
-          treatment2 = olink_pal()(5L)[3L:5L]
+        annotation_colors = list(
+          Assay_Warning = setNames(object = olink_pal()(5L)[1L:2L],
+                                   nm = c("", "PASS")),
+          treatment2 = setNames(object = olink_pal()(5L)[3L:5L],
+                                nm = LETTERS[1L:3L])
         )
       )
     )
@@ -323,7 +326,8 @@ test_that(
         show_colnames = TRUE,
         annotation_legend = TRUE,
         fontsize = 10,
-        cuttree_rows = 3L
+        cuttree_rows = 3L,
+        annotation_colors = NA
       )
     )
   }
