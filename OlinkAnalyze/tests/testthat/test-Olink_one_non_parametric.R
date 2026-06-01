@@ -87,8 +87,12 @@ test_that(
     )
 
     expect_equal(
-      object = kruskal_posthoc_results,
-      expected = ref_results$kruskal_posthoc
+      object = kruskal_posthoc_results |>
+        # for consistency
+        dplyr::arrange(.data[["OlinkID"]], .data[["contrast"]]),
+      expected = ref_results$kruskal_posthoc |>
+        # for consistency
+        dplyr::arrange(.data[["OlinkID"]], .data[["contrast"]])
     )
 
     expect_equal(
