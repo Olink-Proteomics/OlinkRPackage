@@ -112,11 +112,21 @@ test_that(
       code = {
         # write the coma-delimited file
         dplyr::tibble(
-          "A" = c(1, 2.2, 3.14),
-          "B" = c("a", "b", "c"),
-          "C" = c(TRUE, TRUE, FALSE),
-          "D" = c("NA", "B", NA_character_),
-          "E" = c(1L, 2L, 3L)
+          "SampleID" = paste("Sample", 1L:5L, sep = "_"),
+          "OlinkID" = paste0("OID",
+                             stringr::str_pad(
+                               string = as.character(1L:5L),
+                               width = 5L,
+                               side = "left",
+                               pad = "0"
+                             )),
+          "UniProt" = letters[1L:5L],
+          "Assay" = letters[1L:5L],
+          "Panel" = "Panel1",
+          "PlateID" = "Plate1",
+          "PanelVersion" = "PanelVersion1",
+          "NPX" = c(1, 2.2, 3.14, 5.1, -2.8),
+          "QC_Warning" = rep(x = "PASS", times = 5L)
         ) |>
           utils::write.table(
             file = nfile_test,
@@ -150,16 +160,16 @@ test_that(
             expect_true(object = file.exists(zfile_test))
 
             # check that this works
-            # warning comes from read_npx_format because the long file is
-            # totally made up.
-            expect_warning(
-              object = read_npx_zip(file = zfile_test,
-                                    out_df = "arrow",
-                                    long_format = TRUE,
-                                    quiet = TRUE),
-              regexp = "Unable to confirm the \"long\" format from the input"
+            expect_no_error(
+              object = expect_no_warning(
+                object = expect_no_message(
+                  object = read_npx_zip(file = zfile_test,
+                                        out_df = "arrow",
+                                        long_format = TRUE,
+                                        quiet = TRUE)
+                )
+              )
             )
-
           }
         )
       }
@@ -186,11 +196,21 @@ test_that(
       code = {
         # write the coma-delimited file
         dplyr::tibble(
-          "A" = c(1, 2.2, 3.14),
-          "B" = c("a", "b", "c"),
-          "C" = c(TRUE, TRUE, FALSE),
-          "D" = c("NA", "B", NA_character_),
-          "E" = c(1L, 2L, 3L)
+          "SampleID" = paste("Sample", 1L:5L, sep = "_"),
+          "OlinkID" = paste0("OID",
+                             stringr::str_pad(
+                               string = as.character(1L:5L),
+                               width = 5L,
+                               side = "left",
+                               pad = "0"
+                             )),
+          "UniProt" = letters[1L:5L],
+          "Assay" = letters[1L:5L],
+          "Panel" = "Panel1",
+          "PlateID" = "Plate1",
+          "PanelVersion" = "PanelVersion1",
+          "NPX" = c(1, 2.2, 3.14, 5.1, -2.8),
+          "QC_Warning" = rep(x = "PASS", times = 5L)
         ) |>
           utils::write.table(
             file = nfile_test,
@@ -224,14 +244,15 @@ test_that(
             expect_true(object = file.exists(zfile_test))
 
             # check that this works
-            # warning comes from read_npx_format because the long file is
-            # totally made up.
-            expect_warning(
-              object = read_npx_zip(file = zfile_test,
-                                    out_df = "arrow",
-                                    long_format = TRUE,
-                                    quiet = TRUE),
-              regexp = "Unable to confirm the \"long\" format from the input"
+            expect_no_error(
+              object = expect_no_warning(
+                object = expect_no_message(
+                  object = read_npx_zip(file = zfile_test,
+                                        out_df = "arrow",
+                                        long_format = TRUE,
+                                        quiet = TRUE)
+                )
+              )
             )
           }
         )
@@ -264,11 +285,21 @@ test_that(
       code = {
         # write the coma-delimited file
         dplyr::tibble(
-          "A" = c(1, 2.2, 3.14),
-          "B" = c("a", "b", "c"),
-          "C" = c(TRUE, TRUE, FALSE),
-          "D" = c("NA", "B", NA_character_),
-          "E" = c(1L, 2L, 3L)
+          "SampleID" = paste("Sample", 1L:5L, sep = "_"),
+          "OlinkID" = paste0("OID",
+                             stringr::str_pad(
+                               string = as.character(1L:5L),
+                               width = 5L,
+                               side = "left",
+                               pad = "0"
+                             )),
+          "UniProt" = letters[1L:5L],
+          "Assay" = letters[1L:5L],
+          "Panel" = "Panel1",
+          "PlateID" = "Plate1",
+          "PanelVersion" = "PanelVersion1",
+          "NPX" = c(1, 2.2, 3.14, 5.1, -2.8),
+          "QC_Warning" = rep(x = "PASS", times = 5L)
         ) |>
           utils::write.table(
             file = nfile_test,
@@ -313,16 +344,16 @@ test_that(
 
 
                 # check that this works
-                # warning comes from read_npx_format because the long file is
-                # totally made up.
-                expect_warning(
-                  object = read_npx_zip(file = zfile_test,
-                                        out_df = "arrow",
-                                        long_format = TRUE,
-                                        quiet = TRUE),
-                  regexp = "Unable to confirm the \"long\" format from the inpu"
+                expect_no_error(
+                  object = expect_no_warning(
+                    object = expect_no_message(
+                      object = read_npx_zip(file = zfile_test,
+                                            out_df = "arrow",
+                                            long_format = TRUE,
+                                            quiet = TRUE)
+                    )
+                  )
                 )
-
               }
             )
 
@@ -357,11 +388,21 @@ test_that(
       code = {
         # write the coma-delimited file
         dplyr::tibble(
-          "A" = c(1, 2.2, 3.14),
-          "B" = c("a", "b", "c"),
-          "C" = c(TRUE, TRUE, FALSE),
-          "D" = c("NA", "B", NA_character_),
-          "E" = c(1L, 2L, 3L)
+          "SampleID" = paste("Sample", 1L:5L, sep = "_"),
+          "OlinkID" = paste0("OID",
+                             stringr::str_pad(
+                               string = as.character(1L:5L),
+                               width = 5L,
+                               side = "left",
+                               pad = "0"
+                             )),
+          "UniProt" = letters[1L:5L],
+          "Assay" = letters[1L:5L],
+          "Panel" = "Panel1",
+          "PlateID" = "Plate1",
+          "PanelVersion" = "PanelVersion1",
+          "NPX" = c(1, 2.2, 3.14, 5.1, -2.8),
+          "QC_Warning" = rep(x = "PASS", times = 5L)
         ) |>
           utils::write.table(
             file = nfile_test,
@@ -403,18 +444,7 @@ test_that(
                 expect_true(object = file.exists(zfile_test))
 
                 # check that this works
-                # warning comes from read_npx_format because the long file is
-                # totally made up.
-                expect_warning(
-                  object = read_npx_zip(file = zfile_test,
-                                        out_df = "arrow",
-                                        long_format = TRUE,
-                                        .ignore_files =
-                                          c(basename(readmefile_test),
-                                            basename(rfile_test)),
-                                        quiet = TRUE),
-                  regexp = "Unable to confirm the \"long\" format from the inpu"
-                )
+                expect_no_error
               }
             )
           }
@@ -448,11 +478,21 @@ test_that(
       code = {
         # write the coma-delimited file
         dplyr::tibble(
-          "A" = c(1, 2.2, 3.14),
-          "B" = c("a", "b", "c"),
-          "C" = c(TRUE, TRUE, FALSE),
-          "D" = c("NA", "B", NA_character_),
-          "E" = c(1L, 2L, 3L)
+          "SampleID" = paste("Sample", 1L:5L, sep = "_"),
+          "OlinkID" = paste0("OID",
+                             stringr::str_pad(
+                               string = as.character(1L:5L),
+                               width = 5L,
+                               side = "left",
+                               pad = "0"
+                             )),
+          "UniProt" = letters[1L:5L],
+          "Assay" = letters[1L:5L],
+          "Panel" = "Panel1",
+          "PlateID" = "Plate1",
+          "PanelVersion" = "PanelVersion1",
+          "NPX" = c(1, 2.2, 3.14, 5.1, -2.8),
+          "QC_Warning" = rep(x = "PASS", times = 5L)
         ) |>
           utils::write.table(
             file = nfile_test,
@@ -494,17 +534,18 @@ test_that(
                 expect_true(object = file.exists(zfile_test))
 
                 # check that this works
-                # warning comes from read_npx_format because the long file is
-                # totally made up.
-                expect_warning(
-                  object = read_npx_zip(file = zfile_test,
-                                        out_df = "arrow",
-                                        long_format = TRUE,
-                                        .ignore_files =
-                                          c(basename(readmefile_test),
-                                            basename(rfile_test)),
-                                        quiet = TRUE),
-                  regexp = "Unable to confirm the \"long\" format from the inpu"
+                expect_no_error(
+                  object = expect_no_warning(
+                    object = expect_no_message(
+                      object = read_npx_zip(file = zfile_test,
+                                            out_df = "arrow",
+                                            long_format = TRUE,
+                                            .ignore_files =
+                                              c(basename(readmefile_test),
+                                                basename(rfile_test)),
+                                            quiet = TRUE)
+                    )
+                  )
                 )
               }
             )
@@ -539,11 +580,21 @@ test_that(
       code = {
         # write the coma-delimited file
         dplyr::tibble(
-          "A" = c(1, 2.2, 3.14),
-          "B" = c("a", "b", "c"),
-          "C" = c(TRUE, TRUE, FALSE),
-          "D" = c("NA", "B", NA_character_),
-          "E" = c(1L, 2L, 3L)
+          "SampleID" = paste("Sample", 1L:5L, sep = "_"),
+          "OlinkID" = paste0("OID",
+                             stringr::str_pad(
+                               string = as.character(1L:5L),
+                               width = 5L,
+                               side = "left",
+                               pad = "0"
+                             )),
+          "UniProt" = letters[1L:5L],
+          "Assay" = letters[1L:5L],
+          "Panel" = "Panel1",
+          "PlateID" = "Plate1",
+          "PanelVersion" = "PanelVersion1",
+          "NPX" = c(1, 2.2, 3.14, 5.1, -2.8),
+          "QC_Warning" = rep(x = "PASS", times = 5L)
         ) |>
           utils::write.table(
             file = nfile_test,
@@ -587,24 +638,30 @@ test_that(
             # check that this works
             # warning comes from read_npx_format because the long file is
             # totally made up.
-            expect_warning(
-              object = df_out_arrow <- read_npx_zip(file = zfile_test,
-                                                    out_df = "arrow",
-                                                    long_format = TRUE,
-                                                    quiet = TRUE),
-              regexp = "Unable to confirm the \"long\" format from the inpu"
+            expect_no_error(
+              object = expect_no_warning(
+                object = expect_no_message(
+                  object = df_out_arrow <- read_npx_zip(file = zfile_test,
+                                                        out_df = "arrow",
+                                                        long_format = TRUE,
+                                                        quiet = TRUE)
+                )
+              )
             )
 
             expect_true(exists("df_out_arrow"))
 
             expect_true(inherits(x = df_out_arrow, what = "ArrowObject"))
 
-            expect_warning(
-              object = df_out_tibble <- read_npx_zip(file = zfile_test,
-                                                     out_df = "tibble",
-                                                     long_format = TRUE,
-                                                     quiet = TRUE),
-              regexp = "Unable to confirm the \"long\" format from the inpu"
+            expect_no_error(
+              object = expect_no_warning(
+                object = expect_no_message(
+                  object = df_out_tibble <- read_npx_zip(file = zfile_test,
+                                                         out_df = "tibble",
+                                                         long_format = TRUE,
+                                                         quiet = TRUE)
+                )
+              )
             )
 
             expect_true(exists("df_out_tibble"))
@@ -638,11 +695,21 @@ test_that(
       code = {
         # write the coma-delimited file
         dplyr::tibble(
-          "A" = c(1, 2.2, 3.14),
-          "B" = c("a", "b", "c"),
-          "C" = c(TRUE, TRUE, FALSE),
-          "D" = c("NA", "B", NA_character_),
-          "E" = c(1L, 2L, 3L)
+          "SampleID" = paste("Sample", 1L:5L, sep = "_"),
+          "OlinkID" = paste0("OID",
+                             stringr::str_pad(
+                               string = as.character(1L:5L),
+                               width = 5L,
+                               side = "left",
+                               pad = "0"
+                             )),
+          "UniProt" = letters[1L:5L],
+          "Assay" = letters[1L:5L],
+          "Panel" = "Panel1",
+          "PlateID" = "Plate1",
+          "PanelVersion" = "PanelVersion1",
+          "NPX" = c(1, 2.2, 3.14, 5.1, -2.8),
+          "QC_Warning" = rep(x = "PASS", times = 5L)
         ) |>
           utils::write.table(
             file = nfile_test,
@@ -683,14 +750,15 @@ test_that(
             expect_true(object = file.exists(zfile_test))
 
             # check that this works
-            # warning comes from read_npx_format because the long file is
-            # totally made up.
-            expect_warning(
-              object = df_out_arrow <- read_npx_zip(file = zfile_test,
-                                                    out_df = "arrow",
-                                                    long_format = TRUE,
-                                                    quiet = TRUE),
-              regexp = "Unable to confirm the \"long\" format from the inpu"
+            expect_no_error(
+              object = expect_no_warning(
+                object = expect_no_message(
+                  object = df_out_arrow <- read_npx_zip(file = zfile_test,
+                                                        out_df = "arrow",
+                                                        long_format = TRUE,
+                                                        quiet = TRUE)
+                )
+              )
             )
           }
         )
@@ -723,11 +791,21 @@ test_that(
       code = {
         # write the coma-delimited file
         dplyr::tibble(
-          "A" = c(1, 2.2, 3.14),
-          "B" = c("a", "b", "c"),
-          "C" = c(TRUE, TRUE, FALSE),
-          "D" = c("NA", "B", NA_character_),
-          "E" = c(1L, 2L, 3L)
+          "SampleID" = paste("Sample", 1L:5L, sep = "_"),
+          "OlinkID" = paste0("OID",
+                             stringr::str_pad(
+                               string = as.character(1L:5L),
+                               width = 5L,
+                               side = "left",
+                               pad = "0"
+                             )),
+          "UniProt" = letters[1L:5L],
+          "Assay" = letters[1L:5L],
+          "Panel" = "Panel1",
+          "PlateID" = "Plate1",
+          "PanelVersion" = "PanelVersion1",
+          "NPX" = c(1, 2.2, 3.14, 5.1, -2.8),
+          "QC_Warning" = rep(x = "PASS", times = 5L)
         ) |>
           utils::write.table(
             file = nfile_test,
@@ -769,26 +847,30 @@ test_that(
             expect_true(object = file.exists(zfile_test))
 
             # check that this works
-            # warning comes from read_npx_format because the long file is
-            # totally made up.
-            expect_warning(
-              object = df_out_arrow <- read_npx_zip(file = zfile_test,
-                                                    out_df = "arrow",
-                                                    long_format = TRUE,
-                                                    quiet = TRUE),
-              regexp = "Unable to confirm the \"long\" format from the inpu"
+            expect_no_error(
+              object = expect_no_warning(
+                object = expect_no_message(
+                  object = df_out_arrow <- read_npx_zip(file = zfile_test,
+                                                        out_df = "arrow",
+                                                        long_format = TRUE,
+                                                        quiet = TRUE)
+                )
+              )
             )
 
             expect_true(exists("df_out_arrow"))
 
             expect_true(inherits(x = df_out_arrow, what = "ArrowObject"))
 
-            expect_warning(
-              object = df_out_tibble <- read_npx_zip(file = zfile_test,
-                                                     out_df = "tibble",
-                                                     long_format = TRUE,
-                                                     quiet = TRUE),
-              regexp = "Unable to confirm the \"long\" format from the inpu"
+            expect_no_error(
+              object = expect_no_warning(
+                object = expect_no_message(
+                  object = df_out_tibble <- read_npx_zip(file = zfile_test,
+                                                         out_df = "tibble",
+                                                         long_format = TRUE,
+                                                         quiet = TRUE)
+                )
+              )
             )
 
             expect_true(exists("df_out_tibble"))
@@ -823,11 +905,21 @@ test_that(
 
         # write the coma-delimited file
         dplyr::tibble(
-          "A" = c(1, 2.2, 3.14),
-          "B" = c("a", "b", "c"),
-          "C" = c(TRUE, TRUE, FALSE),
-          "D" = c("NA", "B", NA_character_),
-          "E" = c(1L, 2L, 3L)
+          "SampleID" = paste("Sample", 1L:5L, sep = "_"),
+          "OlinkID" = paste0("OID",
+                             stringr::str_pad(
+                               string = as.character(1L:5L),
+                               width = 5L,
+                               side = "left",
+                               pad = "0"
+                             )),
+          "UniProt" = letters[1L:5L],
+          "Assay" = letters[1L:5L],
+          "Panel" = "Panel1",
+          "PlateID" = "Plate1",
+          "PanelVersion" = "PanelVersion1",
+          "NPX" = c(1, 2.2, 3.14, 5.1, -2.8),
+          "QC_Warning" = rep(x = "PASS", times = 5L)
         ) |>
           utils::write.table(
             file = nfile_test,
@@ -868,14 +960,15 @@ test_that(
             expect_true(object = file.exists(zfile_test))
 
             # check that this works
-            # warning comes from read_npx_format because the long file is
-            # totally made up.
-            expect_warning(
-              object = read_npx_zip(file = zfile_test,
-                                    out_df = "arrow",
-                                    long_format = TRUE,
-                                    quiet = TRUE),
-              regexp = "Unable to confirm the \"long\" format from the inpu"
+            expect_no_error(
+              object = expect_no_warning(
+                object = expect_no_message(
+                  object = read_npx_zip(file = zfile_test,
+                                        out_df = "arrow",
+                                        long_format = TRUE,
+                                        quiet = TRUE)
+                )
+              )
             )
           }
         )
