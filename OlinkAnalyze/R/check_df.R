@@ -132,7 +132,6 @@ check_is_olink_class <- function(x,
 #' @inherit .check_params params author return seealso
 #'
 #' @keywords internal
-#' @noRd
 #'
 check_is_dataset <- function(x,
                              error = FALSE) {
