@@ -82,7 +82,7 @@ olink_dist_plot <- function(df,
   check_columns(df = df, col_list = list(color_g))
 
   # Check if check_log is correct
-  check_log <- run_check_npx(df = df, check_log = check_log)
+  check_log <- get_check_npx(df = df, check_log = check_log)
 
   # Remove invalid OlinkID, assays with all NA values, and convert non-unique
   # Uniprot IDs. Note that we do not remove samples with duplicate SampleID,
@@ -103,6 +103,8 @@ olink_dist_plot <- function(df,
     verbose = FALSE
   )
 
+  # re-get check_log after cleaning
+  check_log <- get_check_npx(df = df, check_log = check_log)
 
   reorder_within <- function(x, by, within, fun = mean, sep = "___", ...) {
     new_x <- paste(x, within, sep = sep)
