@@ -3,6 +3,7 @@
 #' @inherit .check_params params author return seealso
 #'
 #' @keywords internal
+#' @noRd
 #'
 check_is_arrow_object <- function(x,
                                   error = FALSE) {
@@ -45,6 +46,7 @@ check_is_arrow_object <- function(x,
 #' @inherit .check_params params author return seealso
 #'
 #' @keywords internal
+#' @noRd
 #'
 check_is_tibble <- function(x,
                             error = FALSE) {
@@ -87,6 +89,7 @@ check_is_tibble <- function(x,
 #' @inherit .check_params params author return seealso
 #'
 #' @keywords internal
+#' @noRd
 #'
 check_is_dataset <- function(x,
                              error = FALSE) {
