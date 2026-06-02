@@ -56,7 +56,7 @@ test_that(
 )
 
 test_that(
-  "olink_dist_plot works - vdiffr",
+  "olink_dist_plot - works - vdiffr",
   {
     skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
     skip_on_cran()
@@ -123,7 +123,7 @@ test_that(
 )
 
 test_that(
-  "olink_dist_plot works - olink_class and arrow",
+  "olink_dist_plot - works - olink_class and arrow",
   {
     skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
     skip_on_cran()

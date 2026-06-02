@@ -104,7 +104,7 @@ olink_dist_plot <- function(df,
   )
 
   # re-get check_log after cleaning
-  check_log <- get_check_npx(df = df, check_log = check_log)
+  check_log <- get_check_npx(df = df)
 
   reorder_within <- function(x, by, within, fun = mean, sep = "___", ...) {
     new_x <- paste(x, within, sep = sep)
