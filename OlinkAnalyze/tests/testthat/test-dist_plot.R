@@ -121,3 +121,129 @@ test_that(
     )
   }
 )
+
+test_that(
+  "olink_dist_plot works - olink_class and arrow",
+  {
+    skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
+    skip_on_cran()
+
+    # To keep the file size down
+    sample_subset <- c("A1", "A10", "A11", "A12", "A13",
+                       "A14", "B79", "B8", "B9")
+
+    npx_data1_filtered <-  npx_data1 |>
+      dplyr::filter(
+        .data[["SampleID"]] %in% .env[["sample_subset"]]
+      )
+
+    check_log_filtered <- check_npx(
+      df = npx_data1_filtered
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # tibble ----
+
+    expect_no_warning(
+      object = expect_no_error(
+        object = expect_no_message(
+          object = distr_plot_tibble <- olink_dist_plot(
+            df = npx_data1_filtered,
+            check_log = check_log_filtered
+          )
+        )
+      )
+    )
+
+    expect_no_warning(
+      object = expect_no_error(
+        object = expect_no_message(
+          object = distr_plot_treat_tibble <- olink_dist_plot(
+            df = npx_data1_filtered,
+            check_log = check_log_filtered,
+            color_g = "Treatment"
+          )
+        )
+      )
+    )
+
+    # olink_class ----
+
+    npx_data1_filtered_obj <- attach_check_log(
+      df = npx_data1_filtered,
+      out_df = "tibble",
+      preferred_names = NULL
+    )
+
+    expect_no_warning(
+      object = expect_no_error(
+        object = expect_no_message(
+          object = distr_plot_obj <- olink_dist_plot(
+            df = npx_data1_filtered_obj
+          )
+        )
+      )
+    )
+
+    expect_equal_ggplot(
+      object = distr_plot_obj,
+      expected = distr_plot_tibble
+    )
+
+    expect_no_warning(
+      object = expect_no_error(
+        object = expect_no_message(
+          object = distr_plot_treat_obj <- olink_dist_plot(
+            df = npx_data1_filtered_obj,
+            color_g = "Treatment"
+          )
+        )
+      )
+    )
+
+    expect_equal_ggplot(
+      object = distr_plot_treat_obj,
+      expected = distr_plot_treat_tibble
+    )
+
+    # arrow ----
+
+    npx_data1_filtered_arrow <- attach_check_log(
+      df = npx_data1_filtered,
+      out_df = "arrow",
+      preferred_names = NULL
+    )
+
+    expect_no_warning(
+      object = expect_no_error(
+        object = expect_no_message(
+          object = distr_plot_arrow <- olink_dist_plot(
+            df = npx_data1_filtered_arrow
+          )
+        )
+      )
+    )
+
+    expect_equal_ggplot(
+      object = distr_plot_arrow,
+      expected = distr_plot_tibble
+    )
+
+    expect_no_warning(
+      object = expect_no_error(
+        object = expect_no_message(
+          object = distr_plot_treat_arrow <- olink_dist_plot(
+            df = npx_data1_filtered_arrow,
+            color_g = "Treatment"
+          )
+        )
+      )
+    )
+
+    expect_equal_ggplot(
+      object = distr_plot_treat_arrow,
+      expected = distr_plot_treat_tibble
+    )
+  }
+)
