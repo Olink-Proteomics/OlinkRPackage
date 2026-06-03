@@ -50,20 +50,30 @@ test_that(
       suppressWarnings() |>
       suppressMessages()
 
+    npx_data1_clean <- clean_npx(df = npx_data1,
+                                 check_log = npx_data1_check) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    npx_data1_clean_check <- check_npx(df = npx_data1_clean) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    npx_data1_clean <- strip_check_log(df = npx_data1_clean)
+
     # ---- 2 proteins ----
 
     expect_no_error(
       object = expect_no_warning(
         object = expect_message(
-          object = boxplot_site_2prots <- npx_data1 |>
-            tidyr::drop_na() |>
-            olink_boxplot(
+          object = boxplot_site_2prots <- olink_boxplot(
+              df = npx_data1_clean,
               variable = "Site",
               olinkid_list = ref_results$anova_site |>
                 dplyr::filter(.data[["Threshold"]] == "Significant") |>
                 dplyr::slice_head(n = 2L) |>
                 dplyr::pull(.data[["OlinkID"]]),
-              check_log = npx_data1_check
+              check_log = npx_data1_clean_check
             ),
           regexp = paste("No sample type column detected in input `df`.",
                          "Control samples may not be filtered out."),
@@ -87,17 +97,16 @@ test_that(
     expect_no_error(
       object = expect_no_warning(
         object = expect_message(
-          object = boxplot_site_10prots <- npx_data1 |>
-            tidyr::drop_na() |>
-            olink_boxplot(
-              variable = "Site",
-              olinkid_list = ref_results$anova_site |>
-                dplyr::filter(.data[["Threshold"]] == "Significant") |>
-                dplyr::slice_head(n = 10L) |>
-                dplyr::pull(.data[["OlinkID"]]),
-              number_of_proteins_per_plot = 5L,
-              check_log = npx_data1_check
-            ),
+          object = boxplot_site_10prots <- olink_boxplot(
+            df = npx_data1_clean,
+            variable = "Site",
+            olinkid_list = ref_results$anova_site |>
+              dplyr::filter(.data[["Threshold"]] == "Significant") |>
+              dplyr::slice_head(n = 10L) |>
+              dplyr::pull(.data[["OlinkID"]]),
+            number_of_proteins_per_plot = 5L,
+            check_log = npx_data1_clean_check
+          ),
           regexp = paste("No sample type column detected in input `df`.",
                          "Control samples may not be filtered out."),
           fixed = TRUE
@@ -198,15 +207,14 @@ test_that(
     expect_no_error(
       object = expect_no_warning(
         object = expect_message(
-          object = boxplot_time_site <- npx_data1 |>
-            tidyr::drop_na() |>
-            olink_boxplot(
-              variable = c("Time", "Site"),
-              olinkid_list = ref_results$anova_time |>
-                dplyr::slice_head(n = 10L) |>
-                dplyr::pull(.data[["OlinkID"]]),
-              check_log = npx_data1_check
-            ),
+          object = boxplot_time_site <- olink_boxplot(
+            df = npx_data1_clean,
+            variable = c("Time", "Site"),
+            olinkid_list = ref_results$anova_time |>
+              dplyr::slice_head(n = 10L) |>
+              dplyr::pull(.data[["OlinkID"]]),
+            check_log = npx_data1_clean_check
+          ),
           regexp = paste("No sample type column detected in input `df`.",
                          "Control samples may not be filtered out."),
           fixed = TRUE
