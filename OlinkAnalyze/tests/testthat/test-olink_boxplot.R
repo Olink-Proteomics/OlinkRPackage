@@ -314,3 +314,389 @@ test_that(
     )
   }
 )
+
+test_that(
+  "olink_boxplot - works - olink_class and arrow",
+  {
+    skip_on_cran()
+    skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
+
+    ref_results <- get_example_data(
+      filename = "reference_results.rds"
+    )
+
+    npx_data1_check <- check_npx(df = npx_data1) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    npx_data1_clean <- clean_npx(df = npx_data1,
+                                 check_log = npx_data1_check) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    npx_data1_clean_check <- check_npx(df = npx_data1_clean) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    npx_data1_clean <- strip_check_log(df = npx_data1_clean)
+
+    # tibble ----
+
+    ## ---- 2 proteins ----
+
+    boxplot_site_2prots <- olink_boxplot(
+      df = npx_data1_clean,
+      variable = "Site",
+      olinkid_list = ref_results$anova_site |>
+        dplyr::filter(.data[["Threshold"]] == "Significant") |>
+        dplyr::slice_head(n = 2L) |>
+        dplyr::pull(.data[["OlinkID"]]),
+      check_log = npx_data1_clean_check
+    ) |>
+      suppressMessages()
+
+    ## ---- 10 proteins ----
+
+    boxplot_site_10prots <- olink_boxplot(
+      df = npx_data1_clean,
+      variable = "Site",
+      olinkid_list = ref_results$anova_site |>
+        dplyr::filter(.data[["Threshold"]] == "Significant") |>
+        dplyr::slice_head(n = 10L) |>
+        dplyr::pull(.data[["OlinkID"]]),
+      number_of_proteins_per_plot = 5L,
+      check_log = npx_data1_clean_check
+    ) |>
+      suppressMessages()
+
+    ## ---- Time ----
+
+    boxplot_time <- olink_boxplot(
+      df = npx_data1,
+      variable = "Time",
+      olinkid_list = ref_results$anova_time |>
+        dplyr::slice_head(n = 10L) |>
+        dplyr::pull(.data[["OlinkID"]]),
+      check_log = npx_data1_check
+    ) |>
+      suppressMessages()
+
+    ## ---- Time w/ coloroption ----
+
+    boxplot_time_coloroption <- olink_boxplot(
+      df = npx_data1,
+      variable = "Time",
+      olinkid_list = ref_results$anova_time |>
+        dplyr::slice_head(n = 10L) |>
+        dplyr::pull(.data[["OlinkID"]]),
+      coloroption = c("teal", "pink", "orange", "turquoise"),
+      check_log = npx_data1_check
+    ) |>
+      suppressMessages()
+
+    ## ---- Time + Site ----
+
+    boxplot_time_site <- olink_boxplot(
+      df = npx_data1_clean,
+      variable = c("Time", "Site"),
+      olinkid_list = ref_results$anova_time |>
+        dplyr::slice_head(n = 10L) |>
+        dplyr::pull(.data[["OlinkID"]]),
+      check_log = npx_data1_clean_check
+    ) |>
+      suppressMessages()
+
+    ## ---- Time + Posthoc ----
+
+    boxplot_time_posthoc <- olink_boxplot(
+      df = npx_data1,
+      variable = "Time",
+      olinkid_list = ref_results$anova_time |>
+        dplyr::slice_head(n = 10L) |>
+        dplyr::pull(.data[["OlinkID"]]),
+      posthoc_results = ref_results$anova_time_posthoc,
+      check_log = npx_data1_check
+    ) |>
+      suppressMessages()
+
+    ## ---- Treatment + ttest ----
+
+    boxplot_treatment_ttest <- olink_boxplot(
+      df = npx_data1,
+      variable = "Treatment",
+      olinkid_list = ref_results$t_test |>
+        dplyr::slice_head(n = 10L) |>
+        dplyr::pull(.data[["OlinkID"]]),
+      ttest_result = ref_results$t_test,
+      check_log = npx_data1_check
+    ) |>
+      suppressMessages()
+
+    # olink_class ----
+
+    npx_data1_obj <- attach_check_log(
+      df = npx_data1,
+      out_df = "tibble",
+      preferred_names = NULL
+    ) |>
+      suppressWarnings()
+
+    npx_data1_clean_obj <- attach_check_log(
+      df = npx_data1_clean,
+      out_df = "tibble",
+      preferred_names = NULL
+    )
+
+    ## ---- 2 proteins ----
+
+    boxplot_site_2prots_obj <- olink_boxplot(
+      df = npx_data1_clean_obj,
+      variable = "Site",
+      olinkid_list = ref_results$anova_site |>
+        dplyr::filter(.data[["Threshold"]] == "Significant") |>
+        dplyr::slice_head(n = 2L) |>
+        dplyr::pull(.data[["OlinkID"]])
+    ) |>
+      suppressMessages()
+
+    expect_equal_ggplot(
+      object = boxplot_site_2prots_obj[[1L]],
+      expected = boxplot_site_2prots[[1L]]
+    )
+
+    ## ---- 10 proteins ----
+
+    boxplot_site_10prots_obj <- olink_boxplot(
+      df = npx_data1_clean_obj,
+      variable = "Site",
+      olinkid_list = ref_results$anova_site |>
+        dplyr::filter(.data[["Threshold"]] == "Significant") |>
+        dplyr::slice_head(n = 10L) |>
+        dplyr::pull(.data[["OlinkID"]]),
+      number_of_proteins_per_plot = 5L
+    ) |>
+      suppressMessages()
+
+    expect_equal_ggplot(
+      object = boxplot_site_10prots_obj[[2L]],
+      expected = boxplot_site_10prots[[2L]]
+    )
+
+    ## ---- Time ----
+
+    boxplot_time_obj <- olink_boxplot(
+      df = npx_data1_obj,
+      variable = "Time",
+      olinkid_list = ref_results$anova_time |>
+        dplyr::slice_head(n = 10L) |>
+        dplyr::pull(.data[["OlinkID"]])
+    ) |>
+      suppressMessages()
+
+    expect_equal_ggplot(
+      object = boxplot_time_obj[[2L]],
+      expected = boxplot_time[[2L]]
+    )
+
+    ## ---- Time w/ coloroption ----
+
+    boxplot_time_coloroption_obj <- olink_boxplot(
+      df = npx_data1_obj,
+      variable = "Time",
+      olinkid_list = ref_results$anova_time |>
+        dplyr::slice_head(n = 10L) |>
+        dplyr::pull(.data[["OlinkID"]]),
+      coloroption = c("teal", "pink", "orange", "turquoise")
+    ) |>
+      suppressMessages()
+
+    expect_equal_ggplot(
+      object = boxplot_time_coloroption_obj[[2L]],
+      expected = boxplot_time_coloroption[[2L]]
+    )
+
+    ## ---- Time + Site ----
+
+    boxplot_time_site_obj <- olink_boxplot(
+      df = npx_data1_clean_obj,
+      variable = c("Time", "Site"),
+      olinkid_list = ref_results$anova_time |>
+        dplyr::slice_head(n = 10L) |>
+        dplyr::pull(.data[["OlinkID"]])
+    ) |>
+      suppressMessages()
+
+    expect_equal_ggplot(
+      object = boxplot_time_site_obj[[2L]],
+      expected = boxplot_time_site[[2L]]
+    )
+
+    ## ---- Time + Posthoc ----
+
+    boxplot_time_posthoc_obj <- olink_boxplot(
+      df = npx_data1_obj,
+      variable = "Time",
+      olinkid_list = ref_results$anova_time |>
+        dplyr::slice_head(n = 10L) |>
+        dplyr::pull(.data[["OlinkID"]]),
+      posthoc_results = ref_results$anova_time_posthoc
+    ) |>
+      suppressMessages()
+
+    expect_equal_ggplot(
+      object = boxplot_time_posthoc_obj[[1L]],
+      expected = boxplot_time_posthoc[[1L]]
+    )
+
+    ## ---- Treatment + ttest ----
+
+    boxplot_treatment_ttest_obj <- olink_boxplot(
+      df = npx_data1_obj,
+      variable = "Treatment",
+      olinkid_list = ref_results$t_test |>
+        dplyr::slice_head(n = 10L) |>
+        dplyr::pull(.data[["OlinkID"]]),
+      ttest_result = ref_results$t_test
+    ) |>
+      suppressMessages()
+
+    expect_equal_ggplot(
+      object = boxplot_treatment_ttest_obj[[2L]],
+      expected = boxplot_treatment_ttest[[2L]]
+    )
+
+    # arrow ----
+
+    npx_data1_arrow <- attach_check_log(
+      df = npx_data1,
+      out_df = "arrow",
+      preferred_names = NULL
+    ) |>
+      suppressWarnings()
+
+    npx_data1_clean_arrow <- attach_check_log(
+      df = npx_data1_clean,
+      out_df = "arrow",
+      preferred_names = NULL
+    )
+
+    ## ---- 2 proteins ----
+
+    boxplot_site_2prots_arrow <- olink_boxplot(
+      df = npx_data1_clean_arrow,
+      variable = "Site",
+      olinkid_list = ref_results$anova_site |>
+        dplyr::filter(.data[["Threshold"]] == "Significant") |>
+        dplyr::slice_head(n = 2L) |>
+        dplyr::pull(.data[["OlinkID"]])
+    ) |>
+      suppressMessages()
+
+    expect_equal_ggplot(
+      object = boxplot_site_2prots_arrow[[1L]],
+      expected = boxplot_site_2prots[[1L]]
+    )
+
+    ## ---- 10 proteins ----
+
+    boxplot_site_10prots_arrow <- olink_boxplot(
+      df = npx_data1_clean_arrow,
+      variable = "Site",
+      olinkid_list = ref_results$anova_site |>
+        dplyr::filter(.data[["Threshold"]] == "Significant") |>
+        dplyr::slice_head(n = 10L) |>
+        dplyr::pull(.data[["OlinkID"]]),
+      number_of_proteins_per_plot = 5L
+    ) |>
+      suppressMessages()
+
+    expect_equal_ggplot(
+      object = boxplot_site_10prots_arrow[[2L]],
+      expected = boxplot_site_10prots[[2L]]
+    )
+
+    ## ---- Time ----
+
+    boxplot_time_arrow <- olink_boxplot(
+      df = npx_data1_arrow,
+      variable = "Time",
+      olinkid_list = ref_results$anova_time |>
+        dplyr::slice_head(n = 10L) |>
+        dplyr::pull(.data[["OlinkID"]])
+    ) |>
+      suppressMessages()
+
+    expect_equal_ggplot(
+      object = boxplot_time_arrow[[2L]],
+      expected = boxplot_time[[2L]]
+    )
+
+    ## ---- Time w/ coloroption ----
+
+    boxplot_time_coloroption_arrow <- olink_boxplot(
+      df = npx_data1_arrow,
+      variable = "Time",
+      olinkid_list = ref_results$anova_time |>
+        dplyr::slice_head(n = 10L) |>
+        dplyr::pull(.data[["OlinkID"]]),
+      coloroption = c("teal", "pink", "orange", "turquoise")
+    ) |>
+      suppressMessages()
+
+    expect_equal_ggplot(
+      object = boxplot_time_coloroption_arrow[[2L]],
+      expected = boxplot_time_coloroption[[2L]]
+    )
+
+    ## ---- Time + Site ----
+
+    boxplot_time_site_arrow <- olink_boxplot(
+      df = npx_data1_clean_arrow,
+      variable = c("Time", "Site"),
+      olinkid_list = ref_results$anova_time |>
+        dplyr::slice_head(n = 10L) |>
+        dplyr::pull(.data[["OlinkID"]])
+    ) |>
+      suppressMessages()
+
+    expect_equal_ggplot(
+      object = boxplot_time_site_arrow[[2L]],
+      expected = boxplot_time_site[[2L]]
+    )
+
+    ## ---- Time + Posthoc ----
+
+    boxplot_time_posthoc_arrow <- olink_boxplot(
+      df = npx_data1_arrow,
+      variable = "Time",
+      olinkid_list = ref_results$anova_time |>
+        dplyr::slice_head(n = 10L) |>
+        dplyr::pull(.data[["OlinkID"]]),
+      posthoc_results = ref_results$anova_time_posthoc
+    ) |>
+      suppressMessages()
+
+    expect_equal_ggplot(
+      object = boxplot_time_posthoc_arrow[[1L]],
+      expected = boxplot_time_posthoc[[1L]]
+    )
+
+    ## ---- Treatment + ttest ----
+
+    boxplot_treatment_ttest_arrow <- olink_boxplot(
+      df = npx_data1_arrow,
+      variable = "Treatment",
+      olinkid_list = ref_results$t_test |>
+        dplyr::slice_head(n = 10L) |>
+        dplyr::pull(.data[["OlinkID"]]),
+      ttest_result = ref_results$t_test
+    ) |>
+      suppressMessages()
+
+    expect_equal_ggplot(
+      object = boxplot_treatment_ttest_arrow[[2L]],
+      expected = boxplot_treatment_ttest[[2L]]
+    )
+
+  }
+)
