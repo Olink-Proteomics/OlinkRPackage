@@ -1094,19 +1094,29 @@ test_that(
     # Load reference results - skipped if files are absent
     reference_results <- get_example_data(filename = "reference_results.rds")
 
+    # data ----
+
     exclude_assays <- npx_data1[["OlinkID"]] |> unique() |> head(n = 5L)
+
+    npx_data1_mod <- npx_data1 |>
+      dplyr::filter(
+        !grepl(pattern = "control",
+               x = .data[["SampleID"]],
+               ignore.case = TRUE)
+      ) |>
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% .env[["exclude_assays"]])
+      )
+
+    # expected results ----
+
+    expected_test_res <- c(179L, 16L)
+
+    # tibble ----
 
     expect_message(
       object = test_prep_out <- test_prep(
-        df = npx_data1 |>
-          dplyr::filter(
-            !grepl(pattern = "control",
-                   x = .data[["SampleID"]],
-                   ignore.case = TRUE)
-          ) |>
-          dplyr::filter(
-            !(.data[["OlinkID"]] %in% .env[["exclude_assays"]])
-          ),
+        df = npx_data1_mod,
         test_results = reference_results$t_test,
         check_log = check_log
       ),
@@ -1119,7 +1129,28 @@ test_that(
 
     expect_identical(
       object = dim(test_prep_out),
-      expected = c(179L, 16L)
+      expected = expected_test_res
+    )
+
+    # olink_class ----
+
+    npx_data1_mod_obj <- attach_check_log(df = npx_data1_mod, out_df = "tibble")
+
+    expect_message(
+      object = test_prep_out_obj <- test_prep(
+        df = npx_data1_mod_obj,
+        test_results = reference_results$t_test
+      ),
+      regexp = paste("5 assays in `test_results` are not represented in `df`",
+                     "and will be removed from `test_results`: \"OID01220\",",
+                     "\"OID01217\", \"OID01216\", \"OID01219\", and",
+                     "\"OID01218\""),
+      fixed = TRUE
+    )
+
+    expect_identical(
+      object = dim(test_prep_out_obj),
+      expected = expected_test_res
     )
   }
 )

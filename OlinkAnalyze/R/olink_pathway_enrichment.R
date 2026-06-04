@@ -484,7 +484,7 @@ test_prep <- function(df,
   no_overlap_assays <- helper_non_overlap_assays(
     df = df,
     test_results = test_results,
-    check_log = check_log,
+    check_log = get_check_npx(df = df, check_log = check_log),
     which = "res"
   )
 
