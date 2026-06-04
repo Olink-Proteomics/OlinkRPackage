@@ -95,7 +95,7 @@ olink_one_non_parametric <- function(df,
   }
 
   # Check data format
-  check_log <- run_check_npx(df = df, check_log = check_log)
+  check_log <- get_check_npx(df = df, check_log = check_log)
 
   withCallingHandlers( # nolint return_linter
     {
@@ -458,7 +458,7 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
   }
 
   # Check data format
-  check_log <- run_check_npx(df = df, check_log = check_log)
+  check_log <- get_check_npx(df = df, check_log = check_log)
 
   withCallingHandlers( # nolint return_linter
     {
