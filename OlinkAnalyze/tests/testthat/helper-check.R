@@ -57,4 +57,6 @@ expect_equal_ggplot <- function(object, expected) {
     object$labels,
     expected$labels
   )
+
+  return(invisible(NULL))
 }

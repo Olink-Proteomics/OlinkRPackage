@@ -67,14 +67,14 @@ test_that(
       object = expect_no_warning(
         object = expect_message(
           object = boxplot_site_2prots <- olink_boxplot(
-              df = npx_data1_clean,
-              variable = "Site",
-              olinkid_list = ref_results$anova_site |>
-                dplyr::filter(.data[["Threshold"]] == "Significant") |>
-                dplyr::slice_head(n = 2L) |>
-                dplyr::pull(.data[["OlinkID"]]),
-              check_log = npx_data1_clean_check
-            ),
+            df = npx_data1_clean,
+            variable = "Site",
+            olinkid_list = ref_results$anova_site |>
+              dplyr::filter(.data[["Threshold"]] == "Significant") |>
+              dplyr::slice_head(n = 2L) |>
+              dplyr::pull(.data[["OlinkID"]]),
+            check_log = npx_data1_clean_check
+          ),
           regexp = paste("No sample type column detected in input `df`.",
                          "Control samples may not be filtered out."),
           fixed = TRUE
