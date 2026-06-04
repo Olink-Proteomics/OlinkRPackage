@@ -213,7 +213,7 @@ olink_lmer <- function(df,
   }
 
   # Check data format
-  check_log <- run_check_npx(df = df, check_log = check_log)
+  check_log <- get_check_npx(df = df, check_log = check_log)
 
   lmer_result <- withCallingHandlers(
     {
@@ -846,7 +846,7 @@ olink_lmer_posthoc <- function(df,
   }
 
   # Check data format
-  check_log <- run_check_npx(df = df, check_log = check_log)
+  check_log <- get_check_npx(df = df, check_log = check_log)
 
   lmer_posthoc_result <- withCallingHandlers(
     {
