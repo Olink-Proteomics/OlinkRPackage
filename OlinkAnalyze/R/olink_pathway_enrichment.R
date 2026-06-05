@@ -549,8 +549,7 @@ select_ont <- function(ontology,
 
       msig_df <- arrow::open_dataset(
         sources = msig_fixture_path
-      ) |>
-        dplyr::collect()
+      )
 
     } else {
       msig_df <- msigdbr::msigdbr(
@@ -592,8 +591,7 @@ select_ont <- function(ontology,
 
       msig_df <- arrow::open_dataset(
         sources = msig_fixture_path
-      ) |>
-        dplyr::collect()
+      )
     } else {
       msig_df <- msigdbr::msigdbr(
         species = "Mus musculus",
@@ -657,7 +655,11 @@ select_ont <- function(ontology,
         dplyr::any_of(
           c("gs_name", "gene_symbol")
         )
-      )
+      ) |>
+      dplyr::collect()
+  } else {
+    msig_df <- msig_df |>
+      dplyr::collect()
   }
 
   return(msig_df)
