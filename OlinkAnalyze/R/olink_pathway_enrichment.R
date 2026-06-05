@@ -400,8 +400,11 @@ data_prep <- function(df,
                       check_log) {
   # clean up data from invalid entries ----
 
+  check_log <- get_check_npx(df = df, check_log = check_log)
+
   df <- run_clean_npx(df = df,
                       check_log = check_log,
+                      out_df = "tibble",
                       remove_assay_na = TRUE,
                       remove_invalid_oid = TRUE,
                       remove_dup_sample_id = FALSE,
@@ -412,6 +415,8 @@ data_prep <- function(df,
                       convert_df_cols = TRUE,
                       convert_nonunique_uniprot = FALSE,
                       verbose = FALSE)
+
+  check_log <- get_check_npx(df = df, check_log = check_log)
 
   # remove non-overlapping assays between df and test_results ----
 
