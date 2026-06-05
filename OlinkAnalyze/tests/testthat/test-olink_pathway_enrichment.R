@@ -964,6 +964,8 @@ test_that(
         )
       )
 
+    # tibble ----
+
     expect_message(
       object = data_prep_out <- data_prep(
         df = npx_data_invalid,
@@ -979,9 +981,55 @@ test_that(
       fixed = TRUE
     )
 
+    expected_check_npx <- check_npx(df = data_prep_out) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_s3_class(object = data_prep_out, class = "olink_class")
+    expect_s3_class(object = data_prep_out, class = "tbl_df")
     expect_identical(
       object = dim(data_prep_out),
       expected = c(28236L, 18L)
+    )
+    expect_equal(
+      object = get_check_npx(data_prep_out),
+      expected = expected_check_npx
+    )
+
+    # olink_class ----
+
+    expect_warning(
+      object = expect_warning(
+        object = npx_data_invalid_obj <- attach_check_log(
+          df = npx_data_invalid,
+          out_df = "tibble"
+        ),
+        regexp = "Unrecognized OlinkID detected: \"OID01218A\""
+      ),
+      regexp = "\"OID01217\" has \"NPX\" = NA for all samples."
+    )
+
+    expect_message(
+      object = data_prep_out_obj <- data_prep(
+        df = npx_data_invalid_obj,
+        test_results = reference_results$t_test
+      ),
+      regexp = paste("468 entries removed by `clean_npx()` from the",
+                     "input dataset `df`. Run `clean_npx()` on your",
+                     "dataset with `verbose = TRUE` to inspect which",
+                     "rows were removed."),
+      fixed = TRUE
+    )
+
+    expect_s3_class(object = data_prep_out_obj, class = "olink_class")
+    expect_s3_class(object = data_prep_out_obj, class = "tbl_df")
+    expect_identical(
+      object = dim(data_prep_out_obj),
+      expected = c(28236L, 18L)
+    )
+    expect_equal(
+      object = get_check_npx(data_prep_out_obj),
+      expected = expected_check_npx
     )
   }
 )
@@ -992,20 +1040,32 @@ test_that(
     # Load reference results - skipped if files are absent
     reference_results <- get_example_data(filename = "reference_results.rds")
 
+    # data ----
+
     exclude_assays <- npx_data1[["OlinkID"]] |> unique() |> head(n = 5L)
+
+    npx_data1_mod <- npx_data1 |>
+      dplyr::filter(
+        !grepl(pattern = "control",
+               x = .data[["SampleID"]],
+               ignore.case = TRUE)
+      )
+
+    t_test_mod <- reference_results$t_test |>
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% .env[["exclude_assays"]])
+      )
+
+    # expected output ----
+
+    expected_dim <- c(27924L, 17L)
+
+    # tibble ----
 
     expect_message(
       object = data_prep_out <- data_prep(
-        df = npx_data1 |>
-          dplyr::filter(
-            !grepl(pattern = "control",
-                   x = .data[["SampleID"]],
-                   ignore.case = TRUE)
-          ),
-        test_results = reference_results$t_test |>
-          dplyr::filter(
-            !(.data[["OlinkID"]] %in% .env[["exclude_assays"]])
-          ),
+        df = npx_data1_mod,
+        test_results = t_test_mod,
         check_log = check_log
       ),
       regexp = paste("5 assays in `df` are not represented in `test_results`",
@@ -1017,7 +1077,35 @@ test_that(
 
     expect_identical(
       object = dim(data_prep_out),
-      expected = c(27924L, 17L)
+      expected = expected_dim
+    )
+
+    # olink_class ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = npx_data1_mod_obj <- attach_check_log(df = npx_data1_mod,
+                                                         out_df = "tibble")
+        )
+      )
+    )
+
+    expect_message(
+      object = data_prep_out <- data_prep(
+        df = npx_data1_mod_obj,
+        test_results = t_test_mod
+      ),
+      regexp = paste("5 assays in `df` are not represented in `test_results`",
+                     "and will be removed from `df`: \"OID01216\",",
+                     "\"OID01217\", \"OID01218\", \"OID01219\", and",
+                     "\"OID01220\""),
+      fixed = TRUE
+    )
+
+    expect_identical(
+      object = dim(data_prep_out),
+      expected = expected_dim
     )
   }
 )
@@ -1073,13 +1161,21 @@ test_that(
         duplicate_assay_data
       )
 
+    expect_warning(
+      object = expect_warning(
+        object = duplicated_assay_data_obj <- attach_check_log(
+          df = duplicated_assay_data,
+          out_df = "arrow"
+        ),
+        regexp = "Duplicate SampleIDs detected: \"A1\", \"A2\", \"A3\", \"A4\""
+      ),
+      regexp = "Detected multiple UniProt identifiers for assay: \"OID01254\""
+    )
+
     expect_error(
       object = data_prep(
-        df = duplicated_assay_data,
-        test_results = reference_results$t_test,
-        check_log = check_npx(df = duplicated_assay_data) |>
-          suppressWarnings() |>
-          suppressMessages()
+        df = duplicated_assay_data_obj,
+        test_results = reference_results$t_test
       ),
       regexp = "Detected 1 duplicated assay in `df`: \"MET\"!"
     )
