@@ -85,11 +85,9 @@ olink_bridge_selector <- function(df,
 
   # ---- STEP 1: Remove invalid OlinkIDs & control samples ---------------------
 
-  check_log <- get_check_npx(df = df, check_log = check_log)
-
   df_clean <- run_clean_npx(
     df = df,
-    check_log = check_log,
+    check_log = get_check_npx(df = df, check_log = check_log),
     out_df = "tibble",
     remove_qc_warning = FALSE,
     remove_assay_warning = FALSE,

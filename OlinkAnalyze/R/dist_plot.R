@@ -81,16 +81,13 @@ olink_dist_plot <- function(df,
   # check if color column is present
   check_columns(df = df, col_list = list(color_g))
 
-  # Check if check_log is correct
-  check_log <- get_check_npx(df = df, check_log = check_log)
-
   # Remove invalid OlinkID, assays with all NA values, and convert non-unique
   # Uniprot IDs. Note that we do not remove samples with duplicate SampleID,
   # control samples or assays, or samples/assays with QC warnings, as this
   # would be the user's decision.
   df <- run_clean_npx(
     df = df,
-    check_log = check_log,
+    check_log = get_check_npx(df = df, check_log = check_log),
     remove_assay_na = TRUE,
     remove_invalid_oid = TRUE,
     remove_dup_sample_id = FALSE,

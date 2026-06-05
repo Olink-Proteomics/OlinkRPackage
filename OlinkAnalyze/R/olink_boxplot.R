@@ -103,11 +103,10 @@ olink_boxplot <- function(df,
     }
   }
   # ---- QC & CLEANING --------------------------------------------------------
-  check_log <- get_check_npx(df = df, check_log = check_log)
   df <- run_clean_npx(
     df = df,
     out_df = "tibble",
-    check_log = check_log,
+    check_log = get_check_npx(df = df, check_log = check_log),
     remove_qc_warning = FALSE,
     remove_assay_warning = FALSE,
     verbose = FALSE

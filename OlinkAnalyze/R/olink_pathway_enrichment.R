@@ -285,7 +285,7 @@ check_pe_inputs <- function(df,
   non_overlap_assays <- helper_non_overlap_assays(
     df = df,
     test_results = test_results,
-    check_log = get_check_npx(df = df, check_log = check_log),
+    check_log = check_log,
     which = "both"
   )
 
@@ -409,7 +409,7 @@ data_prep <- function(df,
   # clean up data from invalid entries ----
 
   df <- run_clean_npx(df = df,
-                      check_log = get_check_npx(df = df, check_log = check_log),
+                      check_log = check_log,
                       out_df = "tibble",
                       remove_assay_na = TRUE,
                       remove_invalid_oid = TRUE,
