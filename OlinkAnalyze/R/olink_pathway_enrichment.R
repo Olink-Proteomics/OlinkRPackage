@@ -400,10 +400,8 @@ data_prep <- function(df,
                       check_log) {
   # clean up data from invalid entries ----
 
-  check_log <- get_check_npx(df = df, check_log = check_log)
-
   df <- run_clean_npx(df = df,
-                      check_log = check_log,
+                      check_log = get_check_npx(df = df, check_log = check_log),
                       out_df = "tibble",
                       remove_assay_na = TRUE,
                       remove_invalid_oid = TRUE,
