@@ -169,6 +169,7 @@ check_columns <- function(df,
 #' @returns Nothing or an error message if the required column is missing.
 #'
 #' @keywords internal
+#' @noRd
 #'
 check_log_colname <- function(check_log, col_key) {
   check_col_key(col_key = col_key)

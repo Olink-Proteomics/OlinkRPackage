@@ -1,6 +1,6 @@
 #' Help function checking if a variable is an R6 ArrowObject.
 #'
-#' @inherit .check_params params author return seealso
+#' @inherit .check_params params author return
 #'
 #' @keywords internal
 #' @noRd
@@ -43,7 +43,7 @@ check_is_arrow_object <- function(x,
 
 #' Help function checking if a variable is a tibble dataset.
 #'
-#' @inherit .check_params params author return seealso
+#' @inherit .check_params params author return
 #'
 #' @keywords internal
 #' @noRd
@@ -86,7 +86,7 @@ check_is_tibble <- function(x,
 
 #' Help function checking if a variable is an Olink class object.
 #'
-#' @inherit .check_params params author return seealso
+#' @inherit .check_params params author return
 #'
 #' @keywords internal
 #' @noRd
@@ -129,9 +129,10 @@ check_is_olink_class <- function(x,
 
 #' Help function checking if a variable is a tibble or an ArrowObject dataset.
 #'
-#' @inherit .check_params params author return seealso
+#' @inherit .check_params params author return
 #'
 #' @keywords internal
+#' @noRd
 #'
 check_is_dataset <- function(x,
                              error = FALSE) {

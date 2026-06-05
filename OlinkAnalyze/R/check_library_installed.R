@@ -8,6 +8,9 @@
 #' @return Boolean if the library is installed or not, and an error if
 #' `error = TRUE`.
 #'
+#' @keywords internal
+#' @noRd
+#'
 check_library_installed <- function(x,
                                     error = FALSE) {
 

@@ -124,7 +124,7 @@ convert_read_npx_output <- function(df,
 #' Determines whether a validated dataset is represented as a tibble or an
 #' Arrow object, and returns the corresponding output type.
 #'
-#' @param df A dataset object. Must pass [check_is_dataset()].
+#' @param df A dataset object. Must pass `check_is_dataset()`.
 #'
 #' @return A character string indicating the dataset output type:
 #' `"tibble"` if `df` is a tibble, or `"arrow"` if `df` is an Arrow object.
@@ -325,20 +325,6 @@ check_osi <- function(df,
 #'
 #' @return Boolean, `TRUE` or `FALSE`, if the variable is of the correct class;
 #' If output is `FALSE` and \var{error} = `TRUE`, an error is thrown.
-#'
-#' @seealso
-#'   \code{\link{check_is_character}}
-#'   \code{\link{check_is_integer}}
-#'   \code{\link{check_is_numeric}}
-#'   \code{\link{check_is_boolean}}
-#'   \code{\link{check_is_scalar_character}}
-#'   \code{\link{check_is_scalar_integer}}
-#'   \code{\link{check_is_scalar_numeric}}
-#'   \code{\link{check_is_scalar_boolean}}
-#'   \code{\link{check_is_tibble}}
-#'   \code{\link{check_is_dataset}}
-#'   \code{\link{check_is_arrow_object}}
-#'   \code{\link{check_is_list}}
 #'
 .check_params <- function(x, error) {}
 
