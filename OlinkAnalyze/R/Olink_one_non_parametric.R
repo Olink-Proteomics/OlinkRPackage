@@ -506,7 +506,7 @@ olink_one_non_parametric_posthoc <- function(df, # nolint: object_length_linter
         num.vars <- c(num.vars, variable_testers) # nolint: object_name_linter
       }
 
-      formula_string <- paste0(data_type, "~", paste(variable, collapse = "*"))
+      formula_string <- paste0(data_type, "~", paste(variable, collapse = "*")) # nolint: object_usage_linter
 
       # Print verbose message
       if (verbose) {
