@@ -271,8 +271,6 @@ check_pe_inputs <- function(df,
                             ontology,
                             organism) {
 
-  check_log <- run_check_npx(df = df, check_log = check_log)
-
   # check required columns in test_results ----
 
   check_columns(df = test_results,
@@ -283,7 +281,7 @@ check_pe_inputs <- function(df,
   non_overlap_assays <- helper_non_overlap_assays(
     df = df,
     test_results = test_results,
-    check_log = check_log,
+    check_log = get_check_npx(df = df, check_log = check_log),
     which = "both"
   )
 
@@ -366,7 +364,7 @@ check_pe_inputs <- function(df,
     )
   }
 
-  return(check_log)
+  return(invisible(NULL))
 }
 
 helper_non_overlap_assays <- function(df,

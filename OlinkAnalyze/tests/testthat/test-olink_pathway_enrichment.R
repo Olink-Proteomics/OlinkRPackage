@@ -681,7 +681,7 @@ test_that(
     reference_results <- get_example_data(filename = "reference_results.rds")
 
     expect_warning(
-      object = check_pe_inputs(
+      object = res_cpei <- check_pe_inputs(
         df = npx_data1,
         check_log = check_log,
         test_results = reference_results$t_test |>
@@ -694,6 +694,8 @@ test_that(
       ),
       regexp = "The sets of assays in `df` and `test_results` do not match!"
     )
+
+    expect_null(object = res_cpei)
   }
 )
 
@@ -770,7 +772,7 @@ test_that(
     reference_results <- get_example_data(filename = "reference_results.rds")
 
     expect_error(
-      object =  olink_pathway_enrichment(
+      object = olink_pathway_enrichment(
         df = npx_data1,
         check_log = check_log,
         test_results = reference_results$t_test,
