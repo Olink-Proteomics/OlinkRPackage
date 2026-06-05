@@ -793,7 +793,9 @@ test_that(
 
     all_assays <- npx_data1[["OlinkID"]] |> unique() |> sort()
 
-    # all assays overlap - both ----
+    # tibble ----
+
+    ## all assays overlap - both ----
 
     expect_equal(
       object = helper_non_overlap_assays(
@@ -806,7 +808,7 @@ test_that(
       expected = character(0L)
     )
 
-    # all assays overlap - df ----
+    ## all assays overlap - df ----
 
     expect_equal(
       object = helper_non_overlap_assays(
@@ -819,7 +821,7 @@ test_that(
       expected = character(0L)
     )
 
-    # all assays overlap - res ----
+    ## all assays overlap - res ----
 
     expect_equal(
       object = helper_non_overlap_assays(
@@ -832,7 +834,7 @@ test_that(
       expected = character(0L)
     )
 
-    # assays only in df - both ----
+    ## assays only in df - both ----
 
     expect_equal(
       object = helper_non_overlap_assays(
@@ -848,7 +850,7 @@ test_that(
       expected = head(x = all_assays, n = 2L)
     )
 
-    # assays only in df - df ----
+    ## assays only in df - df ----
 
     expect_equal(
       object = helper_non_overlap_assays(
@@ -864,7 +866,7 @@ test_that(
       expected = head(x = all_assays, n = 2L)
     )
 
-    # assays only in df - res ----
+    ## assays only in df - res ----
 
     expect_equal(
       object = helper_non_overlap_assays(
@@ -880,7 +882,7 @@ test_that(
       expected = character(0L)
     )
 
-    # assays only in test_results - both ----
+    ## assays only in test_results - both ----
 
     expect_equal(
       object = helper_non_overlap_assays(
@@ -896,7 +898,7 @@ test_that(
       expected = head(x = all_assays, n = 2L)
     )
 
-    # assays only in test_results - df ----
+    ## assays only in test_results - df ----
 
     expect_equal(
       object = helper_non_overlap_assays(
@@ -912,7 +914,7 @@ test_that(
       expected = character(0L)
     )
 
-    # assays only in test_results - both ----
+    ## assays only in test_results - both ----
 
     expect_equal(
       object = helper_non_overlap_assays(
@@ -927,6 +929,303 @@ test_that(
         sort(),
       expected = head(x = all_assays, n = 2L)
     )
+
+    # arrow ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_arrow <- attach_check_log(df = npx_data1,
+                                                       out_df = "arrow"),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    ## all assays overlap - both ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_arrow,
+        test_results = reference_results$t_test,
+        check_log = check_log,
+        which = "both"
+      ) |>
+        sort(),
+      expected = character(0L)
+    )
+
+    ## all assays overlap - df ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_arrow,
+        test_results = reference_results$t_test,
+        check_log = check_log,
+        which = "df"
+      ) |>
+        sort(),
+      expected = character(0L)
+    )
+
+    ## all assays overlap - res ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_arrow,
+        test_results = reference_results$t_test,
+        check_log = check_log,
+        which = "res"
+      ) |>
+        sort(),
+      expected = character(0L)
+    )
+
+    ## assays only in df - both ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_arrow,
+        test_results = reference_results$t_test |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
+          ),
+        check_log = check_log,
+        which = "both"
+      ) |>
+        sort(),
+      expected = head(x = all_assays, n = 2L)
+    )
+
+    ## assays only in df - df ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_arrow,
+        test_results = reference_results$t_test |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
+          ),
+        check_log = check_log,
+        which = "df"
+      ) |>
+        sort(),
+      expected = head(x = all_assays, n = 2L)
+    )
+
+    ## assays only in df - res ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_arrow,
+        test_results = reference_results$t_test |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
+          ),
+        check_log = check_log,
+        which = "res"
+      ) |>
+        sort(),
+      expected = character(0L)
+    )
+
+    ## assays only in test_results - both ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_arrow |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
+          ),
+        test_results = reference_results$t_test,
+        check_log = check_log,
+        which = "both"
+      ) |>
+        sort(),
+      expected = head(x = all_assays, n = 2L)
+    )
+
+    ## assays only in test_results - df ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_arrow |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
+          ),
+        test_results = reference_results$t_test,
+        check_log = check_log,
+        which = "df"
+      ) |>
+        sort(),
+      expected = character(0L)
+    )
+
+    ## assays only in test_results - both ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_arrow |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
+          ),
+        test_results = reference_results$t_test,
+        check_log = check_log,
+        which = "res"
+      ) |>
+        sort(),
+      expected = head(x = all_assays, n = 2L)
+    )
+
+    # olink_class ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_obj <- attach_check_log(df = npx_data1,
+                                                     out_df = "tibble"),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    ## all assays overlap - both ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_obj,
+        test_results = reference_results$t_test,
+        check_log = check_log,
+        which = "both"
+      ) |>
+        sort(),
+      expected = character(0L)
+    )
+
+    ## all assays overlap - df ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_obj,
+        test_results = reference_results$t_test,
+        check_log = check_log,
+        which = "df"
+      ) |>
+        sort(),
+      expected = character(0L)
+    )
+
+    ## all assays overlap - res ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_obj,
+        test_results = reference_results$t_test,
+        check_log = check_log,
+        which = "res"
+      ) |>
+        sort(),
+      expected = character(0L)
+    )
+
+    ## assays only in df - both ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_obj,
+        test_results = reference_results$t_test |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
+          ),
+        check_log = check_log,
+        which = "both"
+      ) |>
+        sort(),
+      expected = head(x = all_assays, n = 2L)
+    )
+
+    ## assays only in df - df ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_obj,
+        test_results = reference_results$t_test |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
+          ),
+        check_log = check_log,
+        which = "df"
+      ) |>
+        sort(),
+      expected = head(x = all_assays, n = 2L)
+    )
+
+    ## assays only in df - res ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_obj,
+        test_results = reference_results$t_test |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
+          ),
+        check_log = check_log,
+        which = "res"
+      ) |>
+        sort(),
+      expected = character(0L)
+    )
+
+    ## assays only in test_results - both ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_obj |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
+          ),
+        test_results = reference_results$t_test,
+        check_log = check_log,
+        which = "both"
+      ) |>
+        sort(),
+      expected = head(x = all_assays, n = 2L)
+    )
+
+    ## assays only in test_results - df ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_obj |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
+          ),
+        test_results = reference_results$t_test,
+        check_log = check_log,
+        which = "df"
+      ) |>
+        sort(),
+      expected = character(0L)
+    )
+
+    ## assays only in test_results - both ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_obj |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
+          ),
+        test_results = reference_results$t_test,
+        check_log = check_log,
+        which = "res"
+      ) |>
+        sort(),
+      expected = head(x = all_assays, n = 2L)
+    )
+
   }
 )
 
