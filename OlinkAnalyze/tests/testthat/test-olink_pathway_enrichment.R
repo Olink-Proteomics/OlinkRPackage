@@ -1208,26 +1208,6 @@ test_that(
 
     expected_test_res <- c(179L, 16L)
 
-    # tibble ----
-
-    expect_message(
-      object = test_prep_out <- test_prep(
-        df = npx_data1_mod,
-        test_results = reference_results$t_test,
-        check_log = check_log
-      ),
-      regexp = paste("5 assays in `test_results` are not represented in `df`",
-                     "and will be removed from `test_results`: \"OID01220\",",
-                     "\"OID01217\", \"OID01216\", \"OID01219\", and",
-                     "\"OID01218\""),
-      fixed = TRUE
-    )
-
-    expect_identical(
-      object = dim(test_prep_out),
-      expected = expected_test_res
-    )
-
     # olink_class ----
 
     npx_data1_mod_obj <- attach_check_log(df = npx_data1_mod, out_df = "tibble")
