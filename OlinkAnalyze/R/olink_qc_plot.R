@@ -114,16 +114,13 @@ olink_qc_plot <- function(df,
   # check input
   check_is_dataset(x = df, error = TRUE)
 
-  # Check if check_log is correct
-  check_log <- run_check_npx(df = df, check_log = check_log)
-
   # Remove invalid OlinkID, assays with all NA values, and convert non-unique
   # Uniprot IDs. Note that we do not remove samples with duplicate SampleID,
   # control samples or assays, or samples/assays with QC warnings, as this
   # would be the user's decision.
   df <- run_clean_npx(
     df = df,
-    check_log = check_log,
+    check_log = get_check_npx(df = df, check_log = check_log),
     remove_assay_na = TRUE,
     remove_invalid_oid = TRUE,
     remove_dup_sample_id = FALSE,
@@ -135,6 +132,8 @@ olink_qc_plot <- function(df,
     out_df = "tibble",
     verbose = FALSE
   )
+
+  check_log <- get_check_npx(df = df, check_log = check_log)
 
   # check IQR_outlierDef and median_outlierDef
   check_is_scalar_numeric(x = IQR_outlierDef, error = TRUE)
@@ -159,34 +158,53 @@ olink_qc_plot <- function(df,
                     osi_score = color_g)
   }
 
-  if ("QC_Warning" %in% names(df)) {
+  if ("qc_warning" %in% names(check_log$col_names)) {
     df_qr <- df |>
-      dplyr::group_by(.data[["Panel"]], .data[["SampleID"]]) |>
+      dplyr::group_by(
+        .data[[check_log$col_names$panel]],
+        .data[[check_log$col_names$sample_id]]
+      ) |>
       dplyr::mutate(
-        QC_Warning = dplyr::if_else(
-          all(toupper(.data[["QC_Warning"]]) == "PASS"),
+        !!check_log$col_names$qc_warning := dplyr::if_else(
+          all(toupper(.data[[check_log$col_names$qc_warning]]) == "PASS"),
           "Pass",
           "Warning"
         )
       )
   } else {
     df_qr <- df |>
-      dplyr::group_by(.data[["Panel"]], .data[["SampleID"]])
+      dplyr::group_by(
+        .data[[check_log$col_names$panel]],
+        .data[[check_log$col_names$sample_id]]
+      )
   }
 
   df_qr <- df_qr |>
     dplyr::mutate(
-      IQR = stats::IQR(.data[["NPX"]], na.rm = TRUE),
-      sample_median = stats::median(.data[["NPX"]], na.rm = TRUE)
+      IQR = stats::IQR(
+        x = .data[[check_log$col_names$quant]],
+        na.rm = TRUE
+      ),
+      sample_median = stats::median(
+        x = .data[[check_log$col_names$quant]],
+        na.rm = TRUE
+      )
     ) |>
     dplyr::ungroup() |>
-    dplyr::select(dplyr::all_of(c("SampleID",
-                                  "Panel",
-                                  "IQR",
-                                  "sample_median",
-                                  color_g))) |>
+    dplyr::select(
+      dplyr::all_of(
+        c(check_log$col_names$sample_id,
+          check_log$col_names$panel,
+          "IQR",
+          "sample_median",
+          color_g
+        )
+      )
+    ) |>
     dplyr::distinct() |>
-    dplyr::group_by(.data[["Panel"]]) |>
+    dplyr::group_by(
+      .data[[check_log$col_names$panel]]
+    ) |>
     dplyr::mutate(
       median_low = mean(.data[["sample_median"]],
                         na.rm = TRUE) -
@@ -215,15 +233,28 @@ olink_qc_plot <- function(df,
     )
 
   qc_plot <- df_qr |>
-    dplyr::mutate(Panel = .data[["Panel"]] |>
-                    stringr::str_replace("Olink ", "")) |>
-    ggplot2::ggplot(ggplot2::aes(x = .data[["sample_median"]],
-                                 y = .data[["IQR"]])) +
-    ggplot2::xlab("Sample Median") +
-    ggplot2::facet_wrap(~Panel,
-                        scale = "free",
-                        nrow = facetNrow,
-                        ncol = facetNcol) +
+    dplyr::mutate(
+      !!check_log$col_names$panel := stringr::str_replace(
+        string = .data[[check_log$col_names$panel]],
+        pattern = "Olink ",
+        replacement = ""
+      )
+    ) |>
+    ggplot2::ggplot(
+      mapping = ggplot2::aes(
+        x = .data[["sample_median"]],
+        y = .data[["IQR"]]
+      )
+    ) +
+    ggplot2::xlab(
+      label = "Sample Median"
+    ) +
+    ggplot2::facet_wrap(
+      facets = ggplot2::vars(.data[[check_log$col_names$panel]]),
+      scale = "free",
+      nrow = facetNrow,
+      ncol = facetNcol
+    ) +
     OlinkAnalyze::set_plot_theme()
 
   if (color_g %in% osi_cont_cols) {
@@ -243,34 +274,58 @@ olink_qc_plot <- function(df,
   }
 
   # Add outlier lines
-  if (outlierLines) {
+  if (outlierLines == TRUE) {
     qc_plot <- qc_plot +
-      ggplot2::geom_hline(ggplot2::aes(yintercept = .data[["iqr_low"]]),
-                          linetype = "dashed",
-                          color = "grey") +
-      ggplot2::geom_hline(ggplot2::aes(yintercept = .data[["iqr_high"]]),
-                          linetype = "dashed",
-                          color = "grey") +
-      ggplot2::geom_vline(ggplot2::aes(xintercept = .data[["median_low"]]),
-                          linetype = "dashed",
-                          color = "grey") +
-      ggplot2::geom_vline(ggplot2::aes(xintercept = .data[["median_high"]]),
-                          linetype = "dashed",
-                          color = "grey")
+      ggplot2::geom_hline(
+        mapping = ggplot2::aes(
+          yintercept = .data[["iqr_low"]]
+        ),
+        linetype = "dashed",
+        color = "grey"
+      ) +
+      ggplot2::geom_hline(
+        mapping = ggplot2::aes(
+          yintercept = .data[["iqr_high"]]
+        ),
+        linetype = "dashed",
+        color = "grey"
+      ) +
+      ggplot2::geom_vline(
+        mapping = ggplot2::aes(
+          xintercept = .data[["median_low"]]
+        ),
+        linetype = "dashed",
+        color = "grey"
+      ) +
+      ggplot2::geom_vline(
+        mapping = ggplot2::aes(
+          xintercept = .data[["median_high"]]
+        ),
+        linetype = "dashed",
+        color = "grey"
+      )
   }
 
-  if (plot_index) {
+  if (plot_index == TRUE) {
     qc_plot <- qc_plot +
-      ggplot2::geom_text(ggplot2::aes(color = !!rlang::ensym(color_g),
-                                      label = .data[["Index"]]),
-                         size = 3L)
+      ggplot2::geom_text(
+        mapping = ggplot2::aes(
+          color = .data[[color_g]],
+          label = .data[["Index"]]
+        ),
+        size = 3L
+      )
   } else {
     qc_plot <- qc_plot +
-      ggplot2::geom_point(ggplot2::aes(color = !!rlang::ensym(color_g)),
-                          size = 2.5)
+      ggplot2::geom_point(
+        mapping = ggplot2::aes(
+          color = .data[[color_g]]
+        ),
+        size = 2.5
+      )
   }
 
-  if (label_outliers) {
+  if (label_outliers == TRUE) {
 
     rlang::check_installed(
       pkg = c("ggrepel"),
@@ -278,16 +333,25 @@ olink_qc_plot <- function(df,
     )
 
     outlier_labels <- qc_plot@data |>
-      dplyr::mutate(SampleIDPlot = dplyr::case_when(Outlier == 1 ~ SampleID,
-                                                    TRUE ~ ""))
+      dplyr::mutate(
+        SampleIDPlot = dplyr::if_else(
+          .data[["Outlier"]] == 1L,
+          .data[["SampleID"]],
+          ""
+        )
+      )
 
     qc_plot <- qc_plot +
-      ggrepel::geom_label_repel(ggplot2::aes(label = outlier_labels$SampleIDPlot), #nolint line_length_linter
-                                box.padding = 0.5,
-                                min.segment.length = 0.1,
-                                show.legend = FALSE,
-                                size = 3L)
-
+      ggrepel::geom_label_repel(
+        data = outlier_labels,
+        mapping = ggplot2::aes(
+          label = .data[["SampleIDPlot"]]
+        ),
+        box.padding = 0.5,
+        min.segment.length = 0.1,
+        show.legend = FALSE,
+        size = 3L
+      )
   }
 
   return(qc_plot)
