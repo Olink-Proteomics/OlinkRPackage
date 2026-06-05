@@ -373,6 +373,12 @@ helper_non_overlap_assays <- function(df,
                                       test_results,
                                       check_log,
                                       which = "both") {
+  # convert to tibble if it's not already a tibble or olink_class
+  if (!any(c(check_is_tibble(x = df, error = FALSE),
+             check_is_olink_class(x = df, error = FALSE)))) {
+    df <- convert_read_npx_output(df = df, out_df = "tibble")
+  }
+
   no_overlap_in_df <- setdiff(
     x = unique(df[[check_log$col_names$olink_id]]),
     y = unique(test_results[["OlinkID"]])
