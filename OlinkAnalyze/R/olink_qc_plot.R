@@ -133,7 +133,7 @@ olink_qc_plot <- function(df,
     verbose = FALSE
   )
 
-  check_log <- get_check_npx(df = df, check_log = check_log)
+  check_log <- get_check_npx(df = df)
 
   # check IQR_outlierDef and median_outlierDef
   check_is_scalar_numeric(x = IQR_outlierDef, error = TRUE)
