@@ -453,6 +453,10 @@ olink_one_non_parametric_posthoc <- function(df, # nolint object_length_linter
     )
   }
 
+  if (test == "kruskal") {
+    warn_if_buggy_dunn_test()
+  }
+
   # Check data format
   check_log <- run_check_npx(df = df, check_log = check_log)
 
