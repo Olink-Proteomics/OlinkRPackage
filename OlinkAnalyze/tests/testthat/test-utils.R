@@ -132,6 +132,188 @@ test_that(
   }
 )
 
+test_that(
+  "remove_all_na_cols - works - olink_class and arrow",
+  {
+    # olink_class ----
+
+    ## no all-NA columns ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_obj <- attach_check_log(
+            df = npx_data1,
+            out_df = "tibble"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_s3_class(object = npx_data1_obj, class = "olink_class")
+
+    expect_no_condition(
+      object = npx_data1_obj_clean_v1 <- remove_all_na_cols(df = npx_data1_obj)
+    )
+
+    expect_equal(
+      object = npx_data1_obj_clean_v1,
+      expected = npx_data1_obj
+    )
+
+    ## one NA column ----
+
+    npx_data1_obj_one_na <- npx_data1_obj |>
+      dplyr::mutate(
+        LOD = NA_real_
+      )
+
+    expect_s3_class(object = npx_data1_obj_one_na, class = "olink_class")
+
+    expect_no_condition(
+      object = npx_data1_obj_clean_v2 <- remove_all_na_cols(
+        df = npx_data1_obj_one_na
+      )
+    )
+
+    expect_equal(
+      object = npx_data1_obj_clean_v2,
+      expected = npx_data1_obj |>
+        dplyr::select(
+          -dplyr::all_of("LOD")
+        )
+    )
+
+    ## multiple NA columns ----
+
+    npx_data1_obj_multi_na <- npx_data1_obj |>
+      dplyr::mutate(
+        dplyr::across(
+          dplyr::all_of(c("LOD", "Index", "Site")),
+          ~ NA_real_
+        )
+      )
+
+    expect_s3_class(object = npx_data1_obj_multi_na, class = "olink_class")
+
+    expect_no_condition(
+      object = npx_data1_obj_clean_v3 <- remove_all_na_cols(
+        df = npx_data1_obj_multi_na
+      )
+    )
+
+    expect_equal(
+      object = npx_data1_obj_clean_v3,
+      expected = npx_data1_obj |>
+        dplyr::select(
+          -dplyr::all_of(
+            c("LOD", "Index", "Site")
+          )
+        )
+    )
+
+    ## arrow ----
+
+    ## no all-NA columns ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_arrow <- attach_check_log(
+            df = npx_data1,
+            out_df = "arrow"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_true(
+      object = check_is_arrow_object(
+        x = npx_data1_arrow,
+        error = FALSE
+      )
+    )
+
+    expect_no_condition(
+      object = npx_data1_arrow_clean_v1 <- remove_all_na_cols(
+        df = npx_data1_arrow
+      )
+    )
+
+    expect_equal(
+      object = npx_data1_arrow_clean_v1 |>
+        dplyr::collect(),
+      expected = npx_data1_arrow |>
+        dplyr::collect()
+    )
+
+    ## one NA column ----
+
+    npx_data1_arrow_one_na <- npx_data1_arrow |>
+      dplyr::mutate(
+        LOD = NA_real_
+      ) |>
+      dplyr::compute()
+
+    expect_true(
+      object = check_is_arrow_object(
+        x = npx_data1_arrow_one_na,
+        error = FALSE
+      )
+    )
+
+    expect_no_condition(
+      object = npx_data1_arrow_clean_v2 <- remove_all_na_cols(
+        df = npx_data1_arrow_one_na
+      )
+    )
+
+    expect_equal(
+      object = npx_data1_arrow_clean_v2 |>
+        dplyr::collect(),
+      expected = npx_data1_arrow |>
+        dplyr::select(
+          -dplyr::all_of("LOD")
+        ) |>
+        dplyr::collect()
+    )
+
+    ## multiple NA columns ----
+
+    npx_data1_arrow_multi_na <- npx_data1_arrow |>
+      dplyr::mutate(
+        dplyr::across(
+          dplyr::all_of(c("LOD", "Index", "Site")),
+          ~ NA_real_
+        )
+      ) |>
+      dplyr::compute()
+
+    expect_no_condition(
+      object = npx_data1_arrow_clean_v3 <- remove_all_na_cols(
+        df = npx_data1_arrow_multi_na
+      )
+    )
+
+    expect_equal(
+      object = npx_data1_arrow_clean_v3 |>
+        dplyr::collect(),
+      expected = npx_data1_arrow |>
+        dplyr::select(
+          -dplyr::all_of(
+            c("LOD", "Index", "Site")
+          )
+        ) |>
+        dplyr::collect()
+    )
+
+  }
+)
+
 # Test check_out_df_arg ----
 
 test_that(
