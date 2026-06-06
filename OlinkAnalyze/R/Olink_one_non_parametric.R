@@ -745,3 +745,26 @@ quiet_dunn <- function(formula, data, method = "bh") {
 
   return(out$res)
 }
+
+has_buggy_dunn_test <- function(is_installed = rlang::is_installed,
+                                package_version = utils::packageVersion) {
+  x <- is_installed("dunn.test") &&
+    package_version("dunn.test") == "1.4.0"
+  return(x)
+}
+
+warn_if_buggy_dunn_test <- function(has_buggy_version = has_buggy_dunn_test) {
+  if (has_buggy_version()) {
+    cli::cli_warn(
+      c(
+        "The installed version of {.pkg dunn.test} contains a known bug that
+        provides incorrect results!",
+        "i" = "Downgrade to v1.3.7 or upgrade to v1.4.1 using
+        {.run remotes::install_version(\"dunn.test\", version = \"1.3.7\")} or
+        {.run install.packages(\"dunn.test\")}, respectively."
+      )
+    )
+  }
+
+  return(invisible(NULL))
+}
