@@ -116,6 +116,10 @@ test_that(
     skip_if_not_installed("FSA")
     skip_if_not_installed("broom")
     skip_if_not_installed("rstatix")
+    skip_if(
+      packageVersion("dunn.test") == "1.4.0",
+      "dunn.test version = 1.4.1 contains a bug."
+    )
 
     # npx_data1 check_log
     check_log <- check_npx(npx_data1) |>
