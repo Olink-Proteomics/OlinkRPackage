@@ -506,7 +506,7 @@ test_that(
         dplyr::collect(),
       expected = npx_data1_obj
     )
-      expect_equal(
+    expect_equal(
       object = check_npx(df = npx_data1_arrow) |>
         suppressMessages() |>
         suppressWarnings(),

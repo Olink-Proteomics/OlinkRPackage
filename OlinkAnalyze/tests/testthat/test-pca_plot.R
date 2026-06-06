@@ -791,7 +791,7 @@ test_that(
     expect_no_error(
       object = expect_no_warning(
         object = expect_no_message(
-          object = pca_plot_treat_top_loading_arrow <- olink_pca_plot(
+          object = pca_plot_treat_top_load_arrow <- olink_pca_plot(
             df = npx_data1_treatment_arrow,
             color_g = "Treatment",
             loadings_list = {
@@ -806,7 +806,7 @@ test_that(
     )
 
     expect_equal_ggplot(
-      object = pca_plot_treat_top_loading_arrow[[1L]],
+      object = pca_plot_treat_top_load_arrow[[1L]],
       expected = pca_plot_treat_top_loading[[1L]]
     )
   }
