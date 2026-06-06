@@ -352,8 +352,10 @@ test_that(
 # Test convert_read_npx_output ----
 
 test_that(
-  "check convert read npx output - df: arrow; out: tibble",
+  "convert_read_npx_output - works - df: arrow; out: tibble",
   {
+    # simple arrow ----
+
     expect_true(
       object = convert_read_npx_output(
         df = dplyr::tibble(
@@ -368,12 +370,49 @@ test_that(
       ) |>
         inherits(what = "tbl_df")
     )
+
+    # olink_class arrow ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_arrow <- attach_check_log(
+            df = npx_data1,
+            out_df = "arrow"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_no_condition(
+      object = npx_data1_tibble <- convert_read_npx_output(
+        df = npx_data1_arrow,
+        out_df = "tibble"
+      )
+    )
+
+    expect_true(object = inherits(x = npx_data1_tibble, what = "tbl_df"))
+    expect_false(object = inherits(x = npx_data1_tibble, what = "olink_class"))
+    expect_equal(
+      object = npx_data1_tibble,
+      expected = npx_data1
+    )
+    expect_equal(
+      object = check_npx(df = npx_data1_tibble) |>
+        suppressMessages() |>
+        suppressWarnings(),
+      expected = olink_check_log(df = npx_data1_arrow)
+    )
   }
 )
 
 test_that(
-  "check convert read npx output - df: arrow; out: arrow",
+  "convert_read_npx_output - works - df: arrow; out: arrow",
   {
+    # simple arrow ----
+
     expect_true(
       object = convert_read_npx_output(
         df = dplyr::tibble(
@@ -388,12 +427,43 @@ test_that(
       ) |>
         inherits(what = "ArrowObject")
     )
+
+    # olink_class arrow ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_arrow <- attach_check_log(
+            df = npx_data1,
+            out_df = "arrow"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_no_condition(
+      object = npx_data1_arrow_v2 <- convert_read_npx_output(
+        df = npx_data1_arrow,
+        out_df = "arrow"
+      )
+    )
+
+    expect_true(object = inherits(x = npx_data1_arrow_v2, what = "ArrowObject"))
+
+    expect_equal(
+      object = olink_check_log(df = npx_data1_arrow_v2),
+      expected = olink_check_log(df = npx_data1_arrow)
+    )
   }
 )
 
 test_that(
-  "check convert read npx output - df: tibble; out: arrow",
+  "convert_read_npx_output - works - df: tibble; out: arrow",
   {
+    # simple tibble ----
+
     expect_true(
       object = convert_read_npx_output(
         df = dplyr::tibble(
@@ -407,12 +477,49 @@ test_that(
       ) |>
         inherits(what = "ArrowObject")
     )
+
+    # olink_class arrow ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_obj <- attach_check_log(
+            df = npx_data1,
+            out_df = "tibble"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_no_condition(
+      object = npx_data1_arrow <- convert_read_npx_output(
+        df = npx_data1_obj,
+        out_df = "arrow"
+      )
+    )
+
+    expect_true(object = inherits(x = npx_data1_arrow, what = "ArrowObject"))
+    expect_equal(
+      object = npx_data1_arrow |>
+        dplyr::collect(),
+      expected = npx_data1_obj
+    )
+      expect_equal(
+      object = check_npx(df = npx_data1_arrow) |>
+        suppressMessages() |>
+        suppressWarnings(),
+      expected = olink_check_log(df = npx_data1_obj)
+    )
   }
 )
 
 test_that(
-  "check convert read npx output - df: tibble; out: tibble",
+  "convert_read_npx_output - works df: tibble; out: tibble",
   {
+    # simple tibble ----
+
     expect_true(
       object = convert_read_npx_output(
         df = dplyr::tibble(
@@ -426,11 +533,49 @@ test_that(
       ) |>
         inherits(what = "tbl_df")
     )
+
+    # olink_class tibble ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_obj <- attach_check_log(
+            df = npx_data1,
+            out_df = "tibble"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_s3_class(object = npx_data1_obj, class = "olink_class")
+
+    expect_no_condition(
+      object = npx_data1_tibble <- convert_read_npx_output(
+        df = npx_data1_obj,
+        out_df = "tibble"
+      )
+    )
+
+    expect_true(object = inherits(x = npx_data1_tibble, what = "tbl_df"))
+    expect_false(object = inherits(x = npx_data1_tibble, what = "olink_class"))
+
+    expect_equal(
+      object = npx_data1_tibble,
+      expected = npx_data1
+    )
+    expect_equal(
+      object = check_npx(df = npx_data1_tibble) |>
+        suppressMessages() |>
+        suppressWarnings(),
+      expected = olink_check_log(df = npx_data1_obj)
+    )
   }
 )
 
 test_that(
-  "check convert read npx output - ERROR",
+  "convert_read_npx_output - works ERROR",
   {
     expect_error(
       object = convert_read_npx_output(df = c("I_Shall_Not_Pass",
