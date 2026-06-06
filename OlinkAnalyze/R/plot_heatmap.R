@@ -95,12 +95,14 @@ olink_heatmap_plot <- function(df,
   plot_heatmap_check_inputs(colnames = colnames,
                             ...)
 
-  check_log <- run_check_npx(df = df,
+  check_log <- get_check_npx(df = df,
                              check_log = check_log)
 
   df <- plot_heatmap_clean_df(df = df,
                               check_log = check_log,
                               colnames = colnames)
+
+  check_log <- get_check_npx(df = df)
 
   df_wide <- plot_heatmap_df_to_wide(df = df,
                                      check_log = check_log,
