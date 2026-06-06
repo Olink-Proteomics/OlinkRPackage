@@ -8,6 +8,8 @@ test_that(
     skip_if_not_installed(pkg = "broom")
     skip_on_cran()
 
+    # tibble ----
+
     check_log <- check_npx(df = npx_data1) |>
       suppressMessages() |>
       suppressWarnings()
@@ -33,6 +35,42 @@ test_that(
       object = t_test_res,
       expected = reference_results$t_test
     )
+
+    # olink_class ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_obj <- attach_check_log(
+            df = npx_data1,
+            out_df = "tibble"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    # run olink_ttest
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = t_test_res_obj <- olink_ttest(
+            df = npx_data1_obj,
+            variable = "Treatment"
+          ),
+          regexp = paste("Samples removed due to missing variable levels:",
+                         "CONTROL_SAMPLE_AS 1, CONTROL_SAMPLE_AS 2")
+        ),
+        regexp = "Variable converted from character to factor: Treatment"
+      ),
+      regexp = "T-test is performed on Treated - Untreated."
+    )
+
+    expect_equal(
+      object = t_test_res_obj,
+      expected = reference_results$t_test
+    )
   }
 )
 
@@ -45,6 +83,8 @@ test_that(
 
     skip_if_not_installed(pkg = "broom")
     skip_on_cran()
+
+    # tibble ----
 
     npx_df <- npx_data1 |>
       dplyr::filter(
@@ -71,6 +111,37 @@ test_that(
 
     expect_equal(
       object = paired_t_test_res,
+      expected = reference_results$t_test_paired
+    )
+
+    # olink_class ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = npx_df_obj <- attach_check_log(
+            df = npx_df,
+            out_df = "tibble"
+          )
+        )
+      )
+    )
+
+    # run olink_ttest
+    expect_message(
+      object = expect_message(
+        object = paired_t_test_res_obj <- olink_ttest(
+          df = npx_df_obj,
+          variable = "Time",
+          pair_id = "Subject"
+        ),
+        regexp = "Variable converted from character to factor: Time"
+      ),
+      regexp = "Paired t-test is performed on Baseline - Week.6."
+    )
+
+    expect_equal(
+      object = paired_t_test_res_obj,
       expected = reference_results$t_test_paired
     )
   }

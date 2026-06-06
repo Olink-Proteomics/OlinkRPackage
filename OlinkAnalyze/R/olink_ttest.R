@@ -190,7 +190,7 @@ olink_ttest <- function(df,
   }
 
   # Check data format
-  check_log <- run_check_npx(df = df, check_log = check_log)
+  check_log <- get_check_npx(df = df, check_log = check_log)
 
   nas_in_level <- df |>
     dplyr::filter(
