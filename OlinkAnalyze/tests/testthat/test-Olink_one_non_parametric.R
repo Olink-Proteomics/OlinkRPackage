@@ -199,10 +199,25 @@ test_that(
       fixed = TRUE
     )
 
-    if (packageVersion("dunn.test") <= "1.3.7") {
-      expect_equal(
-        object = kruskal_posthoc_results,
-        expected = ref_results$kruskal_posthoc
+    expect_equal(
+      object = kruskal_posthoc_results,
+      expected = ref_results$kruskal_posthoc
+    )
+
+    expect_equal(
+      object = nrow(kruskal_posthoc_results),
+      expected = 190
+    )
+
+    expect_equal(
+      object = kruskal_posthoc_results |>
+        dplyr::select(contrast) |>
+        unique() |>
+        nrow(),
+      expected = 10
+    )
+  }
+)
       )
 
       expect_equal(
