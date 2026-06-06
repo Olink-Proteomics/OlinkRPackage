@@ -649,6 +649,29 @@ test_that(
 )
 
 test_that(
+  "get_read_npx_output - works - returns tibble for olink_class input",
+  {
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_obj <- attach_check_log(
+            df = npx_data1,
+            out_df = "tibble"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_identical(
+      object = get_read_npx_output(df = npx_data1_obj),
+      expected = "tibble"
+    )
+  }
+)
+
+test_that(
   "get_read_npx_output - works - returns arrow for Arrow object input",
   {
     df <- arrow::as_arrow_table(
@@ -661,6 +684,29 @@ test_that(
 
     expect_identical(
       object = get_read_npx_output(df = df),
+      expected = "arrow"
+    )
+  }
+)
+
+test_that(
+  "get_read_npx_output - works - returns arrow for olink_class arrow input",
+  {
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_arrow <- attach_check_log(
+            df = npx_data1,
+            out_df = "arrow"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_identical(
+      object = get_read_npx_output(df = npx_data1_arrow),
       expected = "arrow"
     )
   }
