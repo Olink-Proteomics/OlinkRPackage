@@ -173,11 +173,10 @@ olink_pca_plot <- function(df,
     }
   }
 
-  # Check if check_log is correct
-  check_log <- run_check_npx(df = df, check_log = check_log)
-
   # other checks
   check_is_dataset(x = df, error = TRUE)
+  # Check if check_log is correct
+  check_log <- get_check_npx(df = df, check_log = check_log)
   check_is_scalar_character(x = color_g, error = TRUE)
   check_is_scalar_boolean(x = label_samples, error = TRUE)
   check_is_scalar_boolean(x = drop_assays, error = TRUE)
@@ -217,6 +216,8 @@ olink_pca_plot <- function(df,
     verbose = FALSE
   )
 
+  check_log <- get_check_npx(df = df)
+
   # OSI checks - ran only if OSI columns selected to color
   osi_cat_cols <- c("OSICategory")
   osi_cont_cols <- c(
@@ -229,7 +230,6 @@ olink_pca_plot <- function(df,
     # Check for invalid values and NA columns
     df <- check_osi(
       df = df,
-      check_log = check_log,
       osi_score = color_g
     )
   }

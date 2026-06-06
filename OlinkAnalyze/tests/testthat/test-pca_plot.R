@@ -427,6 +427,392 @@ test_that(
 )
 
 test_that(
+  "olink_pca_plot - works - olink_class and arrow",
+  {
+    skip_if_not_installed(pkg = "ggplot2", minimum_version = "3.4.0")
+    skip_if_not_installed(pkg = c("ggrepel"))
+    skip_on_cran()
+
+    # Load reference results
+    # tests are skipped if files are absent
+    reference_results <- get_example_data(filename = "reference_results.rds")
+
+    withr::local_seed(10)
+
+    # data ----
+
+    # Load data with unique SampleID
+    npx_data1_uniqueid <- npx_data1 |>
+      dplyr::mutate(
+        SampleID = paste(.data[["SampleID"]], "_", .data[["Index"]], sep = "")
+      )
+
+    check_log_uniqueid <- check_npx(df = npx_data1_uniqueid) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # Load data with unique SampleID and complete treatment
+    npx_data1_treatment <- npx_data1 |>
+      dplyr::mutate(
+        SampleID = paste(.data[["SampleID"]], "_", .data[["Index"]], sep = "")
+      ) |>
+      dplyr::filter(!is.na(.data[["Treatment"]]))
+
+    check_log_treatment <- check_npx(df = npx_data1_treatment) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # tibble ----
+
+    ## PCA plot ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = pca_plot <- olink_pca_plot(
+            df = npx_data1_uniqueid,
+            check_log = check_log_uniqueid,
+            quiet = TRUE
+          )
+        )
+      )
+    )
+
+    ## PCA plot with dropped assays/samples ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = expect_warning(
+            object = pca_plot_drop <- olink_pca_plot(
+              df = npx_data1_uniqueid,
+              check_log = check_log_uniqueid,
+              color_g = "QC_Warning",
+              drop_assays = TRUE,
+              drop_samples = TRUE,
+              quiet = TRUE
+            ),
+            regexp = "160 samples contain NA and are dropped."
+          ),
+          regexp = "0 assays contain NA and are dropped."
+        )
+      )
+    )
+
+    ## PCA plot by panel ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = pca_plot_by_panel <- olink_pca_plot(
+            df = npx_data1_uniqueid,
+            check_log = check_log_uniqueid,
+            color_g = "QC_Warning",
+            byPanel = TRUE,
+            quiet = TRUE
+          )
+        )
+      )
+    )
+
+    ## PCA plot by treatment ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = pca_plot_treatment <- olink_pca_plot(
+            df = npx_data1_treatment,
+            check_log = check_log_treatment,
+            color_g = "Treatment",
+            quiet = TRUE
+          )
+        )
+      )
+    )
+
+    ## PCA plot by treatment and loading ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = pca_plot_treat_top_loading <- olink_pca_plot(
+            df = npx_data1_treatment,
+            check_log = check_log_treatment,
+            color_g = "Treatment",
+            loadings_list = {
+              reference_results$t_test |>
+                utils::head(5) |>
+                dplyr::pull(.data[["OlinkID"]])
+            },
+            quiet = TRUE
+          )
+        )
+      )
+    )
+
+    # olink_class ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = npx_data1_uniqueid_obj <- attach_check_log(
+            df = npx_data1_uniqueid,
+            out_df = "tibble"
+          )
+        )
+      )
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = npx_data1_treatment_obj <- attach_check_log(
+            df = npx_data1_treatment,
+            out_df = "tibble"
+          )
+        )
+      )
+    )
+
+    ## PCA plot ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = pca_plot_obj <- olink_pca_plot(
+            df = npx_data1_uniqueid_obj,
+            quiet = TRUE
+          )
+        )
+      )
+    )
+
+    expect_equal_ggplot(
+      object = pca_plot_obj[[1L]],
+      expected = pca_plot[[1L]]
+    )
+
+    ## PCA plot with dropped assays/samples ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = expect_warning(
+            object = pca_plot_drop_obj <- olink_pca_plot(
+              df = npx_data1_uniqueid_obj,
+              color_g = "QC_Warning",
+              drop_assays = TRUE,
+              drop_samples = TRUE,
+              quiet = TRUE
+            ),
+            regexp = "160 samples contain NA and are dropped."
+          ),
+          regexp = "0 assays contain NA and are dropped."
+        )
+      )
+    )
+
+    expect_equal_ggplot(
+      object = pca_plot_drop_obj[[1L]],
+      expected = pca_plot_drop[[1L]]
+    )
+
+    ## PCA plot by panel ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = pca_plot_by_panel_obj <- olink_pca_plot(
+            df = npx_data1_uniqueid_obj,
+            color_g = "QC_Warning",
+            byPanel = TRUE,
+            quiet = TRUE
+          )
+        )
+      )
+    )
+
+    expect_equal_ggplot(
+      object = pca_plot_by_panel_obj[[1L]],
+      expected = pca_plot_by_panel[[1L]]
+    )
+
+    ## PCA plot by treatment ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = pca_plot_treatment_obj <- olink_pca_plot(
+            df = npx_data1_treatment_obj,
+            color_g = "Treatment",
+            quiet = TRUE
+          )
+        )
+      )
+    )
+
+    expect_equal_ggplot(
+      object = pca_plot_treatment_obj[[1L]],
+      expected = pca_plot_treatment[[1L]]
+    )
+
+    ## PCA plot by treatment and loading ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = pca_plot_treat_top_loading_obj <- olink_pca_plot(
+            df = npx_data1_treatment_obj,
+            color_g = "Treatment",
+            loadings_list = {
+              reference_results$t_test |>
+                utils::head(5L) |>
+                dplyr::pull(.data[["OlinkID"]])
+            },
+            quiet = TRUE
+          )
+        )
+      )
+    )
+
+    expect_equal_ggplot(
+      object = pca_plot_treat_top_loading_obj[[1L]],
+      expected = pca_plot_treat_top_loading[[1L]]
+    )
+
+    # olink_class arrow ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = npx_data1_uniqueid_arrow <- attach_check_log(
+            df = npx_data1_uniqueid,
+            out_df = "arrow"
+          )
+        )
+      )
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = npx_data1_treatment_arrow <- attach_check_log(
+            df = npx_data1_treatment,
+            out_df = "tibble"
+          )
+        )
+      )
+    )
+
+    ## PCA plot ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = pca_plot_arrow <- olink_pca_plot(
+            df = npx_data1_uniqueid_arrow,
+            quiet = TRUE
+          )
+        )
+      )
+    )
+
+    expect_equal_ggplot(
+      object = pca_plot_arrow[[1L]],
+      expected = pca_plot[[1L]]
+    )
+
+    ## PCA plot with dropped assays/samples ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = expect_warning(
+            object = pca_plot_drop_arrow <- olink_pca_plot(
+              df = npx_data1_uniqueid_arrow,
+              color_g = "QC_Warning",
+              drop_assays = TRUE,
+              drop_samples = TRUE,
+              quiet = TRUE
+            ),
+            regexp = "160 samples contain NA and are dropped."
+          ),
+          regexp = "0 assays contain NA and are dropped."
+        )
+      )
+    )
+
+    expect_equal_ggplot(
+      object = pca_plot_drop_arrow[[1L]],
+      expected = pca_plot_drop[[1L]]
+    )
+
+    ## PCA plot by panel ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = pca_plot_by_panel_arrow <- olink_pca_plot(
+            df = npx_data1_uniqueid_arrow,
+            color_g = "QC_Warning",
+            byPanel = TRUE,
+            quiet = TRUE
+          )
+        )
+      )
+    )
+
+    expect_equal_ggplot(
+      object = pca_plot_by_panel_arrow[[1L]],
+      expected = pca_plot_by_panel[[1L]]
+    )
+
+    ## PCA plot by treatment ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = pca_plot_treatment_arrow <- olink_pca_plot(
+            df = npx_data1_treatment_arrow,
+            color_g = "Treatment",
+            quiet = TRUE
+          )
+        )
+      )
+    )
+
+    expect_equal_ggplot(
+      object = pca_plot_treatment_arrow[[1L]],
+      expected = pca_plot_treatment[[1L]]
+    )
+
+    ## PCA plot by treatment and loading ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = pca_plot_treat_top_loading_arrow <- olink_pca_plot(
+            df = npx_data1_treatment_arrow,
+            color_g = "Treatment",
+            loadings_list = {
+              reference_results$t_test |>
+                utils::head(5L) |>
+                dplyr::pull(.data[["OlinkID"]])
+            },
+            quiet = TRUE
+          )
+        )
+      )
+    )
+
+    expect_equal_ggplot(
+      object = pca_plot_treat_top_loading_arrow[[1L]],
+      expected = pca_plot_treat_top_loading[[1L]]
+    )
+  }
+)
+
+test_that(
   "olink_pca_plot - works - Minimal PCA plot",
   {
     skip_if_not_installed(pkg = "ggplot2", minimum_version = "3.4.0")
