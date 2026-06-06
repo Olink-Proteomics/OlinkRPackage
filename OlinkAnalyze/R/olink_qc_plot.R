@@ -154,7 +154,6 @@ olink_qc_plot <- function(df,
 
     # Check for invalid values and NA columns
     df <- check_osi(df = df,
-                    check_log = check_log,
                     osi_score = color_g)
   }
 
