@@ -68,7 +68,7 @@ URL:
     https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/01-User%20Manuals%20for%20website/1494-Olink-Analyze-Cheatsheet.pdf
 Config/testthat/edition: 3
 Config/testthat/parallel: true
-Config/testthat/start-first: read_npx_l*, read_npx_w*
+Config/testthat/start-first: olink_pathway_enrichment, olink_normalization, read_npx_legacy, read_npx_wide, olink_normalization_utils, olink_lmer, olink_ordinal_regression, olink_normalization_n, olink_normalization_format, pca_plot, read_npx_format, plot_is_bridgeable, clean_npx, plot_heatmap
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
