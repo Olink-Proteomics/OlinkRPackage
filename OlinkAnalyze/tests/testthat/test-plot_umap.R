@@ -49,6 +49,115 @@ test_that(
 )
 
 test_that(
+  "olink_umap_plot - works - snapshot",
+  {
+    skip_if_not_installed("umap")
+    skip_if_not_installed("ggrepel")
+    skip_if_not_installed("ggpubr")
+
+    withr::local_seed(123)
+
+    cfg <- umap::umap.defaults
+    cfg$random_state <- 123
+
+    # data ----
+
+    npx_df <- npx_data1 |>
+      dplyr::filter(
+        !grepl(pattern = "control",
+               x = .data[["SampleID"]],
+               ignore.case = TRUE)
+      )
+
+    # tibble ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = check_log <- check_npx(df = npx_df)
+        )
+      )
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = umap_plot <- olink_umap_plot(
+            df = npx_df,
+            color_g = "QC_Warning",
+            quiet = TRUE,
+            config = cfg,
+            check_log = check_log
+          )
+        )
+      )
+    )
+
+    # olink_class ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = npx_df_obj <- attach_check_log(
+            df = npx_df,
+            out_df = "tibble"
+          )
+        )
+      )
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = umap_plot_obj <- olink_umap_plot(
+            df = npx_df_obj,
+            color_g = "QC_Warning",
+            quiet = TRUE,
+            config = cfg
+          )
+        )
+      )
+    )
+
+    expect_equal_ggplot(
+      object = umap_plot[[1L]],
+      expected = umap_plot_obj[[1L]]
+    )
+
+    # olink_class arrow ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = npx_df_arrow <- attach_check_log(
+            df = npx_df,
+            out_df = "arrow"
+          )
+        )
+      )
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = umap_plot_arrow <- olink_umap_plot(
+            df = npx_df_arrow,
+            color_g = "QC_Warning",
+            quiet = TRUE,
+            config = cfg
+          )
+        )
+      )
+    )
+
+    expect_equal_ggplot(
+      object = umap_plot[[1L]],
+      expected = umap_plot_arrow[[1L]]
+    )
+  }
+)
+
+test_that(
   "olink_umap_plot - works - clusters are there and outlier group is detected",
   {
     skip_if_not_installed("umap")

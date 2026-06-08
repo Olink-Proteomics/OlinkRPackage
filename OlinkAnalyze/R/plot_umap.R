@@ -178,9 +178,6 @@ olink_umap_plot <- function(df,
     }
   }
 
-  # Check data format
-  check_log <- run_check_npx(df = df, check_log = check_log)
-
   # input checks
 
   check_is_dataset(x = df, error = TRUE)
@@ -191,7 +188,7 @@ olink_umap_plot <- function(df,
   # would be the user's decision.
   df <- run_clean_npx(
     df = df,
-    check_log = check_log,
+    check_log = get_check_npx(df = df, check_log = check_log),
     remove_assay_na = TRUE,
     remove_invalid_oid = TRUE,
     remove_dup_sample_id = FALSE,
@@ -203,6 +200,9 @@ olink_umap_plot <- function(df,
     out_df = "tibble",
     verbose = FALSE
   )
+
+  # get check log
+  check_log <- get_check_npx(df = df)
 
   # Check that the user didn't specify just one of outlierDefX and outlierDefY
   if (sum(c(is.numeric(outlierDefX), is.numeric(outlierDefY))) == 1L) {
@@ -233,7 +233,6 @@ olink_umap_plot <- function(df,
 
     # Check for invalid values and NA columns
     df <- check_osi(df = df,
-                    check_log = check_log,
                     osi_score = color_g)
   }
 
