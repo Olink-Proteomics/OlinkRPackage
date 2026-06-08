@@ -170,7 +170,7 @@ olink_lmer_plot <- function(df,
 
   lm.means <- olink_lmer_posthoc( # nolint: object_name_linter
     df = df,
-    check_log = check_log,
+    check_log = get_check_npx(df = df, check_log = check_log),
     variable = variable,
     random = random,
     outcome = outcome,
