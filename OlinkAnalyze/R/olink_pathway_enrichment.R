@@ -405,7 +405,7 @@ helper_non_overlap_assays <- function(df,
 
 data_prep <- function(df,
                       test_results,
-                      check_log) {
+                      check_log = NULL) {
   # clean up data from invalid entries ----
 
   df <- run_clean_npx(df = df,
