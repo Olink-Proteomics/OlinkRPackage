@@ -165,6 +165,38 @@ ansi_collapse_quot <- function(x,
   return(x)
 }
 
+#' Pull a column from a data frame or Arrow object
+#'
+#' Pulls a single column from `.data` using a character column name. If `.data`
+#' is an Arrow object, `dplyr::pull()` is called with `as_vector = TRUE` so that
+#' the result is returned as an R vector.
+#'
+#' @param .data A data frame, tibble, or Arrow object.
+#' @param col A single character string giving the name of the column to pull.
+#'
+#' @return An R vector containing the values from `col`.
+#'
+#' @details
+#' This helper is intended for code paths where `.data` may be either a regular
+#' data frame like object or an Arrow object. The Arrow branch explicitly sets
+#' `as_vector = TRUE` to avoid relying on the deprecated default behavior of
+#' `dplyr::pull()` for Arrow data.
+#'
+#' @keywords internal
+#' @noRd
+#'
+pull_col <- function(.data, col) {
+  check_is_scalar_character(x = col, error = TRUE)
+
+  if (check_is_arrow_object(x = .data, error = FALSE)) {
+    x <- dplyr::pull(.data, .data[[col]], as_vector = TRUE)
+  } else {
+    x <- dplyr::pull(.data, .data[[col]])
+  }
+
+  return(x)
+}
+
 #' Utility function to check OSI values for validity
 #'
 #' @param df An Olink dataset.
