@@ -766,6 +766,137 @@ test_that(
   }
 )
 
+# Test pull_col ----
+
+test_that(
+  "pull_col - works - pulls a character column",
+  {
+    df <- tibble::tibble(
+      sample_id = c("A", "B", "C"),
+      value = 1L:3L
+    )
+
+    # tibble ----
+
+    expect_identical(
+      object = pull_col(df, "sample_id"),
+      expected = c("A", "B", "C")
+    )
+
+    # arrow ----
+
+    arrow_df <- arrow::arrow_table(df)
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = out <- pull_col(arrow_df, "sample_id")
+        )
+      )
+    )
+
+    expect_identical(
+      object = out,
+      expected = c("A", "B", "C")
+    )
+  }
+)
+
+test_that(
+  "pull_col - works - pulls a numeric column from a tibble",
+  {
+    df <- tibble::tibble(
+      sample_id = c("A", "B", "C"),
+      value = 1L:3L
+    )
+
+    # tibble ----
+
+    expect_identical(
+      object = pull_col(df, "value"),
+      expected = 1L:3L
+    )
+
+    # arrow ----
+
+    arrow_df <- arrow::arrow_table(df)
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = out <- pull_col(arrow_df, "value")
+        )
+      )
+    )
+
+    expect_identical(
+      object = out,
+      expected = 1L:3L
+    )
+  }
+)
+
+test_that(
+  "pull_col - works - column name is stored in a variable",
+  {
+    df <- tibble::tibble(
+      sample_id = c("A", "B", "C"),
+      value = 1L:3L
+    )
+
+    col_name <- "sample_id"
+
+    # tibble ----
+
+    expect_identical(
+      object = pull_col(df, col_name),
+      expected = c("A", "B", "C")
+    )
+
+    # arrow ----
+
+    arrow_df <- arrow::arrow_table(df)
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = out <- pull_col(arrow_df, col_name)
+        )
+      )
+    )
+
+    expect_identical(
+      object = out,
+      expected = c("A", "B", "C")
+    )
+  }
+)
+
+test_that(
+  "pull_col - error - requires col to be a scalar character",
+  {
+    df <- tibble::tibble(
+      sample_id = c("A", "B", "C"),
+      value = 1:3
+    )
+
+    expect_error(
+      object = pull_col(df, sample_id),
+      regexp = "object 'sample_id' not found"
+    )
+
+    expect_error(
+      object = pull_col(df, c("sample_id", "value")),
+      regexp = "`col` must be a scalar character!"
+    )
+
+    expect_error(
+      object = pull_col(df, NA_character_),
+      regexp = "`col` must be a scalar character!"
+    )
+  }
+)
+
 # Test check_osi ----
 
 test_that(
