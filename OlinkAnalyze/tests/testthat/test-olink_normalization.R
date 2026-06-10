@@ -18,128 +18,65 @@ test_that(
 
     ### bridge normalization - no norm column ----
 
-    expect_message(
-      object = expect_warning(
-        object = expect_message(
-          object = bridge_no_norm <- olink_normalization(
-            df1 = ref_norm_res$lst_df$df1_no_norm,
-            df2 = ref_norm_res$lst_df$df2_no_norm,
-            overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
-            df1_project_nr = "df1_no_norm",
-            df2_project_nr = "df2_no_norm",
-            reference_project = "df1_no_norm",
-            format = FALSE,
-            df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_norm) |>
-              suppressMessages() |>
-              suppressWarnings(),
-            df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_norm) |>
-              suppressMessages() |>
-              suppressWarnings()
-          ) |>
-            dplyr::filter(
-              .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
-            ),
-          regexp = "Bridge normalization will be performed!"
+    expect_warning(
+      object = expect_message(
+        object = expect_warning(
+          object = expect_message(
+            object = bridge_no_norm <- olink_normalization(
+              df1 = ref_norm_res$lst_df$df1_no_norm,
+              df2 = ref_norm_res$lst_df$df2_no_norm,
+              overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
+              df1_project_nr = "df1_no_norm",
+              df2_project_nr = "df2_no_norm",
+              reference_project = "df1_no_norm",
+              format = FALSE,
+              df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_norm) |>
+                suppressMessages() |>
+                suppressWarnings(),
+              df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_norm) |>
+                suppressMessages() |>
+                suppressWarnings()
+            ) |>
+              dplyr::filter(
+                .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+              ),
+            regexp = "Bridge normalization will be performed!"
+          ),
+          regexp = paste("Datasets \"df1_no_norm\" and \"df2_no_norm\" do not",
+                         "contain a column named \"Normalization\"")
         ),
-        regexp = paste("Datasets \"df1_no_norm\" and \"df2_no_norm\" do not",
-                       "contain a column named \"Normalization\"")
+        regexp = "Output includes two sets of bridging samples"
       ),
-      regexp = "Output includes two sets of bridging samples"
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = bridge_no_norm,
+      object = strip_check_log(df = bridge_no_norm),
       expected = ref_norm_res$lst_norm$bridge_norm$no_norm,
       tolerance = 1e-4
     )
 
     ### bridge normalization - with norm column ----
 
-    expect_message(
-      object = expect_message(
-        object = bridge_norm <- olink_normalization(
-          df1 = ref_norm_res$lst_df$df1_norm,
-          df2 = ref_norm_res$lst_df$df2_norm,
-          overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
-          df1_project_nr = "df1_norm",
-          df2_project_nr = "df2_norm",
-          reference_project = "df1_norm",
-          format = FALSE,
-          df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_norm) |>
-            suppressMessages() |>
-            suppressWarnings(),
-          df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_norm) |>
-            suppressMessages() |>
-            suppressWarnings()
-        ) |>
-          dplyr::filter(
-            .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
-          ),
-        regexp = "Bridge normalization will be performed!"
-      ),
-      regexp = "Output includes two sets of bridging samples"
-    )
-
-    expect_equal(
-      object = bridge_norm,
-      expected = ref_norm_res$lst_norm$bridge_norm$norm,
-      tolerance = 1e-4
-    )
-
-    ### bridge normalization - no lod column ----
-
-    expect_message(
-      object = expect_message(
-        object = bridge_no_lod <- olink_normalization(
-          df1 = ref_norm_res$lst_df$df1_no_lod,
-          df2 = ref_norm_res$lst_df$df2_no_lod,
-          overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
-          df1_project_nr = "df1_no_lod",
-          df2_project_nr = "df2_no_lod",
-          reference_project = "df1_no_lod",
-          format = FALSE,
-          df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_lod) |>
-            suppressMessages() |>
-            suppressWarnings(),
-          df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_lod) |>
-            suppressMessages() |>
-            suppressWarnings()
-        ) |>
-          dplyr::filter(
-            .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
-          ),
-        regexp = "Bridge normalization will be performed!"
-      ),
-      regexp = "Output includes two sets of bridging samples"
-    )
-
-    expect_equal(
-      object = bridge_no_lod,
-      expected = ref_norm_res$lst_norm$bridge_norm$no_lod,
-      tolerance = 1e-4
-    )
-
-    ### bridge normalization - multiple lod columns ----
-
-    expect_message(
+    expect_warning(
       object = expect_message(
         object = expect_message(
-          object = bridge_multiple_lod <- olink_normalization(
-            df1 = ref_norm_res$lst_df$df1_multiple_lod,
-            df2 = ref_norm_res$lst_df$df2_multiple_lod,
+          object = bridge_norm <- olink_normalization(
+            df1 = ref_norm_res$lst_df$df1_norm,
+            df2 = ref_norm_res$lst_df$df2_norm,
             overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
-            df1_project_nr = "df1_multiple_lod",
-            df2_project_nr = "df2_multiple_lod",
-            reference_project = "df1_multiple_lod",
+            df1_project_nr = "df1_norm",
+            df2_project_nr = "df2_norm",
+            reference_project = "df1_norm",
             format = FALSE,
-            df1_check_log = check_npx(
-              df = ref_norm_res$lst_df$df1_multiple_lod
-            ) |>
+            df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_norm) |>
               suppressMessages() |>
               suppressWarnings(),
-            df2_check_log = check_npx(
-              df = ref_norm_res$lst_df$df2_multiple_lod
-            ) |>
+            df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_norm) |>
               suppressMessages() |>
               suppressWarnings()
           ) |>
@@ -148,14 +85,106 @@ test_that(
             ),
           regexp = "Bridge normalization will be performed!"
         ),
-        regexp = paste("Datasets \"df1_multiple_lod\" and \"df2_multiple_lod\"",
-                       "contain multiple columns matching")
+        regexp = "Output includes two sets of bridging samples"
       ),
-      regexp = "Output includes two sets of bridging samples"
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = bridge_multiple_lod,
+      object = strip_check_log(df = bridge_norm),
+      expected = ref_norm_res$lst_norm$bridge_norm$norm,
+      tolerance = 1e-4
+    )
+
+    ### bridge normalization - no lod column ----
+
+    expect_warning(
+      object = expect_message(
+        object = expect_message(
+          object = bridge_no_lod <- olink_normalization(
+            df1 = ref_norm_res$lst_df$df1_no_lod,
+            df2 = ref_norm_res$lst_df$df2_no_lod,
+            overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
+            df1_project_nr = "df1_no_lod",
+            df2_project_nr = "df2_no_lod",
+            reference_project = "df1_no_lod",
+            format = FALSE,
+            df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_lod) |>
+              suppressMessages() |>
+              suppressWarnings(),
+            df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_lod) |>
+              suppressMessages() |>
+              suppressWarnings()
+          ) |>
+            dplyr::filter(
+              .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+            ),
+          regexp = "Bridge normalization will be performed!"
+        ),
+        regexp = "Output includes two sets of bridging samples"
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_equal(
+      object = strip_check_log(df = bridge_no_lod),
+      expected = ref_norm_res$lst_norm$bridge_norm$no_lod,
+      tolerance = 1e-4
+    )
+
+    ### bridge normalization - multiple lod columns ----
+
+    expect_warning(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = bridge_multiple_lod <- olink_normalization(
+              df1 = ref_norm_res$lst_df$df1_multiple_lod,
+              df2 = ref_norm_res$lst_df$df2_multiple_lod,
+              overlapping_samples_df1 = ref_norm_res$lst_sample$bridge_samples,
+              df1_project_nr = "df1_multiple_lod",
+              df2_project_nr = "df2_multiple_lod",
+              reference_project = "df1_multiple_lod",
+              format = FALSE,
+              df1_check_log = check_npx(
+                df = ref_norm_res$lst_df$df1_multiple_lod
+              ) |>
+                suppressMessages() |>
+                suppressWarnings(),
+              df2_check_log = check_npx(
+                df = ref_norm_res$lst_df$df2_multiple_lod
+              ) |>
+                suppressMessages() |>
+                suppressWarnings()
+            ) |>
+              dplyr::filter(
+                .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+              ),
+            regexp = "Bridge normalization will be performed!"
+          ),
+          regexp = paste("Datasets \"df1_multiple_lod\" and",
+                         "\"df2_multiple_lod\" contain multiple columns",
+                         "matching")
+        ),
+        regexp = "Output includes two sets of bridging samples"
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_equal(
+      object = strip_check_log(df = bridge_multiple_lod),
       expected = ref_norm_res$lst_norm$bridge_norm$multiple_lod,
       tolerance = 1e-4
     )
@@ -181,36 +210,43 @@ test_that(
         .data[["SampleID"]], .data[["OlinkID"]]
       )
 
-    expect_message(
+    expect_warning(
       object = expect_message(
-        object = bridge_norm_v1 <- olink_normalization(
-          df1 = df_norm_ref_v1,
-          df2 = df_norm_not_ref_v1,
-          overlapping_samples_df1 = bridge_samples_v1,
-          df1_project_nr = "df1_norm",
-          df2_project_nr = "df2_norm",
-          reference_project = "df1_norm",
-          format = TRUE,
-          df1_check_log = check_npx(df = df_norm_ref_v1) |>
-            suppressMessages() |>
-            suppressWarnings(),
-          df2_check_log = check_npx(df = df_norm_not_ref_v1) |>
-            suppressMessages() |>
-            suppressWarnings()
-        ) |>
-          dplyr::filter(
-            .data[["SampleID"]] %in% .env[["sample_subset"]]
+        object = expect_message(
+          object = bridge_norm_v1 <- olink_normalization(
+            df1 = df_norm_ref_v1,
+            df2 = df_norm_not_ref_v1,
+            overlapping_samples_df1 = bridge_samples_v1,
+            df1_project_nr = "df1_norm",
+            df2_project_nr = "df2_norm",
+            reference_project = "df1_norm",
+            format = TRUE,
+            df1_check_log = check_npx(df = df_norm_ref_v1) |>
+              suppressMessages() |>
+              suppressWarnings(),
+            df2_check_log = check_npx(df = df_norm_not_ref_v1) |>
+              suppressMessages() |>
+              suppressWarnings()
           ) |>
-          dplyr::arrange(
-            .data[["SampleID"]], .data[["OlinkID"]]
-          ),
-        regexp = "Bridge normalization will be performed!"
+            dplyr::filter(
+              .data[["SampleID"]] %in% .env[["sample_subset"]]
+            ) |>
+            dplyr::arrange(
+              .data[["SampleID"]], .data[["OlinkID"]]
+            ),
+          regexp = "Bridge normalization will be performed!"
+        ),
+        regexp = "Output includes two sets of bridging samples"
       ),
-      regexp = "Output includes two sets of bridging samples"
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = bridge_norm_v1,
+      object = strip_check_log(df = bridge_norm_v1),
       expected = ref_bridge_norm_v1,
       tolerance = 1e-4
     )
@@ -267,43 +303,50 @@ test_that(
       )
 
     expect_warning(
-      object = expect_message(
+      object = expect_warning(
         object = expect_message(
           object = expect_message(
-            object = bridge_norm_v2 <- olink_normalization(
-              df1 = df_norm_ref_v2,
-              df2 = df_norm_not_ref_v2,
-              overlapping_samples_df1 = bridge_samples_v2,
-              df1_project_nr = "df1_norm",
-              df2_project_nr = "df2_norm",
-              reference_project = "df1_norm",
-              format = TRUE,
-              df1_check_log = check_npx(df = df_norm_ref_v2) |>
-                suppressMessages() |>
-                suppressWarnings(),
-              df2_check_log = check_npx(df = df_norm_not_ref_v2) |>
-                suppressMessages() |>
-                suppressWarnings()
-            ) |>
-              dplyr::filter(
-                .data[["SampleID"]] %in% .env[["sample_subset"]]
+            object = expect_message(
+              object = bridge_norm_v2 <- olink_normalization(
+                df1 = df_norm_ref_v2,
+                df2 = df_norm_not_ref_v2,
+                overlapping_samples_df1 = bridge_samples_v2,
+                df1_project_nr = "df1_norm",
+                df2_project_nr = "df2_norm",
+                reference_project = "df1_norm",
+                format = TRUE,
+                df1_check_log = check_npx(df = df_norm_ref_v2) |>
+                  suppressMessages() |>
+                  suppressWarnings(),
+                df2_check_log = check_npx(df = df_norm_not_ref_v2) |>
+                  suppressMessages() |>
+                  suppressWarnings()
               ) |>
-              dplyr::arrange(
-                .data[["SampleID"]], .data[["OlinkID"]]
-              ),
-            regexp = "Bridge normalization will be performed!"
+                dplyr::filter(
+                  .data[["SampleID"]] %in% .env[["sample_subset"]]
+                ) |>
+                dplyr::arrange(
+                  .data[["SampleID"]], .data[["OlinkID"]]
+                ),
+              regexp = "Bridge normalization will be performed!"
+            ),
+            regexp = "Output includes two sets of bridging samples"
           ),
-          regexp = "Output includes two sets of bridging samples"
+          regexp = paste("4 non-overlapping assays are included in the",
+                         "normalized dataset without adjustment")
         ),
-        regexp = paste("4 non-overlapping assays are included in the",
-                       "normalized dataset without adjustment")
+        regexp = paste("Assays \"OID01218\", \"OID01219\", \"OID01216\", and",
+                       "\"OID01217\" not shared across input dataset")
       ),
-      regexp = paste("Assays \"OID01218\", \"OID01219\", \"OID01216\", and",
-                     "\"OID01217\" not shared across input dataset")
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = bridge_norm_v2,
+      object = strip_check_log(df = bridge_norm_v2),
       expected = ref_bridge_norm_v2,
       tolerance = 1e-4
     )
@@ -350,49 +393,56 @@ test_that(
         .data[["SampleID"]], .data[["OlinkID"]]
       )
 
-    expect_message(
+    expect_warning(
       object = expect_message(
         object = expect_message(
           object = expect_message(
             object = expect_message(
-              object = bridge_norm_v3 <- olink_normalization(
-                df1 = df_norm_ref_v3,
-                df2 = df_norm_not_ref_v3,
-                overlapping_samples_df1 = bridge_samples_v3,
-                df1_project_nr = "df1_norm",
-                df2_project_nr = "df2_norm",
-                reference_project = "df1_norm",
-                format = TRUE,
-                df1_check_log = check_npx(df = df_norm_ref_v3) |>
-                  suppressMessages() |>
-                  suppressWarnings(),
-                df2_check_log = check_npx(df = df_norm_not_ref_v3) |>
-                  suppressMessages() |>
-                  suppressWarnings()
-              ) |>
-                dplyr::filter(
-                  .data[["SampleID"]] %in% .env[["sample_subset"]]
+              object = expect_message(
+                object = bridge_norm_v3 <- olink_normalization(
+                  df1 = df_norm_ref_v3,
+                  df2 = df_norm_not_ref_v3,
+                  overlapping_samples_df1 = bridge_samples_v3,
+                  df1_project_nr = "df1_norm",
+                  df2_project_nr = "df2_norm",
+                  reference_project = "df1_norm",
+                  format = TRUE,
+                  df1_check_log = check_npx(df = df_norm_ref_v3) |>
+                    suppressMessages() |>
+                    suppressWarnings(),
+                  df2_check_log = check_npx(df = df_norm_not_ref_v3) |>
+                    suppressMessages() |>
+                    suppressWarnings()
                 ) |>
-                dplyr::arrange(
-                  .data[["SampleID"]], .data[["OlinkID"]]
-                ),
-              regexp = "Bridge normalization will be performed!"
+                  dplyr::filter(
+                    .data[["SampleID"]] %in% .env[["sample_subset"]]
+                  ) |>
+                  dplyr::arrange(
+                    .data[["SampleID"]], .data[["OlinkID"]]
+                  ),
+                regexp = "Bridge normalization will be performed!"
+              ),
+              regexp = "Output includes two sets of bridging samples"
             ),
-            regexp = "Output includes two sets of bridging samples"
+            regexp = paste("2 Negative Controls were removed from dataset:",
+                           "\"NEG_CTRL_1\" and \"NEG_CTRL_2\"")
           ),
-          regexp = paste("2 Negative Controls were removed from dataset:",
-                         "\"NEG_CTRL_1\" and \"NEG_CTRL_2\"")
+          regexp = paste("2 Plate Controls were removed from dataset:",
+                         "\"PLATE_CTRL_1\" and \"PLATE_CTRL_2\"")
         ),
-        regexp = paste("2 Plate Controls were removed from dataset:",
-                       "\"PLATE_CTRL_1\" and \"PLATE_CTRL_2\"")
+        regexp = paste("Negative Control and Plate Control samples were",
+                       "identified and removed based on common patterns in",
+                       "sample identifiers")
       ),
-      regexp = paste("Negative Control and Plate Control samples were",
-                     "identified and removed based on common patterns in",
-                     "sample identifiers")
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = bridge_norm_v3,
+      object = strip_check_log(df = bridge_norm_v3),
       expected = ref_bridge_norm_v3,
       tolerance = 1e-4
     )
@@ -480,56 +530,63 @@ test_that(
       )
 
     expect_warning(
-      object = expect_message(
+      object = expect_warning(
         object = expect_message(
           object = expect_message(
             object = expect_message(
               object = expect_message(
                 object = expect_message(
-                  object = bridge_norm_v4 <- olink_normalization(
-                    df1 = df_norm_ref_v4,
-                    df2 = df_norm_not_ref_v4,
-                    overlapping_samples_df1 = bridge_samples_v4,
-                    df1_project_nr = "df1_norm",
-                    df2_project_nr = "df2_norm",
-                    reference_project = "df1_norm",
-                    format = TRUE,
-                    df1_check_log = check_npx(df = df_norm_ref_v4) |>
-                      suppressMessages() |>
-                      suppressWarnings(),
-                    df2_check_log = check_npx(df = df_norm_not_ref_v4) |>
-                      suppressMessages() |>
-                      suppressWarnings()
-                  ) |>
-                    dplyr::filter(
-                      .data[["SampleID"]] %in% .env[["sample_subset"]]
+                  object = expect_message(
+                    object = bridge_norm_v4 <- olink_normalization(
+                      df1 = df_norm_ref_v4,
+                      df2 = df_norm_not_ref_v4,
+                      overlapping_samples_df1 = bridge_samples_v4,
+                      df1_project_nr = "df1_norm",
+                      df2_project_nr = "df2_norm",
+                      reference_project = "df1_norm",
+                      format = TRUE,
+                      df1_check_log = check_npx(df = df_norm_ref_v4) |>
+                        suppressMessages() |>
+                        suppressWarnings(),
+                      df2_check_log = check_npx(df = df_norm_not_ref_v4) |>
+                        suppressMessages() |>
+                        suppressWarnings()
                     ) |>
-                    dplyr::arrange(
-                      .data[["SampleID"]], .data[["OlinkID"]]
-                    ),
-                  regexp = "Bridge normalization will be performed!"
+                      dplyr::filter(
+                        .data[["SampleID"]] %in% .env[["sample_subset"]]
+                      ) |>
+                      dplyr::arrange(
+                        .data[["SampleID"]], .data[["OlinkID"]]
+                      ),
+                    regexp = "Bridge normalization will be performed!"
+                  ),
+                  regexp = "Output includes two sets of bridging samples"
                 ),
-                regexp = "Output includes two sets of bridging samples"
+                regexp = paste("4 non-overlapping assays are included in the",
+                               "normalized dataset without adjustment")
               ),
-              regexp = paste("4 non-overlapping assays are included in the",
-                             "normalized dataset without adjustment")
+              regexp = paste("2 Negative Controls were removed from dataset:",
+                             "\"NEG_CTRL_1\" and \"NEG_CTRL_2\"")
             ),
-            regexp = paste("2 Negative Controls were removed from dataset:",
-                           "\"NEG_CTRL_1\" and \"NEG_CTRL_2\"")
+            regexp = paste("2 Plate Controls were removed from dataset:",
+                           "\"PLATE_CTRL_1\" and \"PLATE_CTRL_2\"")
           ),
-          regexp = paste("2 Plate Controls were removed from dataset:",
-                         "\"PLATE_CTRL_1\" and \"PLATE_CTRL_2\"")
+          regexp = paste("Negative Control and Plate Control samples were",
+                         "identified and removed based on common patterns in",
+                         "sample identifiers")
         ),
-        regexp = paste("Negative Control and Plate Control samples were",
-                       "identified and removed based on common patterns in",
-                       "sample identifiers")
+        regexp = paste("Assays \"OID01218\", \"OID01219\", \"OID01216\", and",
+                       "\"OID01217\" not shared across input dataset")
       ),
-      regexp = paste("Assays \"OID01218\", \"OID01219\", \"OID01216\", and",
-                     "\"OID01217\" not shared across input dataset")
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = bridge_norm_v4,
+      object = strip_check_log(df = bridge_norm_v4),
       expected = ref_bridge_norm_v4,
       tolerance = 1e-4
     )
@@ -545,121 +602,62 @@ test_that(
     ### intensity normalization - no norm column ----
 
     expect_warning(
-      object = expect_message(
-        object = intensity_no_norm <- olink_normalization(
-          df1 = ref_norm_res$lst_df$df1_no_norm,
-          df2 = ref_norm_res$lst_df$df2_no_norm,
-          overlapping_samples_df1 = ref_norm_res$lst_sample$df1_all,
-          overlapping_samples_df2 = ref_norm_res$lst_sample$df2_all,
-          df1_project_nr = "df1_no_norm",
-          df2_project_nr = "df2_no_norm",
-          reference_project = "df1_no_norm",
-          format = FALSE,
-          df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_norm) |>
-            suppressMessages() |>
-            suppressWarnings(),
-          df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_norm) |>
-            suppressMessages() |>
-            suppressWarnings()
-        ) |>
-          dplyr::filter(
-            .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
-          ),
-        regexp = "Subset normalization will be performed!"
+      object = expect_warning(
+        object = expect_message(
+          object = intensity_no_norm <- olink_normalization(
+            df1 = ref_norm_res$lst_df$df1_no_norm,
+            df2 = ref_norm_res$lst_df$df2_no_norm,
+            overlapping_samples_df1 = ref_norm_res$lst_sample$df1_all,
+            overlapping_samples_df2 = ref_norm_res$lst_sample$df2_all,
+            df1_project_nr = "df1_no_norm",
+            df2_project_nr = "df2_no_norm",
+            reference_project = "df1_no_norm",
+            format = FALSE,
+            df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_norm) |>
+              suppressMessages() |>
+              suppressWarnings(),
+            df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_norm) |>
+              suppressMessages() |>
+              suppressWarnings()
+          ) |>
+            dplyr::filter(
+              .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+            ),
+          regexp = "Subset normalization will be performed!"
+        ),
+        regexp = paste("Datasets \"df1_no_norm\" and \"df2_no_norm\" do not",
+                       "contain a column named \"Normalization\"")
       ),
-      regexp = paste("Datasets \"df1_no_norm\" and \"df2_no_norm\" do not",
-                     "contain a column named \"Normalization\"")
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = intensity_no_norm,
+      object = strip_check_log(df = intensity_no_norm),
       expected = ref_norm_res$lst_norm$intensity_norm$no_norm,
       tolerance = 1e-4
     )
 
     ### intensity normalization - with norm column ----
 
-    expect_message(
-      object = intensity_norm <- olink_normalization(
-        df1 = ref_norm_res$lst_df$df1_norm,
-        df2 = ref_norm_res$lst_df$df2_norm,
-        overlapping_samples_df1 = ref_norm_res$lst_sample$df1_all,
-        overlapping_samples_df2 = ref_norm_res$lst_sample$df2_all,
-        df1_project_nr = "df1_norm",
-        df2_project_nr = "df2_norm",
-        reference_project = "df1_norm",
-        format = FALSE,
-        df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_norm) |>
-          suppressMessages() |>
-          suppressWarnings(),
-        df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_norm) |>
-          suppressMessages() |>
-          suppressWarnings()
-      ) |>
-        dplyr::filter(
-          .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
-        ),
-      regexp = "Subset normalization will be performed!"
-    )
-
-    expect_equal(
-      object = intensity_norm,
-      expected = ref_norm_res$lst_norm$intensity_norm$norm,
-      tolerance = 1e-4
-    )
-
-    ### intensity normalization - no lod column ----
-
-    expect_message(
-      object = intensity_no_lod <- olink_normalization(
-        df1 = ref_norm_res$lst_df$df1_no_lod,
-        df2 = ref_norm_res$lst_df$df2_no_lod,
-        overlapping_samples_df1 = ref_norm_res$lst_sample$df1_all,
-        overlapping_samples_df2 = ref_norm_res$lst_sample$df2_all,
-        df1_project_nr = "df1_no_lod",
-        df2_project_nr = "df2_no_lod",
-        reference_project = "df1_no_lod",
-        format = FALSE,
-        df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_lod) |>
-          suppressMessages() |>
-          suppressWarnings(),
-        df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_lod) |>
-          suppressMessages() |>
-          suppressWarnings()
-      ) |>
-        dplyr::filter(
-          .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
-        ),
-      regexp = "Subset normalization will be performed!"
-    )
-
-    expect_equal(
-      object = intensity_no_lod,
-      expected = ref_norm_res$lst_norm$intensity_norm$no_lod,
-      tolerance = 1e-4
-    )
-
-    ### intensity normalization - multiple lod columns ----
-
-    expect_message(
+    expect_warning(
       object = expect_message(
-        object = intensity_multiple_lod <- olink_normalization(
-          df1 = ref_norm_res$lst_df$df1_multiple_lod,
-          df2 = ref_norm_res$lst_df$df2_multiple_lod,
+        object = intensity_norm <- olink_normalization(
+          df1 = ref_norm_res$lst_df$df1_norm,
+          df2 = ref_norm_res$lst_df$df2_norm,
           overlapping_samples_df1 = ref_norm_res$lst_sample$df1_all,
           overlapping_samples_df2 = ref_norm_res$lst_sample$df2_all,
-          df1_project_nr = "df1_multiple_lod",
-          df2_project_nr = "df2_multiple_lod",
-          reference_project = "df1_multiple_lod",
+          df1_project_nr = "df1_norm",
+          df2_project_nr = "df2_norm",
+          reference_project = "df1_norm",
           format = FALSE,
-          df1_check_log = check_npx(
-            df = ref_norm_res$lst_df$df1_multiple_lod
-          ) |>
+          df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_norm) |>
             suppressMessages() |>
             suppressWarnings(),
-          df2_check_log = check_npx(
-            df = ref_norm_res$lst_df$df2_multiple_lod
-          ) |>
+          df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_norm) |>
             suppressMessages() |>
             suppressWarnings()
         ) |>
@@ -668,11 +666,98 @@ test_that(
           ),
         regexp = "Subset normalization will be performed!"
       ),
-      regexp = "Datasets \"df1_multiple_lod\" and \"df2_multiple_lod\" contain"
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = intensity_multiple_lod,
+      object = strip_check_log(df = intensity_norm),
+      expected = ref_norm_res$lst_norm$intensity_norm$norm,
+      tolerance = 1e-4
+    )
+
+    ### intensity normalization - no lod column ----
+
+    expect_warning(
+      object = expect_message(
+        object = intensity_no_lod <- olink_normalization(
+          df1 = ref_norm_res$lst_df$df1_no_lod,
+          df2 = ref_norm_res$lst_df$df2_no_lod,
+          overlapping_samples_df1 = ref_norm_res$lst_sample$df1_all,
+          overlapping_samples_df2 = ref_norm_res$lst_sample$df2_all,
+          df1_project_nr = "df1_no_lod",
+          df2_project_nr = "df2_no_lod",
+          reference_project = "df1_no_lod",
+          format = FALSE,
+          df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_lod) |>
+            suppressMessages() |>
+            suppressWarnings(),
+          df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_lod) |>
+            suppressMessages() |>
+            suppressWarnings()
+        ) |>
+          dplyr::filter(
+            .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+          ),
+        regexp = "Subset normalization will be performed!"
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_equal(
+      object = strip_check_log(df = intensity_no_lod),
+      expected = ref_norm_res$lst_norm$intensity_norm$no_lod,
+      tolerance = 1e-4
+    )
+
+    ### intensity normalization - multiple lod columns ----
+
+    expect_warning(
+      object = expect_message(
+        object = expect_message(
+          object = intensity_multiple_lod <- olink_normalization(
+            df1 = ref_norm_res$lst_df$df1_multiple_lod,
+            df2 = ref_norm_res$lst_df$df2_multiple_lod,
+            overlapping_samples_df1 = ref_norm_res$lst_sample$df1_all,
+            overlapping_samples_df2 = ref_norm_res$lst_sample$df2_all,
+            df1_project_nr = "df1_multiple_lod",
+            df2_project_nr = "df2_multiple_lod",
+            reference_project = "df1_multiple_lod",
+            format = FALSE,
+            df1_check_log = check_npx(
+              df = ref_norm_res$lst_df$df1_multiple_lod
+            ) |>
+              suppressMessages() |>
+              suppressWarnings(),
+            df2_check_log = check_npx(
+              df = ref_norm_res$lst_df$df2_multiple_lod
+            ) |>
+              suppressMessages() |>
+              suppressWarnings()
+          ) |>
+            dplyr::filter(
+              .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+            ),
+          regexp = "Subset normalization will be performed!"
+        ),
+        regexp = "Datasets \"df1_multiple_lod\" and \"df2_multiple_lod\" contain"
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_equal(
+      object = strip_check_log(df = intensity_multiple_lod),
       expected = ref_norm_res$lst_norm$intensity_norm$multiple_lod,
       tolerance = 1e-4
     )
@@ -687,121 +772,62 @@ test_that(
     ### subset normalization - no norm column ----
 
     expect_warning(
-      object = expect_message(
-        object = subset_no_norm <- olink_normalization(
-          df1 = ref_norm_res$lst_df$df1_no_norm,
-          df2 = ref_norm_res$lst_df$df2_no_norm,
-          overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
-          overlapping_samples_df2 = ref_norm_res$lst_sample$df2_subset,
-          df1_project_nr = "df1_no_norm",
-          df2_project_nr = "df2_no_norm",
-          reference_project = "df1_no_norm",
-          format = FALSE,
-          df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_norm) |>
-            suppressMessages() |>
-            suppressWarnings(),
-          df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_norm) |>
-            suppressMessages() |>
-            suppressWarnings()
-        ) |>
-          dplyr::filter(
-            .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
-          ),
-        regexp = "Subset normalization will be performed!"
+      object = expect_warning(
+        object = expect_message(
+          object = subset_no_norm <- olink_normalization(
+            df1 = ref_norm_res$lst_df$df1_no_norm,
+            df2 = ref_norm_res$lst_df$df2_no_norm,
+            overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
+            overlapping_samples_df2 = ref_norm_res$lst_sample$df2_subset,
+            df1_project_nr = "df1_no_norm",
+            df2_project_nr = "df2_no_norm",
+            reference_project = "df1_no_norm",
+            format = FALSE,
+            df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_norm) |>
+              suppressMessages() |>
+              suppressWarnings(),
+            df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_norm) |>
+              suppressMessages() |>
+              suppressWarnings()
+          ) |>
+            dplyr::filter(
+              .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+            ),
+          regexp = "Subset normalization will be performed!"
+        ),
+        regexp = paste("Datasets \"df1_no_norm\" and \"df2_no_norm\" do not",
+                       "contain a column named \"Normalization\"")
       ),
-      regexp = paste("Datasets \"df1_no_norm\" and \"df2_no_norm\" do not",
-                     "contain a column named \"Normalization\"")
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = subset_no_norm,
+      object = strip_check_log(df = subset_no_norm),
       expected = ref_norm_res$lst_norm$subset_norm$no_norm,
       tolerance = 1e-4
     )
 
     ### subset normalization - with norm column ----
 
-    expect_message(
-      object = subset_norm <- olink_normalization(
-        df1 = ref_norm_res$lst_df$df1_norm,
-        df2 = ref_norm_res$lst_df$df2_norm,
-        overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
-        overlapping_samples_df2 = ref_norm_res$lst_sample$df2_subset,
-        df1_project_nr = "df1_norm",
-        df2_project_nr = "df2_norm",
-        reference_project = "df1_norm",
-        format = FALSE,
-        df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_norm) |>
-          suppressMessages() |>
-          suppressWarnings(),
-        df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_norm) |>
-          suppressMessages() |>
-          suppressWarnings()
-      ) |>
-        dplyr::filter(
-          .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
-        ),
-      regexp = "Subset normalization will be performed!"
-    )
-
-    expect_equal(
-      object = subset_norm,
-      expected = ref_norm_res$lst_norm$subset_norm$norm,
-      tolerance = 1e-4
-    )
-
-    ### subset normalization - no lod column ----
-
-    expect_message(
-      object = subset_no_lod <- olink_normalization(
-        df1 = ref_norm_res$lst_df$df1_no_lod,
-        df2 = ref_norm_res$lst_df$df2_no_lod,
-        overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
-        overlapping_samples_df2 = ref_norm_res$lst_sample$df2_subset,
-        df1_project_nr = "df1_no_lod",
-        df2_project_nr = "df2_no_lod",
-        reference_project = "df1_no_lod",
-        format = FALSE,
-        df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_lod) |>
-          suppressMessages() |>
-          suppressWarnings(),
-        df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_lod) |>
-          suppressMessages() |>
-          suppressWarnings()
-      ) |>
-        dplyr::filter(
-          .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
-        ),
-      regexp = "Subset normalization will be performed!"
-    )
-
-    expect_equal(
-      object = subset_no_lod,
-      expected = ref_norm_res$lst_norm$subset_norm$no_lod,
-      tolerance = 1e-4
-    )
-
-    ### subset normalization - multiple lod columns ----
-
-    expect_message(
+    expect_warning(
       object = expect_message(
-        object = subset_multiple_lod <- olink_normalization(
-          df1 = ref_norm_res$lst_df$df1_multiple_lod,
-          df2 = ref_norm_res$lst_df$df2_multiple_lod,
+        object = subset_norm <- olink_normalization(
+          df1 = ref_norm_res$lst_df$df1_norm,
+          df2 = ref_norm_res$lst_df$df2_norm,
           overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
           overlapping_samples_df2 = ref_norm_res$lst_sample$df2_subset,
-          df1_project_nr = "df1_multiple_lod",
-          df2_project_nr = "df2_multiple_lod",
-          reference_project = "df1_multiple_lod",
+          df1_project_nr = "df1_norm",
+          df2_project_nr = "df2_norm",
+          reference_project = "df1_norm",
           format = FALSE,
-          df1_check_log = check_npx(
-            df = ref_norm_res$lst_df$df1_multiple_lod
-          ) |>
+          df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_norm) |>
             suppressMessages() |>
             suppressWarnings(),
-          df2_check_log = check_npx(
-            df = ref_norm_res$lst_df$df2_multiple_lod
-          ) |>
+          df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_norm) |>
             suppressMessages() |>
             suppressWarnings()
         ) |>
@@ -810,11 +836,98 @@ test_that(
           ),
         regexp = "Subset normalization will be performed!"
       ),
-      regexp = "Datasets \"df1_multiple_lod\" and \"df2_multiple_lod\" contain"
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = subset_multiple_lod,
+      object = strip_check_log(df = subset_norm),
+      expected = ref_norm_res$lst_norm$subset_norm$norm,
+      tolerance = 1e-4
+    )
+
+    ### subset normalization - no lod column ----
+
+    expect_warning(
+      object = expect_message(
+        object = subset_no_lod <- olink_normalization(
+          df1 = ref_norm_res$lst_df$df1_no_lod,
+          df2 = ref_norm_res$lst_df$df2_no_lod,
+          overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
+          overlapping_samples_df2 = ref_norm_res$lst_sample$df2_subset,
+          df1_project_nr = "df1_no_lod",
+          df2_project_nr = "df2_no_lod",
+          reference_project = "df1_no_lod",
+          format = FALSE,
+          df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_lod) |>
+            suppressMessages() |>
+            suppressWarnings(),
+          df2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_lod) |>
+            suppressMessages() |>
+            suppressWarnings()
+        ) |>
+          dplyr::filter(
+            .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+          ),
+        regexp = "Subset normalization will be performed!"
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_equal(
+      object = strip_check_log(df = subset_no_lod),
+      expected = ref_norm_res$lst_norm$subset_norm$no_lod,
+      tolerance = 1e-4
+    )
+
+    ### subset normalization - multiple lod columns ----
+
+    expect_warning(
+      object = expect_message(
+        object = expect_message(
+          object = subset_multiple_lod <- olink_normalization(
+            df1 = ref_norm_res$lst_df$df1_multiple_lod,
+            df2 = ref_norm_res$lst_df$df2_multiple_lod,
+            overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
+            overlapping_samples_df2 = ref_norm_res$lst_sample$df2_subset,
+            df1_project_nr = "df1_multiple_lod",
+            df2_project_nr = "df2_multiple_lod",
+            reference_project = "df1_multiple_lod",
+            format = FALSE,
+            df1_check_log = check_npx(
+              df = ref_norm_res$lst_df$df1_multiple_lod
+            ) |>
+              suppressMessages() |>
+              suppressWarnings(),
+            df2_check_log = check_npx(
+              df = ref_norm_res$lst_df$df2_multiple_lod
+            ) |>
+              suppressMessages() |>
+              suppressWarnings()
+          ) |>
+            dplyr::filter(
+              .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+            ),
+          regexp = "Subset normalization will be performed!"
+        ),
+        regexp = "Datasets \"df1_multiple_lod\" and \"df2_multiple_lod\" contain"
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_equal(
+      object = strip_check_log(df = subset_multiple_lod),
       expected = ref_norm_res$lst_norm$subset_norm$multiple_lod,
       tolerance = 1e-4
     )
@@ -841,34 +954,41 @@ test_that(
         .data[["SampleID"]], .data[["OlinkID"]]
       )
 
-    expect_message(
-      object = subset_norm_v1 <- olink_normalization(
-        df1 = df_norm_ref_v1,
-        df2 = df_norm_not_ref_v1,
-        overlapping_samples_df1 = subset_samples_ref_v1,
-        overlapping_samples_df2 = subset_samples_not_ref_v1,
-        df1_project_nr = "df1_norm",
-        df2_project_nr = "df2_norm",
-        reference_project = "df1_norm",
-        format = TRUE,
-        df1_check_log = check_npx(df = df_norm_ref_v1) |>
-          suppressMessages() |>
-          suppressWarnings(),
-        df2_check_log = check_npx(df = df_norm_not_ref_v1) |>
-          suppressMessages() |>
-          suppressWarnings()
-      ) |>
-        dplyr::filter(
-          .data[["SampleID"]] %in% .env[["sample_subset"]]
+    expect_warning(
+      object = expect_message(
+        object = subset_norm_v1 <- olink_normalization(
+          df1 = df_norm_ref_v1,
+          df2 = df_norm_not_ref_v1,
+          overlapping_samples_df1 = subset_samples_ref_v1,
+          overlapping_samples_df2 = subset_samples_not_ref_v1,
+          df1_project_nr = "df1_norm",
+          df2_project_nr = "df2_norm",
+          reference_project = "df1_norm",
+          format = TRUE,
+          df1_check_log = check_npx(df = df_norm_ref_v1) |>
+            suppressMessages() |>
+            suppressWarnings(),
+          df2_check_log = check_npx(df = df_norm_not_ref_v1) |>
+            suppressMessages() |>
+            suppressWarnings()
         ) |>
-        dplyr::arrange(
-          .data[["SampleID"]], .data[["OlinkID"]]
-        ),
-      regexp = "Subset normalization will be performed!"
+          dplyr::filter(
+            .data[["SampleID"]] %in% .env[["sample_subset"]]
+          ) |>
+          dplyr::arrange(
+            .data[["SampleID"]], .data[["OlinkID"]]
+          ),
+        regexp = "Subset normalization will be performed!"
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = subset_norm_v1,
+      object = strip_check_log(df = subset_norm_v1),
       expected = subset_int_norm_v1,
       tolerance = 1e-4
     )
@@ -926,41 +1046,48 @@ test_that(
       )
 
     expect_warning(
-      object = expect_message(
+      object = expect_warning(
         object = expect_message(
-          object = subset_norm_v2 <- olink_normalization(
-            df1 = df_norm_ref_v2,
-            df2 = df_norm_not_ref_v2,
-            overlapping_samples_df1 = subset_samples_ref_v2,
-            overlapping_samples_df2 = subset_samples_not_ref_v2,
-            df1_project_nr = "df1_norm",
-            df2_project_nr = "df2_norm",
-            reference_project = "df1_norm",
-            format = TRUE,
-            df1_check_log = check_npx(df = df_norm_ref_v2) |>
-              suppressMessages() |>
-              suppressWarnings(),
-            df2_check_log = check_npx(df = df_norm_not_ref_v2) |>
-              suppressMessages() |>
-              suppressWarnings()
-          ) |>
-            dplyr::filter(
-              .data[["SampleID"]] %in% .env[["sample_subset"]]
+          object = expect_message(
+            object = subset_norm_v2 <- olink_normalization(
+              df1 = df_norm_ref_v2,
+              df2 = df_norm_not_ref_v2,
+              overlapping_samples_df1 = subset_samples_ref_v2,
+              overlapping_samples_df2 = subset_samples_not_ref_v2,
+              df1_project_nr = "df1_norm",
+              df2_project_nr = "df2_norm",
+              reference_project = "df1_norm",
+              format = TRUE,
+              df1_check_log = check_npx(df = df_norm_ref_v2) |>
+                suppressMessages() |>
+                suppressWarnings(),
+              df2_check_log = check_npx(df = df_norm_not_ref_v2) |>
+                suppressMessages() |>
+                suppressWarnings()
             ) |>
-            dplyr::arrange(
-              .data[["SampleID"]], .data[["OlinkID"]]
-            ),
-          regexp = "Subset normalization will be performed!"
+              dplyr::filter(
+                .data[["SampleID"]] %in% .env[["sample_subset"]]
+              ) |>
+              dplyr::arrange(
+                .data[["SampleID"]], .data[["OlinkID"]]
+              ),
+            regexp = "Subset normalization will be performed!"
+          ),
+          regexp = paste("4 non-overlapping assays are included in the",
+                         "normalized dataset without adjustment")
         ),
-        regexp = paste("4 non-overlapping assays are included in the",
-                       "normalized dataset without adjustment")
+        regexp = paste("Assays \"OID01218\", \"OID01219\", \"OID01216\", and",
+                       "\"OID01217\" not shared across input dataset")
       ),
-      regexp = paste("Assays \"OID01218\", \"OID01219\", \"OID01216\", and",
-                     "\"OID01217\" not shared across input dataset")
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = subset_norm_v2,
+      object = strip_check_log(df = subset_norm_v2),
       expected = ref_subset_norm_v2,
       tolerance = 1e-4
     )
@@ -1008,47 +1135,54 @@ test_that(
         .data[["SampleID"]], .data[["OlinkID"]]
       )
 
-    expect_message(
+    expect_warning(
       object = expect_message(
         object = expect_message(
           object = expect_message(
-            object = subset_norm_v3 <- olink_normalization(
-              df1 = df_norm_ref_v3,
-              df2 = df_norm_not_ref_v3,
-              overlapping_samples_df1 = subset_samples_ref_v3,
-              overlapping_samples_df2 = subset_samples_not_ref_v3,
-              df1_project_nr = "df1_norm",
-              df2_project_nr = "df2_norm",
-              reference_project = "df1_norm",
-              format = TRUE,
-              df1_check_log = check_npx(df = df_norm_ref_v3) |>
-                suppressMessages() |>
-                suppressWarnings(),
-              df2_check_log = check_npx(df = df_norm_not_ref_v3) |>
-                suppressMessages() |>
-                suppressWarnings()
-            ) |>
-              dplyr::filter(
-                .data[["SampleID"]] %in% .env[["sample_subset"]]
+            object = expect_message(
+              object = subset_norm_v3 <- olink_normalization(
+                df1 = df_norm_ref_v3,
+                df2 = df_norm_not_ref_v3,
+                overlapping_samples_df1 = subset_samples_ref_v3,
+                overlapping_samples_df2 = subset_samples_not_ref_v3,
+                df1_project_nr = "df1_norm",
+                df2_project_nr = "df2_norm",
+                reference_project = "df1_norm",
+                format = TRUE,
+                df1_check_log = check_npx(df = df_norm_ref_v3) |>
+                  suppressMessages() |>
+                  suppressWarnings(),
+                df2_check_log = check_npx(df = df_norm_not_ref_v3) |>
+                  suppressMessages() |>
+                  suppressWarnings()
               ) |>
-              dplyr::arrange(
-                .data[["SampleID"]], .data[["OlinkID"]]
-              ),
-            regexp = "Subset normalization will be performed!"
+                dplyr::filter(
+                  .data[["SampleID"]] %in% .env[["sample_subset"]]
+                ) |>
+                dplyr::arrange(
+                  .data[["SampleID"]], .data[["OlinkID"]]
+                ),
+              regexp = "Subset normalization will be performed!"
+            ),
+            regexp = paste("2 Negative Controls were removed from dataset:",
+                           "\"NEG_CTRL_1\" and \"NEG_CTRL_2\"")
           ),
-          regexp = paste("2 Negative Controls were removed from dataset:",
-                         "\"NEG_CTRL_1\" and \"NEG_CTRL_2\"")
+          regexp = paste("2 Plate Controls were removed from dataset:",
+                         "\"PLATE_CTRL_1\" and \"PLATE_CTRL_2\"")
         ),
-        regexp = paste("2 Plate Controls were removed from dataset:",
-                       "\"PLATE_CTRL_1\" and \"PLATE_CTRL_2\"")
+        regexp = paste("Negative Control and Plate Control samples were",
+                       "identified and removed based on common patterns in",
+                       "sample identifiers")
       ),
-      regexp = paste("Negative Control and Plate Control samples were",
-                     "identified and removed based on common patterns in",
-                     "sample identifiers")
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = subset_norm_v3,
+      object = strip_check_log(df = subset_norm_v3),
       expected = ref_subset_norm_v3,
       tolerance = 1e-4
     )
@@ -1137,54 +1271,61 @@ test_that(
       )
 
     expect_warning(
-      object = expect_message(
+      object = expect_warning(
         object = expect_message(
           object = expect_message(
             object = expect_message(
               object = expect_message(
-                object = subset_norm_v4 <- olink_normalization(
-                  df1 = df_norm_ref_v4,
-                  df2 = df_norm_not_ref_v4,
-                  overlapping_samples_df1 = subset_samples_ref_v4,
-                  overlapping_samples_df2 = subset_samples_not_ref_v4,
-                  df1_project_nr = "df1_norm",
-                  df2_project_nr = "df2_norm",
-                  reference_project = "df1_norm",
-                  format = TRUE,
-                  df1_check_log = check_npx(df = df_norm_ref_v4) |>
-                    suppressMessages() |>
-                    suppressWarnings(),
-                  df2_check_log = check_npx(df = df_norm_not_ref_v4) |>
-                    suppressMessages() |>
-                    suppressWarnings()
-                ) |>
-                  dplyr::filter(
-                    .data[["SampleID"]] %in% .env[["sample_subset"]]
+                object = expect_message(
+                  object = subset_norm_v4 <- olink_normalization(
+                    df1 = df_norm_ref_v4,
+                    df2 = df_norm_not_ref_v4,
+                    overlapping_samples_df1 = subset_samples_ref_v4,
+                    overlapping_samples_df2 = subset_samples_not_ref_v4,
+                    df1_project_nr = "df1_norm",
+                    df2_project_nr = "df2_norm",
+                    reference_project = "df1_norm",
+                    format = TRUE,
+                    df1_check_log = check_npx(df = df_norm_ref_v4) |>
+                      suppressMessages() |>
+                      suppressWarnings(),
+                    df2_check_log = check_npx(df = df_norm_not_ref_v4) |>
+                      suppressMessages() |>
+                      suppressWarnings()
                   ) |>
-                  dplyr::arrange(
-                    .data[["SampleID"]], .data[["OlinkID"]]
-                  ),
-                regexp = "Subset normalization will be performed!"
+                    dplyr::filter(
+                      .data[["SampleID"]] %in% .env[["sample_subset"]]
+                    ) |>
+                    dplyr::arrange(
+                      .data[["SampleID"]], .data[["OlinkID"]]
+                    ),
+                  regexp = "Subset normalization will be performed!"
+                ),
+                regexp = paste("4 non-overlapping assays are included in the",
+                               "normalized dataset without adjustment")
               ),
-              regexp = paste("4 non-overlapping assays are included in the",
-                             "normalized dataset without adjustment")
+              regexp = paste("2 Negative Controls were removed from dataset:",
+                             "\"NEG_CTRL_1\" and \"NEG_CTRL_2\"")
             ),
-            regexp = paste("2 Negative Controls were removed from dataset:",
-                           "\"NEG_CTRL_1\" and \"NEG_CTRL_2\"")
+            regexp = paste("2 Plate Controls were removed from dataset:",
+                           "\"PLATE_CTRL_1\" and \"PLATE_CTRL_2\"")
           ),
-          regexp = paste("2 Plate Controls were removed from dataset:",
-                         "\"PLATE_CTRL_1\" and \"PLATE_CTRL_2\"")
+          regexp = paste("Negative Control and Plate Control samples were",
+                         "identified and removed based on common patterns in",
+                         "sample identifiers")
         ),
-        regexp = paste("Negative Control and Plate Control samples were",
-                       "identified and removed based on common patterns in",
-                       "sample identifiers")
+        regexp = paste("Assays \"OID01218\", \"OID01219\", \"OID01216\", and",
+                       "\"OID01217\" not shared across input dataset")
       ),
-      regexp = paste("Assays \"OID01218\", \"OID01219\", \"OID01216\", and",
-                     "\"OID01217\" not shared across input dataset")
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = subset_norm_v4,
+      object = strip_check_log(df = subset_norm_v4),
       expected = ref_subset_norm_v4,
       tolerance = 1e-4
     )
@@ -1200,95 +1341,47 @@ test_that(
     ### reference median normalization - no norm column ----
 
     expect_warning(
-      object = expect_message(
-        object = ref_med_no_norm <- olink_normalization(
-          df1 = ref_norm_res$lst_df$df1_no_norm,
-          overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
-          df1_project_nr = "df1_no_norm",
-          reference_medians = ref_norm_res$lst_df$ref_med,
-          format = FALSE,
-          df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_norm) |>
-            suppressMessages() |>
-            suppressWarnings()
-        ) |>
-          dplyr::filter(
-            .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
-          ),
-        regexp = "Reference median normalization will be performed!"
+      object = expect_warning(
+        object = expect_message(
+          object = ref_med_no_norm <- olink_normalization(
+            df1 = ref_norm_res$lst_df$df1_no_norm,
+            overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
+            df1_project_nr = "df1_no_norm",
+            reference_medians = ref_norm_res$lst_df$ref_med,
+            format = FALSE,
+            df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_norm) |>
+              suppressMessages() |>
+              suppressWarnings()
+          ) |>
+            dplyr::filter(
+              .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+            ),
+          regexp = "Reference median normalization will be performed!"
+        ),
+        regexp = paste("Dataset \"df1_no_norm\" does not contain a column",
+                       "named \"Normalization\"")
       ),
-      regexp = paste("Dataset \"df1_no_norm\" does not contain a column named",
-                     "\"Normalization\"")
+      regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS 1\"",
+                     "and \"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = ref_med_no_norm,
+      object = strip_check_log(df = ref_med_no_norm),
       expected = ref_norm_res$lst_norm$ref_med_norm$no_norm,
       tolerance = 1e-4
     )
 
     ### reference median normalization - with norm column ----
 
-    expect_message(
-      object = ref_med_norm <- olink_normalization(
-        df1 = ref_norm_res$lst_df$df1_norm,
-        overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
-        df1_project_nr = "df1_norm",
-        reference_medians = ref_norm_res$lst_df$ref_med,
-        format = FALSE,
-        df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_norm) |>
-          suppressMessages() |>
-          suppressWarnings()
-      ) |>
-        dplyr::filter(
-          .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
-        ),
-      regexp = "Reference median normalization will be performed!"
-    )
-
-    expect_equal(
-      object = ref_med_norm,
-      expected = ref_norm_res$lst_norm$ref_med_norm$norm,
-      tolerance = 1e-4
-    )
-
-    ### reference median normalization - no lod column ----
-
-    expect_message(
-      object = ref_med_no_lod <- olink_normalization(
-        df1 = ref_norm_res$lst_df$df1_no_lod,
-        overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
-        df1_project_nr = "df1_no_lod",
-        reference_medians = ref_norm_res$lst_df$ref_med,
-        format = FALSE,
-        df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_lod) |>
-          suppressMessages() |>
-          suppressWarnings()
-      ) |>
-        dplyr::filter(
-          .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
-        ),
-      regexp = "Reference median normalization will be performed!"
-    )
-
-    expect_equal(
-      object = ref_med_no_lod,
-      expected = ref_norm_res$lst_norm$ref_med_norm$no_lod,
-      tolerance = 1e-4
-    )
-
-    ### reference median normalization - multiple lod columns ----
-
-    expect_message(
+    expect_warning(
       object = expect_message(
-        object = ref_med_multiple_lod <- olink_normalization(
-          df1 = ref_norm_res$lst_df$df1_multiple_lod,
+        object = ref_med_norm <- olink_normalization(
+          df1 = ref_norm_res$lst_df$df1_norm,
           overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
-          df1_project_nr = "df1_multiple_lod",
+          df1_project_nr = "df1_norm",
           reference_medians = ref_norm_res$lst_df$ref_med,
           format = FALSE,
-          df1_check_log = check_npx(
-            df = ref_norm_res$lst_df$df1_multiple_lod
-          ) |>
+          df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_norm) |>
             suppressMessages() |>
             suppressWarnings()
         ) |>
@@ -1297,11 +1390,75 @@ test_that(
           ),
         regexp = "Reference median normalization will be performed!"
       ),
-      regexp = "Dataset \"df1_multiple_lod\" contains multiple columns matching"
+      regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS 1\"",
+                     "and \"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = ref_med_multiple_lod,
+      object = strip_check_log(df = ref_med_norm),
+      expected = ref_norm_res$lst_norm$ref_med_norm$norm,
+      tolerance = 1e-4
+    )
+
+    ### reference median normalization - no lod column ----
+
+    expect_warning(
+      object = expect_message(
+        object = ref_med_no_lod <- olink_normalization(
+          df1 = ref_norm_res$lst_df$df1_no_lod,
+          overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
+          df1_project_nr = "df1_no_lod",
+          reference_medians = ref_norm_res$lst_df$ref_med,
+          format = FALSE,
+          df1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_lod) |>
+            suppressMessages() |>
+            suppressWarnings()
+        ) |>
+          dplyr::filter(
+            .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+          ),
+        regexp = "Reference median normalization will be performed!"
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS 1\"",
+                     "and \"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_equal(
+      object = strip_check_log(df = ref_med_no_lod),
+      expected = ref_norm_res$lst_norm$ref_med_norm$no_lod,
+      tolerance = 1e-4
+    )
+
+    ### reference median normalization - multiple lod columns ----
+
+    expect_warning(
+      object = expect_message(
+        object = expect_message(
+          object = ref_med_multiple_lod <- olink_normalization(
+            df1 = ref_norm_res$lst_df$df1_multiple_lod,
+            overlapping_samples_df1 = ref_norm_res$lst_sample$df1_subset,
+            df1_project_nr = "df1_multiple_lod",
+            reference_medians = ref_norm_res$lst_df$ref_med,
+            format = FALSE,
+            df1_check_log = check_npx(
+              df = ref_norm_res$lst_df$df1_multiple_lod
+            ) |>
+              suppressMessages() |>
+              suppressWarnings()
+          ) |>
+            dplyr::filter(
+              .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+            ),
+          regexp = "Reference median normalization will be performed!"
+        ),
+        regexp = "Dataset \"df1_multiple_lod\" contains multiple columns"
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS 1\"",
+                     "and \"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_equal(
+      object = strip_check_log(df = ref_med_multiple_lod),
       expected = ref_norm_res$lst_norm$ref_med_norm$multiple_lod,
       tolerance = 1e-4
     )
@@ -1327,28 +1484,32 @@ test_that(
         .data[["SampleID"]], .data[["OlinkID"]]
       )
 
-    expect_message(
-      object = refmed_norm_v1 <- olink_normalization(
-        df1 = df_norm_ref_v1,
-        overlapping_samples_df1 = subset_samples_v1,
-        df1_project_nr = "df1_norm",
-        reference_medians = df_ref_med_v1,
-        format = TRUE,
-        df1_check_log = check_npx(df = df_norm_ref_v1) |>
-          suppressMessages() |>
-          suppressWarnings()
-      ) |>
-        dplyr::filter(
-          .data[["SampleID"]] %in% .env[["sample_subset"]]
+    expect_warning(
+      object = expect_message(
+        object = refmed_norm_v1 <- olink_normalization(
+          df1 = df_norm_ref_v1,
+          overlapping_samples_df1 = subset_samples_v1,
+          df1_project_nr = "df1_norm",
+          reference_medians = df_ref_med_v1,
+          format = TRUE,
+          df1_check_log = check_npx(df = df_norm_ref_v1) |>
+            suppressMessages() |>
+            suppressWarnings()
         ) |>
-        dplyr::arrange(
-          .data[["SampleID"]], .data[["OlinkID"]]
-        ),
-      regexp = "Reference median normalization will be performed!"
+          dplyr::filter(
+            .data[["SampleID"]] %in% .env[["sample_subset"]]
+          ) |>
+          dplyr::arrange(
+            .data[["SampleID"]], .data[["OlinkID"]]
+          ),
+        regexp = "Reference median normalization will be performed!"
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS 1\"",
+                     "and \"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = refmed_norm_v1,
+      object = strip_check_log(df = refmed_norm_v1),
       expected = ref_refmed_norm_v1,
       tolerance = 1e-4
     )
@@ -1405,35 +1566,39 @@ test_that(
       )
 
     expect_warning(
-      object = expect_message(
+      object = expect_warning(
         object = expect_message(
-          object = refmed_norm_v2 <- olink_normalization(
-            df1 = df_norm_ref_v2,
-            overlapping_samples_df1 = subset_samples_v2,
-            df1_project_nr = "df1_norm",
-            reference_medians = df_ref_med_v2,
-            format = TRUE,
-            df1_check_log = check_npx(df = df_norm_ref_v2) |>
-              suppressMessages() |>
-              suppressWarnings()
-          ) |>
-            dplyr::filter(
-              .data[["SampleID"]] %in% .env[["sample_subset"]]
+          object = expect_message(
+            object = refmed_norm_v2 <- olink_normalization(
+              df1 = df_norm_ref_v2,
+              overlapping_samples_df1 = subset_samples_v2,
+              df1_project_nr = "df1_norm",
+              reference_medians = df_ref_med_v2,
+              format = TRUE,
+              df1_check_log = check_npx(df = df_norm_ref_v2) |>
+                suppressMessages() |>
+                suppressWarnings()
             ) |>
-            dplyr::arrange(
-              .data[["SampleID"]], .data[["OlinkID"]]
-            ),
-          regexp = "Reference median normalization will be performed!"
+              dplyr::filter(
+                .data[["SampleID"]] %in% .env[["sample_subset"]]
+              ) |>
+              dplyr::arrange(
+                .data[["SampleID"]], .data[["OlinkID"]]
+              ),
+            regexp = "Reference median normalization will be performed!"
+          ),
+          regexp = paste("2 non-overlapping assays found in the dataset but not",
+                         "in the reference medians")
         ),
-        regexp = paste("2 non-overlapping assays found in the dataset but not",
-                       "in the reference medians")
+        regexp = paste("Assays \"OID01218\", \"OID01219\", \"OID01216\", and",
+                       "\"OID01217\" not shared across input dataset")
       ),
-      regexp = paste("Assays \"OID01218\", \"OID01219\", \"OID01216\", and",
-                     "\"OID01217\" not shared across input dataset")
+      regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS 1\"",
+                     "and \"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = refmed_norm_v2,
+      object = strip_check_log(df = refmed_norm_v2),
       expected = ref_refmed_norm_v2,
       tolerance = 1e-4
     )
@@ -1470,41 +1635,45 @@ test_that(
         .data[["SampleID"]], .data[["OlinkID"]]
       )
 
-    expect_message(
+    expect_warning(
       object = expect_message(
         object = expect_message(
           object = expect_message(
-            object = refmed_norm_v3 <- olink_normalization(
-              df1 = df_norm_ref_v3,
-              overlapping_samples_df1 = subset_samples_v3,
-              df1_project_nr = "df1_norm",
-              reference_medians = df_ref_med_v3,
-              format = TRUE,
-              df1_check_log = check_npx(df = df_norm_ref_v3) |>
-                suppressMessages() |>
-                suppressWarnings()
-            ) |>
-              dplyr::filter(
-                .data[["SampleID"]] %in% .env[["sample_subset"]]
+            object = expect_message(
+              object = refmed_norm_v3 <- olink_normalization(
+                df1 = df_norm_ref_v3,
+                overlapping_samples_df1 = subset_samples_v3,
+                df1_project_nr = "df1_norm",
+                reference_medians = df_ref_med_v3,
+                format = TRUE,
+                df1_check_log = check_npx(df = df_norm_ref_v3) |>
+                  suppressMessages() |>
+                  suppressWarnings()
               ) |>
-              dplyr::arrange(
-                .data[["SampleID"]], .data[["OlinkID"]]
-              ),
-            regexp = "Reference median normalization will be performed!"
+                dplyr::filter(
+                  .data[["SampleID"]] %in% .env[["sample_subset"]]
+                ) |>
+                dplyr::arrange(
+                  .data[["SampleID"]], .data[["OlinkID"]]
+                ),
+              regexp = "Reference median normalization will be performed!"
+            ),
+            regexp = paste("1 Negative Control was removed from dataset:",
+                           "\"NEG_CTRL_1\"")
           ),
-          regexp = paste("1 Negative Control was removed from dataset:",
-                         "\"NEG_CTRL_1\"")
+          regexp = paste("1 Plate Control was removed from dataset:",
+                         "\"PLATE_CTRL_1\"")
         ),
-        regexp = paste("1 Plate Control was removed from dataset:",
-                       "\"PLATE_CTRL_1\"")
+        regexp = paste("Negative Control and Plate Control samples were",
+                       "identified and removed based on common patterns in",
+                       "sample identifiers")
       ),
-      regexp = paste("Negative Control and Plate Control samples were",
-                     "identified and removed based on common patterns in",
-                     "sample identifiers")
+      regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS 1\"",
+                     "and \"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = refmed_norm_v3,
+      object = strip_check_log(df = refmed_norm_v3),
       expected = ref_refmed_norm_v3,
       tolerance = 1e-4
     )
@@ -1582,48 +1751,52 @@ test_that(
       )
 
     expect_warning(
-      object = expect_message(
+      object = expect_warning(
         object = expect_message(
           object = expect_message(
             object = expect_message(
               object = expect_message(
-                object = refmed_norm_v4 <- olink_normalization(
-                  df1 = df_norm_ref_v4,
-                  overlapping_samples_df1 = subset_samples_v4,
-                  df1_project_nr = "df1_norm",
-                  reference_medians = df_ref_med_v4,
-                  format = TRUE,
-                  df1_check_log = check_npx(df = df_norm_ref_v4) |>
-                    suppressMessages() |>
-                    suppressWarnings()
-                ) |>
-                  dplyr::filter(
-                    .data[["SampleID"]] %in% .env[["sample_subset"]]
+                object = expect_message(
+                  object = refmed_norm_v4 <- olink_normalization(
+                    df1 = df_norm_ref_v4,
+                    overlapping_samples_df1 = subset_samples_v4,
+                    df1_project_nr = "df1_norm",
+                    reference_medians = df_ref_med_v4,
+                    format = TRUE,
+                    df1_check_log = check_npx(df = df_norm_ref_v4) |>
+                      suppressMessages() |>
+                      suppressWarnings()
                   ) |>
-                  dplyr::arrange(
-                    .data[["SampleID"]], .data[["OlinkID"]]
-                  ),
-                regexp = "Reference median normalization will be performed!"
+                    dplyr::filter(
+                      .data[["SampleID"]] %in% .env[["sample_subset"]]
+                    ) |>
+                    dplyr::arrange(
+                      .data[["SampleID"]], .data[["OlinkID"]]
+                    ),
+                  regexp = "Reference median normalization will be performed!"
+                ),
+                regexp = paste("2 non-overlapping assays found in the dataset",
+                               "but not in the reference medians")
               ),
-              regexp = paste("2 non-overlapping assays found in the dataset",
-                             "but not in the reference medians")
+              regexp = paste("1 Negative Control was removed from dataset:",
+                             "\"NEG_CTRL_1\"")
             ),
-            regexp = paste("1 Negative Control was removed from dataset:",
-                           "\"NEG_CTRL_1\"")
+            regexp = paste("1 Plate Control was removed from dataset:",
+                           "\"PLATE_CTRL_1\"")
           ),
-          regexp = paste("1 Plate Control was removed from dataset:",
-                         "\"PLATE_CTRL_1\"")
+          regexp = paste("Negative Control and Plate Control samples were",
+                         "identified and removed based on common patterns in",
+                         "sample identifiers")
         ),
-        regexp = paste("Negative Control and Plate Control samples were",
-                       "identified and removed based on common patterns in",
-                       "sample identifiers")
+        regexp = paste("Assays \"OID01218\", \"OID01219\", \"OID01216\", and",
+                       "\"OID01217\" not shared across input dataset")
       ),
-      regexp = paste("Assays \"OID01218\", \"OID01219\", \"OID01216\", and",
-                     "\"OID01217\" not shared across input dataset")
+      regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS 1\"",
+                     "and \"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = refmed_norm_v4,
+      object = strip_check_log(df = refmed_norm_v4),
       expected = ref_refmed_norm_v4,
       tolerance = 1e-4
     )
@@ -1647,60 +1820,11 @@ test_that(
       seed = 123,
       code = {
         expect_message(
-          object = expect_message(
-            expect_warning(
-              object = ht_3k_norm <- olink_normalization(
-                df1 = data_ht,
-                df2 = data_3k,
-                overlapping_samples_df1 = intersect(
-                  x = unique(data_ht$SampleID),
-                  y = unique(data_3k$SampleID)
-                ) |>
-                  (\(.) .[!grepl("CONTROL", .)])(),
-                df1_project_nr = "df_ht",
-                df2_project_nr = "df_3k",
-                reference_project = "df_ht",
-                format = FALSE,
-                df1_check_log = check_npx(df = data_ht) |>
-                  suppressMessages() |>
-                  suppressWarnings(),
-                df2_check_log = check_npx(df = data_3k) |>
-                  suppressMessages() |>
-                  suppressWarnings()
-              ),
-              regexp = "2 assays are not shared across products."
-            ),
-            regexp = "Cross-product normalization will be performed!"
-          ),
-          regexp = "Output includes two sets of bridging samples"
-        )
-      }
-    )
-
-    expect_equal(
-      object = ht_3k_norm |>
-        dplyr::arrange(
-          .data[["SampleID"]],
-          .data[["OlinkID"]]
-        ),
-      expected = data_ref$Reference$NoFormat$HT_3K |>
-        dplyr::arrange(
-          .data[["SampleID"]],
-          .data[["OlinkID"]]
-        ),
-      tolerance = 1e-4
-    )
-
-    ## with format ----
-
-    expect_message(
-      object = expect_message(
-        object = expect_message(
-          object = expect_message(
+          object = expect_warning(
             object = expect_message(
               object = expect_message(
-                expect_warning(
-                  object = ht_3k_norm_format <- olink_normalization(
+                object = expect_warning(
+                  object = ht_3k_norm <- olink_normalization(
                     df1 = data_ht,
                     df2 = data_3k,
                     overlapping_samples_df1 = intersect(
@@ -1711,7 +1835,7 @@ test_that(
                     df1_project_nr = "df_ht",
                     df2_project_nr = "df_3k",
                     reference_project = "df_ht",
-                    format = TRUE,
+                    format = FALSE,
                     df1_check_log = check_npx(df = data_ht) |>
                       suppressMessages() |>
                       suppressWarnings(),
@@ -1725,15 +1849,88 @@ test_that(
               ),
               regexp = "Output includes two sets of bridging samples"
             ),
-            regexp = "10 Plate Controls were removed from dataset"
+            regexp = paste("Duplicate SampleIDs detected:",
+                           "\"CONTROL_SAMPLE_1\", \"CONTROL_SAMPLE_2\",",
+                           "\"CONTROL_SAMPLE_3\"")
           ),
-          regexp = "6 Negative Controls were removed from dataset"
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
+      }
+    )
+
+    expect_equal(
+      object = ht_3k_norm |>
+        dplyr::arrange(
+          .data[["SampleID"]],
+          .data[["OlinkID"]]
+        ) |>
+        strip_check_log(),
+      expected = data_ref$Reference$NoFormat$HT_3K |>
+        dplyr::arrange(
+          .data[["SampleID"]],
+          .data[["OlinkID"]]
         ),
-        regexp = paste("2 not bridgeable assays are included in the",
-                       "bridged dataset without adjustment")
-      ),
-      regexp = paste("2 non-overlapping assays are included in the",
-                     "normalized dataset without adjustment")
+      tolerance = 1e-4
+    )
+
+    ## with format ----
+
+    withr::with_seed(
+      seed = 123,
+      code = {
+        expect_message(
+          object = expect_warning(
+            object = expect_message(
+              object = expect_message(
+                object = expect_message(
+                  object = expect_message(
+                    object = expect_message(
+                      object = expect_message(
+                        expect_warning(
+                          object = ht_3k_norm_format <- olink_normalization(
+                            df1 = data_ht,
+                            df2 = data_3k,
+                            overlapping_samples_df1 = intersect(
+                              x = unique(data_ht$SampleID),
+                              y = unique(data_3k$SampleID)
+                            ) |>
+                              (\(.) .[!grepl("CONTROL", .)])(),
+                            df1_project_nr = "df_ht",
+                            df2_project_nr = "df_3k",
+                            reference_project = "df_ht",
+                            format = TRUE,
+                            df1_check_log = check_npx(df = data_ht) |>
+                              suppressMessages() |>
+                              suppressWarnings(),
+                            df2_check_log = check_npx(df = data_3k) |>
+                              suppressMessages() |>
+                              suppressWarnings()
+                          ),
+                          regexp = "2 assays are not shared across products."
+                        ),
+                        regexp = "Cross-product normalization will be performed"
+                      ),
+                      regexp = "Output includes two sets of bridging samples"
+                    ),
+                    regexp = "10 Plate Controls were removed from dataset"
+                  ),
+                  regexp = "6 Negative Controls were removed from dataset"
+                ),
+                regexp = paste("2 not bridgeable assays are included in the",
+                               "bridged dataset without adjustment")
+              ),
+              regexp = paste("2 non-overlapping assays are included in the",
+                             "normalized dataset without adjustment")
+            ),
+            regexp = paste("Duplicate SampleIDs detected:",
+                           "\"CONTROL_SAMPLE_1\", \"CONTROL_SAMPLE_2\",",
+                           "\"CONTROL_SAMPLE_3\"")
+          ),
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
+      }
     )
 
     expect_equal(
@@ -1741,7 +1938,8 @@ test_that(
         dplyr::arrange(
           .data[["SampleID"]],
           .data[["OlinkID"]]
-        ),
+        ) |>
+        strip_check_log(),
       expected = data_ref$Reference$Format$HT_3K |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -1771,58 +1969,9 @@ test_that(
         expect_message(
           object = expect_warning(
             object = expect_message(
-              object = rev_3k_norm <- olink_normalization(
-                df1 = data_reveal,
-                df2 = data_3k,
-                overlapping_samples_df1 = intersect(
-                  x = unique(data_reveal$SampleID),
-                  y = unique(data_3k$SampleID)
-                ) |>
-                  (\(x) x[!grepl("CONTROL", x)])(),
-                df1_project_nr = "df_reveal",
-                df2_project_nr = "df_3k",
-                reference_project = "df_reveal",
-                format = FALSE,
-                df1_check_log = check_npx(df = data_reveal) |>
-                  suppressMessages() |>
-                  suppressWarnings(),
-                df2_check_log = check_npx(df = data_3k) |>
-                  suppressMessages() |>
-                  suppressWarnings()
-              ),
-              regexp = "Cross-product normalization will be performed!"
-            ),
-            regexp = "85 assays are not shared across products"
-          ),
-          regexp = "Output includes two sets of bridging samples"
-        )
-      }
-    )
-
-    expect_equal(
-      object = rev_3k_norm |>
-        dplyr::arrange(
-          .data[["SampleID"]],
-          .data[["OlinkID"]]
-        ),
-      expected = data_ref$Reference$NoFormat$Reveal_3K |>
-        dplyr::arrange(
-          .data[["SampleID"]],
-          .data[["OlinkID"]]
-        ),
-      tolerance = 1e-4
-    )
-
-    ### with formatting ----
-
-    expect_message(
-      object = expect_message(
-        object = expect_message(
-          object = expect_message(
-            object = expect_message(
               object = expect_warning(
                 object = expect_message(
-                  object = rev_3k_norm_format <- olink_normalization(
+                  object = rev_3k_norm <- olink_normalization(
                     df1 = data_reveal,
                     df2 = data_3k,
                     overlapping_samples_df1 = intersect(
@@ -1833,7 +1982,7 @@ test_that(
                     df1_project_nr = "df_reveal",
                     df2_project_nr = "df_3k",
                     reference_project = "df_reveal",
-                    format = TRUE,
+                    format = FALSE,
                     df1_check_log = check_npx(df = data_reveal) |>
                       suppressMessages() |>
                       suppressWarnings(),
@@ -1847,15 +1996,88 @@ test_that(
               ),
               regexp = "Output includes two sets of bridging samples"
             ),
-            regexp = paste("10 Plate Controls were removed from dataset")
+            regexp = paste("Duplicate SampleIDs detected:",
+                           "\"CONTROL_SAMPLE_1\", \"CONTROL_SAMPLE_2\",",
+                           "\"CONTROL_SAMPLE_3\", \"CONTROL_SAMPLE_4\"")
           ),
-          regexp = paste("6 Negative Controls were removed from dataset")
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
+      }
+    )
+
+    expect_equal(
+      object = rev_3k_norm |>
+        dplyr::arrange(
+          .data[["SampleID"]],
+          .data[["OlinkID"]]
+        ) |>
+        strip_check_log(),
+      expected = data_ref$Reference$NoFormat$Reveal_3K |>
+        dplyr::arrange(
+          .data[["SampleID"]],
+          .data[["OlinkID"]]
         ),
-        regexp = paste("24 not bridgeable assays are included in the",
-                       "bridged dataset without adjustment")
-      ),
-      regexp = paste("85 non-overlapping assays are included in the",
-                     "normalized dataset without adjustment")
+      tolerance = 1e-4
+    )
+
+    ### with formatting ----
+
+    withr::with_seed(
+      seed = 123,
+      code = {
+        expect_message(
+          object = expect_warning(
+            object = expect_message(
+              object = expect_message(
+                object = expect_message(
+                  object = expect_message(
+                    object = expect_message(
+                      object = expect_warning(
+                        object = expect_message(
+                          object = rev_3k_norm_format <- olink_normalization(
+                            df1 = data_reveal,
+                            df2 = data_3k,
+                            overlapping_samples_df1 = intersect(
+                              x = unique(data_reveal$SampleID),
+                              y = unique(data_3k$SampleID)
+                            ) |>
+                              (\(x) x[!grepl("CONTROL", x)])(),
+                            df1_project_nr = "df_reveal",
+                            df2_project_nr = "df_3k",
+                            reference_project = "df_reveal",
+                            format = TRUE,
+                            df1_check_log = check_npx(df = data_reveal) |>
+                              suppressMessages() |>
+                              suppressWarnings(),
+                            df2_check_log = check_npx(df = data_3k) |>
+                              suppressMessages() |>
+                              suppressWarnings()
+                          ),
+                          regexp = "Cross-product normalization will be"
+                        ),
+                        regexp = "85 assays are not shared across products"
+                      ),
+                      regexp = "Output includes two sets of bridging samples"
+                    ),
+                    regexp = paste("10 Plate Controls were removed from datase")
+                  ),
+                  regexp = paste("6 Negative Controls were removed from datase")
+                ),
+                regexp = paste("24 not bridgeable assays are included in the",
+                               "bridged dataset without adjustment")
+              ),
+              regexp = paste("85 non-overlapping assays are included in the",
+                             "normalized dataset without adjustment")
+            ),
+            regexp = paste("Duplicate SampleIDs detected:",
+                           "\"CONTROL_SAMPLE_1\", \"CONTROL_SAMPLE_2\",",
+                           "\"CONTROL_SAMPLE_3\", \"CONTROL_SAMPLE_4\"")
+          ),
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
+      }
     )
 
     expect_equal(
@@ -1863,7 +2085,8 @@ test_that(
         dplyr::arrange(
           .data[["SampleID"]],
           .data[["OlinkID"]]
-        ),
+        ) |>
+        strip_check_log(),
       expected = data_ref$Reference$Format$Reveal_3K |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -1891,31 +2114,44 @@ test_that(
       code = {
         expect_message(
           object = expect_warning(
-            object = expect_message(
-              object = ht_rev_norm <- olink_normalization(
-                df1 = data_reveal,
-                df2 = data_ht,
-                overlapping_samples_df1 = intersect(
-                  x = unique(data_reveal$SampleID),
-                  y = unique(data_ht$SampleID)
-                ) |>
-                  (\(x) x[!grepl("CONTROL", x)])(),
-                df1_project_nr = "df_reveal",
-                df2_project_nr = "df_ht",
-                reference_project = "df_ht",
-                format = FALSE,
-                df1_check_log = check_npx(df = data_reveal) |>
-                  suppressMessages() |>
-                  suppressWarnings(),
-                df2_check_log = check_npx(df = data_ht) |>
-                  suppressMessages() |>
-                  suppressWarnings()
+            object = expect_warning(
+              object = expect_message(
+                object = expect_warning(
+                  object = expect_message(
+                    object = ht_rev_norm <- olink_normalization(
+                      df1 = data_reveal,
+                      df2 = data_ht,
+                      overlapping_samples_df1 = intersect(
+                        x = unique(data_reveal$SampleID),
+                        y = unique(data_ht$SampleID)
+                      ) |>
+                        (\(x) x[!grepl("CONTROL", x)])(),
+                      df1_project_nr = "df_reveal",
+                      df2_project_nr = "df_ht",
+                      reference_project = "df_ht",
+                      format = FALSE,
+                      df1_check_log = check_npx(df = data_reveal) |>
+                        suppressMessages() |>
+                        suppressWarnings(),
+                      df2_check_log = check_npx(df = data_ht) |>
+                        suppressMessages() |>
+                        suppressWarnings()
+                    ),
+                    regexp = "Cross-product normalization will be performed!"
+                  ),
+                  regexp = "80 assays are not shared across products"
+                ),
+                regexp = "Output includes two sets of bridging samples"
               ),
-              regexp = "Cross-product normalization will be performed!"
+              regexp = paste("Duplicate SampleIDs detected:",
+                             "\"CONTROL_SAMPLE_1\", \"CONTROL_SAMPLE_2\",",
+                             "\"CONTROL_SAMPLE_3\", \"CONTROL_SAMPLE_4\"")
             ),
-            regexp = "80 assays are not shared across products"
+            regexp = paste("Detected multiple UniProt identifiers for assay:",
+                           "\"OID54321\"")
           ),
-          regexp = "Output includes two sets of bridging samples"
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
         )
       }
     )
@@ -1925,7 +2161,8 @@ test_that(
         dplyr::arrange(
           .data[["SampleID"]],
           .data[["OlinkID"]]
-        ),
+        ) |>
+        strip_check_log(),
       expected = data_ref$Reference$NoFormat$HT_Reveal |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -1936,47 +2173,65 @@ test_that(
 
     ### with formatting ----
 
-    expect_message(
-      object = expect_message(
-        object = expect_message(
-          object = expect_message(
-            object = expect_message(
-              object = expect_warning(
+    withr::with_seed(
+      seed = 123,
+      code = {
+        expect_message(
+          object = expect_warning(
+            object = expect_warning(
+              object = expect_message(
                 object = expect_message(
-                  object = ht_rev_norm_format <- olink_normalization(
-                    df1 = data_reveal,
-                    df2 = data_ht,
-                    overlapping_samples_df1 = intersect(
-                      x = unique(data_reveal$SampleID),
-                      y = unique(data_ht$SampleID)
-                    ) |>
-                      (\(x) x[!grepl("CONTROL", x)])(),
-                    df1_project_nr = "df_reveal",
-                    df2_project_nr = "df_ht",
-                    reference_project = "df_ht",
-                    format = TRUE,
-                    df1_check_log = check_npx(df = data_reveal) |>
-                      suppressMessages() |>
-                      suppressWarnings(),
-                    df2_check_log = check_npx(df = data_ht) |>
-                      suppressMessages() |>
-                      suppressWarnings()
+                  object = expect_message(
+                    object = expect_message(
+                      object = expect_message(
+                        object = expect_warning(
+                          object = expect_message(
+                            object = ht_rev_norm_format <- olink_normalization(
+                              df1 = data_reveal,
+                              df2 = data_ht,
+                              overlapping_samples_df1 = intersect(
+                                x = unique(data_reveal$SampleID),
+                                y = unique(data_ht$SampleID)
+                              ) |>
+                                (\(x) x[!grepl("CONTROL", x)])(),
+                              df1_project_nr = "df_reveal",
+                              df2_project_nr = "df_ht",
+                              reference_project = "df_ht",
+                              format = TRUE,
+                              df1_check_log = check_npx(df = data_reveal) |>
+                                suppressMessages() |>
+                                suppressWarnings(),
+                              df2_check_log = check_npx(df = data_ht) |>
+                                suppressMessages() |>
+                                suppressWarnings()
+                            ),
+                            regexp = "Cross-product normalization will be perfo"
+                          ),
+                          regexp = "80 assays are not shared across products"
+                        ),
+                        regexp = "Output includes two sets of bridging samples"
+                      ),
+                      regexp = paste("10 Plate Controls were removed from data")
+                    ),
+                    regexp = paste("4 Negative Controls were removed from data")
                   ),
-                  regexp = "Cross-product normalization will be performed!"
+                  regexp = paste("24 not bridgeable assays are included in the",
+                                 "bridged dataset without adjustment")
                 ),
-                regexp = "80 assays are not shared across products"
+                regexp = paste("80 non-overlapping assays are included in the",
+                               "normalized dataset without adjustment")
               ),
-              regexp = "Output includes two sets of bridging samples"
+              regexp = paste("Duplicate SampleIDs detected:",
+                             "\"CONTROL_SAMPLE_1\", \"CONTROL_SAMPLE_2\",",
+                             "\"CONTROL_SAMPLE_3\", \"CONTROL_SAMPLE_4\"")
             ),
-            regexp = paste("10 Plate Controls were removed from dataset")
+            regexp = paste("Detected multiple UniProt identifiers for assay:",
+                           "\"OID54321_OID54321\"")
           ),
-          regexp = paste("4 Negative Controls were removed from dataset")
-        ),
-        regexp = paste("24 not bridgeable assays are included in the",
-                       "bridged dataset without adjustment")
-      ),
-      regexp = paste("80 non-overlapping assays are included in the",
-                     "normalized dataset without adjustment")
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
+      }
     )
 
     expect_equal(
@@ -1984,7 +2239,8 @@ test_that(
         dplyr::arrange(
           .data[["SampleID"]],
           .data[["OlinkID"]]
-        ),
+        ) |>
+        strip_check_log(),
       expected = data_ref$Reference$Format$HT_Reveal |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -2012,31 +2268,44 @@ test_that(
       code = {
         expect_message(
           object = expect_warning(
-            object = expect_message(
-              object = rev_ht_norm <- olink_normalization(
-                df1 = data_reveal,
-                df2 = data_ht,
-                overlapping_samples_df1 = intersect(
-                  x = unique(data_reveal$SampleID),
-                  y = unique(data_ht$SampleID)
-                ) |>
-                  (\(x) x[!grepl("CONTROL", x)])(),
-                df1_project_nr = "df_reveal",
-                df2_project_nr = "df_ht",
-                reference_project = "df_reveal",
-                format = FALSE,
-                df1_check_log = check_npx(df = data_reveal) |>
-                  suppressMessages() |>
-                  suppressWarnings(),
-                df2_check_log = check_npx(df = data_ht) |>
-                  suppressMessages() |>
-                  suppressWarnings()
+            object = expect_warning(
+              object = expect_message(
+                object = expect_warning(
+                  object = expect_message(
+                    object = rev_ht_norm <- olink_normalization(
+                      df1 = data_reveal,
+                      df2 = data_ht,
+                      overlapping_samples_df1 = intersect(
+                        x = unique(data_reveal$SampleID),
+                        y = unique(data_ht$SampleID)
+                      ) |>
+                        (\(x) x[!grepl("CONTROL", x)])(),
+                      df1_project_nr = "df_reveal",
+                      df2_project_nr = "df_ht",
+                      reference_project = "df_reveal",
+                      format = FALSE,
+                      df1_check_log = check_npx(df = data_reveal) |>
+                        suppressMessages() |>
+                        suppressWarnings(),
+                      df2_check_log = check_npx(df = data_ht) |>
+                        suppressMessages() |>
+                        suppressWarnings()
+                    ),
+                    regexp = "Cross-product normalization will be performed!"
+                  ),
+                  regexp = "80 assays are not shared across products"
+                ),
+                regexp = "Output includes two sets of bridging samples"
               ),
-              regexp = "Cross-product normalization will be performed!"
+              regexp = paste("Duplicate SampleIDs detected:",
+                             "\"CONTROL_SAMPLE_1\", \"CONTROL_SAMPLE_2\",",
+                             "\"CONTROL_SAMPLE_3\", \"CONTROL_SAMPLE_4\"")
             ),
-            regexp = "80 assays are not shared across products"
+            regexp = paste("Detected multiple UniProt identifiers for assay:",
+                           "\"OID54321\"")
           ),
-          regexp = "Output includes two sets of bridging samples"
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
         )
       }
     )
@@ -2046,7 +2315,8 @@ test_that(
         dplyr::arrange(
           .data[["SampleID"]],
           .data[["OlinkID"]]
-        ),
+        ) |>
+        strip_check_log(),
       expected = data_ref$Reference$NoFormat$Reveal_HT |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -2057,47 +2327,65 @@ test_that(
 
     ### with formatting ----
 
-    expect_message(
-      object = expect_message(
-        object = expect_message(
-          object = expect_message(
-            object = expect_message(
-              object = expect_warning(
+    withr::with_seed(
+      seed = 123,
+      code = {
+        expect_message(
+          object = expect_warning(
+            object = expect_warning(
+              object = expect_message(
                 object = expect_message(
-                  object = rev_ht_norm_format <- olink_normalization(
-                    df1 = data_reveal,
-                    df2 = data_ht,
-                    overlapping_samples_df1 = intersect(
-                      x = unique(data_reveal$SampleID),
-                      y = unique(data_ht$SampleID)
-                    ) |>
-                      (\(x) x[!grepl("CONTROL", x)])(),
-                    df1_project_nr = "df_reveal",
-                    df2_project_nr = "df_ht",
-                    reference_project = "df_reveal",
-                    format = TRUE,
-                    df1_check_log = check_npx(df = data_reveal) |>
-                      suppressMessages() |>
-                      suppressWarnings(),
-                    df2_check_log = check_npx(df = data_ht) |>
-                      suppressMessages() |>
-                      suppressWarnings()
+                  object = expect_message(
+                    object = expect_message(
+                      object = expect_message(
+                        object = expect_warning(
+                          object = expect_message(
+                            object = rev_ht_norm_format <- olink_normalization(
+                              df1 = data_reveal,
+                              df2 = data_ht,
+                              overlapping_samples_df1 = intersect(
+                                x = unique(data_reveal$SampleID),
+                                y = unique(data_ht$SampleID)
+                              ) |>
+                                (\(x) x[!grepl("CONTROL", x)])(),
+                              df1_project_nr = "df_reveal",
+                              df2_project_nr = "df_ht",
+                              reference_project = "df_reveal",
+                              format = TRUE,
+                              df1_check_log = check_npx(df = data_reveal) |>
+                                suppressMessages() |>
+                                suppressWarnings(),
+                              df2_check_log = check_npx(df = data_ht) |>
+                                suppressMessages() |>
+                                suppressWarnings()
+                            ),
+                            regexp = "Cross-product normalization will be perfo"
+                          ),
+                          regexp = "80 assays are not shared across products"
+                        ),
+                        regexp = "Output includes two sets of bridging samples"
+                      ),
+                      regexp = paste("10 Plate Controls were removed from data")
+                    ),
+                    regexp = paste("4 Negative Controls were removed from data")
                   ),
-                  regexp = "Cross-product normalization will be performed!"
+                  regexp = paste("24 not bridgeable assays are included in the",
+                                 "bridged dataset without adjustment")
                 ),
-                regexp = "80 assays are not shared across products"
+                regexp = paste("80 non-overlapping assays are included in the",
+                               "normalized dataset without adjustment")
               ),
-              regexp = "Output includes two sets of bridging samples"
+              regexp = paste("Duplicate SampleIDs detected:",
+                             "\"CONTROL_SAMPLE_1\", \"CONTROL_SAMPLE_2\",",
+                             "\"CONTROL_SAMPLE_3\", \"CONTROL_SAMPLE_4\"")
             ),
-            regexp = paste("10 Plate Controls were removed from dataset")
+            regexp = paste("Detected multiple UniProt identifiers for assay:",
+                           "\"OID54321_OID54321\"")
           ),
-          regexp = paste("4 Negative Controls were removed from dataset")
-        ),
-        regexp = paste("24 not bridgeable assays are included in the",
-                       "bridged dataset without adjustment")
-      ),
-      regexp = paste("80 non-overlapping assays are included in the",
-                     "normalized dataset without adjustment")
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
+      }
     )
 
     expect_equal(
@@ -2105,7 +2393,8 @@ test_that(
         dplyr::arrange(
           .data[["SampleID"]],
           .data[["OlinkID"]]
-        ),
+        ) |>
+        strip_check_log(),
       expected = data_ref$Reference$Format$Reveal_HT |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -2468,59 +2757,77 @@ test_that(
       )
 
     # HT correlation is present
-    expect_message(
+    expect_warning(
       object = expect_message(
-        object = expect_contains(
-          object = olink_normalization(
-            df1 = df_ht_mod,
-            df2 = df_3k_mod,
-            overlapping_samples_df1 = bridge_samples,
-            df1_project_nr = "proj_ht",
-            df2_project_nr = "proj_3k",
-            reference_project = "proj_ht",
-            format = FALSE,
-            df1_check_log = check_npx(df = df_ht_mod) |>
-              suppressMessages() |>
-              suppressWarnings(),
-            df2_check_log = check_npx(df = df_3k_mod) |>
-              suppressMessages() |>
-              suppressWarnings()
-          ) |>
-            dplyr::distinct(OlinkID) |>
-            dplyr::pull(),
-          expected = oid_ht
+        object = expect_message(
+          object = expect_message(
+            object = expect_contains(
+              object = olink_normalization(
+                df1 = df_ht_mod,
+                df2 = df_3k_mod,
+                overlapping_samples_df1 = bridge_samples,
+                df1_project_nr = "proj_ht",
+                df2_project_nr = "proj_3k",
+                reference_project = "proj_ht",
+                format = FALSE,
+                df1_check_log = check_npx(df = df_ht_mod) |>
+                  suppressMessages() |>
+                  suppressWarnings(),
+                df2_check_log = check_npx(df = df_3k_mod) |>
+                  suppressMessages() |>
+                  suppressWarnings()
+              ) |>
+                dplyr::distinct(OlinkID) |>
+                dplyr::pull(),
+              expected = oid_ht
+            ),
+            regexp = "Cross-product normalization will be performed!"
+          ),
+          regexp = "Output includes two sets of bridging samples"
         ),
-        regexp = "Cross-product normalization will be performed!"
+        regexp = paste("More than one column names in `df` was associated with",
+                       "certain key")
       ),
-      regexp = "Output includes two sets of bridging samples"
+      regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_1\",",
+                     "\"CONTROL_SAMPLE_2\", \"CONTROL_SAMPLE_3\",",
+                     "\"CONTROL_SAMPLE_4\"")
     )
 
     # All 3k correlations are present
-    expect_message(
+    expect_warning(
       object = expect_message(
-        object = expect_contains(
-          object = olink_normalization(
-            df1 = df_ht_mod,
-            df2 = df_3k_mod,
-            overlapping_samples_df1 = bridge_samples,
-            df1_project_nr = "proj_ht",
-            df2_project_nr = "proj_3k",
-            reference_project = "proj_ht",
-            format = FALSE,
-            df1_check_log = check_npx(df = df_ht_mod) |>
-              suppressMessages() |>
-              suppressWarnings(),
-            df2_check_log = check_npx(df = df_3k_mod) |>
-              suppressMessages() |>
-              suppressWarnings()
-          ) |>
-            dplyr::distinct(OlinkID_E3072) |>
-            dplyr::pull(),
-          expected = oid_3k
+        object = expect_message(
+          object = expect_message(
+            object = expect_contains(
+              object = olink_normalization(
+                df1 = df_ht_mod,
+                df2 = df_3k_mod,
+                overlapping_samples_df1 = bridge_samples,
+                df1_project_nr = "proj_ht",
+                df2_project_nr = "proj_3k",
+                reference_project = "proj_ht",
+                format = FALSE,
+                df1_check_log = check_npx(df = df_ht_mod) |>
+                  suppressMessages() |>
+                  suppressWarnings(),
+                df2_check_log = check_npx(df = df_3k_mod) |>
+                  suppressMessages() |>
+                  suppressWarnings()
+              ) |>
+                dplyr::distinct(OlinkID_E3072) |>
+                dplyr::pull(),
+              expected = oid_3k
+            ),
+            regexp = "Cross-product normalization will be performed!"
+          ),
+          regexp = "Output includes two sets of bridging samples"
         ),
-        regexp = "Cross-product normalization will be performed!"
+        regexp = paste("More than one column names in `df` was associated with",
+                       "certain key")
       ),
-      regexp = "Output includes two sets of bridging samples"
+      regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_1\",",
+                     "\"CONTROL_SAMPLE_2\", \"CONTROL_SAMPLE_3\",",
+                     "\"CONTROL_SAMPLE_4\"")
     )
   }
 )
