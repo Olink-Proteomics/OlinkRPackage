@@ -111,9 +111,13 @@ olink_norm_input_check <- function(df1,
   # Check data format
   df1_check_log <- get_check_npx(df = df1, check_log = df1_check_log)
   df1_out_df <- get_read_npx_output(df = df1)
+  df1_preferred_names <- get_preferred_names(df = df1,
+                                             check_log = df1_check_log)
   if (!is.null(df2)) {
     df2_check_log <- get_check_npx(df = df2, check_log = df2_check_log)
     df2_out_df <- get_read_npx_output(df = df2)
+    df2_preferred_names <- get_preferred_names(df = df2,
+                                               check_log = df2_check_log)
   }
 
   norm_valid <- olink_norm_input_validate(
@@ -297,6 +301,7 @@ olink_norm_input_check <- function(df1,
     ref_name = NULL,
     ref_product = NULL,
     ref_out_df = NULL,
+    ref_preferred_names = NULL,
     not_ref_df = NULL,
     not_ref_original_df = NULL,
     not_ref_check_log = NULL,
@@ -304,6 +309,7 @@ olink_norm_input_check <- function(df1,
     not_ref_name = NULL,
     not_ref_product = NULL,
     not_ref_out_df = NULL,
+    not_ref_preferred_names = NULL,
     reference_medians = NULL,
     norm_mode = NULL,
     non_overlapping_oid = NULL
@@ -325,6 +331,9 @@ olink_norm_input_check <- function(df1,
     lst_out$ref_original_df <- df1
     lst_out$ref_check_log <- df1_check_log
     lst_out$ref_out_df <- df1_out_df
+    if(!is.null(df1_preferred_names)) {
+      lst_out$ref_preferred_names <- df1_preferred_names
+    }
     lst_out$reference_medians <- reference_medians
   } else if (norm_mode %in% c(olink_norm_modes$subset,
                               olink_norm_modes$bridge,
@@ -335,19 +344,31 @@ olink_norm_input_check <- function(df1,
       lst_out$ref_name <- df1_project_nr
       lst_out$ref_check_log <- df1_check_log
       lst_out$ref_out_df <- df1_out_df
+      if(!is.null(df1_preferred_names)) {
+        lst_out$ref_preferred_names <- df1_preferred_names
+      }
       lst_out$not_ref_original_df <- df2
       lst_out$not_ref_name <- df2_project_nr
       lst_out$not_ref_check_log <- df2_check_log
       lst_out$not_ref_out_df <- df2_out_df
+      if(!is.null(df2_preferred_names)) {
+        lst_out$not_ref_preferred_names <- df2_preferred_names
+      }
     } else {
       lst_out$ref_original_df <- df2
       lst_out$ref_name <- df2_project_nr
       lst_out$ref_check_log <- df2_check_log
       lst_out$ref_out_df <- df2_out_df
+      if(!is.null(df2_preferred_names)) {
+        lst_out$ref_preferred_names <- df2_preferred_names
+      }
       lst_out$not_ref_original_df <- df1
       lst_out$not_ref_name <- df1_project_nr
       lst_out$not_ref_check_log <- df1_check_log
       lst_out$not_ref_out_df <- df1_out_df
+      if(!is.null(df1_preferred_names)) {
+        lst_out$not_ref_preferred_names <- df1_preferred_names
+      }
     }
     lst_out$ref_df <- lst_df[[lst_out$ref_name]]
     lst_out$not_ref_df <- lst_df[[lst_out$not_ref_name]]

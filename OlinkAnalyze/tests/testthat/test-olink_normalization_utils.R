@@ -49,6 +49,7 @@ test_that(
         ref_name = "20200001",
         ref_product = "other",
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = npx_data2,
         not_ref_original_df = npx_data2,
         not_ref_check_log = df2_check_log,
@@ -56,6 +57,7 @@ test_that(
         not_ref_name = "20200002",
         not_ref_product = "other",
         not_ref_out_df = "tibble",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge,
         non_overlapping_oid = NULL
@@ -112,6 +114,7 @@ test_that(
         ref_name = "20200002",
         ref_product = "other",
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = npx_data1_norm,
         not_ref_original_df = npx_data1_norm,
         not_ref_check_log = df1_norm_check_log,
@@ -119,6 +122,7 @@ test_that(
         not_ref_name = "20200001",
         not_ref_product = "other",
         not_ref_out_df = "tibble",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge,
         non_overlapping_oid = NULL
@@ -183,6 +187,7 @@ test_that(
         ref_name = "20200002",
         ref_product = "other",
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = npx_data1_noid |>
           # rm changed assay
           dplyr::filter(!(.data[["OlinkID"]] %in% c("OID00000", "OID01216"))),
@@ -192,6 +197,7 @@ test_that(
         not_ref_name = "20200001",
         not_ref_product = "other",
         not_ref_out_df = "tibble",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge,
         non_overlapping_oid = list("20200002" = "OID01216",
@@ -254,6 +260,7 @@ test_that(
         ref_name = "20200002",
         ref_product = "other",
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = npx_data1_multiq,
         not_ref_original_df = npx_data1_multiq,
         not_ref_check_log = df1_multiq_check_log,
@@ -261,6 +268,7 @@ test_that(
         not_ref_name = "20200001",
         not_ref_product = "other",
         not_ref_out_df = "tibble",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge,
         non_overlapping_oid = NULL
@@ -319,6 +327,7 @@ test_that(
         ref_name = "20200002",
         ref_product = "other",
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = npx_data1_multiq_v2,
         not_ref_original_df = npx_data1_multiq_v2,
         not_ref_check_log = df1_multiqv2_check_log,
@@ -326,6 +335,7 @@ test_that(
         not_ref_name = "20200001",
         not_ref_product = "other",
         not_ref_out_df = "tibble",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge,
         non_overlapping_oid = NULL
@@ -388,6 +398,7 @@ test_that(
         ref_name = "20200001",
         ref_product = "other",
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = npx_data2_obj,
         not_ref_original_df = npx_data2_obj,
         not_ref_check_log = df2_check_log,
@@ -395,6 +406,7 @@ test_that(
         not_ref_name = "20200002",
         not_ref_product = "other",
         not_ref_out_df = "tibble",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge,
         non_overlapping_oid = NULL
@@ -466,6 +478,7 @@ test_that(
         ref_name = "20200001",
         ref_product = "other",
         ref_out_df = "arrow",
+        ref_preferred_names = NULL,
         not_ref_df = npx_data2,
         not_ref_original_df = npx_data2,
         not_ref_check_log = df2_check_log,
@@ -473,6 +486,7 @@ test_that(
         not_ref_name = "20200002",
         not_ref_product = "other",
         not_ref_out_df = "arrow",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge,
         non_overlapping_oid = NULL
@@ -584,6 +598,7 @@ test_that(
         ref_name = "HT",
         ref_product = "HT",
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = expected_not_ref_df,
         not_ref_original_df = data_3k,
         not_ref_check_log = df_3k_check_log,
@@ -591,6 +606,7 @@ test_that(
         not_ref_name = "E3072",
         not_ref_product = "E3072",
         not_ref_out_df = "tibble",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product,
         non_overlapping_oid = list("HT" = "OID54321",
@@ -657,6 +673,7 @@ test_that(
         ref_name = "HT",
         ref_product = "HT",
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = attach_check_log(
           df = expected_not_ref_df,
           out_df = "tibble"
@@ -668,6 +685,7 @@ test_that(
         not_ref_name = "E3072",
         not_ref_product = "E3072",
         not_ref_out_df = "tibble",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product,
         non_overlapping_oid = list("HT" = "OID54321",
@@ -759,6 +777,7 @@ test_that(
         ref_name = "HT",
         ref_product = "HT",
         ref_out_df = "arrow",
+        ref_preferred_names = NULL,
         not_ref_df = expected_not_ref_df,
         not_ref_original_df = data_3k,
         not_ref_check_log = df_3k_check_log,
@@ -766,6 +785,7 @@ test_that(
         not_ref_name = "E3072",
         not_ref_product = "E3072",
         not_ref_out_df = "arrow",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product,
         non_overlapping_oid = list("HT" = "OID54321",
@@ -911,6 +931,7 @@ test_that(
         ref_name = "Reveal",
         ref_product = "Reveal",
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = expected_not_ref_df,
         not_ref_original_df = data_3k,
         not_ref_check_log = df_3k_check_log,
@@ -918,6 +939,7 @@ test_that(
         not_ref_name = "E3072",
         not_ref_product = "E3072",
         not_ref_out_df = "tibble",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product,
         non_overlapping_oid = expected_non_overlap_oid
@@ -983,6 +1005,7 @@ test_that(
         ref_name = "Reveal",
         ref_product = "Reveal",
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = attach_check_log(
           df = expected_not_ref_df,
           out_df = "tibble"
@@ -994,6 +1017,7 @@ test_that(
         not_ref_name = "E3072",
         not_ref_product = "E3072",
         not_ref_out_df = "tibble",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product,
         non_overlapping_oid = expected_non_overlap_oid
@@ -1092,6 +1116,7 @@ test_that(
         ref_name = "Reveal",
         ref_product = "Reveal",
         ref_out_df = "arrow",
+        ref_preferred_names = NULL,
         not_ref_df = expected_not_ref_df,
         not_ref_original_df = data_3k,
         not_ref_check_log = df_3k_check_log,
@@ -1099,6 +1124,7 @@ test_that(
         not_ref_name = "E3072",
         not_ref_product = "E3072",
         not_ref_out_df = "arrow",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product,
         non_overlapping_oid = expected_non_overlap_oid
@@ -1240,6 +1266,7 @@ test_that(
         ref_name = "HT",
         ref_product = "HT",
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = expected_not_ref_df_v1,
         not_ref_original_df = data_reveal,
         not_ref_check_log = df_reveal_check_log,
@@ -1247,6 +1274,7 @@ test_that(
         not_ref_name = "Reveal",
         not_ref_product = "Reveal",
         not_ref_out_df = "tibble",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product,
         non_overlapping_oid = expected_non_overlap_oid_v1
@@ -1312,6 +1340,7 @@ test_that(
         ref_name = "HT",
         ref_product = "HT",
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = attach_check_log(
           df = expected_not_ref_df_v1,
           out_df = "tibble"
@@ -1323,6 +1352,7 @@ test_that(
         not_ref_name = "Reveal",
         not_ref_product = "Reveal",
         not_ref_out_df = "tibble",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product,
         non_overlapping_oid = expected_non_overlap_oid_v1
@@ -1421,6 +1451,7 @@ test_that(
         ref_name = "HT",
         ref_product = "HT",
         ref_out_df = "arrow",
+        ref_preferred_names = NULL,
         not_ref_df = expected_not_ref_df_v1,
         not_ref_original_df = data_reveal,
         not_ref_check_log = df_reveal_check_log,
@@ -1428,6 +1459,7 @@ test_that(
         not_ref_name = "Reveal",
         not_ref_product = "Reveal",
         not_ref_out_df = "arrow",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product,
         non_overlapping_oid = expected_non_overlap_oid_v1
@@ -1539,6 +1571,7 @@ test_that(
         ref_name = "Reveal",
         ref_product = "Reveal",
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = expected_not_ref_df_v2,
         not_ref_original_df = data_ht,
         not_ref_check_log = df_ht_check_log,
@@ -1546,6 +1579,7 @@ test_that(
         not_ref_name = "HT",
         not_ref_product = "HT",
         not_ref_out_df = "tibble",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product,
         non_overlapping_oid = expected_non_overlap_oid_v2
@@ -1585,6 +1619,7 @@ test_that(
         ref_name = "Reveal",
         ref_product = "Reveal",
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = attach_check_log(
           df = expected_not_ref_df_v2,
           out_df = "tibble"
@@ -1596,6 +1631,7 @@ test_that(
         not_ref_name = "HT",
         not_ref_product = "HT",
         not_ref_out_df = "tibble",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product,
         non_overlapping_oid = expected_non_overlap_oid_v2
@@ -1668,6 +1704,7 @@ test_that(
         ref_name = "Reveal",
         ref_product = "Reveal",
         ref_out_df = "arrow",
+        ref_preferred_names = NULL,
         not_ref_df = expected_not_ref_df_v2,
         not_ref_original_df = data_ht,
         not_ref_check_log = df_reveal_check_log,
@@ -1675,6 +1712,7 @@ test_that(
         not_ref_name = "HT",
         not_ref_product = "HT",
         not_ref_out_df = "arrow",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$norm_cross_product,
         non_overlapping_oid = expected_non_overlap_oid_v2
@@ -1738,6 +1776,7 @@ test_that(
         ref_name = "20200001",
         ref_product = NULL,
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = df2_npx,
         not_ref_original_df = df2_npx,
         not_ref_check_log = df2_check_log,
@@ -1745,6 +1784,7 @@ test_that(
         not_ref_name = "20200002",
         not_ref_product = NULL,
         not_ref_out_df = "tibble",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset,
         non_overlapping_oid = NULL
@@ -1803,6 +1843,7 @@ test_that(
         ref_name = "20200002",
         ref_product = NULL,
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = npx_data1_norm,
         not_ref_original_df = npx_data1_norm,
         not_ref_check_log = df1_norm_check_log,
@@ -1810,6 +1851,7 @@ test_that(
         not_ref_name = "20200001",
         not_ref_product = NULL,
         not_ref_out_df = "tibble",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset,
         non_overlapping_oid = NULL
@@ -1868,6 +1910,7 @@ test_that(
         ref_name = "20200001",
         ref_product = NULL,
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = df2_npx_obj,
         not_ref_original_df = df2_npx_obj,
         not_ref_check_log = df2_check_log,
@@ -1875,6 +1918,7 @@ test_that(
         not_ref_name = "20200002",
         not_ref_product = NULL,
         not_ref_out_df = "tibble",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset,
         non_overlapping_oid = NULL
@@ -1942,6 +1986,7 @@ test_that(
         ref_name = "20200001",
         ref_product = NULL,
         ref_out_df = "arrow",
+        ref_preferred_names = NULL,
         not_ref_df = df2_npx,
         not_ref_original_df = df2_npx,
         not_ref_check_log = df2_check_log,
@@ -1949,6 +1994,7 @@ test_that(
         not_ref_name = "20200002",
         not_ref_product = NULL,
         not_ref_out_df = "arrow",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset,
         non_overlapping_oid = NULL
@@ -2017,6 +2063,7 @@ test_that(
         ref_name = "20200001",
         ref_product = NULL,
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = df2_npx,
         not_ref_original_df = df2_npx,
         not_ref_check_log = df2_check_log,
@@ -2024,6 +2071,7 @@ test_that(
         not_ref_name = "20200002",
         not_ref_product = NULL,
         not_ref_out_df = "tibble",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset,
         non_overlapping_oid = NULL
@@ -2082,6 +2130,7 @@ test_that(
         ref_name = "20200002",
         ref_product = NULL,
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = npx_data1_norm,
         not_ref_original_df = npx_data1_norm,
         not_ref_check_log = df1_norm_check_log,
@@ -2089,6 +2138,7 @@ test_that(
         not_ref_name = "20200001",
         not_ref_product = NULL,
         not_ref_out_df = "tibble",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset,
         non_overlapping_oid = NULL
@@ -2147,6 +2197,7 @@ test_that(
         ref_name = "20200001",
         ref_product = NULL,
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = df2_npx_obj,
         not_ref_original_df = df2_npx_obj,
         not_ref_check_log = df2_check_log,
@@ -2154,6 +2205,7 @@ test_that(
         not_ref_name = "20200002",
         not_ref_product = NULL,
         not_ref_out_df = "tibble",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset,
         non_overlapping_oid = NULL
@@ -2221,6 +2273,7 @@ test_that(
         ref_name = "20200001",
         ref_product = NULL,
         ref_out_df = "arrow",
+        ref_preferred_names = NULL,
         not_ref_df = df2_npx,
         not_ref_original_df = df2_npx,
         not_ref_check_log = df2_check_log,
@@ -2228,6 +2281,7 @@ test_that(
         not_ref_name = "20200002",
         not_ref_product = NULL,
         not_ref_out_df = "arrow",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$subset,
         non_overlapping_oid = NULL
@@ -2294,6 +2348,7 @@ test_that(
         ref_name = "20200001",
         ref_product = NULL,
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = NULL,
         not_ref_original_df = NULL,
         not_ref_check_log = NULL,
@@ -2301,6 +2356,7 @@ test_that(
         not_ref_name = NULL,
         not_ref_product = NULL,
         not_ref_out_df = NULL,
+        not_ref_preferred_names = NULL,
         reference_medians = ref_median_df,
         norm_mode = olink_norm_modes$ref_median,
         non_overlapping_oid = NULL
@@ -2346,6 +2402,7 @@ test_that(
         ref_name = "20200001",
         ref_product = NULL,
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = NULL,
         not_ref_original_df = NULL,
         not_ref_check_log = NULL,
@@ -2353,6 +2410,7 @@ test_that(
         not_ref_name = NULL,
         not_ref_product = NULL,
         not_ref_out_df = NULL,
+        not_ref_preferred_names = NULL,
         reference_medians = ref_median_df,
         norm_mode = olink_norm_modes$ref_median,
         non_overlapping_oid = NULL
@@ -2403,6 +2461,7 @@ test_that(
         ref_name = "20200001",
         ref_product = NULL,
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = NULL,
         not_ref_original_df = NULL,
         not_ref_check_log = NULL,
@@ -2410,6 +2469,7 @@ test_that(
         not_ref_name = NULL,
         not_ref_product = NULL,
         not_ref_out_df = NULL,
+        not_ref_preferred_names = NULL,
         reference_medians = ref_median_df,
         norm_mode = olink_norm_modes$ref_median,
         non_overlapping_oid = NULL
@@ -2465,6 +2525,7 @@ test_that(
         ref_name = "20200001",
         ref_product = NULL,
         ref_out_df = "arrow",
+        ref_preferred_names = NULL,
         not_ref_df = NULL,
         not_ref_original_df = NULL,
         not_ref_check_log = NULL,
@@ -2472,6 +2533,7 @@ test_that(
         not_ref_name = NULL,
         not_ref_product = NULL,
         not_ref_out_df = NULL,
+        not_ref_preferred_names = NULL,
         reference_medians = ref_median_df,
         norm_mode = olink_norm_modes$ref_median,
         non_overlapping_oid = NULL
@@ -2602,6 +2664,7 @@ test_that(
         ref_name = "20200001",
         ref_product = "other",
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = npx_data2_obj,
         not_ref_original_df = npx_data2_obj,
         not_ref_check_log = df2_check_log,
@@ -2609,6 +2672,7 @@ test_that(
         not_ref_name = "20200002",
         not_ref_product = "other",
         not_ref_out_df = "tibble",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge,
         non_overlapping_oid = NULL
@@ -2651,6 +2715,7 @@ test_that(
         ref_name = "20200001",
         ref_product = "other",
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = npx_data2,
         not_ref_original_df = npx_data2,
         not_ref_check_log = df2_check_log,
@@ -2658,6 +2723,7 @@ test_that(
         not_ref_name = "20200002",
         not_ref_product = "other",
         not_ref_out_df = "arrow",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge,
         non_overlapping_oid = NULL
@@ -2699,6 +2765,7 @@ test_that(
         ref_name = "20200001",
         ref_product = "other",
         ref_out_df = "tibble",
+        ref_preferred_names = NULL,
         not_ref_df = npx_data2,
         not_ref_original_df = npx_data2,
         not_ref_check_log = df2_check_log,
@@ -2706,6 +2773,7 @@ test_that(
         not_ref_name = "20200002",
         not_ref_product = "other",
         not_ref_out_df = "arrow",
+        not_ref_preferred_names = NULL,
         reference_medians = NULL,
         norm_mode = olink_norm_modes$bridge,
         non_overlapping_oid = NULL
