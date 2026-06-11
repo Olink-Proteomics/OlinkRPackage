@@ -116,6 +116,10 @@ test_that(
     skip_if_not_installed("FSA")
     skip_if_not_installed("broom")
     skip_if_not_installed("rstatix")
+    skip_if(
+      packageVersion("dunn.test") == "1.4.0",
+      "dunn.test version = 1.4.1 contains a bug."
+    )
 
     # npx_data1 check_log
     check_log <- check_npx(npx_data1) |>
@@ -195,30 +199,75 @@ test_that(
       fixed = TRUE
     )
 
-    if (packageVersion("dunn.test") <= "1.3.7") {
-      expect_equal(
-        object = kruskal_posthoc_results,
-        expected = ref_results$kruskal_posthoc
-      )
+    expect_equal(
+      object = kruskal_posthoc_results,
+      expected = ref_results$kruskal_posthoc
+    )
 
-      expect_equal(
-        object = nrow(kruskal_posthoc_results),
-        expected = 190
-      )
+    expect_equal(
+      object = nrow(kruskal_posthoc_results),
+      expected = 190
+    )
 
-      expect_equal(
-        object = kruskal_posthoc_results |>
-          dplyr::select(contrast) |>
-          unique() |>
-          nrow(),
-        expected = 10
+    expect_equal(
+      object = kruskal_posthoc_results |>
+        dplyr::select(contrast) |>
+        unique() |>
+        nrow(),
+      expected = 10
+    )
+  }
+)
+
+test_that(
+  "olink_one_non_parametric_posthoc - warning - buggy dunn.test",
+  {
+    # has_buggy_dunn_test returns TRUE for dunn.test 1.4.0 ----
+    expect_true(
+      has_buggy_dunn_test(
+        is_installed = function(pkg) TRUE,
+        package_version = function(pkg) package_version("1.4.0")
       )
-    } else {
-      expect_snapshot(
-        kruskal_posthoc_results,
-        variant = "olink_one_non_parametric-kw-posthoc-dunn_test-1.4.0"
+    )
+
+    # has_buggy_dunn_test returns FALSE when dunn.test is not installed ----
+    expect_false(
+      has_buggy_dunn_test(
+        is_installed = function(pkg) FALSE,
+        package_version = function(pkg) package_version("1.4.0")
       )
-    }
+    )
+
+    # has_buggy_dunn_test returns FALSE for dunn.test 1.3.7 ----
+    expect_false(
+      has_buggy_dunn_test(
+        is_installed = function(pkg) TRUE,
+        package_version = function(pkg) package_version("1.3.7")
+      )
+    )
+
+    # has_buggy_dunn_test returns FALSE for dunn.test 1.4.1 ----
+    expect_false(
+      has_buggy_dunn_test(
+        is_installed = function(pkg) TRUE,
+        package_version = function(pkg) package_version("1.4.1")
+      )
+    )
+
+    # warn_if_buggy_dunn_test warns for dunn.test 1.4.0 ----
+    expect_warning(
+      warn_if_buggy_dunn_test(
+        has_buggy_version = function() TRUE
+      ),
+      regexp = "installed version of dunn\\.test contains a known bug"
+    )
+
+    # warn_if_buggy_dunn_test is silent for non-buggy dunn.test versions ----
+    expect_no_warning(
+      warn_if_buggy_dunn_test(
+        has_buggy_version = function() FALSE
+      )
+    )
   }
 )
 
