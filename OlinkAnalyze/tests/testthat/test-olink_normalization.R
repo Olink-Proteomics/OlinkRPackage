@@ -1013,7 +1013,7 @@ test_that(
             ),
           regexp = "Subset normalization will be performed!"
         ),
-        regexp = "Datasets \"df1_multiple_lod\" and \"df2_multiple_lod\" contain"
+        regexp = "Datasets \"df1_multiple_lod\" and \"df2_multiple_lod\" contai"
       ),
       regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
                      "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
@@ -1314,7 +1314,7 @@ test_that(
             ),
           regexp = "Subset normalization will be performed!"
         ),
-        regexp = "Datasets \"df1_multiple_lod\" and \"df2_multiple_lod\" contain"
+        regexp = "Datasets \"df1_multiple_lod\" and \"df2_multiple_lod\" contai"
       ),
       regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
                      "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
@@ -2333,8 +2333,8 @@ test_that(
               ),
             regexp = "Reference median normalization will be performed!"
           ),
-          regexp = paste("2 non-overlapping assays found in the dataset but not",
-                         "in the reference medians")
+          regexp = paste("2 non-overlapping assays found in the dataset but",
+                         "not in the reference medians")
         ),
         regexp = paste("Assays \"OID01218\", \"OID01219\", \"OID01216\", and",
                        "\"OID01217\" not shared across input dataset")
@@ -4310,18 +4310,18 @@ test_that(
                           object = expect_message(
                             object = rev_ht_norm_format_obj <-
                               olink_normalization(
-                              df1 = data_reveal_obj,
-                              df2 = data_ht_obj,
-                              overlapping_samples_df1 = intersect(
-                                x = unique(data_reveal$SampleID),
-                                y = unique(data_ht$SampleID)
-                              ) |>
-                                (\(x) x[!grepl("CONTROL", x)])(),
-                              df1_project_nr = "df_reveal",
-                              df2_project_nr = "df_ht",
-                              reference_project = "df_reveal",
-                              format = TRUE
-                            ),
+                                df1 = data_reveal_obj,
+                                df2 = data_ht_obj,
+                                overlapping_samples_df1 = intersect(
+                                  x = unique(data_reveal$SampleID),
+                                  y = unique(data_ht$SampleID)
+                                ) |>
+                                  (\(x) x[!grepl("CONTROL", x)])(),
+                                df1_project_nr = "df_reveal",
+                                df2_project_nr = "df_ht",
+                                reference_project = "df_reveal",
+                                format = TRUE
+                              ),
                             regexp = "Cross-product normalization will be perfo"
                           ),
                           regexp = "80 assays are not shared across products"

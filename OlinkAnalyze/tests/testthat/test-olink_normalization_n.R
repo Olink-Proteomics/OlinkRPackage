@@ -814,8 +814,9 @@ test_that(
               ),
             regexp = "Bridge normalization will be performed!"
           ),
-          regexp = paste("Datasets \"df1_multiple_lod\" and \"df2_multiple_lod\"",
-                         "contain multiple columns matching")
+          regexp = paste("Datasets \"df1_multiple_lod\" and
+                         \"df2_multiple_lod\" contain multiple columns",
+                         "matching")
         ),
         regexp = "Output includes two sets of bridging samples"
       ),
@@ -1137,10 +1138,14 @@ test_that(
           project_2_name = "df2_no_lod",
           project_ref_name = "df1_no_lod",
           format = FALSE,
-          project_1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_lod) |>
+          project_1_check_log = check_npx(
+            df = ref_norm_res$lst_df$df1_no_lod
+          ) |>
             suppressMessages() |>
             suppressWarnings(),
-          project_2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_lod) |>
+          project_2_check_log = check_npx(
+            df = ref_norm_res$lst_df$df2_no_lod
+          ) |>
             suppressMessages() |>
             suppressWarnings()
         ) |>
@@ -1194,7 +1199,7 @@ test_that(
             ),
           regexp = "Subset normalization will be performed!"
         ),
-        regexp = "Datasets \"df1_multiple_lod\" and \"df2_multiple_lod\" contain"
+        regexp = "Datasets \"df1_multiple_lod\" and \"df2_multiple_lod\" contai"
       ),
       regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
                      "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
@@ -1454,10 +1459,14 @@ test_that(
           project_2_name = "df2_no_lod",
           project_ref_name = "df1_no_lod",
           format = FALSE,
-          project_1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_lod) |>
+          project_1_check_log = check_npx(
+            df = ref_norm_res$lst_df$df1_no_lod
+          ) |>
             suppressMessages() |>
             suppressWarnings(),
-          project_2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_lod) |>
+          project_2_check_log = check_npx(
+            df = ref_norm_res$lst_df$df2_no_lod
+          ) |>
             suppressMessages() |>
             suppressWarnings()
         ) |>
@@ -1511,7 +1520,7 @@ test_that(
             ),
           regexp = "Subset normalization will be performed!"
         ),
-        regexp = "Datasets \"df1_multiple_lod\" and \"df2_multiple_lod\" contain"
+        regexp = "Datasets \"df1_multiple_lod\" and \"df2_multiple_lod\" contai"
       ),
       regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
                      "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
