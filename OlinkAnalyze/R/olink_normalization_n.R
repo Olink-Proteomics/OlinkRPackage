@@ -718,7 +718,8 @@ olink_normalization_bridge <- function(project_1_df,
                                                 .data[["SampleID"]],
                                                 .data[["SampleID_df1"]])) |>
     dplyr::select(-dplyr::all_of("SampleID")) |>
-    dplyr::rename("SampleID" = "SampleID_df1")
+    dplyr::rename("SampleID" = "SampleID_df1") |>
+    dplyr::compute()
 
   # bridge normalize the two data frames
   norm_df <- olink_normalization(

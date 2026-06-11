@@ -638,151 +638,78 @@ test_that(
 
     ### bridge normalization - no norm column ----
 
-    expect_message(
-      object = expect_warning(
-        object = expect_message(
-          object = bridge_no_norm <- olink_normalization_bridge(
-            project_1_df = ref_norm_res$lst_df$df1_no_norm,
-            project_2_df = ref_norm_res$lst_df$df2_no_norm,
-            bridge_samples = list(
-              "DF1" = ref_norm_res$lst_sample$bridge_samples,
-              "DF2" = ref_norm_res$lst_sample$bridge_samples
-            ),
-            project_1_name = "df1_no_norm",
-            project_2_name = "df2_no_norm",
-            project_ref_name = "df1_no_norm",
-            format = FALSE,
-            project_1_check_log = check_npx(
-              df = ref_norm_res$lst_df$df1_no_norm
+    expect_warning(
+      object = expect_message(
+        object = expect_warning(
+          object = expect_message(
+            object = bridge_no_norm <- olink_normalization_bridge(
+              project_1_df = ref_norm_res$lst_df$df1_no_norm,
+              project_2_df = ref_norm_res$lst_df$df2_no_norm,
+              bridge_samples = list(
+                "DF1" = ref_norm_res$lst_sample$bridge_samples,
+                "DF2" = ref_norm_res$lst_sample$bridge_samples
+              ),
+              project_1_name = "df1_no_norm",
+              project_2_name = "df2_no_norm",
+              project_ref_name = "df1_no_norm",
+              format = FALSE,
+              project_1_check_log = check_npx(
+                df = ref_norm_res$lst_df$df1_no_norm
+              ) |>
+                suppressMessages() |>
+                suppressWarnings(),
+              project_2_check_log = check_npx(
+                df = ref_norm_res$lst_df$df2_no_norm
+              ) |>
+                suppressMessages() |>
+                suppressWarnings()
             ) |>
-              suppressMessages() |>
-              suppressWarnings(),
-            project_2_check_log = check_npx(
-              df = ref_norm_res$lst_df$df2_no_norm
-            ) |>
-              suppressMessages() |>
-              suppressWarnings()
-          ) |>
-            dplyr::filter(
-              .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
-            ),
-          regexp = "Bridge normalization will be performed!"
+              dplyr::filter(
+                .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+              ),
+            regexp = "Bridge normalization will be performed!"
+          ),
+          regexp = paste("Datasets \"df1_no_norm\" and \"df2_no_norm\" do not",
+                         "contain a column named \"Normalization\"")
         ),
-        regexp = paste("Datasets \"df1_no_norm\" and \"df2_no_norm\" do not",
-                       "contain a column named \"Normalization\"")
+        regexp = "Output includes two sets of bridging samples"
       ),
-      regexp = "Output includes two sets of bridging samples"
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = bridge_no_norm,
+      object = strip_check_log(df = bridge_no_norm),
       expected = ref_norm_res$lst_norm$bridge_norm$no_norm,
       tolerance = 1e-4
     )
 
     ### bridge normalization - with norm column ----
 
-    expect_message(
-      object = expect_message(
-        object = bridge_norm <- olink_normalization_bridge(
-          project_1_df = ref_norm_res$lst_df$df1_norm,
-          project_2_df = ref_norm_res$lst_df$df2_norm,
-          bridge_samples = list(
-            "DF1" = ref_norm_res$lst_sample$bridge_samples,
-            "DF2" = ref_norm_res$lst_sample$bridge_samples
-          ),
-          project_1_name = "df1_norm",
-          project_2_name = "df2_norm",
-          project_ref_name = "df1_norm",
-          format = FALSE,
-          project_1_check_log = check_npx(
-            df = ref_norm_res$lst_df$df1_norm
-          ) |>
-            suppressMessages() |>
-            suppressWarnings(),
-          project_2_check_log = check_npx(
-            df = ref_norm_res$lst_df$df2_norm
-          ) |>
-            suppressMessages() |>
-            suppressWarnings()
-        ) |>
-          dplyr::filter(
-            .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
-          ),
-        regexp = "Bridge normalization will be performed!"
-      ),
-      regexp = "Output includes two sets of bridging samples"
-    )
-
-    expect_equal(
-      object = bridge_norm,
-      expected = ref_norm_res$lst_norm$bridge_norm$norm,
-      tolerance = 1e-4
-    )
-
-    ### bridge normalization - no lod column ----
-
-    expect_message(
-      object = expect_message(
-        object = bridge_no_lod <- olink_normalization_bridge(
-          project_1_df = ref_norm_res$lst_df$df1_no_lod,
-          project_2_df = ref_norm_res$lst_df$df2_no_lod,
-          bridge_samples = list(
-            "DF1" = ref_norm_res$lst_sample$bridge_samples,
-            "DF2" = ref_norm_res$lst_sample$bridge_samples
-          ),
-          project_1_name = "df1_no_lod",
-          project_2_name = "df2_no_lod",
-          project_ref_name = "df1_no_lod",
-          format = FALSE,
-          project_1_check_log = check_npx(
-            df = ref_norm_res$lst_df$df1_no_lod
-          ) |>
-            suppressMessages() |>
-            suppressWarnings(),
-          project_2_check_log = check_npx(
-            df = ref_norm_res$lst_df$df2_no_lod
-          ) |>
-            suppressMessages() |>
-            suppressWarnings()
-        ) |>
-          dplyr::filter(
-            .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
-          ),
-        regexp = "Bridge normalization will be performed!"
-      ),
-      regexp = "Output includes two sets of bridging samples"
-    )
-
-    expect_equal(
-      object = bridge_no_lod,
-      expected = ref_norm_res$lst_norm$bridge_norm$no_lod,
-      tolerance = 1e-4
-    )
-
-    ### bridge normalization - multiple lod columns ----
-
-    expect_message(
+    expect_warning(
       object = expect_message(
         object = expect_message(
-          object = bridge_multiple_lod <- olink_normalization_bridge(
-            project_1_df = ref_norm_res$lst_df$df1_multiple_lod,
-            project_2_df = ref_norm_res$lst_df$df2_multiple_lod,
+          object = bridge_norm <- olink_normalization_bridge(
+            project_1_df = ref_norm_res$lst_df$df1_norm,
+            project_2_df = ref_norm_res$lst_df$df2_norm,
             bridge_samples = list(
               "DF1" = ref_norm_res$lst_sample$bridge_samples,
               "DF2" = ref_norm_res$lst_sample$bridge_samples
             ),
-            project_1_name = "df1_multiple_lod",
-            project_2_name = "df2_multiple_lod",
-            project_ref_name = "df1_multiple_lod",
+            project_1_name = "df1_norm",
+            project_2_name = "df2_norm",
+            project_ref_name = "df1_norm",
             format = FALSE,
             project_1_check_log = check_npx(
-              df = ref_norm_res$lst_df$df1_multiple_lod
+              df = ref_norm_res$lst_df$df1_norm
             ) |>
               suppressMessages() |>
               suppressWarnings(),
             project_2_check_log = check_npx(
-              df = ref_norm_res$lst_df$df2_multiple_lod
+              df = ref_norm_res$lst_df$df2_norm
             ) |>
               suppressMessages() |>
               suppressWarnings()
@@ -792,15 +719,256 @@ test_that(
             ),
           regexp = "Bridge normalization will be performed!"
         ),
-        regexp = paste("Datasets \"df1_multiple_lod\" and \"df2_multiple_lod\"",
-                       "contain multiple columns matching")
+        regexp = "Output includes two sets of bridging samples"
       ),
-      regexp = "Output includes two sets of bridging samples"
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = bridge_multiple_lod,
+      object = strip_check_log(df = bridge_norm),
+      expected = ref_norm_res$lst_norm$bridge_norm$norm,
+      tolerance = 1e-4
+    )
+
+    ### bridge normalization - no lod column ----
+
+    expect_warning(
+      object = expect_message(
+        object = expect_message(
+          object = bridge_no_lod <- olink_normalization_bridge(
+            project_1_df = ref_norm_res$lst_df$df1_no_lod,
+            project_2_df = ref_norm_res$lst_df$df2_no_lod,
+            bridge_samples = list(
+              "DF1" = ref_norm_res$lst_sample$bridge_samples,
+              "DF2" = ref_norm_res$lst_sample$bridge_samples
+            ),
+            project_1_name = "df1_no_lod",
+            project_2_name = "df2_no_lod",
+            project_ref_name = "df1_no_lod",
+            format = FALSE,
+            project_1_check_log = check_npx(
+              df = ref_norm_res$lst_df$df1_no_lod
+            ) |>
+              suppressMessages() |>
+              suppressWarnings(),
+            project_2_check_log = check_npx(
+              df = ref_norm_res$lst_df$df2_no_lod
+            ) |>
+              suppressMessages() |>
+              suppressWarnings()
+          ) |>
+            dplyr::filter(
+              .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+            ),
+          regexp = "Bridge normalization will be performed!"
+        ),
+        regexp = "Output includes two sets of bridging samples"
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_equal(
+      object = strip_check_log(df = bridge_no_lod),
+      expected = ref_norm_res$lst_norm$bridge_norm$no_lod,
+      tolerance = 1e-4
+    )
+
+    ### bridge normalization - multiple lod columns ----
+
+    expect_warning(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = bridge_multiple_lod <- olink_normalization_bridge(
+              project_1_df = ref_norm_res$lst_df$df1_multiple_lod,
+              project_2_df = ref_norm_res$lst_df$df2_multiple_lod,
+              bridge_samples = list(
+                "DF1" = ref_norm_res$lst_sample$bridge_samples,
+                "DF2" = ref_norm_res$lst_sample$bridge_samples
+              ),
+              project_1_name = "df1_multiple_lod",
+              project_2_name = "df2_multiple_lod",
+              project_ref_name = "df1_multiple_lod",
+              format = FALSE,
+              project_1_check_log = check_npx(
+                df = ref_norm_res$lst_df$df1_multiple_lod
+              ) |>
+                suppressMessages() |>
+                suppressWarnings(),
+              project_2_check_log = check_npx(
+                df = ref_norm_res$lst_df$df2_multiple_lod
+              ) |>
+                suppressMessages() |>
+                suppressWarnings()
+            ) |>
+              dplyr::filter(
+                .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+              ),
+            regexp = "Bridge normalization will be performed!"
+          ),
+          regexp = paste("Datasets \"df1_multiple_lod\" and \"df2_multiple_lod\"",
+                         "contain multiple columns matching")
+        ),
+        regexp = "Output includes two sets of bridging samples"
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_equal(
+      object = strip_check_log(df = bridge_multiple_lod),
       expected = ref_norm_res$lst_norm$bridge_norm$multiple_lod,
+      tolerance = 1e-4
+    )
+
+    ### olink_class ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = df1_no_norm_obj <- attach_check_log(
+            df = ref_norm_res$lst_df$df1_no_norm,
+            out_df = "tibble"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = df2_no_norm_obj <- attach_check_log(
+            df = ref_norm_res$lst_df$df2_no_norm,
+            out_df = "tibble"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_warning(
+      object = expect_message(
+        object = expect_warning(
+          object = expect_message(
+            object = bridge_no_norm_obj <- olink_normalization_bridge(
+              project_1_df = df1_no_norm_obj,
+              project_2_df = df2_no_norm_obj,
+              bridge_samples = list(
+                "DF1" = ref_norm_res$lst_sample$bridge_samples,
+                "DF2" = ref_norm_res$lst_sample$bridge_samples
+              ),
+              project_1_name = "df1_no_norm",
+              project_2_name = "df2_no_norm",
+              project_ref_name = "df1_no_norm",
+              format = FALSE
+            ) |>
+              dplyr::filter(
+                .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+              ),
+            regexp = "Bridge normalization will be performed!"
+          ),
+          regexp = paste("Datasets \"df1_no_norm\" and \"df2_no_norm\" do not",
+                         "contain a column named \"Normalization\"")
+        ),
+        regexp = "Output includes two sets of bridging samples"
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_s3_class(object = bridge_no_norm_obj, class = "olink_class")
+    expect_s3_class(object = bridge_no_norm_obj, class = "tbl_df")
+
+    expect_equal(
+      object = strip_check_log(df = bridge_no_norm_obj),
+      expected = ref_norm_res$lst_norm$bridge_norm$no_norm,
+      tolerance = 1e-4
+    )
+
+    ### olink arrow ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = df1_no_norm_arrow <- attach_check_log(
+            df = ref_norm_res$lst_df$df1_no_norm,
+            out_df = "arrow"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = df2_no_norm_arrow <- attach_check_log(
+            df = ref_norm_res$lst_df$df2_no_norm,
+            out_df = "arrow"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_warning(
+      object = expect_message(
+        object = expect_warning(
+          object = expect_message(
+            object = bridge_no_norm_arrow <- olink_normalization_bridge(
+              project_1_df = df1_no_norm_arrow,
+              project_2_df = df2_no_norm_arrow,
+              bridge_samples = list(
+                "DF1" = ref_norm_res$lst_sample$bridge_samples,
+                "DF2" = ref_norm_res$lst_sample$bridge_samples
+              ),
+              project_1_name = "df1_no_norm",
+              project_2_name = "df2_no_norm",
+              project_ref_name = "df1_no_norm",
+              format = FALSE
+            ) |>
+              dplyr::filter(
+                .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+              ),
+            regexp = "Bridge normalization will be performed!"
+          ),
+          regexp = paste("Datasets \"df1_no_norm\" and \"df2_no_norm\" do not",
+                         "contain a column named \"Normalization\"")
+        ),
+        regexp = "Output includes two sets of bridging samples"
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_s3_class(object = bridge_no_norm_arrow, class = "olink_class")
+    expect_s3_class(object = bridge_no_norm_arrow, class = "tbl_df")
+
+    expect_equal(
+      object = strip_check_log(df = bridge_no_norm_arrow),
+      expected = ref_norm_res$lst_norm$bridge_norm$no_norm,
       tolerance = 1e-4
     )
   }
@@ -869,133 +1037,70 @@ test_that(
     ### intensity normalization - no norm column ----
 
     expect_warning(
-      object = expect_message(
-        object = intensity_no_norm <- olink_normalization_subset(
-          project_1_df = ref_norm_res$lst_df$df1_no_norm,
-          project_2_df = ref_norm_res$lst_df$df2_no_norm,
-          reference_samples = list(
-            "DF1" = ref_norm_res$lst_sample$df1_all,
-            "DF2" = ref_norm_res$lst_sample$df2_all
-          ),
-          project_1_name = "df1_no_norm",
-          project_2_name = "df2_no_norm",
-          project_ref_name = "df1_no_norm",
-          format = FALSE,
-          project_1_check_log = check_npx(
-            df = ref_norm_res$lst_df$df1_no_norm
+      object = expect_warning(
+        object = expect_message(
+          object = intensity_no_norm <- olink_normalization_subset(
+            project_1_df = ref_norm_res$lst_df$df1_no_norm,
+            project_2_df = ref_norm_res$lst_df$df2_no_norm,
+            reference_samples = list(
+              "DF1" = ref_norm_res$lst_sample$df1_all,
+              "DF2" = ref_norm_res$lst_sample$df2_all
+            ),
+            project_1_name = "df1_no_norm",
+            project_2_name = "df2_no_norm",
+            project_ref_name = "df1_no_norm",
+            format = FALSE,
+            project_1_check_log = check_npx(
+              df = ref_norm_res$lst_df$df1_no_norm
+            ) |>
+              suppressMessages() |>
+              suppressWarnings(),
+            project_2_check_log = check_npx(
+              df = ref_norm_res$lst_df$df2_no_norm
+            ) |>
+              suppressMessages() |>
+              suppressWarnings()
           ) |>
-            suppressMessages() |>
-            suppressWarnings(),
-          project_2_check_log = check_npx(
-            df = ref_norm_res$lst_df$df2_no_norm
-          ) |>
-            suppressMessages() |>
-            suppressWarnings()
-        ) |>
-          dplyr::filter(
-            .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
-          ),
-        regexp = "Subset normalization will be performed!"
+            dplyr::filter(
+              .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+            ),
+          regexp = "Subset normalization will be performed!"
+        ),
+        regexp = paste("Datasets \"df1_no_norm\" and \"df2_no_norm\" do not",
+                       "contain a column named \"Normalization\"")
       ),
-      regexp = paste("Datasets \"df1_no_norm\" and \"df2_no_norm\" do not",
-                     "contain a column named \"Normalization\"")
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = intensity_no_norm,
+      object = strip_check_log(df = intensity_no_norm),
       expected = ref_norm_res$lst_norm$intensity_norm$no_norm,
       tolerance = 1e-4
     )
 
     ### intensity normalization - with norm column ----
 
-    expect_message(
-      object = intensity_norm <- olink_normalization_subset(
-        project_1_df = ref_norm_res$lst_df$df1_norm,
-        project_2_df = ref_norm_res$lst_df$df2_norm,
-        reference_samples = list(
-          "DF1" = ref_norm_res$lst_sample$df1_all,
-          "DF2" = ref_norm_res$lst_sample$df2_all
-        ),
-        project_1_name = "df1_norm",
-        project_2_name = "df2_norm",
-        project_ref_name = "df1_norm",
-        format = FALSE,
-        project_1_check_log = check_npx(df = ref_norm_res$lst_df$df1_norm) |>
-          suppressMessages() |>
-          suppressWarnings(),
-        project_2_check_log = check_npx(df = ref_norm_res$lst_df$df2_norm) |>
-          suppressMessages() |>
-          suppressWarnings()
-      ) |>
-        dplyr::filter(
-          .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
-        ),
-      regexp = "Subset normalization will be performed!"
-    )
-
-    expect_equal(
-      object = intensity_norm,
-      expected = ref_norm_res$lst_norm$intensity_norm$norm,
-      tolerance = 1e-4
-    )
-
-    ### intensity normalization - no lod column ----
-
-    expect_message(
-      object = intensity_no_lod <- olink_normalization_subset(
-        project_1_df = ref_norm_res$lst_df$df1_no_lod,
-        project_2_df = ref_norm_res$lst_df$df2_no_lod,
-        reference_samples = list(
-          "DF1" = ref_norm_res$lst_sample$df1_all,
-          "DF2" = ref_norm_res$lst_sample$df2_all
-        ),
-        project_1_name = "df1_no_lod",
-        project_2_name = "df2_no_lod",
-        project_ref_name = "df1_no_lod",
-        format = FALSE,
-        project_1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_lod) |>
-          suppressMessages() |>
-          suppressWarnings(),
-        project_2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_lod) |>
-          suppressMessages() |>
-          suppressWarnings()
-      ) |>
-        dplyr::filter(
-          .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
-        ),
-      regexp = "Subset normalization will be performed!"
-    )
-
-    expect_equal(
-      object = intensity_no_lod,
-      expected = ref_norm_res$lst_norm$intensity_norm$no_lod,
-      tolerance = 1e-4
-    )
-
-    ### intensity normalization - multiple lod columns ----
-
-    expect_message(
+    expect_warning(
       object = expect_message(
-        object = intensity_multiple_lod <- olink_normalization_subset(
-          project_1_df = ref_norm_res$lst_df$df1_multiple_lod,
-          project_2_df = ref_norm_res$lst_df$df2_multiple_lod,
+        object = intensity_norm <- olink_normalization_subset(
+          project_1_df = ref_norm_res$lst_df$df1_norm,
+          project_2_df = ref_norm_res$lst_df$df2_norm,
           reference_samples = list(
             "DF1" = ref_norm_res$lst_sample$df1_all,
             "DF2" = ref_norm_res$lst_sample$df2_all
           ),
-          project_1_name = "df1_multiple_lod",
-          project_2_name = "df2_multiple_lod",
-          project_ref_name = "df1_multiple_lod",
+          project_1_name = "df1_norm",
+          project_2_name = "df2_norm",
+          project_ref_name = "df1_norm",
           format = FALSE,
-          project_1_check_log = check_npx(
-            df = ref_norm_res$lst_df$df1_multiple_lod
-          ) |>
+          project_1_check_log = check_npx(df = ref_norm_res$lst_df$df1_norm) |>
             suppressMessages() |>
             suppressWarnings(),
-          project_2_check_log = check_npx(
-            df = ref_norm_res$lst_df$df2_multiple_lod
-          ) |>
+          project_2_check_log = check_npx(df = ref_norm_res$lst_df$df2_norm) |>
             suppressMessages() |>
             suppressWarnings()
         ) |>
@@ -1004,14 +1109,240 @@ test_that(
           ),
         regexp = "Subset normalization will be performed!"
       ),
-      regexp = "Datasets \"df1_multiple_lod\" and \"df2_multiple_lod\" contain"
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = intensity_multiple_lod,
+      object = strip_check_log(df = intensity_norm),
+      expected = ref_norm_res$lst_norm$intensity_norm$norm,
+      tolerance = 1e-4
+    )
+
+    ### intensity normalization - no lod column ----
+
+    expect_warning(
+      object = expect_message(
+        object = intensity_no_lod <- olink_normalization_subset(
+          project_1_df = ref_norm_res$lst_df$df1_no_lod,
+          project_2_df = ref_norm_res$lst_df$df2_no_lod,
+          reference_samples = list(
+            "DF1" = ref_norm_res$lst_sample$df1_all,
+            "DF2" = ref_norm_res$lst_sample$df2_all
+          ),
+          project_1_name = "df1_no_lod",
+          project_2_name = "df2_no_lod",
+          project_ref_name = "df1_no_lod",
+          format = FALSE,
+          project_1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_lod) |>
+            suppressMessages() |>
+            suppressWarnings(),
+          project_2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_lod) |>
+            suppressMessages() |>
+            suppressWarnings()
+        ) |>
+          dplyr::filter(
+            .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+          ),
+        regexp = "Subset normalization will be performed!"
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_equal(
+      object = strip_check_log(df = intensity_no_lod),
+      expected = ref_norm_res$lst_norm$intensity_norm$no_lod,
+      tolerance = 1e-4
+    )
+
+    ### intensity normalization - multiple lod columns ----
+
+    expect_warning(
+      object = expect_message(
+        object = expect_message(
+          object = intensity_multiple_lod <- olink_normalization_subset(
+            project_1_df = ref_norm_res$lst_df$df1_multiple_lod,
+            project_2_df = ref_norm_res$lst_df$df2_multiple_lod,
+            reference_samples = list(
+              "DF1" = ref_norm_res$lst_sample$df1_all,
+              "DF2" = ref_norm_res$lst_sample$df2_all
+            ),
+            project_1_name = "df1_multiple_lod",
+            project_2_name = "df2_multiple_lod",
+            project_ref_name = "df1_multiple_lod",
+            format = FALSE,
+            project_1_check_log = check_npx(
+              df = ref_norm_res$lst_df$df1_multiple_lod
+            ) |>
+              suppressMessages() |>
+              suppressWarnings(),
+            project_2_check_log = check_npx(
+              df = ref_norm_res$lst_df$df2_multiple_lod
+            ) |>
+              suppressMessages() |>
+              suppressWarnings()
+          ) |>
+            dplyr::filter(
+              .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+            ),
+          regexp = "Subset normalization will be performed!"
+        ),
+        regexp = "Datasets \"df1_multiple_lod\" and \"df2_multiple_lod\" contain"
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_equal(
+      object = strip_check_log(df = intensity_multiple_lod),
       expected = ref_norm_res$lst_norm$intensity_norm$multiple_lod,
       tolerance = 1e-4
     )
+
+    ### olink_class ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = df1_no_norm_obj <- attach_check_log(
+            df = ref_norm_res$lst_df$df1_no_norm,
+            out_df = "tibble"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = df2_no_norm_obj <- attach_check_log(
+            df = ref_norm_res$lst_df$df2_no_norm,
+            out_df = "tibble"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_warning(
+      object = expect_warning(
+        object = expect_message(
+          object = intensity_no_norm_obj <- olink_normalization_subset(
+            project_1_df = df1_no_norm_obj,
+            project_2_df = df2_no_norm_obj,
+            reference_samples = list(
+              "DF1" = ref_norm_res$lst_sample$df1_all,
+              "DF2" = ref_norm_res$lst_sample$df2_all
+            ),
+            project_1_name = "df1_no_norm",
+            project_2_name = "df2_no_norm",
+            project_ref_name = "df1_no_norm",
+            format = FALSE
+          ) |>
+            dplyr::filter(
+              .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+            ),
+          regexp = "Subset normalization will be performed!"
+        ),
+        regexp = paste("Datasets \"df1_no_norm\" and \"df2_no_norm\" do not",
+                       "contain a column named \"Normalization\"")
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_s3_class(object = intensity_no_norm_obj, class = "olink_class")
+    expect_s3_class(object = intensity_no_norm_obj, class = "tbl_df")
+
+    expect_equal(
+      object = strip_check_log(df = intensity_no_norm_obj),
+      expected = ref_norm_res$lst_norm$intensity_norm$no_norm,
+      tolerance = 1e-4
+    )
+
+    ### olink arrow ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = df1_no_norm_arrow <- attach_check_log(
+            df = ref_norm_res$lst_df$df1_no_norm,
+            out_df = "arrow"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = df2_no_norm_arrow <- attach_check_log(
+            df = ref_norm_res$lst_df$df2_no_norm,
+            out_df = "arrow"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_warning(
+      object = expect_warning(
+        object = expect_message(
+          object = intensity_no_norm_arrow <- olink_normalization_subset(
+            project_1_df = df1_no_norm_arrow,
+            project_2_df = df2_no_norm_arrow,
+            reference_samples = list(
+              "DF1" = ref_norm_res$lst_sample$df1_all,
+              "DF2" = ref_norm_res$lst_sample$df2_all
+            ),
+            project_1_name = "df1_no_norm",
+            project_2_name = "df2_no_norm",
+            project_ref_name = "df1_no_norm",
+            format = FALSE
+          ) |>
+            dplyr::filter(
+              .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+            ),
+          regexp = "Subset normalization will be performed!"
+        ),
+        regexp = paste("Datasets \"df1_no_norm\" and \"df2_no_norm\" do not",
+                       "contain a column named \"Normalization\"")
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_s3_class(object = intensity_no_norm_arrow, class = "olink_class")
+    expect_s3_class(object = intensity_no_norm_arrow, class = "tbl_df")
+
+    expect_equal(
+      object = strip_check_log(df = intensity_no_norm_arrow),
+      expected = ref_norm_res$lst_norm$intensity_norm$no_norm,
+      tolerance = 1e-4
+    )
+
   }
 )
 
@@ -1023,133 +1354,70 @@ test_that(
     ### subset normalization - no norm column ----
 
     expect_warning(
-      object = expect_message(
-        object = subset_no_norm <- olink_normalization_subset(
-          project_1_df = ref_norm_res$lst_df$df1_no_norm,
-          project_2_df = ref_norm_res$lst_df$df2_no_norm,
-          reference_samples = list(
-            "DF1" = ref_norm_res$lst_sample$df1_subset,
-            "DF2" = ref_norm_res$lst_sample$df2_subset
-          ),
-          project_1_name = "df1_no_norm",
-          project_2_name = "df2_no_norm",
-          project_ref_name = "df1_no_norm",
-          format = FALSE,
-          project_1_check_log = check_npx(
-            df = ref_norm_res$lst_df$df1_no_norm
+      object = expect_warning(
+        object = expect_message(
+          object = subset_no_norm <- olink_normalization_subset(
+            project_1_df = ref_norm_res$lst_df$df1_no_norm,
+            project_2_df = ref_norm_res$lst_df$df2_no_norm,
+            reference_samples = list(
+              "DF1" = ref_norm_res$lst_sample$df1_subset,
+              "DF2" = ref_norm_res$lst_sample$df2_subset
+            ),
+            project_1_name = "df1_no_norm",
+            project_2_name = "df2_no_norm",
+            project_ref_name = "df1_no_norm",
+            format = FALSE,
+            project_1_check_log = check_npx(
+              df = ref_norm_res$lst_df$df1_no_norm
+            ) |>
+              suppressMessages() |>
+              suppressWarnings(),
+            project_2_check_log = check_npx(
+              df = ref_norm_res$lst_df$df2_no_norm
+            ) |>
+              suppressMessages() |>
+              suppressWarnings()
           ) |>
-            suppressMessages() |>
-            suppressWarnings(),
-          project_2_check_log = check_npx(
-            df = ref_norm_res$lst_df$df2_no_norm
-          ) |>
-            suppressMessages() |>
-            suppressWarnings()
-        ) |>
-          dplyr::filter(
-            .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
-          ),
-        regexp = "Subset normalization will be performed!"
+            dplyr::filter(
+              .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+            ),
+          regexp = "Subset normalization will be performed!"
+        ),
+        regexp = paste("Datasets \"df1_no_norm\" and \"df2_no_norm\" do not",
+                       "contain a column named \"Normalization\"")
       ),
-      regexp = paste("Datasets \"df1_no_norm\" and \"df2_no_norm\" do not",
-                     "contain a column named \"Normalization\"")
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = subset_no_norm,
+      object = strip_check_log(df = subset_no_norm),
       expected = ref_norm_res$lst_norm$subset_norm$no_norm,
       tolerance = 1e-4
     )
 
     ### subset normalization - with norm column ----
 
-    expect_message(
-      object = subset_norm <- olink_normalization_subset(
-        project_1_df = ref_norm_res$lst_df$df1_norm,
-        project_2_df = ref_norm_res$lst_df$df2_norm,
-        reference_samples = list(
-          "DF1" = ref_norm_res$lst_sample$df1_subset,
-          "DF2" = ref_norm_res$lst_sample$df2_subset
-        ),
-        project_1_name = "df1_norm",
-        project_2_name = "df2_norm",
-        project_ref_name = "df1_norm",
-        format = FALSE,
-        project_1_check_log = check_npx(df = ref_norm_res$lst_df$df1_norm) |>
-          suppressMessages() |>
-          suppressWarnings(),
-        project_2_check_log = check_npx(df = ref_norm_res$lst_df$df2_norm) |>
-          suppressMessages() |>
-          suppressWarnings()
-      ) |>
-        dplyr::filter(
-          .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
-        ),
-      regexp = "Subset normalization will be performed!"
-    )
-
-    expect_equal(
-      object = subset_norm,
-      expected = ref_norm_res$lst_norm$subset_norm$norm,
-      tolerance = 1e-4
-    )
-
-    ### subset normalization - no lod column ----
-
-    expect_message(
-      object = subset_no_lod <- olink_normalization_subset(
-        project_1_df = ref_norm_res$lst_df$df1_no_lod,
-        project_2_df = ref_norm_res$lst_df$df2_no_lod,
-        reference_samples = list(
-          "DF1" = ref_norm_res$lst_sample$df1_subset,
-          "DF2" = ref_norm_res$lst_sample$df2_subset
-        ),
-        project_1_name = "df1_no_lod",
-        project_2_name = "df2_no_lod",
-        project_ref_name = "df1_no_lod",
-        format = FALSE,
-        project_1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_lod) |>
-          suppressMessages() |>
-          suppressWarnings(),
-        project_2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_lod) |>
-          suppressMessages() |>
-          suppressWarnings()
-      ) |>
-        dplyr::filter(
-          .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
-        ),
-      regexp = "Subset normalization will be performed!"
-    )
-
-    expect_equal(
-      object = subset_no_lod,
-      expected = ref_norm_res$lst_norm$subset_norm$no_lod,
-      tolerance = 1e-4
-    )
-
-    ### subset normalization - multiple lod columns ----
-
-    expect_message(
+    expect_warning(
       object = expect_message(
-        object = subset_multiple_lod <- olink_normalization_subset(
-          project_1_df = ref_norm_res$lst_df$df1_multiple_lod,
-          project_2_df = ref_norm_res$lst_df$df2_multiple_lod,
+        object = subset_norm <- olink_normalization_subset(
+          project_1_df = ref_norm_res$lst_df$df1_norm,
+          project_2_df = ref_norm_res$lst_df$df2_norm,
           reference_samples = list(
             "DF1" = ref_norm_res$lst_sample$df1_subset,
             "DF2" = ref_norm_res$lst_sample$df2_subset
           ),
-          project_1_name = "df1_multiple_lod",
-          project_2_name = "df2_multiple_lod",
-          project_ref_name = "df1_multiple_lod",
+          project_1_name = "df1_norm",
+          project_2_name = "df2_norm",
+          project_ref_name = "df1_norm",
           format = FALSE,
-          project_1_check_log = check_npx(
-            df = ref_norm_res$lst_df$df1_multiple_lod
-          ) |>
+          project_1_check_log = check_npx(df = ref_norm_res$lst_df$df1_norm) |>
             suppressMessages() |>
             suppressWarnings(),
-          project_2_check_log = check_npx(
-            df = ref_norm_res$lst_df$df2_multiple_lod
-          ) |>
+          project_2_check_log = check_npx(df = ref_norm_res$lst_df$df2_norm) |>
             suppressMessages() |>
             suppressWarnings()
         ) |>
@@ -1158,12 +1426,237 @@ test_that(
           ),
         regexp = "Subset normalization will be performed!"
       ),
-      regexp = "Datasets \"df1_multiple_lod\" and \"df2_multiple_lod\" contain"
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_equal(
-      object = subset_multiple_lod,
+      object = strip_check_log(df = subset_norm),
+      expected = ref_norm_res$lst_norm$subset_norm$norm,
+      tolerance = 1e-4
+    )
+
+    ### subset normalization - no lod column ----
+
+    expect_warning(
+      object = expect_message(
+        object = subset_no_lod <- olink_normalization_subset(
+          project_1_df = ref_norm_res$lst_df$df1_no_lod,
+          project_2_df = ref_norm_res$lst_df$df2_no_lod,
+          reference_samples = list(
+            "DF1" = ref_norm_res$lst_sample$df1_subset,
+            "DF2" = ref_norm_res$lst_sample$df2_subset
+          ),
+          project_1_name = "df1_no_lod",
+          project_2_name = "df2_no_lod",
+          project_ref_name = "df1_no_lod",
+          format = FALSE,
+          project_1_check_log = check_npx(df = ref_norm_res$lst_df$df1_no_lod) |>
+            suppressMessages() |>
+            suppressWarnings(),
+          project_2_check_log = check_npx(df = ref_norm_res$lst_df$df2_no_lod) |>
+            suppressMessages() |>
+            suppressWarnings()
+        ) |>
+          dplyr::filter(
+            .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+          ),
+        regexp = "Subset normalization will be performed!"
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_equal(
+      object = strip_check_log(df = subset_no_lod),
+      expected = ref_norm_res$lst_norm$subset_norm$no_lod,
+      tolerance = 1e-4
+    )
+
+    ### subset normalization - multiple lod columns ----
+
+    expect_warning(
+      object = expect_message(
+        object = expect_message(
+          object = subset_multiple_lod <- olink_normalization_subset(
+            project_1_df = ref_norm_res$lst_df$df1_multiple_lod,
+            project_2_df = ref_norm_res$lst_df$df2_multiple_lod,
+            reference_samples = list(
+              "DF1" = ref_norm_res$lst_sample$df1_subset,
+              "DF2" = ref_norm_res$lst_sample$df2_subset
+            ),
+            project_1_name = "df1_multiple_lod",
+            project_2_name = "df2_multiple_lod",
+            project_ref_name = "df1_multiple_lod",
+            format = FALSE,
+            project_1_check_log = check_npx(
+              df = ref_norm_res$lst_df$df1_multiple_lod
+            ) |>
+              suppressMessages() |>
+              suppressWarnings(),
+            project_2_check_log = check_npx(
+              df = ref_norm_res$lst_df$df2_multiple_lod
+            ) |>
+              suppressMessages() |>
+              suppressWarnings()
+          ) |>
+            dplyr::filter(
+              .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+            ),
+          regexp = "Subset normalization will be performed!"
+        ),
+        regexp = "Datasets \"df1_multiple_lod\" and \"df2_multiple_lod\" contain"
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_equal(
+      object = strip_check_log(df = subset_multiple_lod),
       expected = ref_norm_res$lst_norm$subset_norm$multiple_lod,
+      tolerance = 1e-4
+    )
+
+    ### olink_class ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = df1_no_norm_obj <- attach_check_log(
+            df = ref_norm_res$lst_df$df1_no_norm,
+            out_df = "tibble"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = df2_no_norm_obj <- attach_check_log(
+            df = ref_norm_res$lst_df$df2_no_norm,
+            out_df = "tibble"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_warning(
+      object = expect_warning(
+        object = expect_message(
+          object = subset_no_norm_obj <- olink_normalization_subset(
+            project_1_df = df1_no_norm_obj,
+            project_2_df = df2_no_norm_obj,
+            reference_samples = list(
+              "DF1" = ref_norm_res$lst_sample$df1_subset,
+              "DF2" = ref_norm_res$lst_sample$df2_subset
+            ),
+            project_1_name = "df1_no_norm",
+            project_2_name = "df2_no_norm",
+            project_ref_name = "df1_no_norm",
+            format = FALSE
+          ) |>
+            dplyr::filter(
+              .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+            ),
+          regexp = "Subset normalization will be performed!"
+        ),
+        regexp = paste("Datasets \"df1_no_norm\" and \"df2_no_norm\" do not",
+                       "contain a column named \"Normalization\"")
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_s3_class(object = subset_no_norm_obj, class = "olink_class")
+    expect_s3_class(object = subset_no_norm_obj, class = "tbl_df")
+
+    expect_equal(
+      object = strip_check_log(df = subset_no_norm_obj),
+      expected = ref_norm_res$lst_norm$subset_norm$no_norm,
+      tolerance = 1e-4
+    )
+
+    ### olink arrow ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = df1_no_norm_arrow <- attach_check_log(
+            df = ref_norm_res$lst_df$df1_no_norm,
+            out_df = "arrow"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = df2_no_norm_arrow <- attach_check_log(
+            df = ref_norm_res$lst_df$df2_no_norm,
+            out_df = "arrow"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_warning(
+      object = expect_warning(
+        object = expect_message(
+          object = subset_no_norm_arrow <- olink_normalization_subset(
+            project_1_df = df1_no_norm_arrow,
+            project_2_df = df2_no_norm_arrow,
+            reference_samples = list(
+              "DF1" = ref_norm_res$lst_sample$df1_subset,
+              "DF2" = ref_norm_res$lst_sample$df2_subset
+            ),
+            project_1_name = "df1_no_norm",
+            project_2_name = "df2_no_norm",
+            project_ref_name = "df1_no_norm",
+            format = FALSE
+          ) |>
+            dplyr::filter(
+              .data[["SampleID"]] %in% ref_norm_res$lst_sample$sample_subset
+            ),
+          regexp = "Subset normalization will be performed!"
+        ),
+        regexp = paste("Datasets \"df1_no_norm\" and \"df2_no_norm\" do not",
+                       "contain a column named \"Normalization\"")
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"A13\", \"A29\", \"A30\",",
+                     "\"A36\", \"A45\", \"A46\", \"A52\", \"A63\", \"A71\",",
+                     "\"A73\", \"B3\", \"B37\", \"B4\", \"B45\", \"B63\",",
+                     "\"B75\", \"CONTROL_SAMPLE_AS 1\", and",
+                     "\"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_s3_class(object = subset_no_norm_arrow, class = "olink_class")
+    expect_s3_class(object = subset_no_norm_arrow, class = "tbl_df")
+
+    expect_equal(
+      object = strip_check_log(df = subset_no_norm_arrow),
+      expected = ref_norm_res$lst_norm$subset_norm$no_norm,
       tolerance = 1e-4
     )
   }
