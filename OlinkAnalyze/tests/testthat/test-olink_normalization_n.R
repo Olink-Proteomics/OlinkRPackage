@@ -814,8 +814,8 @@ test_that(
               ),
             regexp = "Bridge normalization will be performed!"
           ),
-          regexp = paste("Datasets \"df1_multiple_lod\" and
-                         \"df2_multiple_lod\" contain multiple columns",
+          regexp = paste("Datasets \"df1_multiple_lod\" and",
+                         "\"df2_multiple_lod\" contain multiple columns",
                          "matching")
         ),
         regexp = "Output includes two sets of bridging samples"
