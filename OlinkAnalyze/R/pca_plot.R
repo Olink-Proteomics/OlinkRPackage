@@ -436,9 +436,6 @@ olink_pca_plot.internal <- function(df, # nolint: object_name_linter
                                     label_outliers,
                                     verbose = verbose,
                                     ...) {
-  # Check if check_log is correct
-  check_log <- run_check_npx(df = df, check_log = check_log)
-
   # Ensure one unique color value per SampleID (required by
   # npxProcessing_forDimRed)
   df <- df |>
