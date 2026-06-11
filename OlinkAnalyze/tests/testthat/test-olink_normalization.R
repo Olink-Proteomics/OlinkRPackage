@@ -189,7 +189,7 @@ test_that(
       tolerance = 1e-4
     )
 
-    # olink_class ----
+    ### olink_class ----
 
     expect_no_error(
       object = expect_no_message(
@@ -256,7 +256,7 @@ test_that(
       tolerance = 1e-4
     )
 
-    # olink arrow ----
+    ### olink arrow ----
 
     expect_no_error(
       object = expect_no_message(
@@ -725,7 +725,7 @@ test_that(
       tolerance = 1e-4
     )
 
-    # olink_class ----
+    ### olink_class ----
 
     expect_no_error(
       object = expect_no_message(
@@ -791,7 +791,7 @@ test_that(
       tolerance = 1e-4
     )
 
-    # olink arrow ----
+    ### olink arrow ----
 
     expect_no_error(
       object = expect_no_message(
@@ -1093,7 +1093,7 @@ test_that(
       tolerance = 1e-4
     )
 
-    # olink arrow ----
+    ### olink arrow ----
 
     expect_no_error(
       object = expect_no_message(
@@ -1329,7 +1329,7 @@ test_that(
       tolerance = 1e-4
     )
 
-    # olink_class ----
+    ### olink_class ----
 
     expect_no_error(
       object = expect_no_message(
@@ -1394,7 +1394,7 @@ test_that(
       tolerance = 1e-4
     )
 
-    # olink arrow ----
+    ### olink arrow ----
 
     expect_no_error(
       object = expect_no_message(
@@ -1857,7 +1857,7 @@ test_that(
       tolerance = 1e-4
     )
 
-    # olink_class ----
+    ### olink_class ----
 
     expect_no_error(
       object = expect_no_message(
@@ -1921,7 +1921,7 @@ test_that(
       tolerance = 1e-4
     )
 
-    # olink arrow ----
+    ### olink arrow ----
 
     expect_no_error(
       object = expect_no_message(
@@ -2117,7 +2117,7 @@ test_that(
       tolerance = 1e-4
     )
 
-    # olink_class ----
+    ### olink_class ----
 
     expect_no_error(
       object = expect_no_message(
@@ -2163,7 +2163,7 @@ test_that(
       tolerance = 1e-4
     )
 
-    # olink arrow ----
+    ### olink arrow ----
 
     expect_no_error(
       object = expect_no_message(
@@ -2547,7 +2547,7 @@ test_that(
       tolerance = 1e-4
     )
 
-    # olink_class ----
+    ### olink_class ----
 
     expect_no_error(
       object = expect_no_message(
@@ -2592,7 +2592,7 @@ test_that(
       tolerance = 1e-4
     )
 
-    # olink arrow ----
+    ### olink arrow ----
 
     expect_no_error(
       object = expect_no_message(
