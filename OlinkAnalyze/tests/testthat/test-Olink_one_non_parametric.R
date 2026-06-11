@@ -8,6 +8,16 @@ test_that(
     skip_if_not_installed("broom")
     skip_if_not_installed("rstatix")
 
+    # expected results ----
+
+    friedman_results_nrow <- 184L
+    friedman_results_ncol <- 11L
+
+    friedman_posthoc_results_nrow <- 3L
+    friedman_posthoc_results_ncol <- 3L
+
+    # tibble ----
+
     # npx_data1 check_log
     check_log <- check_npx(npx_data1) |>
       suppressMessages() |>
@@ -26,7 +36,8 @@ test_that(
       suppressMessages() |>
       suppressWarnings()
 
-    # ---- test friedman with reference file ----
+    ## ---- test friedman with reference file ----
+
     expect_message(
       object = expect_message(
         object = friedman_results <- olink_one_non_parametric(
@@ -50,14 +61,15 @@ test_that(
 
     expect_equal(
       object = nrow(friedman_results),
-      expected = 184
+      expected = friedman_results_nrow
     )
     expect_equal(
       object = ncol(friedman_results),
-      expected = 11
+      expected = friedman_results_ncol
     )
 
-    # ---- test posthoc test for the results from Friedman test ----
+    ## ---- test posthoc test for the results from Friedman test ----
+
     sig_oids <- friedman_results |>
       dplyr::filter(.data[["Threshold"]] == "Significant") |>
       dplyr::select(dplyr::all_of(c("OlinkID"))) |>
@@ -94,7 +106,7 @@ test_that(
 
     expect_equal(
       object = nrow(friedman_posthoc_results),
-      expected = 3
+      expected = friedman_posthoc_results_nrow
     )
 
     expect_equal(
@@ -102,7 +114,88 @@ test_that(
         dplyr::select(contrast) |>
         unique() |>
         nrow(),
-      expected = 3
+      expected = friedman_posthoc_results_ncol
+    )
+
+    # olink_class ----
+
+    npx_data1_noctrl_obj <- attach_check_log(
+      df = npx_data1_noctrl,
+      out_df = "tibble"
+    )
+
+    ## ---- test friedman with reference file ----
+
+    expect_message(
+      object = expect_message(
+        object = friedman_results_obj <- olink_one_non_parametric(
+          df = npx_data1_noctrl_obj,
+          variable = "Time",
+          subject = "Subject",
+          dependence = TRUE
+        ),
+        regexp = "Variables converted from character to factors: \"Time\"",
+        fixed = TRUE
+      ),
+      regexp = "Friedman model fit to each assay: `NPX~Time`",
+      fixed = TRUE
+    )
+
+    expect_equal(
+      object = friedman_results_obj,
+      expected = ref_results$friedman
+    )
+
+    expect_equal(
+      object = nrow(friedman_results_obj),
+      expected = friedman_results_nrow
+    )
+    expect_equal(
+      object = ncol(friedman_results_obj),
+      expected = friedman_results_ncol
+    )
+
+    ## ---- test posthoc test for the results from Friedman test ----
+
+    expect_message(
+      object = expect_message(
+        object = friedman_posthoc_results_obj <-
+          olink_one_non_parametric_posthoc(
+            df = npx_data1_noctrl_obj,
+            variable = "Time",
+            test = "friedman",
+            subject = "Subject",
+            olinkid_list = sig_oids
+          ) |>
+          dplyr::mutate(id = as.character(.data[["OlinkID"]])) |>
+          dplyr::arrange(id, contrast) |> # for consistency.
+          dplyr::select(-id),
+        regexp = "Variables converted from character to factors: \"Time\"",
+        fixed = TRUE
+      ),
+      regexp = paste0(
+        "Pairwise comparisons for Friedman test using ",
+        "paired Wilcoxon signed-rank test were performed"
+      ),
+      fixed = TRUE
+    )
+
+    expect_equal(
+      object = friedman_posthoc_results_obj,
+      expected = ref_results$friedman_posthoc
+    )
+
+    expect_equal(
+      object = nrow(friedman_posthoc_results_obj),
+      expected = friedman_posthoc_results_nrow
+    )
+
+    expect_equal(
+      object = friedman_posthoc_results_obj |>
+        dplyr::select(contrast) |>
+        unique() |>
+        nrow(),
+      expected = friedman_posthoc_results_ncol
     )
   }
 )
@@ -120,6 +213,16 @@ test_that(
       packageVersion("dunn.test") == "1.4.0",
       "dunn.test version = 1.4.1 contains a bug."
     )
+
+    # expected results ----
+
+    kruskal_results_nrow <- 184L
+    kruskal_results_ncol <- 11L
+
+    kruskal_posthoc_results_nrow <- 190L
+    kruskal_posthoc_results_ncol <- 3L
+
+    # tibble ----
 
     # npx_data1 check_log
     check_log <- check_npx(npx_data1) |>
@@ -139,7 +242,7 @@ test_that(
       suppressMessages() |>
       suppressWarnings()
 
-    # ---- test kruskal with reference file ----
+    ## ---- test kruskal with reference file ----
 
     expect_message(
       object = expect_message(
@@ -162,15 +265,16 @@ test_that(
 
     expect_equal(
       object = nrow(kruskal_results),
-      expected = 184
+      expected = kruskal_results_nrow
     )
 
     expect_equal(
       object = ncol(kruskal_results),
-      expected = 11
+      expected = kruskal_results_ncol
     )
 
-    # ---- test posthoc test for the results from Kruskal-Wallis test ----
+    ## ---- test posthoc test for the results from Kruskal-Wallis test ----
+
     sig_oids <- kruskal_results |>
       dplyr::filter(.data[["Threshold"]] == "Significant") |>
       dplyr::select(dplyr::all_of(c("OlinkID"))) |>
