@@ -9,65 +9,87 @@ test_that(
     npx_3072 <- get_example_data(filename = "example_3k_data.rds")
     npx_ht <- get_example_data(filename = "example_HT_data.rds")
 
-    npx_ht <- npx_ht |>
-      dplyr::filter(
-        .data[["SampleType"]] == "SAMPLE"
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = npx_ht <- npx_ht |>
+            dplyr::filter(
+              .data[["SampleType"]] == "SAMPLE"
+            ) |>
+            attach_check_log(
+              out_df = "tibble"
+            ),
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
       )
+    )
 
-    npx_3072 <- npx_3072 |>
-      dplyr::filter(
-        .data[["SampleType"]] == "SAMPLE"
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = npx_3072 <- npx_3072 |>
+            dplyr::filter(
+              .data[["SampleType"]] == "SAMPLE"
+            ) |>
+            attach_check_log(
+              out_df = "tibble"
+            ),
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
       )
+    )
 
     overlapping_samples <- intersect(
       x = npx_ht$SampleID,
       y = npx_3072$SampleID
     )
 
-    expect_message(
+    expect_warning(
       object = expect_message(
         object = expect_message(
           object = expect_message(
-            object = expect_warning(
-              data_norm <- OlinkAnalyze::olink_normalization(
-                df1 = npx_ht,
-                df2 = npx_3072,
-                overlapping_samples_df1 = overlapping_samples,
-                df1_project_nr = "Explore HT",
-                df2_project_nr = "Explore 3072",
-                reference_project = "Explore HT",
-                # setting format = TRUE to test that function works for when
-                # BridgingRecommendation is "NotOverlapping"
-                format = TRUE,
-                df1_check_log = check_npx(df = npx_ht) |>
-                  suppressMessages() |>
-                  suppressWarnings(),
-                df2_check_log = check_npx(df = npx_3072) |>
-                  suppressMessages() |>
-                  suppressWarnings()
+            object = expect_message(
+              object = expect_message(
+                object = expect_warning(
+                  object = data_norm <- OlinkAnalyze::olink_normalization(
+                    df1 = npx_ht,
+                    df2 = npx_3072,
+                    overlapping_samples_df1 = overlapping_samples,
+                    df1_project_nr = "Explore HT",
+                    df2_project_nr = "Explore 3072",
+                    reference_project = "Explore HT",
+                    # setting format = TRUE to test that function works for when
+                    # BridgingRecommendation is "NotOverlapping"
+                    format = TRUE
+                  ),
+                  regexp = "2 assays are not shared across products"
+                ),
+                regexp = "Cross-product normalization will be performed!"
               ),
-              regexp = "2 assays are not shared across products"
+              regexp = "Output includes two sets of bridging samples"
             ),
-            regexp = "Cross-product normalization will be performed!"
+            regexp = paste("2 non-overlapping assays are included in the",
+                           "normalized dataset without adjustment. Assays",
+                           "found in only one project will have decreased",
+                           "statistical power due to the lower number of",
+                           "samples.")
           ),
-          regexp = "Output includes two sets of bridging samples"
+          regexp = paste("2 not bridgeable assays are included in the bridged",
+                         "dataset without adjustment.")
         ),
-        regexp = paste("2 non-overlapping assays are included in the",
-                       "normalized dataset without adjustment. Assays found in",
-                       "only one project will have decreased statistical power",
-                       "due to the lower number of samples.")
+        regexp = paste("More than one column names in `df` was associated",
+                       "with certain key")
       ),
-      regexp = paste("2 not bridgeable assays are included in the bridged",
-                     "dataset without adjustment.")
+      regexp = paste("Duplicate SampleIDs detected: \"Sample_A\",",
+                     "\"Sample_AA\", \"Sample_AB\", \"Sample_AC\"")
     )
 
     expect_message(
       object = data_norm_bridge_all <- withCallingHandlers({
         OlinkAnalyze::olink_bridgeability_plot(
           df = data_norm,
-          check_log = check_npx(df = data_norm) |>
-            suppressMessages() |>
-            suppressWarnings(),
           olink_id = c("OID40770_OID20117", "OID40835_OID31162",
                        "OID40981_OID30796", "OID40986_OID20052",
                        "OID41032_OID20118", "OID41054_OID20055"),
@@ -102,49 +124,70 @@ test_that(
     skip_on_cran()
     skip_if_not_installed("ggpubr")
 
-    npx_ht <- OlinkAnalyze:::data_ht_small |>
-      dplyr::filter(
-        .data[["SampleType"]] == "SAMPLE"
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = npx_ht <- OlinkAnalyze:::data_ht_small |>
+            dplyr::filter(
+              .data[["SampleType"]] == "SAMPLE"
+            ) |>
+            attach_check_log(
+              out_df = "tibble"
+            ),
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
       )
+    )
 
-    npx_3072 <- OlinkAnalyze:::data_3k_small |>
-      dplyr::filter(
-        .data[["SampleType"]] == "SAMPLE"
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = npx_3072 <- OlinkAnalyze:::data_3k_small |>
+            dplyr::filter(
+              .data[["SampleType"]] == "SAMPLE"
+            ) |>
+            attach_check_log(
+              out_df = "tibble"
+            ),
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
       )
+    )
 
     overlapping_samples <- intersect(
       x = npx_ht$SampleID,
       y = npx_3072$SampleID
     )
 
-    expect_message(
+    expect_warning(
       object = expect_message(
-        object = data_norm <- OlinkAnalyze::olink_normalization(
-          df1 = npx_ht,
-          df2 = npx_3072,
-          overlapping_samples_df1 = overlapping_samples,
-          df1_project_nr = "Explore HT",
-          df2_project_nr = "Explore 3072",
-          reference_project = "Explore HT",
-          df1_check_log = check_npx(df = npx_ht) |>
-            suppressMessages() |>
-            suppressWarnings(),
-          df2_check_log = check_npx(df = npx_3072) |>
-            suppressMessages() |>
-            suppressWarnings()
+        object = expect_message(
+          object = expect_message(
+            object = data_norm <- OlinkAnalyze::olink_normalization(
+              df1 = npx_ht,
+              df2 = npx_3072,
+              overlapping_samples_df1 = overlapping_samples,
+              df1_project_nr = "Explore HT",
+              df2_project_nr = "Explore 3072",
+              reference_project = "Explore HT"
+            ),
+            regexp = "Cross-product normalization will be performed!"
+          ),
+          regexp = "Output includes two sets of bridging samples"
         ),
-        regexp = "Cross-product normalization will be performed!"
+        regexp = paste("More than one column names in `df` was associated",
+                       "with certain key")
       ),
-      regexp = "Output includes two sets of bridging samples"
+      regexp = paste("Duplicate SampleIDs detected: \"Sample_A\",",
+                     "\"Sample_AA\", \"Sample_AB\", \"Sample_AC\"")
     )
 
     expect_message(
       object = data_norm_bridge_all <- withCallingHandlers({
         OlinkAnalyze::olink_bridgeability_plot(
           df = data_norm,
-          check_log = check_npx(df = data_norm) |>
-            suppressMessages() |>
-            suppressWarnings(),
           olink_id = c("OID40770", "OID40835"),
           median_counts_threshold = 150L,
           min_count = 10L
@@ -171,9 +214,6 @@ test_that(
       object = data_norm_bridge_pick1 <- withCallingHandlers({
         OlinkAnalyze::olink_bridgeability_plot(
           df = data_norm,
-          check_log = check_npx(df = data_norm) |>
-            suppressMessages() |>
-            suppressWarnings(),
           olink_id = c("OID40770"),
           median_counts_threshold = 150L,
           min_count = 10L
@@ -205,45 +245,67 @@ test_that(
     skip_if_not_installed("ggpubr")
     skip_on_cran()
 
-    npx_ht <- OlinkAnalyze:::data_ht_small |>
-      dplyr::filter(
-        .data[["SampleType"]] == "SAMPLE"
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = npx_ht <- OlinkAnalyze:::data_ht_small |>
+            dplyr::filter(
+              .data[["SampleType"]] == "SAMPLE"
+            ) |>
+            attach_check_log(
+              out_df = "tibble"
+            ),
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
       )
+    )
 
-    npx_3072 <- OlinkAnalyze:::data_3k_small |>
-      dplyr::filter(
-        .data[["SampleType"]] == "SAMPLE"
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = npx_3072 <- OlinkAnalyze:::data_3k_small |>
+            dplyr::filter(
+              .data[["SampleType"]] == "SAMPLE"
+            ) |>
+            attach_check_log(
+              out_df = "tibble"
+            ),
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
       )
+    )
 
     overlapping_samples <- intersect(
       x = npx_ht$SampleID,
       y = npx_3072$SampleID
     )
 
-    expect_message(
+    expect_warning(
       object = expect_message(
-        object = data_norm <- OlinkAnalyze::olink_normalization(
-          df1 = npx_ht,
-          df2 = npx_3072,
-          overlapping_samples_df1 = overlapping_samples,
-          df1_project_nr = "Explore HT",
-          df2_project_nr = "Explore 3072",
-          reference_project = "Explore HT",
-          df1_check_log = check_npx(df = npx_ht) |>
-            suppressMessages() |>
-            suppressWarnings(),
-          df2_check_log = check_npx(df = npx_3072) |>
-            suppressMessages() |>
-            suppressWarnings()
+        object = expect_message(
+          object = expect_message(
+            object = data_norm <- OlinkAnalyze::olink_normalization(
+              df1 = npx_ht,
+              df2 = npx_3072,
+              overlapping_samples_df1 = overlapping_samples,
+              df1_project_nr = "Explore HT",
+              df2_project_nr = "Explore 3072",
+              reference_project = "Explore HT"
+            ),
+            regexp = "Cross-product normalization will be performed!"
+          ),
+          regexp = "Output includes two sets of bridging samples"
         ),
-        regexp = "Cross-product normalization will be performed!"
+        regexp = paste("More than one column names in `df` was associated",
+                       "with certain key")
       ),
-      regexp = "Output includes two sets of bridging samples"
+      regexp = paste("Duplicate SampleIDs detected: \"Sample_A\",",
+                     "\"Sample_AA\", \"Sample_AB\", \"Sample_AC\"")
     )
 
-    data_norm_chk <- check_npx(df = data_norm) |>
-      suppressMessages() |>
-      suppressWarnings()
+    data_norm_chk <- get_check_npx(df = data_norm)
 
     data_norm_clean <- OlinkAnalyze:::bridgeability_prep_data(
       df = data_norm,
@@ -390,40 +452,64 @@ test_that(
     skip_if_not_installed("ggpubr")
     skip_on_cran()
 
-    npx_ht <- OlinkAnalyze:::data_ht_small |>
-      dplyr::filter(
-        .data[["SampleType"]] == "SAMPLE"
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = npx_ht <- OlinkAnalyze:::data_ht_small |>
+            dplyr::filter(
+              .data[["SampleType"]] == "SAMPLE"
+            ) |>
+            attach_check_log(
+              out_df = "tibble"
+            ),
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
       )
+    )
 
-    npx_3072 <- OlinkAnalyze:::data_3k_small |>
-      dplyr::filter(
-        .data[["SampleType"]] == "SAMPLE"
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = npx_3072 <- OlinkAnalyze:::data_3k_small |>
+            dplyr::filter(
+              .data[["SampleType"]] == "SAMPLE"
+            ) |>
+            attach_check_log(
+              out_df = "tibble"
+            ),
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
       )
+    )
 
     overlapping_samples <- intersect(
       x = npx_ht$SampleID,
       y = npx_3072$SampleID
     )
 
-    expect_message(
+    expect_warning(
       object = expect_message(
-        object = data_norm <- OlinkAnalyze::olink_normalization(
-          df1 = npx_ht,
-          df2 = npx_3072,
-          overlapping_samples_df1 = overlapping_samples,
-          df1_project_nr = "Explore HT",
-          df2_project_nr = "Explore 3072",
-          reference_project = "Explore HT",
-          df1_check_log = check_npx(df = npx_ht) |>
-            suppressMessages() |>
-            suppressWarnings(),
-          df2_check_log = check_npx(df = npx_3072) |>
-            suppressMessages() |>
-            suppressWarnings()
+        object = expect_message(
+          object = expect_message(
+            object = data_norm <- OlinkAnalyze::olink_normalization(
+              df1 = npx_ht,
+              df2 = npx_3072,
+              overlapping_samples_df1 = overlapping_samples,
+              df1_project_nr = "Explore HT",
+              df2_project_nr = "Explore 3072",
+              reference_project = "Explore HT"
+            ),
+            regexp = "Cross-product normalization will be performed!"
+          ),
+          regexp = "Output includes two sets of bridging samples"
         ),
-        regexp = "Cross-product normalization will be performed!"
+        regexp = paste("More than one column names in `df` was associated",
+                       "with certain key")
       ),
-      regexp = "Output includes two sets of bridging samples"
+      regexp = paste("Duplicate SampleIDs detected: \"Sample_A\",",
+                     "\"Sample_AA\", \"Sample_AB\", \"Sample_AC\"")
     )
 
     # 1 assay with three projects
@@ -440,9 +526,6 @@ test_that(
                 .data[["Project"]]
               )
             ),
-          check_log = check_npx(df = data_norm) |>
-            suppressMessages() |>
-            suppressWarnings(),
           median_counts_threshold = 150L,
           min_count = 10L
         ),
@@ -464,9 +547,6 @@ test_that(
                 .data[["Project"]]
               )
             ),
-          check_log = check_npx(df = data_norm) |>
-            suppressMessages() |>
-            suppressWarnings(),
           median_counts_threshold = 150L,
           min_count = 10L
         ),
@@ -484,40 +564,64 @@ test_that(
     skip_if_not_installed("ggpubr")
     skip_on_cran()
 
-    npx_ht <- OlinkAnalyze:::data_ht_small |>
-      dplyr::filter(
-        .data[["SampleType"]] == "SAMPLE"
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = npx_ht <- OlinkAnalyze:::data_ht_small |>
+            dplyr::filter(
+              .data[["SampleType"]] == "SAMPLE"
+            ) |>
+            attach_check_log(
+              out_df = "tibble"
+            ),
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
       )
+    )
 
-    npx_3072 <- OlinkAnalyze:::data_3k_small |>
-      dplyr::filter(
-        .data[["SampleType"]] == "SAMPLE"
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = npx_3072 <- OlinkAnalyze:::data_3k_small |>
+            dplyr::filter(
+              .data[["SampleType"]] == "SAMPLE"
+            ) |>
+            attach_check_log(
+              out_df = "tibble"
+            ),
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
       )
+    )
 
     overlapping_samples <- intersect(
       x = npx_ht$SampleID,
       y = npx_3072$SampleID
     )
 
-    expect_message(
+    expect_warning(
       object = expect_message(
-        object = data_norm <- OlinkAnalyze::olink_normalization(
-          df1 = npx_ht,
-          df2 = npx_3072,
-          overlapping_samples_df1 = overlapping_samples,
-          df1_project_nr = "Explore HT",
-          df2_project_nr = "Explore 3072",
-          reference_project = "Explore HT",
-          df1_check_log = check_npx(df = npx_ht) |>
-            suppressMessages() |>
-            suppressWarnings(),
-          df2_check_log = check_npx(df = npx_3072) |>
-            suppressMessages() |>
-            suppressWarnings()
+        object = expect_message(
+          object = expect_message(
+            object = data_norm <- OlinkAnalyze::olink_normalization(
+              df1 = npx_ht,
+              df2 = npx_3072,
+              overlapping_samples_df1 = overlapping_samples,
+              df1_project_nr = "Explore HT",
+              df2_project_nr = "Explore 3072",
+              reference_project = "Explore HT"
+            ),
+            regexp = "Cross-product normalization will be performed!"
+          ),
+          regexp = "Output includes two sets of bridging samples"
         ),
-        regexp = "Cross-product normalization will be performed!"
+        regexp = paste("More than one column names in `df` was associated",
+                       "with certain key")
       ),
-      regexp = "Output includes two sets of bridging samples"
+      regexp = paste("Duplicate SampleIDs detected: \"Sample_A\",",
+                     "\"Sample_AA\", \"Sample_AB\", \"Sample_AC\"")
     )
 
     # too many bridging recommendations
@@ -535,9 +639,6 @@ test_that(
                 .data[["BridgingRecommendation"]]
               )
             ),
-          check_log = check_npx(df = data_norm) |>
-            suppressMessages() |>
-            suppressWarnings(),
           median_counts_threshold = 150L,
           min_count = 10L
         ),
@@ -556,40 +657,64 @@ test_that(
     skip_if_not_installed("ggpubr")
     skip_on_cran()
 
-    npx_ht <- OlinkAnalyze:::data_ht_small |>
-      dplyr::filter(
-        .data[["SampleType"]] == "SAMPLE"
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = npx_ht <- OlinkAnalyze:::data_ht_small |>
+            dplyr::filter(
+              .data[["SampleType"]] == "SAMPLE"
+            ) |>
+            attach_check_log(
+              out_df = "tibble"
+            ),
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
       )
+    )
 
-    npx_3072 <- OlinkAnalyze:::data_3k_small |>
-      dplyr::filter(
-        .data[["SampleType"]] == "SAMPLE"
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = npx_3072 <- OlinkAnalyze:::data_3k_small |>
+            dplyr::filter(
+              .data[["SampleType"]] == "SAMPLE"
+            ) |>
+            attach_check_log(
+              out_df = "tibble"
+            ),
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
       )
+    )
 
     overlapping_samples <- intersect(
       x = npx_ht$SampleID,
       y = npx_3072$SampleID
     )
 
-    expect_message(
+    expect_warning(
       object = expect_message(
-        object = data_norm <- OlinkAnalyze::olink_normalization(
-          df1 = npx_ht,
-          df2 = npx_3072,
-          overlapping_samples_df1 = overlapping_samples,
-          df1_project_nr = "Explore HT",
-          df2_project_nr = "Explore 3072",
-          reference_project = "Explore HT",
-          df1_check_log = check_npx(df = npx_ht) |>
-            suppressMessages() |>
-            suppressWarnings(),
-          df2_check_log = check_npx(df = npx_3072) |>
-            suppressMessages() |>
-            suppressWarnings()
+        object = expect_message(
+          object = expect_message(
+            object = data_norm <- OlinkAnalyze::olink_normalization(
+              df1 = npx_ht,
+              df2 = npx_3072,
+              overlapping_samples_df1 = overlapping_samples,
+              df1_project_nr = "Explore HT",
+              df2_project_nr = "Explore 3072",
+              reference_project = "Explore HT"
+            ),
+            regexp = "Cross-product normalization will be performed!"
+          ),
+          regexp = "Output includes two sets of bridging samples"
         ),
-        regexp = "Cross-product normalization will be performed!"
+        regexp = paste("More than one column names in `df` was associated",
+                       "with certain key")
       ),
-      regexp = "Output includes two sets of bridging samples"
+      regexp = paste("Duplicate SampleIDs detected: \"Sample_A\",",
+                     "\"Sample_AA\", \"Sample_AB\", \"Sample_AC\"")
     )
 
     # check log with errors
@@ -607,9 +732,6 @@ test_that(
                 .data[["BridgingRecommendation"]]
               )
             ),
-          check_log = check_npx(df = data_norm) |>
-            suppressMessages() |>
-            suppressWarnings(),
           olink_id = c("OID40770", "OID40835"),
           median_counts_threshold = 150L,
           min_count = 10L
@@ -629,40 +751,64 @@ test_that(
     skip_if_not_installed("ggpubr")
     skip_on_cran()
 
-    npx_ht <- OlinkAnalyze:::data_ht_small |>
-      dplyr::filter(
-        .data[["SampleType"]] == "SAMPLE"
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = npx_ht <- OlinkAnalyze:::data_ht_small |>
+            dplyr::filter(
+              .data[["SampleType"]] == "SAMPLE"
+            ) |>
+            attach_check_log(
+              out_df = "tibble"
+            ),
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
       )
+    )
 
-    npx_3072 <- OlinkAnalyze:::data_3k_small |>
-      dplyr::filter(
-        .data[["SampleType"]] == "SAMPLE"
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = npx_3072 <- OlinkAnalyze:::data_3k_small |>
+            dplyr::filter(
+              .data[["SampleType"]] == "SAMPLE"
+            ) |>
+            attach_check_log(
+              out_df = "tibble"
+            ),
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
       )
+    )
 
     overlapping_samples <- intersect(
       x = npx_ht$SampleID,
       y = npx_3072$SampleID
     )
 
-    expect_message(
+    expect_warning(
       object = expect_message(
-        object = data_norm <- OlinkAnalyze::olink_normalization(
-          df1 = npx_ht,
-          df2 = npx_3072,
-          overlapping_samples_df1 = overlapping_samples,
-          df1_project_nr = "Explore HT",
-          df2_project_nr = "Explore 3072",
-          reference_project = "Explore HT",
-          df1_check_log = check_npx(df = npx_ht) |>
-            suppressMessages() |>
-            suppressWarnings(),
-          df2_check_log = check_npx(df = npx_3072) |>
-            suppressMessages() |>
-            suppressWarnings()
+        object = expect_message(
+          object = expect_message(
+            object = data_norm <- OlinkAnalyze::olink_normalization(
+              df1 = npx_ht,
+              df2 = npx_3072,
+              overlapping_samples_df1 = overlapping_samples,
+              df1_project_nr = "Explore HT",
+              df2_project_nr = "Explore 3072",
+              reference_project = "Explore HT"
+            ),
+            regexp = "Cross-product normalization will be performed!"
+          ),
+          regexp = "Output includes two sets of bridging samples"
         ),
-        regexp = "Cross-product normalization will be performed!"
+        regexp = paste("More than one column names in `df` was associated",
+                       "with certain key")
       ),
-      regexp = "Output includes two sets of bridging samples"
+      regexp = paste("Duplicate SampleIDs detected: \"Sample_A\",",
+                     "\"Sample_AA\", \"Sample_AB\", \"Sample_AC\"")
     )
 
     # check log with errors
@@ -679,9 +825,6 @@ test_that(
                                                "Sample_C", "Sample_D")
                 )
             ),
-          check_log = check_npx(df = data_norm) |>
-            suppressMessages() |>
-            suppressWarnings(),
           olink_id = c("OID40770", "OID40835"),
           median_counts_threshold = 150L,
           min_count = 10L
@@ -701,40 +844,64 @@ test_that(
     skip_if_not_installed("ggpubr")
     skip_on_cran()
 
-    npx_ht <- OlinkAnalyze:::data_ht_small |>
-      dplyr::filter(
-        .data[["SampleType"]] == "SAMPLE"
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = npx_ht <- OlinkAnalyze:::data_ht_small |>
+            dplyr::filter(
+              .data[["SampleType"]] == "SAMPLE"
+            ) |>
+            attach_check_log(
+              out_df = "tibble"
+            ),
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
       )
+    )
 
-    npx_3072 <- OlinkAnalyze:::data_3k_small |>
-      dplyr::filter(
-        .data[["SampleType"]] == "SAMPLE"
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = npx_3072 <- OlinkAnalyze:::data_3k_small |>
+            dplyr::filter(
+              .data[["SampleType"]] == "SAMPLE"
+            ) |>
+            attach_check_log(
+              out_df = "tibble"
+            ),
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
       )
+    )
 
     overlapping_samples <- intersect(
       x = npx_ht$SampleID,
       y = npx_3072$SampleID
     )
 
-    expect_message(
+    expect_warning(
       object = expect_message(
-        object = data_norm <- OlinkAnalyze::olink_normalization(
-          df1 = npx_ht,
-          df2 = npx_3072,
-          overlapping_samples_df1 = overlapping_samples,
-          df1_project_nr = "Explore HT",
-          df2_project_nr = "Explore 3072",
-          reference_project = "Explore HT",
-          df1_check_log = check_npx(df = npx_ht) |>
-            suppressMessages() |>
-            suppressWarnings(),
-          df2_check_log = check_npx(df = npx_3072) |>
-            suppressMessages() |>
-            suppressWarnings()
+        object = expect_message(
+          object = expect_message(
+            object = data_norm <- OlinkAnalyze::olink_normalization(
+              df1 = npx_ht,
+              df2 = npx_3072,
+              overlapping_samples_df1 = overlapping_samples,
+              df1_project_nr = "Explore HT",
+              df2_project_nr = "Explore 3072",
+              reference_project = "Explore HT"
+            ),
+            regexp = "Cross-product normalization will be performed!"
+          ),
+          regexp = "Output includes two sets of bridging samples"
         ),
-        regexp = "Cross-product normalization will be performed!"
+        regexp = paste("More than one column names in `df` was associated",
+                       "with certain key")
       ),
-      regexp = "Output includes two sets of bridging samples"
+      regexp = paste("Duplicate SampleIDs detected: \"Sample_A\",",
+                     "\"Sample_AA\", \"Sample_AB\", \"Sample_AC\"")
     )
 
     expect_warning(
@@ -742,9 +909,6 @@ test_that(
         object = data_norm_bridge_one <- withCallingHandlers({
           OlinkAnalyze::olink_bridgeability_plot(
             df = data_norm,
-            check_log = check_npx(df = data_norm) |>
-              suppressMessages() |>
-              suppressWarnings(),
             olink_id = c("OID40771", "OID40835"),
             median_counts_threshold = 150L,
             min_count = 10L
@@ -781,56 +945,87 @@ test_that(
     npx_3072 <- get_example_data(filename = "example_3k_data.rds")
     npx_ht <- get_example_data(filename = "example_HT_data.rds")
 
-    npx_ht <- npx_ht |>
-      dplyr::filter(
-        .data[["SampleType"]] == "SAMPLE"
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = npx_ht <- npx_ht |>
+            dplyr::filter(
+              .data[["SampleType"]] == "SAMPLE"
+            ) |>
+            attach_check_log(
+              out_df = "tibble"
+            ),
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
       )
+    )
 
-    npx_3072 <- npx_3072 |>
-      dplyr::filter(
-        .data[["SampleType"]] == "SAMPLE"
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = npx_3072 <- npx_3072 |>
+            dplyr::filter(
+              .data[["SampleType"]] == "SAMPLE"
+            ) |>
+            attach_check_log(
+              out_df = "tibble"
+            ),
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
       )
+    )
 
     overlapping_samples <- intersect(
       x = npx_ht$SampleID,
       y = npx_3072$SampleID
     )
 
-    expect_message(
+    expect_warning(
       object = expect_message(
         object = expect_message(
           object = expect_message(
-            object = expect_warning(
-              data_norm <- OlinkAnalyze::olink_normalization(
-                df1 = npx_ht,
-                df2 = npx_3072,
-                overlapping_samples_df1 = overlapping_samples,
-                df1_project_nr = "Explore HT",
-                df2_project_nr = "Explore 3072",
-                reference_project = "Explore HT",
-                # setting format = TRUE to test that function works for when
-                # BridgingRecommendation is "NotOverlapping"
-                format = TRUE,
-                df1_check_log = check_npx(df = npx_ht) |>
-                  suppressMessages() |>
-                  suppressWarnings(),
-                df2_check_log = check_npx(df = npx_3072) |>
-                  suppressMessages() |>
-                  suppressWarnings()
+            object = expect_message(
+              object = expect_message(
+                object = expect_warning(
+                  data_norm <- OlinkAnalyze::olink_normalization(
+                    df1 = npx_ht,
+                    df2 = npx_3072,
+                    overlapping_samples_df1 = overlapping_samples,
+                    df1_project_nr = "Explore HT",
+                    df2_project_nr = "Explore 3072",
+                    reference_project = "Explore HT",
+                    # setting format = TRUE to test that function works for when
+                    # BridgingRecommendation is "NotOverlapping"
+                    format = TRUE,
+                    df1_check_log = check_npx(df = npx_ht) |>
+                      suppressMessages() |>
+                      suppressWarnings(),
+                    df2_check_log = check_npx(df = npx_3072) |>
+                      suppressMessages() |>
+                      suppressWarnings()
+                  ),
+                  regexp = "2 assays are not shared across products"
+                ),
+                regexp = "Cross-product normalization will be performed!"
               ),
-              regexp = "2 assays are not shared across products"
+              regexp = "Output includes two sets of bridging samples"
             ),
-            regexp = "Cross-product normalization will be performed!"
+            regexp = paste("2 non-overlapping assays are included in the",
+                           "normalized dataset without adjustment. Assays",
+                           "found in only one project will have decreased",
+                           "statistical power due to the lower number of",
+                           "samples.")
           ),
-          regexp = "Output includes two sets of bridging samples"
+          regexp = paste("2 not bridgeable assays are included in the bridged",
+                         "dataset without adjustment.")
         ),
-        regexp = paste("2 non-overlapping assays are included in the",
-                       "normalized dataset without adjustment. Assays found in",
-                       "only one project will have decreased statistical power",
-                       "due to the lower number of samples.")
+        regexp = paste("More than one column names in `df` was associated",
+                       "with certain key")
       ),
-      regexp = paste("2 not bridgeable assays are included in the bridged",
-                     "dataset without adjustment.")
+      regexp = paste("Duplicate SampleIDs detected: \"Sample_A\",",
+                     "\"Sample_AA\", \"Sample_AB\", \"Sample_AC\"")
     )
 
     expect_warning(
@@ -838,9 +1033,6 @@ test_that(
         object = data_norm_bridge_one <- withCallingHandlers({
           OlinkAnalyze::olink_bridgeability_plot(
             df = data_norm,
-            check_log = check_npx(df = data_norm) |>
-              suppressMessages() |>
-              suppressWarnings(),
             olink_id = c("OID12345", "OID40770_OID20117"),
             median_counts_threshold = 150L,
             min_count = 10L
@@ -877,61 +1069,88 @@ test_that(
     npx_3072 <- get_example_data(filename = "example_3k_data.rds")
     npx_ht <- get_example_data(filename = "example_HT_data.rds")
 
-    npx_ht <- npx_ht |>
-      dplyr::filter(
-        .data[["SampleType"]] == "SAMPLE"
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = npx_ht <- npx_ht |>
+            dplyr::filter(
+              .data[["SampleType"]] == "SAMPLE"
+            ) |>
+            attach_check_log(
+              out_df = "tibble"
+            ),
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
       )
+    )
 
-    npx_3072 <- npx_3072 |>
-      dplyr::filter(
-        .data[["SampleType"]] == "SAMPLE"
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = npx_3072 <- npx_3072 |>
+            dplyr::filter(
+              .data[["SampleType"]] == "SAMPLE"
+            ) |>
+            attach_check_log(
+              out_df = "tibble"
+            ),
+          regexp = paste("More than one column names in `df` was associated",
+                         "with certain key")
+        )
       )
+    )
 
     overlapping_samples <- intersect(
       x = npx_ht$SampleID,
       y = npx_3072$SampleID
     )
 
-    expect_message(
+    expect_warning(
       object = expect_message(
         object = expect_message(
           object = expect_message(
-            object = expect_warning(
-              data_norm <- OlinkAnalyze::olink_normalization(
-                df1 = npx_ht,
-                df2 = npx_3072,
-                overlapping_samples_df1 = overlapping_samples,
-                df1_project_nr = "Explore HT",
-                df2_project_nr = "Explore 3072",
-                reference_project = "Explore HT",
-                # setting format = TRUE to test that function works for when
-                # BridgingRecommendation is "NotOverlapping"
-                format = TRUE,
-                df1_check_log = check_npx(df = npx_ht) |>
-                  suppressMessages() |>
-                  suppressWarnings(),
-                df2_check_log = check_npx(df = npx_3072) |>
-                  suppressMessages() |>
-                  suppressWarnings()
+            object = expect_message(
+              object = expect_message(
+                object = expect_warning(
+                  data_norm <- OlinkAnalyze::olink_normalization(
+                    df1 = npx_ht,
+                    df2 = npx_3072,
+                    overlapping_samples_df1 = overlapping_samples,
+                    df1_project_nr = "Explore HT",
+                    df2_project_nr = "Explore 3072",
+                    reference_project = "Explore HT",
+                    # setting format = TRUE to test that function works for when
+                    # BridgingRecommendation is "NotOverlapping"
+                    format = TRUE,
+                    df1_check_log = check_npx(df = npx_ht) |>
+                      suppressMessages() |>
+                      suppressWarnings(),
+                    df2_check_log = check_npx(df = npx_3072) |>
+                      suppressMessages() |>
+                      suppressWarnings()
+                  ),
+                  regexp = "2 assays are not shared across products"
+                ),
+                regexp = "Cross-product normalization will be performed!"
               ),
-              regexp = "2 assays are not shared across products"
+              regexp = "Output includes two sets of bridging samples"
             ),
-            regexp = "Cross-product normalization will be performed!"
+            regexp = paste("2 non-overlapping assays are included in the",
+                           "normalized dataset without adjustment. Assays",
+                           "found in only one project will have decreased",
+                           "statistical power due to the lower number of",
+                           "samples.")
           ),
-          regexp = "Output includes two sets of bridging samples"
+          regexp = paste("2 not bridgeable assays are included in the bridged",
+                         "dataset without adjustment.")
         ),
-        regexp = paste("2 non-overlapping assays are included in the",
-                       "normalized dataset without adjustment. Assays found in",
-                       "only one project will have decreased statistical power",
-                       "due to the lower number of samples.")
+        regexp = paste("More than one column names in `df` was associated",
+                       "with certain key")
       ),
-      regexp = paste("2 not bridgeable assays are included in the bridged",
-                     "dataset without adjustment.")
+      regexp = paste("Duplicate SampleIDs detected: \"Sample_A\",",
+                     "\"Sample_AA\", \"Sample_AB\", \"Sample_AC\"")
     )
-
-    data_norm_check <- check_npx(df = data_norm) |>
-      suppressMessages() |>
-      suppressWarnings()
 
     # v1: none of the assays in olink_id is present df ----
 
@@ -940,7 +1159,6 @@ test_that(
         object = withCallingHandlers({
           OlinkAnalyze::olink_bridgeability_plot(
             df = data_norm,
-            check_log = data_norm_check,
             olink_id = c("OID00000", "OID00001", "OID00002"),
             median_counts_threshold = 150L,
             min_count = 10L
@@ -971,7 +1189,6 @@ test_that(
                   .data[["Count"]]
                 )
               ),
-            check_log = data_norm_check,
             olink_id = c("OID40770_OID20117", "OID40835_OID31162"),
             median_counts_threshold = 150L,
             min_count = 10L
@@ -994,7 +1211,6 @@ test_that(
           object = withCallingHandlers({
             OlinkAnalyze::olink_bridgeability_plot(
               df = data_norm,
-              check_log = data_norm_check,
               olink_id = c("OID12345", "OID54321"),
               median_counts_threshold = 150L,
               min_count = 10L
