@@ -199,7 +199,6 @@ check_log_colname <- function(check_log, col_key) {
 #' @returns Nothing or an error message if col_key is not valid.
 #'
 #' @keywords internal
-#' @noRd
 #'
 check_col_key <- function(col_key) {
   check_is_scalar_character(x = col_key,
