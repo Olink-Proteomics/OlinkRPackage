@@ -566,12 +566,15 @@ olink_normalization_n <- function(norm_schema) {
        project_i_npx_norm)
   }
 
-  normalized_npx <- dplyr::bind_rows(normalized_npx)
+  normalized_npx <- dplyr::bind_rows(normalized_npx) |>
+    attach_check_log(
+      out_df = "tibble"
+    )
 
   # update maxlod if present
   normalized_npx <- norm_internal_update_maxlod(
     df = normalized_npx,
-    cols = check_npx(df = normalized_npx) |>
+    cols = get_check_npx(df = normalized_npx) |>
       suppressMessages() |>
       suppressWarnings() |>
       (\(.) .$col_names)()
