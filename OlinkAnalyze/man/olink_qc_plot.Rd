@@ -70,14 +70,14 @@ if (rlang::is_installed(pkg = c("ggrepel"))) {
 
   # standard plot
   OlinkAnalyze::olink_qc_plot(
-    df = npx_data1,
+    df = OlinkAnalyze::npx_data1,
     color_g = "QC_Warning",
     label_outliers = TRUE
   )
 
   # Change the outlier threshold to +/-4SD
   OlinkAnalyze::olink_qc_plot(
-    df = npx_data1,
+    df = OlinkAnalyze::npx_data1,
     color_g = "QC_Warning",
     IQR_outlierDef = 4L,
     median_outlierDef = 4L,
@@ -86,7 +86,7 @@ if (rlang::is_installed(pkg = c("ggrepel"))) {
 
   # Identify the outliers
   qc <- OlinkAnalyze::olink_qc_plot(
-    df = npx_data1,
+    df = OlinkAnalyze::npx_data1,
     color_g = "QC_Warning",
     IQR_outlierDef = 4L,
     median_outlierDef = 4L,

@@ -57,13 +57,11 @@
 #'       ignore.case = TRUE
 #'     )
 #'   )
-#'   check_log <- OlinkAnalyze::check_npx(df = npx_df)
 #'
 #'   ttest_results <- OlinkAnalyze::olink_ttest(
 #'     df = npx_df,
 #'     variable = "Treatment",
-#'     alternative = "two.sided",
-#'     check_log = check_log
+#'     alternative = "two.sided"
 #'   )
 #'
 #'   # Paired t-test
@@ -73,8 +71,7 @@
 #'     ) |>
 #'     OlinkAnalyze::olink_ttest(
 #'       variable = "Time",
-#'       pair_id = "Subject",
-#'       check_log = check_log
+#'       pair_id = "Subject"
 #'     )
 #' }
 #' }

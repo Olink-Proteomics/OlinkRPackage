@@ -48,20 +48,11 @@
 #'     overlapping_samples_df1 = overlapping_samples,
 #'     df1_project_nr = "Explore HT",
 #'     df2_project_nr = "Explore 3072",
-#'     reference_project = "Explore HT",
-#'     df1_check_log = check_npx(df = npx_ht) |>
-#'       suppressMessages() |>
-#'       suppressWarnings(),
-#'     df2_check_log = check_npx(df = npx_3072) |>
-#'       suppressMessages() |>
-#'       suppressWarnings()
+#'     reference_project = "Explore HT"
 #'   )
 #'
 #'   data_norm_bridge_p <- OlinkAnalyze::olink_bridgeability_plot(
 #'     df = data_norm,
-#'     check_log = check_npx(df = data_norm) |>
-#'       suppressMessages() |>
-#'       suppressWarnings(),
 #'     olink_id = c("OID40770", "OID40835"),
 #'     median_counts_threshold = 150L,
 #'     min_count = 10L

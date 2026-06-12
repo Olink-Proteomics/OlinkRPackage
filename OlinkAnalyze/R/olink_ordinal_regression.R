@@ -75,7 +75,6 @@
 #'       ignore.case = TRUE
 #'     )
 #'   )
-#'   check_log <- OlinkAnalyze::check_npx(df = npx_df)
 #'
 #'   # Two-way Ordinal Regression with CLM.
 #'   # Results in model NPX~Treatment+Time+Treatment:Time.
@@ -459,7 +458,6 @@ olink_ordinalRegression <- olink_ordinal_regression  # nolint: object_name_linte
 #'       ignore.case = TRUE
 #'     )
 #'   )
-#'   check_log <- OlinkAnalyze::check_npx(df = npx_df)
 #'
 #'   # Two-way Ordinal Regression with CLM.
 #'   # Results in model NPX~Treatment+Time+Treatment:Time.
@@ -483,8 +481,7 @@ olink_ordinalRegression <- olink_ordinal_regression  # nolint: object_name_linte
 #'     df = npx_df,
 #'     variable = c("Treatment:Time"),
 #'     olinkid_list = significant_assays,
-#'     effect = "Time",
-#'     check_log = check_log
+#'     effect = "Time"
 #'   )
 #' }
 #' }

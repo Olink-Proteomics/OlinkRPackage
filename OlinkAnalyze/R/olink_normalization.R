@@ -105,11 +105,6 @@
 #'     Normalization = "Intensity"
 #'   )
 #'
-#' # check datasets
-#'
-#' npx_df1_check <- check_npx(df = npx_df1)
-#' npx_df2_check <- check_npx(df = npx_df2)
-#'
 #' # bridge normalization
 #'
 #' # overlapping samples - exclude control samples
@@ -124,9 +119,7 @@
 #'   overlapping_samples_df1 = overlap_samples,
 #'   df1_project_nr = "P1",
 #'   df2_project_nr = "P2",
-#'   reference_project = "P1",
-#'   df1_check_log = npx_df1_check,
-#'   df2_check_log = npx_df2_check
+#'   reference_project = "P1"
 #' )
 #'
 #' # subset normalization
@@ -181,9 +174,7 @@
 #'   overlapping_samples_df2 = df2_subset,
 #'   df1_project_nr = "P1",
 #'   df2_project_nr = "P2",
-#'   reference_project = "P1",
-#'   df1_check_log = npx_df1_check,
-#'   df2_check_log = npx_df2_check
+#'   reference_project = "P1"
 #' )
 #'
 #' # special case of subset normalization using all samples
@@ -194,9 +185,7 @@
 #'   overlapping_samples_df2 = df2_samples,
 #'   df1_project_nr = "P1",
 #'   df2_project_nr = "P2",
-#'   reference_project = "P1",
-#'   df1_check_log = npx_df1_check,
-#'   df2_check_log = npx_df2_check
+#'   reference_project = "P1"
 #' )
 #'
 #' # reference median normalization
@@ -219,8 +208,7 @@
 #' olink_normalization(
 #'   df1 = npx_df1,
 #'   overlapping_samples_df1 = df1_subset,
-#'   reference_medians = ref_med_df,
-#'   df1_check_log = npx_df1_check
+#'   reference_medians = ref_med_df
 #' )
 #'
 #' # cross-product normalization
@@ -232,11 +220,6 @@
 #' ) |>
 #'   (\(.) .[!grepl("CONTROL", .)])()
 #'
-#' # check datasets
-#'
-#' npx_ht_check <- check_npx(df = OlinkAnalyze:::data_ht_small)
-#' npx_3k_check <- check_npx(df = OlinkAnalyze:::data_3k_small)
-#'
 #' # normalize
 #' olink_normalization(
 #'   df1 = OlinkAnalyze:::data_ht_small,
@@ -245,9 +228,7 @@
 #'   df1_project_nr = "proj_ht",
 #'   df2_project_nr = "proj_3k",
 #'   reference_project = "proj_ht",
-#'   format = FALSE,
-#'   df1_check_log = npx_ht_check,
-#'   df2_check_log = npx_3k_check
+#'   format = FALSE
 #' )
 #' }
 #'

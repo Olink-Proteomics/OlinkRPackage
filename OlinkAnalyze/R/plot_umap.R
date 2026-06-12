@@ -70,21 +70,17 @@
 #'       SampleID = paste(.data[["SampleID"]], "_", .data[["Index"]], sep = "")
 #'     )
 #'
-#'   check_log <- check_npx(df = npx_data)
-#'
 #'   # UMAP using all the data
 #'   OlinkAnalyze::olink_umap_plot(
 #'     df = npx_data,
-#'     color_g = "QC_Warning",
-#'     check_log = check_log
+#'     color_g = "QC_Warning"
 #'   )
 #'
 #'   # UMAP per panel
 #'   g <- OlinkAnalyze::olink_umap_plot(
 #'     df = npx_data,
 #'     color_g = "QC_Warning",
-#'     byPanel = TRUE,
-#'     check_log = check_log
+#'     byPanel = TRUE
 #'   )
 #'   # Plot only the Inflammation panel
 #'   g$Inflammation
@@ -94,8 +90,7 @@
 #'     df = npx_data,
 #'     color_g = "QC_Warning",
 #'     outlierDefX = 2L,
-#'     outlierDefY = 4L,
-#'     check_log = check_log
+#'     outlierDefY = 4L
 #'   )
 #'
 #'   OlinkAnalyze::olink_umap_plot(
@@ -103,8 +98,7 @@
 #'     color_g = "QC_Warning",
 #'     outlierDefX = 3L,
 #'     outlierDefY = 2L,
-#'     byPanel = TRUE,
-#'     check_log = check_log
+#'     byPanel = TRUE
 #'   )
 #'
 #'   # Retrieve outliers
@@ -113,8 +107,7 @@
 #'     color_g = "QC_Warning",
 #'     outlierDefX = 3L,
 #'     outlierDefY = 2L,
-#'     byPanel = TRUE,
-#'     check_log = check_log
+#'     byPanel = TRUE
 #'   )
 #'   outliers <- lapply(p, function(x) x$data) |>
 #'     dplyr::bind_rows() |>

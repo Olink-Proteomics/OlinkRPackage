@@ -89,22 +89,21 @@
 #'
 #' @examples
 #' \dontrun{
-#' # run check_npx
-#' check_log <- check_npx(
-#'   df = npx_data1
-#' )
-#'
 #' # run clean_npx
-#' clean_npx(
-#'   df = npx_data1,
-#'   check_log = check_log
+#' OlinkAnalyze::clean_npx(
+#'   df = OlinkAnalyze::npx_data1
 #' )
 #'
 #' # run clean_npx with messages for all steps
-#' clean_npx(
-#'   df = npx_data1,
-#'   check_log = check_log,
+#' OlinkAnalyze::clean_npx(
+#'   df = OlinkAnalyze::npx_data1,
 #'   verbose = TRUE
+#' )
+#'
+#' # run clean_npx but keep duplicated samples
+#' OlinkAnalyze::clean_npx(
+#'   df = OlinkAnalyze::npx_data1,
+#'   remove_dup_sample_id = FALSE
 #' )
 #' }
 #'
@@ -1025,14 +1024,14 @@ clean_assay_warning <- function(df,
 #' @examples
 #' \dontrun{
 #' # use npx_data1 to check that clean_control_sample_id() works
-#' log <- OlinkAnalyze::check_npx(
+#' log <- OlinkAnalyze:::get_check_npx(
 #'   df = OlinkAnalyze::npx_data1
 #' ) |>
 #'   suppressWarnings() |>
 #'   suppressMessages()
 #'
 #' out <- OlinkAnalyze:::clean_control_sample_id(
-#'   df = npx_data1,
+#'   df =  OlinkAnalyze::npx_data1,
 #'   check_npx_log = log,
 #'   control_sample_id = c("CONTROL_SAMPLE_AS 1", "CONTROL_SAMPLE_AS 2")
 #' )

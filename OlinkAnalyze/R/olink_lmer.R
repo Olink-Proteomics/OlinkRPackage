@@ -99,15 +99,9 @@
 #'       )
 #'     )
 #'
-#'   # check data
-#'   npx_df_check_log <- OlinkAnalyze::check_npx(
-#'     df = npx_df
-#'   )
-#'
 #'   # Results in model NPX ~ Time * Treatment + (1 | Subject) + (1 | Site)
 #'   lmer_results <- OlinkAnalyze::olink_lmer(
 #'     df = npx_df,
-#'     check_log = npx_df_check_log,
 #'     variable = c("Time", "Treatment"),
 #'     random = c("Subject", "Site")
 #'   )
@@ -661,15 +655,9 @@ single_lmer <- function(data, formula_string) {
 #'       )
 #'     )
 #'
-#'   # check data
-#'   npx_df_check_log <- OlinkAnalyze::check_npx(
-#'     df = npx_df
-#'   )
-#'
 #'   # Results in model NPX ~ Time * Treatment + (1 | Subject)
 #'   lmer_results <- OlinkAnalyze::olink_lmer(
 #'     df = npx_df,
-#'     check_log = npx_df_check_log,
 #'     variable = c("Time", "Treatment"),
 #'     random = c("Subject")
 #'   )
@@ -686,7 +674,6 @@ single_lmer <- function(data, formula_string) {
 #'   # Run lmer posthoc on significant proteins
 #'   results_lmer_posthoc <- OlinkAnalyze::olink_lmer_posthoc(
 #'     df = npx_df,
-#'     check_log = npx_df_check_log,
 #'     olinkid_list = assay_list,
 #'     variable = c("Time", "Treatment"),
 #'     effect = "Time:Treatment",
@@ -697,7 +684,6 @@ single_lmer <- function(data, formula_string) {
 #'   # Estimate treated vs untreated at each timepoint
 #'   results_lmer_posthoc <- OlinkAnalyze::olink_lmer_posthoc(
 #'     df = npx_df,
-#'     check_log = npx_df_check_log,
 #'     olinkid_list = assay_list,
 #'     model_formula = "NPX~Time*Treatment+(1|Subject)",
 #'     effect_formula = "pairwise~Treatment|Time",

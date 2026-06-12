@@ -33,24 +33,18 @@
 #'       # This will fail if the files do not exist.
 #'
 #'       # Import NPX data
-#'       npx_data <- read_npx(filename = "path/to/npx_file")
-#'
-#'       # Check NPX data
-#'       check_log <- check_npx(df = npx_data)
-#'
-#'       # Clean NPX data
-#'       npx_data_clean <- clean_npx(
-#'         df = npx_data,
-#'         check_log = check_log
+#'       npx_data <- OlinkAnalyze::read_npx(
+#'         filename = "path/to/npx_file"
 #'       )
 #'
-#'       # Re-check NPX data
-#'       check_log_clean <- check_npx(df = npx_data_clean)
+#'       # Clean NPX data
+#'       npx_data_clean <- OlinkAnalyze::clean_npx(
+#'         df = npx_data
+#'       )
 #'
 #'       # Estimate LOD from negative controls
-#'       npx_data_lod_nc <- olink_lod(
+#'       npx_data_lod_nc <- OlinkAnalyze::olink_lod(
 #'         data = npx_data_clean,
-#'         check_log = check_log_clean,
 #'         lod_method = "NCLOD"
 #'       )
 #'
@@ -58,17 +52,15 @@
 #'       ## Locate the fixed LOD file
 #'       lod_file_path <- "path/to/lod_file"
 #'
-#'       npx_data_lod_Fixed <- olink_lod(
+#'       npx_data_lod_Fixed <- OlinkAnalyze::olink_lod(
 #'         data = npx_data,
-#'         check_log = check_log_clean,
 #'         lod_file_path = lod_file_path,
 #'         lod_method = "FixedLOD"
 #'       )
 #'
 #'       # Estimate LOD from both negative controls and fixed LOD
-#'       npx_data_lod_both <- olink_lod(
+#'       npx_data_lod_both <- OlinkAnalyze::olink_lod(
 #'         data = npx_data,
-#'         check_log = check_log_clean,
 #'         lod_file_path = lod_file_path,
 #'         lod_method = "Both"
 #'       )

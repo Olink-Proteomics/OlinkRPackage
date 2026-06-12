@@ -659,10 +659,6 @@ olink_normalization_n <- function(norm_schema) {
 #' overlap_samples_list <- list("DF1" = overlap_samples,
 #'                              "DF2" = overlap_samples)
 #'
-#' # check npx
-#' df1_check_log <- OlinkAnalyze::check_npx(df = npx_df1)
-#' df2_check_log <- OlinkAnalyze::check_npx(df = npx_df2)
-#'
 #' # Normalize
 #' OlinkAnalyze::olink_normalization_bridge(
 #'   project_1_df = npx_df1,
@@ -670,9 +666,7 @@ olink_normalization_n <- function(norm_schema) {
 #'   bridge_samples = overlap_samples_list,
 #'   project_1_name = "P1",
 #'   project_2_name = "P2",
-#'   project_ref_name = "P1",
-#'   project_1_check_log = df1_check_log,
-#'   project_2_check_log = df2_check_log
+#'   project_ref_name = "P1"
 #' )
 #' }
 #'
@@ -883,10 +877,6 @@ olink_normalization_bridge <- function(project_1_df,
 #' subset_samples_list <- list("DF1" = df1_samples,
 #'                             "DF2" = df2_samples)
 #'
-#' # check npx
-#' df1_check_log <- OlinkAnalyze::check_npx(df = npx_df1)
-#' df2_check_log <- OlinkAnalyze::check_npx(df = npx_df2)
-#'
 #' # Normalize
 #' OlinkAnalyze::olink_normalization_subset(
 #'   project_1_df = npx_df1,
@@ -894,9 +884,7 @@ olink_normalization_bridge <- function(project_1_df,
 #'   reference_samples = subset_samples_list,
 #'   project_1_name = "P1",
 #'   project_2_name = "P2",
-#'   project_ref_name = "P1",
-#'   project_1_check_log = df1_check_log,
-#'   project_2_check_log = df2_check_log
+#'   project_ref_name = "P1"
 #' )
 #'
 #'
@@ -967,10 +955,6 @@ olink_normalization_bridge <- function(project_1_df,
 #' subset_samples_all_list <- list("DF1" = df1_samples_all,
 #'                                 "DF2" = df2_samples_all)
 #'
-#' # check npx
-#' df1_check_log <- OlinkAnalyze::check_npx(df = npx_df1)
-#' df2_check_log <- OlinkAnalyze::check_npx(df = npx_df2)
-#'
 #' # Normalize
 #' OlinkAnalyze::olink_normalization_subset(
 #'   project_1_df = npx_df1,
@@ -978,9 +962,7 @@ olink_normalization_bridge <- function(project_1_df,
 #'   reference_samples = subset_samples_all_list,
 #'   project_1_name = "P1",
 #'   project_2_name = "P2",
-#'   project_ref_name = "P1",
-#'   project_1_check_log = df1_check_log,
-#'   project_2_check_log = df2_check_log
+#'   project_ref_name = "P1"
 #' )
 #' }
 #'

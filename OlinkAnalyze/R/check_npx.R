@@ -254,7 +254,7 @@ get_check_npx <- function(df,
 #'   df = OlinkAnalyze::npx_data1
 #' )
 #'
-#' get_preferred_names(
+#' OlinkAnalyze:::get_preferred_names(
 #'   df = OlinkAnalyze::npx_data1,
 #'   check_log = check_log
 #' )

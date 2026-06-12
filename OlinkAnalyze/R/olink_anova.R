@@ -91,16 +91,10 @@
 #'       )
 #'     )
 #'
-#'   # check data
-#'   npx_df_check_log <- OlinkAnalyze::check_npx(
-#'     df = npx_df
-#'   )
-#'
 #'   # One-way ANOVA, no covariates.
 #'   # Results in a model NPX~Time
 #'   anova_results <- OlinkAnalyze::olink_anova(
 #'     df = npx_df,
-#'     check_log = npx_df_check_log,
 #'     variable = "Time"
 #'   )
 #'
@@ -108,7 +102,6 @@
 #'   # Results in model NPX~Treatment*Time+Site.
 #'   anova_results <- OlinkAnalyze::olink_anova(
 #'     df = npx_df,
-#'     check_log = npx_df_check_log,
 #'     variable = c("Treatment:Time"),
 #'     covariates = "Site"
 #'   )
@@ -117,7 +110,6 @@
 #'   # Results in model NPX~Treatment+Site:Time+Site+Time.
 #'   anova_results <- OlinkAnalyze::olink_anova(
 #'     df = npx_df,
-#'     check_log = npx_df_check_log,
 #'     variable = "Treatment",
 #'     covariates = "Site:Time"
 #'   )
@@ -598,16 +590,10 @@ olink_anova <- function(df,
 #'        )
 #'     )
 #'
-#'   # check data
-#'   npx_df_check_log <- OlinkAnalyze::check_npx(
-#'     df = npx_df
-#'   )
-#'
 #'   # Two-way ANOVA, one main effect (Site) covariate.
 #'   # Results in model NPX~Treatment*Time+Site.
 #'   anova_results <- OlinkAnalyze::olink_anova(
 #'     df = npx_df,
-#'     check_log = npx_df_check_log,
 #'     variable = c("Treatment:Time"),
 #'     covariates = "Site"
 #'   )
@@ -630,7 +616,6 @@ olink_anova <- function(df,
 #'   # Posthoc, all pairwise comparisons
 #'   anova_posthoc_results <- OlinkAnalyze::olink_anova_posthoc(
 #'     df = npx_df,
-#'     check_log = npx_df_check_log,
 #'     variable = c("Treatment:Time"),
 #'     covariates = "Site",
 #'     olinkid_list = significant_assays,
@@ -640,7 +625,6 @@ olink_anova <- function(df,
 #'   # Posthoc, treated vs untreated at each timepoint, adjusted for Site effect
 #'   anova_posthoc_results <- OlinkAnalyze::olink_anova_posthoc(
 #'     df = npx_df,
-#'     check_log = npx_df_check_log,
 #'     model_formula = "NPX~Treatment*Time+Site",
 #'     olinkid_list = significant_assays,
 #'     effect_formula = "pairwise~Treatment|Time"

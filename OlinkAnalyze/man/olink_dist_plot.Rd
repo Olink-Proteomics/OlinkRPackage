@@ -29,29 +29,19 @@ and faceted by Panel using ggplot and ggplot2::geom_boxplot.
 }
 \examples{
 \donttest{
-
-# Optional: check and clean dataset
-check_log <- OlinkAnalyze::check_npx(
-  df = npx_data1
-)
-
 cleaned_data <- OlinkAnalyze::clean_npx(
-  df = npx_data1,
-  check_log = check_log
+  df = OlinkAnalyze::npx_data1
 )
 
 OlinkAnalyze::olink_dist_plot(
-  df = npx_data1,
-  check_log = check_log,
+  df = OlinkAnalyze::npx_data1,
   color_g = "QC_Warning"
 )
 
 OlinkAnalyze::olink_dist_plot(
   df = cleaned_data,
-  check_log = check_log,
   color_g = "QC_Warning"
 )
-
 }
 
 }

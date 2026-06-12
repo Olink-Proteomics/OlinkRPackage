@@ -56,18 +56,19 @@ of proteins (OlinkIDs) using ggplot2::ggplot and ggplot2::geom_boxplot.
 }
 \examples{
 \donttest{
-
 if (rlang::is_installed(pkg = c("broom", "car"))) {
-  npx_df <- npx_data1 |>
+  npx_df <- OlinkAnalyze::npx_data1 |>
     dplyr::filter(
       !grepl(pattern = "control|ctrl",
              x = .data[["SampleID"]],
              ignore.case = TRUE)
     )
+
   anova_results <- OlinkAnalyze::olink_anova(
     df = npx_df,
     variable = "Site"
   )
+
   significant_assays <- anova_results |>
     dplyr::filter(
       .data[["Threshold"]] == "Significant"
@@ -75,6 +76,7 @@ if (rlang::is_installed(pkg = c("broom", "car"))) {
     dplyr::pull(
       .data[["OlinkID"]]
     )
+
   OlinkAnalyze::olink_boxplot(
     df = npx_df,
     variable = "Site",
