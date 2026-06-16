@@ -13,10 +13,10 @@ editor_options:
 
 - New QC flags for assays and samples have been added to improve automated data handling (@klevdiamanti, #735)
 - Cheatsheet link has been added to the overview vignette (@klevdiamanti, #747)
-- Flowchart image has been added to the overview vignette to explain how check_npx and clean_npx fit into the data preprocessing workflow (@klevdiamanti, #748)
+- Flowchart image has been added to the overview vignette to explain how check_npx() and clean_npx() fit into the data preprocessing workflow (@klevdiamanti, #748)
 - General updates to overview vignette (@klevdiamanti, #750, #760)
 - If covariate is specified when using model formula in olink_lmer() and olink_lmer_posthoc(), the covariates will not be considered when performing multiple testing correction adjustment (@dtopouza, #754)
-- Version checks and warning have been added when performing Kruskal test and posthoc to address bug in package dependency (@klevdiamanti, #763)
+- Version checks and warnings have been added when performing Kruskal test and posthoc to address bug in package dependency (@klevdiamanti, #763)
 - Links to vignettes from Olink Analyze Vignettes package have been added to the overview vignette (@kathy-nevola, #764)
 - Kristian Hoden's role has been changed from contributor to author (@kathy-nevola, #766)
 
@@ -26,10 +26,10 @@ editor_options:
 - Significance lines no longer overlap when generating boxplots (@kristianHoden #732)
 - Turquoise spelling fixed in olink color palette (@kristianHoden #736)
 - Error message when samples have more than one color assigned to them has been fixed (@kristianHoden #742)
-- olink_dist_plot will now check if color_g column is the QC column in the dataset (@KangD-dev #745)
-- Error message related to imputed assays when generating PCA and UMAP plots has been rephrased (dtopouza, #749)
+- olink_dist_plot() will now check if color_g column is the QC column in the dataset (@KangD-dev #745)
+- Error message related to imputed assays when generating PCA and UMAP plots has been rephrased (@dtopouza, #749)
 - Concatenated Olink IDs are now recognized as Olink IDs (@klevdiamanti, #751)
-- Error message updated in olink_bridgability_plot (@klevdiamanti, #752)
+- Error message updated in olink_bridgability_plot()  (@klevdiamanti, #752)
 - Project Column in example data is now fully populated (@klevdiamanti, #753)
 - Annotation color handling has been improved in olink_heatmap (@dtopouza, #761)
 

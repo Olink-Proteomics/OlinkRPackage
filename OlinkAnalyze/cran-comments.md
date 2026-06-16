@@ -1,6 +1,6 @@
 ## Release Summary
 
-This release includes minor updates to documentation and bug fixes from Olink Analyze 5.0
+This release includes minor updates to documentation and bug fixes from Olink Analyze 5.0.
 ## R CMD check results
 
 There were no ERRORs, WARNINGs, or NOTEs.
