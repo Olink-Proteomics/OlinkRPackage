@@ -1403,7 +1403,7 @@ in the R package `OlinkAnalyzeVignettes`.
 
 ## Heatmap (`olink_heatmap_plot()`)
 
-The `olink_heatmap_plot()` function generates a heatmap for a specfied set of
+The `olink_heatmap_plot()` function generates a heatmap for a specified set of
 samples and proteins. By default, the heatmap centers and scales NPX across
 proteins and clusters samples and proteins using a dendrogram. Unique sample
 names are required.

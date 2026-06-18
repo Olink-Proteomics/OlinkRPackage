@@ -17,12 +17,14 @@ Bargraph
 BgRatio
 BioConductor
 Bo
+bridgability
 bridgeability
 bridgeselector
 BridgingRecommendation
 Bugfixes
 BugFixes
 byPanel
+Cheatsheet
 CHL
 chr
 cli
@@ -97,6 +99,7 @@ hadley
 Hardcoded
 Henriques
 Hochberg
+Hoden's
 https
 Hu
 importFrom
@@ -216,6 +219,7 @@ Readme
 reproducibility
 rstatix
 Rstudio
+RStudio
 RUO
 sampleid
 SampleID
@@ -267,4 +271,3 @@ Xu
 Yu
 Zhan
 Zhou
-turquoise
