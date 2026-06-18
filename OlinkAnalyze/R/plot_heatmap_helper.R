@@ -7,6 +7,7 @@
 #' @return Null or error/warnings
 #'
 #' @keywords internal
+#' @noRd
 #'
 plot_heatmap_check_inputs <- function(colnames, ...) {
   #Checking if packages are installed
@@ -61,21 +62,22 @@ plot_heatmap_check_inputs <- function(colnames, ...) {
 #' @return df w/o low var assays with added colnames
 #'
 #' @keywords internal
+#' @noRd
 #'
 plot_heatmap_clean_df <- function(df, check_log, colnames) {
-  df <- clean_npx(df = df,
-                  check_log = check_log,
-                  remove_assay_na = TRUE,
-                  remove_invalid_oid = TRUE,
-                  remove_control_assay = TRUE,
-                  remove_control_sample = TRUE,
-                  remove_dup_sample_id = TRUE,
-                  remove_assay_warning = FALSE,
-                  remove_qc_warning = FALSE,
-                  convert_df_cols = TRUE,
-                  convert_nonunique_uniprot = TRUE,
-                  out_df = "tibble",
-                  verbose = FALSE)
+  df <- run_clean_npx(df = df,
+                      check_log = check_log,
+                      remove_assay_na = TRUE,
+                      remove_invalid_oid = TRUE,
+                      remove_control_assay = TRUE,
+                      remove_control_sample = TRUE,
+                      remove_dup_sample_id = TRUE,
+                      remove_assay_warning = FALSE,
+                      remove_qc_warning = FALSE,
+                      convert_df_cols = TRUE,
+                      convert_nonunique_uniprot = TRUE,
+                      out_df = "tibble",
+                      verbose = FALSE)
   #Remove assays with no variance
   df <- df |>
     dplyr::group_by(
@@ -113,6 +115,7 @@ plot_heatmap_clean_df <- function(df, check_log, colnames) {
 #' @inheritParams olink_heatmap_plot
 #'
 #' @keywords internal
+#' @noRd
 #'
 plot_heatmap_df_to_wide <- function(df,
                                     check_log,
@@ -138,6 +141,7 @@ plot_heatmap_df_to_wide <- function(df,
 #' @return list of arguments for pheatmap
 #'
 #' @keywords internal
+#' @noRd
 #'
 plot_heatmap_pheatmap_args <- function(df_wide,
                                        df,
@@ -198,6 +202,16 @@ plot_heatmap_pheatmap_args <- function(df_wide,
     )
   }
 
+  # Add annotation colors to function call
+  if (is.null(pheatmap_args[["annot_col_int"]])) {
+    # NA is the default no-specification expected by pheatmap
+    pheatmap_args[["annotation_colors"]] <- NA
+  } else {
+    # Use the created list
+    pheatmap_args[["annotation_colors"]] <- pheatmap_args[["annot_col_int"]]
+    pheatmap_args[["annot_col_int"]] <- NULL
+  }
+
   return(pheatmap_args)
 }
 
@@ -209,6 +223,7 @@ plot_heatmap_pheatmap_args <- function(df_wide,
 #' @return updated pheatmap arguments list with ellipsis variables
 #'
 #' @keywords internal
+#' @noRd
 #'
 pheatmap_extract_ellipsis_arg <- function(pheatmap_args,
                                           ...) {
@@ -238,10 +253,12 @@ pheatmap_extract_ellipsis_arg <- function(pheatmap_args,
 #' Add annotations to pheatmap arguments
 #'
 #' @inheritParams olink_heatmap_plot
+#' @inheritParams pheatmap_extract_ellipsis_arg
 #'
 #' @return updated pheatmap arguments
 #'
 #' @keywords internal
+#' @noRd
 #'
 pheatmap_annotate_heatmap <- function(df,
                                       check_log,
@@ -283,10 +300,12 @@ pheatmap_annotate_heatmap <- function(df,
 #' add colors to pheatmap arguments
 #'
 #' @inheritParams olink_heatmap_plot
+#' @inheritParams pheatmap_extract_ellipsis_arg
 #'
 #' @return updated pheatmap_args
 #'
 #' @keywords internal
+#' @noRd
 #'
 pheatmap_color_heatmap <- function(df,
                                    check_log,
@@ -309,28 +328,38 @@ pheatmap_color_heatmap <- function(df,
                                dplyr::all_of(vars_to_color)),
                  function(x) length(unique(x))))
     )
+
+    variable_list <- as.list(sapply(dplyr::select(df,
+                                                  dplyr::all_of(vars_to_color)),
+                                    function(x) length(unique(x))))
+
+    rep_num <- rep(names(variable_list), times = variable_list)
+
+    color_assignments <- with(data.frame(variable = rep_num, color = colors),
+                              split(color, variable))
+
+    color_assignments <- lapply(vars_to_color, function(x) {
+      y <- color_assignments[[x]]
+      names(y) <- df |> dplyr::pull(.data[[x]]) |> sort() |> unique()
+      return(y)
+    })
+    names(color_assignments) <- vars_to_color
+
+    pheatmap_args[["annot_col_int"]] <- append(pheatmap_args[["annot_col_int"]],
+                                               color_assignments)
   }
-  variable_list <- as.list(sapply(dplyr::select(df,
-                                                dplyr::all_of(vars_to_color)),
-                                  function(x) length(unique(x))))
 
-  rep_num <- rep(names(variable_list), times = variable_list)
-
-  color_assignments <- with(data.frame(variable = rep_num, color = colors),
-                            split(color, variable))
-
-  pheatmap_args[["annot_col_int"]] <- append(pheatmap_args[["annot_col_int"]],
-                                             color_assignments)
   return(pheatmap_args)
 }
 
 #' Run the pheatmap using args
 #'
-#' @param pheatmap_args
+#' @inheritParams pheatmap_extract_ellipsis_arg
 #'
 #' @return ggplot of heatmap as generated by pheatmap
 #'
 #' @keywords internal
+#' @noRd
 #'
 pheatmap_run <- function(pheatmap_args) {
   p <- NULL
@@ -382,6 +411,7 @@ pheatmap_run <- function(pheatmap_args) {
 #' @return pheatmap with updated theme
 #'
 #' @keywords internal
+#' @noRd
 #'
 pheatmap_set_plot_theme <- function(x,
                                     fontsize,
@@ -498,6 +528,7 @@ pheatmap_set_plot_theme <- function(x,
 #' @return updated plot with updated grob
 #'
 #' @keywords internal
+#' @noRd
 #'
 pheatmap_lst_styling <- function(i,
                                  x,

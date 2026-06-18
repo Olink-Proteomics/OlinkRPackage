@@ -1637,50 +1637,58 @@ test_that(
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_ht <- get_example_data(filename = "example_HT_data.rds")
 
+    data_ref <- get_example_data(
+      filename = "ref_results_norm_cross-product.rds"
+    )
+
     ## no format ----
 
-    expect_message(
-      object = expect_message(
-        expect_warning(
-          object = ht_3k_norm <- olink_normalization(
-            df1 = data_ht,
-            df2 = data_3k,
-            overlapping_samples_df1 = intersect(
-              x = unique(data_ht$SampleID),
-              y = unique(data_3k$SampleID)
-            ) |>
-              (\(.) .[!grepl("CONTROL", .)])(),
-            df1_project_nr = "df_ht",
-            df2_project_nr = "df_3k",
-            reference_project = "df_ht",
-            format = FALSE,
-            df1_check_log = check_npx(df = data_ht) |>
-              suppressMessages() |>
-              suppressWarnings(),
-            df2_check_log = check_npx(df = data_3k) |>
-              suppressMessages() |>
-              suppressWarnings()
+    withr::with_seed(
+      seed = 123,
+      code = {
+        expect_message(
+          object = expect_message(
+            expect_warning(
+              object = ht_3k_norm <- olink_normalization(
+                df1 = data_ht,
+                df2 = data_3k,
+                overlapping_samples_df1 = intersect(
+                  x = unique(data_ht$SampleID),
+                  y = unique(data_3k$SampleID)
+                ) |>
+                  (\(.) .[!grepl("CONTROL", .)])(),
+                df1_project_nr = "df_ht",
+                df2_project_nr = "df_3k",
+                reference_project = "df_ht",
+                format = FALSE,
+                df1_check_log = check_npx(df = data_ht) |>
+                  suppressMessages() |>
+                  suppressWarnings(),
+                df2_check_log = check_npx(df = data_3k) |>
+                  suppressMessages() |>
+                  suppressWarnings()
+              ),
+              regexp = "2 assays are not shared across products."
+            ),
+            regexp = "Cross-product normalization will be performed!"
           ),
-          regexp = "2 assays are not shared across products."
+          regexp = "Output includes two sets of bridging samples"
+        )
+      }
+    )
+
+    expect_equal(
+      object = ht_3k_norm |>
+        dplyr::arrange(
+          .data[["SampleID"]],
+          .data[["OlinkID"]]
         ),
-        regexp = "Cross-product normalization will be performed!"
-      ),
-      regexp = "Output includes two sets of bridging samples"
-    )
-
-    expect_identical(
-      object = dim(ht_3k_norm),
-      expected = c(39936L, 22L)
-    )
-
-    expect_identical(
-      object = names(ht_3k_norm),
-      expected = c("SampleID", "OlinkID", "SampleType", "WellID", "PlateID",
-                   "UniProt", "Assay", "AssayType", "Panel", "Block", "NPX",
-                   "PCNormalizedNPX", "Count", "Normalization", "AssayQC",
-                   "SampleQC", "DataAnalysisRefID", "Project", "OlinkID_E3072",
-                   "MedianCenteredNPX", "QSNormalizedNPX",
-                   "BridgingRecommendation")
+      expected = data_ref$Reference$NoFormat$HT_3K |>
+        dplyr::arrange(
+          .data[["SampleID"]],
+          .data[["OlinkID"]]
+        ),
+      tolerance = 1e-4
     )
 
     ## with format ----
@@ -1728,18 +1736,18 @@ test_that(
                      "normalized dataset without adjustment")
     )
 
-    expect_identical(
-      object = dim(ht_3k_norm_format),
-      expected = c(37590L, 19L)
-    )
-
-    expect_identical(
-      object = names(ht_3k_norm_format),
-      expected = c("SampleID", "OlinkID", "SampleType", "WellID", "PlateID",
-                   "UniProt", "Assay", "AssayType", "Panel", "Block", "NPX",
-                   "PCNormalizedNPX", "Count", "Normalization", "AssayQC",
-                   "SampleQC", "DataAnalysisRefID", "Project",
-                   "BridgingRecommendation")
+    expect_equal(
+      object = ht_3k_norm_format |>
+        dplyr::arrange(
+          .data[["SampleID"]],
+          .data[["OlinkID"]]
+        ),
+      expected = data_ref$Reference$Format$HT_3K |>
+        dplyr::arrange(
+          .data[["SampleID"]],
+          .data[["OlinkID"]]
+        ),
+      tolerance = 1e-4
     )
 
   }
@@ -1751,55 +1759,58 @@ test_that(
     data_3k <- get_example_data(filename = "example_3k_data.rds")
     data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
 
+    data_ref <- get_example_data(
+      filename = "ref_results_norm_cross-product.rds"
+    )
+
     ### no format ----
 
-    expect_message(
-      object = expect_warning(
-        object = expect_warning(
-          object = expect_message(
-            object = rev_3k_norm <- olink_normalization(
-              df1 = data_reveal,
-              df2 = data_3k,
-              overlapping_samples_df1 = intersect(
-                x = unique(data_reveal$SampleID),
-                y = unique(data_3k$SampleID)
-              ) |>
-                (\(x) x[!grepl("CONTROL", x)])() |>
-                sort() |>
-                head(32L),
-              df1_project_nr = "Reveal",
-              df2_project_nr = "3k",
-              reference_project = "Reveal",
-              format = FALSE,
-              df1_check_log = check_npx(df = data_reveal) |>
-                suppressMessages() |>
-                suppressWarnings(),
-              df2_check_log = check_npx(df = data_3k) |>
-                suppressMessages() |>
-                suppressWarnings()
+    withr::with_seed(
+      seed = 123,
+      code = {
+        expect_message(
+          object = expect_warning(
+            object = expect_message(
+              object = rev_3k_norm <- olink_normalization(
+                df1 = data_reveal,
+                df2 = data_3k,
+                overlapping_samples_df1 = intersect(
+                  x = unique(data_reveal$SampleID),
+                  y = unique(data_3k$SampleID)
+                ) |>
+                  (\(x) x[!grepl("CONTROL", x)])(),
+                df1_project_nr = "df_reveal",
+                df2_project_nr = "df_3k",
+                reference_project = "df_reveal",
+                format = FALSE,
+                df1_check_log = check_npx(df = data_reveal) |>
+                  suppressMessages() |>
+                  suppressWarnings(),
+                df2_check_log = check_npx(df = data_3k) |>
+                  suppressMessages() |>
+                  suppressWarnings()
+              ),
+              regexp = "Cross-product normalization will be performed!"
             ),
-            regexp = "Cross-product normalization will be performed!"
+            regexp = "85 assays are not shared across products"
           ),
-          regexp = "85 assays are not shared across products"
+          regexp = "Output includes two sets of bridging samples"
+        )
+      }
+    )
+
+    expect_equal(
+      object = rev_3k_norm |>
+        dplyr::arrange(
+          .data[["SampleID"]],
+          .data[["OlinkID"]]
         ),
-        regexp = "There are 20 assays with fewer than 32 bridge samples for QS"
-      ),
-      regexp = "Output includes two sets of bridging samples"
-    )
-
-    expect_identical(
-      object = dim(rev_3k_norm),
-      expected = c(8064L, 22L)
-    )
-
-    expect_identical(
-      object = names(rev_3k_norm),
-      expected = c("SampleID", "OlinkID", "SampleType", "WellID", "PlateID",
-                   "UniProt", "Assay", "AssayType", "Panel", "Block", "NPX",
-                   "PCNormalizedNPX", "Count", "Normalization", "AssayQC",
-                   "SampleQC", "DataAnalysisRefID", "Project", "OlinkID_E3072",
-                   "MedianCenteredNPX", "QSNormalizedNPX",
-                   "BridgingRecommendation")
+      expected = data_ref$Reference$NoFormat$Reveal_3K |>
+        dplyr::arrange(
+          .data[["SampleID"]],
+          .data[["OlinkID"]]
+        ),
+      tolerance = 1e-4
     )
 
     ### with formatting ----
@@ -1810,35 +1821,29 @@ test_that(
           object = expect_message(
             object = expect_message(
               object = expect_warning(
-                object = expect_warning(
-                  object = expect_message(
-                    object = rev_3k_norm_format <- olink_normalization(
-                      df1 = data_reveal,
-                      df2 = data_3k,
-                      overlapping_samples_df1 = intersect(
-                        x = unique(data_reveal$SampleID),
-                        y = unique(data_3k$SampleID)
-                      ) |>
-                        (\(x) x[!grepl("CONTROL", x)])() |>
-                        sort() |>
-                        head(32L),
-                      df1_project_nr = "Reveal",
-                      df2_project_nr = "3k",
-                      reference_project = "Reveal",
-                      format = TRUE,
-                      df1_check_log = check_npx(df = data_reveal) |>
-                        suppressMessages() |>
-                        suppressWarnings(),
-                      df2_check_log = check_npx(df = data_3k) |>
-                        suppressMessages() |>
-                        suppressWarnings()
-                    ),
-                    regexp = "Cross-product normalization will be performed!"
+                object = expect_message(
+                  object = rev_3k_norm_format <- olink_normalization(
+                    df1 = data_reveal,
+                    df2 = data_3k,
+                    overlapping_samples_df1 = intersect(
+                      x = unique(data_reveal$SampleID),
+                      y = unique(data_3k$SampleID)
+                    ) |>
+                      (\(x) x[!grepl("CONTROL", x)])(),
+                    df1_project_nr = "df_reveal",
+                    df2_project_nr = "df_3k",
+                    reference_project = "df_reveal",
+                    format = TRUE,
+                    df1_check_log = check_npx(df = data_reveal) |>
+                      suppressMessages() |>
+                      suppressWarnings(),
+                    df2_check_log = check_npx(df = data_3k) |>
+                      suppressMessages() |>
+                      suppressWarnings()
                   ),
-                  regexp = "85 assays are not shared across products"
+                  regexp = "Cross-product normalization will be performed!"
                 ),
-                regexp = paste("There are 20 assays with fewer than 32 bridge",
-                               "samples for QS normalization")
+                regexp = "85 assays are not shared across products"
               ),
               regexp = "Output includes two sets of bridging samples"
             ),
@@ -1846,25 +1851,267 @@ test_that(
           ),
           regexp = paste("6 Negative Controls were removed from dataset")
         ),
-        regexp = paste("26 not bridgeable assays are included in the",
+        regexp = paste("24 not bridgeable assays are included in the",
                        "bridged dataset without adjustment")
       ),
       regexp = paste("85 non-overlapping assays are included in the",
                      "normalized dataset without adjustment")
     )
 
-    expect_identical(
-      object = dim(rev_3k_norm_format),
-      expected = c(22816L, 19L)
+    expect_equal(
+      object = rev_3k_norm_format |>
+        dplyr::arrange(
+          .data[["SampleID"]],
+          .data[["OlinkID"]]
+        ),
+      expected = data_ref$Reference$Format$Reveal_3K |>
+        dplyr::arrange(
+          .data[["SampleID"]],
+          .data[["OlinkID"]]
+        ),
+      tolerance = 1e-4
+    )
+  }
+)
+
+test_that(
+  "olink_normalization - works - HT-Reveal",
+  {
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
+    data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
+
+    data_ref <- get_example_data(
+      filename = "ref_results_norm_cross-product.rds"
     )
 
-    expect_identical(
-      object = names(rev_3k_norm_format),
-      expected = c("SampleID", "OlinkID", "SampleType", "WellID", "PlateID",
-                   "UniProt", "Assay", "AssayType", "Panel", "Block", "NPX",
-                   "PCNormalizedNPX", "Count", "Normalization", "AssayQC",
-                   "SampleQC", "DataAnalysisRefID", "Project",
-                   "BridgingRecommendation")
+    ### no format ----
+
+    withr::with_seed(
+      seed = 123,
+      code = {
+        expect_message(
+          object = expect_warning(
+            object = expect_message(
+              object = ht_rev_norm <- olink_normalization(
+                df1 = data_reveal,
+                df2 = data_ht,
+                overlapping_samples_df1 = intersect(
+                  x = unique(data_reveal$SampleID),
+                  y = unique(data_ht$SampleID)
+                ) |>
+                  (\(x) x[!grepl("CONTROL", x)])(),
+                df1_project_nr = "df_reveal",
+                df2_project_nr = "df_ht",
+                reference_project = "df_ht",
+                format = FALSE,
+                df1_check_log = check_npx(df = data_reveal) |>
+                  suppressMessages() |>
+                  suppressWarnings(),
+                df2_check_log = check_npx(df = data_ht) |>
+                  suppressMessages() |>
+                  suppressWarnings()
+              ),
+              regexp = "Cross-product normalization will be performed!"
+            ),
+            regexp = "80 assays are not shared across products"
+          ),
+          regexp = "Output includes two sets of bridging samples"
+        )
+      }
+    )
+
+    expect_equal(
+      object = ht_rev_norm |>
+        dplyr::arrange(
+          .data[["SampleID"]],
+          .data[["OlinkID"]]
+        ),
+      expected = data_ref$Reference$NoFormat$HT_Reveal |>
+        dplyr::arrange(
+          .data[["SampleID"]],
+          .data[["OlinkID"]]
+        ),
+      tolerance = 1e-4
+    )
+
+    ### with formatting ----
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = expect_message(
+              object = expect_warning(
+                object = expect_message(
+                  object = ht_rev_norm_format <- olink_normalization(
+                    df1 = data_reveal,
+                    df2 = data_ht,
+                    overlapping_samples_df1 = intersect(
+                      x = unique(data_reveal$SampleID),
+                      y = unique(data_ht$SampleID)
+                    ) |>
+                      (\(x) x[!grepl("CONTROL", x)])(),
+                    df1_project_nr = "df_reveal",
+                    df2_project_nr = "df_ht",
+                    reference_project = "df_ht",
+                    format = TRUE,
+                    df1_check_log = check_npx(df = data_reveal) |>
+                      suppressMessages() |>
+                      suppressWarnings(),
+                    df2_check_log = check_npx(df = data_ht) |>
+                      suppressMessages() |>
+                      suppressWarnings()
+                  ),
+                  regexp = "Cross-product normalization will be performed!"
+                ),
+                regexp = "80 assays are not shared across products"
+              ),
+              regexp = "Output includes two sets of bridging samples"
+            ),
+            regexp = paste("10 Plate Controls were removed from dataset")
+          ),
+          regexp = paste("4 Negative Controls were removed from dataset")
+        ),
+        regexp = paste("24 not bridgeable assays are included in the",
+                       "bridged dataset without adjustment")
+      ),
+      regexp = paste("80 non-overlapping assays are included in the",
+                     "normalized dataset without adjustment")
+    )
+
+    expect_equal(
+      object = ht_rev_norm_format |>
+        dplyr::arrange(
+          .data[["SampleID"]],
+          .data[["OlinkID"]]
+        ),
+      expected = data_ref$Reference$Format$HT_Reveal |>
+        dplyr::arrange(
+          .data[["SampleID"]],
+          .data[["OlinkID"]]
+        ),
+      tolerance = 1e-4
+    )
+  }
+)
+
+test_that(
+  "olink_normalization - works - Reveal-HT",
+  {
+    data_ht <- get_example_data(filename = "example_HT_data.rds")
+    data_reveal <- get_example_data(filename = "example_Reveal_data.rds")
+
+    data_ref <- get_example_data(
+      filename = "ref_results_norm_cross-product.rds"
+    )
+
+    ### no format ----
+
+    withr::with_seed(
+      seed = 123,
+      code = {
+        expect_message(
+          object = expect_warning(
+            object = expect_message(
+              object = rev_ht_norm <- olink_normalization(
+                df1 = data_reveal,
+                df2 = data_ht,
+                overlapping_samples_df1 = intersect(
+                  x = unique(data_reveal$SampleID),
+                  y = unique(data_ht$SampleID)
+                ) |>
+                  (\(x) x[!grepl("CONTROL", x)])(),
+                df1_project_nr = "df_reveal",
+                df2_project_nr = "df_ht",
+                reference_project = "df_reveal",
+                format = FALSE,
+                df1_check_log = check_npx(df = data_reveal) |>
+                  suppressMessages() |>
+                  suppressWarnings(),
+                df2_check_log = check_npx(df = data_ht) |>
+                  suppressMessages() |>
+                  suppressWarnings()
+              ),
+              regexp = "Cross-product normalization will be performed!"
+            ),
+            regexp = "80 assays are not shared across products"
+          ),
+          regexp = "Output includes two sets of bridging samples"
+        )
+      }
+    )
+
+    expect_equal(
+      object = rev_ht_norm |>
+        dplyr::arrange(
+          .data[["SampleID"]],
+          .data[["OlinkID"]]
+        ),
+      expected = data_ref$Reference$NoFormat$Reveal_HT |>
+        dplyr::arrange(
+          .data[["SampleID"]],
+          .data[["OlinkID"]]
+        ),
+      tolerance = 1e-4
+    )
+
+    ### with formatting ----
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = expect_message(
+              object = expect_warning(
+                object = expect_message(
+                  object = rev_ht_norm_format <- olink_normalization(
+                    df1 = data_reveal,
+                    df2 = data_ht,
+                    overlapping_samples_df1 = intersect(
+                      x = unique(data_reveal$SampleID),
+                      y = unique(data_ht$SampleID)
+                    ) |>
+                      (\(x) x[!grepl("CONTROL", x)])(),
+                    df1_project_nr = "df_reveal",
+                    df2_project_nr = "df_ht",
+                    reference_project = "df_reveal",
+                    format = TRUE,
+                    df1_check_log = check_npx(df = data_reveal) |>
+                      suppressMessages() |>
+                      suppressWarnings(),
+                    df2_check_log = check_npx(df = data_ht) |>
+                      suppressMessages() |>
+                      suppressWarnings()
+                  ),
+                  regexp = "Cross-product normalization will be performed!"
+                ),
+                regexp = "80 assays are not shared across products"
+              ),
+              regexp = "Output includes two sets of bridging samples"
+            ),
+            regexp = paste("10 Plate Controls were removed from dataset")
+          ),
+          regexp = paste("4 Negative Controls were removed from dataset")
+        ),
+        regexp = paste("24 not bridgeable assays are included in the",
+                       "bridged dataset without adjustment")
+      ),
+      regexp = paste("80 non-overlapping assays are included in the",
+                     "normalized dataset without adjustment")
+    )
+
+    expect_equal(
+      object = rev_ht_norm_format |>
+        dplyr::arrange(
+          .data[["SampleID"]],
+          .data[["OlinkID"]]
+        ),
+      expected = data_ref$Reference$Format$Reveal_HT |>
+        dplyr::arrange(
+          .data[["SampleID"]],
+          .data[["OlinkID"]]
+        ),
+      tolerance = 1e-4
     )
   }
 )

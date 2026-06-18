@@ -30,8 +30,18 @@ test_that(
     )
 
     expect_equal(
-      object = wilcox_test_res,
-      expected = reference_results$wilcox_test
+      object = wilcox_test_res |>
+        dplyr::arrange(
+          .data[["Adjusted_pval"]],
+          .data[["estimate"]],
+          .data[["OlinkID"]]
+        ),
+      expected = reference_results$wilcox_test |>
+        dplyr::arrange(
+          .data[["Adjusted_pval"]],
+          .data[["estimate"]],
+          .data[["OlinkID"]]
+        )
     )
   }
 )
@@ -70,8 +80,18 @@ test_that(
     )
 
     expect_equal(
-      object = paired_wilcox_test_res,
-      expected = reference_results$wilcox_test_paired
+      object = paired_wilcox_test_res |>
+        dplyr::arrange(
+          .data[["Adjusted_pval"]],
+          .data[["estimate"]],
+          .data[["OlinkID"]]
+        ),
+      expected = reference_results$wilcox_test_paired |>
+        dplyr::arrange(
+          .data[["Adjusted_pval"]],
+          .data[["estimate"]],
+          .data[["OlinkID"]]
+        )
     )
   }
 )

@@ -62,7 +62,7 @@ npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
 
     if (n_sample_w_multiple_colors > 0L) {
       cli::cli_abort(
-        "There are {number_of_sample_w_more_than_one_color} samples that do
+        "There are {n_sample_w_multiple_colors} samples that do
         not have a unique color. Only one color per sample is allowed."
       )
     } else {
@@ -197,7 +197,7 @@ npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
 
     if (verbose) {
       cli::cli_warn(
-        "There are {length(dropped_assays.missingness)} assay{?s} dropped due
+        "{length(dropped_assays.missingness)} assay{?s} were dropped due
         to high missingness (>{round(PERCENT_CUTOFF * 100)}%)."
       )
     }
@@ -228,7 +228,7 @@ npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
 
     if (verbose) {
       cli::cli_warn(
-        "There are {length(imputed_assays)} assay{?s} were imputed using
+        "{length(imputed_assays)} assay{?s} were imputed using
         their median values."
       )
     }

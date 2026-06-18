@@ -800,10 +800,71 @@ test_that(
           expected = expected_result
         ),
         regexp = paste("Unexpected entries \"pc2\" in `remove_control_sample`.",
-                       "Expected values: \"sample\", \"sc\", \"pc\",",
-                       "and \"nc\".")
+                       "Expected values: \"sample\", \"sc\", \"pc\", \"nc\",",
+                       "\"calibrator\", and \"other\".")
       ),
       regexp = "Excluding 1 control sample: \"ControlType\"."
+    )
+
+    # v5 ----
+
+    df_calibrator <- dplyr::bind_rows(
+      df,
+      df |>
+        dplyr::slice(1L) |>
+        dplyr::mutate(
+          SampleID = "CalibratorType",
+          SampleType = "CALIBRATOR"
+        )
+    )
+
+    expected_result <- df_calibrator |>
+      dplyr::filter(
+        .data[["SampleID"]] != "CalibratorType"
+      )
+
+    expect_message(
+      object = expect_equal(
+        object = clean_sample_type(
+          df = df_calibrator,
+          check_log = log,
+          remove_control_sample = c("calibrator"),
+          verbose = FALSE
+        ),
+        expected = expected_result
+      ),
+      regexp = "Excluding 1 control sample: \"CalibratorType\"."
+    )
+
+    # v6 ----
+
+    df_other <- dplyr::bind_rows(
+      df,
+      df |>
+        dplyr::slice(1) |>
+        dplyr::mutate(
+          SampleID = "InterplateControlType",
+          SampleType = "INTERPLATE_CONTROL"
+        )
+    )
+
+    expected_result <- df_other |>
+      dplyr::filter(
+        .data[["SampleID"]] != "ControlType",
+        .data[["SampleID"]] != "InterplateControlType"
+      )
+
+    expect_message(
+      object = expect_equal(
+        object = clean_sample_type(
+          df = df_other,
+          check_log = log,
+          remove_control_sample = TRUE,
+          verbose = FALSE
+        ),
+        expected = expected_result
+      ),
+      regexp = "InterplateControlType"
     )
   }
 )
@@ -2095,6 +2156,80 @@ test_that(
                      "The first instance will be used for downstream analysis.")
     )
 
+  }
+)
+
+# Test run_clean_npx ----
+
+test_that(
+  "run_clean_npx - works - remove samples/assays identified by check_npx",
+  {
+    expected_result <- df |>
+      dplyr::filter(
+        .data[["SampleID"]] == "ValidSample"
+      )
+
+    expect_message(
+      object = curr_result <- run_clean_npx(
+        df = df,
+        check_log = log,
+        control_sample_ids = c("ControlID"),
+        verbose = FALSE
+      ),
+      regexp = paste("9 entries removed by `clean_npx()` from the input",
+                     "dataset `df`. Run `clean_npx()` on your dataset with",
+                     "`verbose = TRUE` to inspect which rows were removed."),
+      fixed = TRUE
+    )
+
+    expect_equal(
+      object = curr_result,
+      expected = expected_result
+    )
+  }
+)
+
+test_that(
+  "run_clean_npx - works - nothing to remove",
+  {
+    tmp_npx_data1 <- npx_data1 |>
+      dplyr::filter(
+        !grepl(pattern = "control",
+               x = .data[["SampleID"]],
+               ignore.case = TRUE)
+      )
+
+    tmp_check_log <- check_npx(df = tmp_npx_data1) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_no_message(
+      object = expect_no_warning(
+        object = expect_no_error(
+          object = curr_result <- run_clean_npx(
+            df = tmp_npx_data1,
+            check_log = tmp_check_log
+          )
+        )
+      )
+    )
+
+    expect_equal(
+      object = curr_result,
+      expected = tmp_npx_data1
+    )
+  }
+)
+
+test_that(
+  "run_clean_npx - error - unexpected arguments",
+  {
+    expect_error(
+      object = run_clean_npx(df = df,
+                             check_log = log,
+                             unexpected_arg = TRUE),
+      regexp = "Unknown argument: \"unexpected_arg\""
+    )
   }
 )
 

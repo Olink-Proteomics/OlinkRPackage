@@ -767,7 +767,7 @@ check_npx_olinkid <- function(df,
     )  |>
     dplyr::filter(
       !grepl(
-        pattern = "^OID\\d{5}$",
+        pattern = "^OID\\d{5}$|^OID\\d{5}_OID\\d{5}$",
         x = .data[[col_names$olink_id]]
       )
     )  |>

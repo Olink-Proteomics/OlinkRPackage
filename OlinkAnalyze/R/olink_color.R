@@ -2,7 +2,7 @@
 #'
 #' @param alpha transparency (optional)
 #' @param coloroption string, one or more of the following:
-#' c("red", "orange", "yellow", "green", "teal", "turqoise", "lightblue",
+#' c("red", "orange", "yellow", "green", "teal", "turquoise", "lightblue",
 #' "darkblue", "purple", "pink")
 #'
 #' @return A character vector of palette hex codes for colors.
@@ -72,7 +72,7 @@ olink_pal <- function(alpha = 1,
     yellow <- get_color(hex_color = "#FFC700", alpha = alpha)
     green <- get_color(hex_color = "#27AE55", alpha = alpha)
     teal <- get_color(hex_color = "#077183", alpha = alpha)
-    turqoise <- get_color(hex_color = "#00C7E1", alpha = alpha)
+    turquoise <- get_color(hex_color = "#00C7E1", alpha = alpha)
     lightblue <- get_color(hex_color = "#A2D9F5", alpha = alpha)
     darkblue <- get_color(hex_color = "#00559E", alpha = alpha)
     purple <- get_color(hex_color = "#6A27AE", alpha = alpha)
@@ -84,7 +84,7 @@ olink_pal <- function(alpha = 1,
     if (is.null(coloroption)) {
 
       hues_length <- n + 1L
-      crispy_colors_hex_ordered <- rbind(turqoise,
+      crispy_colors_hex_ordered <- rbind(turquoise,
                                          red,
                                          darkblue,
                                          yellow,
@@ -95,7 +95,7 @@ olink_pal <- function(alpha = 1,
                                          orange,
                                          lightblue)
 
-      crispy_colors_hex <- rbind(red, orange, yellow, green, teal, turqoise,
+      crispy_colors_hex <- rbind(red, orange, yellow, green, teal, turquoise,
                                  lightblue, darkblue, purple, pink, red)
 
     } else {

@@ -170,25 +170,26 @@ test_that(
 
     # Load data with hidden/excluded assays (all NPX=NA)
     npx_data_format221010 <- get_example_data(
-      filename = "npx_data_format221010.rds"
-    )
-    npx_data_format221121 <- get_example_data(
-      filename = "npx_data_format221121.rds"
+      filename = "npx_data_format-Oct-2022.rds"
     )
     npx_data_extended_format221121 <- get_example_data(
-      filename = "npx_data_extended_format221121.rds"
+      filename = "npx_data_extended_format-Nov-2022.rds"
     )
 
     # data with all NPX=NA for some assays
     expect_no_error(
       object = expect_no_warning(
-        object = expect_no_message(
+        object = expect_message(
           object = olink_qc_plot(
             df = npx_data_format221010,
             check_log = check_npx(df = npx_data_format221010) |>
               suppressMessages() |>
               suppressWarnings()
-          )
+          ),
+          regexp = paste("1530 entries removed by `clean_npx()` from the input",
+                         "dataset `df`. Run `clean_npx()` on your dataset with",
+                         "`verbose = TRUE` to inspect which rows were removed"),
+          fixed = TRUE
         )
       )
     )
@@ -196,27 +197,17 @@ test_that(
     # data with all NPX=NA for some assays
     expect_no_error(
       object = expect_no_warning(
-        object = expect_no_message(
-          object = olink_qc_plot(
-            df = npx_data_format221121,
-            check_log = check_npx(df = npx_data_format221121) |>
-              suppressMessages() |>
-              suppressWarnings()
-          )
-        )
-      )
-    )
-
-    # data with all NPX=NA for some assays
-    expect_no_error(
-      object = expect_no_warning(
-        object = expect_no_message(
+        object = expect_message(
           object = olink_qc_plot(
             df = npx_data_extended_format221121,
             check_log = check_npx(df = npx_data_extended_format221121) |>
               suppressMessages() |>
               suppressWarnings()
-          )
+          ),
+          regexp = paste("50 entries removed by `clean_npx()` from the input",
+                         "dataset `df`. Run `clean_npx()` on your dataset with",
+                         "`verbose = TRUE` to inspect which rows were removed"),
+          fixed = TRUE
         )
       )
     )

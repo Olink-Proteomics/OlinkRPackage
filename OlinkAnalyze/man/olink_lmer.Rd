@@ -100,7 +100,15 @@ message if \code{verbose = TRUE}.
 
 Output p-values are adjusted by \code{stats::p.adjust} according to the
 Benjamini-Hochberg method (“fdr”). Adjusted p-values are logically evaluated
-towards adjusted \code{p-value<0.05}.
+towards adjusted \code{p-value<0.05}. Model terms specified as covariates are
+not included in the adjusted p-value calculation and are not evaluated
+towards the significance threshold, but are included in the output table
+if \code{return.covariates = TRUE}.
+
+If the \code{model_formula} argument is used, all model terms will be tested
+and included in the results. When using a model formula, the \code{covariates}
+argument can be set to specify terms that should be excluded from the
+adjusted p-value calculation and significance threshold evaluation.
 }
 \examples{
 \donttest{

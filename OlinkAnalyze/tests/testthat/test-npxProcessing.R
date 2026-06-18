@@ -103,10 +103,10 @@ test_that(
           drop_samples = FALSE,
           verbose = TRUE
         ),
-        regexp = "There are 4 assays dropped due to high missingness (>10%).",
+        regexp = "4 assays were dropped due to high missingness (>10%).",
         fixed = TRUE
       ),
-      regexp = "There are 3 assays were imputed using their median values.",
+      regexp = "3 assays were imputed using their median values.",
       fixed = TRUE
     )
 

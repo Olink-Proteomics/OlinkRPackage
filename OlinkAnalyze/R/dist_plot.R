@@ -88,8 +88,8 @@ olink_dist_plot <- function(df,
   # Uniprot IDs. Note that we do not remove samples with duplicate SampleID,
   # control samples or assays, or samples/assays with QC warnings, as this
   # would be the user's decision.
-  df <- clean_npx(
-    df,
+  df <- run_clean_npx(
+    df = df,
     check_log = check_log,
     remove_assay_na = TRUE,
     remove_invalid_oid = TRUE,
@@ -101,8 +101,7 @@ olink_dist_plot <- function(df,
     convert_nonunique_uniprot = TRUE,
     out_df = "tibble",
     verbose = FALSE
-  ) |>
-    suppressMessages()
+  )
 
 
   reorder_within <- function(x, by, within, fun = mean, sep = "___", ...) {
@@ -127,7 +126,7 @@ olink_dist_plot <- function(df,
 
   # If QC selected to plot
   # If not all are Pass, the QC_Warning is set as warning for plotting purposes
-  if (color_g %in% column_name_dict$col_names$qc_warning) {
+  if (color_g %in% check_log$col_names$qc_warning) {
 
     df <- df |>
       dplyr::group_by(

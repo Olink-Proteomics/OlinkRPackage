@@ -179,6 +179,15 @@ olink_pathway_enrichment <- function(df,
     cli::cli_abort("Arguments {.arg df} and {.arg test_results} are required!")
   }
 
+  # check if test mode is activated and update arguments accordingly
+  test_mode_results <- check_test_mode(method = method,
+                                       ontology = ontology,
+                                       organism = organism)
+  method <- test_mode_results$method
+  ontology <- test_mode_results$ontology
+  organism <- test_mode_results$organism
+  test_mode <- test_mode_results$test_mode
+
   check_log <- check_pe_inputs(df = df,
                                check_log = check_log,
                                test_results = test_results,
@@ -198,7 +207,8 @@ olink_pathway_enrichment <- function(df,
                             check_log = check_log)
 
   msig_df <- select_ont(ontology = ontology,
-                        organism = organism)
+                        organism = organism,
+                        test_mode = test_mode)
 
   # perform pathway enrichment ----
 
@@ -221,6 +231,37 @@ olink_pathway_enrichment <- function(df,
   }
 
   return(results)
+}
+
+check_test_mode <- function(method,
+                            ontology,
+                            organism) {
+  # set test_mode to FALSE by default
+  test_mode <- FALSE
+
+  # only if all of the arguments method, ontology, and organism start with
+  # "TEST#", then test_mode will be set to TRUE and the "TEST#" prefix will be
+  # removed from the arguments. This is used for internal testing purposes and
+  # is not intended for user use.
+  if (all(
+    stringr::str_starts(string = c(method, ontology, organism),
+                        pattern = "TEST#")
+  ) == TRUE) {
+    test_mode <- TRUE
+    method <- stringr::str_remove(string = method, pattern = "TEST#")
+    ontology <- stringr::str_remove(string = ontology, pattern = "TEST#")
+    organism <- stringr::str_remove(string = organism, pattern = "TEST#")
+  }
+
+  # return the arguments as a list, including test_mode
+  return(
+    list(
+      method = method,
+      ontology = ontology,
+      organism = organism,
+      test_mode = test_mode
+    )
+  )
 }
 
 check_pe_inputs <- function(df,
@@ -359,31 +400,18 @@ data_prep <- function(df,
                       check_log) {
   # clean up data from invalid entries ----
 
-  nrow_df_original <- nrow(df)
-
-  df <- clean_npx(df = df,
-                  check_log = check_log,
-                  remove_assay_na = TRUE,
-                  remove_invalid_oid = TRUE,
-                  remove_dup_sample_id = FALSE,
-                  remove_control_assay = TRUE,
-                  remove_control_sample = FALSE,
-                  remove_qc_warning = FALSE,
-                  remove_assay_warning = FALSE,
-                  convert_df_cols = TRUE,
-                  convert_nonunique_uniprot = FALSE,
-                  verbose = FALSE) |>
-    suppressMessages() |>
-    suppressWarnings()
-
-  if (nrow(df) != nrow_df_original) {
-    cli::cli_inform(
-      "{cli::qty(nrow_df_original - nrow(df))} Removed
-      {.val {nrow_df_original - nrow(df)}} entr{?y/ies} from {.arg df}
-      containing invalid assay identifiers, control assays, and/or 'NA'
-      assays. Run function {.fun clean_npx} to get details on removed entries."
-    )
-  }
+  df <- run_clean_npx(df = df,
+                      check_log = check_log,
+                      remove_assay_na = TRUE,
+                      remove_invalid_oid = TRUE,
+                      remove_dup_sample_id = FALSE,
+                      remove_control_assay = TRUE,
+                      remove_control_sample = FALSE,
+                      remove_qc_warning = FALSE,
+                      remove_assay_warning = FALSE,
+                      convert_df_cols = TRUE,
+                      convert_nonunique_uniprot = FALSE,
+                      verbose = FALSE)
 
   # remove non-overlapping assays between df and test_results ----
 
@@ -479,6 +507,7 @@ test_prep <- function(df,
 
 select_ont <- function(ontology,
                        organism,
+                       test_mode = FALSE,
                        only_relevant = TRUE) {
   # Is Package installed
   rlang::check_installed(pkg = c("msigdbr"),
@@ -488,27 +517,90 @@ select_ont <- function(ontology,
   # select MSigDB collection based on organism ----
 
   if (organism == "human") {
-    msig_df <- msigdbr::msigdbr(
-      species = "Homo sapiens",
-      collection = "C2"
-    ) |>
-      dplyr::bind_rows(
-        msigdbr::msigdbr(
-          species = "Homo sapiens",
-          collection = "C5"
-        )
+    if (test_mode == TRUE) {
+      cli::cli_inform(
+        "Test mode activated: using fixed version of MSigDB for human..."
       )
+
+      msig_fixture_path <- system.file(
+        "tests",
+        "testthat",
+        "data",
+        "msidbr_v26.1.0_hs.parquet",
+        package = "OlinkAnalyze"
+      )
+
+      if (identical(msig_fixture_path, "") || !file.exists(msig_fixture_path)) {
+        cli::cli_abort(
+          c(
+            "x" = "Fixed MSigDB test file not found for {.arg test_mode} =
+            {.val {test_mode}}.",
+            "i" = "Expected file
+            {.val {\"tests/testthat/data/msidbr_v26.1.0_hs.parquet\"}} to be
+            present."
+          )
+        )
+      }
+
+      msig_df <- arrow::open_dataset(
+        sources = msig_fixture_path
+      ) |>
+        dplyr::collect()
+
+    } else {
+      msig_df <- msigdbr::msigdbr(
+        species = "Homo sapiens",
+        collection = "C2"
+      ) |>
+        dplyr::bind_rows(
+          msigdbr::msigdbr(
+            species = "Homo sapiens",
+            collection = "C5"
+          )
+        )
+    }
   } else if (organism == "mouse") {
-    msig_df <- msigdbr::msigdbr(
-      species = "Mus musculus",
-      collection = "C2"
-    ) |>
-      dplyr::bind_rows(
-        msigdbr::msigdbr(
-          species = "Mus musculus",
-          collection = "C5"
-        )
+    if (test_mode == TRUE) {
+      cli::cli_inform(
+        "Test mode activated: using fixed version of MSigDB for mouse..."
       )
+
+      msig_fixture_path <- system.file(
+        "tests",
+        "testthat",
+        "data",
+        "msidbr_v26.1.0_mm.parquet",
+        package = "OlinkAnalyze"
+      )
+
+      if (identical(msig_fixture_path, "") || !file.exists(msig_fixture_path)) {
+        cli::cli_abort(
+          c(
+            "x" = "Fixed MSigDB test file not found for {.arg test_mode} =
+            {.val {test_mode}}.",
+            "i" = "Expected file
+            {.val {\"tests/testthat/data/msidbr_v26.1.0_mm.parquet\"}} to be
+            present."
+          )
+        )
+      }
+
+      msig_df <- arrow::open_dataset(
+        sources = msig_fixture_path
+      ) |>
+        dplyr::collect()
+    } else {
+      msig_df <- msigdbr::msigdbr(
+        species = "Mus musculus",
+        collection = "C2"
+      ) |>
+        dplyr::bind_rows(
+          msigdbr::msigdbr(
+            species = "Mus musculus",
+            collection = "C5"
+          )
+        )
+    }
   }
 
   # select annotation based on ontology ----
@@ -595,7 +687,8 @@ gsea_pathwayenrichment <- function(gene_list,
                                 pvalueCutoff = 1,
                                 verbose = FALSE) |>
     suppressPackageStartupMessages() |>
-    suppressMessages()
+    suppressMessages() |>
+    suppressWarnings()
 
   if (is.null(gsea)) {
     cli::cli_warn(
@@ -603,7 +696,7 @@ gsea_pathwayenrichment <- function(gene_list,
     )
     return(NULL)
   } else {
-    return(gsea@result)
+    return(dplyr::filter(gsea@result, !is.na(.data[["ID"]])))
   }
 }
 

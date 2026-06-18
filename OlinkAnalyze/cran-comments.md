@@ -1,7 +1,6 @@
 ## Release Summary
 
-This release includes major updates to the package, bug fixes, and performance improvements. The package has been thoroughly tested and is now available on CRAN for users to install and use.
-
+This release includes minor updates to documentation and bug fixes from Olink Analyze 5.0.
 ## R CMD check results
 
 There were no ERRORs, WARNINGs, or NOTEs.

@@ -1,7 +1,7 @@
 Type: Package
 Package: OlinkAnalyze
 Title: Facilitate Analysis of Proteomic Data from Olink
-Version: 5.0.0
+Version: 5.0.1
 Authors@R: c(
     person("Kathleen", "Nevola", , "biostattools@olink.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-5183-6444", "kathy-nevola")),
@@ -33,7 +33,7 @@ Authors@R: c(
             comment = c("spollo-olprot", ORCID = "0000-0001-9252-4976")),
     person("Kang", "Dong", role = "aut",
             comment = c("KangD-dev", ORCID = "0000-0002-4567-5007")),
-    person("Kristian", "Hodén", role = "ctb",
+    person("Kristian", "Hodén", role = "aut",
            comment = c(ORCID = "0000-0003-0354-0662", "kristianHoden")),
     person("Per", "Eriksson", role = "ctb",
            comment = c(ORCID = "0000-0001-7633-403X", "b_watcher")),
@@ -62,13 +62,15 @@ Description: A collection of functions to facilitate analysis of proteomic
     data run on the Olink platform.
 License: AGPL (>= 3)
 Contact: biostattools@olink.com
-URL: https://olink.com/ https://github.com/Olink-Proteomics/OlinkRPackage
+URL:
+    https://olink.com/
+    https://github.com/Olink-Proteomics/OlinkRPackage
+    https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/01-User%20Manuals%20for%20website/1494-Olink-Analyze-Cheatsheet.pdf
 Config/testthat/edition: 3
 Config/testthat/parallel: true
 Config/testthat/start-first: read_npx_l*, read_npx_w*
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.3
 Roxygen: list(markdown = TRUE)
 Depends: R (>= 4.1.0)
 Imports: 
@@ -116,3 +118,4 @@ Suggests:
     knitr
 VignetteBuilder: 
     knitr
+Config/roxygen2/version: 8.0.0

@@ -32,7 +32,15 @@
 #'
 #' Output p-values are adjusted by `stats::p.adjust` according to the
 #' Benjamini-Hochberg method (“fdr”). Adjusted p-values are logically evaluated
-#' towards adjusted `p-value<0.05`.
+#' towards adjusted `p-value<0.05`. Model terms specified as covariates are
+#' not included in the adjusted p-value calculation and are not evaluated
+#' towards the significance threshold, but are included in the output table
+#' if `return.covariates = TRUE`.
+#'
+#' If the `model_formula` argument is used, all model terms will be tested
+#' and included in the results. When using a model formula, the `covariates`
+#' argument can be set to specify terms that should be excluded from the
+#' adjusted p-value calculation and significance threshold evaluation.
 #'
 #' @param df NPX data frame in long format with at least protein name (Assay),
 #' OlinkID, UniProt, 1-2 variables with at least 2 levels.
@@ -122,6 +130,7 @@ olink_lmer <- function(df,
     call = rlang::caller_env()
   )
 
+
   if (!missing(model_formula)) {
     if ("formula" %in% class(model_formula)) {
       model_formula <- deparse(model_formula) # Convert to string if is formula
@@ -134,11 +143,11 @@ olink_lmer <- function(df,
       }
     )
 
-    # If variable, random or covariates were included, message that they will
+    # If variable or random were included, message that they will
     # not be used as model_formula is provided
-    if (!missing(variable) || !is.null(covariates) || !missing(random)) {
+    if (!missing(variable) || !missing(random)) {
       message(
-        paste("model_formula overriding variable, covariate and random",
+        paste("model_formula overriding variable and random",
               "arguments.")
       )
     }
@@ -167,25 +176,55 @@ olink_lmer <- function(df,
       splt_form <- splt_form[-which(splt_form == "-1")]
     }
 
-    outcome <- splt_form[1L]
-    variable <- splt_form[-1L]
-    covariates <- NULL
+    # Check if covariate was specified and remove from variables
+    if (!missing(covariates)) {
+
+      # Check if covariate exists in formula
+      if (all(covariates %in% splt_form[-1L])) {
+
+        outcome <- splt_form[1L]
+        variable <- setdiff(splt_form[-1L], covariates)
+
+      } else {
+
+        cli::cli_abort(
+          c(
+            "x" = "Covariate{?s} {.val {setdiff(covariates,splt_form[-1L])}}
+            {?is/are} not present in the model formula!",
+            "i" = "Expected {.or {.val {splt_form[-1L]}}}."
+          ),
+          call = rlang::caller_env(),
+          wrap = FALSE
+        )
+      }
+
+    } else {
+      # If no covariate specified, treat all terms as variables
+      outcome <- splt_form[1L]
+      variable <- splt_form[-1L]
+      covariates <- NULL
+    }
+
+
   }
 
   if (missing(df) || missing(variable) || missing(random)) {
     stop("The df and variable and random arguments need to be specified.")
   }
 
+  # Check data format
+  check_log <- run_check_npx(df = df, check_log = check_log)
+
   lmer_result <- withCallingHandlers(
     {
       # Filtering on valid OlinkID
-      df <- df |>
-        dplyr::filter(
-          stringr::str_detect(
-            string = .data[["OlinkID"]],
-            pattern = "OID[0-9]{5}"
+      if (length(check_log$oid_invalid > 0)) {
+        df <- df |>
+          dplyr::filter(
+            !(.data[[check_log$col_names$olink_id]] %in% check_log$oid_invalid)
           )
-        )
+      }
+
 
       # Allow for :/* notation in covariates
       variable <- gsub(pattern = "\\*", replacement = ":", x = variable)
@@ -193,22 +232,22 @@ olink_lmer <- function(df,
         covariates <- gsub(pattern = "\\*", replacement = ":", x = covariates)
       }
 
-      add.main.effects <- NULL # nolint: object_name_linter
+      add_main_effects <- NULL
       if (any(grepl(":", covariates))) {
         tmp <- unlist(strsplit(covariates, ":"))
-        add.main.effects <- c(add.main.effects, setdiff(tmp, covariates)) # nolint: object_name_linter
-        covariates <- union(covariates, add.main.effects)
+        add_main_effects <- c(add_main_effects, setdiff(tmp, covariates))
+        covariates <- union(covariates, add_main_effects)
       }
       if (any(grepl(":", variable))) {
         tmp <- unlist(strsplit(variable, ":"))
-        add.main.effects <- c(add.main.effects, setdiff(tmp, variable)) # nolint: object_name_linter
+        add_main_effects <- c(add_main_effects, setdiff(tmp, variable))
         variable <- union(variable, unlist(strsplit(variable, ":")))
         variable <- variable[!grepl(":", variable)]
       }
       # If variable is in both variable and covariate, keep it in variable or
       # will get removed from final table
       covariates <- setdiff(x = covariates, y = variable)
-      add.main.effects <- setdiff(x = add.main.effects, y = variable) # nolint: object_name_linter
+      add_main_effects <- setdiff(x = add_main_effects, y = variable)
 
       # Variables to be checked
       variable_testers <- intersect(x = c(variable, covariates, random),
@@ -216,26 +255,28 @@ olink_lmer <- function(df,
 
       # Remove rows where variables or covariate is NA (can't include in
       # analysis anyway)
-      removed.sampleids <- NULL # nolint: object_name_linter
+      removed_sampleids <- NULL
       for (i in variable_testers) {
-        removed.sampleids <- c(removed.sampleids, # nolint: object_name_linter
-                               df$SampleID[is.na(df[[i]])]) |>
+        sampleids_na <- df |>
+          dplyr::filter(is.na(.data[[i]])) |>
+          dplyr::distinct(.data[[check_log$col_names$sample_id]]) |>
+          dplyr::pull()
+
+        removed_sampleids <- c(removed_sampleids,
+                               sampleids_na) |>
           unique()
         df <- df[!is.na(df[[i]]), ]
       }
 
-      # Check data format
-      check_log <- run_check_npx(df = df, check_log = check_log)
-
       # Convert character vars to factor
-      converted.vars <- NULL # nolint: object_name_linter
-      num.vars <- NULL # nolint: object_name_linter
+      converted_vars <- NULL
+      num_vars <- NULL
       for (i in variable_testers) {
         if (is.character(df[[i]])) {
           df[[i]] <- factor(df[[i]])
-          converted.vars <- c(converted.vars, i) # nolint: object_name_linter
+          converted_vars <- c(converted_vars, i)
         } else if (is.numeric(df[[i]])) {
-          num.vars <- c(num.vars, i) # nolint: object_name_linter
+          num_vars <- c(num_vars, i)
         }
       }
 
@@ -257,12 +298,12 @@ olink_lmer <- function(df,
 
         current_nas <- df |>
           dplyr::filter( # Exclude assays that have all NA:s
-            !(.data[["OlinkID"]] %in% check_log$assay_na)
+            !(.data[[check_log$col_names$olink_id]] %in% check_log$assay_na)
           ) |>
           dplyr::group_by(
             dplyr::across(
               dplyr::all_of(
-                c("OlinkID", effect)
+                c(check_log$col_names$olink_id, effect)
               )
             )
           ) |>
@@ -275,10 +316,10 @@ olink_lmer <- function(df,
             .data[["n"]] == .data[["n_na"]]
           ) |>
           dplyr::distinct(
-            .data[["OlinkID"]]
+            .data[[check_log$col_names$olink_id]]
           ) |>
           dplyr::pull(
-            .data[["OlinkID"]]
+            .data[[check_log$col_names$olink_id]]
           )
 
         if (length(current_nas) > 0L) {
@@ -299,7 +340,7 @@ olink_lmer <- function(df,
           dplyr::group_by(
             dplyr::across(
               dplyr::all_of(
-                c("SampleID")
+                c(check_log$col_names$sample_id)
               )
             )
           ) |>
@@ -341,35 +382,35 @@ olink_lmer <- function(df,
       }
 
       #Get factors
-      fact.vars <- sapply(variable_testers, function(x) is.factor(df[[x]])) # nolint: object_name_linter
-      fact.vars <- names(fact.vars)[fact.vars] # nolint: object_name_linter
+      fact_vars <- sapply(variable_testers, function(x) is.factor(df[[x]]))
+      fact_vars <- names(fact_vars)[fact_vars]
 
       #Print verbose message
       if (verbose) {
-        if (!is.null(add.main.effects) & length(add.main.effects) > 0L) {
+        if (!is.null(add_main_effects) & length(add_main_effects) > 0L) {
           message(
             "Missing main effects added to the model formula: ",
-            paste(add.main.effects, collapse = ", ")
+            paste(add_main_effects, collapse = ", ")
           )
         }
-        if (!is.null(removed.sampleids) & length(removed.sampleids) > 0L) {
+        if (!is.null(removed_sampleids) & length(removed_sampleids) > 0L) {
           message(
             "Samples removed due to missing variable or covariate levels: ",
-            paste(removed.sampleids, collapse = ", ")
+            paste(removed_sampleids, collapse = ", ")
           )
         }
-        if (!is.null(converted.vars)) {
+        if (!is.null(converted_vars)) {
           message(
             paste0(
               "Variables and covariates converted from character to factors: ",
-              paste(converted.vars, collapse = ", ")
+              paste(converted_vars, collapse = ", ")
             )
           )
         }
-        if (!is.null(num.vars)) {
+        if (!is.null(num_vars)) {
           message(
             paste0("Variables and covariates treated as numeric: ",
-                   paste(num.vars, collapse = ", "))
+                   paste(num_vars, collapse = ", "))
           )
         }
         message(
@@ -393,15 +434,18 @@ olink_lmer <- function(df,
       lmer_model <- df |>
         # Exclude assays that have all NA:s
         dplyr::filter(
-          !(.data[["OlinkID"]] %in% check_log$assay_na)
+          !(.data[[check_log$col_names$olink_id]] %in% check_log$assay_na)
         ) |>
         dplyr::filter(
-          !(.data[["OlinkID"]] %in% .env[["nas_in_var"]])
+          !(.data[[check_log$col_names$olink_id]] %in% .env[["nas_in_var"]])
         ) |>
         dplyr::group_by(
           dplyr::across(
             dplyr::all_of(
-              c("Assay", "OlinkID", "UniProt", "Panel")
+              c(check_log$col_names$assay,
+                check_log$col_names$olink_id,
+                check_log$col_names$uniprot,
+                check_log$col_names$panel)
             )
           )
         ) |>
@@ -495,7 +539,7 @@ olink_lmer <- function(df,
 #'
 single_lmer <- function(data, formula_string) {
 
-  out.model <- tryCatch( # nolint: object_name_linter
+  out_model <- tryCatch(
     lmerTest::lmer(
       formula = stats::as.formula(formula_string),
       data = data,
@@ -519,8 +563,8 @@ single_lmer <- function(data, formula_string) {
     }
   )
 
-  if (inherits(out.model, "lmerModLmerTest")) {
-    return(out.model)
+  if (inherits(out_model, "lmerModLmerTest")) {
+    return(out_model)
   } else {
     stop("Convergence issue not caught by single_lmer")
   }
@@ -544,6 +588,10 @@ single_lmer <- function(data, formula_string) {
 #' e.g. mean NPX at mean(numerical variable) versus mean NPX at mean(numerical
 #' variable) + 1*SD(numerical variable). The output tibble is arranged by
 #' ascending Tukey adjusted p-values.
+#'
+#' The `variable`, `covariates`, `random`, and/or `model_formula` arguments can
+#' be used in the same way as in `\code{\link{olink_lmer}} to specify the model
+#' to be fitted.
 #'
 #' @param df NPX data frame in long format with at least protein name (Assay),
 #' OlinkID, UniProt, 1-2 variables with at least 2 levels and subject
@@ -690,11 +738,11 @@ olink_lmer_posthoc <- function(df,
       }
     )
 
-    # If variable and covariates were included, throw a message that they will
+    # If variable or random were included, throw a message that they will
     # not be used as model_formula is provided
-    if (!missing(variable) || !is.null(covariates) || !missing(random)) {
+    if (!missing(variable) || !missing(random)) {
       message(
-        paste("model_formula overriding variable and covariate and",
+        paste("model_formula overriding variable and",
               "random arguments.")
       )
     }
@@ -720,9 +768,35 @@ olink_lmer_posthoc <- function(df,
     if ("-1" %in% splt_form) {
       splt_form <- splt_form[-which(splt_form == "-1")]
     }
-    outcome <- splt_form[1L]
-    variable <- splt_form[-1L]
-    covariates <- NULL
+
+    # Check if covariate was specified and remove from variables
+    if (!missing(covariates)) {
+
+      # Check if covariate exists in formula
+      if (all(covariates %in% splt_form[-1L])) {
+
+        outcome <- splt_form[1L]
+        variable <- setdiff(splt_form[-1L], covariates)
+
+      } else {
+
+        cli::cli_abort(
+          c(
+            "x" = "Covariate{?s} {.val {setdiff(covariates,splt_form[-1L])}}
+            {?is/are} not present in the model formula!",
+            "i" = "Expected {.or {.val {splt_form[-1L]}}}."
+          ),
+          call = rlang::caller_env(),
+          wrap = FALSE
+        )
+      }
+
+    } else {
+      # If no covariate specified, treat all terms as variables
+      outcome <- splt_form[1L]
+      variable <- splt_form[-1L]
+      covariates <- NULL
+    }
   }
 
   if (!missing(effect_formula)) {
@@ -771,21 +845,23 @@ olink_lmer_posthoc <- function(df,
     stop("All effect terms must be included in the variable argument.")
   }
 
+  # Check data format
+  check_log <- run_check_npx(df = df, check_log = check_log)
+
   lmer_posthoc_result <- withCallingHandlers(
     {
       #Filtering on valid OlinkID
-      df <- df |>
-        dplyr::filter(
-          stringr::str_detect(
-            string = .data[["OlinkID"]],
-            pattern = "OID[0-9]{5}"
+      if (length(check_log$oid_invalid > 0)) {
+        df <- df |>
+          dplyr::filter(
+            !(.data[[check_log$col_names$olink_id]] %in% check_log$oid_invalid)
           )
-        )
+      }
 
       if (is.null(olinkid_list) || length(olinkid_list) == 0L) {
         olinkid_list <- df |>
           dplyr::select(
-            dplyr::all_of("OlinkID")
+            dplyr::all_of(check_log$col_names$olink_id)
           ) |>
           dplyr::distinct() |>
           dplyr::pull()
@@ -797,17 +873,17 @@ olink_lmer_posthoc <- function(df,
         covariates <- gsub(pattern = "\\*", replacement = ":", x = covariates)
       }
 
-      add.main.effects <- NULL # nolint: object_name_linter
+      add_main_effects <- NULL
       if (any(grepl(pattern = ":", x = covariates))) {
         tmp <- strsplit(x = covariates, split = ":") |> unlist()
-        add.main.effects <- c(add.main.effects, # nolint: object_name_linter
+        add_main_effects <- c(add_main_effects,
                               setdiff(x = tmp, y = covariates))
-        covariates <- union(x = covariates, y = add.main.effects)
+        covariates <- union(x = covariates, y = add_main_effects)
       }
 
       if (any(grepl(pattern = ":", x = variable))) {
         tmp <- strsplit(x = variable, split = ":") |> unlist()
-        add.main.effects <- c(add.main.effects, setdiff(x = tmp, y = variable)) # nolint: object_name_linter
+        add_main_effects <- c(add_main_effects, setdiff(x = tmp, y = variable))
         variable <- union(x = variable,
                           y = unlist(strsplit(x = variable, split = ":")))
         variable <- variable[!grepl(pattern = ":", x = variable)]
@@ -816,28 +892,33 @@ olink_lmer_posthoc <- function(df,
       # If variable is in both variable and covariate, keep it in variable or
       # will get removed from final table
       covariates <- setdiff(x = covariates, y = variable)
-      add.main.effects <- setdiff(x = add.main.effects, y = variable) # nolint: object_name_linter
+      add_main_effects <- setdiff(x = add_main_effects, y = variable)
 
       variable_testers <- intersect(x = c(variable, covariates), y = names(df))
       # Remove rows where variables or covariate is NA (cant include in analysis
       # anyway)
-      removed.sampleids <- NULL # nolint: object_name_linter
+      removed_sampleids <- NULL
       for (i in variable_testers) {
-        removed.sampleids <- c(removed.sampleids, # nolint: object_name_linter
-                               df$SampleID[is.na(df[[i]])]) |>
+        sampleids_na <- df |>
+          dplyr::filter(is.na(.data[[i]])) |>
+          dplyr::distinct(.data[[check_log$col_names$sample_id]]) |>
+          dplyr::pull()
+
+        removed_sampleids <- c(removed_sampleids,
+                               sampleids_na) |>
           unique()
         df <- df[!is.na(df[[i]]), ]
       }
 
       # Convert character vars to factor
-      converted.vars <- NULL # nolint: object_name_linter
-      num.vars <- NULL # nolint: object_name_linter
+      converted_vars <- NULL
+      num_vars <- NULL
       for (i in variable_testers) {
         if (is.character(df[[i]])) {
           df[[i]] <- factor(df[[i]])
-          converted.vars <- c(converted.vars, i) # nolint: object_name_linter
+          converted_vars <- c(converted_vars, i)
         } else if (is.numeric(df[[i]])) {
-          num.vars <- c(num.vars, i) # nolint: object_name_linter
+          num_vars <- c(num_vars, i)
         }
       }
 
@@ -866,38 +947,38 @@ olink_lmer_posthoc <- function(df,
 
       #Print verbose message
       if (verbose) {
-        if (!is.null(add.main.effects) & length(add.main.effects) > 0L) {
+        if (!is.null(add_main_effects) & length(add_main_effects) > 0L) {
           message(
             "Missing main effects added to the model formula: ",
-            paste(add.main.effects, collapse = ", ")
+            paste(add_main_effects, collapse = ", ")
           )
         }
-        if (!is.null(removed.sampleids) & length(removed.sampleids) > 0L) {
+        if (!is.null(removed_sampleids) & length(removed_sampleids) > 0L) {
           message(
             "Samples removed due to missing variable or covariate levels: ",
-            paste(removed.sampleids, collapse = ", ")
+            paste(removed_sampleids, collapse = ", ")
           )
         }
-        if (!is.null(converted.vars)) {
+        if (!is.null(converted_vars)) {
           message(
             paste0(
               "Variables and covariates converted from character to factors: ",
-              paste(converted.vars, collapse = ", ")
+              paste(converted_vars, collapse = ", ")
             )
           )
         }
-        if (!is.null(num.vars)) {
+        if (!is.null(num_vars)) {
           message(
             paste0("Variables and covariates treated as numeric: ",
-                   paste(num.vars, collapse = ", "))
+                   paste(num_vars, collapse = ", "))
           )
         }
-        if (any(variable %in% num.vars)) {
+        if (any(variable %in% num_vars)) {
           message(
             paste0(
               "Numeric variables post-hoc performed using",
               " Mean and Mean + 1SD: ",
-              paste(num.vars[num.vars %in% variable], collapse = ", ")
+              paste(num_vars[num_vars %in% variable], collapse = ", ")
             )
           )
         }
@@ -907,21 +988,22 @@ olink_lmer_posthoc <- function(df,
         )
       }
 
-      # Check data format
-      check_log <- run_check_npx(df = df, check_log = check_log)
 
       output_df <- df |>
         dplyr::filter(
-          .data[["OlinkID"]] %in% .env[["olinkid_list"]]
+          .data[[check_log$col_names$olink_id]] %in% .env[["olinkid_list"]]
         ) |>
         # Exclude assays that have all NA:s
         dplyr::filter(
-          !(.data[["OlinkID"]] %in% check_log$assay_na)
+          !(.data[[check_log$col_names$olink_id]] %in% check_log$assay_na)
         ) |>
         dplyr::group_by(
           dplyr::across(
             dplyr::all_of(
-              c("Assay", "OlinkID", "UniProt", "Panel")
+              c(check_log$col_names$assay,
+                check_log$col_names$olink_id,
+                check_log$col_names$uniprot,
+                check_log$col_names$panel)
             )
           )
         ) |>
@@ -940,7 +1022,11 @@ olink_lmer_posthoc <- function(df,
         ) |>
         dplyr::select(
           dplyr::all_of(
-            c("Assay", "OlinkID", "UniProt", "Panel", "term")
+            c(check_log$col_names$assay,
+              check_log$col_names$olink_id,
+              check_log$col_names$uniprot,
+              check_log$col_names$panel,
+              "term")
           ),
           dplyr::everything()
         )

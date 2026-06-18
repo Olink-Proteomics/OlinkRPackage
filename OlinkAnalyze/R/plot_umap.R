@@ -189,8 +189,8 @@ olink_umap_plot <- function(df,
   # Uniprot IDs. Note that we do not remove samples with duplicate SampleID,
   # control samples or assays, or samples/assays with QC warnings, as this
   # would be the user's decision.
-  df <- clean_npx(
-    df,
+  df <- run_clean_npx(
+    df = df,
     check_log = check_log,
     remove_assay_na = TRUE,
     remove_invalid_oid = TRUE,
@@ -202,8 +202,7 @@ olink_umap_plot <- function(df,
     convert_nonunique_uniprot = TRUE,
     out_df = "tibble",
     verbose = FALSE
-  ) |>
-    suppressMessages()
+  )
 
   # Check that the user didn't specify just one of outlierDefX and outlierDefY
   if (sum(c(is.numeric(outlierDefX), is.numeric(outlierDefY))) == 1L) {
