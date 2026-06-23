@@ -4,15 +4,17 @@ editor_options:
   markdown: 
     wrap: 72
 ---
+# Olink Analyze 5.0.2
+
+## Bug Fix
+- Fixed spelling and URLs to be canonical form (@kathy-nevola, #769, #770)
 
 # Olink Analyze 5.0.1
-
-## Major Changes
 
 ## Minor Changes
 
 - New QC flags for assays and samples have been added to improve automated data handling (@klevdiamanti, #735)
-- Cheatsheet link has been added to the overview vignette (@klevdiamanti, #747)
+- Cheat sheet link has been added to the overview vignette (@klevdiamanti, #747)
 - Flowchart image has been added to the overview vignette to explain how check_npx() and clean_npx() fit into the data preprocessing workflow (@klevdiamanti, #748)
 - General updates to overview vignette (@klevdiamanti, #750, #760)
 - If covariate is specified when using model formula in olink_lmer() and olink_lmer_posthoc(), the covariates will not be considered when performing multiple testing correction adjustment (@dtopouza, #754)
@@ -29,7 +31,7 @@ editor_options:
 - olink_dist_plot() will now check if color_g column is the QC column in the dataset (@KangD-dev #745)
 - Error message related to imputed assays when generating PCA and UMAP plots has been rephrased (@dtopouza, #749)
 - Concatenated Olink IDs are now recognized as Olink IDs (@klevdiamanti, #751)
-- Error message updated in olink_bridgability_plot()  (@klevdiamanti, #752)
+- Error message updated in olink_bridgeability_plot()  (@klevdiamanti, #752)
 - Project Column in example data is now fully populated (@klevdiamanti, #753)
 - Annotation color handling has been improved in olink_heatmap (@dtopouza, #761)
 
