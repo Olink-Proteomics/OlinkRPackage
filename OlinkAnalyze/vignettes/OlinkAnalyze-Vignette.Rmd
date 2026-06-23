@@ -54,7 +54,7 @@ install.packages("OlinkAnalyze")
 # List of functions
 
 *For a quick overview of the main functions and typical workflows, see the*
-*[Olink® Analyze R Package Cheatsheet](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/01-User%20Manuals%20for%20website/1494-Olink-Analyze-Cheatsheet.pdf).*
+*[Olink® Analyze R Package Cheat sheet](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/01-User%20Manuals%20for%20website/1494-Olink-Analyze-Cheatsheet.pdf).*
 
 **Preprocessing**
 
@@ -418,7 +418,7 @@ with the option to keep the same individuals on the same plate. Olink® does not
 recommend to force balance based on other clinical variables.
 
 For more information on plate randomization, consult the 
-[Plate Randomization Vignette](https://cran.r-project.org/web/packages/OlinkAnalyzeVignettes/vignettes/plate_randomizer.html) in the R package `OlinkAnalyzeVignettes`.
+[Plate Randomization Vignette](https://CRAN.R-project.org/package=OlinkAnalyzeVignettes/vignettes/plate_randomizer.html) in the R package `OlinkAnalyzeVignettes`.
 
 ## Select bridge samples (`olink_bridgeselector()`)
 
@@ -429,7 +429,7 @@ selects samples that have good detectability (if applicable), pass quality
 control, and cover a wide range of data points.
 
 For more information on bridge sample selection, consult the 
-[Introduction to bridging Olink® NPX datasets tutorial](https://cran.r-project.org/web/packages/OlinkAnalyzeVignettes/vignettes/bridging_introduction.html) 
+[Introduction to bridging Olink® NPX datasets tutorial](https://CRAN.R-project.org/package=OlinkAnalyzeVignettes/vignettes/bridging_introduction.html) 
 in the R package `OlinkAnalyzeVignettes`.
 
 ## Normalizing NPX data (`olink_normalization()`)
@@ -443,7 +443,7 @@ The function handles four different types of normalization:
     using overlapping samples (bridge samples). The overlapping samples should
     have the same IDs between data sets. Adjustment is made using the median of
     the paired differences between the bridge samples. For more information on
-    bridging, consult the [Introduction to bridging Olink® NPX datasets tutorial](https://cran.r-project.org/web/packages/OlinkAnalyzeVignettes/vignettes/bridging_introduction.html)
+    bridging, consult the [Introduction to bridging Olink® NPX datasets tutorial](https://CRAN.R-project.org/package=OlinkAnalyzeVignettes/vignettes/bridging_introduction.html)
     in the R package `OlinkAnalyzeVignettes`.
 -   **Subset normalization**: A subset of samples is used to normalize two data
     sets, one of which is used as a `reference_project`. Adjustment is made
@@ -459,7 +459,7 @@ The function handles four different types of normalization:
     Explore HT" data. Overlapping samples are run on both products and used to
     determine which assays are bridgeable and what method should be used to
     bridge each assay. For more information on the between-product bridging
-    methodology, consult the [Bridging across NGS-based Olink^®^ products Tutorial](https://cran.r-project.org/web/packages/OlinkAnalyzeVignettes/vignettes/bridging_cross-product.html) in the R package `OlinkAnalyzeVignettes`.
+    methodology, consult the [Bridging across NGS-based Olink^®^ products Tutorial](https://CRAN.R-project.org/package=OlinkAnalyzeVignettes/vignettes/bridging_cross-product.html) in the R package `OlinkAnalyzeVignettes`.
 
 ## Integrating NGS NPX LOD (`olink_lod()`)
 
@@ -473,7 +473,7 @@ is intensity normalized, both intensity normalized and PC normalized LODs are
 provided.
 
 For more information on calculating LOD, consult the 
-[Calculating LOD from Olink® Explore data tutorial](https://cran.r-project.org/web/packages/OlinkAnalyzeVignettes/vignettes/lod.html) 
+[Calculating LOD from Olink® Explore data tutorial](https://CRAN.R-project.org/package=OlinkAnalyzeVignettes/vignettes/lod.html) 
 in the R package `OlinkAnalyzeVignettes`.
 
 # Statistical analysis
@@ -1066,7 +1066,7 @@ missingness \<10% for multi-plate projects, and for missingness \<5% for single
 plate projects.
 
 More information about `olink_pca()` can be found in the 
-[Outlier Exclusion Vignette](https://cran.r-project.org/web/packages/OlinkAnalyzeVignettes/vignettes/outlier_exclusion.html) in the R package `OlinkAnalyzeVignettes`.
+[Outlier Exclusion Vignette](https://CRAN.R-project.org/package=OlinkAnalyzeVignettes/vignettes/outlier_exclusion.html) in the R package `OlinkAnalyzeVignettes`.
 
 ## Uniform Manifold Approximation and Projection for Dimension Reduction (UMAP) (`olink_umap_plot()`)
 
@@ -1235,7 +1235,7 @@ sample, faceted by Olink panel. This is used as an initial QC step to identify
 potential outliers.
 
 More information about `olink_dist_plot()` can be found in the 
-[Outlier Exclusion Vignette](https://cran.r-project.org/web/packages/OlinkAnalyzeVignettes/vignettes/outlier_exclusion.html)
+[Outlier Exclusion Vignette](https://CRAN.R-project.org/package=OlinkAnalyzeVignettes/vignettes/outlier_exclusion.html)
 in the R package `OlinkAnalyzeVignettes`.
 
 ## Point-range plot for LMER (`olink_lmer_plot()`)
@@ -1398,12 +1398,12 @@ indicate +/-3 standard deviations from the mean IQR. Vertical dashed lines
 indicate +/-3 standard deviations from the mean sample median.
 
 More information about `olink_qc_plot()` can be found in the 
-[Outlier Exclusion Vignette](https://cran.r-project.org/web/packages/OlinkAnalyzeVignettes/vignettes/outlier_exclusion.html)
+[Outlier Exclusion Vignette](https://CRAN.R-project.org/package=OlinkAnalyzeVignettes/vignettes/outlier_exclusion.html)
 in the R package `OlinkAnalyzeVignettes`.
 
 ## Heatmap (`olink_heatmap_plot()`)
 
-The `olink_heatmap_plot()` function generates a heatmap for a specfied set of
+The `olink_heatmap_plot()` function generates a heatmap for a specified set of
 samples and proteins. By default, the heatmap centers and scales NPX across
 proteins and clusters samples and proteins using a dendrogram. Unique sample
 names are required.
@@ -1614,7 +1614,7 @@ corresponding KS statistic are used to determine which normalization approach
 (median centering or quantile smoothing) is most suitable for between-product
 normalization. For more information on the between-product bridging methodology
 and bridgeability criteria, consult the 
-[Bridging across NGS-based Olink^®^ products Tutorial](https://cran.r-project.org/web/packages/OlinkAnalyzeVignettes/vignettes/bridging_cross-product.html)
+[Bridging across NGS-based Olink^®^ products Tutorial](https://CRAN.R-project.org/package=OlinkAnalyzeVignettes/vignettes/bridging_cross-product.html)
 in the R package `OlinkAnalyzeVignettes`.
 
 ### Function arguments
