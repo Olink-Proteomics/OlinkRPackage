@@ -54,7 +54,7 @@ install.packages("OlinkAnalyze")
 # List of functions
 
 *For a quick overview of the main functions and typical workflows, see the*
-*[Olink® Analyze R Package Cheatsheet](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/01-User%20Manuals%20for%20website/1494-Olink-Analyze-Cheatsheet.pdf).*
+*[Olink® Analyze R Package Cheat sheet](https://7074596.fs1.hubspotusercontent-na1.net/hubfs/7074596/01-User%20Manuals%20for%20website/1494-Olink-Analyze-Cheatsheet.pdf).*
 
 **Preprocessing**
 

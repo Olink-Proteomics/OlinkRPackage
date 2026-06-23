@@ -7,7 +7,7 @@ editor_options:
 # Olink Analyze 5.0.2
 
 ## Bug Fix
-- Fixed spelling and URLs to be canonical form (@kathy-nevola, )
+- Fixed spelling and URLs to be canonical form (@kathy-nevola, #769, #770)
 
 # Olink Analyze 5.0.1
 
