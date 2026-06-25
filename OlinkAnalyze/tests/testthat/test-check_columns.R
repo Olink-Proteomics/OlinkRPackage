@@ -75,6 +75,83 @@ test_that(
 )
 
 test_that(
+  "check_columns - works - olink_class",
+  {
+    npx_data1_check_log <- check_npx(df = npx_data1) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    # clean data has no issues
+    npx_data1_obj <- new_olink_class(
+      df = npx_data1,
+      check_log = npx_data1_check_log
+    )
+
+    # both SampleID and NPX exist
+    expect_no_condition(
+      object = check_columns(df = npx_data1_obj,
+                             col_list = list("SampleID",
+                                             "NPX"))
+    )
+
+    # SampleID and (NPX or LOD) exist
+    expect_no_condition(
+      object = check_columns(df = npx_data1_obj,
+                             col_list = list("SampleID",
+                                             c("NPX", "LOD")))
+    )
+
+    # (SampleID or OlinkID) and (NPX or LOD) exist
+    expect_no_condition(
+      object = check_columns(df = npx_data1_obj,
+                             col_list = list(c("SampleID", "OlinkID"),
+                                             c("NPX", "LOD")))
+    )
+
+    # SampleID exists but ExtNPX does not
+    expect_error(
+      object = check_columns(df = npx_data1_obj,
+                             col_list = list("SampleID",
+                                             "ExtNPX")),
+      regexp = "is missing the required columns: \"ExtNPX\"!"
+    )
+
+    # SampleID exists but ExtNPX and Count do not
+    expect_error(
+      object = check_columns(df = npx_data1_obj,
+                             col_list = list("SampleID",
+                                             "ExtNPX",
+                                             "Count")),
+      regexp = "is missing the required columns: \"ExtNPX\" and \"Count\"!"
+    )
+
+    # SampleID and (LOD or ExtNPX) exist -> no error as LOD exists
+    expect_no_condition(
+      object = check_columns(df = npx_data1_obj,
+                             col_list = list("SampleID",
+                                             c("LOD", "ExtNPX")))
+    )
+
+    # SampleID and (F or E) exist -> error as neither E nor F exist
+    expect_error(
+      object = check_columns(df = npx_data1_obj,
+                             col_list = list("SampleID",
+                                             c("Count", "ExtNPX"))),
+      regexp = "is missing columns that should be present in at least one"
+    )
+
+    # SampleID and (Count or ExtNPX) exist -> error as neither E nor F exist
+    expect_error(
+      object = check_columns(df = npx_data1_obj,
+                             col_list = list("SampleID",
+                                             c("Count", "ExtNPX"),
+                                             c("PlateLOD", "MaxLOD"))),
+      regexp = "is missing columns that should be present in at least one"
+    )
+  }
+)
+
+test_that(
   "check_columns - works - arrow",
   {
     tmp_data <- dplyr::tibble(

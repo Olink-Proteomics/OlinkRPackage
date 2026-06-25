@@ -579,6 +579,197 @@ test_that(
   }
 )
 
+# Test check_is_olink_class ----
+
+# Test that relevant errors are thrown when non-Olink class objects are checked
+test_that(
+  "check is olink class - ERROR",
+  {
+    expect_error(
+      object = check_is_olink_class(x = c("I_Shall_Not_Pass",
+                                          NA_character_),
+                                    error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "is not an Olink class object!",
+                    fixed = TRUE)
+    )
+
+    expect_error(
+      object = check_is_olink_class(x = NA_character_,
+                                    error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "is not an Olink class object!",
+                    fixed = TRUE)
+    )
+
+    expect_error(
+      object = check_is_olink_class(x = NULL,
+                                    error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "is not an Olink class object!",
+                    fixed = TRUE)
+    )
+
+    expect_error(
+      object = check_is_olink_class(x = 1,
+                                    error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "is not an Olink class object!",
+                    fixed = TRUE)
+    )
+
+    expect_error(
+      object = check_is_olink_class(x = 1L,
+                                    error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "is not an Olink class object!",
+                    fixed = TRUE)
+    )
+
+    expect_error(
+      object = check_is_olink_class(x = TRUE,
+                                    error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "is not an Olink class object!",
+                    fixed = TRUE)
+    )
+
+    expect_error(
+      object = check_is_olink_class(x = data.frame(a = c(1, 2),
+                                                   b = c("a", "b"),
+                                                   c = c(TRUE, FALSE)),
+                                    error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "is not an Olink class object!",
+                    fixed = TRUE)
+    )
+
+    expect_error(
+      object = check_is_olink_class(x = data.frame(a = c(1, 2),
+                                                   b = c("a", "b"),
+                                                   c = c(TRUE, FALSE)) |>
+                                      dplyr::as_tibble(),
+                                    error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "is not an Olink class object!",
+                    fixed = TRUE)
+    )
+
+    expect_error(
+      object = check_is_olink_class(x = data.frame(a = c(1, 2),
+                                                   b = c("a", "b"),
+                                                   c = c(TRUE, FALSE)) |>
+                                      arrow::as_arrow_table(),
+                                    error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "is not an Olink class object!",
+                    fixed = TRUE)
+    )
+  }
+)
+
+# Test that check_is_olink_class returns FALSE when non-Olink class objects are
+# checked
+test_that(
+  "check is olink class - FALSE",
+  {
+    expect_false(
+      object = check_is_olink_class(x = c("I_Shall_Not_Pass",
+                                          NA_character_),
+                                    error = FALSE)
+    )
+
+    expect_false(
+      object = check_is_olink_class(x = NA_character_,
+                                    error = FALSE)
+    )
+
+    expect_false(
+      object = check_is_olink_class(x = NULL,
+                                    error = FALSE)
+    )
+
+    expect_false(
+      object = check_is_olink_class(x = 1,
+                                    error = FALSE)
+    )
+
+    expect_false(
+      object = check_is_olink_class(x = 1L,
+                                    error = FALSE)
+    )
+
+    expect_false(
+      object = check_is_olink_class(x = TRUE,
+                                    error = FALSE)
+    )
+
+    expect_false(
+      object = check_is_olink_class(x = data.frame(a = c(1, 2),
+                                                   b = c("a", "b"),
+                                                   c = c(TRUE, FALSE)),
+                                    error = FALSE)
+    )
+
+    expect_false(
+      object = check_is_olink_class(x = data.frame(a = c(1, 2),
+                                                   b = c("a", "b"),
+                                                   c = c(TRUE, FALSE)) |>
+                                      dplyr::as_tibble(),
+                                    error = FALSE)
+    )
+
+    expect_false(
+      object = check_is_olink_class(x = data.frame(a = c(1, 2),
+                                                   b = c("a", "b"),
+                                                   c = c(TRUE, FALSE)) |>
+                                      arrow::as_arrow_table(),
+                                    error = FALSE)
+    )
+  }
+)
+
+# Test that no errors are thrown when an object inherits from olink_class
+test_that(
+  "check is olink class - TRUE",
+  {
+    # random olink class object
+    npx_data1_check_log <- check_npx(df = npx_data1) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    # clean data has no issues
+    npx_data1_obj <- new_olink_class(
+      df = npx_data1,
+      check_log = npx_data1_check_log
+    )
+
+    # check that variable exists
+    expect_true(object = exists("npx_data1_obj"))
+
+    # check if check_is_olink_class returns TRUE
+    expect_true(
+      object = check_is_olink_class(x = npx_data1_obj,
+                                    error = FALSE)
+    )
+
+    # check if check_is_olink_class returns TRUE
+    expect_true(
+      object = check_is_olink_class(x = npx_data1_obj,
+                                    error = TRUE)
+    )
+  }
+)
+
 # Test check_is_dataset ----
 
 test_that(
@@ -590,7 +781,7 @@ test_that(
                                 error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "is not a tibble or an ArrowObject dataset!",
+                    x = "is not a tibble, Olink class object or an ArrowObject",
                     fixed = TRUE)
     )
 
@@ -599,7 +790,7 @@ test_that(
                                 error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "is not a tibble or an ArrowObject dataset!",
+                    x = "is not a tibble, Olink class object or an ArrowObject",
                     fixed = TRUE)
     )
 
@@ -608,7 +799,7 @@ test_that(
                                 error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "is not a tibble or an ArrowObject dataset!",
+                    x = "is not a tibble, Olink class object or an ArrowObject",
                     fixed = TRUE)
     )
 
@@ -617,7 +808,7 @@ test_that(
                                 error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "is not a tibble or an ArrowObject dataset!",
+                    x = "is not a tibble, Olink class object or an ArrowObject",
                     fixed = TRUE)
     )
 
@@ -626,7 +817,7 @@ test_that(
                                 error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "is not a tibble or an ArrowObject dataset!",
+                    x = "is not a tibble, Olink class object or an ArrowObject",
                     fixed = TRUE)
     )
 
@@ -635,7 +826,7 @@ test_that(
                                 error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",
-                    x = "is not a tibble or an ArrowObject dataset!",
+                    x = "is not a tibble, Olink class object or an ArrowObject",
                     fixed = TRUE)
     )
   }
@@ -799,6 +990,64 @@ test_that(
         )
       }
     )
+
+    ## olink class ----
+
+    withr::with_tempfile(
+      new = "dfile_test",
+      pattern = "delim-file-test",
+      fileext = ".csv",
+      code = {
+        # random data frame
+        df <- dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        )
+
+        sep_arrow <- ","
+
+        # write the coma-delimited file
+        utils::write.table(
+          x = df,
+          file = dfile_test,
+          append = FALSE,
+          quote = FALSE,
+          sep = sep_arrow,
+          eol = "\n",
+          na = "",
+          dec = ".",
+          row.names = FALSE,
+          col.names = TRUE
+        )
+
+        # check that the comma delimited file exists
+        expect_true(object = file.exists(dfile_test))
+
+        # check that reading the file works
+        expect_no_condition(
+          object = df_read <- utils::read.delim(
+            file = dfile_test,
+            header = TRUE,
+            sep = sep_arrow,
+            na.strings = c("NA", ""),
+            stringsAsFactors = FALSE
+          )
+        )
+        class(df_read) <- c("olink_class", class(df_read))
+
+        # check that variable exists
+        expect_true(object = exists("df_read"))
+
+        # check if return from check_is_data_frame is TRUE
+        expect_true(
+          object = check_is_dataset(x = dplyr::as_tibble(df_read),
+                                    error = TRUE)
+        )
+      }
+    )
   }
 )
 
@@ -920,6 +1169,50 @@ test_that(
         )
       }
     )
+
+    ## olink class ----
+
+    withr::with_tempfile(
+      new = "pfile_test",
+      pattern = "delim-file-test",
+      fileext = ".parquet",
+      code = {
+        # write the parquet file from random data frame
+        dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ) |>
+          arrow::write_parquet(
+            sink = pfile_test,
+            compression = "gzip"
+          )
+
+        # check that the semicolon delimited file exists
+        expect_true(object = file.exists(pfile_test))
+
+        # check that reading the file works
+        expect_no_condition(
+          object = df_read <- arrow::open_dataset(
+            sources = pfile_test
+          ) |>
+            dplyr::collect()
+        )
+
+        # check that variable exists
+        expect_true(object = exists("df_read"))
+
+        class(df_read) <- c("olink_class", class(df_read))
+
+        # check if check_is_dataset returns TRUE
+        expect_true(
+          object = check_is_dataset(x = df_read,
+                                    error = TRUE)
+        )
+      }
+    )
   }
 )
 
@@ -954,6 +1247,45 @@ test_that(
     expect_true(
       object = check_is_dataset(x = arrow::as_arrow_table(df),
                                 error = FALSE)
+    )
+
+    df <- dplyr::as_tibble(df)
+    class(df) <- c("olink_class", class(df))
+
+    # check if check_is_dataset returns TRUE
+    expect_true(
+      object = check_is_dataset(x = df,
+                                error = FALSE)
+    )
+  }
+)
+
+test_that(
+  "check_is_dataset - works - olink_class",
+  {
+    npx_data1_check_log <- check_npx(df = npx_data1) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    # clean data has no issues
+    npx_data1_obj <- new_olink_class(
+      df = npx_data1,
+      check_log = npx_data1_check_log
+    )
+
+    # check that variable exists
+    expect_true(object = exists("npx_data1_obj"))
+
+    # check if check_is_dataset returns TRUE
+    expect_true(
+      object = check_is_dataset(x = npx_data1_obj,
+                                error = FALSE)
+    )
+
+    # check if check_is_dataset returns TRUE
+    expect_true(
+      object = check_is_dataset(x = npx_data1_obj,
+                                error = TRUE)
     )
   }
 )

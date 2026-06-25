@@ -31,11 +31,8 @@
 #'      )
 #'   )
 #'
-#'   check_log <- check_npx(df = npx_df)
-#'
 #'   ttest_results <- OlinkAnalyze::olink_ttest(
 #'     df = npx_df,
-#'     check_log = check_log,
 #'     variable = "Treatment",
 #'     alternative = "two.sided"
 #'   )

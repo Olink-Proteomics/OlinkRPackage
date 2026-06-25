@@ -30,9 +30,9 @@
 #' \code{\link{olink_norm_input_check}} when it is called from
 #' \code{\link{olink_normalization}}. In addition,
 #' \code{\link{olink_normalization}} has also utilized
-#' \code{\link{norm_internal_rename_cols}} to rename the columns of the
-#' non-reference dataset according to the ones of the reference dataset, hence
-#' all column names should match.
+#' `norm_internal_rename_cols` to rename the columns of the non-reference
+#' dataset according to the ones of the reference dataset, hence all column
+#' names should match.
 #'
 #' @param lst_df A named list of the 2 input datasets. First element should be
 #' the reference dataset from Olink Explore HT and the second element should

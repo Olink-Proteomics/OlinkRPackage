@@ -122,19 +122,15 @@ if (rlang::is_installed(pkg = c("ggrepel", "ggpubr"))) {
              ignore.case = TRUE)
     )
 
-  check_log <- check_npx(npx_data)
-
   # PCA using all the data
   OlinkAnalyze::olink_pca_plot(
     df = npx_data,
-    check_log = check_log,
     color_g = "QC_Warning"
   )
 
   # PCA per panel
   g <- OlinkAnalyze::olink_pca_plot(
     df = npx_data,
-    check_log = check_log,
     color_g = "QC_Warning",
     byPanel = TRUE
   )
@@ -143,7 +139,6 @@ if (rlang::is_installed(pkg = c("ggrepel", "ggpubr"))) {
   # Label outliers
   OlinkAnalyze::olink_pca_plot(
     df = npx_data,
-    check_log = check_log,
     color_g = "QC_Warning",
     outlierDefX = 2L,
     outlierDefY = 4L
@@ -151,7 +146,6 @@ if (rlang::is_installed(pkg = c("ggrepel", "ggpubr"))) {
 
   OlinkAnalyze::olink_pca_plot(
     df = npx_data,
-    check_log = check_log,
     color_g = "QC_Warning",
     outlierDefX = 2.5,
     outlierDefY = 4L,
@@ -161,7 +155,6 @@ if (rlang::is_installed(pkg = c("ggrepel", "ggpubr"))) {
   # Retrieve the outliers
   g <- OlinkAnalyze::olink_pca_plot(
     df = npx_data,
-    check_log = check_log,
     color_g = "QC_Warning",
     outlierDefX = 2.5,
     outlierDefY = 4L,

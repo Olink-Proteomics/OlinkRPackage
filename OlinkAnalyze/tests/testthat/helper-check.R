@@ -20,3 +20,43 @@ check_snap_exist <- function(test_dir_name, snap_name) {
 
   return(invisible(NULL))
 }
+
+# check if ggplot objects are equal by comparing the built ggplot objects, the
+# mapping, the geom and stat of each layer, and the labels. This is preferred
+# over comparing the ggplot objects directly, which can fail due to differences
+# in attributes or other non-essential components of the ggplot objects.
+expect_equal_ggplot <- function(object, expected) {
+  testthat::expect_s3_class(object, "ggplot")
+  testthat::expect_s3_class(expected, "ggplot")
+
+  object_built   <- ggplot2::ggplot_build(object)
+  expected_built <- ggplot2::ggplot_build(expected)
+
+  testthat::expect_equal(
+    object_built$data,
+    expected_built$data,
+    ignore_attr = TRUE
+  )
+
+  testthat::expect_equal(
+    object$mapping,
+    expected$mapping
+  )
+
+  testthat::expect_equal(
+    lapply(object$layers, function(x) class(x$geom)[1L]),
+    lapply(expected$layers, function(x) class(x$geom)[1L])
+  )
+
+  testthat::expect_equal(
+    lapply(object$layers, function(x) class(x$stat)[1L]),
+    lapply(expected$layers, function(x) class(x$stat)[1L])
+  )
+
+  testthat::expect_equal(
+    object$labels,
+    expected$labels
+  )
+
+  return(invisible(NULL))
+}

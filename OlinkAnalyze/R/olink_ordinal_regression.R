@@ -75,7 +75,6 @@
 #'       ignore.case = TRUE
 #'     )
 #'   )
-#'   check_log <- OlinkAnalyze::check_npx(df = npx_df)
 #'
 #'   # Two-way Ordinal Regression with CLM.
 #'   # Results in model NPX~Treatment+Time+Treatment:Time.
@@ -159,7 +158,7 @@ olink_ordinal_regression <- function(df,
       }
 
       # check data format
-      check_log <- run_check_npx(df = df, check_log = check_log)
+      check_log <- get_check_npx(df = df, check_log = check_log)
       data_type <- check_log$col_names$quant
 
       # Convert outcome to factor
@@ -459,7 +458,6 @@ olink_ordinalRegression <- olink_ordinal_regression  # nolint: object_name_linte
 #'       ignore.case = TRUE
 #'     )
 #'   )
-#'   check_log <- OlinkAnalyze::check_npx(df = npx_df)
 #'
 #'   # Two-way Ordinal Regression with CLM.
 #'   # Results in model NPX~Treatment+Time+Treatment:Time.
@@ -483,8 +481,7 @@ olink_ordinalRegression <- olink_ordinal_regression  # nolint: object_name_linte
 #'     df = npx_df,
 #'     variable = c("Treatment:Time"),
 #'     olinkid_list = significant_assays,
-#'     effect = "Time",
-#'     check_log = check_log
+#'     effect = "Time"
 #'   )
 #' }
 #' }
@@ -536,7 +533,7 @@ olink_ordinal_regression_posthoc <- function(df, # nolint: object_length_linter
       }
 
       # check data format
-      check_log <- run_check_npx(df = df, check_log = check_log)
+      check_log <- get_check_npx(df = df, check_log = check_log)
       data_type <- check_log$col_names$quant
 
       # Allow for :/* notation in covariates

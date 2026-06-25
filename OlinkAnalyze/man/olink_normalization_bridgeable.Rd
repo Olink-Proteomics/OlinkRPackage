@@ -53,9 +53,9 @@ reference dataset. This list is generated automatically from
 \code{\link{olink_norm_input_check}} when it is called from
 \code{\link{olink_normalization}}. In addition,
 \code{\link{olink_normalization}} has also utilized
-\code{\link{norm_internal_rename_cols}} to rename the columns of the
-non-reference dataset according to the ones of the reference dataset, hence
-all column names should match.
+\code{norm_internal_rename_cols} to rename the columns of the non-reference
+dataset according to the ones of the reference dataset, hence all column
+names should match.
 }
 \examples{
 \donttest{

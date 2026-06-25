@@ -99,6 +99,7 @@ olink_displayPlateLayout(randomized.manifest_c, fill.color = 'Site')
 olink_displayPlateDistributions(randomized.manifest_a, fill.color = 'Site')
 olink_displayPlateDistributions(randomized.manifest_b, fill.color = 'Site')
 }
+
 }
 \seealso{
 \itemize{

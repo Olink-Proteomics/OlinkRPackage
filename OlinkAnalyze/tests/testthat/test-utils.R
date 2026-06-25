@@ -132,6 +132,586 @@ test_that(
   }
 )
 
+test_that(
+  "remove_all_na_cols - works - olink_class and arrow",
+  {
+    # olink_class ----
+
+    ## no all-NA columns ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_obj <- attach_check_log(
+            df = npx_data1,
+            out_df = "tibble"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_s3_class(object = npx_data1_obj, class = "olink_class")
+
+    expect_no_condition(
+      object = npx_data1_obj_clean_v1 <- remove_all_na_cols(df = npx_data1_obj)
+    )
+
+    expect_equal(
+      object = npx_data1_obj_clean_v1,
+      expected = npx_data1_obj
+    )
+
+    ## one NA column ----
+
+    npx_data1_obj_one_na <- npx_data1_obj |>
+      dplyr::mutate(
+        LOD = NA_real_
+      )
+
+    expect_s3_class(object = npx_data1_obj_one_na, class = "olink_class")
+
+    expect_no_condition(
+      object = npx_data1_obj_clean_v2 <- remove_all_na_cols(
+        df = npx_data1_obj_one_na
+      )
+    )
+
+    expect_equal(
+      object = npx_data1_obj_clean_v2,
+      expected = npx_data1_obj |>
+        dplyr::select(
+          -dplyr::all_of("LOD")
+        )
+    )
+
+    ## multiple NA columns ----
+
+    npx_data1_obj_multi_na <- npx_data1_obj |>
+      dplyr::mutate(
+        dplyr::across(
+          dplyr::all_of(c("LOD", "Index", "Site")),
+          ~ NA_real_
+        )
+      )
+
+    expect_s3_class(object = npx_data1_obj_multi_na, class = "olink_class")
+
+    expect_no_condition(
+      object = npx_data1_obj_clean_v3 <- remove_all_na_cols(
+        df = npx_data1_obj_multi_na
+      )
+    )
+
+    expect_equal(
+      object = npx_data1_obj_clean_v3,
+      expected = npx_data1_obj |>
+        dplyr::select(
+          -dplyr::all_of(
+            c("LOD", "Index", "Site")
+          )
+        )
+    )
+
+    ## arrow ----
+
+    ## no all-NA columns ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_arrow <- attach_check_log(
+            df = npx_data1,
+            out_df = "arrow"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_true(
+      object = check_is_arrow_object(
+        x = npx_data1_arrow,
+        error = FALSE
+      )
+    )
+
+    expect_no_condition(
+      object = npx_data1_arrow_clean_v1 <- remove_all_na_cols(
+        df = npx_data1_arrow
+      )
+    )
+
+    expect_equal(
+      object = npx_data1_arrow_clean_v1 |>
+        dplyr::collect(),
+      expected = npx_data1_arrow |>
+        dplyr::collect()
+    )
+
+    ## one NA column ----
+
+    npx_data1_arrow_one_na <- npx_data1_arrow |>
+      dplyr::mutate(
+        LOD = NA_real_
+      ) |>
+      dplyr::compute()
+
+    expect_true(
+      object = check_is_arrow_object(
+        x = npx_data1_arrow_one_na,
+        error = FALSE
+      )
+    )
+
+    expect_no_condition(
+      object = npx_data1_arrow_clean_v2 <- remove_all_na_cols(
+        df = npx_data1_arrow_one_na
+      )
+    )
+
+    expect_equal(
+      object = npx_data1_arrow_clean_v2 |>
+        dplyr::collect(),
+      expected = npx_data1_arrow |>
+        dplyr::select(
+          -dplyr::all_of("LOD")
+        ) |>
+        dplyr::collect()
+    )
+
+    ## multiple NA columns ----
+
+    npx_data1_arrow_multi_na <- npx_data1_arrow |>
+      dplyr::mutate(
+        dplyr::across(
+          dplyr::all_of(c("LOD", "Index", "Site")),
+          ~ NA_real_
+        )
+      ) |>
+      dplyr::compute()
+
+    expect_no_condition(
+      object = npx_data1_arrow_clean_v3 <- remove_all_na_cols(
+        df = npx_data1_arrow_multi_na
+      )
+    )
+
+    expect_equal(
+      object = npx_data1_arrow_clean_v3 |>
+        dplyr::collect(),
+      expected = npx_data1_arrow |>
+        dplyr::select(
+          -dplyr::all_of(
+            c("LOD", "Index", "Site")
+          )
+        ) |>
+        dplyr::collect()
+    )
+
+  }
+)
+
+# Test check_out_df_arg ----
+
+test_that(
+  "check out df arg works - TRUE",
+  {
+    expect_no_condition(
+      object = check_out_df_arg(out_df = "tibble")
+    )
+
+    expect_no_condition(
+      object = check_out_df_arg(out_df = "arrow")
+    )
+  }
+)
+
+test_that(
+  "check out df arg works - ERROR",
+  {
+    expect_error(
+      object = check_out_df_arg(out_df = "Tibble"),
+      regexp = "Unknown output argument"
+    )
+
+    expect_error(
+      object = check_out_df_arg(out_df = "TIBBLE"),
+      regexp = "Unknown output argument"
+    )
+
+    expect_error(
+      object = check_out_df_arg(out_df = "I_Shall_Not_Pass"),
+      regexp = "Unknown output argument"
+    )
+  }
+)
+
+# Test convert_read_npx_output ----
+
+test_that(
+  "convert_read_npx_output - works - df: arrow; out: tibble",
+  {
+    # simple arrow ----
+
+    expect_true(
+      object = convert_read_npx_output(
+        df = dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ) |>
+          arrow::as_arrow_table(df),
+        out_df = "tibble"
+      ) |>
+        inherits(what = "tbl_df")
+    )
+
+    # olink_class arrow ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_arrow <- attach_check_log(
+            df = npx_data1,
+            out_df = "arrow"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_no_condition(
+      object = npx_data1_tibble <- convert_read_npx_output(
+        df = npx_data1_arrow,
+        out_df = "tibble"
+      )
+    )
+
+    expect_true(object = inherits(x = npx_data1_tibble, what = "tbl_df"))
+    expect_false(object = inherits(x = npx_data1_tibble, what = "olink_class"))
+    expect_equal(
+      object = npx_data1_tibble,
+      expected = npx_data1
+    )
+    expect_equal(
+      object = check_npx(df = npx_data1_tibble) |>
+        suppressMessages() |>
+        suppressWarnings(),
+      expected = olink_check_log(df = npx_data1_arrow)
+    )
+  }
+)
+
+test_that(
+  "convert_read_npx_output - works - df: arrow; out: arrow",
+  {
+    # simple arrow ----
+
+    expect_true(
+      object = convert_read_npx_output(
+        df = dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ) |>
+          arrow::as_arrow_table(df),
+        out_df = "arrow"
+      ) |>
+        inherits(what = "ArrowObject")
+    )
+
+    # olink_class arrow ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_arrow <- attach_check_log(
+            df = npx_data1,
+            out_df = "arrow"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_no_condition(
+      object = npx_data1_arrow_v2 <- convert_read_npx_output(
+        df = npx_data1_arrow,
+        out_df = "arrow"
+      )
+    )
+
+    expect_true(object = inherits(x = npx_data1_arrow_v2, what = "ArrowObject"))
+
+    expect_equal(
+      object = olink_check_log(df = npx_data1_arrow_v2),
+      expected = olink_check_log(df = npx_data1_arrow)
+    )
+  }
+)
+
+test_that(
+  "convert_read_npx_output - works - df: tibble; out: arrow",
+  {
+    # simple tibble ----
+
+    expect_true(
+      object = convert_read_npx_output(
+        df = dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ),
+        out_df = "arrow"
+      ) |>
+        inherits(what = "ArrowObject")
+    )
+
+    # olink_class arrow ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_obj <- attach_check_log(
+            df = npx_data1,
+            out_df = "tibble"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_no_condition(
+      object = npx_data1_arrow <- convert_read_npx_output(
+        df = npx_data1_obj,
+        out_df = "arrow"
+      )
+    )
+
+    expect_true(object = inherits(x = npx_data1_arrow, what = "ArrowObject"))
+    expect_equal(
+      object = npx_data1_arrow |>
+        dplyr::collect(),
+      expected = npx_data1_obj
+    )
+    expect_equal(
+      object = check_npx(df = npx_data1_arrow) |>
+        suppressMessages() |>
+        suppressWarnings(),
+      expected = olink_check_log(df = npx_data1_obj)
+    )
+  }
+)
+
+test_that(
+  "convert_read_npx_output - works df: tibble; out: tibble",
+  {
+    # simple tibble ----
+
+    expect_true(
+      object = convert_read_npx_output(
+        df = dplyr::tibble(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ),
+        out_df = "tibble"
+      ) |>
+        inherits(what = "tbl_df")
+    )
+
+    # olink_class tibble ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_obj <- attach_check_log(
+            df = npx_data1,
+            out_df = "tibble"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_s3_class(object = npx_data1_obj, class = "olink_class")
+
+    expect_no_condition(
+      object = npx_data1_tibble <- convert_read_npx_output(
+        df = npx_data1_obj,
+        out_df = "tibble"
+      )
+    )
+
+    expect_true(object = inherits(x = npx_data1_tibble, what = "tbl_df"))
+    expect_false(object = inherits(x = npx_data1_tibble, what = "olink_class"))
+
+    expect_equal(
+      object = npx_data1_tibble,
+      expected = npx_data1
+    )
+    expect_equal(
+      object = check_npx(df = npx_data1_tibble) |>
+        suppressMessages() |>
+        suppressWarnings(),
+      expected = olink_check_log(df = npx_data1_obj)
+    )
+  }
+)
+
+test_that(
+  "convert_read_npx_output - works ERROR",
+  {
+    expect_error(
+      object = convert_read_npx_output(df = c("I_Shall_Not_Pass",
+                                              NA_character_),
+                                       out_df = "tibble"),
+      regexp = "Unexpected input dataset"
+    )
+
+    expect_error(
+      object = convert_read_npx_output(df = NA_character_,
+                                       out_df = "tibble"),
+      regexp = "Unexpected input dataset"
+    )
+
+    expect_error(
+      object = convert_read_npx_output(df = NULL,
+                                       out_df = "tibble"),
+      regexp = "Unexpected input dataset"
+    )
+
+    expect_error(
+      object = convert_read_npx_output(df = 1,
+                                       out_df = "tibble"),
+      regexp = "Unexpected input dataset"
+    )
+
+    expect_error(
+      object = convert_read_npx_output(df = 1L,
+                                       out_df = "tibble"),
+      regexp = "Unexpected input dataset"
+    )
+
+    expect_error(
+      object = convert_read_npx_output(df = TRUE,
+                                       out_df = "tibble"),
+      regexp = "Unexpected input dataset"
+    )
+
+    expect_error(
+      object = convert_read_npx_output(
+        df = data.frame(
+          "A" = c(1, 2.2, 3.14),
+          "B" = c("a", "b", "c"),
+          "C" = c(TRUE, TRUE, FALSE),
+          "D" = c("NA", "B", NA_character_),
+          "E" = c(1L, 2L, 3L)
+        ),
+        out_df = "tibble"
+      ),
+      regexp = "Unexpected input dataset"
+    )
+  }
+)
+
+# Test get_read_npx_output ----
+
+test_that(
+  "get_read_npx_output - works - returns tibble for tibble input",
+  {
+    df <- tibble::tibble(
+      SampleID = "sample_1",
+      OlinkID = "OID001",
+      NPX = 1.2
+    )
+
+    expect_identical(
+      object = get_read_npx_output(df = df),
+      expected = "tibble"
+    )
+  }
+)
+
+test_that(
+  "get_read_npx_output - works - returns tibble for olink_class input",
+  {
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_obj <- attach_check_log(
+            df = npx_data1,
+            out_df = "tibble"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_identical(
+      object = get_read_npx_output(df = npx_data1_obj),
+      expected = "tibble"
+    )
+  }
+)
+
+test_that(
+  "get_read_npx_output - works - returns arrow for Arrow object input",
+  {
+    df <- arrow::as_arrow_table(
+      tibble::tibble(
+        SampleID = "sample_1",
+        OlinkID = "OID001",
+        NPX = 1.2
+      )
+    )
+
+    expect_identical(
+      object = get_read_npx_output(df = df),
+      expected = "arrow"
+    )
+  }
+)
+
+test_that(
+  "get_read_npx_output - works - returns arrow for olink_class arrow input",
+  {
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_arrow <- attach_check_log(
+            df = npx_data1,
+            out_df = "arrow"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_identical(
+      object = get_read_npx_output(df = npx_data1_arrow),
+      expected = "arrow"
+    )
+  }
+)
+
 # Test ansi_collapse_quot ----
 
 test_that(
@@ -186,23 +766,149 @@ test_that(
   }
 )
 
+# Test pull_col ----
+
+test_that(
+  "pull_col - works - pulls a character column",
+  {
+    df <- tibble::tibble(
+      sample_id = c("A", "B", "C"),
+      value = 1L:3L
+    )
+
+    # tibble ----
+
+    expect_identical(
+      object = pull_col(df, "sample_id"),
+      expected = c("A", "B", "C")
+    )
+
+    # arrow ----
+
+    arrow_df <- arrow::arrow_table(df)
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = out <- pull_col(arrow_df, "sample_id")
+        )
+      )
+    )
+
+    expect_identical(
+      object = out,
+      expected = c("A", "B", "C")
+    )
+  }
+)
+
+test_that(
+  "pull_col - works - pulls a numeric column from a tibble",
+  {
+    df <- tibble::tibble(
+      sample_id = c("A", "B", "C"),
+      value = 1L:3L
+    )
+
+    # tibble ----
+
+    expect_identical(
+      object = pull_col(df, "value"),
+      expected = 1L:3L
+    )
+
+    # arrow ----
+
+    arrow_df <- arrow::arrow_table(df)
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = out <- pull_col(arrow_df, "value")
+        )
+      )
+    )
+
+    expect_identical(
+      object = out,
+      expected = 1L:3L
+    )
+  }
+)
+
+test_that(
+  "pull_col - works - column name is stored in a variable",
+  {
+    df <- tibble::tibble(
+      sample_id = c("A", "B", "C"),
+      value = 1L:3L
+    )
+
+    col_name <- "sample_id"
+
+    # tibble ----
+
+    expect_identical(
+      object = pull_col(df, col_name),
+      expected = c("A", "B", "C")
+    )
+
+    # arrow ----
+
+    arrow_df <- arrow::arrow_table(df)
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = out <- pull_col(arrow_df, col_name)
+        )
+      )
+    )
+
+    expect_identical(
+      object = out,
+      expected = c("A", "B", "C")
+    )
+  }
+)
+
+test_that(
+  "pull_col - error - requires col to be a scalar character",
+  {
+    df <- tibble::tibble(
+      sample_id = c("A", "B", "C"),
+      value = 1:3
+    )
+
+    expect_error(
+      object = pull_col(df, sample_id),
+      regexp = "object 'sample_id' not found"
+    )
+
+    expect_error(
+      object = pull_col(df, c("sample_id", "value")),
+      regexp = "`col` must be a scalar character!"
+    )
+
+    expect_error(
+      object = pull_col(df, NA_character_),
+      regexp = "`col` must be a scalar character!"
+    )
+  }
+)
+
 # Test check_osi ----
 
 test_that(
-  "check_osi - works",
+  "check_osi - works - tibble",
   {
     osi_data <- get_example_data("example_osi_data.rds")
-
-    osi_check_log <- check_npx(osi_data) |>
-      suppressWarnings() |>
-      suppressMessages()
 
     # OSISUmmary ----
 
     expect_no_condition(
       object = osi_summary <- check_osi(
         df = osi_data,
-        check_log = osi_check_log,
         osi_score = "OSISummary"
       )
     )
@@ -217,7 +923,6 @@ test_that(
     expect_no_condition(
       object = osi_prep_temp <- check_osi(
         df = osi_data,
-        check_log = osi_check_log,
         osi_score = "OSIPreparationTemperature"
       )
     )
@@ -232,7 +937,6 @@ test_that(
     expect_no_condition(
       object = osi_time <- check_osi(
         df = osi_data,
-        check_log = osi_check_log,
         osi_score = "OSITimeToCentrifugation"
       )
     )
@@ -247,7 +951,6 @@ test_that(
     expect_no_condition(
       object = osi_cat <- check_osi(
         df = osi_data,
-        check_log = osi_check_log,
         osi_score = "OSICategory"
       )
     )
@@ -263,13 +966,86 @@ test_that(
 )
 
 test_that(
-  "check_osi - errors",
+  "check_osi - works - olink_class",
   {
     osi_data <- get_example_data("example_osi_data.rds")
 
-    osi_check_log <- check_npx(osi_data) |>
-      suppressWarnings() |>
-      suppressMessages()
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = osi_data_obj <- attach_check_log(
+            df = osi_data,
+            out_df = "tibble"
+          )
+        )
+      )
+    )
+
+    # OSISUmmary ----
+
+    expect_no_condition(
+      object = osi_summary <- check_osi(
+        df = osi_data_obj,
+        osi_score = "OSISummary"
+      )
+    )
+
+    expect_equal(
+      object = osi_summary,
+      expected = osi_data_obj
+    )
+
+    # OSIPreparationTemperature ----
+
+    expect_no_condition(
+      object = osi_prep_temp <- check_osi(
+        df = osi_data_obj,
+        osi_score = "OSIPreparationTemperature"
+      )
+    )
+
+    expect_equal(
+      object = osi_prep_temp,
+      expected = osi_data_obj
+    )
+
+    # OSITimeToCentrifugation ----
+
+    expect_no_condition(
+      object = osi_time <- check_osi(
+        df = osi_data_obj,
+        osi_score = "OSITimeToCentrifugation"
+      )
+    )
+
+    expect_equal(
+      object = osi_time,
+      expected = osi_data_obj
+    )
+
+    # OSICategory ----
+
+    expect_no_condition(
+      object = osi_cat <- check_osi(
+        df = osi_data_obj,
+        osi_score = "OSICategory"
+      )
+    )
+
+    expect_equal(
+      object = osi_cat |>
+        dplyr::mutate(
+          OSICategory = as.character(OSICategory) |> as.numeric()
+        ),
+      expected = osi_data_obj
+    )
+  }
+)
+
+test_that(
+  "check_osi - errors",
+  {
+    osi_data <- get_example_data("example_osi_data.rds")
 
     # check inputs ----
 
@@ -289,8 +1065,7 @@ test_that(
 
     expect_error(
       object = check_osi(
-        df = osi_data,
-        check_log = osi_check_log
+        df = osi_data
       ),
       regexp = "`osi_score` must be a scalar character!"
     )
@@ -300,7 +1075,6 @@ test_that(
     expect_error(
       object = check_osi(
         df = osi_data,
-        check_log = osi_check_log,
         osi_score = "not a real score"
       ),
       regexp = "Invalid value for `osi_score` = \"not a real score\"!"
@@ -314,7 +1088,6 @@ test_that(
           dplyr::select(
             -dplyr::all_of("OSISummary")
           ),
-        check_log = osi_check_log,
         osi_score = "OSISummary"
       ),
       regexp = "\`df` is missing the required columns: \"OSISummary\"!"
@@ -328,7 +1101,6 @@ test_that(
           dplyr::mutate(
             OSIPreparationTemperature = NA
           ),
-        check_log = osi_check_log,
         osi_score = "OSIPreparationTemperature"
       ),
       regexp = paste("All values are 'NA' in the column",
@@ -348,7 +1120,6 @@ test_that(
               .data[["OSICategory"]]
             )
           ),
-        check_log = osi_check_log,
         osi_score = "OSICategory"
       ),
       regexp = "Invalid values detected in column \"OSICategory\" of `df`!"
@@ -366,7 +1137,6 @@ test_that(
               as.character(.data[["OSISummary"]])
             )
           ),
-        check_log = osi_check_log,
         osi_score = "OSISummary"
       ),
       regexp = "Non-numeric values detected in column \"OSISummary\" of `df`!"
@@ -384,7 +1154,6 @@ test_that(
               .data[["OSISummary"]]
             )
           ),
-        check_log = osi_check_log,
         osi_score = "OSISummary"
       ),
       regexp = "Out of range values detected in column \"OSISummary\" of `df`!"

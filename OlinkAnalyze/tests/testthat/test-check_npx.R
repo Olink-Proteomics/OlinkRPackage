@@ -15,7 +15,8 @@ test_that(
 
     expect_error(
       object = check_npx(df),
-      regexp = "`df` is not a tibble or an ArrowObject dataset!"
+      regexp = paste("`df` is not a tibble, Olink class object or an",
+                     "ArrowObject dataset!")
     )
   }
 )
@@ -368,191 +369,409 @@ test_that(
   }
 )
 
-# Test run_check_npx ----
+# Test get_check_npx ----
 
 test_that(
-  "run_check_npx - works - no check_log",
+  "get_check_npx - works - extracts check_log from olink_class",
   {
-    test_npx_data1 <- npx_data1 |>
-      dplyr::filter(
-        !(.data[["SampleID"]]
-          %in% c("CONTROL_SAMPLE_AS 1", "CONTROL_SAMPLE_AS 2"))
+    df_tbl <- dplyr::tibble(
+      SampleID = LETTERS[1L:4L],
+      OlinkID = paste0("OID1234", seq(1L:4L)),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L)
+    )
+
+    check_log_result <- check_npx(df = df_tbl) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    obj <- new_olink_class(df = df_tbl,
+                           check_log = check_log_result)
+
+    result <- get_check_npx(df = obj,
+                            check_log = NULL)
+
+    expect_identical(object = result,
+                     expected = check_log_result)
+  }
+)
+
+test_that(
+  "get_check_npx - works - extracts check_log from ArrowObject",
+  {
+    df_tbl <- dplyr::tibble(
+      SampleID = LETTERS[1L:4L],
+      OlinkID = paste0("OID1234", seq(1L:4L)),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L)
+    )
+
+    check_log_result <- check_npx(df = df_tbl) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    arrow_tbl <- arrow::as_arrow_table(x = df_tbl)
+    arrow_with_log <- attach_check_log_arrow(df = arrow_tbl,
+                                             check_log = check_log_result)
+
+    result <- get_check_npx(df = arrow_with_log,
+                            check_log = NULL)
+
+    expect_identical(object = result,
+                     expected = check_log_result)
+  }
+)
+
+test_that(
+  "get_check_npx - works - uses provided check_log when df has none",
+  {
+    df_tbl <- dplyr::tibble(
+      SampleID = LETTERS[1L:4L],
+      OlinkID = paste0("OID1234", seq(1L:4L)),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L)
+    )
+
+    check_log_result <- check_npx(df = df_tbl) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    result <- get_check_npx(df = df_tbl,
+                            check_log = check_log_result)
+
+    expect_identical(object = result,
+                     expected = check_log_result)
+  }
+)
+
+test_that(
+  "get_check_npx - works - uses provided check_log when ArrowObject has none",
+  {
+    df_tbl <- dplyr::tibble(
+      SampleID = LETTERS[1L:4L],
+      OlinkID = paste0("OID1234", seq(1L:4L)),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L)
+    )
+
+    check_log_result <- check_npx(df = df_tbl) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    arrow_tbl <- arrow::as_arrow_table(x = df_tbl)
+
+    result <- get_check_npx(df = arrow_tbl,
+                            check_log = check_log_result)
+
+    expect_identical(object = result,
+                     expected = check_log_result)
+  }
+)
+
+test_that(
+  "get_check_npx - works - runs check_npx when no check_log provided",
+  {
+    df_tbl <- dplyr::tibble(
+      SampleID = LETTERS[1L:4L],
+      SampleType = LETTERS[1L:4L],
+      OlinkID = paste0("OID1234", seq(1L:4L)),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L)
+    )
+
+    # no preferred names ----
+
+    expect_message(
+      object = {
+        result <- get_check_npx(df = df_tbl)
+      },
+      regexp = "`check_log` not provided. Running `check_npx()`.",
+      fixed = TRUE
+    )
+
+    check_log_result <- check_npx(df = df_tbl) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_identical(object = result,
+                     expected = check_log_result)
+
+    # one column name ----
+
+    df_tbl_v1 <- df_tbl |>
+      dplyr::rename(
+        "IamSampleName" = "SampleID"
       )
 
     expect_message(
-      object = run_check_npx(df = test_npx_data1),
-      regexp = "`check_log` not provided. Running `check_npx\\(\\)`"
+      object = {
+        result_v1 <- get_check_npx(
+          df = df_tbl_v1,
+          preferred_names = c("sample_id" = "IamSampleName")
+        )
+      },
+      regexp = "`check_log` not provided. Running `check_npx()`.",
+      fixed = TRUE
+    )
+
+    check_log_result_v1 <- check_npx(
+      df = df_tbl_v1,
+      preferred_names = c("sample_id" = "IamSampleName")
+    ) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_identical(
+      object = result_v1,
+      expected = check_log_result_v1
+    )
+
+    # multiple column names ----
+
+    df_tbl_v2 <- df_tbl |>
+      dplyr::rename(
+        "IamSampleName" = "SampleID",
+        "IamSampleType" = "SampleType",
+        "IamPlateIdentifier" = "PlateID",
+        "IamOlinkIdentifier" = "OlinkID"
+      )
+
+    expect_message(
+      object = {
+        result_v2 <- get_check_npx(
+          df = df_tbl_v2,
+          preferred_names = c("sample_id" = "IamSampleName",
+                              "sample_type" = "IamSampleType",
+                              "plate_id" = "IamPlateIdentifier",
+                              "olink_id" = "IamOlinkIdentifier")
+        )
+      },
+      regexp = "`check_log` not provided. Running `check_npx()`.",
+      fixed = TRUE
+    )
+
+    check_log_result_v2 <- check_npx(
+      df = df_tbl_v2,
+      preferred_names = c("sample_id" = "IamSampleName",
+                          "sample_type" = "IamSampleType",
+                          "plate_id" = "IamPlateIdentifier",
+                          "olink_id" = "IamOlinkIdentifier")
+    ) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_identical(
+      object = result_v2,
+      expected = check_log_result_v2
     )
   }
 )
 
 test_that(
-  "run_check_npx - works - check_log is all correct",
+  "get_check_npx - error - invalid check_log provided for plain tibble",
   {
-    test_check_log <- check_npx(df = npx_data1) |>
-      suppressWarnings() |>
-      suppressMessages()
+    df_tbl <- dplyr::tibble(
+      SampleID = LETTERS[1L:4L],
+      OlinkID = paste0("OID1234", seq(1L:4L)),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L)
+    )
 
-    expect_equal(
-      object = run_check_npx(df = npx_data1,
-                             check_log = test_check_log),
-      expected = test_check_log
+    expect_error(
+      object = get_check_npx(df = df_tbl,
+                             check_log = list(a = 1L)),
+      regexp = paste("Elements \"col_names\", \"oid_invalid\", \"assay_na\",",
+                     "\"sample_id_dups\", \"sample_id_na\", \"col_class\",",
+                     "\"assay_qc\", \"non_unique_uniprot\", and",
+                     "\"darid_invalid\" are missing from `check_log`!"),
+      fixed = TRUE
     )
   }
 )
 
 test_that(
-  "run_check_npx - error - check_log has no names",
+  "get_check_npx - prefers embedded check_log over provided check_log argument",
   {
-    test_check_log <- check_npx(df = npx_data1) |>
+    df_tbl <- dplyr::tibble(
+      SampleID = LETTERS[1L:4L],
+      OlinkID = paste0("OID1234", seq(1L:4L)),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L)
+    )
+
+    check_log_result <- check_npx(df = df_tbl) |>
       suppressWarnings() |>
       suppressMessages()
-    names(test_check_log) <- NULL
 
-    expect_error(
-      object = run_check_npx(df = npx_data1,
-                             check_log = test_check_log),
-      regexp = "`check_log` is a list with no names!"
+    obj <- new_olink_class(df = df_tbl,
+                           check_log = check_log_result)
+
+    # pass a deliberately different (invalid) check_log argument; the embedded
+    # one should be used instead without raising an error
+    result <- get_check_npx(df = obj,
+                            check_log = list(a = 1L))
+
+    expect_identical(object = result,
+                     expected = check_log_result)
+  }
+)
+
+# Test get_preferred_names ----
+
+test_that(
+  "get_preferred_names - works - check_log match",
+  {
+    # v1 - all match - no multiple alt names ----
+
+    check_log <- check_npx(df = npx_data1) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_null(
+      object = get_preferred_names(df = npx_data1, check_log = check_log)
+    )
+
+    # v2 - all match - multiple alt names ----
+
+    npx_data1_v2 <- npx_data1 |>
+      dplyr::mutate(
+        "PlateLOD" = .data[["LOD"]],
+        "MaxLOD" = .data[["LOD"]]
+      )
+
+    check_log_v2 <- check_npx(
+      df = npx_data1_v2
+    ) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_null(
+      object = get_preferred_names(df = npx_data1_v2, check_log = check_log_v2)
+    )
+
+    # v3 - all match - multiple alt names - order is ignored ----
+
+    check_log_v3 <- check_log_v2
+    check_log_v3$col_names$lod <- sample(x = check_log_v3$col_names$lod,
+                                         size = 3L,
+                                         replace = FALSE)
+
+    expect_null(
+      object = get_preferred_names(df = npx_data1_v2, check_log = check_log_v3)
     )
   }
 )
 
 test_that(
-  "run_check_npx - error - check_log misses some names",
+  "get_preferred_names - works - check_log match",
   {
-    test_check_log <- check_npx(df = npx_data1) |>
-      suppressWarnings() |>
-      suppressMessages()
-    test_check_log <- test_check_log[utils::head(x = check_npx_lst_names,
-                                                 n = 4L)]
+    # v1 - 1 mismatched name ----
 
-    expect_error(
-      object = run_check_npx(df = npx_data1,
-                             check_log = test_check_log),
-      regexp = paste("Elements \"sample_id_na\", \"col_class\", \"assay_qc\",",
-                     "\"non_unique_uniprot\", and \"darid_invalid\" are",
-                     "missing from `check_log`!")
-    )
-  }
-)
+    npx_data1_v1 <- npx_data1 |>
+      dplyr::mutate(
+        "SampleID2" = .data[["SampleID"]]
+      )
 
-test_that(
-  "run_check_npx - warning - check_log has additional unexpected names",
-  {
-    test_check_log <- check_npx(df = npx_data1) |>
-      suppressWarnings() |>
-      suppressMessages()
-    test_check_log <- append(
-      x = test_check_log,
-      values = list("i_am_a_new_element" = c(1L, 2L, 3L))
-    )
-
-    expect_warning(
-      object = run_check_npx(df = npx_data1,
-                             check_log = test_check_log),
-      regexp = paste("Additional element \"i_am_a_new_element\" detected in",
-                     "`check_log`!")
-    )
-  }
-)
-
-test_that(
-  "run_check_npx - error - check_log misses required keys for column names",
-  {
-    test_check_log <- check_npx(df = npx_data1) |>
-      suppressWarnings() |>
-      suppressMessages()
-    test_check_log$col_names <- test_check_log$col_names[utils::head(x = names(test_check_log$col_names), n = 4L)] # nolint: indentation_linter
-
-    expect_error(
-      object = run_check_npx(df = npx_data1,
-                             check_log = test_check_log),
-      regexp = "There are no column names associated with the following keys:"
-    )
-  }
-)
-
-test_that(
-  "run_check_npx - warning - check_log has additional keys for column names",
-  {
-    test_check_log <- check_npx(df = npx_data1) |>
-      suppressWarnings() |>
-      suppressMessages()
-    test_check_log$col_names <- append(
-      x = test_check_log$col_names,
-      values = list("i_am_a_new_element" = "Site")
-    )
-
-    expect_warning(
-      object = run_check_npx(df = npx_data1,
-                             check_log = test_check_log),
-      regexp = "Unexpected key \"i_am_a_new_element\" corresponding to column"
-    )
-  }
-)
-
-test_that(
-  "run_check_npx - error - check_log contains column names not in df",
-  {
-    test_check_log <- check_npx(df = npx_data1) |>
+    check_log_v1 <- check_npx(
+      df = npx_data1_v1,
+      preferred_names = c("sample_id" = "SampleID2")
+    ) |>
       suppressWarnings() |>
       suppressMessages()
 
-    # check_log contains non-character values v1 ----
-
-    test_check_log_v1 <- test_check_log
-    test_check_log_v1$col_names$sample_id <- FALSE
-
-    expect_error(
-      object = run_check_npx(df = npx_data1,
-                             check_log = test_check_log_v1),
-      regexp = paste("Column name \"FALSE\" from `check_log` is missing from",
-                     "the dataset `df`!")
+    expect_identical(
+      object = get_preferred_names(df = npx_data1_v1, check_log = check_log_v1),
+      expected = c("sample_id" = "SampleID2")
     )
 
-    # check_log contains non-character values v2 ----
+    # v2 - multiple mismatched names ----
 
-    test_check_log_v2 <- test_check_log
-    test_check_log_v2$col_names$sample_id <- FALSE
-    test_check_log_v2$col_names$olink_id <- 1L
-    test_check_log_v2$col_names$uniprot <- 1.1
-    test_check_log_v2$col_names$plate_id <- TRUE
+    npx_data1_v2 <- npx_data1 |>
+      dplyr::mutate(
+        "SampleID2" = .data[["SampleID"]],
+        "OlinkID2" = .data[["OlinkID"]],
+        "UniProt2" = .data[["UniProt"]]
+      )
 
-    expect_error(
-      object = run_check_npx(df = npx_data1,
-                             check_log = test_check_log_v2),
-      regexp = paste("Column names \"FALSE\", \"1\", \"1.1\", and \"TRUE\"",
-                     "from `check_log` are missing from the dataset `df`!")
+    check_log_v2 <- check_npx(
+      df = npx_data1_v2,
+      preferred_names = c("sample_id" = "SampleID2",
+                          "olink_id" = "OlinkID2",
+                          "uniprot" = "UniProt2")
+    ) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_identical(
+      object = get_preferred_names(df = npx_data1_v2, check_log = check_log_v2),
+      expected = c("sample_id" = "SampleID2",
+                   "olink_id" = "OlinkID2",
+                   "uniprot" = "UniProt2")
     )
 
-    # check_log contains values not in df v1 ----
+    # v3 - multiple mismatched names ----
 
-    test_check_log_v3 <- test_check_log
-    test_check_log_v3$col_names$sample_id <- "SampleID2"
+    npx_data1_v3 <- npx_data1 |>
+      dplyr::mutate(
+        "SampleID2" = .data[["SampleID"]],
+        "OlinkID2" = .data[["OlinkID"]],
+        "UniProt2" = .data[["UniProt"]],
+        "PlateLOD" = .data[["LOD"]],
+        "MaxLOD" = .data[["LOD"]]
+      )
 
-    expect_error(
-      object = run_check_npx(df = npx_data1,
-                             check_log = test_check_log_v3),
-      regexp = paste("Column name \"SampleID2\" from `check_log` is missing",
-                     "from the dataset `df`!")
+    check_log_v3 <- check_npx(
+      df = npx_data1_v3,
+      preferred_names = c("sample_id" = "SampleID2",
+                          "olink_id" = "OlinkID2",
+                          "uniprot" = "UniProt2",
+                          "lod" = "LOD")
+    ) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_identical(
+      object = get_preferred_names(df = npx_data1_v3, check_log = check_log_v3),
+      expected = c("sample_id" = "SampleID2",
+                   "olink_id" = "OlinkID2",
+                   "uniprot" = "UniProt2",
+                   "lod" = "LOD")
     )
-
-    # check_log contains values not in df v2 ----
-
-    test_check_log_v4 <- test_check_log
-    test_check_log_v4$col_names$sample_id <- "SampleID2"
-    test_check_log_v4$col_names$i_am_a_new_element <- "Site2"
-
-    expect_error(
-      object = expect_warning(
-        object = run_check_npx(df = npx_data1,
-                               check_log = test_check_log_v4),
-        regexp = "Unexpected key \"i_am_a_new_element\" corresponding to column"
-      ),
-      regexp = paste("Column names \"SampleID2\" and \"Site2\" from",
-                     "`check_log` are missing from the dataset `df`!")
-    )
-
   }
 )
 

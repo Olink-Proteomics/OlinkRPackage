@@ -41,14 +41,9 @@ npx_df <- OlinkAnalyze::npx_data1 |>
                                              na.rm = TRUE)
   )
 
-check_log <- OlinkAnalyze::check_npx(
-  df = npx_df
-)
-
 # Generate figure
 OlinkAnalyze::olink_osi_dist_plot(
   df = npx_df,
-  check_log = check_log,
   osi_score = "OSISummary"
 )
 }

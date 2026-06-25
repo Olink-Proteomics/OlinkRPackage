@@ -180,24 +180,38 @@ check_npx <- function(df,
 
 }
 
-#' Check and run [`check_npx()`] if not provided.
+#' Get check log from input or run [`check_npx()`] if not provided.
 #'
 #' @details
-#' This function acts as a wrapper for [`check_npx()`]. It will check if the
-#' input `check_log` provided by the user is valid. If not, it will throw
-#' relevant errors or warnings. Alternatively, if `check_log` was not provided
-#' by the user, it will run [`check_npx()`] to provide `check_log` to enable
-#' downstream functions to run.#'
+#' This function checks if the input data frame is an `olink_class` or an
+#' ArrowObject with `check_log` in its metadata. If so, it uses the internal
+#' function [`olink_check_log()`] to extract `check_log` from it. If the output
+#' from [`olink_check_log()`] is not null, then it returns `check_log`. If the
+#' output from [`olink_check_log()`] is null, then it checks if the argument
+#' `check_log` in this function is not null. If it is not null, it runs the
+#' internal function [`validate_check_log()`] on it to ensure that the provided
+#' `check_log` is valid. If the provided `check_log` is valid, it returns it. If
+#' it is not valid, a relevant error is thrown from [`validate_check_log()`]. If
+#' the argument `check_log` in this function is null, then it runs
+#' [`check_npx()`] on the input `df` and returns the output.
 #'
 #' @inherit .downstream_fun_args params author
+#' @inherit .read_npx_args params
 #' @inherit check_npx return
 #'
 #' @keywords internal
+#' @noRd
 #'
-run_check_npx <- function(df,
-                          check_log = NULL) {
-  # generate check_log if not provided ----
-  if (is.null(check_log)) {
+get_check_npx <- function(df,
+                          check_log = NULL,
+                          preferred_names = NULL) {
+  tmp_check_log <- olink_check_log(df = df)
+
+  if (!is.null(tmp_check_log)) {
+    check_log <- tmp_check_log
+  } else if (!is.null(check_log)) {
+    validate_check_log(df = df, check_log = check_log)
+  } else {
     cli::cli_inform(
       c(
         "{.arg check_log} not provided. Running {.fn check_npx}.",
@@ -205,144 +219,95 @@ run_check_npx <- function(df,
         full picture of the results from the data validity check!"
       )
     )
-
-    check_log <- check_npx(df = df)
-    return(check_log)
-  }
-
-  # checks if check_log was provided ----
-
-  check_is_list(x = check_log, error = TRUE)
-
-  ## check that check_log has all expected output names ----
-
-  # check that check_log has names
-  if (is.null(names(check_log))) {
-    cli::cli_abort(
-      c(
-        "x" = "{.arg check_log} is a list with no names!",
-        "i" = "Ensure that {.arg check_log} is the output of {.fn check_npx}
-        for dataset {.arg df}!"
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-  }
-
-  # check that all expected elements in check_log are in place
-  check_log_missing <- setdiff(
-    x = check_npx_lst_names,
-    y = names(check_log)
-  )
-  if (length(check_log_missing) > 0L) {
-    cli::cli_abort(
-      c(
-        "x" = "Element{?s} {.val {check_log_missing}} are missing from
-        {.arg check_log}!",
-        "i" = "Ensure that {.arg check_log} is the output of {.fn check_npx}
-        for dataset {.arg df}!"
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-  }
-
-  # check if check_log contains additional elements
-  check_log_additional <- setdiff(
-    x = names(check_log),
-    y = check_npx_lst_names
-  )
-  if (length(check_log_additional) > 0L) {
-    cli::cli_warn(
-      c(
-        "Additional element{?s} {.val {check_log_additional}} detected in
-        {.arg check_log}!",
-        "i" = "Ensure that {.arg check_log} is the output of {.fn check_npx}
-        for dataset {.arg df}!"
-      )
-    )
-  }
-
-  ## check that df column names are in place ----
-
-  # missing required column keys
-  check_log_cnames_missing <- setdiff(
-    x = column_name_dict |> # required column names
-      dplyr::filter(
-        .data[["col_miss"]] == FALSE
-      ) |>
-      dplyr::pull(
-        .data[["col_key"]]
-      ),
-    y = names(check_log$col_names)
-  )
-  if (length(check_log_cnames_missing) > 0L) {
-    df_req_cols_miss <- column_name_dict |>
-      dplyr::filter(
-        .data[["col_miss"]] == FALSE
-        & .data[["col_key"]] %in% .env[["check_log_cnames_missing"]]
-      )
-
-    miss_cols <- paste0(
-      "* \"", df_req_cols_miss$col_key, "\": One of ",
-      sapply(df_req_cols_miss$col_names,
-             ansi_collapse_quot,
-             sep = "or"), "."
-    )
-
-    cli::cli_abort(
-      c(
-        "x" = "{cli::qty(df_req_cols_miss$col_key)} There {?is/are} no column
-        name{?s} associated with the following key{?s}:",
-        miss_cols,
-        "i" = "Ensure that {.arg check_log} is the output of {.fn check_npx}
-        for dataset {.arg df}!"
-      ),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
-  }
-
-  # additional unexpected column names
-  check_log_cnames_additional <- setdiff(
-    x = names(check_log$col_names),
-    y = column_name_dict |> # all column names
-      dplyr::pull(
-        .data[["col_key"]]
-      )
-  )
-  if (length(check_log_cnames_additional) > 0L) {
-    cli::cli_warn(
-      c(
-        "Unexpected key{?s} {.val {check_log_cnames_additional}} corresponding
-        to column names detected in {.arg check_log$col_names}!",
-        "i" = "Ensure that {.arg check_log} is the output of {.fn check_npx}
-        for dataset {.arg df}!"
-      )
-    )
-  }
-
-  # check that actual column names are in place - sort of security check that
-  # check_log corresponds to the current df
-  check_log_cols_miss <- setdiff(
-    x = unlist(x = check_log$col_names,
-               recursive = TRUE,
-               use.names = FALSE),
-    y = names(df)
-  )
-  if (length(check_log_cols_miss) > 0L) {
-    cli::cli_abort(
-      c(
-        "x" = "Column name{?s} {.val {check_log_cols_miss}} from
-        {.arg check_log} {?is/are} missing from the dataset {.arg df}!",
-        "i" = "Ensure that {.arg check_log} is the output of {.fn check_npx}
-        for dataset {.arg df}!"),
-      call = rlang::caller_env(),
-      wrap = FALSE
-    )
+    check_log <- check_npx(df = df, preferred_names = preferred_names)
   }
 
   return(check_log)
+}
+
+#' Get preferred column names from a check log
+#'
+#' Identifies preferred column names from a supplied check log by comparing the
+#' column name matches stored in `check_log` with the column name matches
+#' detected locally in `df`.
+#'
+#' Names are returned for keys that are either only present in `check_log`, or
+#' present in both `check_log` and the local check but have different matched
+#' values. Vector order is ignored when comparing matched values.
+#'
+#' The function only supports cases where each selected key maps to a single
+#' preferred name. If any selected key maps to multiple names, an error is
+#' thrown and preferred names must be supplied manually.
+#'
+#' @param df A data frame to check for NPX column names.
+#' @param check_log A check log object. Must pass [validate_check_log()].
+#'
+#' @return A named character vector. Names are column name keys and values are
+#'   the preferred column names selected from `check_log`.
+#'
+#' @keywords internal
+#' @noRd
+#'
+#' @examples
+#' \dontrun{
+#' check_log <- OlinkAnalyze::check_npx(
+#'   df = OlinkAnalyze::npx_data1
+#' )
+#'
+#' OlinkAnalyze:::get_preferred_names(
+#'   df = OlinkAnalyze::npx_data1,
+#'   check_log = check_log
+#' )
+#' }
+get_preferred_names <- function(df,
+                                check_log) {
+  validate_check_log(df = df, check_log = check_log)
+  check_log_names <- check_log$col_names
+
+  check_log_local_names <- check_npx_col_names(df = df) |>
+    suppressMessages() |>
+    suppressWarnings()
+
+  only_in_check_log <- setdiff(
+    x = names(check_log_names),
+    y = names(check_log_local_names)
+  )
+
+  shared_names <- intersect(
+    x = names(check_log_names),
+    y = names(check_log_local_names)
+  )
+
+  same_content <- function(x, y) {
+    z <- identical(x = sort(x), y = sort(y))
+    return(z)
+  }
+
+  different_content <- shared_names[
+    vapply(
+      shared_names,
+      function(nm) {
+        !same_content( # nolint: return_linter
+          x = check_log_names[[nm]],
+          y = check_log_local_names[[nm]]
+        )
+      },
+      logical(1)
+    )
+  ]
+
+  result <- check_log_names[c(only_in_check_log, different_content)]
+
+  # result will never contain elements with length greater than 0. This can
+  # happen only in the case when `check_log_names` contains multiple matches,
+  # and `check_log_local_names` does not. However, this will never be the case
+  # as it is taken care of `validate_check_log()` which checks whether all
+  # columns with multiple matches in `check_log` are present in the `df`.
+
+  # if result has length 0, this return NULL
+  preferred_names <- unlist(result, use.names = TRUE)
+
+  return(preferred_names)
 }
 
 #' Check, update and define column names used in downstream analyses

@@ -81,15 +81,9 @@ if (rlang::is_installed(pkg = c("lme4", "lmerTest", "broom", "emmeans"))) {
       )
     )
 
-  # check data
-  npx_df_check_log <- OlinkAnalyze::check_npx(
-    df = npx_df
-  )
-
   # Results in model NPX ~ Time * Treatment + (1 | Subject) + (1 | Site)
   lmer_results <- OlinkAnalyze::olink_lmer(
     df = npx_df,
-    check_log = npx_df_check_log,
     variable = c("Time", "Treatment"),
     random = c("Subject")
   )
@@ -100,12 +94,13 @@ if (rlang::is_installed(pkg = c("lme4", "lmerTest", "broom", "emmeans"))) {
     .data[["Threshold"]] == "Significant"
     & .data[["term"]] == "Time:Treatment"
   ) |>
-    dplyr::distinct(.data[["OlinkID"]]) |>
+    dplyr::distinct(
+      .data[["OlinkID"]]
+    ) |>
     dplyr::pull()
 
   lst_pointrange_plots <- OlinkAnalyze::olink_lmer_plot(
     df = npx_df,
-    check_log = npx_df_check_log,
     variable = c("Time", "Treatment"),
     random = c("Subject"),
     x_axis_variable = "Time",

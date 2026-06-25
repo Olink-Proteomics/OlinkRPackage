@@ -6,6 +6,7 @@
 #' @param df An Olink dataset.
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @return The input Olink dataset without all-NA columns.
 #'
@@ -36,6 +37,111 @@ remove_all_na_cols <- function(df) {
   return(df)
 }
 
+#' Help function checking that the requested output class of the read_npx*
+#' functions is acceptable.
+#'
+#' @author
+#'   Klev Diamanti
+#'
+#' @inheritParams .read_npx_args
+#'
+#' @return Error if \var{out_df} is not one of
+#' `r ansi_collapse_quot(x = read_npx_df_output, sep = "and")`.
+#'
+#' @keywords internal
+#' @noRd
+#'
+check_out_df_arg <- function(out_df) {
+
+  # check that out_df is a string
+  check_is_scalar_character(x = out_df,
+                            error = TRUE)
+
+  if (!(out_df %in% read_npx_df_output)) {
+
+    cli::cli_abort( # nolint: return_linter
+      message = c(
+        "x" = "Unknown output argument {.arg out_df}!",
+        "i" = "Expected one of {.val {read_npx_df_output}}"
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
+}
+
+#' Help function converting the output dataset from read_npx* functions to
+#' `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")`.
+#'
+#' @author
+#'   Klev Diamanti
+#'
+#' @inheritParams .read_npx_args
+#' @inheritParams .downstream_fun_args
+#'
+#' @return The dataset in the requested class.
+#'
+#' @keywords internal
+#'
+convert_read_npx_output <- function(df,
+                                    out_df) {
+
+  # check that out_df is ok
+  check_out_df_arg(out_df = out_df)
+
+  if (check_is_dataset(x = df, error = FALSE)) {
+
+    if (out_df == "tibble") {
+
+      return(dplyr::as_tibble(df))
+
+    } else if (out_df == "arrow") {
+
+      return(arrow::as_arrow_table(df))
+
+    }
+
+  } else {
+
+    # if none of the above throw an error
+    cli::cli_abort( # nolint: return_linter
+      message = c(
+        "x" = "Unexpected input dataset {.arg df}!",
+        "i" = "Expected one of: {.val {read_npx_df_output}}."
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+
+  }
+
+}
+
+#' Get the output type for NPX data
+#'
+#' Determines whether a validated dataset is represented as a tibble or an
+#' Arrow object, and returns the corresponding output type.
+#'
+#' @param df A dataset object. Must pass `check_is_dataset()`.
+#'
+#' @return A character string indicating the dataset output type:
+#' `"tibble"` if `df` is a tibble, or `"arrow"` if `df` is an Arrow object.
+#'
+#' @keywords internal
+#' @noRd
+#'
+get_read_npx_output <- function(df) {
+  check_is_dataset(x = df, error = TRUE)
+
+  if (check_is_tibble(x = df, error = FALSE)) {
+    return("tibble")
+  } else if (check_is_arrow_object(x = df, error = FALSE)) {
+    return("arrow")
+  }
+}
+
 #' Utility function that adds quotation marks on elements printed by
 #' ansi_collapse from cli.
 #'
@@ -43,6 +149,7 @@ remove_all_na_cols <- function(df) {
 #' @param sep One of "or" and "and".
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @return Scalar character vector collapsed by "and" or "or".
 #'
@@ -58,10 +165,41 @@ ansi_collapse_quot <- function(x,
   return(x)
 }
 
+#' Pull a column from a data frame or Arrow object
+#'
+#' Pulls a single column from `.data` using a character column name. If `.data`
+#' is an Arrow object, `dplyr::pull()` is called with `as_vector = TRUE` so that
+#' the result is returned as an R vector.
+#'
+#' @param .data A data frame, tibble, or Arrow object.
+#' @param col A single character string giving the name of the column to pull.
+#'
+#' @return An R vector containing the values from `col`.
+#'
+#' @details
+#' This helper is intended for code paths where `.data` may be either a regular
+#' data frame like object or an Arrow object. The Arrow branch explicitly sets
+#' `as_vector = TRUE` to avoid relying on the deprecated default behavior of
+#' `dplyr::pull()` for Arrow data.
+#'
+#' @keywords internal
+#' @noRd
+#'
+pull_col <- function(.data, col) {
+  check_is_scalar_character(x = col, error = TRUE)
+
+  if (check_is_arrow_object(x = .data, error = FALSE)) {
+    x <- dplyr::pull(.data, .data[[col]], as_vector = TRUE)
+  } else {
+    x <- dplyr::pull(.data, .data[[col]])
+  }
+
+  return(x)
+}
+
 #' Utility function to check OSI values for validity
 #'
 #' @param df An Olink dataset.
-#' @param check_log Output log of check_npx(). Defaults to NULL.
 #' @param osi_score Name of OSI column to check. Defaults to NULL.
 #'
 #' @keywords internal
@@ -69,7 +207,6 @@ ansi_collapse_quot <- function(x,
 #' @return An Olink dataset with the OSI column checked and cleaned
 #'
 check_osi <- function(df,
-                      check_log = NULL,
                       osi_score = NULL) {
 
   if (missing(df)) {
@@ -219,20 +356,6 @@ check_osi <- function(df,
 #' @return Boolean, `TRUE` or `FALSE`, if the variable is of the correct class;
 #' If output is `FALSE` and \var{error} = `TRUE`, an error is thrown.
 #'
-#' @seealso
-#'   \code{\link{check_is_character}}
-#'   \code{\link{check_is_integer}}
-#'   \code{\link{check_is_numeric}}
-#'   \code{\link{check_is_boolean}}
-#'   \code{\link{check_is_scalar_character}}
-#'   \code{\link{check_is_scalar_integer}}
-#'   \code{\link{check_is_scalar_numeric}}
-#'   \code{\link{check_is_scalar_boolean}}
-#'   \code{\link{check_is_tibble}}
-#'   \code{\link{check_is_dataset}}
-#'   \code{\link{check_is_arrow_object}}
-#'   \code{\link{check_is_list}}
-#'
 .check_params <- function(x, error) {}
 
 #' Common parameters for read_npx-related functions.
@@ -247,6 +370,9 @@ check_osi <- function(df,
 #' @param out_df The class of the output dataset. One of
 #' `r ansi_collapse_quot(x = read_npx_df_output, sep = "or")`. Defaults to
 #' "tibble".
+#' @param preferred_names A named character vector where names are internal
+#' column names and values are column names to be selected from the input data
+#' frame. Read the \emph{description} of [`check_npx()`]for further information.
 #' @param long_format Boolean marking format of input file. One of `TRUE` for
 #' long format and `FALSE` for wide format files. Defaults to `NULL` for
 #' auto-detection.
@@ -275,6 +401,7 @@ check_osi <- function(df,
 .read_npx_args <- function(filename,
                            file,
                            out_df,
+                           preferred_names,
                            long_format,
                            olink_platform,
                            data_type,

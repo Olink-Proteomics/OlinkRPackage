@@ -12,6 +12,8 @@ test_that(
     # tests are skipped if files are absent
     reference_results <- get_example_data(filename = "reference_results.rds")
 
+    # tibble ----
+
     npx_data1_check <- check_npx(df = npx_data1) |>
       suppressMessages() |>
       suppressWarnings()
@@ -55,6 +57,63 @@ test_that(
 
     expect_equal(
       object = lmer_result,
+      expected = reference_results$lmer,
+      tolerance = 1e-4
+    )
+
+    # olink_class ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_obj <- attach_check_log(
+            df = npx_data1,
+            out_df = "tibble"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = expect_message(
+            object = expect_message(
+              object = lmer_result_obj <- olink_lmer(
+                df = npx_data1_obj,
+                variable = c("Treatment", "Time"),
+                random = "Subject"
+              ),
+              regexp = paste("Samples removed due to missing variable or",
+                             "covariate levels: CONTROL_SAMPLE_AS 1,",
+                             "CONTROL_SAMPLE_AS 2")
+            ),
+            regexp = paste("Variables and covariates converted from character",
+                           "to factors: Treatment, Time, Subject")
+          ),
+          regexp = paste("Linear mixed effects model fit to each",
+                         "assay:NPX~Treatment*Time+(1|Subject)"),
+          fixed = TRUE
+        )
+      )
+    )
+
+    lmer_result_obj <- lmer_result_obj |>
+      dplyr::mutate(
+        id = as.character(.data[["OlinkID"]])
+      ) |>
+      # Since OlinkID is not unique here (=> ties), term is used to break ties
+      dplyr::arrange(
+        .data[["id"]], .data[["term"]]
+      ) |>
+      dplyr::select(
+        -dplyr::all_of("id")
+      )
+
+    expect_equal(
+      object = lmer_result_obj,
       expected = reference_results$lmer,
       tolerance = 1e-4
     )
@@ -276,11 +335,13 @@ test_that(
     # tests are skipped if files are absent
     reference_results <- get_example_data(filename = "reference_results.rds")
 
+    # tibble ----
+
     npx_data1_check <- check_npx(df = npx_data1) |>
       suppressMessages() |>
       suppressWarnings()
 
-    # olink_lmer result was tested against the referebce, so there is no need
+    # olink_lmer result was tested against the reference, so there is no need
     # to retest it here. Just extract the list of OlinkIDs with significant
     # Treatment:Time interaction from the reference results.
     oid_list <- reference_results$lmer |>
@@ -341,6 +402,83 @@ test_that(
       object = lmer_posthoc_result,
       expected = reference_results$lmer_posthoc
     )
+
+    # olink_class ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_obj <- attach_check_log(
+            df = npx_data1,
+            out_df = "tibble"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    # olink_lmer result was tested against the reference, so there is no need
+    # to retest it here. Just extract the list of OlinkIDs with significant
+    # Treatment:Time interaction from the reference results.
+    oid_list <- reference_results$lmer |>
+      dplyr::filter(
+        .data[["term"]] == "Treatment:Time"
+      ) |>
+      dplyr::filter(
+        .data[["Threshold"]] == "Significant"
+      ) |>
+      dplyr::pull(
+        .data[["OlinkID"]]
+      )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = expect_message(
+            object = expect_message(
+              object = lmer_posthoc_result_obj <- olink_lmer_posthoc(
+                df = npx_data1_obj,
+                variable = c("Treatment", "Time"),
+                random = "Subject",
+                olinkid_list = oid_list,
+                effect = c("Treatment", "Time")
+              ),
+              regexp = paste("Samples removed due to missing variable or",
+                             "covariate levels: CONTROL_SAMPLE_AS 1,",
+                             "CONTROL_SAMPLE_AS 2")
+            ),
+            regexp = paste("Variables and covariates converted from character",
+                           "to factors: Treatment, Time")
+          ),
+          regexp = paste("Means estimated for each assay from linear mixed",
+                         "effects model: NPX~Treatment*Time+(1|Subject)"),
+          fixed = TRUE
+        )
+      )
+    )
+
+    # Run olink_lmer_posthoc
+    lmer_posthoc_result_obj <- lmer_posthoc_result_obj |>
+      dplyr::mutate(
+        id = as.character(.data[["OlinkID"]])
+      ) |>
+      dplyr::arrange(
+        .data[["id"]], .data[["contrast"]]
+      ) |>
+      # In R 3.6.1 we get factors, but reference is characters
+      dplyr::mutate(
+        contrast = as.character(.data[["contrast"]])
+      ) |>
+      dplyr::select(
+        -dplyr::all_of("id")
+      )
+
+    expect_equal(
+      object = lmer_posthoc_result_obj,
+      expected = reference_results$lmer_posthoc
+    )
+
   }
 )
 

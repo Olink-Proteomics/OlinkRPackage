@@ -50,21 +50,31 @@ test_that(
       suppressWarnings() |>
       suppressMessages()
 
+    npx_data1_clean <- clean_npx(df = npx_data1,
+                                 check_log = npx_data1_check) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    npx_data1_clean_check <- check_npx(df = npx_data1_clean) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    npx_data1_clean <- strip_check_log(df = npx_data1_clean)
+
     # ---- 2 proteins ----
 
     expect_no_error(
       object = expect_no_warning(
         object = expect_message(
-          object = boxplot_site_2prots <- npx_data1 |>
-            tidyr::drop_na() |>
-            olink_boxplot(
-              variable = "Site",
-              olinkid_list = ref_results$anova_site |>
-                dplyr::filter(.data[["Threshold"]] == "Significant") |>
-                dplyr::slice_head(n = 2L) |>
-                dplyr::pull(.data[["OlinkID"]]),
-              check_log = npx_data1_check
-            ),
+          object = boxplot_site_2prots <- olink_boxplot(
+            df = npx_data1_clean,
+            variable = "Site",
+            olinkid_list = ref_results$anova_site |>
+              dplyr::filter(.data[["Threshold"]] == "Significant") |>
+              dplyr::slice_head(n = 2L) |>
+              dplyr::pull(.data[["OlinkID"]]),
+            check_log = npx_data1_clean_check
+          ),
           regexp = paste("No sample type column detected in input `df`.",
                          "Control samples may not be filtered out."),
           fixed = TRUE
@@ -87,17 +97,16 @@ test_that(
     expect_no_error(
       object = expect_no_warning(
         object = expect_message(
-          object = boxplot_site_10prots <- npx_data1 |>
-            tidyr::drop_na() |>
-            olink_boxplot(
-              variable = "Site",
-              olinkid_list = ref_results$anova_site |>
-                dplyr::filter(.data[["Threshold"]] == "Significant") |>
-                dplyr::slice_head(n = 10L) |>
-                dplyr::pull(.data[["OlinkID"]]),
-              number_of_proteins_per_plot = 5L,
-              check_log = npx_data1_check
-            ),
+          object = boxplot_site_10prots <- olink_boxplot(
+            df = npx_data1_clean,
+            variable = "Site",
+            olinkid_list = ref_results$anova_site |>
+              dplyr::filter(.data[["Threshold"]] == "Significant") |>
+              dplyr::slice_head(n = 10L) |>
+              dplyr::pull(.data[["OlinkID"]]),
+            number_of_proteins_per_plot = 5L,
+            check_log = npx_data1_clean_check
+          ),
           regexp = paste("No sample type column detected in input `df`.",
                          "Control samples may not be filtered out."),
           fixed = TRUE
@@ -198,15 +207,14 @@ test_that(
     expect_no_error(
       object = expect_no_warning(
         object = expect_message(
-          object = boxplot_time_site <- npx_data1 |>
-            tidyr::drop_na() |>
-            olink_boxplot(
-              variable = c("Time", "Site"),
-              olinkid_list = ref_results$anova_time |>
-                dplyr::slice_head(n = 10L) |>
-                dplyr::pull(.data[["OlinkID"]]),
-              check_log = npx_data1_check
-            ),
+          object = boxplot_time_site <- olink_boxplot(
+            df = npx_data1_clean,
+            variable = c("Time", "Site"),
+            olinkid_list = ref_results$anova_time |>
+              dplyr::slice_head(n = 10L) |>
+              dplyr::pull(.data[["OlinkID"]]),
+            check_log = npx_data1_clean_check
+          ),
           regexp = paste("No sample type column detected in input `df`.",
                          "Control samples may not be filtered out."),
           fixed = TRUE
@@ -304,5 +312,203 @@ test_that(
       boxplot_treatment_ttest_name,
       boxplot_treatment_ttest[[2L]]
     )
+  }
+)
+
+test_that(
+  "olink_boxplot - works - vdiffr olink_class",
+  {
+    skip_on_cran()
+    skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
+    skip_if_not_installed("vdiffr")
+
+    ref_results <- get_example_data(
+      filename = "reference_results.rds"
+    )
+
+    # data ----
+
+    npx_data1_clean <- clean_npx(df = npx_data1) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    npx_data1_obj <- attach_check_log(
+      df = npx_data1,
+      out_df = "tibble",
+      preferred_names = NULL
+    ) |>
+      suppressWarnings()
+
+    npx_data1_clean_obj <- attach_check_log(
+      df = npx_data1_clean,
+      out_df = "tibble",
+      preferred_names = NULL
+    )
+
+    ## ---- 2 proteins ----
+
+    boxplot_site_2prots_obj <- olink_boxplot(
+      df = npx_data1_clean_obj,
+      variable = "Site",
+      olinkid_list = ref_results$anova_site |>
+        dplyr::filter(.data[["Threshold"]] == "Significant") |>
+        dplyr::slice_head(n = 2L) |>
+        dplyr::pull(.data[["OlinkID"]])
+    ) |>
+      suppressMessages()
+
+    boxplot_site_2prots_name <- "boxplot site 2prots olink_class"
+    check_snap_exist(
+      test_dir_name = "olink_boxplot",
+      snap_name = boxplot_site_2prots_name
+    )
+    vdiffr::expect_doppelganger(
+      boxplot_site_2prots_name,
+      boxplot_site_2prots_obj[[1L]]
+    )
+
+    ## ---- 10 proteins ----
+
+    boxplot_site_10prots_obj <- olink_boxplot(
+      df = npx_data1_clean_obj,
+      variable = "Site",
+      olinkid_list = ref_results$anova_site |>
+        dplyr::filter(.data[["Threshold"]] == "Significant") |>
+        dplyr::slice_head(n = 10L) |>
+        dplyr::pull(.data[["OlinkID"]]),
+      number_of_proteins_per_plot = 5L
+    ) |>
+      suppressMessages()
+
+    boxplot_site_10prots_name <- "boxplot site 10prots olink_class"
+    check_snap_exist(
+      test_dir_name = "olink_boxplot",
+      snap_name = boxplot_site_10prots_name
+    )
+    vdiffr::expect_doppelganger(
+      boxplot_site_10prots_name,
+      boxplot_site_10prots_obj[[2L]]
+    )
+
+    ## ---- Time ----
+
+    boxplot_time_obj <- olink_boxplot(
+      df = npx_data1_obj,
+      variable = "Time",
+      olinkid_list = ref_results$anova_time |>
+        dplyr::slice_head(n = 10L) |>
+        dplyr::pull(.data[["OlinkID"]])
+    ) |>
+      suppressMessages()
+
+    boxplot_time_name <- "boxplot time olink_class"
+    check_snap_exist(
+      test_dir_name = "olink_boxplot",
+      snap_name = boxplot_time_name
+    )
+    vdiffr::expect_doppelganger(
+      boxplot_time_name,
+      boxplot_time_obj[[2L]]
+    )
+
+  }
+)
+
+test_that(
+  "olink_boxplot - works - vdiffr olink arrow",
+  {
+    skip_on_cran()
+    skip_if_not_installed("ggplot2", minimum_version = "3.4.0")
+    skip_if_not_installed("vdiffr")
+
+    ref_results <- get_example_data(
+      filename = "reference_results.rds"
+    )
+
+    # data ----
+
+    npx_data1_clean <- clean_npx(df = npx_data1) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    npx_data1_arrow <- attach_check_log(
+      df = npx_data1,
+      out_df = "arrow",
+      preferred_names = NULL
+    ) |>
+      suppressWarnings()
+
+    npx_data1_clean_arrow <- attach_check_log(
+      df = npx_data1_clean,
+      out_df = "arrow",
+      preferred_names = NULL
+    )
+
+    ## ---- 2 proteins ----
+
+    boxplot_site_2prots_arrow <- olink_boxplot(
+      df = npx_data1_clean_arrow,
+      variable = "Site",
+      olinkid_list = ref_results$anova_site |>
+        dplyr::filter(.data[["Threshold"]] == "Significant") |>
+        dplyr::slice_head(n = 2L) |>
+        dplyr::pull(.data[["OlinkID"]])
+    ) |>
+      suppressMessages()
+
+    boxplot_site_2prots_name <- "boxplot site 2prots olink arrow"
+    check_snap_exist(
+      test_dir_name = "olink_boxplot",
+      snap_name = boxplot_site_2prots_name
+    )
+    vdiffr::expect_doppelganger(
+      boxplot_site_2prots_name,
+      boxplot_site_2prots_arrow[[1L]]
+    )
+
+    ## ---- 10 proteins ----
+
+    boxplot_site_10prots_arrow <- olink_boxplot(
+      df = npx_data1_clean_arrow,
+      variable = "Site",
+      olinkid_list = ref_results$anova_site |>
+        dplyr::filter(.data[["Threshold"]] == "Significant") |>
+        dplyr::slice_head(n = 10L) |>
+        dplyr::pull(.data[["OlinkID"]]),
+      number_of_proteins_per_plot = 5L
+    ) |>
+      suppressMessages()
+
+    boxplot_site_10prots_name <- "boxplot site 10prots olink arrow"
+    check_snap_exist(
+      test_dir_name = "olink_boxplot",
+      snap_name = boxplot_site_10prots_name
+    )
+    vdiffr::expect_doppelganger(
+      boxplot_site_10prots_name,
+      boxplot_site_10prots_arrow[[2L]]
+    )
+
+    ## ---- Time ----
+
+    boxplot_time_arrow <- olink_boxplot(
+      df = npx_data1_arrow,
+      variable = "Time",
+      olinkid_list = ref_results$anova_time |>
+        dplyr::slice_head(n = 10L) |>
+        dplyr::pull(.data[["OlinkID"]])
+    ) |>
+      suppressMessages()
+
+    boxplot_time_name <- "boxplot time olink arrow"
+    check_snap_exist(
+      test_dir_name = "olink_boxplot",
+      snap_name = boxplot_time_name
+    )
+    vdiffr::expect_doppelganger(
+      boxplot_time_name,
+      boxplot_time_arrow[[2L]]
+    )
+
   }
 )

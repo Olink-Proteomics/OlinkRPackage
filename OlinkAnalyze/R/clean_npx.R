@@ -89,22 +89,21 @@
 #'
 #' @examples
 #' \dontrun{
-#' # run check_npx
-#' check_log <- check_npx(
-#'   df = npx_data1
-#' )
-#'
 #' # run clean_npx
-#' clean_npx(
-#'   df = npx_data1,
-#'   check_log = check_log
+#' OlinkAnalyze::clean_npx(
+#'   df = OlinkAnalyze::npx_data1
 #' )
 #'
 #' # run clean_npx with messages for all steps
-#' clean_npx(
-#'   df = npx_data1,
-#'   check_log = check_log,
+#' OlinkAnalyze::clean_npx(
+#'   df = OlinkAnalyze::npx_data1,
 #'   verbose = TRUE
+#' )
+#'
+#' # run clean_npx but keep duplicated samples
+#' OlinkAnalyze::clean_npx(
+#'   df = OlinkAnalyze::npx_data1,
+#'   remove_dup_sample_id = FALSE
 #' )
 #' }
 #'
@@ -126,7 +125,19 @@ clean_npx <- function(df,
   # Validate input dataset
   check_is_dataset(x = df, error = TRUE)
   check_is_scalar_boolean(x = verbose, error = TRUE)
-  check_log <- run_check_npx(df = df, check_log = check_log)
+
+  # obtain check_log: from df attribute, from argument, or by running check_npx
+  check_log <- get_check_npx(
+    df = df,
+    check_log = check_log,
+    preferred_names = NULL # no need to specify preferred names here
+  )
+
+  # get preferred column names to assign to output dataset
+  preferred_names <- get_preferred_names(
+    df = df,
+    check_log = check_log
+  )
 
   if (verbose) cli::cli_h2("Starting {.fn clean_npx} pipeline.")
 
@@ -242,12 +253,14 @@ clean_npx <- function(df,
     cli::cli_h2("Completed {.fn clean_npx}. Returning clean dataset.")
   }
 
-  return(
-    convert_read_npx_output(
-      df = df,
-      out_df = out_df
-    )
+  # Convert to requested output format, re-run check_npx, and attach check_log
+  df <- attach_check_log(
+    df = df,
+    out_df = out_df,
+    preferred_names = preferred_names
   )
+
+  return(df)
 }
 
 # Help Functions ----------------------------------------------------------
@@ -307,7 +320,12 @@ run_clean_npx <- function(df, ...) {
   n_before <- nrow(df)
 
   cleaned_df <- withCallingHandlers(
-    expr = do.call(clean_npx, c(list(df = df), dots, list(verbose = FALSE))),
+    expr = do.call(
+      what = clean_npx,
+      args = c(list(df = df),
+               dots,
+               list(verbose = FALSE))
+    ),
     message = function(m) invokeRestart("muffleMessage"),
     warning = function(w) invokeRestart("muffleWarning")
   )
@@ -319,7 +337,7 @@ run_clean_npx <- function(df, ...) {
     cli::cli_inform(
       c("{.val {n_removed}} entr{?y/ies} removed by {.fn clean_npx} from the
       input dataset {.arg df}. Run {.fn clean_npx} on your dataset with
-      {.arg verbose = TRUE} to inspect which rows were removed."),
+        {.arg verbose = TRUE} to inspect which rows were removed."),
       wrap = FALSE
     )
   }
@@ -1006,14 +1024,14 @@ clean_assay_warning <- function(df,
 #' @examples
 #' \dontrun{
 #' # use npx_data1 to check that clean_control_sample_id() works
-#' log <- OlinkAnalyze::check_npx(
+#' log <- OlinkAnalyze:::get_check_npx(
 #'   df = OlinkAnalyze::npx_data1
 #' ) |>
 #'   suppressWarnings() |>
 #'   suppressMessages()
 #'
 #' out <- OlinkAnalyze:::clean_control_sample_id(
-#'   df = npx_data1,
+#'   df =  OlinkAnalyze::npx_data1,
 #'   check_npx_log = log,
 #'   control_sample_id = c("CONTROL_SAMPLE_AS 1", "CONTROL_SAMPLE_AS 2")
 #' )

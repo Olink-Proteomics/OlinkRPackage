@@ -110,16 +110,10 @@ if (rlang::is_installed(pkg = c("car", "emmeans"))) {
        )
     )
 
-  # check data
-  npx_df_check_log <- OlinkAnalyze::check_npx(
-    df = npx_df
-  )
-
   # Two-way ANOVA, one main effect (Site) covariate.
   # Results in model NPX~Treatment*Time+Site.
   anova_results <- OlinkAnalyze::olink_anova(
     df = npx_df,
-    check_log = npx_df_check_log,
     variable = c("Treatment:Time"),
     covariates = "Site"
   )
@@ -142,7 +136,6 @@ if (rlang::is_installed(pkg = c("car", "emmeans"))) {
   # Posthoc, all pairwise comparisons
   anova_posthoc_results <- OlinkAnalyze::olink_anova_posthoc(
     df = npx_df,
-    check_log = npx_df_check_log,
     variable = c("Treatment:Time"),
     covariates = "Site",
     olinkid_list = significant_assays,
@@ -152,7 +145,6 @@ if (rlang::is_installed(pkg = c("car", "emmeans"))) {
   # Posthoc, treated vs untreated at each timepoint, adjusted for Site effect
   anova_posthoc_results <- OlinkAnalyze::olink_anova_posthoc(
     df = npx_df,
-    check_log = npx_df_check_log,
     model_formula = "NPX~Treatment*Time+Site",
     olinkid_list = significant_assays,
     effect_formula = "pairwise~Treatment|Time"

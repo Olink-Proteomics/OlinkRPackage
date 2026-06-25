@@ -123,15 +123,9 @@ if (rlang::is_installed(pkg = c("lme4", "lmerTest", "broom"))) {
       )
     )
 
-  # check data
-  npx_df_check_log <- OlinkAnalyze::check_npx(
-    df = npx_df
-  )
-
   # Results in model NPX ~ Time * Treatment + (1 | Subject) + (1 | Site)
   lmer_results <- OlinkAnalyze::olink_lmer(
     df = npx_df,
-    check_log = npx_df_check_log,
     variable = c("Time", "Treatment"),
     random = c("Subject", "Site")
   )

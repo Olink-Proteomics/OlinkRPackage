@@ -2162,7 +2162,202 @@ test_that(
 # Test run_clean_npx ----
 
 test_that(
-  "run_clean_npx - works - remove samples/assays identified by check_npx",
+  "run_clean_npx - works - passes through clean olink_class data",
+  {
+    npx_data1_check_log <- check_npx(df = npx_data1) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    # clean data has no issues
+    obj <- new_olink_class(
+      df = npx_data1,
+      check_log = npx_data1_check_log
+    )
+
+    expect_no_message(
+      object = expect_no_error(
+        object = expect_no_warning(
+          object = result <- run_clean_npx(
+            df = obj,
+            check_log = npx_data1_check_log,
+            remove_dup_sample_id = FALSE
+          )
+        )
+      )
+    )
+
+    expect_s3_class(
+      object = result,
+      class = "olink_class"
+    )
+
+    expect_identical(
+      object = olink_check_log(df = result),
+      expected = npx_data1_check_log
+    )
+  }
+)
+
+test_that(
+  "run_clean_npx - works - passes through clean arrow data",
+  {
+    npx_data1_arrow <- arrow::as_arrow_table(npx_data1)
+
+    npx_data1_check_log <- check_npx(df = npx_data1_arrow) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    # clean data has no issues
+    expect_warning(
+      object = obj <- attach_check_log(df = npx_data1_arrow,
+                                       out_df = "arrow"),
+      regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS 1\"",
+                     "and \"CONTROL_SAMPLE_AS 2\"")
+    )
+
+
+    expect_no_message(
+      object = expect_no_error(
+        object = expect_no_warning(
+          object = result <- run_clean_npx(
+            df = obj,
+            out_df = "arrow",
+            check_log = npx_data1_check_log,
+            remove_dup_sample_id = FALSE
+          )
+        )
+      )
+    )
+
+    expect_true(
+      object = check_is_arrow_object(x = result, error = FALSE)
+    )
+
+    expect_identical(
+      object = get_check_npx(result),
+      expected = npx_data1_check_log
+    )
+  }
+)
+
+test_that(
+  "run_clean_npx - works - cleans plain tibble without errors",
+  {
+    npx_data1_check_log <- check_npx(df = npx_data1) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    npx_data1_clean <- clean_npx(
+      df = npx_data1,
+      check_log = npx_data1_check_log
+    ) |>
+      suppressMessages()
+
+    # plain tibble without olink_class class — run_clean_npx delegates to
+    # clean_npx which will auto-run check_npx if needed
+    expect_message(
+      object = result <- run_clean_npx(
+        df = npx_data1
+      ),
+      regexp = "736 entries removed by `clean_npx()` from the input dataset",
+      fixed = TRUE
+    )
+
+    expect_s3_class(
+      object = result,
+      class = "olink_class"
+    )
+
+    expect_equal(
+      object = result,
+      expected = npx_data1_clean,
+      tolerance = 1e-4
+    )
+  }
+)
+
+test_that(
+  "run_clean_npx - works - cleans plain arrow without errors",
+  {
+    npx_data1_arrow <- arrow::as_arrow_table(npx_data1)
+
+    npx_data1_check_log <- check_npx(df = npx_data1_arrow) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    npx_data1_arrow_clean <- clean_npx(
+      df = npx_data1_arrow,
+      check_log = npx_data1_check_log,
+      out_df = "arrow"
+    ) |>
+      suppressMessages()
+
+    # plain arrow without olink_class class — run_clean_npx delegates to
+    # clean_npx which will auto-run check_npx if needed
+    expect_message(
+      object = result <- run_clean_npx(
+        df = npx_data1_arrow,
+        out_df = "arrow"
+      ),
+      regexp = "736 entries removed by `clean_npx()` from the input dataset",
+      fixed = TRUE
+    )
+
+    expect_true(
+      object = check_is_arrow_object(x = result, error = FALSE)
+    )
+
+    expect_equal(
+      object = dplyr::collect(result),
+      expected = dplyr::collect(npx_data1_arrow_clean),
+      tolerance = 1e-4
+    )
+  }
+)
+
+test_that(
+  "run_clean_npx - works - obj - rm samples/assays identified by check_npx",
+  {
+    expected_result <- df |>
+      dplyr::filter(
+        .data[["SampleID"]] == "ValidSample"
+      )
+
+    # create olink_class with the dirty check_log
+    obj <- new_olink_class(
+      df = df,
+      check_log = log
+    )
+
+    expect_message(
+      object = curr_result <- run_clean_npx(
+        df = obj,
+        control_sample_ids = c("ControlID"),
+        verbose = FALSE
+      ),
+      regexp = paste("9 entries removed by `clean_npx()` from the input",
+                     "dataset `df`. Run `clean_npx()` on your dataset with",
+                     "`verbose = TRUE` to inspect which rows were removed."),
+      fixed = TRUE
+    )
+
+    expect_equal(
+      object = strip_check_log(curr_result),
+      expected = expected_result
+    )
+
+    expect_identical(
+      object = get_check_npx(df = curr_result),
+      expected = strip_check_log(df = curr_result) |>
+        check_npx() |>
+        suppressMessages() |>
+        suppressWarnings()
+    )
+  }
+)
+
+test_that(
+  "run_clean_npx - works - tibble - rm samples/assays identified by check_npx",
   {
     expected_result <- df |>
       dplyr::filter(
@@ -2183,8 +2378,110 @@ test_that(
     )
 
     expect_equal(
-      object = curr_result,
+      object = strip_check_log(curr_result),
       expected = expected_result
+    )
+
+    expect_identical(
+      object = get_check_npx(df = curr_result),
+      expected = strip_check_log(df = curr_result) |>
+        check_npx() |>
+        suppressMessages() |>
+        suppressWarnings()
+    )
+  }
+)
+
+test_that(
+  "run_clean_npx - works - arrow - rm samples/assays identified by check_npx",
+  {
+    expected_result <- df |>
+      dplyr::filter(
+        .data[["SampleID"]] == "ValidSample"
+      )
+
+    expect_message(
+      object = curr_result <- run_clean_npx(
+        df = df_arrow,
+        check_log = log,
+        control_sample_ids = c("ControlID"),
+        out_df = "arrow",
+        verbose = FALSE
+      ),
+      regexp = paste("9 entries removed by `clean_npx()` from the input",
+                     "dataset `df`. Run `clean_npx()` on your dataset with",
+                     "`verbose = TRUE` to inspect which rows were removed."),
+      fixed = TRUE
+    )
+
+    expect_identical(
+      object = get_check_npx(df = curr_result),
+      expected = strip_check_log(df = curr_result) |>
+        check_npx() |>
+        suppressMessages() |>
+        suppressWarnings()
+    )
+
+    expect_equal(
+      object = strip_check_log(curr_result) |> dplyr::collect(),
+      expected = expected_result
+    )
+  }
+)
+
+test_that(
+  "run_clean_npx - works - obj - alternative names are inherited",
+  {
+    npx_data1_tmp <- npx_data1 |>
+      dplyr::mutate(
+        "SampleID2" = .data[["SampleID"]],
+        "OlinkID2" = .data[["OlinkID"]],
+        "New_Panel" = .data[["Panel"]]
+      )
+
+    # approach 1 - use check_npx ----
+
+    check_log_tmp <- check_npx(
+      df = npx_data1_tmp,
+      preferred_names = c(
+        "sample_id" = "SampleID2",
+        "olink_id" = "OlinkID2",
+        "panel" = "New_Panel"
+      )
+    ) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    npx_data1_tmp_obj <- new_olink_class(
+      df = npx_data1_tmp,
+      check_log = check_log_tmp
+    )
+
+    expect_no_message(
+      object = curr_result_v1 <- run_clean_npx(
+        df = npx_data1_tmp_obj,
+        remove_dup_sample_id = FALSE
+      )
+    )
+
+    expect_identical(
+      object = olink_check_log(df = curr_result_v1)$col_names,
+      expected = check_log_tmp$col_names
+    )
+
+    # approach 2 - use check_log directly on run_clean_npx ----
+
+    expect_no_message(
+      object = curr_result_v2 <- run_clean_npx(
+        df = npx_data1_tmp,
+        check_log = check_log_tmp,
+        remove_dup_sample_id = FALSE
+      )
+    )
+
+    expect_identical(
+      object = olink_check_log(df = curr_result_v2)$col_names,
+      expected = check_log_tmp$col_names
     )
   }
 )
@@ -2215,7 +2512,7 @@ test_that(
     )
 
     expect_equal(
-      object = curr_result,
+      object = strip_check_log(curr_result),
       expected = tmp_npx_data1
     )
   }
@@ -2248,7 +2545,8 @@ test_that(
                          check_log = log,
                          control_sample_ids = c("ControlID"),
                          verbose = TRUE) |>
-        suppressMessages(),
+        suppressMessages() |>
+        strip_check_log(),
       expected = expected_result
     )
   }
@@ -2361,11 +2659,472 @@ test_that(
     expect_message(
       object = expect_equal(
         object = clean_npx(df = test_result,
-                           check_log = log_test),
+                           check_log = log_test) |>
+          strip_check_log(),
         expected = test_result
       ),
       regexp = paste("Detected data in absolute quantification in column",
                      "Quantified_value.")
+    )
+  }
+)
+
+test_that(
+  "clean_npx - works - passes through clean olink_class data",
+  {
+    npx_data1_check_log <- check_npx(df = npx_data1) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    # clean data has no issues
+    obj <- new_olink_class(
+      df = npx_data1,
+      check_log = npx_data1_check_log
+    )
+
+    expect_warning(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = result <- clean_npx(
+              df = obj,
+              check_log = npx_data1_check_log,
+              remove_dup_sample_id = FALSE
+            ),
+            regexp = "No column marking control samples in dataset"
+          ),
+          regexp = "No column marking control assays in dataset"
+        ),
+        regexp = "No column marking assay warnings in dataset"
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS 1\"",
+                     "and \"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_s3_class(
+      object = result,
+      class = "olink_class"
+    )
+
+    expect_identical(
+      object = olink_check_log(df = result),
+      expected = npx_data1_check_log
+    )
+  }
+)
+
+test_that(
+  "clean_npx - works - passes through clean arrow data",
+  {
+    npx_data1_arrow <- arrow::as_arrow_table(npx_data1)
+
+    npx_data1_check_log <- check_npx(df = npx_data1_arrow) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    # clean data has no issues
+    expect_warning(
+      object = obj <- attach_check_log(df = npx_data1_arrow,
+                                       out_df = "arrow"),
+      regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS 1\"",
+                     "and \"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_warning(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = result <- clean_npx(
+              df = obj,
+              out_df = "arrow",
+              check_log = npx_data1_check_log,
+              remove_dup_sample_id = FALSE
+            ),
+            regexp = "No column marking control samples in dataset"
+          ),
+          regexp = "No column marking control assays in dataset"
+        ),
+        regexp = "No column marking assay warnings in dataset"
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS 1\"",
+                     "and \"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_true(
+      object = check_is_arrow_object(x = result, error = FALSE)
+    )
+
+    expect_identical(
+      object = get_check_npx(result),
+      expected = npx_data1_check_log
+    )
+  }
+)
+
+test_that(
+  "clean_npx - works - cleans plain tibble without errors",
+  {
+    npx_data1_check_log <- check_npx(df = npx_data1) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    # plain tibble without olink_class class — run_clean_npx delegates to
+    # clean_npx which will auto-run check_npx if needed
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = expect_warning(
+              object = expect_message(
+                object = result <- clean_npx(
+                  df = npx_data1
+                ),
+                regexp = "`check_log` not provided. Running `check_npx()`",
+                fixed = TRUE
+              ),
+              regexp = paste("Duplicate SampleIDs detected:",
+                             "\"CONTROL_SAMPLE_AS 1\" and",
+                             "\"CONTROL_SAMPLE_AS 2\"")
+            ),
+            regexp = paste("Excluding 2 samples with duplicate identifiers:",
+                           "\"CONTROL_SAMPLE_AS 1\" and",
+                           "\"CONTROL_SAMPLE_AS 2\"")
+          ),
+          regexp = "No column marking control samples in dataset"
+        ),
+        regexp = "No column marking control assays in dataset"
+      ),
+      regexp = "No column marking assay warnings in dataset"
+    )
+
+    expect_s3_class(
+      object = result,
+      class = "olink_class"
+    )
+
+    expect_equal(
+      object = strip_check_log(df = result),
+      expected = npx_data1 |>
+        dplyr::filter(
+          !(.data[["SampleID"]] %in% npx_data1_check_log[["sample_id_dups"]])
+        ),
+      tolerance = 1e-4
+    )
+  }
+)
+
+test_that(
+  "clean_npx - works - cleans plain arrow without errors",
+  {
+    npx_data1_arrow <- arrow::as_arrow_table(npx_data1)
+
+    npx_data1_check_log <- check_npx(df = npx_data1_arrow) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    # plain arrow without olink_class class — run_clean_npx delegates to
+    # clean_npx which will auto-run check_npx if needed
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = expect_warning(
+              object = expect_message(
+                object = result <- clean_npx(
+                  df = npx_data1_arrow,
+                  out_df = "arrow"
+                ),
+                regexp = "`check_log` not provided. Running `check_npx()`",
+                fixed = TRUE
+              ),
+              regexp = paste("Duplicate SampleIDs detected:",
+                             "\"CONTROL_SAMPLE_AS 1\" and",
+                             "\"CONTROL_SAMPLE_AS 2\"")
+            ),
+            regexp = paste("Excluding 2 samples with duplicate identifiers:",
+                           "\"CONTROL_SAMPLE_AS 1\" and",
+                           "\"CONTROL_SAMPLE_AS 2\"")
+          ),
+          regexp = "No column marking control samples in dataset"
+        ),
+        regexp = "No column marking control assays in dataset"
+      ),
+      regexp = "No column marking assay warnings in dataset"
+    )
+
+    expect_true(
+      object = check_is_arrow_object(x = result, error = FALSE)
+    )
+
+    expect_equal(
+      object = dplyr::collect(result),
+      expected = npx_data1 |>
+        dplyr::filter(
+          !(.data[["SampleID"]] %in% npx_data1_check_log[["sample_id_dups"]])
+        ),
+      tolerance = 1e-4
+    )
+  }
+)
+
+test_that(
+  "clean_npx - works - obj - rm samples/assays identified by check_npx",
+  {
+    expected_result <- df |>
+      dplyr::filter(
+        .data[["SampleID"]] == "ValidSample"
+      )
+
+    # create olink_class with the dirty check_log
+    obj <- new_olink_class(
+      df = df,
+      check_log = log
+    )
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = expect_message(
+              object = expect_message(
+                object = expect_message(
+                  object = expect_message(
+                    object = curr_result <- clean_npx(
+                      df = obj,
+                      control_sample_ids = c("ControlID"),
+                      verbose = FALSE
+                    ),
+                    regexp = paste("Excluding 1 assay with invalid identifier:",
+                                   "\"OID1234\"")
+                  ),
+                  regexp = paste("Excluding 1 assay with only \"NA\" values:",
+                                 "\"OID23456\"")
+                ),
+                regexp = paste("Excluding 1 sample with duplicate identifier:",
+                               "\"DuplicateSample\"")
+              ),
+              regexp = "Excluding 1 control sample: \"ControlType\""
+            ),
+            regexp = "Excluding sample: \"ControlID\""
+          ),
+          regexp = paste("Excluding 1 datapoint from 1 sample flagged with",
+                         "SampleQC = \"FAIL\": \"FailQC\"")
+        ),
+        regexp = "Excluding 1 control assay: \"OID78901\""
+      ),
+      regexp = paste("Excluding 1 datapoint from 1 assay flagged with AssayQC",
+                     "= \"WARN\" or \"Warning\": \"OID89012\"")
+    )
+
+    expect_equal(
+      object = strip_check_log(curr_result),
+      expected = expected_result
+    )
+
+    expect_identical(
+      object = get_check_npx(df = curr_result),
+      expected = strip_check_log(df = curr_result) |>
+        check_npx() |>
+        suppressMessages() |>
+        suppressWarnings()
+    )
+  }
+)
+
+test_that(
+  "clean_npx - works - tibble - rm samples/assays identified by check_npx",
+  {
+    expected_result <- df |>
+      dplyr::filter(
+        .data[["SampleID"]] == "ValidSample"
+      )
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = expect_message(
+              object = expect_message(
+                object = expect_message(
+                  object = expect_message(
+                    object = curr_result <- clean_npx(
+                      df = df,
+                      check_log = log,
+                      control_sample_ids = c("ControlID"),
+                      verbose = FALSE
+                    ),
+                    regexp = paste("Excluding 1 assay with invalid identifier:",
+                                   "\"OID1234\"")
+                  ),
+                  regexp = paste("Excluding 1 assay with only \"NA\" values:",
+                                 "\"OID23456\"")
+                ),
+                regexp = paste("Excluding 1 sample with duplicate identifier:",
+                               "\"DuplicateSample\"")
+              ),
+              regexp = "Excluding 1 control sample: \"ControlType\""
+            ),
+            regexp = "Excluding sample: \"ControlID\""
+          ),
+          regexp = paste("Excluding 1 datapoint from 1 sample flagged with",
+                         "SampleQC = \"FAIL\": \"FailQC\"")
+        ),
+        regexp = "Excluding 1 control assay: \"OID78901\""
+      ),
+      regexp = paste("Excluding 1 datapoint from 1 assay flagged with AssayQC",
+                     "= \"WARN\" or \"Warning\": \"OID89012\"")
+    )
+
+    expect_equal(
+      object = strip_check_log(curr_result),
+      expected = expected_result
+    )
+
+    expect_identical(
+      object = get_check_npx(df = curr_result),
+      expected = strip_check_log(df = curr_result) |>
+        check_npx() |>
+        suppressMessages() |>
+        suppressWarnings()
+    )
+  }
+)
+
+test_that(
+  "clean_npx - works - arrow - rm samples/assays identified by check_npx",
+  {
+    expected_result <- df |>
+      dplyr::filter(
+        .data[["SampleID"]] == "ValidSample"
+      )
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = expect_message(
+              object = expect_message(
+                object = expect_message(
+                  object = expect_message(
+                    object = curr_result <- clean_npx(
+                      df = df_arrow,
+                      check_log = log,
+                      control_sample_ids = c("ControlID"),
+                      out_df = "arrow",
+                      verbose = FALSE
+                    ),
+                    regexp = paste("Excluding 1 assay with invalid identifier:",
+                                   "\"OID1234\"")
+                  ),
+                  regexp = paste("Excluding 1 assay with only \"NA\" values:",
+                                 "\"OID23456\"")
+                ),
+                regexp = paste("Excluding 1 sample with duplicate identifier:",
+                               "\"DuplicateSample\"")
+              ),
+              regexp = "Excluding 1 control sample: \"ControlType\""
+            ),
+            regexp = "Excluding sample: \"ControlID\""
+          ),
+          regexp = paste("Excluding 1 datapoint from 1 sample flagged with",
+                         "SampleQC = \"FAIL\": \"FailQC\"")
+        ),
+        regexp = "Excluding 1 control assay: \"OID78901\""
+      ),
+      regexp = paste("Excluding 1 datapoint from 1 assay flagged with AssayQC",
+                     "= \"WARN\" or \"Warning\": \"OID89012\"")
+    )
+
+    expect_identical(
+      object = get_check_npx(df = curr_result),
+      expected = strip_check_log(df = curr_result) |>
+        check_npx() |>
+        suppressMessages() |>
+        suppressWarnings()
+    )
+
+    expect_equal(
+      object = strip_check_log(df = curr_result) |> dplyr::collect(),
+      expected = expected_result
+    )
+  }
+)
+
+test_that(
+  "clean_npx - works - obj - alternative names are inherited",
+  {
+    npx_data1_tmp <- npx_data1 |>
+      dplyr::mutate(
+        "SampleID2" = .data[["SampleID"]],
+        "OlinkID2" = .data[["OlinkID"]],
+        "New_Panel" = .data[["Panel"]]
+      )
+
+    # approach 1 - use check_npx ----
+
+    check_log_tmp <- check_npx(
+      df = npx_data1_tmp,
+      preferred_names = c(
+        "sample_id" = "SampleID2",
+        "olink_id" = "OlinkID2",
+        "panel" = "New_Panel"
+      )
+    ) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    npx_data1_tmp_obj <- new_olink_class(
+      df = npx_data1_tmp,
+      check_log = check_log_tmp
+    )
+
+    expect_warning(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = curr_result_v1 <- clean_npx(
+              df = npx_data1_tmp_obj,
+              remove_dup_sample_id = FALSE
+            ),
+            regexp = "No column marking control samples in dataset"
+          ),
+          regexp = "No column marking control assays in dataset"
+        ),
+        regexp = "No column marking assay warnings in dataset"
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS 1\"",
+                     "and \"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_identical(
+      object = olink_check_log(df = curr_result_v1)$col_names,
+      expected = check_log_tmp$col_names
+    )
+
+    # approach 2 - use check_log directly on clean_npx ----
+
+    expect_warning(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = curr_result_v2 <- clean_npx(
+              df = npx_data1_tmp,
+              check_log = check_log_tmp,
+              remove_dup_sample_id = FALSE
+            ),
+            regexp = "No column marking control samples in dataset"
+          ),
+          regexp = "No column marking control assays in dataset"
+        ),
+        regexp = "No column marking assay warnings in dataset"
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS 1\"",
+                     "and \"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_identical(
+      object = olink_check_log(df = curr_result_v2)$col_names,
+      expected = check_log_tmp$col_names
     )
   }
 )

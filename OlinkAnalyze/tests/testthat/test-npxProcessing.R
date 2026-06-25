@@ -178,3 +178,97 @@ test_that(
     )
   }
 )
+
+test_that(
+  "npxProcessing_forDimRed - works - olink_class and arrow",
+  {
+    local_edition(3)
+
+    oids_to_use <- sort(unique(npx_data1$OlinkID))[1:10L]
+    sids_to_use <- sort(unique(npx_data1$SampleID))[1:10L]
+
+    # tibble ----
+
+    test_npx_df <- npx_data1 |>
+      dplyr::filter(
+        .data[["SampleID"]] %in% .env[["sids_to_use"]]
+      ) |>
+      dplyr::filter(
+        .data[["OlinkID"]] %in% .env[["oids_to_use"]]
+      ) |>
+      dplyr::mutate(
+        SampleID = paste0(.data[["SampleID"]], "_", .data[["Index"]])
+      )
+
+    check_log <- check_npx(test_npx_df) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = npx_proc_tibble <- npxProcessing_forDimRed(
+            df = test_npx_df,
+            check_log = check_log,
+            color_g = "QC_Warning",
+            drop_assays = FALSE,
+            drop_samples = FALSE,
+            verbose = TRUE
+          )
+        )
+      )
+    )
+
+    # olink_class ----
+
+    test_npx_df_obj <- attach_check_log(
+      df = test_npx_df,
+      out_df = "tibble"
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = npx_proc_obj <- npxProcessing_forDimRed(
+            df = test_npx_df_obj,
+            color_g = "QC_Warning",
+            drop_assays = FALSE,
+            drop_samples = FALSE,
+            verbose = TRUE
+          )
+        )
+      )
+    )
+
+    expect_equal(
+      object = npx_proc_obj,
+      expected = npx_proc_tibble
+    )
+
+    # arrow ----
+
+    test_npx_df_arrow <- attach_check_log(
+      df = test_npx_df,
+      out_df = "arrow"
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = npx_proc_arrow <- npxProcessing_forDimRed(
+            df = test_npx_df_arrow,
+            color_g = "QC_Warning",
+            drop_assays = FALSE,
+            drop_samples = FALSE,
+            verbose = TRUE
+          )
+        )
+      )
+    )
+
+    expect_equal(
+      object = npx_proc_arrow,
+      expected = npx_proc_tibble
+    )
+  }
+)

@@ -47,17 +47,25 @@ test_that(
     skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_hs.parquet")))
     skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_mm.parquet")))
 
+    # expected output ----
+
+    expected_dim <- c(6992L, 12L)
+
+    # tibble ----
+
+    npx_data1_mod <- npx_data1 |>
+      dplyr::filter(
+        !grepl(pattern = "control",
+               x = .data[["SampleID"]],
+               ignore.case = TRUE)
+      )
+
     expect_message(
       object = expect_message(
         object = expect_message(
           object = expect_message(
             object = tt_gsea <- olink_pathway_enrichment(
-              df = npx_data1 |>
-                dplyr::filter(
-                  !grepl(pattern = "control",
-                         x = .data[["SampleID"]],
-                         ignore.case = TRUE)
-                ),
+              df = npx_data1_mod,
               check_log = check_log,
               test_results = reference_results$t_test,
               method = "TEST#GSEA",
@@ -76,7 +84,68 @@ test_that(
 
     expect_identical(
       object = dim(tt_gsea),
-      expected = c(6992L, 12L)
+      expected = expected_dim
+    )
+
+    # olink_class ----
+
+    npx_data1_mod_obj <- attach_check_log(df = npx_data1_mod, out_df = "tibble")
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = tt_gsea_obj <- olink_pathway_enrichment(
+              df = npx_data1_mod_obj,
+              test_results = reference_results$t_test,
+              method = "TEST#GSEA",
+              ontology = "TEST#MSigDb",
+              organism = "TEST#human"
+            ),
+            regexp = paste("Test mode activated: using fixed version of MSigDB",
+                           "for human")
+          ),
+          regexp = "Using MSigDB..."
+        ),
+        regexp = "45 assays are not found in the database"
+      ),
+      regexp = "Gene set enrichment analysis used by default"
+    )
+
+    expect_identical(
+      object = dim(tt_gsea_obj),
+      expected = expected_dim
+    )
+
+    # olink_class ----
+
+    npx_data1_mod_arrow <- attach_check_log(df = npx_data1_mod,
+                                            out_df = "arrow")
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = tt_gsea_arrow <- olink_pathway_enrichment(
+              df = npx_data1_mod_arrow,
+              test_results = reference_results$t_test,
+              method = "TEST#GSEA",
+              ontology = "TEST#MSigDb",
+              organism = "TEST#human"
+            ),
+            regexp = paste("Test mode activated: using fixed version of MSigDB",
+                           "for human")
+          ),
+          regexp = "Using MSigDB..."
+        ),
+        regexp = "45 assays are not found in the database"
+      ),
+      regexp = "Gene set enrichment analysis used by default"
+    )
+
+    expect_identical(
+      object = dim(tt_gsea_arrow),
+      expected = expected_dim
     )
 
   }
@@ -389,17 +458,25 @@ test_that(
     skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_hs.parquet")))
     skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_mm.parquet")))
 
+    # expected output ----
+
+    expected_dim <- c(573L, 12L)
+
+    # tibble ----
+
+    npx_data1_mod <- npx_data1 |>
+      dplyr::filter(
+        !grepl(pattern = "control",
+               x = .data[["SampleID"]],
+               ignore.case = TRUE)
+      )
+
     expect_message(
       object = expect_message(
         object = expect_message(
           object = expect_message(
             object = tt_ora <- olink_pathway_enrichment(
-              df = npx_data1 |>
-                dplyr::filter(
-                  !grepl(pattern = "control",
-                         x = .data[["SampleID"]],
-                         ignore.case = TRUE)
-                ),
+              df = npx_data1_mod,
               check_log = check_log,
               test_results = reference_results$t_test,
               method = "TEST#ORA",
@@ -420,7 +497,72 @@ test_that(
 
     expect_equal(
       object = dim(tt_ora),
-      expected = c(573L, 12L)
+      expected = expected_dim
+    )
+
+    # olink_class ----
+
+    npx_data1_mod_obj <- attach_check_log(df = npx_data1_mod, out_df = "tibble")
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = tt_ora_obj <- olink_pathway_enrichment(
+              df = npx_data1_mod_obj,
+              test_results = reference_results$t_test,
+              method = "TEST#ORA",
+              ontology = "TEST#MSigDb",
+              organism = "TEST#human"
+            ),
+            regexp = paste("Test mode activated: using fixed version of MSigDB",
+                           "for human")
+          ),
+          regexp = "Using MSigDB..."
+        ),
+        regexp = paste("45 assays are not found in the database. Please check",
+                       "the names for the following assays in `test_results`",
+                       "and `df`")
+      ),
+      regexp = "Over-representation analysis performed"
+    )
+
+    expect_equal(
+      object = dim(tt_ora_obj),
+      expected = expected_dim
+    )
+
+    # arrow ----
+
+    npx_data1_mod_arrow <- attach_check_log(df = npx_data1_mod,
+                                            out_df = "arrow")
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = tt_ora_arrow <- olink_pathway_enrichment(
+              df = npx_data1_mod_arrow,
+              test_results = reference_results$t_test,
+              method = "TEST#ORA",
+              ontology = "TEST#MSigDb",
+              organism = "TEST#human"
+            ),
+            regexp = paste("Test mode activated: using fixed version of MSigDB",
+                           "for human")
+          ),
+          regexp = "Using MSigDB..."
+        ),
+        regexp = paste("45 assays are not found in the database. Please check",
+                       "the names for the following assays in `test_results`",
+                       "and `df`")
+      ),
+      regexp = "Over-representation analysis performed"
+    )
+
+    expect_equal(
+      object = dim(tt_ora_arrow),
+      expected = expected_dim
     )
   }
 )
@@ -681,7 +823,7 @@ test_that(
     reference_results <- get_example_data(filename = "reference_results.rds")
 
     expect_warning(
-      object = check_pe_inputs(
+      object = res_cpei <- check_pe_inputs(
         df = npx_data1,
         check_log = check_log,
         test_results = reference_results$t_test |>
@@ -694,6 +836,8 @@ test_that(
       ),
       regexp = "The sets of assays in `df` and `test_results` do not match!"
     )
+
+    expect_null(object = res_cpei)
   }
 )
 
@@ -770,7 +914,7 @@ test_that(
     reference_results <- get_example_data(filename = "reference_results.rds")
 
     expect_error(
-      object =  olink_pathway_enrichment(
+      object = olink_pathway_enrichment(
         df = npx_data1,
         check_log = check_log,
         test_results = reference_results$t_test,
@@ -793,7 +937,9 @@ test_that(
 
     all_assays <- npx_data1[["OlinkID"]] |> unique() |> sort()
 
-    # all assays overlap - both ----
+    # tibble ----
+
+    ## all assays overlap - both ----
 
     expect_equal(
       object = helper_non_overlap_assays(
@@ -806,7 +952,7 @@ test_that(
       expected = character(0L)
     )
 
-    # all assays overlap - df ----
+    ## all assays overlap - df ----
 
     expect_equal(
       object = helper_non_overlap_assays(
@@ -819,7 +965,7 @@ test_that(
       expected = character(0L)
     )
 
-    # all assays overlap - res ----
+    ## all assays overlap - res ----
 
     expect_equal(
       object = helper_non_overlap_assays(
@@ -832,7 +978,7 @@ test_that(
       expected = character(0L)
     )
 
-    # assays only in df - both ----
+    ## assays only in df - both ----
 
     expect_equal(
       object = helper_non_overlap_assays(
@@ -848,7 +994,7 @@ test_that(
       expected = head(x = all_assays, n = 2L)
     )
 
-    # assays only in df - df ----
+    ## assays only in df - df ----
 
     expect_equal(
       object = helper_non_overlap_assays(
@@ -864,7 +1010,7 @@ test_that(
       expected = head(x = all_assays, n = 2L)
     )
 
-    # assays only in df - res ----
+    ## assays only in df - res ----
 
     expect_equal(
       object = helper_non_overlap_assays(
@@ -880,7 +1026,7 @@ test_that(
       expected = character(0L)
     )
 
-    # assays only in test_results - both ----
+    ## assays only in test_results - both ----
 
     expect_equal(
       object = helper_non_overlap_assays(
@@ -896,7 +1042,7 @@ test_that(
       expected = head(x = all_assays, n = 2L)
     )
 
-    # assays only in test_results - df ----
+    ## assays only in test_results - df ----
 
     expect_equal(
       object = helper_non_overlap_assays(
@@ -912,7 +1058,7 @@ test_that(
       expected = character(0L)
     )
 
-    # assays only in test_results - both ----
+    ## assays only in test_results - both ----
 
     expect_equal(
       object = helper_non_overlap_assays(
@@ -927,6 +1073,303 @@ test_that(
         sort(),
       expected = head(x = all_assays, n = 2L)
     )
+
+    # arrow ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_arrow <- attach_check_log(df = npx_data1,
+                                                       out_df = "arrow"),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    ## all assays overlap - both ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_arrow,
+        test_results = reference_results$t_test,
+        check_log = check_log,
+        which = "both"
+      ) |>
+        sort(),
+      expected = character(0L)
+    )
+
+    ## all assays overlap - df ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_arrow,
+        test_results = reference_results$t_test,
+        check_log = check_log,
+        which = "df"
+      ) |>
+        sort(),
+      expected = character(0L)
+    )
+
+    ## all assays overlap - res ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_arrow,
+        test_results = reference_results$t_test,
+        check_log = check_log,
+        which = "res"
+      ) |>
+        sort(),
+      expected = character(0L)
+    )
+
+    ## assays only in df - both ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_arrow,
+        test_results = reference_results$t_test |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
+          ),
+        check_log = check_log,
+        which = "both"
+      ) |>
+        sort(),
+      expected = head(x = all_assays, n = 2L)
+    )
+
+    ## assays only in df - df ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_arrow,
+        test_results = reference_results$t_test |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
+          ),
+        check_log = check_log,
+        which = "df"
+      ) |>
+        sort(),
+      expected = head(x = all_assays, n = 2L)
+    )
+
+    ## assays only in df - res ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_arrow,
+        test_results = reference_results$t_test |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
+          ),
+        check_log = check_log,
+        which = "res"
+      ) |>
+        sort(),
+      expected = character(0L)
+    )
+
+    ## assays only in test_results - both ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_arrow |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
+          ),
+        test_results = reference_results$t_test,
+        check_log = check_log,
+        which = "both"
+      ) |>
+        sort(),
+      expected = head(x = all_assays, n = 2L)
+    )
+
+    ## assays only in test_results - df ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_arrow |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
+          ),
+        test_results = reference_results$t_test,
+        check_log = check_log,
+        which = "df"
+      ) |>
+        sort(),
+      expected = character(0L)
+    )
+
+    ## assays only in test_results - both ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_arrow |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
+          ),
+        test_results = reference_results$t_test,
+        check_log = check_log,
+        which = "res"
+      ) |>
+        sort(),
+      expected = head(x = all_assays, n = 2L)
+    )
+
+    # olink_class ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_obj <- attach_check_log(df = npx_data1,
+                                                     out_df = "tibble"),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    ## all assays overlap - both ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_obj,
+        test_results = reference_results$t_test,
+        check_log = check_log,
+        which = "both"
+      ) |>
+        sort(),
+      expected = character(0L)
+    )
+
+    ## all assays overlap - df ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_obj,
+        test_results = reference_results$t_test,
+        check_log = check_log,
+        which = "df"
+      ) |>
+        sort(),
+      expected = character(0L)
+    )
+
+    ## all assays overlap - res ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_obj,
+        test_results = reference_results$t_test,
+        check_log = check_log,
+        which = "res"
+      ) |>
+        sort(),
+      expected = character(0L)
+    )
+
+    ## assays only in df - both ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_obj,
+        test_results = reference_results$t_test |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
+          ),
+        check_log = check_log,
+        which = "both"
+      ) |>
+        sort(),
+      expected = head(x = all_assays, n = 2L)
+    )
+
+    ## assays only in df - df ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_obj,
+        test_results = reference_results$t_test |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
+          ),
+        check_log = check_log,
+        which = "df"
+      ) |>
+        sort(),
+      expected = head(x = all_assays, n = 2L)
+    )
+
+    ## assays only in df - res ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_obj,
+        test_results = reference_results$t_test |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
+          ),
+        check_log = check_log,
+        which = "res"
+      ) |>
+        sort(),
+      expected = character(0L)
+    )
+
+    ## assays only in test_results - both ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_obj |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
+          ),
+        test_results = reference_results$t_test,
+        check_log = check_log,
+        which = "both"
+      ) |>
+        sort(),
+      expected = head(x = all_assays, n = 2L)
+    )
+
+    ## assays only in test_results - df ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_obj |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
+          ),
+        test_results = reference_results$t_test,
+        check_log = check_log,
+        which = "df"
+      ) |>
+        sort(),
+      expected = character(0L)
+    )
+
+    ## assays only in test_results - both ----
+
+    expect_equal(
+      object = helper_non_overlap_assays(
+        df = npx_data1_obj |>
+          dplyr::filter(
+            !(.data[["OlinkID"]] %in% head(x = all_assays, n = 2L))
+          ),
+        test_results = reference_results$t_test,
+        check_log = check_log,
+        which = "res"
+      ) |>
+        sort(),
+      expected = head(x = all_assays, n = 2L)
+    )
+
   }
 )
 
@@ -964,6 +1407,8 @@ test_that(
         )
       )
 
+    # tibble ----
+
     expect_message(
       object = data_prep_out <- data_prep(
         df = npx_data_invalid,
@@ -979,9 +1424,87 @@ test_that(
       fixed = TRUE
     )
 
+    expect_true(
+      object = is.list(data_prep_out)
+    )
     expect_identical(
-      object = dim(data_prep_out),
+      object = length(data_prep_out),
+      expected = 2L
+    )
+    expect_identical(
+      object = names(data_prep_out),
+      expected = c("df", "check_log")
+    )
+
+    expected_check_npx <- check_npx(df = data_prep_out$df) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_s3_class(object = data_prep_out$df, class = "olink_class")
+    expect_s3_class(object = data_prep_out$df, class = "tbl_df")
+    expect_identical(
+      object = dim(data_prep_out$df),
       expected = c(28236L, 18L)
+    )
+    expect_equal(
+      object = get_check_npx(data_prep_out$df),
+      expected = expected_check_npx
+    )
+    expect_equal(
+      object = data_prep_out$check_log,
+      expected = expected_check_npx
+    )
+
+    # olink_class ----
+
+    expect_warning(
+      object = expect_warning(
+        object = npx_data_invalid_obj <- attach_check_log(
+          df = npx_data_invalid,
+          out_df = "tibble"
+        ),
+        regexp = "Unrecognized OlinkID detected: \"OID01218A\""
+      ),
+      regexp = "\"OID01217\" has \"NPX\" = NA for all samples."
+    )
+
+    expect_message(
+      object = data_prep_out_obj <- data_prep(
+        df = npx_data_invalid_obj,
+        test_results = reference_results$t_test
+      ),
+      regexp = paste("468 entries removed by `clean_npx()` from the",
+                     "input dataset `df`. Run `clean_npx()` on your",
+                     "dataset with `verbose = TRUE` to inspect which",
+                     "rows were removed."),
+      fixed = TRUE
+    )
+
+    expect_true(
+      object = is.list(data_prep_out_obj)
+    )
+    expect_identical(
+      object = length(data_prep_out_obj),
+      expected = 2L
+    )
+    expect_identical(
+      object = names(data_prep_out_obj),
+      expected = c("df", "check_log")
+    )
+
+    expect_s3_class(object = data_prep_out_obj$df, class = "olink_class")
+    expect_s3_class(object = data_prep_out_obj$df, class = "tbl_df")
+    expect_identical(
+      object = dim(data_prep_out_obj$df),
+      expected = c(28236L, 18L)
+    )
+    expect_equal(
+      object = get_check_npx(data_prep_out_obj$df),
+      expected = expected_check_npx
+    )
+    expect_equal(
+      object = data_prep_out_obj$check_log,
+      expected = expected_check_npx
     )
   }
 )
@@ -992,20 +1515,32 @@ test_that(
     # Load reference results - skipped if files are absent
     reference_results <- get_example_data(filename = "reference_results.rds")
 
+    # data ----
+
     exclude_assays <- npx_data1[["OlinkID"]] |> unique() |> head(n = 5L)
+
+    npx_data1_mod <- npx_data1 |>
+      dplyr::filter(
+        !grepl(pattern = "control",
+               x = .data[["SampleID"]],
+               ignore.case = TRUE)
+      )
+
+    t_test_mod <- reference_results$t_test |>
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% .env[["exclude_assays"]])
+      )
+
+    # expected output ----
+
+    expected_dim <- c(27924L, 17L)
+
+    # tibble ----
 
     expect_message(
       object = data_prep_out <- data_prep(
-        df = npx_data1 |>
-          dplyr::filter(
-            !grepl(pattern = "control",
-                   x = .data[["SampleID"]],
-                   ignore.case = TRUE)
-          ),
-        test_results = reference_results$t_test |>
-          dplyr::filter(
-            !(.data[["OlinkID"]] %in% .env[["exclude_assays"]])
-          ),
+        df = npx_data1_mod,
+        test_results = t_test_mod,
         check_log = check_log
       ),
       regexp = paste("5 assays in `df` are not represented in `test_results`",
@@ -1016,8 +1551,36 @@ test_that(
     )
 
     expect_identical(
-      object = dim(data_prep_out),
-      expected = c(27924L, 17L)
+      object = dim(data_prep_out$df),
+      expected = expected_dim
+    )
+
+    # olink_class ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = npx_data1_mod_obj <- attach_check_log(df = npx_data1_mod,
+                                                         out_df = "tibble")
+        )
+      )
+    )
+
+    expect_message(
+      object = data_prep_out <- data_prep(
+        df = npx_data1_mod_obj,
+        test_results = t_test_mod
+      ),
+      regexp = paste("5 assays in `df` are not represented in `test_results`",
+                     "and will be removed from `df`: \"OID01216\",",
+                     "\"OID01217\", \"OID01218\", \"OID01219\", and",
+                     "\"OID01220\""),
+      fixed = TRUE
+    )
+
+    expect_identical(
+      object = dim(data_prep_out$df),
+      expected = expected_dim
     )
   }
 )
@@ -1073,13 +1636,21 @@ test_that(
         duplicate_assay_data
       )
 
+    expect_warning(
+      object = expect_warning(
+        object = duplicated_assay_data_obj <- attach_check_log(
+          df = duplicated_assay_data,
+          out_df = "arrow"
+        ),
+        regexp = "Duplicate SampleIDs detected: \"A1\", \"A2\", \"A3\", \"A4\""
+      ),
+      regexp = "Detected multiple UniProt identifiers for assay: \"OID01254\""
+    )
+
     expect_error(
       object = data_prep(
-        df = duplicated_assay_data,
-        test_results = reference_results$t_test,
-        check_log = check_npx(df = duplicated_assay_data) |>
-          suppressWarnings() |>
-          suppressMessages()
+        df = duplicated_assay_data_obj,
+        test_results = reference_results$t_test
       ),
       regexp = "Detected 1 duplicated assay in `df`: \"MET\"!"
     )
@@ -1094,21 +1665,33 @@ test_that(
     # Load reference results - skipped if files are absent
     reference_results <- get_example_data(filename = "reference_results.rds")
 
+    # data ----
+
     exclude_assays <- npx_data1[["OlinkID"]] |> unique() |> head(n = 5L)
 
+    npx_data1_mod <- npx_data1 |>
+      dplyr::filter(
+        !grepl(pattern = "control",
+               x = .data[["SampleID"]],
+               ignore.case = TRUE)
+      ) |>
+      dplyr::filter(
+        !(.data[["OlinkID"]] %in% .env[["exclude_assays"]])
+      )
+
+    # expected results ----
+
+    expected_test_res <- c(179L, 16L)
+
+    # olink_class ----
+
+    npx_data1_mod_obj <- attach_check_log(df = npx_data1_mod, out_df = "tibble")
+
     expect_message(
-      object = test_prep_out <- test_prep(
-        df = npx_data1 |>
-          dplyr::filter(
-            !grepl(pattern = "control",
-                   x = .data[["SampleID"]],
-                   ignore.case = TRUE)
-          ) |>
-          dplyr::filter(
-            !(.data[["OlinkID"]] %in% .env[["exclude_assays"]])
-          ),
+      object = test_prep_out_obj <- test_prep(
+        df = npx_data1_mod_obj,
         test_results = reference_results$t_test,
-        check_log = check_log
+        check_log = get_check_npx(df = npx_data1_mod_obj)
       ),
       regexp = paste("5 assays in `test_results` are not represented in `df`",
                      "and will be removed from `test_results`: \"OID01220\",",
@@ -1118,8 +1701,8 @@ test_that(
     )
 
     expect_identical(
-      object = dim(test_prep_out),
-      expected = c(179L, 16L)
+      object = dim(test_prep_out_obj),
+      expected = expected_test_res
     )
   }
 )
