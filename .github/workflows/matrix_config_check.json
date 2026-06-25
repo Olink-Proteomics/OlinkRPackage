@@ -2,22 +2,22 @@
    {
       "os": "macOS-latest",
       "r": "release",
-      "events": ["push", "pull_request"]
+      "events": ["pull_request"]
    },
    {
       "os": "windows-latest",
       "r": "release",
-      "events": ["push", "pull_request"]
+      "events": ["pull_request"]
    },
    {
       "os": "ubuntu-22.04",
       "r": "release",
-      "events": ["push", "pull_request"]
+      "events": ["pull_request"]
    },
    {
       "os": "ubuntu-24.04",
       "r": "devel",
-      "events": ["push", "pull_request"]
+      "events": ["pull_request"]
    },
    {
       "os": "ubuntu-24.04",
