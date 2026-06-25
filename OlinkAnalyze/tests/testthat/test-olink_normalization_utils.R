@@ -1872,7 +1872,8 @@ test_that(
       object = olink_norm_input_class(
         df1 = c(1L, 2L)
       ),
-      regexp = "`df1` is not a tibble or an ArrowObject dataset"
+      regexp = paste("`df1` is not a tibble, Olink class object or an",
+                     "ArrowObject dataset!")
     )
   }
 )
@@ -1891,7 +1892,8 @@ test_that(
         df1_project_nr = "P1",
         norm_mode = olink_norm_modes$bridge
       ),
-      regexp = "`df2` is not a tibble or an ArrowObject dataset"
+      regexp = paste("`df2` is not a tibble, Olink class object or an",
+                     "ArrowObject dataset!")
     )
   }
 )
@@ -2090,7 +2092,8 @@ test_that(
         reference_medians = 1L,
         norm_mode = olink_norm_modes$ref_median
       ),
-      regexp = "`reference_medians` is not a tibble or an ArrowObject dataset"
+      regexp = paste("`reference_medians` is not a tibble, Olink class object",
+                     "or an ArrowObject dataset!")
     )
 
     expect_error(
@@ -2102,7 +2105,8 @@ test_that(
         reference_medians = TRUE,
         norm_mode = olink_norm_modes$ref_median
       ),
-      regexp = "`reference_medians` is not a tibble or an ArrowObject dataset"
+      regexp = paste("`reference_medians` is not a tibble, Olink class object",
+                     "or an ArrowObject dataset!")
     )
 
     # If reference median normalization we do not check df2_project_nr and
