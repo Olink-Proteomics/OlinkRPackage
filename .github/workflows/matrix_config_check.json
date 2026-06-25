@@ -2,26 +2,26 @@
    {
       "os": "macOS-latest",
       "r": "release",
-      "runOn": "pull_request"
+      "events": ["pull_request"]
    },
    {
       "os": "windows-latest",
       "r": "release",
-      "runOn": "pull_request"
+      "events": ["pull_request"]
    },
    {
       "os": "ubuntu-22.04",
       "r": "release",
-      "runOn": "pull_request"
+      "events": ["pull_request"]
    },
    {
       "os": "ubuntu-24.04",
       "r": "devel",
-      "runOn": "pull_request"
+      "events": ["pull_request"]
    },
    {
       "os": "ubuntu-24.04",
       "r": "release",
-      "runOn": "always"
+      "events": ["push", "pull_request"]
    }
 ]
