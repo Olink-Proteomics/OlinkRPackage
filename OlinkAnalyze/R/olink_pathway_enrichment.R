@@ -188,6 +188,8 @@ olink_pathway_enrichment <- function(df,
   organism <- test_mode_results$organism
   test_mode <- test_mode_results$test_mode
 
+  check_log <- get_check_npx(df = df, check_log = check_log)
+
   check_pe_inputs(df = df,
                   check_log = check_log,
                   test_results = test_results,

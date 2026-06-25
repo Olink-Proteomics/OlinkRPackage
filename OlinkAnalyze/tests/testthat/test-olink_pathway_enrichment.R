@@ -47,17 +47,25 @@ test_that(
     skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_hs.parquet")))
     skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_mm.parquet")))
 
+    # expected output ----
+
+    expected_dim <- c(6992L, 12L)
+
+    # tibble ----
+
+    npx_data1_mod <- npx_data1 |>
+      dplyr::filter(
+        !grepl(pattern = "control",
+               x = .data[["SampleID"]],
+               ignore.case = TRUE)
+      )
+
     expect_message(
       object = expect_message(
         object = expect_message(
           object = expect_message(
             object = tt_gsea <- olink_pathway_enrichment(
-              df = npx_data1 |>
-                dplyr::filter(
-                  !grepl(pattern = "control",
-                         x = .data[["SampleID"]],
-                         ignore.case = TRUE)
-                ),
+              df = npx_data1_mod,
               check_log = check_log,
               test_results = reference_results$t_test,
               method = "TEST#GSEA",
@@ -76,7 +84,68 @@ test_that(
 
     expect_identical(
       object = dim(tt_gsea),
-      expected = c(6992L, 12L)
+      expected = expected_dim
+    )
+
+    # olink_class ----
+
+    npx_data1_mod_obj <- attach_check_log(df = npx_data1_mod, out_df = "tibble")
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = tt_gsea_obj <- olink_pathway_enrichment(
+              df = npx_data1_mod_obj,
+              test_results = reference_results$t_test,
+              method = "TEST#GSEA",
+              ontology = "TEST#MSigDb",
+              organism = "TEST#human"
+            ),
+            regexp = paste("Test mode activated: using fixed version of MSigDB",
+                           "for human")
+          ),
+          regexp = "Using MSigDB..."
+        ),
+        regexp = "45 assays are not found in the database"
+      ),
+      regexp = "Gene set enrichment analysis used by default"
+    )
+
+    expect_identical(
+      object = dim(tt_gsea_obj),
+      expected = expected_dim
+    )
+
+    # olink_class ----
+
+    npx_data1_mod_arrow <- attach_check_log(df = npx_data1_mod,
+                                            out_df = "arrow")
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = tt_gsea_arrow <- olink_pathway_enrichment(
+              df = npx_data1_mod_arrow,
+              test_results = reference_results$t_test,
+              method = "TEST#GSEA",
+              ontology = "TEST#MSigDb",
+              organism = "TEST#human"
+            ),
+            regexp = paste("Test mode activated: using fixed version of MSigDB",
+                           "for human")
+          ),
+          regexp = "Using MSigDB..."
+        ),
+        regexp = "45 assays are not found in the database"
+      ),
+      regexp = "Gene set enrichment analysis used by default"
+    )
+
+    expect_identical(
+      object = dim(tt_gsea_arrow),
+      expected = expected_dim
     )
 
   }
@@ -389,17 +458,25 @@ test_that(
     skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_hs.parquet")))
     skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_mm.parquet")))
 
+    # expected output ----
+
+    expected_dim <- c(573L, 12L)
+
+    # tibble ----
+
+    npx_data1_mod <- npx_data1 |>
+      dplyr::filter(
+        !grepl(pattern = "control",
+               x = .data[["SampleID"]],
+               ignore.case = TRUE)
+      )
+
     expect_message(
       object = expect_message(
         object = expect_message(
           object = expect_message(
             object = tt_ora <- olink_pathway_enrichment(
-              df = npx_data1 |>
-                dplyr::filter(
-                  !grepl(pattern = "control",
-                         x = .data[["SampleID"]],
-                         ignore.case = TRUE)
-                ),
+              df = npx_data1_mod,
               check_log = check_log,
               test_results = reference_results$t_test,
               method = "TEST#ORA",
@@ -420,7 +497,72 @@ test_that(
 
     expect_equal(
       object = dim(tt_ora),
-      expected = c(573L, 12L)
+      expected = expected_dim
+    )
+
+    # olink_class ----
+
+    npx_data1_mod_obj <- attach_check_log(df = npx_data1_mod, out_df = "tibble")
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = tt_ora_obj <- olink_pathway_enrichment(
+              df = npx_data1_mod_obj,
+              test_results = reference_results$t_test,
+              method = "TEST#ORA",
+              ontology = "TEST#MSigDb",
+              organism = "TEST#human"
+            ),
+            regexp = paste("Test mode activated: using fixed version of MSigDB",
+                           "for human")
+          ),
+          regexp = "Using MSigDB..."
+        ),
+        regexp = paste("45 assays are not found in the database. Please check",
+                       "the names for the following assays in `test_results`",
+                       "and `df`")
+      ),
+      regexp = "Over-representation analysis performed"
+    )
+
+    expect_equal(
+      object = dim(tt_ora_obj),
+      expected = expected_dim
+    )
+
+    # arrow ----
+
+    npx_data1_mod_arrow <- attach_check_log(df = npx_data1_mod,
+                                            out_df = "arrow")
+
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = expect_message(
+            object = tt_ora_arrow <- olink_pathway_enrichment(
+              df = npx_data1_mod_arrow,
+              test_results = reference_results$t_test,
+              method = "TEST#ORA",
+              ontology = "TEST#MSigDb",
+              organism = "TEST#human"
+            ),
+            regexp = paste("Test mode activated: using fixed version of MSigDB",
+                           "for human")
+          ),
+          regexp = "Using MSigDB..."
+        ),
+        regexp = paste("45 assays are not found in the database. Please check",
+                       "the names for the following assays in `test_results`",
+                       "and `df`")
+      ),
+      regexp = "Over-representation analysis performed"
+    )
+
+    expect_equal(
+      object = dim(tt_ora_arrow),
+      expected = expected_dim
     )
   }
 )
