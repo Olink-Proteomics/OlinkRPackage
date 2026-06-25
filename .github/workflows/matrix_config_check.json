@@ -23,5 +23,10 @@
       "os": "ubuntu-24.04",
       "r": "release",
       "events": ["push", "pull_request"]
+   },
+   {
+      "os": "ubuntu-26.04",
+      "r": "release",
+      "events": ["push", "pull_request"]
    }
 ]
