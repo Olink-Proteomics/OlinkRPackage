@@ -1282,18 +1282,34 @@ test_that(
       fixed = TRUE
     )
 
-    expected_check_npx <- check_npx(df = data_prep_out) |>
+    expect_true(
+      object = is.list(data_prep_out)
+    )
+    expect_identical(
+      object = length(data_prep_out),
+      expected = 2L
+    )
+    expect_identical(
+      object = names(data_prep_out),
+      expected = c("df", "check_log")
+    )
+
+    expected_check_npx <- check_npx(df = data_prep_out$df) |>
       suppressWarnings() |>
       suppressMessages()
 
-    expect_s3_class(object = data_prep_out, class = "olink_class")
-    expect_s3_class(object = data_prep_out, class = "tbl_df")
+    expect_s3_class(object = data_prep_out$df, class = "olink_class")
+    expect_s3_class(object = data_prep_out$df, class = "tbl_df")
     expect_identical(
-      object = dim(data_prep_out),
+      object = dim(data_prep_out$df),
       expected = c(28236L, 18L)
     )
     expect_equal(
-      object = get_check_npx(data_prep_out),
+      object = get_check_npx(data_prep_out$df),
+      expected = expected_check_npx
+    )
+    expect_equal(
+      object = data_prep_out$check_log,
       expected = expected_check_npx
     )
 
@@ -1322,14 +1338,30 @@ test_that(
       fixed = TRUE
     )
 
-    expect_s3_class(object = data_prep_out_obj, class = "olink_class")
-    expect_s3_class(object = data_prep_out_obj, class = "tbl_df")
+    expect_true(
+      object = is.list(data_prep_out_obj)
+    )
     expect_identical(
-      object = dim(data_prep_out_obj),
+      object = length(data_prep_out_obj),
+      expected = 2L
+    )
+    expect_identical(
+      object = names(data_prep_out_obj),
+      expected = c("df", "check_log")
+    )
+
+    expect_s3_class(object = data_prep_out_obj$df, class = "olink_class")
+    expect_s3_class(object = data_prep_out_obj$df, class = "tbl_df")
+    expect_identical(
+      object = dim(data_prep_out_obj$df),
       expected = c(28236L, 18L)
     )
     expect_equal(
-      object = get_check_npx(data_prep_out_obj),
+      object = get_check_npx(data_prep_out_obj$df),
+      expected = expected_check_npx
+    )
+    expect_equal(
+      object = data_prep_out_obj$check_log,
       expected = expected_check_npx
     )
   }
@@ -1377,7 +1409,7 @@ test_that(
     )
 
     expect_identical(
-      object = dim(data_prep_out),
+      object = dim(data_prep_out$df),
       expected = expected_dim
     )
 
@@ -1405,7 +1437,7 @@ test_that(
     )
 
     expect_identical(
-      object = dim(data_prep_out),
+      object = dim(data_prep_out$df),
       expected = expected_dim
     )
   }
@@ -1516,7 +1548,8 @@ test_that(
     expect_message(
       object = test_prep_out_obj <- test_prep(
         df = npx_data1_mod_obj,
-        test_results = reference_results$t_test
+        test_results = reference_results$t_test,
+        check_log = get_check_npx(df = npx_data1_mod_obj)
       ),
       regexp = paste("5 assays in `test_results` are not represented in `df`",
                      "and will be removed from `test_results`: \"OID01220\",",

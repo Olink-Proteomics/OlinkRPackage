@@ -188,19 +188,21 @@ olink_pathway_enrichment <- function(df,
   organism <- test_mode_results$organism
   test_mode <- test_mode_results$test_mode
 
-  check_log <- check_pe_inputs(df = df,
-                               check_log = check_log,
-                               test_results = test_results,
-                               method = method,
-                               ontology = ontology,
-                               organism = organism)
+  check_pe_inputs(df = df,
+                  check_log = check_log,
+                  test_results = test_results,
+                  method = method,
+                  ontology = ontology,
+                  organism = organism)
 
   # prepare data ----
 
-  df <- data_prep(df = df,
-                  check_log = check_log,
-                  test_results = test_results)
-
+  lst_out <- data_prep(df = df,
+                       check_log = check_log,
+                       test_results = test_results)
+  df <- lst_out$df
+  check_log <- lst_out$check_log
+  rm(lst_out)
 
   test_results <- test_prep(df = df,
                             test_results = test_results,
@@ -479,18 +481,24 @@ data_prep <- function(df,
     )
   }
 
-  return(df)
+  return(
+    list(
+      df = df,
+      check_log = check_log
+    )
+  )
 }
 
 test_prep <- function(df,
-                      test_results) {
+                      test_results,
+                      check_log) {
 
   # remove non-overlapping assays between test_results and df ----
 
   no_overlap_assays <- helper_non_overlap_assays(
     df = df,
     test_results = test_results,
-    check_log = get_check_npx(df = df),
+    check_log = check_log,
     which = "res"
   )
 
