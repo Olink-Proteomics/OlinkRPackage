@@ -109,9 +109,9 @@ olink_norm_input_check <- function(df1,
   # Validate the normalization input ----
 
   # Check data format
-  df1_check_log <- run_check_npx(df = df1, check_log = df1_check_log)
+  df1_check_log <- get_check_npx(df = df1, check_log = df1_check_log)
   if (!is.null(df2)) {
-    df2_check_log <- run_check_npx(df = df2, check_log = df2_check_log)
+    df2_check_log <- get_check_npx(df = df2, check_log = df2_check_log)
   }
 
   norm_valid <- olink_norm_input_validate(
@@ -230,9 +230,8 @@ olink_norm_input_check <- function(df1,
         )
       ) |>
       dplyr::distinct() |>
-      dplyr::collect() |>
-      dplyr::pull(
-        .data[[lst_cols[[l_col]]$sample_id]]
+      pull_col(
+        col = lst_cols[[l_col]]$sample_id
       )
   })
   names(lst_df_samples) <- names(lst_cols)
@@ -1431,9 +1430,8 @@ olink_norm_input_ref_medians <- function(reference_medians) {
             olink_norm_ref_median_cols$cols[i]
           )
         ) |>
-        dplyr::collect() |>
-        dplyr::pull(
-          .data[[olink_norm_ref_median_cols$cols[i]]]
+        pull_col(
+          col = olink_norm_ref_median_cols$cols[i]
         ) |>
         (\(x) inherits(x = x, what = olink_norm_ref_median_cols$class[i]))()
     }
@@ -1453,7 +1451,7 @@ olink_norm_input_ref_medians <- function(reference_medians) {
           dplyr::mutate(
             x = paste0("* ", .data[["cols"]], ": ", .data[["class"]])
           ) |>
-          dplyr::pull(.data[["x"]])
+          pull_col(col = "x")
       ),
       call = rlang::caller_env(),
       wrap = FALSE
@@ -1467,8 +1465,8 @@ olink_norm_input_ref_medians <- function(reference_medians) {
     dplyr::filter(
       .data[["name"]] == "olink_id"
     ) |>
-    dplyr::pull(
-      .data[["cols"]]
+    pull_col(
+      col = "cols"
     )
   oid_dups <- reference_medians |>
     dplyr::count(
@@ -1480,9 +1478,8 @@ olink_norm_input_ref_medians <- function(reference_medians) {
     dplyr::select(
       dplyr::all_of(oid_name)
     ) |>
-    dplyr::collect() |>
-    dplyr::pull(
-      .data[[oid_name]]
+    pull_col(
+      col = oid_name
     ) |>
     unique()
 
@@ -1577,9 +1574,8 @@ olink_norm_input_clean_assays <- function(lst_df,
         dplyr::all_of(lst_cols[[l_name]]$olink_id)
       ) |>
       dplyr::distinct() |>
-      dplyr::collect() |>
-      dplyr::pull(
-        .data[[lst_cols[[l_name]]$olink_id]]
+      pull_col(
+        col = lst_cols[[l_name]]$olink_id
       )
     # OlinkID in the cleaned dataset
     oid_out <- lst_df_oid[[l_name]] |>
@@ -1587,9 +1583,8 @@ olink_norm_input_clean_assays <- function(lst_df,
         dplyr::all_of(lst_cols[[l_name]]$olink_id)
       ) |>
       dplyr::distinct() |>
-      dplyr::collect() |>
-      dplyr::pull(
-        .data[[lst_cols[[l_name]]$olink_id]]
+      pull_col(
+        col = lst_cols[[l_name]]$olink_id
       )
     setdiff(x = oid_orig, # nolint: return_linter
             y = oid_out) |>
@@ -1639,9 +1634,8 @@ olink_norm_input_clean_assays <- function(lst_df,
         dplyr::all_of("OlinkID")
       ) |>
       dplyr::distinct() |>
-      dplyr::collect() |>
-      dplyr::pull(
-        .data[["OlinkID"]]
+      pull_col(
+        col = "OlinkID"
       )
     # OlinkID in the cleaned reference_medians
     oid_ref_med_out <- reference_medians_out |>
@@ -1649,9 +1643,8 @@ olink_norm_input_clean_assays <- function(lst_df,
         dplyr::all_of("OlinkID")
       ) |>
       dplyr::distinct() |>
-      dplyr::collect() |>
-      dplyr::pull(
-        .data[["OlinkID"]]
+      pull_col(
+        col = "OlinkID"
       )
     oid_ref_med_removed <- setdiff(x = oid_ref_med_orig,
                                    y = oid_ref_med_out) |>
@@ -1687,8 +1680,8 @@ olink_norm_input_clean_assays <- function(lst_df,
   lst_out$lst_df <- lst_df_excluded
 
   # check that df's have still rows
-  if (any(sapply(lst_out$lst_df, nrow) == 0L)) {
-    no_row_df <- names(lst_out$lst_df)[sapply(lst_out$lst_df, nrow) == 0L] # nolint: object_usage_linter
+  if (any(sapply(lapply(lst_out$lst_df, dplyr::compute), nrow) == 0L)) {
+    no_row_df <- names(lst_out$lst_df)[sapply(lapply(lst_out$lst_df, dplyr::compute), nrow) == 0L] # nolint: object_usage_linter, line_length_linter
 
     cli::cli_abort(
       c(
@@ -1712,9 +1705,8 @@ olink_norm_input_clean_assays <- function(lst_df,
         dplyr::all_of(lst_cols[[l_name]]$olink_id)
       ) |>
       dplyr::distinct() |>
-      dplyr::collect() |>
-      dplyr::pull(
-        .data[[lst_cols[[l_name]]$olink_id]]
+      pull_col(
+        col = lst_cols[[l_name]]$olink_id
       )
     # OlinkID in the cleaned dataset
     oid_out <- lst_df_excluded[[l_name]] |>
@@ -1722,9 +1714,8 @@ olink_norm_input_clean_assays <- function(lst_df,
         dplyr::all_of(lst_cols[[l_name]]$olink_id)
       ) |>
       dplyr::distinct() |>
-      dplyr::collect() |>
-      dplyr::pull(
-        .data[[lst_cols[[l_name]]$olink_id]]
+      pull_col(
+        col = lst_cols[[l_name]]$olink_id
       )
     setdiff(x = oid_orig, # nolint: return_linter
             y = oid_out) |>
@@ -1782,9 +1773,8 @@ olink_norm_input_assay_overlap <- function(lst_df,
         dplyr::all_of(lst_cols[[l_name]]$olink_id)
       ) |>
       dplyr::distinct() |>
-      dplyr::collect() |>
-      dplyr::pull(
-        .data[[lst_cols[[l_name]]$olink_id]]
+      pull_col(
+        col = lst_cols[[l_name]]$olink_id
       )
   })
   names(lst_df_oid) <- names(lst_df)
@@ -1796,9 +1786,8 @@ olink_norm_input_assay_overlap <- function(lst_df,
         dplyr::all_of("OlinkID")
       ) |>
       dplyr::distinct() |>
-      dplyr::collect() |>
-      dplyr::pull(
-        .data[["OlinkID"]]
+      pull_col(
+        col = "OlinkID"
       )
   }
 
@@ -1869,7 +1858,7 @@ olink_norm_input_assay_overlap <- function(lst_df,
         c(
           "Assay{?s} {.val {unique(unlist(oid_removed))}} not shared across
           input dataset(s):",
-          dplyr::pull(oid_combos_miss, .data[["M"]]),
+          pull_col(oid_combos_miss, col = "M"),
           "i" = "{length(unique(unlist(oid_removed)))} Assay{?s} will be
           removed from normalization."
         ),
@@ -1941,8 +1930,8 @@ olink_norm_input_norm_method <- function(lst_df,
       dplyr::filter(
         .data[[names(lst_df_norm)[1L]]] != .data[[names(lst_df_norm)[2L]]]
       ) |>
-      dplyr::pull(
-        .data[["olink_id"]]
+      pull_col(
+        col = "olink_id"
       )
 
     if (!identical(oid_norm_diff, character(0L))) {
@@ -1995,8 +1984,8 @@ olink_norm_product_id <- function(lst_df,
   lst_product <- sapply(names(lst_df), function(d_name) {
     # get unique panels
     u_panel <- lst_df[[d_name]] |>
-      dplyr::pull(
-        .data[[lst_cols[[d_name]]$panel]]
+      pull_col(
+        col = lst_cols[[d_name]]$panel
       ) |>
       unique()
     if (all(u_panel %in% eHT_e3072_mapping$Panel_E3072)) {
