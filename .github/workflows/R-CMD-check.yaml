@@ -10,21 +10,34 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+      
     steps:
       # Required as the JSON input file needs to be read
       - uses: actions/checkout@v6
+      
       - id: set-matrix
-        uses: JoshuaTheMiller/conditional-build-matrix@v2.0.1
-        with:
-          inputFile: '.github/workflows/matrix_config_check.json'
-          filter: '[?runOn==`${{ github.event_name }}` || runOn==`always`]'
-          # addInclude: true
+        shell: bash
+        run: |
+          matrix=$(
+            jq -c \
+              --arg event_name "${{ github.event_name }}" \
+              '{
+                include: [
+                  .[]
+                  | select(.events | index($event_name))
+                  | {os, r}
+                ]
+              }' \
+              .github/workflows/matrix_config_check.json
+          )
+
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
 
   R-CMD-check:
     needs: matrix_prep
     strategy:
       fail-fast: false
-      matrix: ${{fromJson(needs.matrix_prep.outputs.matrix)}}
+      matrix: ${{ fromJson(needs.matrix_prep.outputs.matrix) }}
   
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
