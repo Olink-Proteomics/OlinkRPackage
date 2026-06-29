@@ -451,6 +451,7 @@ read_npx_format_get_format <- function(df_top_n,
                         x = data_cells_long,
                         ignore.case = FALSE) |>
     any()
+  is_data_long <- is_data_long & data_cells_len > 2L
 
   if (is_data_wide == TRUE) {
     # in wide format files we expect the quantification method to appear in
