@@ -442,9 +442,11 @@ read_npx_format_get_format <- function(df_top_n,
 
   # Determine long or wide format from file ----
 
+  # data is wide when the quant method is found in cell A2 or the length of
+  # non-NA columns in the first row is exactly 2.
   is_data_wide <- grepl(pattern = paste(get_olink_data_types(), collapse = "|"),
                         x = data_cells_wide,
-                        ignore.case = FALSE)
+                        ignore.case = FALSE) | data_cells_len == 2L
   is_data_long <- grepl(pattern = paste(get_olink_data_types(), collapse = "|"),
                         x = data_cells_long,
                         ignore.case = FALSE) |>
