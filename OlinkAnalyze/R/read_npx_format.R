@@ -433,7 +433,8 @@ read_npx_format_get_format <- function(df_top_n,
                         ignore.case = FALSE)
   is_data_long <- grepl(pattern = paste(get_olink_data_types(), collapse = "|"),
                         x = data_cells_long,
-                        ignore.case = FALSE)
+                        ignore.case = FALSE) |>
+    any()
 
   if (is_data_wide == TRUE) {
     # in wide format files we expect the quantification method to appear in
@@ -442,7 +443,7 @@ read_npx_format_get_format <- function(df_top_n,
     detected_long_format <- FALSE
     data_cells <- data_cells_wide
 
-  } else if (is_data_wide == FALSE && any(is_data_long == TRUE)) {
+  } else if (is_data_wide == FALSE && is_data_long == TRUE) {
     # in long format files we expect the quantification method to appear in
     # cells L1:O1 and we also expect no matches to cell A2. This is what marks
     # wide format files.
