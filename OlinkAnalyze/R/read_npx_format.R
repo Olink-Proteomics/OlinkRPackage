@@ -416,6 +416,16 @@ read_npx_format_get_format <- function(df_top_n,
     # convert to character to simplify operations below
     as.character()
 
+  data_cells_len <- df_top_n |>
+    dplyr::slice_head(
+      n = 1L
+    ) |>
+    # convert to character to simplify operations below
+    as.character() |>
+    # remove NA values and count the number of non-NA columns
+    (\(.x) .x[!is.na(.x)])() |>
+    length()
+
   data_cells_long <- df_top_n |>
     dplyr::slice_head(
       n = 1L
