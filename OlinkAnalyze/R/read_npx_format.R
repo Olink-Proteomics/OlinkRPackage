@@ -432,9 +432,13 @@ read_npx_format_get_format <- function(df_top_n,
     ) |>
     # convert to character to simplify operations below
     as.character() |>
-    # exclude column NPX Signature Version as it results in the function not
-    # recognizing the format
-    (\(.x) .x[!grepl(pattern = "Version", x = .x, ignore.case = TRUE)])()
+    # exclude columns:
+    # "NPX Signature Version"
+    # "Olink NPX Signature X.Y.Z.M"
+    # as they result in the function not recognizing the format
+    (\(.x) .x[!grepl(pattern = "Version|Signature",
+                     x = .x,
+                     ignore.case = TRUE)])()
 
   # Determine long or wide format from file ----
 
