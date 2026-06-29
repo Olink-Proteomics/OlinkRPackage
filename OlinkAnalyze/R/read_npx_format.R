@@ -436,9 +436,7 @@ read_npx_format_get_format <- function(df_top_n,
     # "NPX Signature Version"
     # "Olink NPX Signature X.Y.Z.M"
     # as they result in the function not recognizing the format
-    (\(.x) .x[!grepl(pattern = "Version|Signature",
-                     x = .x,
-                     ignore.case = TRUE)])()
+    (\(.x) .x[!grepl(pattern = "Version|Signature", x = .x, ignore.case = TRUE)])() # nolint: line_length_linter
 
   # Determine long or wide format from file ----
 
