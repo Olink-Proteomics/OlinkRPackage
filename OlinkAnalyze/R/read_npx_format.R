@@ -797,6 +797,21 @@ read_npx_format_get_quant <- function(file,
   check_file_exists(file = file,
                     error = TRUE)
 
+  if (all(is.na(data_cells))) {
+    cli::cli_abort(
+      message = c(
+        "x" = "Unable to recognize the quantification method from the input
+        file!",
+        "i" = "Cell 'A2' of the input file {.file {file}} in {.val {\"wide\"}}
+        format was likely empty. Expected one of:
+        {.val {get_olink_data_types(broad_platform = broad_platform)}}. Consider
+        setting {.arg data_type}."
+      ),
+      call = rlang::caller_env(),
+      wrap = FALSE
+    )
+  }
+
   check_is_character(x = data_cells,
                      error = TRUE)
 
