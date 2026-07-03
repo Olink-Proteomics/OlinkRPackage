@@ -1442,6 +1442,68 @@ test_that(
   }
 )
 
+## Special cases ----
+
+test_that(
+  "read_npx_format - error - wide - cell A2 is empty",
+  {
+    skip_if_not_installed("writexl")
+
+    ## current version ----
+
+    # get synthetic data, or skip if not available
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "NPX",
+      n_panels = 3L,
+      n_assays = 45L,
+      n_samples = 99L,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = 2L
+    )
+
+    ## excel ----
+
+    withr::with_tempfile(
+      new = "excel_wide",
+      pattern = "test_wide",
+      fileext = ".xlsx",
+      code = {
+        df_rand$list_df_wide$df_wide <- df_rand$list_df_wide$df_wide |>
+          dplyr::mutate(
+            V1 = dplyr::if_else(
+              dplyr::row_number() == 2L, NA_character_, .data[["V1"]]
+            )
+          )
+
+        # write in csv
+        writexl::write_xlsx(x = df_rand$list_df_wide$df_wide,
+                            path = excel_wide,
+                            col_names = FALSE,
+                            format_headers = FALSE)
+
+        #check that file exists
+        expect_true(object = file.exists(excel_wide))
+
+        # check that read_npx_format works
+        expect_error(
+          object = df_out_v1 <- read_npx_format(
+            file = excel_wide,
+            out_df = "tibble",
+            long_format = NULL,
+            olink_platform = NULL,
+            data_type = NULL,
+            quiet = FALSE
+          ),
+          regexp = "Cell 'A2' of the input file.*format was likely empty"
+        )
+      }
+    )
+
+  }
+)
+
 # Test read_npx_format_read ----
 
 test_that(
