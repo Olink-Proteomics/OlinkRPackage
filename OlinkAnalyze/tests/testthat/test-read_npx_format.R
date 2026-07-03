@@ -3405,3 +3405,41 @@ test_that(
     )
   }
 )
+
+test_that(
+  "read_npx_format_get_quant - error - empty cell A2 in wide file",
+  {
+    withr::with_tempfile(
+      new = "excel_wide",
+      pattern = "test_excel_wide",
+      fileext = ".xlsx",
+      code = {
+        # writing something to the file
+        writeLines("foo", excel_wide)
+
+        # check that file exists
+        expect_true(object = file.exists(excel_wide))
+
+        # check that read_npx_format_get_quant works for data_type = NULL
+        expect_error(
+          object = read_npx_format_get_quant(
+            file = excel_wide,
+            data_type = NULL,
+            data_cells = NA_character_
+          ),
+          regexp = "Cell 'A2' of the input file"
+        )
+
+        # check that read_npx_format_get_quant works for data_type = NULL
+        expect_error(
+          object = read_npx_format_get_quant(
+            file = excel_wide,
+            data_type = NULL,
+            data_cells = c(NA_character_, NA_real_, NA)
+          ),
+          regexp = "Cell 'A2' of the input file"
+        )
+      }
+    )
+  }
+)
