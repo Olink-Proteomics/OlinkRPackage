@@ -789,6 +789,9 @@ read_npx_format_get_quant <- function(file,
                                       data_type = NULL,
                                       data_cells) {
 
+  # help vars
+  broad_platform <- "qPCR"
+
   # Checks inputs ----
 
   check_file_exists(file = file,
@@ -796,9 +799,6 @@ read_npx_format_get_quant <- function(file,
 
   check_is_character(x = data_cells,
                      error = TRUE)
-
-  # help vars
-  broad_platform <- "qPCR"
 
   # check data type
   if (!is.null(data_type)) {
