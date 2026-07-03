@@ -1893,6 +1893,93 @@ test_that(
 )
 
 test_that(
+  "read_npx_format_get_format - works - wide - Cell 'A2' is NA",
+  {
+    # get synthetic data, or skip if not available
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "NPX",
+      n_panels = 3L,
+      n_assays = 45L,
+      n_samples = 88L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = TRUE,
+      version = 1L
+    )
+
+    withr::with_tempfile(
+      new = "excel_wide",
+      pattern = "test_excel_npx_wide",
+      fileext = ".xlsx",
+      code = {
+        # modify df wide
+        df <- df_rand$list_df_wide$df_wide |>
+          dplyr::slice_head(
+            n = 2L
+          ) |>
+          # creating special cases when cell A2 is NA
+          dplyr::mutate(
+            V1 = dplyr::if_else(dplyr::row_number() == 2L, NA, .data[["V1"]])
+          )
+
+        # write a dummy file
+        writeLines("foo", excel_wide)
+
+        #check that file exists
+        expect_true(object = file.exists(excel_wide))
+
+        # check that read_npx_format_get_format works with long_format = NULL
+        expect_no_condition(
+          object = df_npx_null <- read_npx_format_get_format(
+            df_top_n = df,
+            file = excel_wide,
+            long_format = NULL
+          )
+        )
+
+        # check that object exists
+        expect_true(object = exists("df_npx_null"))
+
+        # check that it contains the correct elements
+        expect_equal(
+          object = names(df_npx_null),
+          expected = c("is_long_format", "data_cells")
+        )
+
+        # check that it is the correct format
+        expect_equal(
+          object = df_npx_null$is_long_format,
+          expected = FALSE
+        )
+
+        # check that the output string is correct
+        expect_true(
+          object = is.na(df_npx_null$data_cells)
+        )
+
+        # check that read_npx_format_get_format works with long_format = FALSE
+        expect_no_condition(
+          object = df_npx_false <- read_npx_format_get_format(
+            df_top_n = df,
+            file = excel_wide,
+            long_format = FALSE
+          )
+        )
+
+        # check that object exists
+        expect_true(object = exists("df_npx_false"))
+
+        # check that the two runs of read_npx_format_get_format return the same
+        expect_identical(
+          object = df_npx_false,
+          expected = df_npx_null
+        )
+      }
+    )
+  }
+)
+
+test_that(
   "read_npx_format_get_format - works - long",
   {
     # get synthetic data, or skip if not available
