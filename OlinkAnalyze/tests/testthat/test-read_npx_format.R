@@ -2300,7 +2300,8 @@ test_that(
           dplyr::mutate(
             V1 = dplyr::if_else(.data[["V1"]] == "NPX",
                                 "Wrong_Name",
-                                .data[["V1"]])
+                                .data[["V1"]]),
+            V2 = dplyr::if_else(dplyr::row_number() == 1L, NA, .data[["V2"]])
           )
 
         # write a dummy file
@@ -2421,7 +2422,8 @@ test_that(
           dplyr::mutate(
             V1 = dplyr::if_else(.data[["V1"]] == "NPX",
                                 "Wrong_Name",
-                                .data[["V1"]])
+                                .data[["V1"]]),
+            V2 = dplyr::if_else(dplyr::row_number() == 1L, NA, .data[["V2"]])
           )
 
         # write a dummy file
@@ -2523,7 +2525,8 @@ test_that(
           dplyr::mutate(
             V1 = dplyr::if_else(.data[["V1"]] == "NPX",
                                 "Wrong_Name",
-                                .data[["V1"]])
+                                .data[["V1"]]),
+            V2 = dplyr::if_else(dplyr::row_number() == 1L, NA, .data[["V2"]])
           )
 
         # write a dummy file
