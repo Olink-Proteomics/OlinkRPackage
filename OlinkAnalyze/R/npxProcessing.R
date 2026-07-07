@@ -28,21 +28,10 @@ npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
 
   if (color_g == check_log$col_names$qc_warning) {
     df_temp <- df |>
-      dplyr::group_by(
-        dplyr::across(
-          dplyr::all_of(check_log$col_names$sample_id)
-        )
-      ) |>
-      dplyr::mutate(
-        !!check_log$col_names$qc_warning := dplyr::if_else(
-          any(grepl(pattern = "warn",
-                    x = .data[[check_log$col_names$qc_warning]],
-                    ignore.case = TRUE)),
-          "Warning",
-          "Pass"
-        )
-      ) |>
-      dplyr::ungroup()
+      olink_summarize_qc_warning(
+        qc_warning = check_log$col_names$qc_warning,
+        group = check_log$col_names$sample_id
+      )
   } else {
 
     check_columns(df = df, col_list = list(color_g))

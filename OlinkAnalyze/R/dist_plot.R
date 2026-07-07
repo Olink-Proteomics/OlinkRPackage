@@ -114,31 +114,18 @@ olink_dist_plot <- function(df,
       )
     )
 
-  # If QC selected to plot
-  # If not all are Pass, the QC_Warning is set as warning for plotting purposes
+  # If QC selected to plot, summarize assay-level flags to one flag per sample
+  # and panel for plotting purposes.
   if (color_g %in% check_log$col_names$qc_warning) {
 
     df <- df |>
-      dplyr::group_by(
-        dplyr::pick(
-          dplyr::all_of(
-            c(
-              check_log$col_names$sample_id,
-              check_log$col_names$panel
-            )
-          )
+      olink_summarize_qc_warning(
+        qc_warning = check_log$col_names$qc_warning,
+        group = c(
+          check_log$col_names$sample_id,
+          check_log$col_names$panel
         )
-      ) |>
-      dplyr::mutate(
-        !!check_log$col_names$qc_warning := dplyr::if_else(
-          all(
-            toupper(.data[[check_log$col_names$qc_warning]]) == "PASS"
-          ),
-          "Pass",
-          "Warning"
-        )
-      ) |>
-      dplyr::ungroup()
+      )
 
   }
 
