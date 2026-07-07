@@ -7,6 +7,9 @@
 #'
 #' @return Input dataset with two additional columns, iqr and iqr_sd
 #'
+#' @keywords internal
+#' @noRd
+#'
 olink_iqr <- function(df,
                       quant_col,
                       iqr_group,
@@ -38,6 +41,9 @@ olink_iqr <- function(df,
 #'
 #' @return Input dataset with one additional columns, median
 #'
+#' @keywords internal
+#' @noRd
+#'
 olink_median <- function(df,
                          quant_col,
                          median_group) {
@@ -66,6 +72,9 @@ olink_median <- function(df,
 #'
 #' @return Boolean vector with length equal to the number of input rows
 #' indicating outlier.
+#'
+#' @keywords internal
+#' @noRd
 #'
 olink_median_iqr_outlier <- function(df,
                                      quant_col,
