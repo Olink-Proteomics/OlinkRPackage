@@ -25,15 +25,20 @@ test_that(
 )
 
 test_that(
-  "olink_summarize_qc_warning - works - summarizes by group (QC_Warning & PlateID)",
+  "olink_summarize_qc_warning - works - summarize by QC_Warning & PlateID",
   {
-    # duplicate sample identifiers are allowed in different plates. this functions allows
-    # duplicates, but not OA as whole.
-    
+    # duplicate sample identifiers are allowed in different plates. This
+    # function allows duplicates, but not OA as whole.
+
     df <- tibble::tibble(
       SampleID = c("S1", "S1", "S1", "S1", "S1", "S1", "S2", "S2", "S2"),
       PlateID = c("P1", "P1", "P2", "P2", "P3", "P3", "P1", "P1", "P1"),
-      QC_Warning = c("Pass", "Warning", "PASS", "Fail", "Pass", NA_character_, "FAIL", "PASS", "WARN")
+      QC_Warning = c(
+        "Pass", "Warning",
+        "PASS", "Fail",
+        "Pass", NA_character_,
+        "FAIL", "PASS", "WARN"
+      )
     )
 
     expect_no_warning(
@@ -46,7 +51,9 @@ test_that(
 
     expect_identical(
       object = df_summary |>
-        dplyr::distinct(.data[["SampleID"]], .data[["PlateID"]], .data[["QC_Warning"]]) |>
+        dplyr::distinct(
+          .data[["SampleID"]], .data[["PlateID"]], .data[["QC_Warning"]]
+        ) |>
         dplyr::arrange(.data[["SampleID"]], .data[["PlateID"]]) |>
         dplyr::pull(.data[["QC_Warning"]]),
       expected = c("Warning", "Fail", "Pass", "Fail")
@@ -55,7 +62,7 @@ test_that(
 )
 
 test_that(
-  "olink_summarize_qc_warning - works - supports flexible groups and output columns",
+  "olink_summarize_qc_warning - works - flexible groups and output columns",
   {
     df <- tibble::tibble(
       SampleID = c("S1", "S1", "S1", "S1"),
