@@ -2290,7 +2290,8 @@ test_that(
       check_log = npx_data1_check_log,
       out_df = "arrow"
     ) |>
-      suppressMessages()
+      suppressMessages() |>
+      suppressWarnings()
 
     # plain arrow without olink_class class — run_clean_npx delegates to
     # clean_npx which will auto-run check_npx if needed
@@ -2824,32 +2825,35 @@ test_that(
 
     # plain arrow without olink_class class — run_clean_npx delegates to
     # clean_npx which will auto-run check_npx if needed
-    expect_message(
+    expect_warning(
       object = expect_message(
         object = expect_message(
           object = expect_message(
-            object = expect_warning(
-              object = expect_message(
-                object = result <- clean_npx(
-                  df = npx_data1_arrow,
-                  out_df = "arrow"
+            object = expect_message(
+              object = expect_warning(
+                object = expect_message(
+                  object = result <- clean_npx(
+                    df = npx_data1_arrow,
+                    out_df = "arrow"
+                  ),
+                  regexp = "`check_log` not provided. Running `check_npx()`",
+                  fixed = TRUE
                 ),
-                regexp = "`check_log` not provided. Running `check_npx()`",
-                fixed = TRUE
+                regexp = paste("Duplicate SampleIDs detected:",
+                               "\"CONTROL_SAMPLE_AS 1\" and",
+                               "\"CONTROL_SAMPLE_AS 2\"")
               ),
-              regexp = paste("Duplicate SampleIDs detected:",
+              regexp = paste("Excluding 2 samples with duplicate identifiers:",
                              "\"CONTROL_SAMPLE_AS 1\" and",
                              "\"CONTROL_SAMPLE_AS 2\"")
             ),
-            regexp = paste("Excluding 2 samples with duplicate identifiers:",
-                           "\"CONTROL_SAMPLE_AS 1\" and",
-                           "\"CONTROL_SAMPLE_AS 2\"")
+            regexp = "No column marking control samples in dataset"
           ),
-          regexp = "No column marking control samples in dataset"
+          regexp = "No column marking control assays in dataset"
         ),
-        regexp = "No column marking control assays in dataset"
+        regexp = "No column marking assay warnings in dataset"
       ),
-      regexp = "No column marking assay warnings in dataset"
+      regexp = "No `olink_check_log` metadata found in the ArrowObject"
     )
 
     expect_true(
@@ -2998,7 +3002,7 @@ test_that(
         .data[["SampleID"]] == "ValidSample"
       )
 
-    expect_message(
+    expect_warning(
       object = expect_message(
         object = expect_message(
           object = expect_message(
@@ -3006,33 +3010,36 @@ test_that(
               object = expect_message(
                 object = expect_message(
                   object = expect_message(
-                    object = curr_result <- clean_npx(
-                      df = df_arrow,
-                      check_log = log,
-                      control_sample_ids = c("ControlID"),
-                      out_df = "arrow",
-                      verbose = FALSE
+                    object = expect_message(
+                      object = curr_result <- clean_npx(
+                        df = df_arrow,
+                        check_log = log,
+                        control_sample_ids = c("ControlID"),
+                        out_df = "arrow",
+                        verbose = FALSE
+                      ),
+                      regexp = paste("Excluding 1 assay with invalid",
+                                     "identifier: \"OID1234\"")
                     ),
-                    regexp = paste("Excluding 1 assay with invalid identifier:",
-                                   "\"OID1234\"")
+                    regexp = paste("Excluding 1 assay with only \"NA\" values:",
+                                   "\"OID23456\"")
                   ),
-                  regexp = paste("Excluding 1 assay with only \"NA\" values:",
-                                 "\"OID23456\"")
+                  regexp = paste("Excluding 1 sample with duplicate",
+                                 "identifier: \"DuplicateSample\"")
                 ),
-                regexp = paste("Excluding 1 sample with duplicate identifier:",
-                               "\"DuplicateSample\"")
+                regexp = "Excluding 1 control sample: \"ControlType\""
               ),
-              regexp = "Excluding 1 control sample: \"ControlType\""
+              regexp = "Excluding sample: \"ControlID\""
             ),
-            regexp = "Excluding sample: \"ControlID\""
+            regexp = paste("Excluding 1 datapoint from 1 sample flagged with",
+                           "SampleQC = \"FAIL\": \"FailQC\"")
           ),
-          regexp = paste("Excluding 1 datapoint from 1 sample flagged with",
-                         "SampleQC = \"FAIL\": \"FailQC\"")
+          regexp = "Excluding 1 control assay: \"OID78901\""
         ),
-        regexp = "Excluding 1 control assay: \"OID78901\""
+        regexp = paste("Excluding 1 datapoint from 1 assay flagged with",
+                       "AssayQC = \"WARN\" or \"Warning\": \"OID89012\"")
       ),
-      regexp = paste("Excluding 1 datapoint from 1 assay flagged with AssayQC",
-                     "= \"WARN\" or \"Warning\": \"OID89012\"")
+      regexp = "No `olink_check_log` metadata found in the ArrowObject"
     )
 
     expect_identical(

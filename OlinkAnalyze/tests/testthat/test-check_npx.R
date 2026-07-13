@@ -480,8 +480,11 @@ test_that(
 
     arrow_tbl <- arrow::as_arrow_table(x = df_tbl)
 
-    result <- get_check_npx(df = arrow_tbl,
-                            check_log = check_log_result)
+    expect_warning(
+      object = result <- get_check_npx(df = arrow_tbl,
+                                       check_log = check_log_result),
+      regexp = "No `olink_check_log` metadata found in the ArrowObject"
+    )
 
     expect_identical(object = result,
                      expected = check_log_result)

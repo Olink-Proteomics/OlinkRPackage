@@ -276,6 +276,12 @@ olink_extract_check_log <- function(df) {
     check_log_encoded <- df$metadata[["olink_check_log"]]
 
     if (is.null(check_log_encoded)) {
+      cli::cli_warn(
+        c(
+          "No {.arg olink_check_log} metadata found in the ArrowObject.",
+          "i" = "Consider generating it using {.fn check_npx}."
+        )
+      )
       return(NULL)
     }
 

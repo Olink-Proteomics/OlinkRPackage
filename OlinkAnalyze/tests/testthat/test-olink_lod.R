@@ -46,15 +46,18 @@ test_that(
       suppressMessages() |>
       suppressWarnings()
 
-    expect_message(
-      object = df_ht_lod_arrow <- olink_lod(
-        data = df_ht_arrow,
-        check_log = check_log_arrow,
-        lod_file_path = ht_fixed_lod_url,
-        lod_method = "FixedLOD"
+    expect_warning(
+      object = expect_message(
+        object = df_ht_lod_arrow <- olink_lod(
+          data = df_ht_arrow,
+          check_log = check_log_arrow,
+          lod_file_path = ht_fixed_lod_url,
+          lod_method = "FixedLOD"
+        ),
+        regexp = paste("More than one column names in `df` was associated with",
+                       "certain key. One was selected based on an ordered list")
       ),
-      regexp = paste("More than one column names in `df` was associated with",
-                     "certain key. One was selected based on an ordered list")
+      regexp = "No `olink_check_log` metadata found in the ArrowObject"
     )
 
     expect_true(object = check_is_arrow_object(x = df_ht_lod_arrow,
@@ -198,15 +201,18 @@ test_that(
       suppressMessages() |>
       suppressWarnings()
 
-    expect_message(
-      object = df_r_lod_arrow <- olink_lod(
-        data = df_r_arrow,
-        check_log = check_log_arrow,
-        lod_file_path = reveal_fixed_lod_url,
-        lod_method = "FixedLOD"
+    expect_warning(
+      object = expect_message(
+        object = df_r_lod_arrow <- olink_lod(
+          data = df_r_arrow,
+          check_log = check_log_arrow,
+          lod_file_path = reveal_fixed_lod_url,
+          lod_method = "FixedLOD"
+        ),
+        regexp = paste("More than one column names in `df` was associated with",
+                       "certain key. One was selected based on an ordered list")
       ),
-      regexp = paste("More than one column names in `df` was associated with",
-                     "certain key. One was selected based on an ordered list")
+      regexp = "No `olink_check_log` metadata found in the ArrowObject"
     )
 
     expect_true(object = check_is_arrow_object(x = df_r_lod_arrow,
@@ -352,15 +358,18 @@ test_that(
       suppressMessages() |>
       suppressWarnings()
 
-    expect_message(
-      object = df_3k_lod_arrow <- olink_lod(
-        data = df_3k_arrow,
-        check_log = check_log_arrow,
-        lod_file_path = e3k_fixed_lod_url,
-        lod_method = "FixedLOD"
+    expect_warning(
+      object = expect_message(
+        object = df_3k_lod_arrow <- olink_lod(
+          data = df_3k_arrow,
+          check_log = check_log_arrow,
+          lod_file_path = e3k_fixed_lod_url,
+          lod_method = "FixedLOD"
+        ),
+        regexp = paste("More than one column names in `df` was associated with",
+                       "certain key. One was selected based on an ordered list")
       ),
-      regexp = paste("More than one column names in `df` was associated with",
-                     "certain key. One was selected based on an ordered list")
+      regexp = "No `olink_check_log` metadata found in the ArrowObject"
     )
 
     expect_true(object = check_is_arrow_object(x = df_3k_lod_arrow,

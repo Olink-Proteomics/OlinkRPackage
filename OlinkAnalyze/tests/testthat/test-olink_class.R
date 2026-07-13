@@ -135,7 +135,10 @@ test_that(
   "olink_extract_check_log - works - returns NULL for ArrowObject w/o metadata",
   {
     arrow_tbl <- arrow::as_arrow_table(x = npx_data1)
-    result <- olink_extract_check_log(df = arrow_tbl)
+    expect_warning(
+      object = result <- olink_extract_check_log(df = arrow_tbl),
+      regexp = "No `olink_check_log` metadata found in the ArrowObject"
+    )
     expect_null(object = result)
   }
 )
@@ -521,7 +524,12 @@ test_that(
     result <- strip_check_log(df = arrow_with_log)
 
     expect_true(object = inherits(x = result, what = "ArrowObject"))
-    expect_null(object = olink_extract_check_log(df = result))
+    expect_warning(
+      object = expect_null(
+        object = olink_extract_check_log(df = result)
+      ),
+      regexp = "No `olink_check_log` metadata found in the ArrowObject"
+    )
   }
 )
 
@@ -543,7 +551,12 @@ test_that(
     result <- strip_check_log(df = arrow_tbl)
 
     expect_true(object = inherits(x = result, what = "ArrowObject"))
-    expect_null(object = olink_extract_check_log(df = result))
+    expect_warning(
+      object = expect_null(
+        object = olink_extract_check_log(df = result)
+      ),
+      regexp = "No `olink_check_log` metadata found in the ArrowObject"
+    )
   }
 )
 
