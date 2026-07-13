@@ -22,5 +22,6 @@ creating an \code{olink_class} subclass. This allows downstream functions to
 automatically extract the check log from the data.
 }
 \seealso{
-\code{\link[=olink_check_log]{olink_check_log()}} for retrieving the check log from an object.
+\code{\link[=olink_extract_check_log]{olink_extract_check_log()}} for retrieving the check log from an
+object.
 }

@@ -43,7 +43,7 @@ log, it is returned unchanged.
 
   class(npx_tbl)
 
-  OlinkAnalyze::olink_check_log(
+  OlinkAnalyze::olink_extract_check_log(
     df = npx_tbl
   )
 }
