@@ -337,7 +337,7 @@ as_tibble.olink_class <- function(x, ...) { # nolint: object_name_linter
 #' @keywords internal
 #' @noRd
 #'
-strip_check_log_arrow <- function(df) {
+rm_check_log_arrow <- function(df) {
 
   check_is_arrow_object(x = df, error = TRUE)
 
@@ -404,7 +404,7 @@ strip_check_log <- function(df) {
 
   } else if (check_is_arrow_object(x = df, error = FALSE)) {
 
-    return(strip_check_log_arrow(df = df))
+    return(rm_check_log_arrow(df = df))
 
   }
 
