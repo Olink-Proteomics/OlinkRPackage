@@ -314,8 +314,8 @@ test_that(
       )
     )
     umap_osi_cat_name <- "umap_plot_osi_category"
-    # check_snap_exist(test_dir_name = "plot_umap",
-    # snap_name = umap_osi_cat_name)
+    check_snap_exist(test_dir_name = "plot_umap",
+                     snap_name = umap_osi_cat_name)
     vdiffr::expect_doppelganger(umap_osi_cat_name, umap_osi_cat[[1L]]) |>
       suppressMessages() |>
       suppressWarnings()
@@ -334,8 +334,8 @@ test_that(
       )
     )
     umap_osi_sum_name <- "umap_plot_osi_summary"
-    # check_snap_exist(test_dir_name = "plot_umap",
-    # snap_name = umap_osi_sum_name)
+    check_snap_exist(test_dir_name = "plot_umap",
+                     snap_name = umap_osi_sum_name)
     vdiffr::expect_doppelganger(umap_osi_sum_name, umap_osi_sum[[1L]]) |>
       suppressMessages() |>
       suppressWarnings()
@@ -354,8 +354,8 @@ test_that(
       )
     )
     umap_osi_temp_name <- "umap_plot_osi_temperature"
-    # check_snap_exist(test_dir_name = "plot_umap",
-    # snap_name = umap_osi_temp_name)
+    check_snap_exist(test_dir_name = "plot_umap",
+                     snap_name = umap_osi_temp_name)
     vdiffr::expect_doppelganger(umap_osi_temp_name, umap_osi_temp[[1L]]) |>
       suppressMessages() |>
       suppressWarnings()
@@ -374,8 +374,8 @@ test_that(
       )
     )
     umap_osi_centr_name <- "umap_plot_osi_centrifugation"
-    # check_snap_exist(test_dir_name = "plot_umap",
-    # snap_name = umap_osi_centr_name)
+    check_snap_exist(test_dir_name = "plot_umap",
+                     snap_name = umap_osi_centr_name)
     vdiffr::expect_doppelganger(umap_osi_centr_name, umap_osi_centr[[1L]]) |>
       suppressMessages() |>
       suppressWarnings()
