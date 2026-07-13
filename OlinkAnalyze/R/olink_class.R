@@ -47,7 +47,7 @@ NULL
 #'
 #' @seealso [olink_check_log()] for retrieving the check log from an object.
 #'
-#' @keywords internal
+#' @export
 #'
 new_olink_class <- function(df,
                             check_log) {

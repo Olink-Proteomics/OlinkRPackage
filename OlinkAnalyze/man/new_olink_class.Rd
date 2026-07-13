@@ -24,4 +24,3 @@ automatically extract the check log from the data.
 \seealso{
 \code{\link[=olink_check_log]{olink_check_log()}} for retrieving the check log from an object.
 }
-\keyword{internal}
