@@ -2192,7 +2192,7 @@ test_that(
     )
 
     expect_identical(
-      object = olink_check_log(df = result),
+      object = olink_extract_check_log(df = result),
       expected = npx_data1_check_log
     )
   }
@@ -2465,7 +2465,7 @@ test_that(
     )
 
     expect_identical(
-      object = olink_check_log(df = curr_result_v1)$col_names,
+      object = olink_extract_check_log(df = curr_result_v1)$col_names,
       expected = check_log_tmp$col_names
     )
 
@@ -2480,7 +2480,7 @@ test_that(
     )
 
     expect_identical(
-      object = olink_check_log(df = curr_result_v2)$col_names,
+      object = olink_extract_check_log(df = curr_result_v2)$col_names,
       expected = check_log_tmp$col_names
     )
   }
@@ -2707,7 +2707,7 @@ test_that(
     )
 
     expect_identical(
-      object = olink_check_log(df = result),
+      object = olink_extract_check_log(df = result),
       expected = npx_data1_check_log
     )
   }
@@ -3097,7 +3097,7 @@ test_that(
     )
 
     expect_identical(
-      object = olink_check_log(df = curr_result_v1)$col_names,
+      object = olink_extract_check_log(df = curr_result_v1)$col_names,
       expected = check_log_tmp$col_names
     )
 
@@ -3123,7 +3123,7 @@ test_that(
     )
 
     expect_identical(
-      object = olink_check_log(df = curr_result_v2)$col_names,
+      object = olink_extract_check_log(df = curr_result_v2)$col_names,
       expected = check_log_tmp$col_names
     )
   }

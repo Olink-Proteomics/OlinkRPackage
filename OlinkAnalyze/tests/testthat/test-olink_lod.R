@@ -102,7 +102,7 @@ test_that(
     expect_true(
       object = all(
         c("LOD", "PCNormalizedLOD") %in%
-          olink_check_log(df = df_ht_obj_lod)$col_names$lod
+          olink_extract_check_log(df = df_ht_obj_lod)$col_names$lod
       )
     )
 
@@ -146,7 +146,7 @@ test_that(
     expect_true(
       object = all(
         c("LOD", "PCNormalizedLOD") %in%
-          olink_check_log(df = df_ht_arrow_obj_lod)$col_names$lod
+          olink_extract_check_log(df = df_ht_arrow_obj_lod)$col_names$lod
       )
     )
   }
@@ -254,7 +254,7 @@ test_that(
     expect_true(
       object = all(
         c("LOD", "PCNormalizedLOD") %in%
-          olink_check_log(df = df_r_obj_lod)$col_names$lod
+          olink_extract_check_log(df = df_r_obj_lod)$col_names$lod
       )
     )
 
@@ -298,7 +298,7 @@ test_that(
     expect_true(
       object = all(
         c("LOD", "PCNormalizedLOD") %in%
-          olink_check_log(df = df_r_arrow_obj_lod)$col_names$lod
+          olink_extract_check_log(df = df_r_arrow_obj_lod)$col_names$lod
       )
     )
   }
@@ -408,7 +408,7 @@ test_that(
     expect_true(
       object = all(
         c("LOD", "PCNormalizedLOD") %in%
-          olink_check_log(df = df_3k_obj_lod)$col_names$lod
+          olink_extract_check_log(df = df_3k_obj_lod)$col_names$lod
       )
     )
 
@@ -452,7 +452,7 @@ test_that(
     expect_true(
       object = all(
         c("LOD", "PCNormalizedLOD") %in%
-          olink_check_log(df = df_3k_arrow_obj_lod)$col_names$lod
+          olink_extract_check_log(df = df_3k_arrow_obj_lod)$col_names$lod
       )
     )
   }
