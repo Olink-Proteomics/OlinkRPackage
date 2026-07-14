@@ -56,6 +56,18 @@ new_olink_class <- function(df,
   # validate inputs
   check_is_tibble(x = df, error = TRUE)
 
+  # check that we are not overwriting an existing olink_class S3 object
+  if (rlang::inherits_any(x = df, class = "olink_class")) {
+    cli::cli_warn(
+      c(
+        "{.arg df} is already an {.cls olink_class} object!",
+        "i" = "Use {.fn rm_check_log} to remove the existing check log before
+        creating a new one."
+      ),
+      call = rlang::caller_env()
+    )
+  }
+
   validate_check_log(df = df, check_log = check_log)
 
   # construct the subclass

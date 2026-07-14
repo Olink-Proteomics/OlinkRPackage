@@ -27,6 +27,34 @@ test_that(
 )
 
 test_that(
+  "new_olink_class - warning - df is already an olink_class",
+  {
+    result <- new_olink_class(
+      df = npx_data1,
+      check_log = npx_data1_check_log
+    )
+
+    expect_s3_class(object = result, class = "olink_class")
+
+    expect_warning(
+      object = result_new <- new_olink_class(
+        df = result,
+        check_log = npx_data1_check_log
+      ),
+      regexp = "`df` is already an <olink_class> object!"
+    )
+
+    expect_s3_class(object = result_new, class = "olink_class")
+    expect_s3_class(object = result_new, class = "tbl_df")
+    expect_identical(object = dim(result_new), expected = c(29440L, 17L))
+    expect_identical(
+      object = attr(x = result_new, which = "check_log", exact = TRUE),
+      expected = npx_data1_check_log
+    )
+  }
+)
+
+test_that(
   "new_olink_class - error - non-tibble input",
   {
     expect_error(
