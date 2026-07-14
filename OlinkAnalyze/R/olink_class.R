@@ -385,7 +385,7 @@ rm_check_log_arrow <- function(df) {
 #'   )
 #'
 #'   # strip check log, returning a plain tibble
-#'   npx_tbl <- OlinkAnalyze::strip_check_log(
+#'   npx_tbl <- OlinkAnalyze::rm_check_log(
 #'     df = npx_obj
 #'   )
 #'
@@ -396,7 +396,7 @@ rm_check_log_arrow <- function(df) {
 #'   )
 #' }
 #'
-strip_check_log <- function(df) {
+rm_check_log <- function(df) {
 
   if (inherits(x = df, what = "olink_class")) {
 
@@ -707,10 +707,10 @@ tbl_sum.olink_class <- function(x, ...) {
 
   if (!is.null(check_log)) {
     olink_class_name <- c(default_header,
-                          "Check log" = "attached")
+                          "olink_check_log" = "attached")
   } else {
     olink_class_name <- c(default_header,
-                          "Check log" = "missing")
+                          "olink_check_log" = "missing")
   }
 
   return(olink_class_name)

@@ -2343,13 +2343,13 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(curr_result),
+      object = rm_check_log(curr_result),
       expected = expected_result
     )
 
     expect_identical(
       object = get_check_npx(df = curr_result),
-      expected = strip_check_log(df = curr_result) |>
+      expected = rm_check_log(df = curr_result) |>
         check_npx() |>
         suppressMessages() |>
         suppressWarnings()
@@ -2379,13 +2379,13 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(curr_result),
+      object = rm_check_log(curr_result),
       expected = expected_result
     )
 
     expect_identical(
       object = get_check_npx(df = curr_result),
-      expected = strip_check_log(df = curr_result) |>
+      expected = rm_check_log(df = curr_result) |>
         check_npx() |>
         suppressMessages() |>
         suppressWarnings()
@@ -2417,14 +2417,14 @@ test_that(
 
     expect_identical(
       object = get_check_npx(df = curr_result),
-      expected = strip_check_log(df = curr_result) |>
+      expected = rm_check_log(df = curr_result) |>
         check_npx() |>
         suppressMessages() |>
         suppressWarnings()
     )
 
     expect_equal(
-      object = strip_check_log(curr_result) |> dplyr::collect(),
+      object = rm_check_log(curr_result) |> dplyr::collect(),
       expected = expected_result
     )
   }
@@ -2513,7 +2513,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(curr_result),
+      object = rm_check_log(curr_result),
       expected = tmp_npx_data1
     )
   }
@@ -2547,7 +2547,7 @@ test_that(
                          control_sample_ids = c("ControlID"),
                          verbose = TRUE) |>
         suppressMessages() |>
-        strip_check_log(),
+        rm_check_log(),
       expected = expected_result
     )
   }
@@ -2661,7 +2661,7 @@ test_that(
       object = expect_equal(
         object = clean_npx(df = test_result,
                            check_log = log_test) |>
-          strip_check_log(),
+          rm_check_log(),
         expected = test_result
       ),
       regexp = paste("Detected data in absolute quantification in column",
@@ -2804,7 +2804,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = result),
+      object = rm_check_log(df = result),
       expected = npx_data1 |>
         dplyr::filter(
           !(.data[["SampleID"]] %in% npx_data1_check_log[["sample_id_dups"]])
@@ -2921,13 +2921,13 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(curr_result),
+      object = rm_check_log(curr_result),
       expected = expected_result
     )
 
     expect_identical(
       object = get_check_npx(df = curr_result),
-      expected = strip_check_log(df = curr_result) |>
+      expected = rm_check_log(df = curr_result) |>
         check_npx() |>
         suppressMessages() |>
         suppressWarnings()
@@ -2980,13 +2980,13 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(curr_result),
+      object = rm_check_log(curr_result),
       expected = expected_result
     )
 
     expect_identical(
       object = get_check_npx(df = curr_result),
-      expected = strip_check_log(df = curr_result) |>
+      expected = rm_check_log(df = curr_result) |>
         check_npx() |>
         suppressMessages() |>
         suppressWarnings()
@@ -3044,14 +3044,14 @@ test_that(
 
     expect_identical(
       object = get_check_npx(df = curr_result),
-      expected = strip_check_log(df = curr_result) |>
+      expected = rm_check_log(df = curr_result) |>
         check_npx() |>
         suppressMessages() |>
         suppressWarnings()
     )
 
     expect_equal(
-      object = strip_check_log(df = curr_result) |> dplyr::collect(),
+      object = rm_check_log(df = curr_result) |> dplyr::collect(),
       expected = expected_result
     )
   }

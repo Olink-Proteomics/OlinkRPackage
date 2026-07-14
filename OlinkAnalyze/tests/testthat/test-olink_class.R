@@ -470,8 +470,8 @@ test_that(
 
     header <- tbl_sum(obj)
 
-    expect_true(object = "Check log" %in% names(header))
-    expect_equal(object = header[["Check log"]],
+    expect_true(object = "olink_check_log" %in% names(header))
+    expect_equal(object = header[["olink_check_log"]],
                  expected = "attached")
   }
 )
@@ -488,23 +488,23 @@ test_that(
 
     header <- tbl_sum(obj)
 
-    expect_true(object = "Check log" %in% names(header))
-    expect_equal(object = header[["Check log"]],
+    expect_true(object = "olink_check_log" %in% names(header))
+    expect_equal(object = header[["olink_check_log"]],
                  expected = "missing")
   }
 )
 
-# Test strip_check_log ----
+# Test rm_check_log ----
 
 test_that(
-  "strip_check_log - works - strips check_log from olink_class tibble",
+  "rm_check_log - works - strips check_log from olink_class tibble",
   {
     obj <- new_olink_class(
       df = npx_data1,
       check_log = npx_data1_check_log
     )
 
-    result <- strip_check_log(df = obj)
+    result <- rm_check_log(df = obj)
 
     expect_false(object = inherits(x = result, what = "olink_class"))
     expect_s3_class(object = result, class = "tbl_df")
@@ -513,7 +513,7 @@ test_that(
 )
 
 test_that(
-  "strip_check_log - works - strips check_log from ArrowObject",
+  "rm_check_log - works - strips check_log from ArrowObject",
   {
     arrow_tbl <- arrow::as_arrow_table(x = npx_data1)
     arrow_with_log <- attach_check_log_arrow(
@@ -521,7 +521,7 @@ test_that(
       check_log = npx_data1_check_log
     )
 
-    result <- strip_check_log(df = arrow_with_log)
+    result <- rm_check_log(df = arrow_with_log)
 
     expect_true(object = inherits(x = result, what = "ArrowObject"))
     expect_warning(
@@ -534,9 +534,9 @@ test_that(
 )
 
 test_that(
-  "strip_check_log - works - returns plain tibble unchanged",
+  "rm_check_log - works - returns plain tibble unchanged",
   {
-    result <- strip_check_log(df = npx_data1)
+    result <- rm_check_log(df = npx_data1)
 
     expect_s3_class(object = result, class = "tbl_df")
     expect_identical(object = result, expected = npx_data1)
@@ -544,11 +544,11 @@ test_that(
 )
 
 test_that(
-  "strip_check_log - works - returns ArrowObject without metadata unchanged",
+  "rm_check_log - works - returns ArrowObject without metadata unchanged",
   {
     arrow_tbl <- arrow::as_arrow_table(x = npx_data1)
 
-    result <- strip_check_log(df = arrow_tbl)
+    result <- rm_check_log(df = arrow_tbl)
 
     expect_true(object = inherits(x = result, what = "ArrowObject"))
     expect_warning(
