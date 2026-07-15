@@ -53,6 +53,8 @@
 #' }
 #'
 #' @keywords NPX Bridging
+#' @keywords internal
+#' @noRd
 #'
 #' @examples
 #' \donttest{
