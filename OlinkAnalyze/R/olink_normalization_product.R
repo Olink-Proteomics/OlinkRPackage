@@ -403,6 +403,8 @@ olink_normalization_bridgeable <- function(lst_df,
 #' datasets with the quantile normalized quantifications.
 #'
 #' @keywords Normalization Quantile Smoothing
+#' @keywords internal
+#' @noRd
 #'
 #' @examples
 #' \donttest{
