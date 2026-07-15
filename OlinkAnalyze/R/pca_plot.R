@@ -12,8 +12,8 @@
 #'
 #' Unique sample names are required.
 #'
-#' Imputation by the median is done for assays with missingness <10\%
-#' for multi-plate projects and <5\% for single plate projects.
+#' Imputation by the median is done for assays with missingness <10%
+#' for multi-plate projects and <5% for single plate projects.
 #'
 #' The plot is printed, and a list of ggplot objects is returned.
 #' If byPanel = TRUE, the data processing (imputation of missing
