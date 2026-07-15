@@ -260,7 +260,7 @@ olink_normalization <- function(df1,
 
   # kill switch
   # convert to tibble if no time to get arrow work across the function
-  if (lst_check$ref_out_df == "arrow") {
+  if (lst_check$ref_output_df_format == "arrow") {
     lst_check$ref_df <- convert_read_npx_output(
       df = lst_check$ref_df,
       out_df = "tibble"
@@ -293,7 +293,7 @@ olink_normalization <- function(df1,
 
     # kill switch
     # convert to tibble if no time to get arrow work across the function
-    if (lst_check$not_ref_out_df == "arrow") {
+    if (lst_check$not_ref_output_df_format == "arrow") {
       lst_check$not_ref_df <- convert_read_npx_output(
         df = lst_check$not_ref_df,
         out_df = "tibble"
