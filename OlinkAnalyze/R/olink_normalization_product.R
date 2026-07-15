@@ -30,7 +30,7 @@
 #' \code{\link{olink_norm_input_check}} when it is called from
 #' \code{\link{olink_normalization}}. In addition,
 #' \code{\link{olink_normalization}} has also utilized
-#' `norm_internal_rename_cols` to rename the columns of the non-reference
+#' `norm_internal_preferred_names` to rename the columns of the non-reference
 #' dataset according to the ones of the reference dataset, hence all column
 #' names should match.
 #'
