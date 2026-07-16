@@ -674,6 +674,15 @@ test_that(
                     x = "is not an Olink class object!",
                     fixed = TRUE)
     )
+
+    expect_error(
+      object = check_is_olink_class(x = npx_data1,
+                                    error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "is not an Olink class object!",
+                    fixed = TRUE)
+    )
   }
 )
 
