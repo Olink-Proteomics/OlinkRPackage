@@ -3135,3 +3135,82 @@ test_that(
     )
   }
 )
+
+test_that(
+  "clean_npx - works - obj - if both check_log and olink_lass are provided",
+  {
+    # prepare check log ----
+
+    # original check log
+    npx_data1_check_log <- check_npx(df = npx_data1) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    # clean up data and generate new check log
+    npx_data1_clean <- npx_data1 |>
+      dplyr::filter(
+        .data[["SampleID"]] != c("CONTROL_SAMPLE_AS 1", "CONTROL_SAMPLE_AS 2")
+      )
+
+    npx_data1_clean_check_log <- check_npx(df = npx_data1_clean) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    # check differences between check logs
+    expect_equal(
+      object = npx_data1_check_log[!(names(npx_data1_check_log) %in% c("sample_id_dups"))], # nolint: line_length-linter
+      expected = npx_data1_clean_check_log[!(names(npx_data1_clean_check_log) %in% c("sample_id_dups"))] # nolint: line_length-linter
+    )
+
+    expect_equal(
+      object = npx_data1_check_log[["sample_id_dups"]],
+      expected = c("CONTROL_SAMPLE_AS 1", "CONTROL_SAMPLE_AS 2")
+    )
+
+    expect_equal(
+      object = npx_data1_clean_check_log[["sample_id_dups"]],
+      expected = character(0)
+    )
+
+    # attaching check log to olink_class object, and generating new class are
+    # the same
+    obj <- new_olink_class(
+      df = npx_data1_clean,
+      check_log = npx_data1_clean_check_log
+    )
+
+    obj_attach <- attach_check_log(df = npx_data1_clean, out_df = "tibble")
+
+    expect_equal(
+      object = obj,
+      expected = obj_attach
+    )
+
+    # run clean_npx
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = result <- clean_npx(
+            df = obj,
+            check_log = npx_data1_check_log
+          ),
+          regexp = "No column marking control samples in dataset"
+        ),
+        regexp = "No column marking control assays in dataset"
+      ),
+      regexp = "No column marking assay warnings in dataset"
+    )
+
+    expect_s3_class(
+      object = result,
+      class = "olink_class"
+    )
+
+    # check that check_log from cleaned dataset was attached
+
+    expect_identical(
+      object = olink_extract_check_log(df = result),
+      expected = npx_data1_clean_check_log
+    )
+  }
+)
