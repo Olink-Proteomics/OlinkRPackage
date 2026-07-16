@@ -998,13 +998,7 @@ test_that(
                     reference_project = "Explore HT",
                     # setting format = TRUE to test that function works for when
                     # BridgingRecommendation is "NotOverlapping"
-                    format = TRUE,
-                    df1_check_log = check_npx(df = npx_ht) |>
-                      suppressMessages() |>
-                      suppressWarnings(),
-                    df2_check_log = check_npx(df = npx_3072) |>
-                      suppressMessages() |>
-                      suppressWarnings()
+                    format = TRUE
                   ),
                   regexp = "2 assays are not shared across products"
                 ),
@@ -1122,13 +1116,7 @@ test_that(
                     reference_project = "Explore HT",
                     # setting format = TRUE to test that function works for when
                     # BridgingRecommendation is "NotOverlapping"
-                    format = TRUE,
-                    df1_check_log = check_npx(df = npx_ht) |>
-                      suppressMessages() |>
-                      suppressWarnings(),
-                    df2_check_log = check_npx(df = npx_3072) |>
-                      suppressMessages() |>
-                      suppressWarnings()
+                    format = TRUE
                   ),
                   regexp = "2 assays are not shared across products"
                 ),
