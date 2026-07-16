@@ -904,7 +904,7 @@ test_that(
   {
     osi_data <- get_example_data("example_osi_data.rds")
 
-    # OSISUmmary ----
+    # OSISummary ----
 
     expect_no_condition(
       object = osi_summary <- check_osi(
