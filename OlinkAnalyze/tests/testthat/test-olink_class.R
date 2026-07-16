@@ -18,7 +18,7 @@ test_that(
 
     expect_s3_class(object = result, class = "olink_class")
     expect_s3_class(object = result, class = "tbl_df")
-    expect_identical(object = dim(result), expected = c(29440L, 17L))
+    expect_identical(object = dim(result), expected = dim(npx_data1))
     expect_identical(
       object = attr(x = result, which = "check_log", exact = TRUE),
       expected = npx_data1_check_log
@@ -46,7 +46,7 @@ test_that(
 
     expect_s3_class(object = result_new, class = "olink_class")
     expect_s3_class(object = result_new, class = "tbl_df")
-    expect_identical(object = dim(result_new), expected = c(29440L, 17L))
+    expect_identical(object = dim(result_new), expected = dim(npx_data1))
     expect_identical(
       object = attr(x = result_new, which = "check_log", exact = TRUE),
       expected = npx_data1_check_log
@@ -459,7 +459,7 @@ test_that(
     )
     expect_equal(
       object = nrow(result),
-      expected = 29440L
+      expected = nrow(npx_data1)
     )
   }
 )
@@ -568,6 +568,7 @@ test_that(
 
     expect_s3_class(object = result, class = "tbl_df")
     expect_identical(object = result, expected = npx_data1)
+    expect_false(object = inherits(x = result, what = "olink_class"))
   }
 )
 
