@@ -145,7 +145,7 @@ test_that(
       pattern = "delim-file-test",
       fileext = ".csv",
       code = {
-        # write the coma-delimited file from random data frame
+        # write the comma-delimited file from random data frame
         dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
           "B" = c("a", "b", "c"),

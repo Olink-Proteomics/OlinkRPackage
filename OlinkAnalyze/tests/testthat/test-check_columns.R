@@ -140,7 +140,8 @@ test_that(
       regexp = "is missing columns that should be present in at least one"
     )
 
-    # SampleID and (Count or ExtNPX) exist -> error as neither E nor F exist
+    # SampleID and (Count or ExtNPX) and (PlateLOD or MaxLOD) exist -> error as
+    # neither (Count or ExtNPX) nor (PlateLOD or MaxLOD) exist
     expect_error(
       object = check_columns(df = npx_data1_obj,
                              col_list = list("SampleID",
