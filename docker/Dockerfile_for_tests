@@ -103,11 +103,7 @@ RUN set -e; \
       R -q -e 'remotes::install_version("arrow", version = "14.0.0", repos = "https://packagemanager.posit.co/cran/2023-11-17")' ; \
       R -q -e 'remotes::install_version("testthat", version = "3.3.0", repos = "https://packagemanager.posit.co/cran/2025-11-17")' ; \
       R -q -e 'remotes::install_version("msigdbr", version = "24.1.0", repos = "https://packagemanager.posit.co/cran/2025-05-14")' ;; \
-    "4.3.3") \
-      R -q -e 'remotes::install_version("dplyr", version = "1.2.0", repos = "https://packagemanager.posit.co/cran/2026-02-04")'; \
-      R -q -e 'remotes::install_version("testthat", version = "3.3.0", repos = "https://packagemanager.posit.co/cran/2025-11-17")' ; \
-      R -q -e 'remotes::install_version("msigdbr", version = "24.1.0", repos = "https://packagemanager.posit.co/cran/2025-05-14")' ;; \
-    "4.4.3") \
+    "4.3.3"|"4.4.3") \
       R -q -e 'remotes::install_version("dplyr", version = "1.2.0", repos = "https://packagemanager.posit.co/cran/2026-02-04")'; \
       R -q -e 'remotes::install_version("testthat", version = "3.3.0", repos = "https://packagemanager.posit.co/cran/2025-11-17")' ; \
       R -q -e 'remotes::install_version("msigdbr", version = "24.1.0", repos = "https://packagemanager.posit.co/cran/2025-05-14")' ;; \
