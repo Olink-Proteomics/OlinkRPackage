@@ -5132,5 +5132,36 @@ test_that(
                    "BridgingRecommendation")
     )
 
+    # ensure that the check log is updated with the new column names
+
+    ht_3k_norm_chec_log <- olink_extract_check_log(df = ht_3k_norm)
+
+    data_ht_check_log <- check_npx(df = data_ht) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    expect_identical(
+      object = ht_3k_norm_chec_log$col_names[{
+        column_name_dict |>
+          dplyr::filter(
+            .data[["is_updatable"]]
+          ) |>
+          dplyr::pull(
+            .data[["col_key"]]
+          ) |>
+          (\(.) .[. %in% names(ht_3k_norm_chec_log$col_names)])()
+      }],
+      expected = data_ht_check_log$col_names[{
+        column_name_dict |>
+          dplyr::filter(
+            .data[["is_updatable"]]
+          ) |>
+          dplyr::pull(
+            .data[["col_key"]]
+          ) |>
+          (\(.) .[. %in% names(data_ht_check_log$col_names)])()
+      }]
+    )
+
   }
 )
