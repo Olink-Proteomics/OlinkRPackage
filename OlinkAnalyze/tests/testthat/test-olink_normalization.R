@@ -5076,7 +5076,8 @@ test_that(
       dplyr::rename(
         "Sample_Type" = "SampleType",
         "QC_Warning" = "SampleQC",
-        "Assay_Warning" = "AssayQC"
+        "Assay_Warning" = "AssayQC",
+        "Assay_Type" = "AssayType"
       )
 
     expect_message(
@@ -5119,7 +5120,7 @@ test_that(
 
     expect_identical(
       object = dim(ht_3k_norm),
-      expected = c(39936L, 23L)
+      expected = c(39936L, 22L)
     )
 
     expect_identical(
@@ -5128,7 +5129,7 @@ test_that(
                    "UniProt", "Assay", "AssayType", "Panel", "Block", "NPX",
                    "PCNormalizedNPX", "Count", "Normalization", "AssayQC",
                    "SampleQC", "DataAnalysisRefID", "Project", "OlinkID_E3072",
-                   "Sample_Type", "MedianCenteredNPX", "QSNormalizedNPX",
+                   "MedianCenteredNPX", "QSNormalizedNPX",
                    "BridgingRecommendation")
     )
 

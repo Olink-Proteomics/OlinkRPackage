@@ -238,8 +238,8 @@ column_name_dict <- dplyr::tibble(
   ),
   is_updatable = c(
     FALSE, # sample_id
-    FALSE, # sample_type
-    FALSE, # assay_type
+    TRUE, # sample_type
+    TRUE, # assay_type
     FALSE, # olink_id
     FALSE, # uniprot
     FALSE, # assay
