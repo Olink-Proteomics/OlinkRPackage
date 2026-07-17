@@ -1,7 +1,10 @@
 # Test olink_normalization ----
 
 # this tests also all functions called norm_internal_* except from
-# "norm_internal_rename_cols". Namely:
+# "norm_internal_preferred_names", "norm_internal_update_pref_name" and
+# "norm_internal_update_df_names".
+#
+# Namely:
 # - norm_internal_assay_median
 # - norm_internal_reference_median
 # - norm_internal_bridge
@@ -4792,6 +4795,83 @@ test_that(
   }
 )
 
+
+test_that(
+  "norm_internal_update_pref_name - keeps only updatable keys",
+  {
+    expect_identical(
+      object = norm_internal_update_pref_name(
+        preferred_names = c(
+          "sample_id" = "SampleID",
+          "panel_version" = "Panel_Lot_Nr",
+          "qc_warning" = "SampleQC"
+        )
+      ),
+      expected = c("panel_version" = "Panel_Lot_Nr",
+                   "qc_warning" = "SampleQC")
+    )
+
+    expect_null(
+      object = norm_internal_update_pref_name(
+        preferred_names = c("sample_id" = "SampleID")
+      )
+    )
+  }
+)
+
+test_that(
+  "norm_internal_update_df_names - renames data and check log",
+  {
+    not_ref_df <- npx_data1 |>
+      dplyr::mutate(
+        Normalization = "Intensity",
+        Assay_Warning = "Pass"
+      )
+
+    not_ref_check_log <- check_npx(df = not_ref_df) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    lst_check <- list(
+      not_ref_df = not_ref_df,
+      not_ref_original_df = not_ref_df,
+      not_ref_check_log = not_ref_check_log
+    )
+
+    lst_check_update <- norm_internal_update_df_names(
+      lst_check = lst_check,
+      preferred_names = c(
+        "panel_version" = "Panel_Lot_Nr",
+        "qc_warning" = "SampleQC",
+        "assay_warn" = "AssayQC"
+      )
+    )
+
+    expect_false(
+      object = any(c("Panel_Version", "QC_Warning", "Assay_Warning") %in%
+                     names(lst_check_update$not_ref_df))
+    )
+    expect_true(
+      object = all(c("Panel_Lot_Nr", "SampleQC", "AssayQC") %in%
+                     names(lst_check_update$not_ref_df))
+    )
+    expect_true(
+      object = all(c("Panel_Lot_Nr", "SampleQC", "AssayQC") %in%
+                     names(lst_check_update$not_ref_original_df))
+    )
+    expect_identical(
+      object = lst_check_update$not_ref_check_log$col_names[
+        c("panel_version", "qc_warning", "assay_warn")
+      ],
+      expected = list(
+        "panel_version" = "Panel_Lot_Nr",
+        "qc_warning" = "SampleQC",
+        "assay_warn" = "AssayQC"
+      )
+    )
+  }
+)
+
 # Cross-product specific tests ----
 
 test_that(
@@ -5039,7 +5119,7 @@ test_that(
 
     expect_identical(
       object = dim(ht_3k_norm),
-      expected = c(39936L, 25L)
+      expected = c(39936L, 23L)
     )
 
     expect_identical(
@@ -5048,8 +5128,7 @@ test_that(
                    "UniProt", "Assay", "AssayType", "Panel", "Block", "NPX",
                    "PCNormalizedNPX", "Count", "Normalization", "AssayQC",
                    "SampleQC", "DataAnalysisRefID", "Project", "OlinkID_E3072",
-                   "Sample_Type", "Assay_Warning", "QC_Warning",
-                   "MedianCenteredNPX", "QSNormalizedNPX",
+                   "Sample_Type", "MedianCenteredNPX", "QSNormalizedNPX",
                    "BridgingRecommendation")
     )
 
