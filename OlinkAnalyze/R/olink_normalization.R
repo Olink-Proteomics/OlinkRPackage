@@ -306,6 +306,10 @@ olink_normalization <- function(df1,
 
     ## rename non-reference columns to reference columns ----
 
+    # get names of columns from the reference and non-reference datasets that
+    # map to the same key. These are used to rename the non-reference dataset
+    # columns to the reference dataset column names. The full vector of
+    # preferred names is still used for the final check log.
     diff_preferred_names <- norm_internal_preferred_names(
       ref_cols = lst_check$ref_check_log$col_names,
       not_ref_cols = lst_check$not_ref_check_log$col_names
