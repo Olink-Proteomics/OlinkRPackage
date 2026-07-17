@@ -1445,7 +1445,7 @@ test_that(
 ## Special cases ----
 
 test_that(
-  "read_npx_format - error - wide - cell A2 is empty",
+  "read_npx_format - wide - cell A2 is empty",
   {
     skip_if_not_installed("writexl")
 
@@ -1463,7 +1463,7 @@ test_that(
       version = 2L
     )
 
-    ## excel ----
+    ## excel  - data_type = NULL ----
 
     withr::with_tempfile(
       new = "excel_wide",
@@ -1497,6 +1497,50 @@ test_that(
             quiet = FALSE
           ),
           regexp = "Cell 'A2' of the input file.*format was likely empty"
+        )
+      }
+    )
+
+    ## excel  - data_type = "NPX" ----
+
+    withr::with_tempfile(
+      new = "excel_wide",
+      pattern = "test_wide",
+      fileext = ".xlsx",
+      code = {
+        df_rand$list_df_wide$df_wide <- df_rand$list_df_wide$df_wide |>
+          dplyr::mutate(
+            V1 = dplyr::if_else(
+              dplyr::row_number() == 2L, NA_character_, .data[["V1"]]
+            )
+          )
+
+        # write in csv
+        writexl::write_xlsx(x = df_rand$list_df_wide$df_wide,
+                            path = excel_wide,
+                            col_names = FALSE,
+                            format_headers = FALSE)
+
+        #check that file exists
+        expect_true(object = file.exists(excel_wide))
+
+        # check that read_npx_format works
+        expect_no_error(
+          object = expect_message(
+            object = expect_warning(
+              object = df_out_v1 <- read_npx_format(
+                file = excel_wide,
+                out_df = "tibble",
+                long_format = NULL,
+                olink_platform = NULL,
+                data_type = "NPX",
+                quiet = FALSE
+              ),
+              regexp = "Unable to recognize the quantification method from the"
+            ),
+            regexp = paste("Detected \"NPX\" data from \"Olink Target 48\" in",
+                           "wide format!")
+          )
         )
       }
     )
