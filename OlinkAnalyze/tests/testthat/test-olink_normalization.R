@@ -766,7 +766,7 @@ test_that(
             df1_project_nr = "df1_norm",
             df2_project_nr = "df2_norm",
             reference_project = "df1_norm",
-            format = FALSE
+            format = TRUE
           ) |>
             dplyr::filter(
               .data[["SampleID"]] %in% .env[["sample_subset"]]
@@ -832,7 +832,7 @@ test_that(
             df1_project_nr = "df1_norm",
             df2_project_nr = "df2_norm",
             reference_project = "df1_norm",
-            format = FALSE
+            format = TRUE
           ) |>
             dplyr::filter(
               .data[["SampleID"]] %in% .env[["sample_subset"]]
