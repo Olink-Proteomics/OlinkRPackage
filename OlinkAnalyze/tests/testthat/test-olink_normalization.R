@@ -4536,10 +4536,10 @@ test_that(
   }
 )
 
-# Test norm_internal_rename_cols ----
+# Test norm_internal_preferred_names ----
 
 test_that(
-  "norm_internal_rename_cols - works",
+  "norm_internal_preferred_names - works",
   {
     skip_if_not_installed("arrow")
 
@@ -4656,7 +4656,7 @@ test_that(
 )
 
 test_that(
-  "norm_internal_rename_cols - works - no error when AssayQC is missing",
+  "norm_internal_preferred_names - works - no error when AssayQC is missing",
   {
     skip_if_not_installed("arrow")
 
@@ -4745,7 +4745,7 @@ test_that(
 )
 
 test_that(
-  "norm_internal_rename_cols - works - all input combos",
+  "norm_internal_preferred_names - works - all input combos",
   {
     ref_lst <- list(
       "x1" = c("A"),
