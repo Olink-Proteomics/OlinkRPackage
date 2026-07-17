@@ -107,7 +107,7 @@ Suggests:
     showtext,
     sysfonts,
     systemfonts,
-    testthat (>= 3.0.0),
+    testthat (>= 3.3.0),
     vdiffr,
     withr,
     writexl,
