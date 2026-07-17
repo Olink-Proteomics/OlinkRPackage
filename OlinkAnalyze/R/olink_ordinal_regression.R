@@ -290,7 +290,7 @@ olink_ordinal_regression <- function(df,
                       formula_string))
       }
 
-      if (!is.null(covariates) & any(grepl(":", covariates))) {
+      if (!is.null(covariates) && any(grepl(":", covariates))) {
         covariate_filter_str <- covariates[grepl(pattern = ":", x = covariates)]
         covariate_filter_str <- sub(pattern = "(.*)\\:(.*)$",
                                     replacement = "\\2:\\1",

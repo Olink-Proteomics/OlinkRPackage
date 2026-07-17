@@ -381,13 +381,13 @@ olink_lmer <- function(df,
 
       #Print verbose message
       if (verbose) {
-        if (!is.null(add_main_effects) & length(add_main_effects) > 0L) {
+        if (!is.null(add_main_effects) && length(add_main_effects) > 0L) {
           message(
             "Missing main effects added to the model formula: ",
             paste(add_main_effects, collapse = ", ")
           )
         }
-        if (!is.null(removed_sampleids) & length(removed_sampleids) > 0L) {
+        if (!is.null(removed_sampleids) && length(removed_sampleids) > 0L) {
           message(
             "Samples removed due to missing variable or covariate levels: ",
             paste(removed_sampleids, collapse = ", ")
@@ -412,7 +412,7 @@ olink_lmer <- function(df,
         )
       }
 
-      if (!is.null(covariates) & any(grepl(":", covariates))) {
+      if (!is.null(covariates) && any(grepl(":", covariates))) {
         covariate_filter_string <- covariates[stringr::str_detect(covariates, ":")] # nolint: line_length_linter
         covariate_filter_string <- sub(
           pattern = "(.*)\\:(.*)$",
