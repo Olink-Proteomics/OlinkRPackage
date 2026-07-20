@@ -34,18 +34,12 @@ jobs:
           working-directory: OlinkAnalyze
           
       - name: Test coverage badge
-        if: github.event_name == 'push' && (
-              github.ref == 'refs/heads/develop' ||
-              github.ref == 'refs/heads/OA-2615-Update-README-badge-only-when-pushing-to-develop'
-            )
+        if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
         run: |
           Rscript -e 'source("test_coverage/update_readme_coverage_badge.R")'
 
       - name: Commit changes if README is updated
-        if: github.event_name == 'push' && (
-              github.ref == 'refs/heads/develop' ||
-              github.ref == 'refs/heads/OA-2615-Update-README-badge-only-when-pushing-to-develop'
-            )
+        if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
         run: |
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
