@@ -416,24 +416,40 @@ read_npx_format_get_format <- function(df_top_n,
     # convert to character to simplify operations below
     as.character()
 
+  data_cells_len <- df_top_n |>
+    dplyr::slice_head(
+      n = 1L
+    ) |>
+    # convert to character to simplify operations below
+    as.character() |>
+    # remove NA values and count the number of non-NA columns
+    (\(.x) .x[!is.na(.x)])() |>
+    length()
+
   data_cells_long <- df_top_n |>
     dplyr::slice_head(
       n = 1L
     ) |>
     # convert to character to simplify operations below
     as.character() |>
-    # exclude column NPX Signature Version as it results in the function not
-    # recognizing the format
-    (\(.x) .x[!grepl(pattern = "Version", x = .x, ignore.case = TRUE)])()
+    # exclude columns:
+    # "NPX Signature Version"
+    # "Olink NPX Signature X.Y.Z.M"
+    # as they result in the function not recognizing the format
+    (\(.x) .x[!grepl(pattern = "Version|Signature", x = .x, ignore.case = TRUE)])() # nolint: line_length_linter
 
   # Determine long or wide format from file ----
 
+  # data is wide when the quant method is found in cell A2 or the length of
+  # non-NA columns in the first row is exactly 2.
   is_data_wide <- grepl(pattern = paste(get_olink_data_types(), collapse = "|"),
                         x = data_cells_wide,
-                        ignore.case = FALSE)
+                        ignore.case = FALSE) | data_cells_len == 2L
   is_data_long <- grepl(pattern = paste(get_olink_data_types(), collapse = "|"),
                         x = data_cells_long,
-                        ignore.case = FALSE)
+                        ignore.case = FALSE) |>
+    any()
+  is_data_long <- is_data_long & data_cells_len > 2L
 
   if (is_data_wide == TRUE) {
     # in wide format files we expect the quantification method to appear in
@@ -442,7 +458,7 @@ read_npx_format_get_format <- function(df_top_n,
     detected_long_format <- FALSE
     data_cells <- data_cells_wide
 
-  } else if (is_data_wide == FALSE && any(is_data_long == TRUE)) {
+  } else if (is_data_wide == FALSE && is_data_long == TRUE) {
     # in long format files we expect the quantification method to appear in
     # cells L1:O1 and we also expect no matches to cell A2. This is what marks
     # wide format files.
@@ -773,21 +789,36 @@ read_npx_format_get_quant <- function(file,
                                       data_type = NULL,
                                       data_cells) {
 
+  # help vars
+  broad_platform <- "qPCR"
+
   # Checks inputs ----
 
   check_file_exists(file = file,
                     error = TRUE)
 
-  check_is_character(x = data_cells,
-                     error = TRUE)
-
-  # help vars
-  broad_platform <- "qPCR"
-
   # check data type
   if (!is.null(data_type)) {
     check_olink_data_type(x = data_type,
                           broad_platform = broad_platform)
+  } else {
+    if (all(is.na(data_cells))) {
+      cli::cli_abort(
+        message = c(
+          "x" = "Unable to recognize the quantification method from the input
+        file!",
+          "i" = "Cell 'A2' of the input file {.file {file}} in {.val {\"wide\"}}
+        format was likely empty. Expected one of:
+        {.val {get_olink_data_types(broad_platform = broad_platform)}}. Consider
+        setting {.arg data_type}."
+        ),
+        call = rlang::caller_env(),
+        wrap = FALSE
+      )
+    } else {
+      check_is_character(x = data_cells,
+                         error = TRUE)
+    }
   }
 
   # Determine quantification method from excel file ----
