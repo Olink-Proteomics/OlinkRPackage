@@ -460,7 +460,7 @@ test_that(
 
     # expected output ----
 
-    expected_dim <- c(573L, 12L)
+    expected_dim <- c(345L, 12L)
 
     # tibble ----
 
@@ -611,7 +611,7 @@ test_that(
 
     expect_equal(
       object = dim(tt_ora_reactome),
-      expected = c(20L, 12L)
+      expected = c(15L, 12L)
     )
   }
 )
@@ -714,7 +714,7 @@ test_that(
 
     expect_equal(
       object = dim(tt_ora_go),
-      expected = c(356L, 12L)
+      expected = c(212L, 12L)
     )
   }
 )
