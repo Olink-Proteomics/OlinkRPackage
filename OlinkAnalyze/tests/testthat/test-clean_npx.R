@@ -3137,7 +3137,7 @@ test_that(
 )
 
 test_that(
-  "clean_npx - works - obj - if both check_log and olink_lass are provided",
+  "clean_npx - works - obj - if both check_log and olink_class are provided",
   {
     # prepare check log ----
 

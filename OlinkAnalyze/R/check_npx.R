@@ -185,7 +185,7 @@ check_npx <- function(df,
 #' @details
 #' This function checks if the input data frame is an `olink_class` or an
 #' ArrowObject with `olink_check_log` in its metadata. If so, it uses the
-#' internal function [`olink_extract_check_log()`] to extract he `check_log`
+#' internal function [`olink_extract_check_log()`] to extract the `check_log`
 #' from it. If the output from [`olink_extract_check_log()`] is not null, then
 #' it returns the retrieved `check_log`. If the output from
 #' [`olink_extract_check_log()`] is null, then it checks if the argument
