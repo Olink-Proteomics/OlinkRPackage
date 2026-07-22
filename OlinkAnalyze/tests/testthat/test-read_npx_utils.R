@@ -45,13 +45,17 @@ test_that(
         expect_error(
           object = read_npx_format_colnames(df = df,
                                             file = cdfile_test),
-          regexp = "Detected file in wide format"
+          regexp = paste("Expected only cells A1 and B1 to be populated with",
+                         "the string \"Project Name\" and the name of the",
+                         "current project, respectively.")
         )
 
         expect_error(
           object = read_npx_format_colnames(df = arrow::as_arrow_table(df),
                                             file = cdfile_test),
-          regexp = "Detected file in wide format"
+          regexp = paste("Expected only cells A1 and B1 to be populated with",
+                         "the string \"Project Name\" and the name of the",
+                         "current project, respectively.")
         )
       }
     )
