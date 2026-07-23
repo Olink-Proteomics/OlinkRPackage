@@ -267,6 +267,10 @@ read_npx_wide_split_row <- function(df,
     # filter rows with all cols NA
     dplyr::filter(
       .data[["num_na"]] == .data[["total_col"]]
+    ) |>
+    # ignore the first two rows which we expect to be the header matrix
+    dplyr::filter(
+      .data[["row_number"]] > 2L
     )
 
   if (nrow(na_row_index) > 0L) {
