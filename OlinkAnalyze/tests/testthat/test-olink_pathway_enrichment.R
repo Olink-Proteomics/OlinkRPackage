@@ -980,7 +980,7 @@ test_that(
     )
 
     expect_identical(
-      object = dim(data_prep_out),
+      object = dim(data_prep_out$df),
       expected = c(28236L, 18L)
     )
   }
@@ -1016,7 +1016,7 @@ test_that(
     )
 
     expect_identical(
-      object = dim(data_prep_out),
+      object = dim(data_prep_out$df),
       expected = c(27924L, 17L)
     )
   }
