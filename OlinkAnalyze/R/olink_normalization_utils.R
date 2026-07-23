@@ -300,7 +300,7 @@ olink_norm_input_check <- function(df1,
     ref_samples = NULL,
     ref_name = NULL,
     ref_product = NULL,
-    ref_out_df = NULL,
+    ref_output_df_format = NULL,
     ref_preferred_names = NULL,
     not_ref_df = NULL,
     not_ref_original_df = NULL,
@@ -308,7 +308,7 @@ olink_norm_input_check <- function(df1,
     not_ref_samples = NULL,
     not_ref_name = NULL,
     not_ref_product = NULL,
-    not_ref_out_df = NULL,
+    not_ref_output_df_format = NULL,
     not_ref_preferred_names = NULL,
     reference_medians = NULL,
     norm_mode = NULL,
@@ -330,7 +330,7 @@ olink_norm_input_check <- function(df1,
     lst_out$ref_df <- lst_df[[lst_out$ref_name]]
     lst_out$ref_original_df <- df1
     lst_out$ref_check_log <- df1_check_log
-    lst_out$ref_out_df <- df1_out_df
+    lst_out$ref_output_df_format <- df1_out_df
     if (!is.null(df1_preferred_names)) {
       lst_out$ref_preferred_names <- df1_preferred_names
     }
@@ -343,14 +343,14 @@ olink_norm_input_check <- function(df1,
       lst_out$ref_original_df <- df1
       lst_out$ref_name <- df1_project_nr
       lst_out$ref_check_log <- df1_check_log
-      lst_out$ref_out_df <- df1_out_df
+      lst_out$ref_output_df_format <- df1_out_df
       if (!is.null(df1_preferred_names)) {
         lst_out$ref_preferred_names <- df1_preferred_names
       }
       lst_out$not_ref_original_df <- df2
       lst_out$not_ref_name <- df2_project_nr
       lst_out$not_ref_check_log <- df2_check_log
-      lst_out$not_ref_out_df <- df2_out_df
+      lst_out$not_ref_output_df_format <- df2_out_df
       if (!is.null(df2_preferred_names)) {
         lst_out$not_ref_preferred_names <- df2_preferred_names
       }
@@ -358,14 +358,14 @@ olink_norm_input_check <- function(df1,
       lst_out$ref_original_df <- df2
       lst_out$ref_name <- df2_project_nr
       lst_out$ref_check_log <- df2_check_log
-      lst_out$ref_out_df <- df2_out_df
+      lst_out$ref_output_df_format <- df2_out_df
       if (!is.null(df2_preferred_names)) {
         lst_out$ref_preferred_names <- df2_preferred_names
       }
       lst_out$not_ref_original_df <- df1
       lst_out$not_ref_name <- df1_project_nr
       lst_out$not_ref_check_log <- df1_check_log
-      lst_out$not_ref_out_df <- df1_out_df
+      lst_out$not_ref_output_df_format <- df1_out_df
       if (!is.null(df1_preferred_names)) {
         lst_out$not_ref_preferred_names <- df1_preferred_names
       }

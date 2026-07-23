@@ -220,7 +220,7 @@ test_that(
     kruskal_results_ncol <- 11L
 
     kruskal_posthoc_results_nrow <- 190L
-    kruskal_posthoc_results_ncol <- 3L
+    kruskal_posthoc_results_ncol <- 9L
 
     # tibble ----
 
@@ -264,13 +264,8 @@ test_that(
     )
 
     expect_equal(
-      object = nrow(kruskal_results),
-      expected = kruskal_results_nrow
-    )
-
-    expect_equal(
-      object = ncol(kruskal_results),
-      expected = kruskal_results_ncol
+      object = dim(kruskal_results),
+      expected = c(kruskal_results_nrow, kruskal_results_ncol)
     )
 
     ## ---- test posthoc test for the results from Kruskal-Wallis test ----
@@ -309,12 +304,92 @@ test_that(
     )
 
     expect_equal(
-      object = nrow(kruskal_posthoc_results),
-      expected = 190
+      object = dim(kruskal_posthoc_results),
+      expected = c(kruskal_posthoc_results_nrow, kruskal_posthoc_results_ncol)
     )
 
     expect_equal(
       object = kruskal_posthoc_results |>
+        dplyr::select(contrast) |>
+        unique() |>
+        nrow(),
+      expected = 10
+    )
+
+    # olink_class ----
+
+    npx_data1_noctrl_obj <- attach_check_log(
+      df = npx_data1_noctrl,
+      out_df = "tibble"
+    )
+
+    ## ---- test kruskal with reference file ----
+
+    expect_message(
+      object = expect_message(
+        object = kruskal_results_obj <- olink_one_non_parametric(
+          df = npx_data1_noctrl_obj,
+          variable = "Site"
+        ),
+        regexp = "Variables converted from character to factors: \"Site\"",
+        fixed = TRUE
+      ),
+      regexp = "Kruskal model fit to each assay: `NPX~Site`",
+      fixed = TRUE
+    )
+
+    expect_equal(
+      object = kruskal_results_obj,
+      expected = ref_results$kruskal
+    )
+
+    expect_equal(
+      object = dim(kruskal_results_obj),
+      expected = c(kruskal_results_nrow, kruskal_results_ncol)
+    )
+
+    ## ---- test posthoc test for the results from Kruskal-Wallis test ----
+
+    sig_oids_obj <- kruskal_results_obj |>
+      dplyr::filter(.data[["Threshold"]] == "Significant") |>
+      dplyr::select(dplyr::all_of(c("OlinkID"))) |>
+      dplyr::distinct() |>
+      dplyr::pull()
+
+    expect_message(
+      object = expect_message(
+        object = kruskal_posthoc_results_obj <-
+          olink_one_non_parametric_posthoc(
+            df = npx_data1_noctrl_obj,
+            variable = "Site",
+            test = "kruskal",
+            olinkid_list = sig_oids_obj
+          ) |>
+          dplyr::mutate(id = as.character(.data[["OlinkID"]])) |>
+          dplyr::arrange(id, contrast) |> # for consistency.
+          dplyr::select(-id),
+        regexp = "Variables converted from character to factors: \"Site\"",
+        fixed = TRUE
+      ),
+      regexp = paste0(
+        "Pairwise comparisons for Kruskal-Wallis test using ",
+        "Dunn test were performed"
+      ),
+      fixed = TRUE
+    )
+
+    expect_equal(
+      object = kruskal_posthoc_results_obj,
+      expected = ref_results$kruskal_posthoc
+    )
+
+    expect_equal(
+      object = dim(kruskal_posthoc_results_obj),
+      expected = c(kruskal_posthoc_results_nrow, kruskal_posthoc_results_ncol)
+    )
+
+    expect_equal(
+      object = kruskal_posthoc_results_obj |>
         dplyr::select(contrast) |>
         unique() |>
         nrow(),

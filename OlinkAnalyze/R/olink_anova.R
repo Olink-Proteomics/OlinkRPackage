@@ -378,13 +378,13 @@ olink_anova <- function(df,
 
       #Print verbose message
       if (verbose) {
-        if (!is.null(add.main.effects) & length(add.main.effects) > 0L) {
+        if (!is.null(add.main.effects) && length(add.main.effects) > 0L) {
           message(
             "Missing main effects added to the model formula: ",
             paste(add.main.effects, collapse = ", ")
           )
         }
-        if (!is.null(removed.sampleids) & length(removed.sampleids) > 0L) {
+        if (!is.null(removed.sampleids) && length(removed.sampleids) > 0L) {
           message(
             "Samples removed due to missing variable or covariate levels: ",
             paste(removed.sampleids, collapse = ", ")
@@ -409,7 +409,7 @@ olink_anova <- function(df,
         )
       }
 
-      if (!is.null(covariates) & any(grepl(":", covariates))) {
+      if (!is.null(covariates) && any(grepl(":", covariates))) {
         covariate_filter_string <- covariates[stringr::str_detect(covariates, ":")] # nolint: line_length_linter
         covariate_filter_string <- sub(
           pattern = "(.*)\\:(.*)$",
@@ -872,13 +872,13 @@ olink_anova_posthoc <- function(df,
 
       # Print verbose message
       if (verbose) {
-        if (!is.null(add.main.effects) & length(add.main.effects) > 0L) {
+        if (!is.null(add.main.effects) && length(add.main.effects) > 0L) {
           message(
             "Missing main effects added to the model formula: ",
             paste(add.main.effects, collapse = ", ")
           )
         }
-        if (!is.null(removed.sampleids) & length(removed.sampleids) > 0L) {
+        if (!is.null(removed.sampleids) && length(removed.sampleids) > 0L) {
           message(
             "Samples removed due to missing variable or covariate levels: ",
             paste(removed.sampleids, collapse = ", ")

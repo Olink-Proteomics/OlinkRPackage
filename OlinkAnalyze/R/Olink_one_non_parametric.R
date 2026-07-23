@@ -501,7 +501,7 @@ olink_one_non_parametric_posthoc <- function(df, # nolint: object_length_linter
 
       # Print verbose message
       if (verbose) {
-        if (!is.null(removed.sampleids) & length(removed.sampleids) > 0) {
+        if (!is.null(removed.sampleids) && length(removed.sampleids) > 0) {
           cli::cli_inform(
             "Samples removed due to missing variable:
             {.val {removed.sampleids}}"

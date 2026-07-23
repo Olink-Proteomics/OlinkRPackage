@@ -59,7 +59,7 @@ test_that(
       suppressWarnings() |>
       suppressMessages()
 
-    npx_data1_clean <- strip_check_log(df = npx_data1_clean)
+    npx_data1_clean <- rm_check_log(df = npx_data1_clean)
 
     # ---- 2 proteins ----
 

@@ -45,15 +45,28 @@ NULL
 #' `tbl_df`, `tbl`, and `data.frame`, with the check log stored as an
 #' attribute.
 #'
-#' @seealso [olink_check_log()] for retrieving the check log from an object.
+#' @seealso [olink_extract_check_log()] for retrieving the check log from an
+#' object.
 #'
-#' @keywords internal
+#' @export
 #'
 new_olink_class <- function(df,
                             check_log) {
 
   # validate inputs
   check_is_tibble(x = df, error = TRUE)
+
+  # check that we are not overwriting an existing olink_class S3 object
+  if (rlang::inherits_any(x = df, class = "olink_class")) {
+    cli::cli_warn(
+      c(
+        "{.arg df} is already an {.cls olink_class} object!",
+        "i" = "Use {.fn rm_check_log} to remove the existing check log before
+        creating a new one."
+      ),
+      call = rlang::caller_env()
+    )
+  }
 
   validate_check_log(df = df, check_log = check_log)
 
@@ -259,12 +272,12 @@ validate_check_log <- function(df, check_log) {
 #'   )
 #'
 #'   # retrieve check_log
-#'   OlinkAnalyze::olink_check_log(
+#'   OlinkAnalyze::olink_extract_check_log(
 #'     df = npx_obj
 #'   )
 #' }
 #'
-olink_check_log <- function(df) {
+olink_extract_check_log <- function(df) {
 
   if (inherits(x = df, what = "olink_class")) {
 
@@ -275,6 +288,12 @@ olink_check_log <- function(df) {
     check_log_encoded <- df$metadata[["olink_check_log"]]
 
     if (is.null(check_log_encoded)) {
+      cli::cli_warn(
+        c(
+          "No {.arg olink_check_log} metadata found in the ArrowObject.",
+          "i" = "Consider generating it using {.fn check_npx}."
+        )
+      )
       return(NULL)
     }
 
@@ -330,7 +349,7 @@ as_tibble.olink_class <- function(x, ...) { # nolint: object_name_linter
 #' @keywords internal
 #' @noRd
 #'
-strip_check_log_arrow <- function(df) {
+rm_check_log_arrow <- function(df) {
 
   check_is_arrow_object(x = df, error = TRUE)
 
@@ -378,18 +397,18 @@ strip_check_log_arrow <- function(df) {
 #'   )
 #'
 #'   # strip check log, returning a plain tibble
-#'   npx_tbl <- OlinkAnalyze::strip_check_log(
+#'   npx_tbl <- OlinkAnalyze::rm_check_log(
 #'     df = npx_obj
 #'   )
 #'
 #'   class(npx_tbl)
 #'
-#'   OlinkAnalyze::olink_check_log(
+#'   OlinkAnalyze::olink_extract_check_log(
 #'     df = npx_tbl
 #'   )
 #' }
 #'
-strip_check_log <- function(df) {
+rm_check_log <- function(df) {
 
   if (inherits(x = df, what = "olink_class")) {
 
@@ -397,7 +416,7 @@ strip_check_log <- function(df) {
 
   } else if (check_is_arrow_object(x = df, error = FALSE)) {
 
-    return(strip_check_log_arrow(df = df))
+    return(rm_check_log_arrow(df = df))
 
   }
 
@@ -700,10 +719,10 @@ tbl_sum.olink_class <- function(x, ...) {
 
   if (!is.null(check_log)) {
     olink_class_name <- c(default_header,
-                          "Check log" = "attached")
+                          "olink_check_log" = "attached")
   } else {
     olink_class_name <- c(default_header,
-                          "Check log" = "missing")
+                          "olink_check_log" = "missing")
   }
 
   return(olink_class_name)

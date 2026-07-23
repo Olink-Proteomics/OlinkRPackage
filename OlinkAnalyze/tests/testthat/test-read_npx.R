@@ -71,13 +71,13 @@ test_that(
 
         # check that check_log was attached
         expect_identical(
-          object = olink_check_log(df = npx_df),
+          object = olink_extract_check_log(df = npx_df),
           expected = check_npx(df = npx_df) |>
             suppressMessages() |>
             suppressWarnings()
         )
         expect_identical(
-          object = olink_check_log(df = npx_arrow),
+          object = olink_extract_check_log(df = npx_arrow),
           expected = check_npx(df = npx_arrow) |>
             suppressMessages() |>
             suppressWarnings()
@@ -85,12 +85,12 @@ test_that(
 
         # check identical to reference
         expect_equal(
-          object = strip_check_log(df = npx_df),
+          object = rm_check_log(df = npx_df),
           expected = ref_res$npx_data_parquet,
           tolerance = 1e-4
         )
         expect_equal(
-          object = strip_check_log(df = npx_arrow) |> dplyr::collect(),
+          object = rm_check_log(df = npx_arrow) |> dplyr::collect(),
           expected = ref_res$npx_data_parquet,
           tolerance = 1e-4
         )
@@ -169,13 +169,13 @@ test_that(
 
         # check that check_log was attached
         expect_identical(
-          object = olink_check_log(df = npx_df),
+          object = olink_extract_check_log(df = npx_df),
           expected = check_npx(df = npx_df) |>
             suppressMessages() |>
             suppressWarnings()
         )
         expect_identical(
-          object = olink_check_log(df = npx_arrow),
+          object = olink_extract_check_log(df = npx_arrow),
           expected = check_npx(df = npx_arrow) |>
             suppressMessages() |>
             suppressWarnings()
@@ -183,12 +183,12 @@ test_that(
 
         # check identical to reference
         expect_equal(
-          object = strip_check_log(df = npx_df),
+          object = rm_check_log(df = npx_df),
           expected = ref_res$npx_data_long_csv,
           tolerance = 1e-4
         )
         expect_equal(
-          object = strip_check_log(df = npx_arrow) |> dplyr::collect(),
+          object = rm_check_log(df = npx_arrow) |> dplyr::collect(),
           expected = ref_res$npx_data_long_csv,
           tolerance = 1e-4
         )
@@ -277,13 +277,13 @@ test_that(
 
         # check that check_log was attached
         expect_identical(
-          object = olink_check_log(df = npx_df),
+          object = olink_extract_check_log(df = npx_df),
           expected = check_npx(df = npx_df) |>
             suppressMessages() |>
             suppressWarnings()
         )
         expect_identical(
-          object = olink_check_log(df = npx_arrow),
+          object = olink_extract_check_log(df = npx_arrow),
           expected = check_npx(df = npx_arrow) |>
             suppressMessages() |>
             suppressWarnings()
@@ -291,12 +291,12 @@ test_that(
 
         # check identical to reference
         expect_equal(
-          object = strip_check_log(df = npx_df),
+          object = rm_check_log(df = npx_df),
           expected = ref_res$npx_data_long_zip,
           tolerance = 1e-4
         )
         expect_equal(
-          object = strip_check_log(df = npx_arrow) |> dplyr::collect(),
+          object = rm_check_log(df = npx_arrow) |> dplyr::collect(),
           expected = ref_res$npx_data_long_zip,
           tolerance = 1e-4
         )
@@ -396,7 +396,7 @@ test_that(
         # making some harmless minor modifications to enable the match
         expect_equal(
           object = lst_df$df_expected |>
-            strip_check_log() |>
+            rm_check_log() |>
             dplyr::mutate(
               Panel = toupper(.data[["Panel"]])
             ),
@@ -410,13 +410,13 @@ test_that(
 
         # check that check_log was attached
         expect_identical(
-          object = olink_check_log(df = npx_df),
+          object = olink_extract_check_log(df = npx_df),
           expected = check_npx(df = npx_df) |>
             suppressMessages() |>
             suppressWarnings()
         )
         expect_identical(
-          object = olink_check_log(df = npx_arrow),
+          object = olink_extract_check_log(df = npx_arrow),
           expected = check_npx(df = npx_arrow) |>
             suppressMessages() |>
             suppressWarnings()
@@ -534,7 +534,7 @@ test_that(
         # making some harmless minor modifications to enable the match
         expect_equal(
           object = lst_df$df_expected |>
-            strip_check_log() |>
+            rm_check_log() |>
             dplyr::mutate(
               Panel = toupper(.data[["Panel"]])
             ),
@@ -548,13 +548,13 @@ test_that(
 
         # check that check_log was attached
         expect_identical(
-          object = olink_check_log(df = npx_df),
+          object = olink_extract_check_log(df = npx_df),
           expected = check_npx(df = npx_df) |>
             suppressMessages() |>
             suppressWarnings()
         )
         expect_identical(
-          object = olink_check_log(df = npx_arrow),
+          object = olink_extract_check_log(df = npx_arrow),
           expected = check_npx(df = npx_arrow) |>
             suppressMessages() |>
             suppressWarnings()
@@ -676,7 +676,7 @@ test_that(
         # making some harmless minor modifications to enable the match
         expect_equal(
           object = lst_df$df_expected |>
-            strip_check_log() |>
+            rm_check_log() |>
             dplyr::mutate(
               Panel = toupper(.data[["Panel"]])
             ),
@@ -690,13 +690,13 @@ test_that(
 
         # check that check_log was attached
         expect_identical(
-          object = olink_check_log(df = npx_df),
+          object = olink_extract_check_log(df = npx_df),
           expected = check_npx(df = npx_df) |>
             suppressMessages() |>
             suppressWarnings()
         )
         expect_identical(
-          object = olink_check_log(df = npx_arrow),
+          object = olink_extract_check_log(df = npx_arrow),
           expected = check_npx(df = npx_arrow) |>
             suppressMessages() |>
             suppressWarnings()
@@ -771,7 +771,7 @@ test_that(
 
         expect_equal(
           object = npx_df |>
-            strip_check_log() |>
+            rm_check_log() |>
             dplyr::arrange(
               .data[["OlinkID"]], .data[["Assay"]], .data[["SampleID"]]
             ),
@@ -787,7 +787,7 @@ test_that(
 
         # check that check_log was attached
         expect_identical(
-          object = olink_check_log(df = npx_df),
+          object = olink_extract_check_log(df = npx_df),
           expected = check_npx(df = npx_df) |>
             suppressMessages() |>
             suppressWarnings()

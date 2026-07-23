@@ -260,7 +260,7 @@ olink_normalization <- function(df1,
 
   # kill switch
   # convert to tibble if no time to get arrow work across the function
-  if (lst_check$ref_out_df == "arrow") {
+  if (lst_check$ref_output_df_format == "arrow") {
     lst_check$ref_df <- convert_read_npx_output(
       df = lst_check$ref_df,
       out_df = "tibble"
@@ -293,7 +293,7 @@ olink_normalization <- function(df1,
 
     # kill switch
     # convert to tibble if no time to get arrow work across the function
-    if (lst_check$not_ref_out_df == "arrow") {
+    if (lst_check$not_ref_output_df_format == "arrow") {
       lst_check$not_ref_df <- convert_read_npx_output(
         df = lst_check$not_ref_df,
         out_df = "tibble"
@@ -306,9 +306,18 @@ olink_normalization <- function(df1,
 
     ## rename non-reference columns to reference columns ----
 
+    # get names of columns from the reference and non-reference datasets that
+    # map to the same key. These are used to rename the non-reference dataset
+    # columns to the reference dataset column names. The full vector of
+    # preferred names is still used for the final check log.
     diff_preferred_names <- norm_internal_preferred_names(
       ref_cols = lst_check$ref_check_log$col_names,
       not_ref_cols = lst_check$not_ref_check_log$col_names
+    )
+    # Only dictionary-approved keys should be physically renamed in the
+    # non-reference data; the full vector is still used for the final check log.
+    updatable_preferred_names <- norm_internal_update_pref_name(
+      preferred_names = diff_preferred_names
     )
     if (!is.null(lst_check$ref_preferred_names)) {
       diff_preferred_names <- c(diff_preferred_names,
@@ -317,6 +326,14 @@ olink_normalization <- function(df1,
     if (length(diff_preferred_names) == 0L) {
       diff_preferred_names <- NULL
     }
+    # update the non-reference dataset column names to the reference dataset
+    # column names, for the subset of columns that are mapped to different names
+    # in the reference and non-reference datasets. The full vector of preferred
+    # names is still used for the final check log.
+    lst_check <- norm_internal_update_df_names(
+      lst_check = lst_check,
+      preferred_names = updatable_preferred_names
+    )
 
     ## normalize bridge or subest ----
 
@@ -499,6 +516,95 @@ norm_internal_preferred_names <- function(ref_cols,
     tibble::deframe()
 
   return(preferred_names)
+}
+
+#' Keep Updatable Preferred Column Names
+#'
+#' @param preferred_names A named character vector where names are column keys
+#' and values are preferred column names.
+#'
+#' @return A named character vector containing only keys marked as updatable in
+#' `column_name_dict`.
+#'
+#' @keywords internal
+#' @noRd
+#'
+norm_internal_update_pref_name <- function(preferred_names) {
+
+  if (is.null(preferred_names) || length(preferred_names) == 0L) {
+    return(NULL)
+  }
+
+  # `is_updatable` marks column keys whose names can be harmonized between
+  # normalized datasets without changing core join/quantification semantics.
+  updatable_keys <- column_name_dict |>
+    dplyr::filter(
+      .data[["is_updatable"]] == TRUE
+    ) |>
+    dplyr::pull(
+      .data[["col_key"]]
+    )
+
+  updatable_preferred_names <- preferred_names[
+    names(preferred_names) %in% updatable_keys
+  ]
+
+  if (length(updatable_preferred_names) == 0L) {
+    updatable_preferred_names <- NULL
+  }
+
+  return(updatable_preferred_names)
+}
+
+#' Update Non-Reference Column Names
+#'
+#' @param lst_check Named list returned by [olink_norm_input_check()].
+#' @param preferred_names A named character vector where names are updatable
+#' column keys and values are the corresponding reference column names.
+#'
+#' @return \var{lst_check} with the non-reference data and check log column
+#' names updated to match the reference dataset.
+#'
+#' @keywords internal
+#' @noRd
+#'
+norm_internal_update_df_names <- function(lst_check,
+                                          preferred_names) {
+
+  if (is.null(preferred_names) || length(preferred_names) == 0L) {
+    return(lst_check)
+  }
+
+  # Build a dplyr rename map in the form c("new_reference_name" =
+  # "old_non_reference_name"), while keeping the original dictionary keys for
+  # updating not_ref_check_log$col_names below.
+  not_ref_cols <- lst_check$not_ref_check_log$col_names[names(preferred_names)]
+  rename_cols <- unlist(not_ref_cols, use.names = TRUE)
+  rename_cols <- rename_cols[rename_cols != preferred_names[names(rename_cols)]]
+  rename_keys <- names(rename_cols)
+  names(rename_cols) <- preferred_names[names(rename_cols)]
+
+  if (length(rename_cols) == 0L) {
+    return(lst_check)
+  }
+
+  lst_check$not_ref_df <- lst_check$not_ref_df |>
+    dplyr::rename(
+      dplyr::all_of(rename_cols)
+    )
+  # Formatted normalization can re-add non-overlapping assays from the original
+  # data, so keep that copy in sync with the cleaned normalization input.
+  if (!is.null(lst_check$not_ref_original_df)) {
+    lst_check$not_ref_original_df <- lst_check$not_ref_original_df |>
+      dplyr::rename(
+        dplyr::all_of(rename_cols)
+      )
+  }
+
+  lst_check$not_ref_check_log$col_names[rename_keys] <-
+    as.list(names(rename_cols))
+
+  return(lst_check)
 }
 
 #' Compute median value of the quantification method for each Olink assay

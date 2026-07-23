@@ -49,6 +49,22 @@ expect_equal_ggplot <- function(object, expected) {
   )
 
   testthat::expect_equal(
+    lapply(object$layers, function(x) class(x$position)[1L]),
+    lapply(expected$layers, function(x) class(x$position)[1L])
+  )
+
+  testthat::expect_equal(
+    object$scales,
+    expected$scales
+  )
+
+  testthat::expect_equal(
+    object$facet,
+    expected$facet,
+    ignore_attr = TRUE
+  )
+
+  testthat::expect_equal(
     lapply(object$layers, function(x) class(x$stat)[1L]),
     lapply(expected$layers, function(x) class(x$stat)[1L])
   )

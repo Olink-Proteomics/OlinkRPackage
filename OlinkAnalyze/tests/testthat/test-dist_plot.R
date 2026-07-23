@@ -186,6 +186,7 @@ test_that(
       )
     )
 
+    # Dist plot using olink_class is same as dist plot using df and check_log
     expect_equal_ggplot(
       object = distr_plot_obj,
       expected = distr_plot_tibble
@@ -202,6 +203,8 @@ test_that(
       )
     )
 
+    # Dist plot using olink_class is same as dist plot using df and check_log
+    # when defining color_g
     expect_equal_ggplot(
       object = distr_plot_treat_obj,
       expected = distr_plot_treat_tibble
@@ -225,6 +228,8 @@ test_that(
       )
     )
 
+    # Dist plot using arrow object with check_log is same as dist plot with df
+    # and check_log
     expect_equal_ggplot(
       object = distr_plot_arrow,
       expected = distr_plot_tibble
@@ -241,6 +246,8 @@ test_that(
       )
     )
 
+    # Dist plot using arrow object with check_log is same as dist plot with df
+    # and check_log and defining color_g
     expect_equal_ggplot(
       object = distr_plot_treat_arrow,
       expected = distr_plot_treat_tibble

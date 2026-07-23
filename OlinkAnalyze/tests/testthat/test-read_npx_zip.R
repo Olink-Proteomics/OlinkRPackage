@@ -443,8 +443,23 @@ test_that(
                 # check that the zip file was created
                 expect_true(object = file.exists(zfile_test))
 
-                # check that this works
-                expect_no_error
+                # warning comes from read_npx_format because the long file is
+                # totally made up.
+                expect_no_error(
+                  object = expect_no_message(
+                    object = expect_no_warning(
+                      object = read_npx_zip(
+                        file = zfile_test,
+                        out_df = "arrow",
+                        long_format = TRUE,
+                        .ignore_files =
+                          c(basename(readmefile_test),
+                            basename(rfile_test)),
+                        quiet = TRUE
+                      )
+                    )
+                  )
+                )
               }
             )
           }

@@ -356,7 +356,7 @@ test_that(
   {
     # simple arrow ----
 
-    expect_true(
+    expect_s3_class(
       object = convert_read_npx_output(
         df = dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -367,8 +367,8 @@ test_that(
         ) |>
           arrow::as_arrow_table(df),
         out_df = "tibble"
-      ) |>
-        inherits(what = "tbl_df")
+      ),
+      class = "tbl_df"
     )
 
     # olink_class arrow ----
@@ -393,7 +393,7 @@ test_that(
       )
     )
 
-    expect_true(object = inherits(x = npx_data1_tibble, what = "tbl_df"))
+    expect_s3_class(object = npx_data1_tibble, class = "tbl_df")
     expect_false(object = inherits(x = npx_data1_tibble, what = "olink_class"))
     expect_equal(
       object = npx_data1_tibble,
@@ -403,7 +403,7 @@ test_that(
       object = check_npx(df = npx_data1_tibble) |>
         suppressMessages() |>
         suppressWarnings(),
-      expected = olink_check_log(df = npx_data1_arrow)
+      expected = olink_extract_check_log(df = npx_data1_arrow)
     )
   }
 )
@@ -413,7 +413,7 @@ test_that(
   {
     # simple arrow ----
 
-    expect_true(
+    expect_r6_class(
       object = convert_read_npx_output(
         df = dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -424,8 +424,8 @@ test_that(
         ) |>
           arrow::as_arrow_table(df),
         out_df = "arrow"
-      ) |>
-        inherits(what = "ArrowObject")
+      ),
+      class = "ArrowObject"
     )
 
     # olink_class arrow ----
@@ -450,11 +450,11 @@ test_that(
       )
     )
 
-    expect_true(object = inherits(x = npx_data1_arrow_v2, what = "ArrowObject"))
+    expect_r6_class(object = npx_data1_arrow_v2, class = "ArrowObject")
 
     expect_equal(
-      object = olink_check_log(df = npx_data1_arrow_v2),
-      expected = olink_check_log(df = npx_data1_arrow)
+      object = olink_extract_check_log(df = npx_data1_arrow_v2),
+      expected = olink_extract_check_log(df = npx_data1_arrow)
     )
   }
 )
@@ -464,7 +464,7 @@ test_that(
   {
     # simple tibble ----
 
-    expect_true(
+    expect_r6_class(
       object = convert_read_npx_output(
         df = dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -474,8 +474,8 @@ test_that(
           "E" = c(1L, 2L, 3L)
         ),
         out_df = "arrow"
-      ) |>
-        inherits(what = "ArrowObject")
+      ),
+      class = "ArrowObject"
     )
 
     # olink_class arrow ----
@@ -500,7 +500,7 @@ test_that(
       )
     )
 
-    expect_true(object = inherits(x = npx_data1_arrow, what = "ArrowObject"))
+    expect_r6_class(object = npx_data1_arrow, class = "ArrowObject")
     expect_equal(
       object = npx_data1_arrow |>
         dplyr::collect(),
@@ -510,7 +510,7 @@ test_that(
       object = check_npx(df = npx_data1_arrow) |>
         suppressMessages() |>
         suppressWarnings(),
-      expected = olink_check_log(df = npx_data1_obj)
+      expected = olink_extract_check_log(df = npx_data1_obj)
     )
   }
 )
@@ -520,7 +520,7 @@ test_that(
   {
     # simple tibble ----
 
-    expect_true(
+    expect_s3_class(
       object = convert_read_npx_output(
         df = dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
@@ -530,8 +530,8 @@ test_that(
           "E" = c(1L, 2L, 3L)
         ),
         out_df = "tibble"
-      ) |>
-        inherits(what = "tbl_df")
+      ),
+      class = "tbl_df"
     )
 
     # olink_class tibble ----
@@ -558,7 +558,7 @@ test_that(
       )
     )
 
-    expect_true(object = inherits(x = npx_data1_tibble, what = "tbl_df"))
+    expect_s3_class(object = npx_data1_tibble, class = "tbl_df")
     expect_false(object = inherits(x = npx_data1_tibble, what = "olink_class"))
 
     expect_equal(
@@ -569,7 +569,7 @@ test_that(
       object = check_npx(df = npx_data1_tibble) |>
         suppressMessages() |>
         suppressWarnings(),
-      expected = olink_check_log(df = npx_data1_obj)
+      expected = olink_extract_check_log(df = npx_data1_obj)
     )
   }
 )
@@ -904,7 +904,7 @@ test_that(
   {
     osi_data <- get_example_data("example_osi_data.rds")
 
-    # OSISUmmary ----
+    # OSISummary ----
 
     expect_no_condition(
       object = osi_summary <- check_osi(

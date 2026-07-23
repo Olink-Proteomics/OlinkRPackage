@@ -1,7 +1,10 @@
 # Test olink_normalization ----
 
 # this tests also all functions called norm_internal_* except from
-# "norm_internal_rename_cols". Namely:
+# "norm_internal_preferred_names", "norm_internal_update_pref_name" and
+# "norm_internal_update_df_names".
+#
+# Namely:
 # - norm_internal_assay_median
 # - norm_internal_reference_median
 # - norm_internal_bridge
@@ -55,7 +58,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = bridge_no_norm),
+      object = rm_check_log(df = bridge_no_norm),
       expected = ref_norm_res$lst_norm$bridge_norm$no_norm,
       tolerance = 1e-4
     )
@@ -95,7 +98,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = bridge_norm),
+      object = rm_check_log(df = bridge_norm),
       expected = ref_norm_res$lst_norm$bridge_norm$norm,
       tolerance = 1e-4
     )
@@ -135,7 +138,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = bridge_no_lod),
+      object = rm_check_log(df = bridge_no_lod),
       expected = ref_norm_res$lst_norm$bridge_norm$no_lod,
       tolerance = 1e-4
     )
@@ -184,7 +187,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = bridge_multiple_lod),
+      object = rm_check_log(df = bridge_multiple_lod),
       expected = ref_norm_res$lst_norm$bridge_norm$multiple_lod,
       tolerance = 1e-4
     )
@@ -251,7 +254,7 @@ test_that(
     expect_s3_class(object = bridge_no_norm_obj, class = "tbl_df")
 
     expect_equal(
-      object = strip_check_log(df = bridge_no_norm_obj),
+      object = rm_check_log(df = bridge_no_norm_obj),
       expected = ref_norm_res$lst_norm$bridge_norm$no_norm,
       tolerance = 1e-4
     )
@@ -318,7 +321,7 @@ test_that(
     expect_s3_class(object = bridge_no_norm_arrow, class = "tbl_df")
 
     expect_equal(
-      object = strip_check_log(df = bridge_no_norm_arrow),
+      object = rm_check_log(df = bridge_no_norm_arrow),
       expected = ref_norm_res$lst_norm$bridge_norm$no_norm,
       tolerance = 1e-4
     )
@@ -380,7 +383,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = bridge_norm_v1),
+      object = rm_check_log(df = bridge_norm_v1),
       expected = ref_bridge_norm_v1,
       tolerance = 1e-4
     )
@@ -480,7 +483,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = bridge_norm_v2),
+      object = rm_check_log(df = bridge_norm_v2),
       expected = ref_bridge_norm_v2,
       tolerance = 1e-4
     )
@@ -576,7 +579,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = bridge_norm_v3),
+      object = rm_check_log(df = bridge_norm_v3),
       expected = ref_bridge_norm_v3,
       tolerance = 1e-4
     )
@@ -720,7 +723,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = bridge_norm_v4),
+      object = rm_check_log(df = bridge_norm_v4),
       expected = ref_bridge_norm_v4,
       tolerance = 1e-4
     )
@@ -763,7 +766,7 @@ test_that(
             df1_project_nr = "df1_norm",
             df2_project_nr = "df2_norm",
             reference_project = "df1_norm",
-            format = FALSE
+            format = TRUE
           ) |>
             dplyr::filter(
               .data[["SampleID"]] %in% .env[["sample_subset"]]
@@ -786,7 +789,7 @@ test_that(
     expect_s3_class(object = bridge_no_norm_obj, class = "tbl_df")
 
     expect_equal(
-      object = strip_check_log(df = bridge_no_norm_obj),
+      object = rm_check_log(df = bridge_no_norm_obj),
       expected = ref_bridge_norm_v1,
       tolerance = 1e-4
     )
@@ -829,7 +832,7 @@ test_that(
             df1_project_nr = "df1_norm",
             df2_project_nr = "df2_norm",
             reference_project = "df1_norm",
-            format = FALSE
+            format = TRUE
           ) |>
             dplyr::filter(
               .data[["SampleID"]] %in% .env[["sample_subset"]]
@@ -852,7 +855,7 @@ test_that(
     expect_s3_class(object = bridge_no_norm_arrow, class = "tbl_df")
 
     expect_equal(
-      object = strip_check_log(df = bridge_no_norm_arrow),
+      object = rm_check_log(df = bridge_no_norm_arrow),
       expected = ref_bridge_norm_v1,
       tolerance = 1e-4
     )
@@ -902,7 +905,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = intensity_no_norm),
+      object = rm_check_log(df = intensity_no_norm),
       expected = ref_norm_res$lst_norm$intensity_norm$no_norm,
       tolerance = 1e-4
     )
@@ -940,7 +943,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = intensity_norm),
+      object = rm_check_log(df = intensity_norm),
       expected = ref_norm_res$lst_norm$intensity_norm$norm,
       tolerance = 1e-4
     )
@@ -978,7 +981,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = intensity_no_lod),
+      object = rm_check_log(df = intensity_no_lod),
       expected = ref_norm_res$lst_norm$intensity_norm$no_lod,
       tolerance = 1e-4
     )
@@ -1023,7 +1026,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = intensity_multiple_lod),
+      object = rm_check_log(df = intensity_multiple_lod),
       expected = ref_norm_res$lst_norm$intensity_norm$multiple_lod,
       tolerance = 1e-4
     )
@@ -1088,7 +1091,7 @@ test_that(
     expect_s3_class(object = intensity_no_norm_obj, class = "tbl_df")
 
     expect_equal(
-      object = strip_check_log(df = intensity_no_norm_obj),
+      object = rm_check_log(df = intensity_no_norm_obj),
       expected = ref_norm_res$lst_norm$intensity_norm$no_norm,
       tolerance = 1e-4
     )
@@ -1153,7 +1156,7 @@ test_that(
     expect_s3_class(object = intensity_no_norm_arrow, class = "tbl_df")
 
     expect_equal(
-      object = strip_check_log(df = intensity_no_norm_arrow),
+      object = rm_check_log(df = intensity_no_norm_arrow),
       expected = ref_norm_res$lst_norm$intensity_norm$no_norm,
       tolerance = 1e-4
     )
@@ -1203,7 +1206,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = subset_no_norm),
+      object = rm_check_log(df = subset_no_norm),
       expected = ref_norm_res$lst_norm$subset_norm$no_norm,
       tolerance = 1e-4
     )
@@ -1241,7 +1244,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = subset_norm),
+      object = rm_check_log(df = subset_norm),
       expected = ref_norm_res$lst_norm$subset_norm$norm,
       tolerance = 1e-4
     )
@@ -1279,7 +1282,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = subset_no_lod),
+      object = rm_check_log(df = subset_no_lod),
       expected = ref_norm_res$lst_norm$subset_norm$no_lod,
       tolerance = 1e-4
     )
@@ -1324,7 +1327,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = subset_multiple_lod),
+      object = rm_check_log(df = subset_multiple_lod),
       expected = ref_norm_res$lst_norm$subset_norm$multiple_lod,
       tolerance = 1e-4
     )
@@ -1389,7 +1392,7 @@ test_that(
     expect_s3_class(object = subset_no_norm_obj, class = "tbl_df")
 
     expect_equal(
-      object = strip_check_log(df = subset_no_norm_obj),
+      object = rm_check_log(df = subset_no_norm_obj),
       expected = ref_norm_res$lst_norm$subset_norm$no_norm,
       tolerance = 1e-4
     )
@@ -1454,7 +1457,7 @@ test_that(
     expect_s3_class(object = subset_no_norm_arrow, class = "tbl_df")
 
     expect_equal(
-      object = strip_check_log(df = subset_no_norm_arrow),
+      object = rm_check_log(df = subset_no_norm_arrow),
       expected = ref_norm_res$lst_norm$subset_norm$no_norm,
       tolerance = 1e-4
     )
@@ -1515,7 +1518,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = subset_norm_v1),
+      object = rm_check_log(df = subset_norm_v1),
       expected = subset_int_norm_v1,
       tolerance = 1e-4
     )
@@ -1614,7 +1617,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = subset_norm_v2),
+      object = rm_check_log(df = subset_norm_v2),
       expected = ref_subset_norm_v2,
       tolerance = 1e-4
     )
@@ -1709,7 +1712,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = subset_norm_v3),
+      object = rm_check_log(df = subset_norm_v3),
       expected = ref_subset_norm_v3,
       tolerance = 1e-4
     )
@@ -1852,7 +1855,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = subset_norm_v4),
+      object = rm_check_log(df = subset_norm_v4),
       expected = ref_subset_norm_v4,
       tolerance = 1e-4
     )
@@ -1916,7 +1919,7 @@ test_that(
     expect_s3_class(object = subset_norm_v1_obj, class = "tbl_df")
 
     expect_equal(
-      object = strip_check_log(df = subset_norm_v1_obj),
+      object = rm_check_log(df = subset_norm_v1_obj),
       expected = subset_int_norm_v1,
       tolerance = 1e-4
     )
@@ -1980,7 +1983,7 @@ test_that(
     expect_s3_class(object = subset_norm_v1_arrow, class = "tbl_df")
 
     expect_equal(
-      object = strip_check_log(df = subset_norm_v1_arrow),
+      object = rm_check_log(df = subset_norm_v1_arrow),
       expected = subset_int_norm_v1,
       tolerance = 1e-4
     )
@@ -2020,7 +2023,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = ref_med_no_norm),
+      object = rm_check_log(df = ref_med_no_norm),
       expected = ref_norm_res$lst_norm$ref_med_norm$no_norm,
       tolerance = 1e-4
     )
@@ -2049,7 +2052,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = ref_med_norm),
+      object = rm_check_log(df = ref_med_norm),
       expected = ref_norm_res$lst_norm$ref_med_norm$norm,
       tolerance = 1e-4
     )
@@ -2078,7 +2081,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = ref_med_no_lod),
+      object = rm_check_log(df = ref_med_no_lod),
       expected = ref_norm_res$lst_norm$ref_med_norm$no_lod,
       tolerance = 1e-4
     )
@@ -2112,7 +2115,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = ref_med_multiple_lod),
+      object = rm_check_log(df = ref_med_multiple_lod),
       expected = ref_norm_res$lst_norm$ref_med_norm$multiple_lod,
       tolerance = 1e-4
     )
@@ -2158,7 +2161,7 @@ test_that(
     expect_s3_class(object = ref_med_no_norm_obj, class = "tbl_df")
 
     expect_equal(
-      object = strip_check_log(df = ref_med_no_norm_obj),
+      object = rm_check_log(df = ref_med_no_norm_obj),
       expected = ref_norm_res$lst_norm$ref_med_norm$no_norm,
       tolerance = 1e-4
     )
@@ -2204,7 +2207,7 @@ test_that(
     expect_s3_class(object = ref_med_no_norm_arrow, class = "tbl_df")
 
     expect_equal(
-      object = strip_check_log(df = ref_med_no_norm_arrow),
+      object = rm_check_log(df = ref_med_no_norm_arrow),
       expected = ref_norm_res$lst_norm$ref_med_norm$no_norm,
       tolerance = 1e-4
     )
@@ -2255,7 +2258,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = refmed_norm_v1),
+      object = rm_check_log(df = refmed_norm_v1),
       expected = ref_refmed_norm_v1,
       tolerance = 1e-4
     )
@@ -2344,7 +2347,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = refmed_norm_v2),
+      object = rm_check_log(df = refmed_norm_v2),
       expected = ref_refmed_norm_v2,
       tolerance = 1e-4
     )
@@ -2419,7 +2422,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = refmed_norm_v3),
+      object = rm_check_log(df = refmed_norm_v3),
       expected = ref_refmed_norm_v3,
       tolerance = 1e-4
     )
@@ -2542,7 +2545,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = refmed_norm_v4),
+      object = rm_check_log(df = refmed_norm_v4),
       expected = ref_refmed_norm_v4,
       tolerance = 1e-4
     )
@@ -2587,7 +2590,7 @@ test_that(
     expect_s3_class(object = refmed_norm_v1_obj, class = "tbl_df")
 
     expect_equal(
-      object = strip_check_log(df = refmed_norm_v1_obj),
+      object = rm_check_log(df = refmed_norm_v1_obj),
       expected = ref_refmed_norm_v1,
       tolerance = 1e-4
     )
@@ -2632,7 +2635,7 @@ test_that(
     expect_s3_class(object = refmed_norm_v1_arrow, class = "tbl_df")
 
     expect_equal(
-      object = strip_check_log(df = refmed_norm_v1_arrow),
+      object = rm_check_log(df = refmed_norm_v1_arrow),
       expected = ref_refmed_norm_v1,
       tolerance = 1e-4
     )
@@ -2702,7 +2705,7 @@ test_that(
           .data[["SampleID"]],
           .data[["OlinkID"]]
         ) |>
-        strip_check_log(),
+        rm_check_log(),
       expected = data_ref$Reference$NoFormat$HT_3K |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -2776,7 +2779,7 @@ test_that(
           .data[["SampleID"]],
           .data[["OlinkID"]]
         ) |>
-        strip_check_log(),
+        rm_check_log(),
       expected = data_ref$Reference$Format$HT_3K |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -2861,7 +2864,7 @@ test_that(
           .data[["SampleID"]],
           .data[["OlinkID"]]
         ) |>
-        strip_check_log(),
+        rm_check_log(),
       expected = data_ref$Reference$NoFormat$HT_3K |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -2932,7 +2935,7 @@ test_that(
           .data[["SampleID"]],
           .data[["OlinkID"]]
         ) |>
-        strip_check_log(),
+        rm_check_log(),
       expected = data_ref$Reference$Format$HT_3K |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -3018,7 +3021,7 @@ test_that(
           .data[["OlinkID"]],
           .data[["OlinkID_E3072"]]
         ) |>
-        strip_check_log(),
+        rm_check_log(),
       expected = data_ref$Reference$NoFormat$HT_3K |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -3091,7 +3094,7 @@ test_that(
           .data[["SampleID"]],
           .data[["OlinkID"]]
         ) |>
-        strip_check_log(),
+        rm_check_log(),
       expected = data_ref$Reference$Format$HT_3K |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -3165,7 +3168,7 @@ test_that(
           .data[["SampleID"]],
           .data[["OlinkID"]]
         ) |>
-        strip_check_log(),
+        rm_check_log(),
       expected = data_ref$Reference$NoFormat$Reveal_3K |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -3239,7 +3242,7 @@ test_that(
           .data[["SampleID"]],
           .data[["OlinkID"]]
         ) |>
-        strip_check_log(),
+        rm_check_log(),
       expected = data_ref$Reference$Format$Reveal_3K |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -3324,7 +3327,7 @@ test_that(
           .data[["SampleID"]],
           .data[["OlinkID"]]
         ) |>
-        strip_check_log(),
+        rm_check_log(),
       expected = data_ref$Reference$NoFormat$Reveal_3K |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -3396,7 +3399,7 @@ test_that(
           .data[["SampleID"]],
           .data[["OlinkID"]]
         ) |>
-        strip_check_log(),
+        rm_check_log(),
       expected = data_ref$Reference$Format$Reveal_3K |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -3481,7 +3484,7 @@ test_that(
           .data[["SampleID"]],
           .data[["OlinkID"]]
         ) |>
-        strip_check_log(),
+        rm_check_log(),
       expected = data_ref$Reference$NoFormat$Reveal_3K |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -3553,7 +3556,7 @@ test_that(
           .data[["SampleID"]],
           .data[["OlinkID"]]
         ) |>
-        strip_check_log(),
+        rm_check_log(),
       expected = data_ref$Reference$Format$Reveal_3K |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -3631,7 +3634,7 @@ test_that(
           .data[["SampleID"]],
           .data[["OlinkID"]]
         ) |>
-        strip_check_log(),
+        rm_check_log(),
       expected = data_ref$Reference$NoFormat$HT_Reveal |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -3709,7 +3712,7 @@ test_that(
           .data[["SampleID"]],
           .data[["OlinkID"]]
         ) |>
-        strip_check_log(),
+        rm_check_log(),
       expected = data_ref$Reference$Format$HT_Reveal |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -3798,7 +3801,7 @@ test_that(
           .data[["SampleID"]],
           .data[["OlinkID"]]
         ) |>
-        strip_check_log(),
+        rm_check_log(),
       expected = data_ref$Reference$NoFormat$HT_Reveal |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -3874,7 +3877,7 @@ test_that(
           .data[["SampleID"]],
           .data[["OlinkID"]]
         ) |>
-        strip_check_log(),
+        rm_check_log(),
       expected = data_ref$Reference$Format$HT_Reveal |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -3963,7 +3966,7 @@ test_that(
           .data[["SampleID"]],
           .data[["OlinkID"]]
         ) |>
-        strip_check_log(),
+        rm_check_log(),
       expected = data_ref$Reference$NoFormat$HT_Reveal |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -4039,7 +4042,7 @@ test_that(
           .data[["SampleID"]],
           .data[["OlinkID"]]
         ) |>
-        strip_check_log(),
+        rm_check_log(),
       expected = data_ref$Reference$Format$HT_Reveal |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -4117,7 +4120,7 @@ test_that(
           .data[["SampleID"]],
           .data[["OlinkID"]]
         ) |>
-        strip_check_log(),
+        rm_check_log(),
       expected = data_ref$Reference$NoFormat$Reveal_HT |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -4195,7 +4198,7 @@ test_that(
           .data[["SampleID"]],
           .data[["OlinkID"]]
         ) |>
-        strip_check_log(),
+        rm_check_log(),
       expected = data_ref$Reference$Format$Reveal_HT |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -4284,7 +4287,7 @@ test_that(
           .data[["SampleID"]],
           .data[["OlinkID"]]
         ) |>
-        strip_check_log(),
+        rm_check_log(),
       expected = data_ref$Reference$NoFormat$Reveal_HT |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -4360,7 +4363,7 @@ test_that(
           .data[["SampleID"]],
           .data[["OlinkID"]]
         ) |>
-        strip_check_log(),
+        rm_check_log(),
       expected = data_ref$Reference$Format$Reveal_HT |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -4449,7 +4452,7 @@ test_that(
           .data[["SampleID"]],
           .data[["OlinkID"]]
         ) |>
-        strip_check_log(),
+        rm_check_log(),
       expected = data_ref$Reference$NoFormat$Reveal_HT |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -4525,7 +4528,7 @@ test_that(
           .data[["SampleID"]],
           .data[["OlinkID"]]
         ) |>
-        strip_check_log(),
+        rm_check_log(),
       expected = data_ref$Reference$Format$Reveal_HT |>
         dplyr::arrange(
           .data[["SampleID"]],
@@ -4536,10 +4539,10 @@ test_that(
   }
 )
 
-# Test norm_internal_rename_cols ----
+# Test norm_internal_preferred_names ----
 
 test_that(
-  "norm_internal_rename_cols - works",
+  "norm_internal_preferred_names - works",
   {
     skip_if_not_installed("arrow")
 
@@ -4656,7 +4659,7 @@ test_that(
 )
 
 test_that(
-  "norm_internal_rename_cols - works - no error when AssayQC is missing",
+  "norm_internal_preferred_names - works - no error when AssayQC is missing",
   {
     skip_if_not_installed("arrow")
 
@@ -4745,7 +4748,7 @@ test_that(
 )
 
 test_that(
-  "norm_internal_rename_cols - works - all input combos",
+  "norm_internal_preferred_names - works - all input combos",
   {
     ref_lst <- list(
       "x1" = c("A"),
@@ -4788,6 +4791,83 @@ test_that(
     expect_identical(
       object = update_cnames,
       expected = c("x2" = "A", "x7" = "B")
+    )
+  }
+)
+
+
+test_that(
+  "norm_internal_update_pref_name - keeps only updatable keys",
+  {
+    expect_identical(
+      object = norm_internal_update_pref_name(
+        preferred_names = c(
+          "sample_id" = "SampleID",
+          "panel_version" = "Panel_Lot_Nr",
+          "qc_warning" = "SampleQC"
+        )
+      ),
+      expected = c("panel_version" = "Panel_Lot_Nr",
+                   "qc_warning" = "SampleQC")
+    )
+
+    expect_null(
+      object = norm_internal_update_pref_name(
+        preferred_names = c("sample_id" = "SampleID")
+      )
+    )
+  }
+)
+
+test_that(
+  "norm_internal_update_df_names - renames data and check log",
+  {
+    not_ref_df <- npx_data1 |>
+      dplyr::mutate(
+        Normalization = "Intensity",
+        Assay_Warning = "Pass"
+      )
+
+    not_ref_check_log <- check_npx(df = not_ref_df) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    lst_check <- list(
+      not_ref_df = not_ref_df,
+      not_ref_original_df = not_ref_df,
+      not_ref_check_log = not_ref_check_log
+    )
+
+    lst_check_update <- norm_internal_update_df_names(
+      lst_check = lst_check,
+      preferred_names = c(
+        "panel_version" = "Panel_Lot_Nr",
+        "qc_warning" = "SampleQC",
+        "assay_warn" = "AssayQC"
+      )
+    )
+
+    expect_false(
+      object = any(c("Panel_Version", "QC_Warning", "Assay_Warning") %in%
+                     names(lst_check_update$not_ref_df))
+    )
+    expect_true(
+      object = all(c("Panel_Lot_Nr", "SampleQC", "AssayQC") %in%
+                     names(lst_check_update$not_ref_df))
+    )
+    expect_true(
+      object = all(c("Panel_Lot_Nr", "SampleQC", "AssayQC") %in%
+                     names(lst_check_update$not_ref_original_df))
+    )
+    expect_identical(
+      object = lst_check_update$not_ref_check_log$col_names[
+        c("panel_version", "qc_warning", "assay_warn")
+      ],
+      expected = list(
+        "panel_version" = "Panel_Lot_Nr",
+        "qc_warning" = "SampleQC",
+        "assay_warn" = "AssayQC"
+      )
     )
   }
 )
@@ -4996,7 +5076,8 @@ test_that(
       dplyr::rename(
         "Sample_Type" = "SampleType",
         "QC_Warning" = "SampleQC",
-        "Assay_Warning" = "AssayQC"
+        "Assay_Warning" = "AssayQC",
+        "Assay_Type" = "AssayType"
       )
 
     expect_message(
@@ -5039,7 +5120,7 @@ test_that(
 
     expect_identical(
       object = dim(ht_3k_norm),
-      expected = c(39936L, 25L)
+      expected = c(39936L, 22L)
     )
 
     expect_identical(
@@ -5048,9 +5129,39 @@ test_that(
                    "UniProt", "Assay", "AssayType", "Panel", "Block", "NPX",
                    "PCNormalizedNPX", "Count", "Normalization", "AssayQC",
                    "SampleQC", "DataAnalysisRefID", "Project", "OlinkID_E3072",
-                   "Sample_Type", "Assay_Warning", "QC_Warning",
                    "MedianCenteredNPX", "QSNormalizedNPX",
                    "BridgingRecommendation")
+    )
+
+    # ensure that the check log is updated with the new column names
+
+    ht_3k_norm_chec_log <- olink_extract_check_log(df = ht_3k_norm)
+
+    data_ht_check_log <- check_npx(df = data_ht) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    expect_identical(
+      object = ht_3k_norm_chec_log$col_names[{
+        column_name_dict |>
+          dplyr::filter(
+            .data[["is_updatable"]]
+          ) |>
+          dplyr::pull(
+            .data[["col_key"]]
+          ) |>
+          (\(.) .[. %in% names(ht_3k_norm_chec_log$col_names)])()
+      }],
+      expected = data_ht_check_log$col_names[{
+        column_name_dict |>
+          dplyr::filter(
+            .data[["is_updatable"]]
+          ) |>
+          dplyr::pull(
+            .data[["col_key"]]
+          ) |>
+          (\(.) .[. %in% names(data_ht_check_log$col_names)])()
+      }]
     )
 
   }

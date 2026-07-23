@@ -145,7 +145,7 @@ test_that(
       pattern = "delim-file-test",
       fileext = ".csv",
       code = {
-        # write the coma-delimited file from random data frame
+        # write the comma-delimited file from random data frame
         dplyr::tibble(
           "A" = c(1, 2.2, 3.14),
           "B" = c("a", "b", "c"),
@@ -668,6 +668,15 @@ test_that(
                                                    b = c("a", "b"),
                                                    c = c(TRUE, FALSE)) |>
                                       arrow::as_arrow_table(),
+                                    error = TRUE),
+      regexp = gsub(pattern = " ",
+                    replacement = "([[:space:]].*|\\n.*)?",
+                    x = "is not an Olink class object!",
+                    fixed = TRUE)
+    )
+
+    expect_error(
+      object = check_is_olink_class(x = npx_data1,
                                     error = TRUE),
       regexp = gsub(pattern = " ",
                     replacement = "([[:space:]].*|\\n.*)?",

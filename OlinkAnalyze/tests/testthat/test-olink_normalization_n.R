@@ -35,7 +35,7 @@ test_that(
       )
 
     expect_equal(
-      object = strip_check_log(df = norm_results_bridge_nonorm),
+      object = rm_check_log(df = norm_results_bridge_nonorm),
       expected = ref_norm_res$lst_norm$bridge_norm$no_norm,
       tolerance = 1e-4
     )
@@ -70,7 +70,7 @@ test_that(
       )
 
     expect_equal(
-      object = strip_check_log(df = norm_results_bridge_norm),
+      object = rm_check_log(df = norm_results_bridge_norm),
       expected = ref_norm_res$lst_norm$bridge_norm$norm,
       tolerance = 1e-4
     )
@@ -105,7 +105,7 @@ test_that(
       )
 
     expect_equal(
-      object = strip_check_log(df = norm_results_bridge_nolod),
+      object = rm_check_log(df = norm_results_bridge_nolod),
       expected = ref_norm_res$lst_norm$bridge_norm$no_lod,
       tolerance = 1e-4
     )
@@ -140,7 +140,7 @@ test_that(
       )
 
     expect_equal(
-      object = strip_check_log(df = norm_results_bridge_multilod),
+      object = rm_check_log(df = norm_results_bridge_multilod),
       expected = ref_norm_res$lst_norm$bridge_norm$multiple_lod,
       tolerance = 1e-4
     )
@@ -182,7 +182,7 @@ test_that(
       )
 
     expect_equal(
-      object = strip_check_log(df = norm_results_intensity_nonorm),
+      object = rm_check_log(df = norm_results_intensity_nonorm),
       expected = ref_norm_res$lst_norm$intensity_norm$no_norm,
       tolerance = 1e-4
     )
@@ -217,7 +217,7 @@ test_that(
       )
 
     expect_equal(
-      object = strip_check_log(df = norm_results_intensity_norm),
+      object = rm_check_log(df = norm_results_intensity_norm),
       expected = ref_norm_res$lst_norm$intensity_norm$norm,
       tolerance = 1e-4
     )
@@ -252,7 +252,7 @@ test_that(
       )
 
     expect_equal(
-      object = strip_check_log(df = norm_results_intensity_nolod),
+      object = rm_check_log(df = norm_results_intensity_nolod),
       expected = ref_norm_res$lst_norm$intensity_norm$no_lod,
       tolerance = 1e-4
     )
@@ -287,7 +287,7 @@ test_that(
       )
 
     expect_equal(
-      object = strip_check_log(df = norm_res_intensity_multilod),
+      object = rm_check_log(df = norm_res_intensity_multilod),
       expected = ref_norm_res$lst_norm$intensity_norm$multiple_lod,
       tolerance = 1e-4
     )
@@ -329,7 +329,7 @@ test_that(
       )
 
     expect_equal(
-      object = strip_check_log(df = norm_results_subset_nonorm),
+      object = rm_check_log(df = norm_results_subset_nonorm),
       expected = ref_norm_res$lst_norm$subset_norm$no_norm,
       tolerance = 1e-4
     )
@@ -364,7 +364,7 @@ test_that(
       )
 
     expect_equal(
-      object = strip_check_log(df = norm_results_subset_norm),
+      object = rm_check_log(df = norm_results_subset_norm),
       expected = ref_norm_res$lst_norm$subset_norm$norm,
       tolerance = 1e-4
     )
@@ -399,7 +399,7 @@ test_that(
       )
 
     expect_equal(
-      object = strip_check_log(df = norm_results_subset_nolod),
+      object = rm_check_log(df = norm_results_subset_nolod),
       expected = ref_norm_res$lst_norm$subset_norm$no_lod,
       tolerance = 1e-4
     )
@@ -434,7 +434,7 @@ test_that(
       )
 
     expect_equal(
-      object = strip_check_log(df = norm_results_subset_multilod),
+      object = rm_check_log(df = norm_results_subset_multilod),
       expected = ref_norm_res$lst_norm$subset_norm$multiple_lod,
       tolerance = 1e-4
     )
@@ -622,7 +622,7 @@ test_that(
       )
 
     expect_equal(
-      object = strip_check_log(df = normalization_results_multi),
+      object = rm_check_log(df = normalization_results_multi),
       expected = reference_results$normalization_multibatch,
       tolerance = 1e-4
     )
@@ -682,7 +682,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = bridge_no_norm),
+      object = rm_check_log(df = bridge_no_norm),
       expected = ref_norm_res$lst_norm$bridge_norm$no_norm,
       tolerance = 1e-4
     )
@@ -729,7 +729,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = bridge_norm),
+      object = rm_check_log(df = bridge_norm),
       expected = ref_norm_res$lst_norm$bridge_norm$norm,
       tolerance = 1e-4
     )
@@ -776,7 +776,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = bridge_no_lod),
+      object = rm_check_log(df = bridge_no_lod),
       expected = ref_norm_res$lst_norm$bridge_norm$no_lod,
       tolerance = 1e-4
     )
@@ -828,7 +828,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = bridge_multiple_lod),
+      object = rm_check_log(df = bridge_multiple_lod),
       expected = ref_norm_res$lst_norm$bridge_norm$multiple_lod,
       tolerance = 1e-4
     )
@@ -898,7 +898,7 @@ test_that(
     expect_s3_class(object = bridge_no_norm_obj, class = "tbl_df")
 
     expect_equal(
-      object = strip_check_log(df = bridge_no_norm_obj),
+      object = rm_check_log(df = bridge_no_norm_obj),
       expected = ref_norm_res$lst_norm$bridge_norm$no_norm,
       tolerance = 1e-4
     )
@@ -968,7 +968,7 @@ test_that(
     expect_s3_class(object = bridge_no_norm_arrow, class = "tbl_df")
 
     expect_equal(
-      object = strip_check_log(df = bridge_no_norm_arrow),
+      object = rm_check_log(df = bridge_no_norm_arrow),
       expected = ref_norm_res$lst_norm$bridge_norm$no_norm,
       tolerance = 1e-4
     )
@@ -1078,7 +1078,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = intensity_no_norm),
+      object = rm_check_log(df = intensity_no_norm),
       expected = ref_norm_res$lst_norm$intensity_norm$no_norm,
       tolerance = 1e-4
     )
@@ -1118,7 +1118,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = intensity_norm),
+      object = rm_check_log(df = intensity_norm),
       expected = ref_norm_res$lst_norm$intensity_norm$norm,
       tolerance = 1e-4
     )
@@ -1162,7 +1162,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = intensity_no_lod),
+      object = rm_check_log(df = intensity_no_lod),
       expected = ref_norm_res$lst_norm$intensity_norm$no_lod,
       tolerance = 1e-4
     )
@@ -1209,7 +1209,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = intensity_multiple_lod),
+      object = rm_check_log(df = intensity_multiple_lod),
       expected = ref_norm_res$lst_norm$intensity_norm$multiple_lod,
       tolerance = 1e-4
     )
@@ -1276,7 +1276,7 @@ test_that(
     expect_s3_class(object = intensity_no_norm_obj, class = "tbl_df")
 
     expect_equal(
-      object = strip_check_log(df = intensity_no_norm_obj),
+      object = rm_check_log(df = intensity_no_norm_obj),
       expected = ref_norm_res$lst_norm$intensity_norm$no_norm,
       tolerance = 1e-4
     )
@@ -1343,7 +1343,7 @@ test_that(
     expect_s3_class(object = intensity_no_norm_arrow, class = "tbl_df")
 
     expect_equal(
-      object = strip_check_log(df = intensity_no_norm_arrow),
+      object = rm_check_log(df = intensity_no_norm_arrow),
       expected = ref_norm_res$lst_norm$intensity_norm$no_norm,
       tolerance = 1e-4
     )
@@ -1399,7 +1399,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = subset_no_norm),
+      object = rm_check_log(df = subset_no_norm),
       expected = ref_norm_res$lst_norm$subset_norm$no_norm,
       tolerance = 1e-4
     )
@@ -1439,7 +1439,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = subset_norm),
+      object = rm_check_log(df = subset_norm),
       expected = ref_norm_res$lst_norm$subset_norm$norm,
       tolerance = 1e-4
     )
@@ -1483,7 +1483,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = subset_no_lod),
+      object = rm_check_log(df = subset_no_lod),
       expected = ref_norm_res$lst_norm$subset_norm$no_lod,
       tolerance = 1e-4
     )
@@ -1530,7 +1530,7 @@ test_that(
     )
 
     expect_equal(
-      object = strip_check_log(df = subset_multiple_lod),
+      object = rm_check_log(df = subset_multiple_lod),
       expected = ref_norm_res$lst_norm$subset_norm$multiple_lod,
       tolerance = 1e-4
     )
@@ -1597,7 +1597,7 @@ test_that(
     expect_s3_class(object = subset_no_norm_obj, class = "tbl_df")
 
     expect_equal(
-      object = strip_check_log(df = subset_no_norm_obj),
+      object = rm_check_log(df = subset_no_norm_obj),
       expected = ref_norm_res$lst_norm$subset_norm$no_norm,
       tolerance = 1e-4
     )
@@ -1664,7 +1664,7 @@ test_that(
     expect_s3_class(object = subset_no_norm_arrow, class = "tbl_df")
 
     expect_equal(
-      object = strip_check_log(df = subset_no_norm_arrow),
+      object = rm_check_log(df = subset_no_norm_arrow),
       expected = ref_norm_res$lst_norm$subset_norm$no_norm,
       tolerance = 1e-4
     )
