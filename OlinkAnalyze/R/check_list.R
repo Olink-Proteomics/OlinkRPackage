@@ -1,8 +1,9 @@
 #' Help function checking if a variable is a list.
 #'
-#' @inherit .check_params params author return seealso
+#' @inherit .check_params params author return
 #'
 #' @keywords internal
+#' @noRd
 #'
 check_is_list <- function(x,
                           error = FALSE) {

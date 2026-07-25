@@ -48,20 +48,11 @@
 #'     overlapping_samples_df1 = overlapping_samples,
 #'     df1_project_nr = "Explore HT",
 #'     df2_project_nr = "Explore 3072",
-#'     reference_project = "Explore HT",
-#'     df1_check_log = check_npx(df = npx_ht) |>
-#'       suppressMessages() |>
-#'       suppressWarnings(),
-#'     df2_check_log = check_npx(df = npx_3072) |>
-#'       suppressMessages() |>
-#'       suppressWarnings()
+#'     reference_project = "Explore HT"
 #'   )
 #'
 #'   data_norm_bridge_p <- OlinkAnalyze::olink_bridgeability_plot(
 #'     df = data_norm,
-#'     check_log = check_npx(df = data_norm) |>
-#'       suppressMessages() |>
-#'       suppressWarnings(),
 #'     olink_id = c("OID40770", "OID40835"),
 #'     median_counts_threshold = 150L,
 #'     min_count = 10L
@@ -85,7 +76,7 @@ olink_bridgeability_plot <- function(df,
   set.seed(seed = 1L)
 
   # Check data format
-  check_log <- run_check_npx(df = df, check_log = check_log)
+  check_log <- get_check_npx(df = df, check_log = check_log)
 
   # check that check_log$col_names$count exists
   check_log_colname(check_log = check_log, col_key = "count")

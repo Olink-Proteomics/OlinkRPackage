@@ -203,6 +203,86 @@ test_that(
         )
       }
     )
+
+    ## NPX - special case when A2 is empty ----
+
+    # synthetic wide df
+    data_type <- "NPX"
+    show_dev_int_ctrl <- TRUE
+    version <- 1L
+
+    # get synthetic data, or skip if not available
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = olink_platform,
+      data_type = data_type,
+      n_panels = n_panels,
+      n_assays = n_assays,
+      n_samples = n_samples,
+      show_dev_int_ctrl = show_dev_int_ctrl,
+      show_int_ctrl = show_int_ctrl,
+      version = version
+    )
+
+    withr::with_tempfile(
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
+      fileext = ".xlsx",
+      code = {
+        df_rand$list_df_wide$df_wide <- df_rand$list_df_wide$df_wide |>
+          dplyr::mutate(
+            V1 = dplyr::if_else(
+              .data[["V1"]] == .env[["data_type"]], NA_character_, .data[["V1"]]
+            )
+          )
+
+        # write wide df
+        writeLines("foo", olink_wide_format)
+
+        # check that function runs
+        expect_no_error(
+          expect_no_warning(
+            object = df_out <- read_npx_wide_split_row(
+              df = df_rand$list_df_wide$df_wide,
+              file = olink_wide_format,
+              data_type = data_type,
+              format_spec = get_format_spec(data_type = data_type)
+            )
+          )
+        )
+
+        # check that df_head works
+        expect_identical(
+          object = remove_all_na_cols(df = df_out$df_head),
+          expected = df_rand$list_df_wide$df_head_wide |>
+            dplyr::mutate(
+              V1 = dplyr::if_else(
+                .data[["V1"]] == .env[["data_type"]],
+                NA_character_,
+                .data[["V1"]]
+              )
+            )
+        )
+
+        # check that df_top works
+        expect_identical(
+          object = df_out$df_top,
+          expected = df_rand$list_df_wide$df_top_wide
+        )
+
+        # check that df_mid works
+        expect_identical(
+          object = df_out$df_mid,
+          expected = df_rand$list_df_wide$df_middle_wide
+        )
+
+        # check that df_bottom works
+        expect_identical(
+          object = remove_all_na_cols(df = df_out$df_bottom),
+          expected = df_rand$list_df_wide$df_bottom_wide
+        )
+
+      }
+    )
   }
 )
 
@@ -744,10 +824,16 @@ test_that(
       code = {
         # modify and write wide df
         df_rand$list_df_wide$df_wide <- df_rand$list_df_wide$df_wide |>
+          # all columns in row 15 should be NA
           dplyr::mutate(
-            V1 = dplyr::if_else(.data[["V1"]] == .env[["data_type"]],
-                                NA_character_,
-                                .data[["V1"]])
+            dplyr::across(
+              .cols = dplyr::everything(),
+              .fns = ~ dplyr::if_else(
+                dplyr::row_number() == 15L,
+                NA_character_,
+                .x
+              )
+            )
           )
 
         # write wide df
@@ -757,6 +843,58 @@ test_that(
         expect_error(
           object = read_npx_wide_split_row(
             df = df_rand$list_df_wide$df_wide,
+            file = olink_wide_format,
+            data_type = data_type,
+            format_spec = format_spec
+          ),
+          regexp = "We identified 3 rows with all columns `NA` in file"
+        )
+      }
+    )
+
+    ## Too many all-NA rows - special case when A2 is empty ----
+
+    # A2 is empty and its next row is also empty
+
+    withr::with_tempfile(
+      new = "olink_wide_format",
+      pattern = "test-olink-wide",
+      fileext = ".xlsx",
+      code = {
+        # modify and write wide df
+        df_rand_tmp <- df_rand$list_df_wide$df_head_wide |>
+          dplyr::slice_head(
+            n = 1L
+          ) |>
+          dplyr::bind_rows(
+            df_rand$list_df_wide$df_na_wide
+          ) |>
+          dplyr::bind_rows(
+            df_rand$list_df_wide$df_na_wide
+          ) |>
+          dplyr::bind_rows(
+            df_rand$list_df_wide$df_top_wide
+          ) |>
+          dplyr::bind_rows(
+            df_rand$list_df_wide$df_na_wide
+          ) |>
+          dplyr::bind_rows(
+            df_rand$list_df_wide$df_middle_wide
+          ) |>
+          dplyr::bind_rows(
+            df_rand$list_df_wide$df_na_wide
+          ) |>
+          dplyr::bind_rows(
+            df_rand$list_df_wide$df_bottom_wide
+          )
+
+        # write wide df
+        writeLines("foo", olink_wide_format)
+
+        # check that function runs with error
+        expect_error(
+          object = read_npx_wide_split_row(
+            df = df_rand_tmp,
             file = olink_wide_format,
             data_type = data_type,
             format_spec = format_spec

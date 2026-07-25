@@ -1,8 +1,9 @@
 #' Help function checking if a variable is a vector of integers.
 #'
-#' @inherit .check_params params author return seealso
+#' @inherit .check_params params author return
 #'
 #' @keywords internal
+#' @noRd
 #'
 check_is_integer <- function(x,
                              error = FALSE) {
@@ -41,9 +42,10 @@ check_is_integer <- function(x,
 
 #' Help function checking if a variable is a scalar integer.
 #'
-#' @inherit .check_params params author return seealso
+#' @inherit .check_params params author return
 #'
 #' @keywords internal
+#' @noRd
 #'
 check_is_scalar_integer <- function(x,
                                     error = FALSE) {

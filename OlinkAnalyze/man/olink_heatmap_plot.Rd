@@ -83,27 +83,21 @@ if (rlang::is_installed(pkg = c("ggplotify", "pheatmap"))) {
         pattern = "CONT"
       )
     )
-  check_log <- OlinkAnalyze::check_npx(
-    df = npx_data
-  )
 
   # Heatmap
   OlinkAnalyze::olink_heatmap_plot(
-    df = npx_data,
-    check_log = check_log
+    df = npx_data
   )
 
   # Heatmap with annotation
   OlinkAnalyze::olink_heatmap_plot(
     df = npx_data,
-    check_log = check_log,
     variable_row_list = c("Time", "Site")
   )
 
   # Heatmap with calls from pheatmap
   OlinkAnalyze::olink_heatmap_plot(
     df = npx_data,
-    check_log = check_log,
     cutree_rows = 3L
   )
 }

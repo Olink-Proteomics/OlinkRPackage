@@ -48,13 +48,10 @@ The function accepts NPX Excel files with data < LOD replaced.
 }
 \examples{
 \donttest{
-  check_log <- OlinkAnalyze::check_npx(df = npx_data1)
-
   bridge_samples <- OlinkAnalyze::olink_bridge_selector(
-    df = npx_data1,
+    df = OlinkAnalyze::npx_data1,
     sample_missing_freq = 0.1,
-    n = 20L,
-    check_log = check_log
+    n = 20L
   )
 }
 

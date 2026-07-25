@@ -18,31 +18,22 @@
 #' @keywords NPX
 #'
 #' @export
+#'
 #' @examples
 #' \donttest{
-#'
-#' # Optional: check and clean dataset
-#' check_log <- OlinkAnalyze::check_npx(
-#'   df = npx_data1
-#' )
-#'
 #' cleaned_data <- OlinkAnalyze::clean_npx(
-#'   df = npx_data1,
-#'   check_log = check_log
+#'   df = OlinkAnalyze::npx_data1
 #' )
 #'
 #' OlinkAnalyze::olink_dist_plot(
-#'   df = npx_data1,
-#'   check_log = check_log,
+#'   df = OlinkAnalyze::npx_data1,
 #'   color_g = "QC_Warning"
 #' )
 #'
 #' OlinkAnalyze::olink_dist_plot(
 #'   df = cleaned_data,
-#'   check_log = check_log,
 #'   color_g = "QC_Warning"
 #' )
-#'
 #' }
 #'
 olink_dist_plot <- function(df,
@@ -81,16 +72,13 @@ olink_dist_plot <- function(df,
   # check if color column is present
   check_columns(df = df, col_list = list(color_g))
 
-  # Check if check_log is correct
-  check_log <- run_check_npx(df = df, check_log = check_log)
-
   # Remove invalid OlinkID, assays with all NA values, and convert non-unique
   # Uniprot IDs. Note that we do not remove samples with duplicate SampleID,
   # control samples or assays, or samples/assays with QC warnings, as this
   # would be the user's decision.
   df <- run_clean_npx(
     df = df,
-    check_log = check_log,
+    check_log = get_check_npx(df = df, check_log = check_log),
     remove_assay_na = TRUE,
     remove_invalid_oid = TRUE,
     remove_dup_sample_id = FALSE,
@@ -103,6 +91,8 @@ olink_dist_plot <- function(df,
     verbose = FALSE
   )
 
+  # re-get check_log after cleaning
+  check_log <- get_check_npx(df = df)
 
   reorder_within <- function(x, by, within, fun = mean, sep = "___", ...) {
     new_x <- paste(x, within, sep = sep)
