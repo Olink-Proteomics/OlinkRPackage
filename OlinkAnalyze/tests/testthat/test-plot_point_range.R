@@ -14,6 +14,8 @@ test_that(
     # tests are skipped if files are absent
     reference_results <- get_example_data(filename = "reference_results.rds")
 
+    # tibble ----
+
     npx_data1_check <- check_npx(df = npx_data1) |>
       suppressMessages() |>
       suppressWarnings()
@@ -51,6 +53,49 @@ test_that(
                      snap_name = lmer_plot_name)
     vdiffr::expect_doppelganger(title = lmer_plot_name,
                                 fig = lmer_plot[[1L]])
+
+    # olink_class ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_obj <- attach_check_log(
+            df = npx_data1,
+            out_df = "tibble"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = lmer_plot_obj <- olink_lmer_plot(
+            df = npx_data1_obj,
+            variable = c("Treatment", "Time"),
+            random = "Subject",
+            olinkid_list = reference_results$lmer |>
+              dplyr::filter(
+                .data[["term"]] == "Treatment:Time"
+                & .data[["Threshold"]] == "Significant"
+              ) |>
+              dplyr::pull(
+                .data[["OlinkID"]]
+              ) |>
+              utils::head(6L),
+            x_axis_variable = "Time",
+            col_variable = "Treatment"
+          )
+        )
+      )
+    )
+
+    expect_equal_ggplot(
+      object = lmer_plot_obj[[1L]],
+      expected = lmer_plot[[1L]]
+    )
   }
 )
 
@@ -67,6 +112,8 @@ test_that(
     # Load reference results
     # tests are skipped if files are absent
     reference_results <- get_example_data(filename = "reference_results.rds")
+
+    # tibble ----
 
     npx_data1_check <- check_npx(df = npx_data1) |>
       suppressMessages() |>
@@ -107,6 +154,50 @@ test_that(
                      snap_name = lmer_plot_name)
     vdiffr::expect_doppelganger(title = lmer_plot_name,
                                 fig = lmer_plot[[2L]])
+
+    # olink_class ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_obj <- attach_check_log(
+            df = npx_data1,
+            out_df = "tibble"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = lmer_plot_obj <- olink_lmer_plot(
+            df = npx_data1_obj,
+            variable = c("Treatment", "Time"),
+            random = "Subject",
+            olinkid_list = reference_results$lmer |>
+              dplyr::filter(
+                .data[["term"]] == "Treatment:Time"
+                & .data[["Threshold"]] == "Significant"
+              ) |>
+              dplyr::pull(
+                .data[["OlinkID"]]
+              ) |>
+              utils::head(10L),
+            x_axis_variable = "Time",
+            col_variable = "Treatment",
+            number_of_proteins_per_plot = 5L
+          )
+        )
+      )
+    )
+
+    expect_equal_ggplot(
+      object = lmer_plot_obj[[1L]],
+      expected = lmer_plot[[1L]]
+    )
   }
 )
 

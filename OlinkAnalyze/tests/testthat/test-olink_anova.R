@@ -125,6 +125,8 @@ test_that(
     skip_if_not_installed(pkg = "broom")
     skip_on_cran()
 
+    # tibble ----
+
     expect_no_warning(
       object = expect_no_error(
         object = expect_message(
@@ -155,6 +157,39 @@ test_that(
       object = anova_res_site,
       expected = reference_results$anova_site
     )
+
+    # olink_class ----
+
+    expect_no_warning(
+      object = expect_no_error(
+        object = expect_message(
+          object = expect_message(
+            object = anova_res_site_olink_class <- olink_anova(
+              df = attach_check_log(df = npx_data1_mod,
+                                    out_df = "tibble"),
+              variable = "Site"
+            ) |>
+              dplyr::mutate(
+                id = as.character(.data[["OlinkID"]])
+              ) |>
+              dplyr::arrange(
+                .data[["id"]]
+              ) |>
+              dplyr::select(
+                -dplyr::all_of("id")
+              ),
+            regexp = paste("Variables and covariates converted from character",
+                           "to factors: Site")
+          ),
+          regexp = "ANOVA model fit to each assay: NPX~Site"
+        )
+      )
+    )
+
+    expect_equal(
+      object = anova_res_site_olink_class,
+      expected = reference_results$anova_site
+    )
   }
 )
 
@@ -168,6 +203,8 @@ test_that(
     skip_if_not_installed(pkg = "car")
     skip_if_not_installed(pkg = "broom")
     skip_on_cran()
+
+    # tibble ----
 
     expect_no_warning(
       object = expect_no_error(
@@ -199,6 +236,39 @@ test_that(
       object = anova_res_time,
       expected = reference_results$anova_time
     )
+
+    # olink_class ----
+
+    expect_no_warning(
+      object = expect_no_error(
+        object = expect_message(
+          object = expect_message(
+            object = anova_res_time_obj <- olink_anova(
+              df = attach_check_log(df = npx_data1_mod,
+                                    out_df = "tibble"),
+              variable = "Time"
+            ) |>
+              dplyr::mutate(
+                id = as.character(.data[["OlinkID"]])
+              ) |>
+              dplyr::arrange(
+                .data[["id"]]
+              ) |>
+              dplyr::select(
+                -dplyr::all_of("id")
+              ),
+            regexp = paste("Variables and covariates converted from character",
+                           "to factors: Time")
+          ),
+          regexp = "ANOVA model fit to each assay: NPX~Time"
+        )
+      )
+    )
+
+    expect_equal(
+      object = anova_res_time_obj,
+      expected = reference_results$anova_time
+    )
   }
 )
 
@@ -212,6 +282,8 @@ test_that(
     skip_if_not_installed(pkg = "car")
     skip_if_not_installed(pkg = "broom")
     skip_on_cran()
+
+    # tibble ----
 
     expect_no_warning(
       object = expect_no_error(
@@ -243,6 +315,41 @@ test_that(
 
     expect_equal(
       object = anova_res_site_time,
+      expected = reference_results$anova_site_time
+    )
+
+    # olink_class ----
+
+    expect_no_warning(
+      object = expect_no_error(
+        object = expect_message(
+          object = expect_message(
+            object = anova_res_site_time_obj <- olink_anova(
+              df = attach_check_log(df = npx_data1_mod,
+                                    out_df = "tibble"),
+              variable = c("Site", "Time")
+            ) |>
+              dplyr::mutate(
+                id = as.character(.data[["OlinkID"]])
+              ) |>
+              dplyr::arrange(
+                .data[["id"]],
+                .data[["term"]]
+              ) |>
+              dplyr::select(
+                -dplyr::all_of("id")
+              ),
+            regexp = paste("Variables and covariates converted from character",
+                           "to factors: Site, Time")
+          ),
+          regexp = "ANOVA model fit to each assay: NPX~Site*Time",
+          fixed = TRUE
+        )
+      )
+    )
+
+    expect_equal(
+      object = anova_res_site_time_obj,
       expected = reference_results$anova_site_time
     )
   }
@@ -405,6 +512,8 @@ test_that(
         .data[["OlinkID"]]
       )
 
+    # tibble ----
+
     expect_no_error(
       object = expect_no_warning(
         object = expect_message(
@@ -439,6 +548,45 @@ test_that(
 
     expect_equal(
       object = anova_posthoc_res_site,
+      expected = reference_results$anova_site_posthoc
+    )
+
+    # olink_class ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = expect_message(
+            object = anova_posthoc_res_site_obj <- olink_anova_posthoc(
+              df = attach_check_log(df = npx_data1_mod,
+                                    out_df = "tibble"),
+              variable = "Site",
+              olinkid_list = anova_res_site_oid,
+              effect = "Site"
+            ) |>
+              dplyr::mutate(
+                id = as.character(.data[["OlinkID"]]),
+                # In R 3.6.1 we get factors, but reference is characters
+                contrast = as.character(.data[["contrast"]])
+              ) |>
+              # Since OlinkID is not unique here (=> ties), contrast is used to
+              # break the ties
+              dplyr::arrange(
+                .data[["id"]], .data[["contrast"]]
+              ) |>
+              dplyr::select(
+                -dplyr::all_of("id")
+              ),
+            regexp = paste("Variables and covariates converted from character",
+                           "to factors: Site")
+          ),
+          regexp = "Means estimated for each assay from ANOVA model: NPX~Site"
+        )
+      )
+    )
+
+    expect_equal(
+      object = anova_posthoc_res_site_obj,
       expected = reference_results$anova_site_posthoc
     )
   }
@@ -484,6 +632,8 @@ test_that(
         .data[["OlinkID"]]
       )
 
+    # tibble ----
+
     expect_no_error(
       object = expect_no_warning(
         object = expect_message(
@@ -518,6 +668,45 @@ test_that(
 
     expect_equal(
       object = anova_posthoc_res_time,
+      expected = reference_results$anova_time_posthoc
+    )
+
+    # olink_class ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_message(
+          object = expect_message(
+            object = anova_posthoc_res_time_obj <- olink_anova_posthoc(
+              df = attach_check_log(df = npx_data1_mod,
+                                    out_df = "tibble"),
+              variable = "Time",
+              olinkid_list = anova_res_time_oid,
+              effect = "Time"
+            ) |>
+              dplyr::mutate(
+                id = as.character(.data[["OlinkID"]]),
+                # In R 3.6.1 we get factors, but reference is characters
+                contrast = as.character(.data[["contrast"]])
+              ) |>
+              # Since OlinkID is not unique here (=> ties), contrast is used to
+              # break the ties
+              dplyr::arrange(
+                .data[["id"]], .data[["contrast"]]
+              ) |>
+              dplyr::select(
+                -dplyr::all_of("id")
+              ),
+            regexp = paste("Variables and covariates converted from character",
+                           "to factors: Time")
+          ),
+          regexp = "Means estimated for each assay from ANOVA model: NPX~Time"
+        )
+      )
+    )
+
+    expect_equal(
+      object = anova_posthoc_res_time_obj,
       expected = reference_results$anova_time_posthoc
     )
   }

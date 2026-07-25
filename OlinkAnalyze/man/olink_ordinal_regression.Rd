@@ -103,7 +103,6 @@ if (rlang::is_installed(pkg = c("ordinal", "broom"))) {
       ignore.case = TRUE
     )
   )
-  check_log <- OlinkAnalyze::check_npx(df = npx_df)
 
   # Two-way Ordinal Regression with CLM.
   # Results in model NPX~Treatment+Time+Treatment:Time.

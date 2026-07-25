@@ -10,6 +10,7 @@
 #' not exist and `error = TRUE`.
 #'
 #' @keywords internal
+#' @noRd
 #'
 check_file_exists <- function(file,
                               error = FALSE) {
@@ -63,6 +64,7 @@ check_file_exists <- function(file,
 #' \var{accepted_npx_file_ext}.
 #'
 #' @keywords internal
+#' @noRd
 #'
 check_file_extension <- function(file) {
 

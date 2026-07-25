@@ -389,6 +389,19 @@ test_that(
     skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_hs.parquet")))
     skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_mm.parquet")))
 
+    # expected output ----
+
+    expected_dim <- c(345L, 12L)
+
+    # tibble ----
+
+    npx_data1_mod <- npx_data1 |>
+      dplyr::filter(
+        !grepl(pattern = "control",
+               x = .data[["SampleID"]],
+               ignore.case = TRUE)
+      )
+
     expect_message(
       object = expect_message(
         object = expect_message(
@@ -980,7 +993,7 @@ test_that(
     )
 
     expect_identical(
-      object = dim(data_prep_out),
+      object = dim(data_prep_out$df),
       expected = c(28236L, 18L)
     )
   }
@@ -1016,7 +1029,7 @@ test_that(
     )
 
     expect_identical(
-      object = dim(data_prep_out),
+      object = dim(data_prep_out$df),
       expected = c(27924L, 17L)
     )
   }

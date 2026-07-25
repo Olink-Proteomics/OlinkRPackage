@@ -96,10 +96,6 @@ overlap_samples <- dplyr::intersect(x = unique(npx_df1[["SampleID"]]),
 overlap_samples_list <- list("DF1" = overlap_samples,
                              "DF2" = overlap_samples)
 
-# check npx
-df1_check_log <- OlinkAnalyze::check_npx(df = npx_df1)
-df2_check_log <- OlinkAnalyze::check_npx(df = npx_df2)
-
 # Normalize
 OlinkAnalyze::olink_normalization_bridge(
   project_1_df = npx_df1,
@@ -107,9 +103,7 @@ OlinkAnalyze::olink_normalization_bridge(
   bridge_samples = overlap_samples_list,
   project_1_name = "P1",
   project_2_name = "P2",
-  project_ref_name = "P1",
-  project_1_check_log = df1_check_log,
-  project_2_check_log = df2_check_log
+  project_ref_name = "P1"
 )
 }
 
