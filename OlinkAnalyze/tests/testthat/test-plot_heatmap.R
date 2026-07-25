@@ -221,3 +221,146 @@ test_that(
     })
   }
 )
+
+test_that(
+  "olink_heatmap_plot - works - olink_class and arrow",
+  {
+    skip_if_not_installed("ggplotify")
+    skip_if_not_installed("pheatmap")
+    skip_if_not_installed("vdiffr")
+
+    # data ----
+
+    check_npx_data1 <- check_npx(
+      df = npx_data1
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    npx_data1_clean <- OlinkAnalyze::clean_npx(
+      df = OlinkAnalyze::npx_data1,
+      check_log = check_npx_data1
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    check_npx_data1_clean <- OlinkAnalyze::check_npx(
+      df = npx_data1_clean
+    ) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    # olink_class ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = npx_data1_clean_obj <- attach_check_log(
+            df = npx_data1_clean,
+            out_df = "tibble"
+          )
+        )
+      )
+    )
+
+    ## v1 - 1 annotation on rows - auto color scale ----
+
+    heatmap_v1_obj <- OlinkAnalyze::olink_heatmap_plot(
+      df = npx_data1_clean_obj,
+      variable_row_list = "Treatment"
+    )
+
+    # this a copy of the v1 plot
+    heatmap_plot_name_v1 <- "heatmap_v1_olink_class"
+    check_snap_exist(test_dir_name = "plot_heatmap",
+                     snap_name = heatmap_plot_name_v1)
+    withCallingHandlers({
+      vdiffr::expect_doppelganger(
+        title = heatmap_plot_name_v1,
+        fig = heatmap_v1_obj,
+        cran = FALSE
+      )
+    }, warning = function(w) {
+      if (grepl(x = w, pattern = "font family 'Arial Regular' not found"))
+        invokeRestart("muffleWarning")
+    })
+
+    # v2 - 2 annotations on rows - auto color scale ----
+
+    heatmap_v2_obj <- OlinkAnalyze::olink_heatmap_plot(
+      df = npx_data1_clean_obj,
+      variable_row_list = c("Treatment", "Site")
+    )
+
+    # this is a copy of the v2 plot
+    heatmap_plot_name_v2 <- "heatmap_v2_olink_class"
+    check_snap_exist(test_dir_name = "plot_heatmap",
+                     snap_name = heatmap_plot_name_v2)
+    withCallingHandlers({
+      vdiffr::expect_doppelganger(
+        title = heatmap_plot_name_v2,
+        fig = heatmap_v2_obj,
+        cran = FALSE
+      )
+    }, warning = function(w) {
+      if (grepl(x = w, pattern = "font family 'Arial Regular' not found"))
+        invokeRestart("muffleWarning")
+    })
+
+    # arrow olink_class ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = npx_data1_clean_arrow <- attach_check_log(
+            df = npx_data1_clean,
+            out_df = "arrow"
+          )
+        )
+      )
+    )
+
+    ## v1 - 1 annotation on rows - auto color scale ----
+
+    heatmap_v1_arrow <- OlinkAnalyze::olink_heatmap_plot(
+      df = npx_data1_clean_arrow,
+      variable_row_list = "Treatment"
+    )
+
+    # this a copy of the v1 plot
+    heatmap_plot_name_v1 <- "heatmap_v1_olink_arrow"
+    check_snap_exist(test_dir_name = "plot_heatmap",
+                     snap_name = heatmap_plot_name_v1)
+    withCallingHandlers({
+      vdiffr::expect_doppelganger(
+        title = heatmap_plot_name_v1,
+        fig = heatmap_v1_arrow,
+        cran = FALSE
+      )
+    }, warning = function(w) {
+      if (grepl(x = w, pattern = "font family 'Arial Regular' not found"))
+        invokeRestart("muffleWarning")
+    })
+
+    # v2 - 2 annotations on rows - auto color scale ----
+
+    heatmap_v2_arrow <- OlinkAnalyze::olink_heatmap_plot(
+      df = npx_data1_clean_arrow,
+      variable_row_list = c("Treatment", "Site")
+    )
+
+    heatmap_plot_name_v2 <- "heatmap_v2_olink_arrow"
+    check_snap_exist(test_dir_name = "plot_heatmap",
+                     snap_name = heatmap_plot_name_v2)
+    withCallingHandlers({
+      vdiffr::expect_doppelganger(
+        title = heatmap_plot_name_v2,
+        fig = heatmap_v2_arrow,
+        cran = FALSE
+      )
+    }, warning = function(w) {
+      if (grepl(x = w, pattern = "font family 'Arial Regular' not found"))
+        invokeRestart("muffleWarning")
+    })
+  }
+)

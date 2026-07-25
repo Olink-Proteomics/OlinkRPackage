@@ -1,8 +1,9 @@
 #' Help function checking if a variable is a vector of booleans.
 #'
-#' @inherit .check_params params author return seealso
+#' @inherit .check_params params author return
 #'
 #' @keywords internal
+#' @noRd
 #'
 check_is_boolean <- function(x,
                              error = FALSE) {
@@ -37,9 +38,10 @@ check_is_boolean <- function(x,
 
 #' Help function checking if a variable is a scalar boolean.
 #'
-#' @inherit .check_params params author return seealso
+#' @inherit .check_params params author return
 #'
 #' @keywords internal
+#' @noRd
 #'
 check_is_scalar_boolean <- function(x,
                                     error = FALSE) {

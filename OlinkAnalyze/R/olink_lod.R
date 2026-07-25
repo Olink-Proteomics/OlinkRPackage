@@ -33,24 +33,18 @@
 #'       # This will fail if the files do not exist.
 #'
 #'       # Import NPX data
-#'       npx_data <- read_npx(filename = "path/to/npx_file")
-#'
-#'       # Check NPX data
-#'       check_log <- check_npx(df = npx_data)
-#'
-#'       # Clean NPX data
-#'       npx_data_clean <- clean_npx(
-#'         df = npx_data,
-#'         check_log = check_log
+#'       npx_data <- OlinkAnalyze::read_npx(
+#'         filename = "path/to/npx_file"
 #'       )
 #'
-#'       # Re-check NPX data
-#'       check_log_clean <- check_npx(df = npx_data_clean)
+#'       # Clean NPX data
+#'       npx_data_clean <- OlinkAnalyze::clean_npx(
+#'         df = npx_data
+#'       )
 #'
 #'       # Estimate LOD from negative controls
-#'       npx_data_lod_nc <- olink_lod(
+#'       npx_data_lod_nc <- OlinkAnalyze::olink_lod(
 #'         data = npx_data_clean,
-#'         check_log = check_log_clean,
 #'         lod_method = "NCLOD"
 #'       )
 #'
@@ -58,17 +52,15 @@
 #'       ## Locate the fixed LOD file
 #'       lod_file_path <- "path/to/lod_file"
 #'
-#'       npx_data_lod_Fixed <- olink_lod(
+#'       npx_data_lod_Fixed <- OlinkAnalyze::olink_lod(
 #'         data = npx_data,
-#'         check_log = check_log_clean,
 #'         lod_file_path = lod_file_path,
 #'         lod_method = "FixedLOD"
 #'       )
 #'
 #'       # Estimate LOD from both negative controls and fixed LOD
-#'       npx_data_lod_both <- olink_lod(
+#'       npx_data_lod_both <- OlinkAnalyze::olink_lod(
 #'         data = npx_data,
-#'         check_log = check_log_clean,
 #'         lod_file_path = lod_file_path,
 #'         lod_method = "Both"
 #'       )
@@ -81,8 +73,19 @@ olink_lod <- function(data,
                       check_log = NULL,
                       lod_file_path = NULL,
                       lod_method = "NCLOD") {
-  # check if check_log is correct
-  check_log <- run_check_npx(df = data, check_log = check_log)
+  # obtain check_log: from df attribute, from argument, or by running check_npx
+  check_log <- get_check_npx(
+    df = data,
+    check_log = check_log,
+    preferred_names = NULL # no need to specify preferred names here
+  )
+  # get preferred column names to assign to output dataset
+  preferred_names <- get_preferred_names(
+    df = data,
+    check_log = check_log
+  )
+  # get data type to convert the output accordingly at the end of the function
+  out_df <- get_read_npx_output(df = data)
   # make sure data is a tibble
   data <- convert_read_npx_output(df = data, out_df = "tibble")
 
@@ -137,6 +140,14 @@ olink_lod <- function(data,
       lod_method = lod_method
     )
   }
+
+  # Convert to requested output format, re-run check_npx, and attach check_log
+  data <- attach_check_log(
+    df = data,
+    out_df = out_df,
+    preferred_names = preferred_names
+  )
+
   return(data)
 }
 

@@ -7,6 +7,29 @@
 #' \strong{Note:} Do not modify the Olink software output file prior to
 #' importing it with \code{\link{read_npx}} as it might fail.
 #'
+#' @details
+#' OlinkAnalyze uses pre-defined names of columns of data frames to perform
+#' downstream analyses. At the same time, different Olink platforms export data
+#' with different column names (e.g. different protein quantification metric).
+#' The output of this function aims to instruct each function of OlinkAnalyze on
+#' the column it should be using for the downstream analysis. This should be
+#' seamless for data exported from Olink Software and imported to R using the
+#' `read_npx()` or processed using the `clean_npx()` function.
+#'
+#' However, in certain cases the columns of interest might be named differently.
+#' The argument \var{preferred_names} allows assigning custom-named columns of a
+#' data frame to internally expected variables that will in turn instruct Olink
+#' Analyze functions to use them for downstream analysis. For example, if one
+#' wished to use the column \var{PCNormalizedNPX} for their analysis instead of
+#' the column \var{NPX}, then they can assign this new name to the internal
+#' variable \var{quant} to inform the package that in the downstream analysis
+#' \var{PCNormalizedNPX} should be used. See examples below.
+#'
+#' The argument \var{preferred_names} is a named character vector with internal
+#' column names as names and column names of the current data set as values.
+#' Names of the input vector can be one or more of the following:
+#' `r ansi_collapse_quot(x = column_name_dict$col_key)`
+#'
 #' @author
 #' Klev Diamanti
 #' Kathleen Nevola
@@ -27,10 +50,19 @@
 #' file <- system.file("extdata",
 #'                     "npx_data_ext.parquet",
 #'                     package = "OlinkAnalyze")
-#' read_npx(filename = file)
+#'
+#' # use NPX by default as quantification
+#' OlinkAnalyze::read_npx(filename = file)
+#'
+#' # use PCNormalizedNPX as quantification
+#' OlinkAnalyze::read_npx(
+#'   filename = file,
+#'   preferred_names = c("quant" = "PCNormalizedNPX")
+#' )
 #' }
 #'
 read_npx <- function(filename,
+                     preferred_names = NULL,
                      out_df = "tibble",
                      long_format = NULL,
                      olink_platform = NULL,
@@ -106,9 +138,12 @@ read_npx <- function(filename,
 
   # convert and return ----
 
-  # if needed convert the object to the requested output
-  df_olink <- convert_read_npx_output(df = df_olink,
-                                      out_df = out_df)
+  # Convert to requested output format, run check_npx, and attach check_log
+  df_olink <- attach_check_log(
+    df = df_olink,
+    out_df = out_df,
+    preferred_names = preferred_names
+  )
 
   return(df_olink)
 }

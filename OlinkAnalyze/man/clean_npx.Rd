@@ -132,22 +132,21 @@ auto-detect internal control assays. \emph{Please ensure internal control assays
 }
 \examples{
 \dontrun{
-# run check_npx
-check_log <- check_npx(
-  df = npx_data1
-)
-
 # run clean_npx
-clean_npx(
-  df = npx_data1,
-  check_log = check_log
+OlinkAnalyze::clean_npx(
+  df = OlinkAnalyze::npx_data1
 )
 
 # run clean_npx with messages for all steps
-clean_npx(
-  df = npx_data1,
-  check_log = check_log,
+OlinkAnalyze::clean_npx(
+  df = OlinkAnalyze::npx_data1,
   verbose = TRUE
+)
+
+# run clean_npx but keep duplicated samples
+OlinkAnalyze::clean_npx(
+  df = OlinkAnalyze::npx_data1,
+  remove_dup_sample_id = FALSE
 )
 }
 

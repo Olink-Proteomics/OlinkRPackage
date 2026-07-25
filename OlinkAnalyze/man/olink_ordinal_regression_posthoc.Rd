@@ -109,7 +109,6 @@ if (rlang::is_installed(pkg = c("ordinal", "emmeans"))) {
       ignore.case = TRUE
     )
   )
-  check_log <- OlinkAnalyze::check_npx(df = npx_df)
 
   # Two-way Ordinal Regression with CLM.
   # Results in model NPX~Treatment+Time+Treatment:Time.
@@ -133,8 +132,7 @@ if (rlang::is_installed(pkg = c("ordinal", "emmeans"))) {
     df = npx_df,
     variable = c("Treatment:Time"),
     olinkid_list = significant_assays,
-    effect = "Time",
-    check_log = check_log
+    effect = "Time"
   )
 }
 }

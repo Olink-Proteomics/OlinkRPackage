@@ -35,13 +35,10 @@
 #'
 #' @examples
 #' \donttest{
-#'   check_log <- OlinkAnalyze::check_npx(df = npx_data1)
-#'
 #'   bridge_samples <- OlinkAnalyze::olink_bridge_selector(
-#'     df = npx_data1,
+#'     df = OlinkAnalyze::npx_data1,
 #'     sample_missing_freq = 0.1,
-#'     n = 20L,
-#'     check_log = check_log
+#'     n = 20L
 #'   )
 #' }
 #'
@@ -85,19 +82,16 @@ olink_bridge_selector <- function(df,
 
   # ---- STEP 1: Remove invalid OlinkIDs & control samples ---------------------
 
-  check_log <- run_check_npx(df = df, check_log = check_log)
-
   df_clean <- run_clean_npx(
     df = df,
-    check_log = check_log,
+    check_log = get_check_npx(df = df, check_log = check_log),
+    out_df = "tibble",
     remove_qc_warning = FALSE,
     remove_assay_warning = FALSE,
     verbose = FALSE
   )
 
-  check_log_clean <- run_check_npx(df = df_clean, check_log = NULL) |>
-    suppressMessages() |>
-    suppressWarnings()
+  check_log_clean <- get_check_npx(df = df_clean)
 
   if (!("sample_type" %in% names(check_log_clean$col_names))) {
     cli::cli_inform(

@@ -27,7 +27,7 @@ product_to_platesize <- function(product) {
 #'
 #' Displays each plate in a facet with cells colored by the given variable
 #' using ggplot and ggplot2::geom_tile.
-
+#'
 #' @param data tibble/data frame in long format returned from the
 #' olink_plate_randomizer function.
 #' @param fill.color Column name to be used as coloring variable for wells.
@@ -51,6 +51,7 @@ product_to_platesize <- function(product) {
 #'   fill.color = "Site"
 #' )
 #' }
+#'
 olink_display_plate_layout <- function(data,
                                        fill.color, # nolint: object_name_linter
                                        PlateSize = 96L, # nolint: object_name_linter
@@ -151,24 +152,24 @@ olink_display_plate_layout <- function(data,
 #' @export
 olink_displayPlateLayout <- olink_display_plate_layout  # nolint: object_name_linter
 
-
 #' Plot distributions of a given variable for all plates
 #'
 #' Displays a bar chart for each plate representing the distribution of the
 #' given grouping variable on each plate using ggplot2::ggplot
 #' and ggplot2::geom_bar.
-
+#'
 #' @param data tibble/data frame in long format returned from the
 #' olink_plate_randomizer function.
 #' @param fill.color Column name to be used as coloring variable for wells.
 #' @export
 #' @return An object of class "ggplot" showing the percent distribution of
 #' fill.color in each plate (x-axis)
-
+#'
 #' @examples
 #' \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
 #' \donttest{olink_display_plate_dist(data=randomized.manifest,
 #' fill.color="Site")}
+#'
 olink_display_plate_dist <- function(data,
                                      fill.color = "plate") { # nolint: object_name_linter
 
@@ -205,7 +206,6 @@ olink_display_plate_dist <- function(data,
 #' @export
 olink_displayPlateDistributions <- olink_display_plate_dist # nolint: object_name_linter
 
-
 #' assign subject to a plate for longitudinal randomization
 #'
 #' @param plate_map character vector of locations available for samples
@@ -215,6 +215,7 @@ olink_displayPlateDistributions <- olink_display_plate_dist # nolint: object_nam
 #'
 #' @returns plate_map adding sample IDs to plates keeping samples from the
 #' same subject on the same plate
+#'
 assign_subject2plate <- function(plate_map,
                                  manifest,
                                  subject_id) {
@@ -249,7 +250,6 @@ assign_subject2plate <- function(plate_map,
 
 }
 
-
 #' Create empty plate layout
 #'
 #' @param nplates number of plates
@@ -261,6 +261,7 @@ assign_subject2plate <- function(plate_map,
 #'
 #' @keywords internal
 #' @returns plate layout including plates, rows, and columns of available wells
+#'
 generate_plate_holder <- function(nplates,
                                   nspots,
                                   nsamples,
@@ -321,9 +322,6 @@ generate_plate_holder <- function(nplates,
   return(out)
 }
 
-
-
-
 #' Randomly assign samples to plates
 #'
 #' Generates a scheme for how to plate samples with an option to keep subjects
@@ -334,7 +332,7 @@ generate_plate_holder <- function(nplates,
 #' samples per subject (e.g. in longitudinal studies), Olink recommends keeping
 #' each subject on the same plate. This can be achieved using the SubjectColumn
 #' argument.
-
+#'
 #' @param Manifest tibble/data frame in long format containing all sample ID's.
 #' Sample ID column must be named SampleID.
 #' @param PlateSize Integer. Either 96 or 48. 96 is default.
@@ -357,7 +355,7 @@ generate_plate_holder <- function(nplates,
 #' information. For when multiple studies are being plated and randomizing
 #' within studies. If `study` column is present in manifest, within study
 #' randomization will be performed.
-
+#'
 #' @return A "tibble" including SampleID, SubjectID etc. assigned to
 #' well positions.
 #' Columns include same columns as Manifest with additional columns:
@@ -367,9 +365,9 @@ generate_plate_holder <- function(nplates,
 #'    \item{row:} Row on the plate
 #'    \item{well:} Well location on the plate
 #' }
-
+#'
 #' @export
-
+#'
 #' @seealso \itemize{
 #' \item{
 #' \code{
@@ -409,6 +407,7 @@ generate_plate_holder <- function(nplates,
 #' olink_displayPlateDistributions(randomized.manifest_a, fill.color = 'Site')
 #' olink_displayPlateDistributions(randomized.manifest_b, fill.color = 'Site')
 #' }
+#'
 olink_plate_randomizer <- function(Manifest, # nolint: object_name_linter
                                    PlateSize = 96, # nolint: object_name_linter
                                    Product, # nolint: object_name_linter

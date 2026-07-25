@@ -78,6 +78,8 @@ plot_heatmap_clean_df <- function(df, check_log, colnames) {
                       convert_nonunique_uniprot = TRUE,
                       out_df = "tibble",
                       verbose = FALSE)
+  check_log <- get_check_npx(df = df)
+
   #Remove assays with no variance
   df <- df |>
     dplyr::group_by(
@@ -107,6 +109,9 @@ plot_heatmap_clean_df <- function(df, check_log, colnames) {
       "oid" = check_log$col_names$olink_id,
       "assay" = check_log$col_names$assay
     )
+
+  df <- attach_check_log(df = df, out_df = "tibble")
+
   return(df)
 }
 
