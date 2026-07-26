@@ -7,7 +7,8 @@
 update_check_log(df, check_log = NULL, preferred_names = NULL)
 }
 \arguments{
-\item{df}{An Olink dataset.}
+\item{df}{A "tibble" or "ArrowObject"
+from \code{\link{read_npx}}.}
 
 \item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
 \code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
@@ -25,8 +26,7 @@ are returned with refreshed \code{olink_check_log} schema metadata.
 Refreshes the \code{check_log} attached to an \code{olink_class} tibble or ArrowObject.
 This is useful after manually modifying or cleaning an Olink dataset, where
 the attached check log may no longer describe the current data.
-}
-\details{
+
 The function can also be used to update only the column-name choices stored
 in the attached check log by supplying \code{preferred_names}, even when the data
 itself has not changed. The supplied names are validated by the same
