@@ -461,11 +461,17 @@ check_npx_col_names <- function(df,
 
   if (nrow(df_req_cols) > 0L) {
 
-    miss_cols <- paste0(
-      "* \"", df_req_cols$col_key, "\": One of ",
-      sapply(df_req_cols$col_names,
-             ansi_collapse_quot,
-             sep = "or"), "."
+    miss_cols <- vapply(
+      seq_len(nrow(df_req_cols)),
+      function(i) {
+        cli::format_inline(
+          paste0(
+            "* {.val {df_req_cols$col_key[[i]]}}: One of ",
+            "{.or {.val {df_req_cols$col_names[[i]]}}}."
+          )
+        )
+      },
+      character(1L)
     )
 
     cli::cli_abort(
@@ -517,12 +523,18 @@ check_npx_col_names <- function(df,
       )
 
     # inform message string
-    multi_ties_cols <- paste0(
-      "* \"", df_multi_ties_cols$col_key, "\": \"",
-      unlist(df_multi_ties_cols$col_df), "\" was selected. Options were ",
-      sapply(df_multi_ties_cols$col_df_tmp,
-             ansi_collapse_quot,
-             sep = "or"), "."
+    multi_ties_cols <- vapply(
+      seq_len(nrow(df_multi_ties_cols)),
+      function(i) {
+        cli::format_inline(
+          paste0(
+            "* {.val {df_multi_ties_cols$col_key[[i]]}}: ",
+            "{.val {df_multi_ties_cols$col_df[[i]]}} was selected. ",
+            "Options were {.or {.val {df_multi_ties_cols$col_df_tmp[[i]]}}}."
+          )
+        )
+      },
+      character(1L)
     )
 
     cli::cli_inform(
@@ -550,11 +562,17 @@ check_npx_col_names <- function(df,
 
   if (nrow(df_multi_cols) > 0L) {
 
-    multi_cols <- paste0(
-      "* \"", df_multi_cols$col_key, "\": ",
-      sapply(df_multi_cols$col_names,
-             ansi_collapse_quot,
-             sep = "or"), "."
+    multi_cols <- vapply(
+      seq_len(nrow(df_multi_cols)),
+      function(i) {
+        cli::format_inline(
+          paste0(
+            "* {.val {df_multi_cols$col_key[[i]]}}: ",
+            "{.or {.val {df_multi_cols$col_names[[i]]}}}."
+          )
+        )
+      },
+      character(1L)
     )
 
     cli::cli_abort(

@@ -721,7 +721,7 @@ olink_norm_input_check_df_cols <- function(lst_df, lst_cols) {
       c(
         "{cli::qty(names(lst_cols))} Dataset{?s} {.val {names(lst_cols)}}
         {cli::qty(names(lst_cols))} {?does/do} not contain a column named
-        {ansi_collapse_quot(get_alt_colnames(\"normalization\"), \"or\")}."
+        {.or {.val {get_alt_colnames(\"normalization\")}}}."
       )
     )
   } else if (length(col_norm) != length(lst_cols)) { # missing in some datasets
@@ -730,7 +730,7 @@ olink_norm_input_check_df_cols <- function(lst_df, lst_cols) {
         "x" = "{cli::qty(length(lst_cols) - length(col_norm))} Dataset{?s}
         {.val {setdiff(names(lst_cols), names(col_norm))}} {?does/do}
         not contain a column named
-        {ansi_collapse_quot(get_alt_colnames(\"normalization\"), \"or\")}!",
+        {.or {.val {get_alt_colnames(\"normalization\")}}}!",
         "i" = "The column should be present in all, or missing from all input
         datasets."
       ),
@@ -754,7 +754,7 @@ olink_norm_input_check_df_cols <- function(lst_df, lst_cols) {
       c(
         "{cli::qty(names(col_lod))} Dataset{?s} {.val {names(col_lod)}}
         {cli::qty(names(col_lod))} {?contains/contain} multiple columns matching
-        {ansi_collapse_quot(get_alt_colnames(\"lod\"), \"or\")}.",
+        {.or {.val {get_alt_colnames(\"lod\")}}}.",
         "i" = "They will be all adjusted!"
       )
     )
@@ -1126,7 +1126,7 @@ olink_norm_input_cross_product <- function(lst_df,
         c(
           "x" = "{cli::qty(names(check_cnt))} Dataset{?s}
             {.val {names(check_cnt)}} {?contains/contain} a column matching
-            {ansi_collapse_quot(get_alt_colnames(\"count\"), \"or\")} but with
+            {.or {.val {get_alt_colnames(\"count\")}}} but with
             different names!",
           "i" = "When performing cross-product normalization, count column
             should be named the same across datasets!"

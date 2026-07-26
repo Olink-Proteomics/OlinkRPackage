@@ -1268,7 +1268,7 @@ clean_nonunique_uniprot <- function(df,
           x = .data[[check_log$col_names$uniprot]],
           n = -1L
         ) |>
-          ansi_collapse_quot(),
+          (\(x) cli::format_inline("{.and {.val {x}}}"))(),
         .groups = "drop"
       )
 
