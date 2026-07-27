@@ -13,7 +13,7 @@ test_that(
       )(n = 2L),
       expected = structure(
         c("#077183FF", "#FF51B8FF"),
-        .Dim = 2:1
+        dim = 2:1
       )
     )
 
