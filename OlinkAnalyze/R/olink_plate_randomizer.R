@@ -13,7 +13,8 @@
 product_to_platesize <- function(product) {
   if (!(product %in% accepted_olink_platforms[["name"]])) {
     cli::cli_abort(
-      "Product must be one of {.or {.val {accepted_olink_platforms[[\"name\"]]}}}."
+      "Product must be one of
+      {.or {.val {accepted_olink_platforms[[\"name\"]]}}}."
     )
   }
   plate_size <- accepted_olink_platforms |>
@@ -64,7 +65,8 @@ olink_display_plate_layout <- function(data,
 
   if (!(PlateSize %in% unique(accepted_olink_platforms$plate_size))) {
     cli::cli_abort(
-      "Plate size needs to be either {.or {.val {unique(accepted_olink_platforms[[\"plate_size\"]])}}}."
+      "Plate size needs to be either
+      {.or {.val {unique(accepted_olink_platforms[[\"plate_size\"]])}}}."
     )
   }
 
@@ -278,7 +280,9 @@ generate_plate_holder <- function(nplates,
   }
 
   if (sum(nspots) < nsamples) {
-    cli::cli_abort("More samples than available spots! Double check your numbers!")
+    cli::cli_abort(
+      "More samples than available spots! Double check your numbers!"
+    )
   }
 
 
@@ -430,8 +434,8 @@ olink_plate_randomizer <- function(Manifest, # nolint: object_name_linter
   if (is.null(study) && ("study" %in% names(Manifest))) {
     study <- "study"
     cli::cli_alert_info(
-      "{.val {\"study\"}} column detected in manifest. Optional study argument
-      is set to {.val {\"study\"}}."
+      "{.arg study} column detected in manifest. Optional study argument is set
+      to {.val {\"study\"}}."
     )
   }
 
@@ -439,18 +443,16 @@ olink_plate_randomizer <- function(Manifest, # nolint: object_name_linter
   if (any(which(duplicated(Manifest$SampleID)))) {
     duplications <- Manifest$SampleID[which(duplicated(Manifest$SampleID))]
     cli::cli_warn(
-      c(
-        "Following SampleID(s) was/were duplicated:",
-        "{.val {duplications}}"
-      )
+      "The following sample identifier{?s} was/were duplicated:
+      {.val {duplications}}"
     )
   }
 
   # Check if there are any NAs in SampleID column
   if (any(is.na(Manifest$SampleID))) {
     cli::cli_abort(
-      "No {.val {NA}} allowed in the SampleID column. Check that all the
-      samples are named."
+      "No {.val {NA}} allowed in the SampleID column. Check that all the samples
+      are named."
     )
   }
 
@@ -475,8 +477,8 @@ olink_plate_randomizer <- function(Manifest, # nolint: object_name_linter
   if (!missing(SubjectColumn)) {
     if (!any(colnames(Manifest) == SubjectColumn)) {
       cli::cli_abort(
-        "The user assigned SubjectColumn name {.val {SubjectColumn}} was not
-        found! Make sure the SubjectColumn is present in the dataset."
+        "The user assigned {.arg SubjectColumn} name {.val {SubjectColumn}} was
+        not found! Make sure the SubjectColumn is present in the dataset."
       )
     }
     Manifest$SubjectID <- Manifest[[SubjectColumn]] # nolint: object_name_linter
@@ -870,7 +872,7 @@ olink_plate_randomizer <- function(Manifest, # nolint: object_name_linter
         if (passed) break
       }
     }
-    cli::cli_alert_info("Random assignment of SUBJECTS to plates\n")
+    cli::cli_alert_info("Random assignment of SUBJECTS to plates")
     if (passed) {
       cli::cli_alert_info(
         "Included total of {.val {j_tot}} empty well(s) in first and/or

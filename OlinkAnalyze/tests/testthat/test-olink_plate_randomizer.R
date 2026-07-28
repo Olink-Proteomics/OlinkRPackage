@@ -327,7 +327,7 @@ test_that(
 
     expect_true(
       object = grepl(
-        pattern = "\"study\" column detected in manifest",
+        pattern = "`study` column detected in manifest",
         x = msgs,
         fixed = TRUE
       ) |>
@@ -434,7 +434,7 @@ test_that(
 
     expect_true(
       object = grepl(
-        pattern = "\"study\" column detected in manifest",
+        pattern = "`study` column detected in manifest",
         x = msgs,
         fixed = TRUE
       ) |>
@@ -584,7 +584,7 @@ test_that(
         Manifest = manifest,
         SubjectColumn = "I_Shall_Not_Pass"
       ),
-      regexp = "The user assigned SubjectColumn name \"I_Shall_Not_Pass\""
+      regexp = "The user assigned `SubjectColumn` name \"I_Shall_Not_Pass\""
     )
   }
 )
