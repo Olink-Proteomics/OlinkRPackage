@@ -1305,9 +1305,9 @@ clean_nonunique_uniprot <- function(df,
         "{nrow(oid_uniprot_map)} assay identifier{?s} map multiple UniProt
         identifiers. The first instance will be used for downstream analysis.",
         paste0(
-          "* ", oid_uniprot_map$uniprot_extra, " will be replaced with ",
-          "\"", oid_uniprot_map$uniprot_keep, "\" for ",
-          "\"", oid_uniprot_map$OlinkID, "\"."
+          "* ", oid_uniprot_map[["uniprot_extra"]], " will be replaced with ",
+          "\"", oid_uniprot_map[["uniprot_keep"]], "\" for ",
+          "\"", oid_uniprot_map[[check_log$col_names$olink_id]], "\"."
         )
       )
     )
