@@ -441,7 +441,7 @@ olink_plate_randomizer <- function(Manifest, # nolint: object_name_linter
 
   # Check if there are any duplicated Sample IDs in manifest
   if (any(which(duplicated(Manifest$SampleID)))) {
-    duplications <- Manifest$SampleID[which(duplicated(Manifest$SampleID))]
+    duplications <- Manifest$SampleID[which(duplicated(Manifest$SampleID))] # nolint: object_usage_linter
     cli::cli_warn(
       "The following sample identifier{?s} was/were duplicated:
       {.val {duplications}}"

@@ -1103,7 +1103,7 @@ check_npx_col_class <- function(df, col_names) {
     col_class_msg <- vapply(
       seq_len(nrow(df_col_class)),
       function(i) {
-        cli::format_inline(
+        cli::format_inline( # nolint: return_linter
           paste0(
             "* {.val {df_col_class[[\"col_name\"]][[i]]}}: Expected ",
             "{.val {df_col_class[[\"expected_col_class\"]][[i]]}}. ",

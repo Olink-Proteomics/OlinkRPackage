@@ -172,7 +172,7 @@ validate_check_log <- function(df, check_log) {
     miss_cols <- vapply(
       seq_len(nrow(df_req_cols_miss)),
       function(i) {
-        cli::format_inline(
+        cli::format_inline( # nolint: return_linter
           paste0(
             "* {.val {df_req_cols_miss$col_key[[i]]}}: One of ",
             "{.or {.val {df_req_cols_miss$col_names[[i]]}}}."

@@ -808,7 +808,7 @@ olink_norm_input_check_df_cols <- function(lst_df, lst_cols) {
           vapply(
             seq_len(nrow(df_non_req_col)),
             function(i) {
-              cli::format_inline(
+              cli::format_inline( # nolint: return_linter
                 paste0(
                   "* {.val {df_non_req_col$n_df[[i]]}}: ",
                   "{.and {.val {df_non_req_col$prnt_msg[[i]]}}}"
@@ -837,7 +837,7 @@ olink_norm_input_check_df_cols <- function(lst_df, lst_cols) {
         vapply(
           seq_along(quant_cols),
           function(i) {
-            cli::format_inline(
+            cli::format_inline( # nolint: return_linter
               paste0(
                 "* {.val {names(quant_cols)[[i]]}} is quantified with: ",
                 "{.val {quant_cols[[i]]}}"
@@ -868,7 +868,7 @@ olink_norm_input_check_df_cols <- function(lst_df, lst_cols) {
         vapply(
           seq_along(olink_id_cols),
           function(i) {
-            cli::format_inline(
+            cli::format_inline( # nolint: return_linter
               paste0(
                 "* {.val {names(olink_id_cols)[[i]]}} has OlinkID column: ",
                 "{.val {olink_id_cols[[i]]}}"
@@ -892,7 +892,7 @@ olink_norm_input_check_df_cols <- function(lst_df, lst_cols) {
         vapply(
           seq_along(sample_id_cols),
           function(i) {
-            cli::format_inline(
+            cli::format_inline( # nolint: return_linter
               paste0(
                 "* {.val {names(sample_id_cols)[[i]]}} has sample ID column: ",
                 "{.val {sample_id_cols[[i]]}}"
@@ -1351,7 +1351,7 @@ olink_norm_input_check_samples <- function(lst_df_samples,
         vapply(
           seq_along(dup_ref_overlap),
           function(i) {
-            cli::format_inline(
+            cli::format_inline( # nolint: return_linter
               paste0(
                 "* {.val {names(dup_ref_overlap)[[i]]}}: ",
                 "{.and {.val {dup_ref_overlap[[i]]}}}"
@@ -1394,7 +1394,7 @@ olink_norm_input_check_samples <- function(lst_df_samples,
           vapply(
             seq_along(miss_samples),
             function(i) {
-              cli::format_inline(
+              cli::format_inline( # nolint: return_linter
                 paste0(
                   "* {.val {names(miss_samples)[[i]]}}: ",
                   "{.and {.val {miss_samples[[i]]}}}"
@@ -1435,7 +1435,7 @@ olink_norm_input_check_samples <- function(lst_df_samples,
           vapply(
             seq_along(lst_sample_dups),
             function(i) {
-              cli::format_inline(
+              cli::format_inline( # nolint: return_linter
                 paste0(
                   "* {.val {names(lst_sample_dups)[[i]]}}: ",
                   "{.and {.val {lst_sample_dups[[i]]}}}"
@@ -1551,7 +1551,7 @@ olink_norm_input_ref_medians <- function(reference_medians) {
           dplyr::mutate(
             x = mapply(
               function(cols, class) {
-                cli::format_inline("* {.val {cols}}: {.cls {class}}")
+                cli::format_inline("* {.val {cols}}: {.cls {class}}") # nolint: return_linter
               },
               cols = .data[["cols"]],
               class = .data[["class"]],
@@ -1708,7 +1708,7 @@ olink_norm_input_clean_assays <- function(lst_df,
         vapply(
           seq_along(oid_removed),
           function(i) {
-            cli::format_inline(
+            cli::format_inline( # nolint: return_linter
               paste0(
                 "* {.val {names(oid_removed)[[i]]}}: ",
                 "{.and {.val {oid_removed[[i]]}}}"
@@ -1849,7 +1849,7 @@ olink_norm_input_clean_assays <- function(lst_df,
         vapply(
           seq_along(oid_excluded),
           function(i) {
-            cli::format_inline(
+            cli::format_inline( # nolint: return_linter
               paste0(
                 "* {.val {names(oid_excluded)[[i]]}}: ",
                 "{.and {.val {oid_excluded[[i]]}}}"
@@ -1935,14 +1935,14 @@ olink_norm_input_assay_overlap <- function(lst_df,
     dplyr::mutate(
       L = sapply(.data[["Z"]], length),
       M = mapply(
-        function(X, Y, Z) {
-          cli::format_inline(
-            "In {.val {X}} & not in {.val {Y}}: {.and {.val {Z}}}"
+        function(tmp_x, tmp_y, tmp_z) {
+          cli::format_inline( # nolint: return_linter
+            "In {.val {tmp_x}} & not in {.val {tmp_y}}: {.and {.val {tmp_z}}}"
           )
         },
-        X = .data[["X"]],
-        Y = .data[["Y"]],
-        Z = .data[["Z"]],
+        tmp_x = .data[["X"]],
+        tmp_y = .data[["Y"]],
+        tmp_z = .data[["Z"]],
         USE.NAMES = FALSE
       )
     ) |>

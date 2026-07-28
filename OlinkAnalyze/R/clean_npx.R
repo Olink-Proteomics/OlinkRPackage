@@ -1183,7 +1183,7 @@ clean_col_class <- function(df,
   col_class_msg <- vapply(
     seq_len(nrow(check_log$col_class)),
     function(i) {
-      cli::format_inline(
+      cli::format_inline( # nolint: return_linter
         paste0(
           "* {.val {check_log$col_class$col_name[[i]]}}: from ",
           "{.val {check_log$col_class$col_class[[i]]}} converted to ",
@@ -1317,7 +1317,7 @@ clean_nonunique_uniprot <- function(df,
         vapply(
           seq_len(nrow(oid_uniprot_map)),
           function(i) {
-            cli::format_inline(
+            cli::format_inline( # nolint: return_linter
               paste(
                 "* {oid_uniprot_map[[\"uniprot_extra\"]][[i]]} will be",
                 "replaced with",
