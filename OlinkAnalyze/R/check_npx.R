@@ -465,7 +465,7 @@ check_npx_col_names <- function(df,
     miss_cols <- vapply(
       seq_len(nrow(df_req_cols)),
       function(i) {
-        cli::format_inline(
+        cli::format_inline( # nolint: return_linter
           paste0(
             "* {.val {df_req_cols[[\"col_key\"]][[i]]}}: One of ",
             "{.or {.val {df_req_cols[[\"col_names\"]][[i]]}}}."
@@ -527,7 +527,7 @@ check_npx_col_names <- function(df,
     multi_ties_cols <- vapply(
       seq_len(nrow(df_multi_ties_cols)),
       function(i) {
-        cli::format_inline(
+        cli::format_inline( # nolint: return_linter
           paste0(
             "* {.val {df_multi_ties_cols[[\"col_key\"]][[i]]}}: ",
             "{.val {df_multi_ties_cols[[\"col_df\"]][[i]]}} was selected. ",
@@ -567,7 +567,7 @@ check_npx_col_names <- function(df,
     multi_cols <- vapply(
       seq_len(nrow(df_multi_cols)),
       function(i) {
-        cli::format_inline(
+        cli::format_inline( # nolint: return_linter
           paste0(
             "* {.val {df_multi_cols[[\"col_key\"]][[i]]}}: ",
             "{.or {.val {df_multi_cols[[\"col_names\"]][[i]]}}}."
