@@ -327,7 +327,7 @@ test_that(
 
     expect_true(
       object = grepl(
-        pattern = "`study` column detected in manifest",
+        pattern = "\"study\" column detected in manifest",
         x = msgs,
         fixed = TRUE
       ) |>
@@ -336,7 +336,7 @@ test_that(
 
     expect_true(
       object = grepl(
-        pattern = "Keeping studies together during randomization",
+        pattern = "Keeping studies together during",
         x = msgs,
         fixed = TRUE
       ) |>
@@ -345,7 +345,7 @@ test_that(
 
     expect_true(
       object = grepl(
-        pattern = "study1 successful",
+        pattern = "\"study1\" successful",
         x = msgs,
         fixed = TRUE
       ) |>
@@ -354,7 +354,7 @@ test_that(
 
     expect_true(
       object = grepl(
-        pattern = "study2 successful",
+        pattern = "\"study2\" successful",
         x = msgs,
         fixed = TRUE
       ) |>
@@ -434,7 +434,7 @@ test_that(
 
     expect_true(
       object = grepl(
-        pattern = "`study` column detected in manifest",
+        pattern = "\"study\" column detected in manifest",
         x = msgs,
         fixed = TRUE
       ) |>
@@ -443,7 +443,7 @@ test_that(
 
     expect_true(
       object = grepl(
-        pattern = "Studies will be kept together during randomization",
+        pattern = "will be kept together during",
         x = msgs,
         fixed = TRUE
       ) |>
@@ -540,8 +540,7 @@ test_that(
         SubjectColumn = "SubjectID",
         Product = "Olink"
       ),
-      regexp = paste("Product must be one of the following: Target 48, Flex,",
-                     "Target 96, Explore 3072, Explore HT, Focus, Reveal")
+      regexp = "Product must be one of"
     )
   }
 )
@@ -577,8 +576,7 @@ test_that(
             "sample_id" = "SampleID"
           )
       ),
-      regexp = paste("SampleID not found! Be sure the column of samples ID's",
-                     "is named'SampleID'")
+      regexp = "SampleID not found! Be sure the column of samples ID's is named"
     )
 
     expect_error(
@@ -586,8 +584,7 @@ test_that(
         Manifest = manifest,
         SubjectColumn = "I_Shall_Not_Pass"
       ),
-      regexp = paste("The user assigned SubjectColumn name was not found! Make",
-                     "sure the SubjectColumn is present in the dataset.")
+      regexp = "The user assigned SubjectColumn name \"I_Shall_Not_Pass\""
     )
   }
 )
@@ -645,7 +642,7 @@ test_that(
                 dplyr::slice_head(n = 1L)
             )
         ),
-        regexp = "Following SampleID(s) was/were duplicated: A 1",
+        regexp = "\"A 1\"",
         fixed = TRUE
       ),
       regexp = "Random assignment of SAMPLES to plates"

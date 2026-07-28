@@ -1100,10 +1100,18 @@ check_npx_col_class <- function(df, col_names) {
 
   if (nrow(df_col_class) > 0L) {
 
-    col_class_msg <- paste0(
-      "* \"", df_col_class[["col_name"]], "\"",
-      ": Expected \"", df_col_class[["expected_col_class"]],
-      "\". Detected \"", df_col_class[["col_class"]], "\"."
+    col_class_msg <- vapply(
+      seq_len(nrow(df_col_class)),
+      function(i) {
+        cli::format_inline(
+          paste0(
+            "* {.val {df_col_class[[\"col_name\"]][[i]]}}: Expected ",
+            "{.val {df_col_class[[\"expected_col_class\"]][[i]]}}. ",
+            "Detected {.val {df_col_class[[\"col_class\"]][[i]]}}."
+          )
+        )
+      },
+      character(1L)
     )
 
     cli::cli_warn(
@@ -1299,14 +1307,13 @@ check_darid <- function(df, col_names) {
   # Emit a warning if any invalid combinations are found
   if (nrow(invalid_darid) > 0L) {
 
-    invalid_darid_msg <- paste0(
-      col_names[["panel_version"]], ": ",
-      paste(unique(invalid_darid[[col_names[["panel_version"]]]]),
-            collapse = ", "),
-      "; ", col_names[["qc_version"]], ": ",
-      paste(unique(invalid_darid[[col_names[["qc_version"]]]]),
-            collapse = ", "),
-      "."
+    invalid_darid_msg <- cli::format_inline(
+      paste0(
+        "{.val {col_names[[\"panel_version\"]]}}: ",
+        "{.val {unique(invalid_darid[[col_names[[\"panel_version\"]]]])}}; ",
+        "{.val {col_names[[\"qc_version\"]]}}: ",
+        "{.val {unique(invalid_darid[[col_names[[\"qc_version\"]]]])}}."
+      )
     )
 
     cli::cli_warn(

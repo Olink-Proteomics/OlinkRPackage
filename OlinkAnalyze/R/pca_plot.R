@@ -161,7 +161,7 @@ olink_pca_plot <- function(df,
     } else {
       cli::cli_abort(
         "The ... option only takes the coloroption argument. ... currently
-        contains the variables {paste(ellipsis_variables, collapse = ', ')}."
+        contains the variables {.val {ellipsis_variables}}."
       )
     }
   }
@@ -184,7 +184,7 @@ olink_pca_plot <- function(df,
   if (length(check_log$sample_id_dups) > 0L) {
     cli::cli_abort(
       "Duplicate SampleID(s) detected:
-      {paste(check_log$sample_id_dups, collapse = ', ')}.
+      {.val {check_log$sample_id_dups}}.
       Each sample ID must be unique. Please check your data and ensure that
       each sample has a unique identifier."
     )
@@ -459,7 +459,7 @@ olink_pca_plot.internal <- function(df, # nolint: object_name_linter
     if (length(dropped_loadings) > 0L) {
       if (verbose) {
         cli::cli_warn(
-          "The loading(s) {paste0(dropped_loadings, collapse = ', ')} from the
+          "The loading(s) {.val {dropped_loadings}} from the
           loadings_list contain NA and are dropped."
         )
       }
@@ -477,7 +477,7 @@ olink_pca_plot.internal <- function(df, # nolint: object_name_linter
     if (length(dropped_loadings) > 0L) {
       if (verbose) {
         cli::cli_warn(
-          "The loading(s) {paste0(dropped_loadings, collapse = ', ')} from the
+          "The loading(s) {.val {dropped_loadings}} from the
           loadings_list are dropped due to high missingness."
         )
       }

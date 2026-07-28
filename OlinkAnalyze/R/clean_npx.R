@@ -223,8 +223,9 @@ clean_npx <- function(df,
   )
 
   # Correct non-unique Uniprot IDs
-  if (verbose) cli::cli_h3(paste("Converting non-unique assay identifiers -",
-                                 "UniProt mapping."))
+  if (verbose) {
+    cli::cli_h3("Converting non-unique assay identifiers - UniProt mapping.")
+  }
   df <- clean_nonunique_uniprot(
     df = df,
     check_log = check_log,
@@ -1179,10 +1180,18 @@ clean_col_class <- function(df,
       )
     )
 
-  col_class_msg <- paste0(
-    "* \"", check_log$col_class$col_name, "\": ",
-    "from \"", check_log$col_class$col_class, "\" converted to ",
-    "\"", check_log$col_class$expected_col_class, "\"."
+  col_class_msg <- vapply(
+    seq_len(nrow(check_log$col_class)),
+    function(i) {
+      cli::format_inline(
+        paste0(
+          "* {.val {check_log$col_class$col_name[[i]]}}: from ",
+          "{.val {check_log$col_class$col_class[[i]]}} converted to ",
+          "{.val {check_log$col_class$expected_col_class[[i]]}}."
+        )
+      )
+    },
+    character(1L)
   )
 
   cli::cli_inform(
@@ -1305,10 +1314,18 @@ clean_nonunique_uniprot <- function(df,
       c(
         "{nrow(oid_uniprot_map)} assay identifier{?s} map multiple UniProt
         identifiers. The first instance will be used for downstream analysis.",
-        paste0(
-          "* ", oid_uniprot_map[["uniprot_extra"]], " will be replaced with ",
-          "\"", oid_uniprot_map[["uniprot_keep"]], "\" for ",
-          "\"", oid_uniprot_map[[check_log$col_names$olink_id]], "\"."
+        vapply(
+          seq_len(nrow(oid_uniprot_map)),
+          function(i) {
+            cli::format_inline(
+              paste0(
+                "* {oid_uniprot_map[[\"uniprot_extra\"]][[i]]} ",
+                "will be replaced with {.val {oid_uniprot_map[[\"uniprot_keep\"]][[i]]}} ",
+                "for {.val {oid_uniprot_map[[check_log$col_names$olink_id]][[i]]}}."
+              )
+            )
+          },
+          character(1L)
         )
       )
     )

@@ -12,10 +12,9 @@
 #'
 product_to_platesize <- function(product) {
   if (!(product %in% accepted_olink_platforms[["name"]])) {
-    cli::cli_abort(paste0("Product must be one of the following: ",
-                          paste(accepted_olink_platforms[["name"]],
-                                sep = " ",
-                                collapse = ", ")))
+    cli::cli_abort(
+      "Product must be one of {.or {.val {accepted_olink_platforms[[\"name\"]]}}}."
+    )
   }
   plate_size <- accepted_olink_platforms |>
     dplyr::filter(product == .data[["name"]]) |>
@@ -65,15 +64,8 @@ olink_display_plate_layout <- function(data,
 
   if (!(PlateSize %in% unique(accepted_olink_platforms$plate_size))) {
     cli::cli_abort(
-                   paste0("Plate size needs to be either ",
-                          cli::ansi_collapse(
-                                             unique(
-                                                    accepted_olink_platforms[[
-                                                      "plate_size"
-                                                    ]]),
-                                             sep2 = " or ",
-                                             last = ", or "),
-                          "."))
+      "Plate size needs to be either {.or {.val {unique(accepted_olink_platforms[[\"plate_size\"]])}}}."
+    )
   }
 
   ncols_per_plate <- PlateSize / 8
@@ -280,13 +272,13 @@ generate_plate_holder <- function(nplates,
     cli::cli_abort("Vector of available spots must equal number of plates!")
   }
   if (any(nspots > spots_per_plate)) {
-    cli::cli_abort(paste0("Number of samples per plates cannot exceed 40 ",
-                          "for T48 and 88 for T96!"))
+    cli::cli_abort(
+      "Number of samples per plates cannot exceed 40 for T48 and 88 for T96!"
+    )
   }
 
   if (sum(nspots) < nsamples) {
-    cli::cli_abort(paste0("More samples than available spots! ",
-                          "Double check your numbers!"))
+    cli::cli_abort("More samples than available spots! Double check your numbers!")
   }
 
 
@@ -425,9 +417,10 @@ olink_plate_randomizer <- function(Manifest, # nolint: object_name_linter
 
   #Check if SampleID column is present in manifest
   if (!"SampleID" %in% colnames(Manifest)) {
-    cli::cli_abort(paste0("SampleID not found! ",
-                          "Be sure the column of samples ID's is named",
-                          "'SampleID'"))
+    cli::cli_abort(
+      "SampleID not found! Be sure the column of samples ID's is named
+      {.val {\"SampleID\"}}."
+    )
   }
 
   if (!missing(Product)) {
@@ -436,22 +429,29 @@ olink_plate_randomizer <- function(Manifest, # nolint: object_name_linter
 
   if (is.null(study) && ("study" %in% names(Manifest))) {
     study <- "study"
-    cli::cli_alert_info(paste0("`study` column detected in manifest. ",
-                               "Optional study argument is set to \"study\"."))
+    cli::cli_alert_info(
+      "{.val {\"study\"}} column detected in manifest. Optional study argument
+      is set to {.val {\"study\"}}."
+    )
   }
 
   # Check if there are any duplicated Sample IDs in manifest
   if (any(which(duplicated(Manifest$SampleID)))) {
     duplications <- Manifest$SampleID[which(duplicated(Manifest$SampleID))]
-    cli::cli_warn(paste("Following SampleID(s) was/were duplicated:",
-                        paste(duplications, collapse = "\n"),
-                        sep = "\n"))
+    cli::cli_warn(
+      c(
+        "Following SampleID(s) was/were duplicated:",
+        "{.val {duplications}}"
+      )
+    )
   }
 
   # Check if there are any NAs in SampleID column
   if (any(is.na(Manifest$SampleID))) {
-    cli::cli_abort(paste0("No NA allowed in the SampleID column. ",
-                          "Check that all the samples are named."))
+    cli::cli_abort(
+      "No {.val {NA}} allowed in the SampleID column. Check that all the
+      samples are named."
+    )
   }
 
   # Check plate size is acceptable
@@ -474,17 +474,20 @@ olink_plate_randomizer <- function(Manifest, # nolint: object_name_linter
   # Check that the subject column provided is present
   if (!missing(SubjectColumn)) {
     if (!any(colnames(Manifest) == SubjectColumn)) {
-      cli::cli_abort(paste0("The user assigned SubjectColumn name was not ",
-                            "found! Make sure the SubjectColumn is present in ",
-                            "the dataset."))
+      cli::cli_abort(
+        "The user assigned SubjectColumn name {.val {SubjectColumn}} was not
+        found! Make sure the SubjectColumn is present in the dataset."
+      )
     }
     Manifest$SubjectID <- Manifest[[SubjectColumn]] # nolint: object_name_linter
   }
 
   # Check that the subjectID column does not have any NAs
   if (any(is.na(Manifest$SubjectID))) {
-    cli::cli_abort(paste0("No NA allowed in the SubjectID column. ",
-                          "Check that all the subjects are named."))
+    cli::cli_abort(
+      "No {.val {NA}} allowed in the SubjectID column. Check that all the
+      subjects are named."
+    )
   }
 
   # Assuming all plates have same plate size
@@ -696,17 +699,20 @@ olink_plate_randomizer <- function(Manifest, # nolint: object_name_linter
       class(out_manifest) <- c("randomizedManifest", class(out_manifest))
       return(out_manifest)
     } else {
-      cli::cli_abort(paste0("Could not keep all subjects on the same plate! ",
-                            "Try increasing the number of iterations."))
+      cli::cli_abort(
+        "Could not keep all subjects on the same plate! Try increasing the
+        number of iterations."
+      )
     }
 
   }
 
   #### Keep subjects together and keep studies together ####
   if (!missing(SubjectColumn) && !is.null(study)) {
-    cli::cli_alert_info(paste0("Assigning subjects to plates. ",
-                               "Keeping studies together during randomization.",
-                               " \n"))
+    cli::cli_alert_info(
+      "Assigning subjects to plates. Keeping studies together during
+      randomization."
+    )
     # When randomizing controls
     all.plates$SampleID <- NA_character_
     ctrl_locations <- all.plates |>
@@ -809,9 +815,9 @@ olink_plate_randomizer <- function(Manifest, # nolint: object_name_linter
                                                     j_tot +
                                                     j))))
         }
-        cli::cli_progress_message(paste0("Testing with ",
-                                         j,
-                                         " empty well(s) in the plate..."))
+        cli::cli_progress_message(
+          "Testing with {cli::qty(j)} empty well{?s} in the plate..."
+        )
         manifest_study <- Manifest[study_interval, ]
         for (i in 1:iterations) {
           for (sub in rand_subjects) {
@@ -845,7 +851,7 @@ olink_plate_randomizer <- function(Manifest, # nolint: object_name_linter
                              .data[["column"]],
                              .data[["row"]])
 
-            cli::cli_alert_success(paste(studyNo, "successful! \n"))
+            cli::cli_alert_success("{.val {studyNo}} successful!")
             out_manifest <- dplyr::bind_rows(out_manifest,
                                              out_manifest_study)
             manifest_study2 <- manifest_study |>
@@ -866,16 +872,15 @@ olink_plate_randomizer <- function(Manifest, # nolint: object_name_linter
     }
     cli::cli_alert_info("Random assignment of SUBJECTS to plates\n")
     if (passed) {
-      cli::cli_alert_info(paste("Included total of",
-                                j_tot,
-                                "empty well(s) in first and/or",
-                                "intermediate plate(s) to accomplish",
-                                "the randomization.\n"))
-      cli::cli_alert_warning(paste("Please try another seed or increase the",
-                                   "number of iterations if there are",
-                                   "indications that",
-                                   "another randomization might leave fewer",
-                                   "empty wells.\n"))
+      cli::cli_alert_info(
+        "Included total of {.val {j_tot}} empty well(s) in first and/or
+        intermediate plate(s) to accomplish the randomization."
+      )
+      cli::cli_alert_warning(
+        "Please try another seed or increase the number of iterations if there
+        are indications that another randomization might leave fewer empty
+        wells."
+      )
       out_manifest <- out_manifest |>
         dplyr::bind_rows(ctrl_locations) |>
         dplyr::mutate(well = paste0(.data[["row"]],
@@ -895,17 +900,19 @@ olink_plate_randomizer <- function(Manifest, # nolint: object_name_linter
       class(out_manifest) <- c("randomizedManifest", class(out_manifest))
       return(out_manifest)
     } else {
-      cli::cli_abort(paste0("Could not keep all subjects on the same plate! ",
-                            "Try increasing the number of iterations."))
+      cli::cli_abort(
+        "Could not keep all subjects on the same plate! Try increasing the
+        number of iterations."
+      )
     }
   }
 
   #### Complete randomization within studies when subjectID is not given ####
   if (missing(SubjectColumn) && !is.null(study)) {
-    cli::cli_alert_info(paste0("Assigning subjects to plates. ",
-                               "Multi-study project detected. ",
-                               "Studies will be kept together during ",
-                               "randomization. \n"))
+    cli::cli_alert_info(
+      "Assigning subjects to plates. Multi-study project detected. Studies
+      will be kept together during randomization."
+    )
 
     out_manifest <- matrix(nrow = 0, ncol = ncol(Manifest))
 

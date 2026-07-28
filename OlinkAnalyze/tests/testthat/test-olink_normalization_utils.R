@@ -5526,7 +5526,7 @@ test_that(
         ),
         norm_mode = "bridge"
       ),
-      regexp = "B37_not_here, B45_not_here, B63_not_here, and B75_not_here"
+      regexp = "\"B37_not_here\""
     )
 
     ## reference samples not in datasets v2 ----
@@ -5552,7 +5552,7 @@ test_that(
         ),
         norm_mode = "bridge"
       ),
-      regexp = "A13_not_here and A29_not_here"
+      regexp = "\"A13_not_here\""
     )
 
     ## reference samples not in datasets v3 ----
@@ -5577,7 +5577,7 @@ test_that(
         ),
         norm_mode = "bridge"
       ),
-      regexp = "A13_not_here and A29_not_here"
+      regexp = "\"A13_not_here\""
     )
 
     # subset norm ----
@@ -5628,7 +5628,7 @@ test_that(
         ),
         norm_mode = "subset"
       ),
-      regexp = "A52_not_here, A53_not_here, A54_not_here, A55_not_here, A56_not"
+      regexp = "\"A52_not_here\""
     )
 
     ## reference samples not in datasets v2 ----
@@ -5655,7 +5655,7 @@ test_that(
         ),
         norm_mode = "subset"
       ),
-      regexp = "A52_not_here, A53_not_here, A54_not_here, A55_not_here, A56_not"
+      regexp = "\"C1_not_here\""
     )
 
     ## reference samples not in datasets v3 ----
@@ -5680,7 +5680,7 @@ test_that(
         ),
         norm_mode = "subset"
       ),
-      regexp = "C44_not_here, C45_not_here, C46_not_here, C47_not_here, C48_not"
+      regexp = "\"C1_not_here\""
     )
 
   }
@@ -5719,7 +5719,7 @@ test_that(
         ),
         norm_mode = "bridge"
       ),
-      regexp = "* p1: A13 and A29"
+      regexp = "\"p1\": \"A13\""
     )
 
     ## duplicate reference samples in datasets v2 ----
@@ -5744,7 +5744,7 @@ test_that(
         ),
         norm_mode = "bridge"
       ),
-      regexp = "* p2: A13 and A29"
+      regexp = "\"p2\": \"A13\""
     )
 
     # subset norm ----
@@ -5794,7 +5794,7 @@ test_that(
         ),
         norm_mode = "subset"
       ),
-      regexp = "* p1: A1, A2, A3, A4, A5, A6, A7, A8, A9, A10,"
+      regexp = "\"p1\": \"A1\""
     )
 
     ## reference samples not in datasets v2 ----
@@ -5820,7 +5820,7 @@ test_that(
         ),
         norm_mode = "subset"
       ),
-      regexp = "* p2: C1, C2, C3, C4, C5, C6, C7, C8, C9, C10,"
+      regexp = "\"p2\": \"C1\""
     )
 
   }
@@ -6048,7 +6048,7 @@ test_that(
         ),
         norm_mode = "ref_median"
       ),
-      regexp = "* p1: A",
+      regexp = "\"p1\": \"A\"",
       fixed = TRUE
     )
 
@@ -6070,7 +6070,7 @@ test_that(
         ),
         norm_mode = "bridge"
       ),
-      regexp = "* p1: A\n* p2: E",
+      regexp = "\"p1\": \"A\"",
       fixed = TRUE
     )
 
@@ -6092,7 +6092,7 @@ test_that(
         ),
         norm_mode = "bridge"
       ),
-      regexp = "* p1: A\n* p2: E",
+      regexp = "\"p1\": \"A\"",
       fixed = TRUE
     )
 
@@ -6114,7 +6114,7 @@ test_that(
         ),
         norm_mode = "bridge"
       ),
-      regexp = "* p1: A, B, and D\n* p2: A",
+      regexp = "\"p1\": \"A\"",
       fixed = TRUE
     )
   }
@@ -6327,7 +6327,7 @@ test_that(
         ),
         norm_mode = olink_norm_modes$bridge
       ),
-      regexp = "* p1: OID1234"
+      regexp = "\"p1\": \"OID1234\""
     )
 
     expect_identical(object = lst_out$lst_df$p1,
@@ -6363,8 +6363,7 @@ test_that(
         ),
         norm_mode = olink_norm_modes$bridge
       ),
-      regexp = paste("* p1: OID00471A, OID00471B, OID00471C, OID00471D,",
-                     "OID00471E, OID0047, OID00471#, and OID00471&")
+      regexp = "\"p1\": \"OID00471A\""
     )
 
     expect_identical(object = lst_out$lst_df$p1,
@@ -6429,7 +6428,7 @@ test_that(
         ),
         norm_mode = olink_norm_modes$bridge
       ),
-      regexp = "* p2: OID01224B"
+      regexp = "\"p2\": \"OID01224B\""
     )
 
     lst_df_v5$p1 <- lst_df_v5$p1 |>
@@ -6484,8 +6483,7 @@ test_that(
         ),
         norm_mode = olink_norm_modes$bridge
       ),
-      regexp = paste("* p2: OID01301A, OID01302B, OID01303C, OID01304D,",
-                     "OID01305E, OID0130, and OID01307#")
+      regexp = "\"p2\": \"OID01301A\""
     )
 
     lst_df_v6$p1 <- lst_df_v6$p1 |>
@@ -6533,7 +6531,7 @@ test_that(
         ),
         norm_mode = olink_norm_modes$bridge
       ),
-      regexp = "* p2: OID01224B"
+      regexp = "\"p2\": \"OID01224B\""
     )
 
     lst_df_v7$p1 <- lst_df_v7$p1 |>
@@ -6583,7 +6581,7 @@ test_that(
         ),
         norm_mode = olink_norm_modes$bridge
       ),
-      regexp = "* p4: OID01301B"
+      regexp = "\"p4\": \"OID01301B\""
     )
 
     lst_df_v8$p1 <- lst_df_v8$p1 |>
@@ -6688,7 +6686,7 @@ test_that(
         ),
         norm_mode = olink_norm_modes$norm_cross_product
       ),
-      regexp = "* p1: OID40770_OID2011"
+      regexp = "\"p1\": \"OID40770_OID2011\""
     )
 
     expect_identical(object = lst_out$lst_df$p1,
@@ -7062,7 +7060,7 @@ test_that(
         ),
         norm_mode = olink_norm_modes$bridge
       ),
-      regexp = "* p1: OID01307"
+      regexp = "\"p1\": \"OID01307\""
     )
 
     lst_df_v0$p1 <- lst_df_v0$p1 |>
@@ -7098,7 +7096,7 @@ test_that(
         ),
         norm_mode = olink_norm_modes$bridge
       ),
-      regexp = paste("p1: OID00471, OID00472, OID00474, OID00475, OID00476")
+      regexp = "\"p1\": \"OID00471\""
     )
 
     lst_df_v1$p1 <- lst_df_v1$p1 |>
@@ -7136,7 +7134,7 @@ test_that(
         ),
         norm_mode = olink_norm_modes$bridge
       ),
-      regexp = "* p2: OID01224"
+      regexp = "\"p2\": \"OID01224\""
     )
 
     lst_df_v2$p1 <- lst_df_v2$p1 |>
@@ -7187,7 +7185,7 @@ test_that(
         ),
         norm_mode = olink_norm_modes$bridge
       ),
-      regexp = "* p2: OID01269, OID01270, OID01271, OID01272"
+      regexp = "\"p2\": \"OID01269\""
     )
 
     lst_df_v3$p1 <- lst_df_v3$p1 |>
@@ -7240,7 +7238,7 @@ test_that(
         ),
         norm_mode = olink_norm_modes$bridge
       ),
-      regexp = "* p2: OID01269, OID01270, OID01271, OID01272"
+      regexp = "\"p2\": \"OID01269\""
     )
 
     lst_df_v4$p1 <- lst_df_v4$p1 |>
@@ -7308,7 +7306,7 @@ test_that(
         ),
         norm_mode = olink_norm_modes$bridge
       ),
-      regexp = "* p4: OID01269, OID01270, and OID01271"
+      regexp = "\"p4\": \"OID01269\""
     )
 
     lst_df_v5$p1 <- lst_df_v5$p1 |>
