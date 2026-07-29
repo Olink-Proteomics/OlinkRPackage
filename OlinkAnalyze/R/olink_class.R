@@ -497,17 +497,23 @@ update_check_log <- function(df,
 
   check_is_dataset(x = df, error = TRUE)
 
+  # get current check_log
   check_log <- get_check_npx(
     df = df,
     check_log = check_log,
     preferred_names = preferred_names
   )
 
+  # get current preferred names from check_log
   existing_preferred_names <- get_preferred_names(
     df = df,
     check_log = check_log
   )
 
+  # append new preferred_names, if provided, to the existing preferred_names
+  # and remove duplicates, keeping the last occurrence of each name
+  # essentially preferred_names provided to update_check_log() will override any
+  # existing preferred_names in the check_log.
   if (!is.null(preferred_names)) {
     existing_preferred_names <- c(existing_preferred_names, preferred_names)
     existing_preferred_names <- existing_preferred_names[
@@ -515,12 +521,16 @@ update_check_log <- function(df,
     ]
   }
 
+  # if no preferred_names, set to NULL to avoid passing an empty vector
   if (length(existing_preferred_names) == 0L) {
     existing_preferred_names <- NULL
   }
 
+  # get the format of the input data (tibble or ArrowObject) to retain that
+  # format after updating the check log
   out_df <- get_read_npx_output(df = df)
 
+  # remove current check_log from the data object before attaching the new one
   df <- rm_check_log(df = df)
 
   df <- attach_check_log(
@@ -530,7 +540,6 @@ update_check_log <- function(df,
   )
 
   return(df)
-
 }
 
 # Arrow metadata helpers ----
