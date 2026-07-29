@@ -424,7 +424,9 @@ rm_check_log <- function(df) {
 
 }
 
-#' Update the attached check log for an Olink data object
+#' Update the attached check log for an Olink dataset
+#'
+#' @author Klev Diamanti
 #'
 #' @description
 #' Refreshes the `check_log` attached to an `olink_class` tibble or ArrowObject.
@@ -455,40 +457,80 @@ rm_check_log <- function(df) {
 #'
 #' @examples
 #' \dontrun{
+#'
+#' # get file
 #' npx_file <- system.file(
 #'   "extdata",
-#'   "npx_data_ext.parquet",
+#'   "npx_data1.xlsx",
 #'   package = "OlinkAnalyze"
 #' )
 #'
-#' npx_df <- OlinkAnalyze::read_npx(filename = npx_file)
+#' # Example 1: manually modify the dataset and update the check log accordingly
 #'
+#' # read file
+#' npx_df <- OlinkAnalyze::read_npx(
+#'   filename = npx_file,
+#'   olink_platform = "Target 96"
+#' )
+#'
+#' # manually cleanup the data based on the warning messages from read_npx
 #' npx_df <- npx_df |>
-#'   dplyr::filter(.data[["QC_Warning"]] == "Pass")
+#'   # remove duplicated samples
+#'   dplyr::filter(
+#'     !grepl("^CONTROL", .data[["SampleID"]])
+#'   ) |>
+#'   # convert NPX and LOD columns to numeric
+#'   dplyr::mutate(
+#'     NPX = as.numeric(.data[["NPX"]]),
+#'     LOD = as.numeric(.data[["LOD"]])
+#'   )
+#' # same result achieved by using clean_npx
 #'
-#' npx_df <- OlinkAnalyze::update_check_log(df = npx_df)
+#' # run update_check_log so that it describes the current status of the dataset
+#' npx_df <- OlinkAnalyze::update_check_log(
+#'   df = npx_df
+#' )
+#'
+#' # Example 2: change preferred column names to be used in the analyses
 #'
 #' # update preferred column names without otherwise modifying the dataset
 #' npx_df <- npx_df |>
-#'   dplyr::mutate(PCNormalizedNPX = .data[["NPX"]])
+#'   dplyr::mutate(
+#'     PCNormalizedNPX = .data[["NPX"]]
+#'   )
 #'
 #' npx_df <- OlinkAnalyze::update_check_log(
 #'   df = npx_df,
 #'   preferred_names = c("quant" = "PCNormalizedNPX")
 #' )
 #'
-#' # attach an existing check log to a plain tibble or ArrowObject
-#' npx_tbl <- OlinkAnalyze::rm_check_log(df = npx_df)
-#' check_log <- OlinkAnalyze::olink_extract_check_log(df = npx_df)
+#' # Example 3: attach an existing check log to a plain tibble or ArrowObject
 #'
+#' # attach an existing check log to a plain tibble or ArrowObject
+#' npx_tbl <- OlinkAnalyze::rm_check_log(
+#'   df = npx_df
+#' )
+#' check_log <- OlinkAnalyze::check_npx(
+#'   df = npx_df,
+#'   preferred_names = c("quant" = "PCNormalizedNPX")
+#' )
+#'
+#' # attach an existing check log to a plain tibble
 #' npx_obj <- OlinkAnalyze::update_check_log(
 #'   df = npx_tbl,
 #'   check_log = check_log
 #' )
 #'
+#' # attach an existing check log to an ArrowObject
 #' npx_arrow <- npx_tbl |>
 #'   arrow::as_arrow_table() |>
-#'   OlinkAnalyze::update_check_log(check_log = check_log)
+#'   OlinkAnalyze::update_check_log(
+#'     check_log = check_log
+#'   )
+#'
+#' # inspect ArrowObject has a check_log
+#' names(npx_arrow$metadata)
+#'
 #' }
 #'
 update_check_log <- function(df,
