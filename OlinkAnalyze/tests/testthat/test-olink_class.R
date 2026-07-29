@@ -622,7 +622,7 @@ test_that(
 
     expect_warning(
       object = df_obj_updated <- update_check_log(df = df_obj_mod),
-      regexp = "Duplicate SampleID detected"
+      regexp = "Duplicate SampleID detected: \"A\""
     )
 
     expect_s3_class(object = df_obj_updated, class = "olink_class")
@@ -671,7 +671,7 @@ test_that(
 
     expect_warning(
       object = df_arrow_updated <- update_check_log(df = df_arrow_mod),
-      regexp = "Duplicate SampleID detected"
+      regexp = "Duplicate SampleID detected: \"A\""
     )
 
     expect_r6_class(object = df_arrow_updated, class = "ArrowObject")
@@ -702,8 +702,8 @@ test_that(
       object = expect_no_message(
         object = df_obj_updated <- update_check_log(df = df_obj)
       ),
-      regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
-                     "1\" and \"CONTROL_SAMPLE_AS 2\"")
+      regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS 1\"",
+                     "and \"CONTROL_SAMPLE_AS 2\"")
     )
 
     expect_identical(
@@ -767,7 +767,9 @@ test_that(
         df = df_obj,
         preferred_names = c("quant" = "NotAColumn")
       ),
-      regexp = "is missing from the input dataset"
+      regexp = paste("Value \"NotAColumn\" from `preferred_names`",
+                     "corresponding to key \"quant\" is missing from the input",
+                     "dataset `df`")
     )
   }
 )
