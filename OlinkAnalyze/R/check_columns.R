@@ -180,7 +180,7 @@ check_log_colname <- function(check_log, col_key) {
       c(
         "x" = "Input dataset lacks a column matching to the key
         {.val {col_key}}!",
-        "i" = "Please make sure that the it contains a column named:
+        "i" = "Please make sure that it contains a column named:
         {.or {.val {get_alt_colnames(col_key = col_key)}}}."
 
       ),
