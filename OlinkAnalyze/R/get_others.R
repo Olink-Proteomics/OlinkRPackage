@@ -32,10 +32,9 @@ get_file_ext_summary <- function() {
     get_file_formats(),
     function(ff) {
       paste0( # nolint: return_linter
-        cli::format_inline("{.or {.val {get_file_ext(name_sub = ff)}}}"),
+        get_file_ext(name_sub = ff) |> ansi_collapse_quot(sep = "or"),
         " for ", ff, " files"
       )
-
     }
   ) |>
     cli::ansi_collapse()
