@@ -35,7 +35,6 @@ get_file_ext_summary <- function() {
         get_file_ext(name_sub = ff) |> ansi_collapse_quot(sep = "or"),
         " for ", ff, " files"
       )
-
     }
   ) |>
     cli::ansi_collapse()

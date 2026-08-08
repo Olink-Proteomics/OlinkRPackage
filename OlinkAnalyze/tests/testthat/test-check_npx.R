@@ -362,8 +362,9 @@ test_that(
                            preferred_names = NULL),
         expected = expected_result
       ),
-      regexp = paste("DataAnalysisRefID: D10007, D20007, D30007, D40007;",
-                     "PanelDataArchiveVersion: 1.2.1.")
+      regexp = paste("\"DataAnalysisRefID\": \"D10007\", \"D20007\",",
+                     "\"D30007\", and \"D40007\"; \"PanelDataArchiveVersion\":",
+                     "\"1.2.1\"")
     )
 
   }
@@ -2092,8 +2093,8 @@ test_that(
                              col_names = col_names),
         expected = expected_result
       ),
-      regexp = paste("DataAnalysisRefID: D10007, D20007, D30007;",
-                     "PanelDataArchiveVersion: 1.2.0.")
+      regexp = paste("\"DataAnalysisRefID\": \"D10007\", \"D20007\", and",
+                     "\"D30007\"; \"PanelDataArchiveVersion\": \"1.2.0\"")
     )
   }
 )
