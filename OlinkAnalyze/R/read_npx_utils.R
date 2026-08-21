@@ -37,9 +37,9 @@ read_npx_format_colnames <- function(df,
 
       cli::cli_abort( # nolint: return_linter
         message = c(
-          "x" = "Unexpected first row in file {.file {file}}!",
-          "i" = "Detected file in wide format. Expected only cells in A1 and B1
-          to be populated."
+          "x" = "Unexpected first row in wide format file {.file {file}}!",
+          "i" = "Expected only cells A1 and B1 to be populated with the string
+          \"Project Name\" and the name of the current project, respectively."
         ),
         call = rlang::caller_env(),
         wrap = FALSE
