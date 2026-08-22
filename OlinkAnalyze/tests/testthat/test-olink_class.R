@@ -814,6 +814,34 @@ test_that(
 )
 
 test_that(
+  "update_check_log - error - preferred name keys must be unique",
+  {
+    df <- npx_data1 |>
+      dplyr::mutate(
+        SampleID2 = .data[["SampleID"]],
+        SampleID3 = .data[["SampleID"]]
+      )
+
+    df_obj <- attach_check_log(
+      df = df,
+      out_df = "tibble",
+      preferred_names = c("sample_id" = "SampleID2")
+    ) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_error(
+      object = update_check_log(
+        df = df_obj,
+        preferred_names = c("sample_id" = "SampleID",
+                            "sample_id" = "SampleID3")
+      ),
+      regexp = "Duplicated name in"
+    )
+  }
+)
+
+test_that(
   "update_check_log - works - attaches check log to plain tibble",
   {
     df <- dplyr::tibble(
