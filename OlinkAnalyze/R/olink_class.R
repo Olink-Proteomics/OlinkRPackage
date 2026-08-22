@@ -540,11 +540,19 @@ update_check_log <- function(df,
   check_is_dataset(x = df, error = TRUE)
 
   # get current check_log
-  check_log <- get_check_npx(
-    df = df,
-    check_log = check_log,
-    preferred_names = preferred_names
-  )
+  check_log <- withCallingHandlers({
+    get_check_npx(
+      df = df,
+      check_log = check_log,
+      preferred_names = preferred_names
+    )
+  }, warning = function(w) {
+    if (grepl(
+      x = w,
+      pattern = "No `olink_check_log` metadata found in the ArrowObject"
+    ))
+      invokeRestart("muffleWarning")
+  })
 
   # get current preferred names from check_log
   existing_preferred_names <- get_preferred_names(

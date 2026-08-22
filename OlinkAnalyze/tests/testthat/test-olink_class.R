@@ -860,12 +860,15 @@ test_that(
     check_log <- check_npx(df = df)
     df_arrow <- arrow::as_arrow_table(df)
 
-    expect_warning(
-      object = df_arrow_obj <- update_check_log(
-        df = df_arrow,
-        check_log = check_log
-      ),
-      regexp = "No `olink_check_log` metadata found in the ArrowObject"
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = df_arrow_obj <- update_check_log(
+            df = df_arrow,
+            check_log = check_log
+          )
+        )
+      )
     )
 
     expect_r6_class(object = df_arrow_obj, class = "ArrowObject")
