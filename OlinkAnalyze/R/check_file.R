@@ -91,7 +91,7 @@ check_file_extension <- function(file) {
     cli::cli_abort(
       message = c(
         "x" = "Unable to recognize the extension of the file {.file {file}}!",
-        "i" = "Expected one of {.val {get_file_ext_summary()}}!"
+        "i" = "Expected one of {.or {.val {get_file_formats()}}}!"
       ),
       call = rlang::caller_env(),
       wrap = FALSE

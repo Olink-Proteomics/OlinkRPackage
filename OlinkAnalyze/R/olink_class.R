@@ -169,11 +169,17 @@ validate_check_log <- function(df, check_log) {
         & .data[["col_key"]] %in% .env[["check_log_cnames_missing"]]
       )
 
-    miss_cols <- paste0(
-      "* \"", df_req_cols_miss$col_key, "\": One of ",
-      sapply(df_req_cols_miss$col_names,
-             ansi_collapse_quot,
-             sep = "or"), "."
+    miss_cols <- vapply(
+      seq_len(nrow(df_req_cols_miss)),
+      function(i) {
+        cli::format_inline( # nolint: return_linter
+          paste0(
+            "* {.val {df_req_cols_miss$col_key[[i]]}}: One of ",
+            "{.or {.val {df_req_cols_miss$col_names[[i]]}}}."
+          )
+        )
+      },
+      character(1L)
     )
 
     cli::cli_abort(

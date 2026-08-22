@@ -116,8 +116,8 @@ olink_boxplot <- function(df,
   check_log_clean <- get_check_npx(df = df)
   if (!("sample_type" %in% names(check_log_clean$col_names))) {
     cli::cli_inform(
-      paste("No sample type column detected in input {.arg df}. Control",
-            "samples may not be filtered out.")
+      "No sample type column detected in input {.arg df}. Control samples may
+      not be filtered out."
     )
   }
   # ---- Early column trimming ------------------------------------------------

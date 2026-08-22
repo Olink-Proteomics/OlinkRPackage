@@ -154,14 +154,14 @@ olink_pca_plot <- function(df,
     if (length(ellipsis_variables) == 1L) {
       if (!(ellipsis_variables == "coloroption")) {
         cli::cli_abort(
-          "The ... option only takes the coloroption argument. ... currently
-          contains the variable {ellipsis_variables}."
+          "The ... option only takes the {.val {\"coloroption\"}} argument. ...
+          currently contains the variable {.val {ellipsis_variables}}."
         )
       }
     } else {
       cli::cli_abort(
-        "The ... option only takes the coloroption argument. ... currently
-        contains the variables {paste(ellipsis_variables, collapse = ', ')}."
+        "The ... option only takes the {.val {\"coloroption\"}} argument. ...
+        currently contains the variables {.val {ellipsis_variables}}."
       )
     }
   }
@@ -183,10 +183,9 @@ olink_pca_plot <- function(df,
   # Stop if duplicate sample ID's detected
   if (length(check_log$sample_id_dups) > 0L) {
     cli::cli_abort(
-      "Duplicate SampleID(s) detected:
-      {paste(check_log$sample_id_dups, collapse = ', ')}.
-      Each sample ID must be unique. Please check your data and ensure that
-      each sample has a unique identifier."
+      "Duplicate SampleID(s) detected: {.val {check_log$sample_id_dups}}. Each
+      sample ID must be unique. Please check your data and ensure that each
+      sample has a unique identifier."
     )
   }
 
@@ -459,8 +458,8 @@ olink_pca_plot.internal <- function(df, # nolint: object_name_linter
     if (length(dropped_loadings) > 0L) {
       if (verbose) {
         cli::cli_warn(
-          "The loading(s) {paste0(dropped_loadings, collapse = ', ')} from the
-          loadings_list contain NA and are dropped."
+          "The loading(s) {.val {dropped_loadings}} from the loadings_list
+          contain NA and are dropped."
         )
       }
 
@@ -477,8 +476,8 @@ olink_pca_plot.internal <- function(df, # nolint: object_name_linter
     if (length(dropped_loadings) > 0L) {
       if (verbose) {
         cli::cli_warn(
-          "The loading(s) {paste0(dropped_loadings, collapse = ', ')} from the
-          loadings_list are dropped due to high missingness."
+          "The loading(s) {.val {dropped_loadings}} from the loadings_list are
+          dropped due to high missingness."
         )
       }
 

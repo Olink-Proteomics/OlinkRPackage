@@ -373,10 +373,10 @@ pheatmap_run <- function(pheatmap_args) {
   },
   error = function(e) {
     if (grepl("NA/NaN/Inf", e$message, fixed = TRUE)) {
-      cli::cli_abort(cli::cli_bullets(c("x" = "Error when clustering.",
-                                        "i" = paste("Try setting cluster of",
-                                                    "rows or columns to",
-                                                    "`FALSE`."))))
+      cli::cli_abort(cli::cli_bullets(c(
+        "x" = "Error when clustering.",
+        "i" = "Try setting cluster of rows or columns to {.val {FALSE}}."
+      )))
     } else {
       cli::cli_abort(e$message)
     }

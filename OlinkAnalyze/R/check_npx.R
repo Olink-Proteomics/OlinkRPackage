@@ -30,7 +30,7 @@
 #' The argument \var{preferred_names} is a named character vector with internal
 #' column names as names and column names of the current data set as values.
 #' Names of the input vector can be one or more of the following:
-#' `r ansi_collapse_quot(x = column_name_dict$col_key)`
+#' `r ansi_collapse_quot(x = column_name_dict[["col_key"]])`
 #'
 #' @author
 #'   Masoumeh Sheikhi
@@ -121,57 +121,57 @@ check_npx <- function(df,
   check_npx_out_lst <- list()
 
   # column names
-  check_npx_out_lst$col_names <- check_npx_col_names(
+  check_npx_out_lst[["col_names"]] <- check_npx_col_names(
     df = df,
     preferred_names = preferred_names
   )
 
   # check Olink IDs
-  check_npx_out_lst$oid_invalid <- check_npx_olinkid(
+  check_npx_out_lst[["oid_invalid"]] <- check_npx_olinkid(
     df = df,
-    col_names = check_npx_out_lst$col_names
+    col_names = check_npx_out_lst[["col_names"]]
   )
 
   # assays with all NA values
-  check_npx_out_lst$assay_na <- check_npx_all_na_assays(
+  check_npx_out_lst[["assay_na"]] <- check_npx_all_na_assays(
     df = df,
-    col_names = check_npx_out_lst$col_names
+    col_names = check_npx_out_lst[["col_names"]]
   )
 
   # duplicate sample IDs
-  check_npx_out_lst$sample_id_dups <- check_npx_duplicate_sample_ids(
+  check_npx_out_lst[["sample_id_dups"]] <- check_npx_duplicate_sample_ids(
     df = df,
-    col_names = check_npx_out_lst$col_names
+    col_names = check_npx_out_lst[["col_names"]]
   )
 
   # samples with all NA values
-  check_npx_out_lst$sample_id_na <- check_npx_all_na_sample(
+  check_npx_out_lst[["sample_id_na"]] <- check_npx_all_na_sample(
     df = df,
-    col_names = check_npx_out_lst$col_names
+    col_names = check_npx_out_lst[["col_names"]]
   )
 
   # column classes
-  check_npx_out_lst$col_class <- check_npx_col_class(
+  check_npx_out_lst[["col_class"]] <- check_npx_col_class(
     df = df,
-    col_names = check_npx_out_lst$col_names
+    col_names = check_npx_out_lst[["col_names"]]
   )
 
   # assay QC
-  check_npx_out_lst$assay_qc <- check_npx_qcwarn_assays(
+  check_npx_out_lst[["assay_qc"]] <- check_npx_qcwarn_assays(
     df = df,
-    col_names = check_npx_out_lst$col_names
+    col_names = check_npx_out_lst[["col_names"]]
   )
 
   # non-unique uniprot id
-  check_npx_out_lst$non_unique_uniprot <- check_npx_nonunique_uniprot(
+  check_npx_out_lst[["non_unique_uniprot"]] <- check_npx_nonunique_uniprot(
     df = df,
-    col_names = check_npx_out_lst$col_names
+    col_names = check_npx_out_lst[["col_names"]]
   )
 
   # check Data Analysis Reference ID and Panel Archive Version combination
-  check_npx_out_lst$darid_invalid <- check_darid(
+  check_npx_out_lst[["darid_invalid"]] <- check_darid(
     df = df,
-    col_names = check_npx_out_lst$col_names
+    col_names = check_npx_out_lst[["col_names"]]
   )
 
   # return results ----
@@ -263,7 +263,7 @@ get_check_npx <- function(df,
 get_preferred_names <- function(df,
                                 check_log) {
   validate_check_log(df = df, check_log = check_log)
-  check_log_names <- check_log$col_names
+  check_log_names <- check_log[["col_names"]]
 
   check_log_local_names <- check_npx_col_names(df = df) |>
     suppressMessages() |>
@@ -338,7 +338,7 @@ get_preferred_names <- function(df,
 #' The argument \var{preferred_names} is a named character vector with internal
 #' column names as names and column names of the current data set as values.
 #' Names of the input vector can be one or more of the following:
-#' `r cli::ansi_collapse(x = column_name_dict$col_key)`
+#' `r cli::ansi_collapse(x = column_name_dict[["col_key"]])`
 #'
 #' @author
 #'  Klev Diamanti
@@ -438,10 +438,11 @@ check_npx_col_names <- function(df,
 
     cli::cli_abort(
       c(
-        "x" = "{cli::qty(df_custom_names$col_key)} Value{?s}
-        {.val {unlist(df_custom_names$col_names)}} from {.arg preferred_names}
-        corresponding to key{?s} {.val {df_custom_names$col_key}} {?is/are}
-        missing from the input dataset {.arg df}.",
+        "x" = "{cli::qty(df_custom_names[[\"col_key\"]])} Value{?s}
+        {.val {unlist(df_custom_names[[\"col_names\"]])}} from
+        {.arg preferred_names} corresponding to key{?s}
+        {.val {df_custom_names[[\"col_key\"]]}} {?is/are} missing from the input
+        dataset {.arg df}.",
         "i" = "Please ensure all provided column names are present in the data!"
       ),
       call = rlang::caller_env(),
@@ -461,15 +462,21 @@ check_npx_col_names <- function(df,
 
   if (nrow(df_req_cols) > 0L) {
 
-    miss_cols <- paste0(
-      "* \"", df_req_cols$col_key, "\": One of ",
-      sapply(df_req_cols$col_names,
-             ansi_collapse_quot,
-             sep = "or"), "."
+    miss_cols <- vapply(
+      seq_len(nrow(df_req_cols)),
+      function(i) {
+        cli::format_inline( # nolint: return_linter
+          paste0(
+            "* {.val {df_req_cols[[\"col_key\"]][[i]]}}: One of ",
+            "{.or {.val {df_req_cols[[\"col_names\"]][[i]]}}}."
+          )
+        )
+      },
+      character(1L)
     )
 
     cli::cli_abort(
-      c("x" = "{cli::qty(df_req_cols$col_key)} There {?is/are} no column
+      c("x" = "{cli::qty(df_req_cols[[\"col_key\"]])} There {?is/are} no column
         name{?s} associated with the following key{?s}:",
         miss_cols,
         "i" = "Please ensure presence of columns above in dataset {.arg df}. If
@@ -504,7 +511,7 @@ check_npx_col_names <- function(df,
     # update column_name_dict_updated
     column_name_dict_updated <- column_name_dict_updated |>
       dplyr::filter(
-        !(.data[["col_key"]] %in% df_multi_ties_cols$col_key)
+        !(.data[["col_key"]] %in% df_multi_ties_cols[["col_key"]])
       ) |>
       dplyr::bind_rows(
         df_multi_ties_cols |>
@@ -513,22 +520,29 @@ check_npx_col_names <- function(df,
           )
       ) |>
       dplyr::arrange(
-        match(x = .data[["col_key"]], table = column_name_dict$col_key)
+        match(x = .data[["col_key"]], table = column_name_dict[["col_key"]])
       )
 
     # inform message string
-    multi_ties_cols <- paste0(
-      "* \"", df_multi_ties_cols$col_key, "\": \"",
-      unlist(df_multi_ties_cols$col_df), "\" was selected. Options were ",
-      sapply(df_multi_ties_cols$col_df_tmp,
-             ansi_collapse_quot,
-             sep = "or"), "."
+    multi_ties_cols <- vapply(
+      seq_len(nrow(df_multi_ties_cols)),
+      function(i) {
+        cli::format_inline( # nolint: return_linter
+          paste0(
+            "* {.val {df_multi_ties_cols[[\"col_key\"]][[i]]}}: ",
+            "{.val {df_multi_ties_cols[[\"col_df\"]][[i]]}} was selected. ",
+            "Options were
+            {.or {.val {df_multi_ties_cols[[\"col_df_tmp\"]][[i]]}}}."
+          )
+        )
+      },
+      character(1L)
     )
 
     cli::cli_inform(
-      c("i" = "{cli::qty(df_multi_ties_cols$col_key)} More than one column names
-      in {.arg df} was associated with certain key{?s}. One was selected based
-      on an ordered list:",
+      c("i" = "{cli::qty(df_multi_ties_cols[[\"col_key\"]])} More than one
+      column names in {.arg df} was associated with certain key{?s}. One was
+      selected based on an ordered list:",
         multi_ties_cols,
         "Please use {.arg preferred_names} to select a different column
         name."),
@@ -550,16 +564,22 @@ check_npx_col_names <- function(df,
 
   if (nrow(df_multi_cols) > 0L) {
 
-    multi_cols <- paste0(
-      "* \"", df_multi_cols$col_key, "\": ",
-      sapply(df_multi_cols$col_names,
-             ansi_collapse_quot,
-             sep = "or"), "."
+    multi_cols <- vapply(
+      seq_len(nrow(df_multi_cols)),
+      function(i) {
+        cli::format_inline( # nolint: return_linter
+          paste0(
+            "* {.val {df_multi_cols[[\"col_key\"]][[i]]}}: ",
+            "{.or {.val {df_multi_cols[[\"col_names\"]][[i]]}}}."
+          )
+        )
+      },
+      character(1L)
     )
 
     cli::cli_abort(
-      c("x" = "{cli::qty(df_multi_cols$col_key)} There is more than one column
-      names in {.arg df} associated with the following key{?s}:",
+      c("x" = "{cli::qty(df_multi_cols[[\"col_key\"]])} There is more than one
+      column names in {.arg df} associated with the following key{?s}:",
         multi_cols,
         "i" = "Please use {.arg preferred_names} to break ties of column
         names."),
@@ -612,18 +632,18 @@ check_preferred_names <- function(preferred_names) {
   # check for names not matching expected ----
 
   # Check valid names
-  if (!all(names(preferred_names) %in% column_name_dict$col_key)) {
+  if (!all(names(preferred_names) %in% column_name_dict[["col_key"]])) {
 
     # identify names of the vector preferred_names that do not match names from
     # column_name_dict. Names should match to be able to update the field.
     missing_names <- setdiff(x = names(preferred_names), # nolint: object_usage_linter
-                             y = column_name_dict$col_key)
+                             y = column_name_dict[["col_key"]])
 
     cli::cli_abort(
       c("x" = "Unexpected name{?s} in {.arg preferred_names}:
         {.val {missing_names}}!",
         "i" = "Expected one or more of the following names:
-        {.val {column_name_dict$col_key}}"),
+        {.val {column_name_dict[[\"col_key\"]]}}"),
       call = rlang::caller_env(),
       wrap = FALSE
     )
@@ -718,7 +738,7 @@ check_npx_update_col_names <- function(preferred_names) {
     dplyr::arrange(
       match(
         x = .data[["col_key"]],
-        table = column_name_dict$col_key
+        table = column_name_dict[["col_key"]]
       )
     )
 
@@ -753,17 +773,17 @@ check_npx_olinkid <- function(df,
   # extract invalid Olink IDs
   invalid_oid <- df |>
     dplyr::distinct(
-      .data[[col_names$olink_id]]
+      .data[[col_names[["olink_id"]]]]
     )  |>
     dplyr::filter(
       !grepl(
         pattern = "^OID\\d{5}$|^OID\\d{5}_OID\\d{5}$",
-        x = .data[[col_names$olink_id]]
+        x = .data[[col_names[["olink_id"]]]]
       )
     )  |>
     dplyr::collect() |>
     dplyr::pull(
-      .data[[col_names$olink_id]]
+      .data[[col_names[["olink_id"]]]]
     )
 
   # warning if there are invalid Olink identifiers ----
@@ -817,15 +837,15 @@ check_npx_all_na_assays <- function(df, col_names) {
   all_nas <- df |>
     dplyr::select(
       dplyr::all_of(
-        c(col_names$olink_id,
-          col_names$quant)
+        c(col_names[["olink_id"]],
+          col_names[["quant"]])
       )
     ) |>
     dplyr::group_by(
-      .data[[col_names$olink_id]]
+      .data[[col_names[["olink_id"]]]]
     ) |>
     dplyr::mutate(
-      is_na = dplyr::if_else(is.na(.data[[col_names$quant]]), 1L, 0L)
+      is_na = dplyr::if_else(is.na(.data[[col_names[["quant"]]]]), 1L, 0L)
     ) |>
     arrow::to_duckdb() |>
     dplyr::summarise(
@@ -838,7 +858,7 @@ check_npx_all_na_assays <- function(df, col_names) {
     ) |>
     dplyr::collect() |>
     dplyr::pull(
-      .data[[col_names$olink_id]]
+      .data[[col_names[["olink_id"]]]]
     ) |>
     sort()
 
@@ -846,7 +866,7 @@ check_npx_all_na_assays <- function(df, col_names) {
   if (length(all_nas) > 0L) {
     cli::cli_warn(
       c(
-        "{.val {all_nas}} ha{?s/ve} {.val {col_names$quant}} = NA for all
+        "{.val {all_nas}} ha{?s/ve} {.val {col_names[[\"quant\"]]}} = NA for all
         samples.",
         "i" = "Consider running {.fn clean_npx} next!"
       )
@@ -876,12 +896,12 @@ check_npx_duplicate_sample_ids <- function(df, col_names) {
   # Select relevant columns
   sample_summary <- df  |>
     dplyr::select(dplyr::all_of(c(
-      col_names$sample_id,
-      col_names$olink_id
+      col_names[["sample_id"]],
+      col_names[["olink_id"]]
     ))) |>
     dplyr::group_by(
-      .data[[col_names$sample_id]],
-      .data[[col_names$olink_id]]
+      .data[[col_names[["sample_id"]]]],
+      .data[[col_names[["olink_id"]]]]
     ) |>
     dplyr::summarise(freq = dplyr::n(),
                      .groups = "drop") |>
@@ -892,7 +912,7 @@ check_npx_duplicate_sample_ids <- function(df, col_names) {
   duplicates <- sample_summary |>
     dplyr::filter(.data[["freq"]] > 1) |>
     dplyr::collect() |>
-    dplyr::pull(.data[[col_names$sample_id]]) |>
+    dplyr::pull(.data[[col_names[["sample_id"]]]]) |>
     unique()
 
   # Warn if duplicates are found
@@ -944,15 +964,15 @@ check_npx_all_na_sample <- function(df, col_names) {
   all_na_sample <- df |>
     dplyr::select(
       dplyr::all_of(
-        c(col_names$sample_id,
-          col_names$quant)
+        c(col_names[["sample_id"]],
+          col_names[["quant"]])
       )
     ) |>
     dplyr::group_by(
-      .data[[col_names$sample_id]]
+      .data[[col_names[["sample_id"]]]]
     ) |>
     dplyr::mutate(
-      is_na = dplyr::if_else(is.na(.data[[col_names$quant]]), 1L, 0L)
+      is_na = dplyr::if_else(is.na(.data[[col_names[["quant"]]]]), 1L, 0L)
     ) |>
     arrow::to_duckdb() |>
     dplyr::summarise(
@@ -965,7 +985,7 @@ check_npx_all_na_sample <- function(df, col_names) {
     ) |>
     dplyr::collect() |>
     dplyr::pull(
-      .data[[col_names$sample_id]]
+      .data[[col_names[["sample_id"]]]]
     ) |>
     sort()
 
@@ -973,8 +993,8 @@ check_npx_all_na_sample <- function(df, col_names) {
   if (length(all_na_sample) > 0L) {
     cli::cli_warn(
       c(
-        "{.val {all_na_sample}} ha{?s/ve} {.val {col_names$quant}} = NA for all
-        assays.",
+        "{.val {all_na_sample}} ha{?s/ve} {.val {col_names[[\"quant\"]]}} = NA
+        for all assays.",
         "i" = "Consider running {.fn clean_npx} next!"
       )
     )
@@ -1104,9 +1124,19 @@ check_npx_col_class <- function(df, col_names) {
 
   if (nrow(df_col_class) > 0L) {
 
-    col_class_msg <- paste0("* \"", df_col_class$col_name, "\"",
-                            ": Expected \"", df_col_class$expected_col_class,
-                            "\". Detected \"", df_col_class$col_class, "\".")
+    col_class_msg <- vapply(
+      seq_len(nrow(df_col_class)),
+      function(i) {
+        cli::format_inline( # nolint: return_linter
+          paste0(
+            "* {.val {df_col_class[[\"col_name\"]][[i]]}}: Expected ",
+            "{.val {df_col_class[[\"expected_col_class\"]][[i]]}}. ",
+            "Detected {.val {df_col_class[[\"col_class\"]][[i]]}}."
+          )
+        )
+      },
+      character(1L)
+    )
 
     cli::cli_warn(
       c(
@@ -1145,22 +1175,23 @@ check_npx_qcwarn_assays <- function(df, col_names) {
     qc_warn_assays <- df |>
       dplyr::select(
         dplyr::all_of(
-          c(col_names$olink_id, col_names$assay_warn)
+          c(col_names[["olink_id"]],
+            col_names[["assay_warn"]])
         )
       ) |>
       dplyr::filter(
         grepl(
           pattern = "warn",
-          x = .data[[col_names$assay_warn]],
+          x = .data[[col_names[["assay_warn"]]]],
           ignore.case = TRUE
         )
       ) |>
       dplyr::distinct(
-        .data[[col_names$olink_id]]
+        .data[[col_names[["olink_id"]]]]
       ) |>
       dplyr::collect() |>
       dplyr::pull(
-        .data[[col_names$olink_id]]
+        .data[[col_names[["olink_id"]]]]
       ) |>
       unique() |>
       sort()
@@ -1169,7 +1200,7 @@ check_npx_qcwarn_assays <- function(df, col_names) {
       cli::cli_inform(
         c(
           "{.val {length(qc_warn_assays)}} assay{?s} exhibited assay QC warnings
-          in column {.arg {unname(col_names$assay_warn)}} of the dataset:
+          in column {.arg {unname(col_names[[\"assay_warn\"]])}} of the dataset:
           {.val {qc_warn_assays}}.",
           "i" = "Consider running {.fn clean_npx} next!"
         )
@@ -1211,11 +1242,11 @@ check_npx_nonunique_uniprot <- function(df, col_names) {
   # linked to multiple UniProt IDs
   oid_uniprot_dups <- df |>
     dplyr::distinct( # Ensure uniqueness of OlinkID-UniProt pairs
-      .data[[col_names$olink_id]],
-      .data[[col_names$uniprot]]
+      .data[[col_names[["olink_id"]]]],
+      .data[[col_names[["uniprot"]]]]
     ) |>
     dplyr::group_by(
-      .data[[col_names$olink_id]]
+      .data[[col_names[["olink_id"]]]]
     ) |>
     dplyr::summarise(
       freq = dplyr::n(),
@@ -1226,7 +1257,7 @@ check_npx_nonunique_uniprot <- function(df, col_names) {
     ) |>
     dplyr::collect() |>
     dplyr::pull(
-      .data[[col_names$olink_id]]
+      .data[[col_names[["olink_id"]]]]
     )
 
   # Emit a warning if any duplicates are found
@@ -1269,7 +1300,7 @@ check_darid <- function(df, col_names) {
   if (!("qc_version" %in% names(col_names))) {
     return(
       dplyr::tibble(
-        !!col_names$panel_version := character(0L)
+        !!col_names[["panel_version"]] := character(0L)
       )
     )
   }
@@ -1277,37 +1308,36 @@ check_darid <- function(df, col_names) {
   # Identify invalid panel_version and qc_version combinations
   invalid_darid <- df |>
     dplyr::distinct(
-      .data[[col_names$panel_version]],
-      .data[[col_names$qc_version]]
+      .data[[col_names[["panel_version"]]]],
+      .data[[col_names[["qc_version"]]]]
     ) |>
     dplyr::collect() |>
     dplyr::inner_join(
       outdated_darid_panel_archive,
       by = stats::setNames("darid_list",
-                           col_names$panel_version)
+                           col_names[["panel_version"]])
     ) |>
     dplyr::filter(
-      as.numeric_version(.data[[col_names$qc_version]]) <
+      as.numeric_version(.data[[col_names[["qc_version"]]]]) <
         as.numeric_version(.data[["min_version"]])
     ) |>
     dplyr::select(
       dplyr::all_of(c(
-        col_names$panel_version,
-        col_names$qc_version
+        col_names[["panel_version"]],
+        col_names[["qc_version"]]
       ))
     )
 
   # Emit a warning if any invalid combinations are found
   if (nrow(invalid_darid) > 0L) {
 
-    invalid_darid_msg <- paste0(
-      col_names$panel_version, ": ",
-      paste(unique(invalid_darid[[col_names$panel_version]]),
-            collapse = ", "),
-      "; ", col_names$qc_version, ": ",
-      paste(unique(invalid_darid[[col_names$qc_version]]),
-            collapse = ", "),
-      "."
+    invalid_darid_msg <- cli::format_inline(
+      paste0(
+        "{.val {col_names[[\"panel_version\"]]}}: ",
+        "{.val {unique(invalid_darid[[col_names[[\"panel_version\"]]]])}}; ",
+        "{.val {col_names[[\"qc_version\"]]}}: ",
+        "{.val {unique(invalid_darid[[col_names[[\"qc_version\"]]]])}}."
+      )
     )
 
     cli::cli_warn(
@@ -1332,8 +1362,8 @@ check_darid <- function(df, col_names) {
 
     return(
       dplyr::tibble(
-        !!col_names$panel_version := character(0L),
-        !!col_names$qc_version := character(0L)
+        !!col_names[["panel_version"]] := character(0L),
+        !!col_names[["qc_version"]] := character(0L)
       )
     )
 
