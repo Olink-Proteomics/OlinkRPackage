@@ -565,6 +565,7 @@ update_check_log <- function(df,
   # essentially preferred_names provided to update_check_log() will override any
   # existing preferred_names in the check_log.
   if (!is.null(preferred_names)) {
+    check_preferred_names(preferred_names = preferred_names)
     existing_preferred_names <- c(existing_preferred_names, preferred_names)
     existing_preferred_names <- existing_preferred_names[
       !duplicated(names(existing_preferred_names), fromLast = TRUE)
