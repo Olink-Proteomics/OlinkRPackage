@@ -589,6 +589,399 @@ test_that(
   }
 )
 
+# Test update_check_log ----
+
+test_that(
+  "update_check_log - works - refreshes olink_class check log",
+  {
+    df <- dplyr::tibble(
+      SampleID = LETTERS[1L:4L],
+      OlinkID = paste0("OID1234", seq(1L:4L)),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L)
+    )
+
+    df_obj <- attach_check_log(df = df, out_df = "tibble")
+    expect_identical(
+      object = olink_extract_check_log(df = df_obj)$sample_id_dups,
+      expected = character(0L)
+    )
+
+    df_obj_mod <- df_obj |>
+      dplyr::mutate(
+        SampleID = c("A", "A", "C", "D"),
+        OlinkID = c("OID12341", "OID12341", "OID12343", "OID12344"),
+        UniProt = c("A", "A", "C", "D"),
+        Assay = c("A", "A", "C", "D")
+      )
+
+    expect_warning(
+      object = df_obj_updated <- update_check_log(df = df_obj_mod),
+      regexp = "Duplicate SampleID detected: \"A\""
+    )
+
+    expect_s3_class(object = df_obj_updated, class = "olink_class")
+    expect_identical(
+      object = olink_extract_check_log(df = df_obj_updated)$sample_id_dups,
+      expected = "A"
+    )
+  }
+)
+
+test_that(
+  "update_check_log - works - refreshes ArrowObject check log",
+  {
+    df <- dplyr::tibble(
+      SampleID = LETTERS[1L:4L],
+      OlinkID = paste0("OID1234", seq(1L:4L)),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L)
+    )
+
+    df_arrow <- attach_check_log(df = df, out_df = "arrow")
+    expect_identical(
+      object = olink_extract_check_log(df = df_arrow)$sample_id_dups,
+      expected = character(0L)
+    )
+
+    df_arrow_mod <- df_arrow |>
+      dplyr::collect() |>
+      dplyr::mutate(
+        SampleID = c("A", "A", "C", "D"),
+        OlinkID = c("OID12341", "OID12341", "OID12343", "OID12344"),
+        UniProt = c("A", "A", "C", "D"),
+        Assay = c("A", "A", "C", "D")
+      ) |>
+      arrow::as_arrow_table()
+
+    df_arrow_mod <- attach_check_log_arrow(
+      df = df_arrow_mod,
+      check_log = olink_extract_check_log(df = df_arrow)
+    )
+
+    expect_warning(
+      object = df_arrow_updated <- update_check_log(df = df_arrow_mod),
+      regexp = "Duplicate SampleID detected: \"A\""
+    )
+
+    expect_r6_class(object = df_arrow_updated, class = "ArrowObject")
+    expect_identical(
+      object = olink_extract_check_log(df = df_arrow_updated)$sample_id_dups,
+      expected = "A"
+    )
+  }
+)
+
+test_that(
+  "update_check_log - works - preserves preferred names",
+  {
+    df <- npx_data1 |>
+      dplyr::mutate(
+        SampleID2 = .data[["SampleID"]]
+      )
+
+    df_obj <- attach_check_log(
+      df = df,
+      out_df = "tibble",
+      preferred_names = c("sample_id" = "SampleID2")
+    ) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_warning(
+      object = expect_no_message(
+        object = df_obj_updated <- update_check_log(df = df_obj)
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS 1\"",
+                     "and \"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_identical(
+      object = olink_extract_check_log(df = df_obj_updated)$col_names$sample_id,
+      expected = "SampleID2"
+    )
+  }
+)
+
+test_that(
+  "update_check_log - works - updates preferred names",
+  {
+    df <- npx_data1 |>
+      dplyr::mutate(
+        SampleID2 = .data[["SampleID"]],
+        PCNormalizedNPX = .data[["NPX"]]
+      )
+
+    df_obj <- attach_check_log(
+      df = df,
+      out_df = "tibble",
+      preferred_names = c("sample_id" = "SampleID2")
+    ) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_warning(
+      object = expect_no_message(
+        object = df_obj_updated <- update_check_log(
+          df = df_obj,
+          preferred_names = c("quant" = "PCNormalizedNPX")
+        )
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                     "1\" and \"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_identical(
+      object = olink_extract_check_log(df = df_obj_updated)$col_names$sample_id,
+      expected = "SampleID2"
+    )
+    expect_identical(
+      object = olink_extract_check_log(df = df_obj_updated)$col_names$quant,
+      expected = "PCNormalizedNPX"
+    )
+  }
+)
+
+test_that(
+  "update_check_log - works - overwrites preferred names",
+  {
+    df <- npx_data1 |>
+      dplyr::mutate(
+        SampleID2 = .data[["SampleID"]],
+        SampleID3 = .data[["SampleID"]]
+      )
+
+    df_obj <- attach_check_log(
+      df = df,
+      out_df = "tibble",
+      preferred_names = c("sample_id" = "SampleID2")
+    ) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_warning(
+      object = expect_no_message(
+        object = df_obj_updated <- update_check_log(
+          df = df_obj,
+          preferred_names = c("sample_id" = "SampleID3")
+        )
+      ),
+      regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                     "1\" and \"CONTROL_SAMPLE_AS 2\"")
+    )
+
+    expect_identical(
+      object = olink_extract_check_log(df = df_obj)$col_names$sample_id,
+      expected = "SampleID2"
+    )
+    expect_identical(
+      object = olink_extract_check_log(df = df_obj_updated)$col_names$sample_id,
+      expected = "SampleID3"
+    )
+  }
+)
+
+test_that(
+  "update_check_log - error - preferred names must exist",
+  {
+    df_obj <- attach_check_log(
+      df = npx_data1,
+      out_df = "tibble"
+    ) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_error(
+      object = update_check_log(
+        df = df_obj,
+        preferred_names = c("quant" = "NotAColumn")
+      ),
+      regexp = paste("Value \"NotAColumn\" from `preferred_names`",
+                     "corresponding to key \"quant\" is missing from the input",
+                     "dataset `df`")
+    )
+  }
+)
+
+test_that(
+  "update_check_log - error - preferred name keys must be unique",
+  {
+    df <- npx_data1 |>
+      dplyr::mutate(
+        SampleID2 = .data[["SampleID"]],
+        SampleID3 = .data[["SampleID"]]
+      )
+
+    df_obj <- attach_check_log(
+      df = df,
+      out_df = "tibble",
+      preferred_names = c("sample_id" = "SampleID2")
+    ) |>
+      suppressWarnings() |>
+      suppressMessages()
+
+    expect_error(
+      object = update_check_log(
+        df = df_obj,
+        preferred_names = c("sample_id" = "SampleID",
+                            "sample_id" = "SampleID3")
+      ),
+      regexp = "Duplicated name in"
+    )
+  }
+)
+
+test_that(
+  "update_check_log - works - attaches check log to plain tibble",
+  {
+    df <- dplyr::tibble(
+      SampleID = LETTERS[1L:4L],
+      OlinkID = paste0("OID1234", seq(1L:4L)),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L)
+    )
+
+    check_log <- check_npx(df = df)
+
+    expect_no_error(
+      object = df_obj <- update_check_log(df = df, check_log = check_log)
+    )
+
+    expect_s3_class(object = df_obj, class = "olink_class")
+    expect_identical(
+      object = olink_extract_check_log(df = df_obj),
+      expected = check_log
+    )
+  }
+)
+
+test_that(
+  "update_check_log - works - attaches check log to ArrowObject",
+  {
+    df <- dplyr::tibble(
+      SampleID = LETTERS[1L:4L],
+      OlinkID = paste0("OID1234", seq(1L:4L)),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L)
+    )
+
+    check_log <- check_npx(df = df)
+    df_arrow <- arrow::as_arrow_table(df)
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = df_arrow_obj <- update_check_log(
+            df = df_arrow,
+            check_log = check_log
+          )
+        )
+      )
+    )
+
+    expect_r6_class(object = df_arrow_obj, class = "ArrowObject")
+    expect_identical(
+      object = olink_extract_check_log(df = df_arrow_obj),
+      expected = check_log
+    )
+  }
+)
+
+test_that(
+  "update_check_log - works - consistent results for plain tibble",
+  {
+    df <- dplyr::tibble(
+      SampleID = LETTERS[1L:4L],
+      OlinkID = paste0("OID1234", seq(1L:4L)),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L)
+    )
+
+    check_log <- check_npx(df = df)
+
+    expect_no_error(
+      df_obj_attach <- attach_check_log(df = df)
+    )
+
+    expect_no_error(
+      object = df_obj_update <- update_check_log(df = df, check_log = check_log)
+    )
+
+    expect_s3_class(object = df_obj_attach, class = "olink_class")
+    expect_s3_class(object = df_obj_update, class = "olink_class")
+
+    expect_identical(
+      object = olink_extract_check_log(df = df_obj_update),
+      expected = olink_extract_check_log(df = df_obj_attach)
+    )
+  }
+)
+
+test_that(
+  "update_check_log - works - consistent results for ArrowObject",
+  {
+    df <- dplyr::tibble(
+      SampleID = LETTERS[1L:4L],
+      OlinkID = paste0("OID1234", seq(1L:4L)),
+      UniProt = LETTERS[1L:4L],
+      Assay = LETTERS[1L:4L],
+      Panel = LETTERS[1L:4L],
+      Panel_Lot_Nr = LETTERS[1L:4L],
+      NPX = rnorm(4L),
+      PlateID = rep("plate1", 4L),
+      QC_Warning = rep("Pass", 4L)
+    )
+
+    check_log <- check_npx(df = df)
+    df_arrow <- arrow::as_arrow_table(df)
+
+    expect_no_error(
+      df_arrow_obj_attach <- attach_check_log_arrow(df = df_arrow,
+                                                    check_log = check_log)
+    )
+
+    expect_no_error(
+      object = df_arrow_obj_update <- update_check_log(
+        df = df_arrow,
+        check_log = check_log
+      )
+    )
+
+    expect_r6_class(object = df_arrow_obj_attach, class = "ArrowObject")
+    expect_r6_class(object = df_arrow_obj_update, class = "ArrowObject")
+
+    expect_identical(
+      object = olink_extract_check_log(df = df_arrow_obj_update),
+      expected = olink_extract_check_log(df = df_arrow_obj_attach)
+    )
+  }
+)
+
 # Test base64 round-trip ----
 
 test_that(

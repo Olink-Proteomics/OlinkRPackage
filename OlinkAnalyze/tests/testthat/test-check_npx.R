@@ -1189,6 +1189,19 @@ test_that(
 # here we will check only the errors
 
 test_that(
+  "check_preferred_names - error - duplicated names in array",
+  {
+    expect_error(
+      object = check_preferred_names(
+        preferred_names = c("sample_id" = "SampleID",
+                            "sample_id" = "SampleID2")
+      ),
+      regexp = "Duplicated name in"
+    )
+  }
+)
+
+test_that(
   "check_npx_update_col_names - error - no match in col_keys",
   {
     # one name not in column_name_dict ----

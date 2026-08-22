@@ -607,37 +607,23 @@ check_npx_col_names <- function(df,
   return(column_name_df)
 }
 
-#' Update column names to be used in downstream analyses
+#' Check preferred column names
 #'
 #' @description
-#' OlinkAnalyze uses pre-defined names of columns of data frames to perform
-#' downstream analyses. However, in certain cases the columns of interest might
-#' be named differently. The aim of this function is to assign custom-named
-#' columns of a data frame to internally expected variables that will in turn
-#' enable analysis of Olink data. For example, if one wished to #' use the
-#' column \var{PCNormalizedNPX} for their analysis instead of the column
-#' \var{NPX}, then they can assign this new name to the internal variable
-#' \var{quant} to inform the package that in the downstream analysis
-#' \var{PCNormalizedNPX} should be used.
-#'
-#' This function takes as input a named character vector with internal column
-#' names as names and column names of the current data set as values. Names of
-#' the input vector can be one or more of the following:
-#' `r cli::ansi_collapse(x = column_name_dict[["col_key"]])`
+#' Validates that `preferred_names` is a character vector with valid and unique
+#' names corresponding to column keys in \var{column_name_dict}.
 #'
 #' @author
 #'  Klev Diamanti
-#'  Masoumeh Sheikhi
 #'
 #' @inheritParams check_npx
 #'
 #' @keywords internal
+#' @noRd
 #'
-#' @return \var{column_name_dict} updated based on \var{preferred_names}.
+#' @return Invisibly returns `TRUE`, or throws an error.
 #'
-check_npx_update_col_names <- function(preferred_names) {
-
-  # check input ----
+check_preferred_names <- function(preferred_names) {
 
   # Check if preferred_names is character
   check_is_character(x = preferred_names,
@@ -680,6 +666,44 @@ check_npx_update_col_names <- function(preferred_names) {
 
   }
 
+  return(invisible(TRUE))
+
+}
+
+#' Update column names to be used in downstream analyses
+#'
+#' @description
+#' OlinkAnalyze uses pre-defined names of columns of data frames to perform
+#' downstream analyses. However, in certain cases the columns of interest might
+#' be named differently. The aim of this function is to assign custom-named
+#' columns of a data frame to internally expected variables that will in turn
+#' enable analysis of Olink data. For example, if one wished to #' use the
+#' column \var{PCNormalizedNPX} for their analysis instead of the column
+#' \var{NPX}, then they can assign this new name to the internal variable
+#' \var{quant} to inform the package that in the downstream analysis
+#' \var{PCNormalizedNPX} should be used.
+#'
+#' This function takes as input a named character vector with internal column
+#' names as names and column names of the current data set as values. Names of
+#' the input vector can be one or more of the following:
+#' `r cli::ansi_collapse(x = column_name_dict$col_key)`
+#'
+#' @author
+#'  Klev Diamanti
+#'  Masoumeh Sheikhi
+#'
+#' @inheritParams check_npx
+#' @noRd
+#'
+#' @keywords internal
+#'
+#' @return \var{column_name_dict} updated based on \var{preferred_names}.
+#'
+check_npx_update_col_names <- function(preferred_names) {
+
+  # check input ----
+
+  check_preferred_names(preferred_names = preferred_names)
 
   # update column names ----
 
