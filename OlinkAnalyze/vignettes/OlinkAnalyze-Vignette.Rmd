@@ -63,7 +63,7 @@ install.packages("OlinkAnalyze")
 -   `check_npx()` Function to check the quality and format of NPX data
 -   `clean_npx()` Function to clean NPX data based on the output of
     `check_npx()`
--   `olink_extract_check_log()` Function to retrieve an attached `check_log`
+-   `extract_check_log()` Function to retrieve an attached `check_log`
 -   `rm_check_log()` Function to strip the `olink_class` or ArrowObject
     `check_log` metadata
 -   `update_check_log()` Function to attach or refresh a `check_log`
@@ -388,7 +388,7 @@ Use `update_check_log()` after manual edits to refresh and re-attach the
 
 Several helper functions are available for working with attached check logs:
 
--   `olink_extract_check_log()` retrieves the attached `check_log` from an
+-   `extract_check_log()` retrieves the attached `check_log` from an
     `olink_class` tibble or an `ArrowObject`.
 -   `rm_check_log()` strips the `olink_class` and `check_log` attribute from a
     tibble, or removes the `olink_check_log` metadata from an `ArrowObject`.
@@ -403,7 +403,7 @@ data <- OlinkAnalyze::read_npx(
 )
 
 # Inspect the attached check_log
-check_log <- OlinkAnalyze::olink_extract_check_log(
+check_log <- OlinkAnalyze::extract_check_log(
   df = data
 )
 

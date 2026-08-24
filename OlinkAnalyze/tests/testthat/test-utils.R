@@ -403,7 +403,7 @@ test_that(
       object = check_npx(df = npx_data1_tibble) |>
         suppressMessages() |>
         suppressWarnings(),
-      expected = olink_extract_check_log(df = npx_data1_arrow)
+      expected = extract_check_log(df = npx_data1_arrow)
     )
   }
 )
@@ -453,8 +453,8 @@ test_that(
     expect_r6_class(object = npx_data1_arrow_v2, class = "ArrowObject")
 
     expect_equal(
-      object = olink_extract_check_log(df = npx_data1_arrow_v2),
-      expected = olink_extract_check_log(df = npx_data1_arrow)
+      object = extract_check_log(df = npx_data1_arrow_v2),
+      expected = extract_check_log(df = npx_data1_arrow)
     )
   }
 )
@@ -510,7 +510,7 @@ test_that(
       object = check_npx(df = npx_data1_arrow) |>
         suppressMessages() |>
         suppressWarnings(),
-      expected = olink_extract_check_log(df = npx_data1_obj)
+      expected = extract_check_log(df = npx_data1_obj)
     )
   }
 )
@@ -569,7 +569,7 @@ test_that(
       object = check_npx(df = npx_data1_tibble) |>
         suppressMessages() |>
         suppressWarnings(),
-      expected = olink_extract_check_log(df = npx_data1_obj)
+      expected = extract_check_log(df = npx_data1_obj)
     )
   }
 )

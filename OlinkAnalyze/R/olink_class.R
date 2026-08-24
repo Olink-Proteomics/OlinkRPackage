@@ -45,7 +45,7 @@ NULL
 #' `tbl_df`, `tbl`, and `data.frame`, with the check log stored as an
 #' attribute.
 #'
-#' @seealso [olink_extract_check_log()] for retrieving the check log from an
+#' @seealso [extract_check_log()] for retrieving the check log from an
 #' object.
 #'
 #' @export
@@ -278,12 +278,12 @@ validate_check_log <- function(df, check_log) {
 #'   )
 #'
 #'   # retrieve check_log
-#'   OlinkAnalyze::olink_extract_check_log(
+#'   OlinkAnalyze::extract_check_log(
 #'     df = npx_obj
 #'   )
 #' }
 #'
-olink_extract_check_log <- function(df) {
+extract_check_log <- function(df) {
 
   if (inherits(x = df, what = "olink_class")) {
 
@@ -409,7 +409,7 @@ rm_check_log_arrow <- function(df) {
 #'
 #'   class(npx_tbl)
 #'
-#'   OlinkAnalyze::olink_extract_check_log(
+#'   OlinkAnalyze::extract_check_log(
 #'     df = npx_tbl
 #'   )
 #' }

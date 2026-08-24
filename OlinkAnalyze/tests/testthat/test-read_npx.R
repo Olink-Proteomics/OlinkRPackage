@@ -71,13 +71,13 @@ test_that(
 
         # check that check_log was attached
         expect_identical(
-          object = olink_extract_check_log(df = npx_df),
+          object = extract_check_log(df = npx_df),
           expected = check_npx(df = npx_df) |>
             suppressMessages() |>
             suppressWarnings()
         )
         expect_identical(
-          object = olink_extract_check_log(df = npx_arrow),
+          object = extract_check_log(df = npx_arrow),
           expected = check_npx(df = npx_arrow) |>
             suppressMessages() |>
             suppressWarnings()
@@ -169,13 +169,13 @@ test_that(
 
         # check that check_log was attached
         expect_identical(
-          object = olink_extract_check_log(df = npx_df),
+          object = extract_check_log(df = npx_df),
           expected = check_npx(df = npx_df) |>
             suppressMessages() |>
             suppressWarnings()
         )
         expect_identical(
-          object = olink_extract_check_log(df = npx_arrow),
+          object = extract_check_log(df = npx_arrow),
           expected = check_npx(df = npx_arrow) |>
             suppressMessages() |>
             suppressWarnings()
@@ -277,13 +277,13 @@ test_that(
 
         # check that check_log was attached
         expect_identical(
-          object = olink_extract_check_log(df = npx_df),
+          object = extract_check_log(df = npx_df),
           expected = check_npx(df = npx_df) |>
             suppressMessages() |>
             suppressWarnings()
         )
         expect_identical(
-          object = olink_extract_check_log(df = npx_arrow),
+          object = extract_check_log(df = npx_arrow),
           expected = check_npx(df = npx_arrow) |>
             suppressMessages() |>
             suppressWarnings()
@@ -410,13 +410,13 @@ test_that(
 
         # check that check_log was attached
         expect_identical(
-          object = olink_extract_check_log(df = npx_df),
+          object = extract_check_log(df = npx_df),
           expected = check_npx(df = npx_df) |>
             suppressMessages() |>
             suppressWarnings()
         )
         expect_identical(
-          object = olink_extract_check_log(df = npx_arrow),
+          object = extract_check_log(df = npx_arrow),
           expected = check_npx(df = npx_arrow) |>
             suppressMessages() |>
             suppressWarnings()
@@ -548,13 +548,13 @@ test_that(
 
         # check that check_log was attached
         expect_identical(
-          object = olink_extract_check_log(df = npx_df),
+          object = extract_check_log(df = npx_df),
           expected = check_npx(df = npx_df) |>
             suppressMessages() |>
             suppressWarnings()
         )
         expect_identical(
-          object = olink_extract_check_log(df = npx_arrow),
+          object = extract_check_log(df = npx_arrow),
           expected = check_npx(df = npx_arrow) |>
             suppressMessages() |>
             suppressWarnings()
@@ -690,13 +690,13 @@ test_that(
 
         # check that check_log was attached
         expect_identical(
-          object = olink_extract_check_log(df = npx_df),
+          object = extract_check_log(df = npx_df),
           expected = check_npx(df = npx_df) |>
             suppressMessages() |>
             suppressWarnings()
         )
         expect_identical(
-          object = olink_extract_check_log(df = npx_arrow),
+          object = extract_check_log(df = npx_arrow),
           expected = check_npx(df = npx_arrow) |>
             suppressMessages() |>
             suppressWarnings()
@@ -787,7 +787,7 @@ test_that(
 
         # check that check_log was attached
         expect_identical(
-          object = olink_extract_check_log(df = npx_df),
+          object = extract_check_log(df = npx_df),
           expected = check_npx(df = npx_df) |>
             suppressMessages() |>
             suppressWarnings()

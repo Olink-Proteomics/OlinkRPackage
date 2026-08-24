@@ -102,36 +102,36 @@ test_that(
   }
 )
 
-# Test olink_extract_check_log ----
+# Test extract_check_log ----
 
 test_that(
-  "olink_extract_check_log - works - extracts check_log from olink_class",
+  "extract_check_log - works - extracts check_log from olink_class",
   {
     obj <- new_olink_class(
       df = npx_data1,
       check_log = npx_data1_check_log
     )
 
-    result <- olink_extract_check_log(df = obj)
+    result <- extract_check_log(df = obj)
 
     expect_identical(object = result, expected = npx_data1_check_log)
   }
 )
 
 test_that(
-  "olink_extract_check_log - works - returns NULL for plain tibble",
+  "extract_check_log - works - returns NULL for plain tibble",
   {
-    result <- olink_extract_check_log(df = npx_data1)
+    result <- extract_check_log(df = npx_data1)
     expect_null(object = result)
   }
 )
 
 test_that(
-  "olink_extract_check_log - works - returns NULL for non-data objects",
+  "extract_check_log - works - returns NULL for non-data objects",
   {
-    expect_null(object = olink_extract_check_log(df = "string"))
-    expect_null(object = olink_extract_check_log(df = 42L))
-    expect_null(object = olink_extract_check_log(df = list(a = 1L)))
+    expect_null(object = extract_check_log(df = "string"))
+    expect_null(object = extract_check_log(df = 42L))
+    expect_null(object = extract_check_log(df = list(a = 1L)))
   }
 )
 
@@ -153,18 +153,18 @@ test_that(
     expect_true(object = "olink_check_log" %in% names(result$metadata))
 
     # round-trip extraction
-    extracted <- olink_extract_check_log(df = result)
+    extracted <- extract_check_log(df = result)
 
     expect_identical(object = extracted, expected = npx_data1_check_log)
   }
 )
 
 test_that(
-  "olink_extract_check_log - works - returns NULL for ArrowObject w/o metadata",
+  "extract_check_log - works - returns NULL for ArrowObject w/o metadata",
   {
     arrow_tbl <- arrow::as_arrow_table(x = npx_data1)
     expect_warning(
-      object = result <- olink_extract_check_log(df = arrow_tbl),
+      object = result <- extract_check_log(df = arrow_tbl),
       regexp = "No `olink_check_log` metadata found in the ArrowObject"
     )
     expect_null(object = result)
@@ -190,7 +190,7 @@ test_that(
     )
 
     expect_s3_class(object = result, class = "olink_class")
-    expect_false(object = is.null(olink_extract_check_log(df = result)))
+    expect_false(object = is.null(extract_check_log(df = result)))
   }
 )
 
@@ -211,7 +211,7 @@ test_that(
     )
 
     expect_true(object = inherits(x = result, what = "ArrowObject"))
-    expect_false(object = is.null(olink_extract_check_log(df = result)))
+    expect_false(object = is.null(extract_check_log(df = result)))
   }
 )
 
@@ -235,7 +235,7 @@ test_that(
     )
 
     expect_s3_class(object = result, class = "olink_class")
-    expect_false(object = is.null(olink_extract_check_log(df = result)))
+    expect_false(object = is.null(extract_check_log(df = result)))
   }
 )
 
@@ -408,7 +408,7 @@ test_that(
 
     expect_s3_class(object = result, class = "olink_class")
     expect_identical(
-      object = olink_extract_check_log(df = result),
+      object = extract_check_log(df = result),
       expected = npx_data1_check_log
     )
     expect_equal(object = nrow(result), expected = 184L)
@@ -427,7 +427,7 @@ test_that(
 
     expect_s3_class(object = result, class = "olink_class")
     expect_identical(
-      object = olink_extract_check_log(df = result),
+      object = extract_check_log(df = result),
       expected = npx_data1_check_log
     )
     expect_true(object = "new_col" %in% names(result))
@@ -450,7 +450,7 @@ test_that(
 
     expect_s3_class(object = result, class = "olink_class")
     expect_identical(
-      object = olink_extract_check_log(df = result),
+      object = extract_check_log(df = result),
       expected = npx_data1_check_log
     )
     expect_equal(
@@ -476,7 +476,7 @@ test_that(
 
     expect_s3_class(object = result, class = "olink_class")
     expect_identical(
-      object = olink_extract_check_log(df = result),
+      object = extract_check_log(df = result),
       expected = npx_data1_check_log
     )
     expect_identical(
@@ -536,7 +536,7 @@ test_that(
 
     expect_false(object = inherits(x = result, what = "olink_class"))
     expect_s3_class(object = result, class = "tbl_df")
-    expect_null(object = olink_extract_check_log(df = result))
+    expect_null(object = extract_check_log(df = result))
   }
 )
 
@@ -554,7 +554,7 @@ test_that(
     expect_true(object = inherits(x = result, what = "ArrowObject"))
     expect_warning(
       object = expect_null(
-        object = olink_extract_check_log(df = result)
+        object = extract_check_log(df = result)
       ),
       regexp = "No `olink_check_log` metadata found in the ArrowObject"
     )
@@ -582,7 +582,7 @@ test_that(
     expect_true(object = inherits(x = result, what = "ArrowObject"))
     expect_warning(
       object = expect_null(
-        object = olink_extract_check_log(df = result)
+        object = extract_check_log(df = result)
       ),
       regexp = "No `olink_check_log` metadata found in the ArrowObject"
     )
@@ -608,7 +608,7 @@ test_that(
 
     df_obj <- attach_check_log(df = df, out_df = "tibble")
     expect_identical(
-      object = olink_extract_check_log(df = df_obj)$sample_id_dups,
+      object = extract_check_log(df = df_obj)$sample_id_dups,
       expected = character(0L)
     )
 
@@ -627,7 +627,7 @@ test_that(
 
     expect_s3_class(object = df_obj_updated, class = "olink_class")
     expect_identical(
-      object = olink_extract_check_log(df = df_obj_updated)$sample_id_dups,
+      object = extract_check_log(df = df_obj_updated)$sample_id_dups,
       expected = "A"
     )
   }
@@ -650,7 +650,7 @@ test_that(
 
     df_arrow <- attach_check_log(df = df, out_df = "arrow")
     expect_identical(
-      object = olink_extract_check_log(df = df_arrow)$sample_id_dups,
+      object = extract_check_log(df = df_arrow)$sample_id_dups,
       expected = character(0L)
     )
 
@@ -666,7 +666,7 @@ test_that(
 
     df_arrow_mod <- attach_check_log_arrow(
       df = df_arrow_mod,
-      check_log = olink_extract_check_log(df = df_arrow)
+      check_log = extract_check_log(df = df_arrow)
     )
 
     expect_warning(
@@ -676,7 +676,7 @@ test_that(
 
     expect_r6_class(object = df_arrow_updated, class = "ArrowObject")
     expect_identical(
-      object = olink_extract_check_log(df = df_arrow_updated)$sample_id_dups,
+      object = extract_check_log(df = df_arrow_updated)$sample_id_dups,
       expected = "A"
     )
   }
@@ -707,7 +707,7 @@ test_that(
     )
 
     expect_identical(
-      object = olink_extract_check_log(df = df_obj_updated)$col_names$sample_id,
+      object = extract_check_log(df = df_obj_updated)$col_names$sample_id,
       expected = "SampleID2"
     )
   }
@@ -742,11 +742,11 @@ test_that(
     )
 
     expect_identical(
-      object = olink_extract_check_log(df = df_obj_updated)$col_names$sample_id,
+      object = extract_check_log(df = df_obj_updated)$col_names$sample_id,
       expected = "SampleID2"
     )
     expect_identical(
-      object = olink_extract_check_log(df = df_obj_updated)$col_names$quant,
+      object = extract_check_log(df = df_obj_updated)$col_names$quant,
       expected = "PCNormalizedNPX"
     )
   }
@@ -781,11 +781,11 @@ test_that(
     )
 
     expect_identical(
-      object = olink_extract_check_log(df = df_obj)$col_names$sample_id,
+      object = extract_check_log(df = df_obj)$col_names$sample_id,
       expected = "SampleID2"
     )
     expect_identical(
-      object = olink_extract_check_log(df = df_obj_updated)$col_names$sample_id,
+      object = extract_check_log(df = df_obj_updated)$col_names$sample_id,
       expected = "SampleID3"
     )
   }
@@ -864,7 +864,7 @@ test_that(
 
     expect_s3_class(object = df_obj, class = "olink_class")
     expect_identical(
-      object = olink_extract_check_log(df = df_obj),
+      object = extract_check_log(df = df_obj),
       expected = check_log
     )
   }
@@ -901,7 +901,7 @@ test_that(
 
     expect_r6_class(object = df_arrow_obj, class = "ArrowObject")
     expect_identical(
-      object = olink_extract_check_log(df = df_arrow_obj),
+      object = extract_check_log(df = df_arrow_obj),
       expected = check_log
     )
   }
@@ -936,8 +936,8 @@ test_that(
     expect_s3_class(object = df_obj_update, class = "olink_class")
 
     expect_identical(
-      object = olink_extract_check_log(df = df_obj_update),
-      expected = olink_extract_check_log(df = df_obj_attach)
+      object = extract_check_log(df = df_obj_update),
+      expected = extract_check_log(df = df_obj_attach)
     )
   }
 )
@@ -976,8 +976,8 @@ test_that(
     expect_r6_class(object = df_arrow_obj_update, class = "ArrowObject")
 
     expect_identical(
-      object = olink_extract_check_log(df = df_arrow_obj_update),
-      expected = olink_extract_check_log(df = df_arrow_obj_attach)
+      object = extract_check_log(df = df_arrow_obj_update),
+      expected = extract_check_log(df = df_arrow_obj_attach)
     )
   }
 )
