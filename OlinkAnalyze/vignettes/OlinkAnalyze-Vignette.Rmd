@@ -305,11 +305,13 @@ data <- list.files(
 ## Check NPX data quality (`check_npx()`)
 
 The `check_npx()` function performs various quality and format checks on NPX
-data imported with `read_npx()`. It is recommended to run this function after
-reading in NPX data and before downstream analysis. The result can be passed as
-the `check_log` argument to `clean_npx()` and all downstream Olink Analyze
-functions, allowing each function to skip its own internal check and improve
-performance.
+data. Running `check_npx()` directly is optional for most workflows: imported
+NPX data from `read_npx()`, as well as NPX data exported from `clean_npx()`, `olink_lod()` and the normalization functions (e.g. `olink_normalization()`, `olink_normalization_bridge()` and `olink_normalization_subset()`), already carries a `check_log`, and downstream Olink
+Analyze functions can use either an attached `check_log`, a user-supplied
+`check_log` argument, or an internally generated one. Calling `check_npx()`
+explicitly is still useful when you want to inspect the checks yourself, work
+with manually created or modified NPX data, or define custom column mappings
+through `preferred_names`.
 
 `check_npx()` also allows for alternative column names to be used in the
 downstream analysis, both standard and non-standard. If the user wishes to
