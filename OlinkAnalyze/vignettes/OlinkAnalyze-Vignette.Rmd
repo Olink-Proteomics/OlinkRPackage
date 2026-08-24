@@ -216,7 +216,12 @@ data <- OlinkAnalyze::read_NPX(
 
 ### Function output
 
-A `tibble` or `ArrowObject` in long format containing:
+A `tibble` or `ArrowObject` in long format containing the columns listed below.
+Tibble output is returned as an `olink_class` object, which is a tibble subclass
+with the `check_log` attached as an attribute. Arrow output is returned as an
+`ArrowObject` with the `check_log` stored in the Arrow schema metadata. Because
+`read_npx()` attaches this information automatically, users usually do not need
+to run `check_npx()` immediately after importing a file.
 
 -   `SampleID`: Sample names or IDs.
 -   `OlinkID`: Unique ID for each assay assigned by Olink. In case the assay is
