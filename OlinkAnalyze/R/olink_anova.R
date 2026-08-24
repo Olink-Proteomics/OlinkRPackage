@@ -41,8 +41,9 @@
 #' @param variable Single character value or character array. Variable(s) to
 #' test. If length > 1, the included variable names will be used in crossed
 #' analyses. Also takes ':' or '*' notation.
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`, an
+#' attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #' @param outcome Character. The dependent variable. Default: NPX.
 #' @param covariates Single character value or character array. Default: NULL.
 #' Covariates to include. Takes ':' or '*' notation. Crossed analysis will not
@@ -527,8 +528,9 @@ olink_anova <- function(df,
 #'
 #' @param df NPX data frame in long format with at least protein name (Assay),
 #' OlinkID, UniProt, Panel and a factor with at least 3 levels.
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`, an
+#' attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #' @param olinkid_list Character vector of OlinkID's on which to perform post
 #' hoc analysis. If not specified, all assays in df are used.
 #' @param variable Single character value or character array. Variable(s) to

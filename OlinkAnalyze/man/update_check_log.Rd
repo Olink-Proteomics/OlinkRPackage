@@ -10,8 +10,9 @@ update_check_log(df, check_log = NULL, preferred_names = NULL)
 \item{df}{A "tibble" or "ArrowObject"
 from \code{\link{read_npx}}.}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+an attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df}.}
 
 \item{preferred_names}{A named character vector where names are internal
 column names and values are column names to be selected from the input data

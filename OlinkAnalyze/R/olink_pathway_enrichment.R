@@ -59,8 +59,9 @@
 #' columns representing limit of detection ("LOD", "PlateLOD" or "MaxLOD").
 #' @param test_results a data frame of statistical test results including the
 #' columns "Adjusted_pval" and "estimate".
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`, an
+#' attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #' @param method One of "GSEA" (default) or "ORA".
 #' @param ontology One of "MSigDb" (default), "MSigDb_com", "KEGG", "GO", and
 #' "Reactome". "MSigDb" contains "C2" and "C5" gene sets which encompass "KEGG",

@@ -84,10 +84,12 @@
 #' Required for reference median normalization.
 #' @param format Boolean that controls whether the normalized dataset will be
 #' formatted for input to downstream analysis.
-#' @param df1_check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df1`.
-#' @param df2_check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df2`.
+#' @param df1_check_log Optional named list returned by [`check_npx()`]. If `NULL`, an
+#' attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df1`.
+#' @param df2_check_log Optional named list returned by [`check_npx()`]. If `NULL`, an
+#' attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df2`.
 #'
 #' @return Tibble or ArrowObject with the normalized dataset.
 #'

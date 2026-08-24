@@ -17,8 +17,9 @@ olink_one_non_parametric(
 \item{df}{NPX data frame in long format with at least protein name (Assay),
 OlinkID, UniProt, Panel and a factor with at least 3 levels.}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL}, an
+attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df}.}
 
 \item{variable}{Single character value.}
 

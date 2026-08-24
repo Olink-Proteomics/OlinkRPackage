@@ -46,11 +46,13 @@ Required for reference median normalization.}
 \item{format}{Boolean that controls whether the normalized dataset will be
 formatted for input to downstream analysis.}
 
-\item{df1_check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df1}.}
+\item{df1_check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL}, an
+attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df1}.}
 
-\item{df2_check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df2}.}
+\item{df2_check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL}, an
+attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df2}.}
 }
 \value{
 Tibble or ArrowObject with the normalized dataset.

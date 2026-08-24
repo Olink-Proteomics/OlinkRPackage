@@ -613,11 +613,13 @@ olink_normalization_n <- function(norm_schema) {
 #' project to which the other project will be adjusted to (default: P1).
 #' @param format Boolean that controls whether the normalized dataset will be
 #' formatted for input to downstream analysis.
-#' @param project_1_check_log A named list returned by [`check_npx()`]. If
-#' `NULL`, [`check_npx()`] will be run internally using `project_1_df`.
+#' @param project_1_check_log Optional named list returned by [`check_npx()`]. If `NULL`, an
+#' attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `project_1_df`.
 #' (default: `NULL`)
-#' @param project_2_check_log A named list returned by [`check_npx()`]. If
-#' `NULL`, [`check_npx()`] will be run internally using `project_2_df`.
+#' @param project_2_check_log Optional named list returned by [`check_npx()`]. If `NULL`, an
+#' attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `project_2_df`.
 #' (default: `NULL`)
 #'
 #' @return A "tibble" of NPX data in long format containing normalized NPX
@@ -786,11 +788,13 @@ olink_normalization_bridge <- function(project_1_df,
 #' project to which the other project will be adjusted to (default: P1).
 #' @param format Boolean that controls whether the normalized dataset will be
 #' formatted for input to downstream analysis.
-#' @param project_1_check_log A named list returned by [`check_npx()`]. If
-#' `NULL`, [`check_npx()`] will be run internally using `project_1_df`.
+#' @param project_1_check_log Optional named list returned by [`check_npx()`]. If `NULL`, an
+#' attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `project_1_df`.
 #' (default: `NULL`)
-#' @param project_2_check_log A named list returned by [`check_npx()`]. If
-#' `NULL`, [`check_npx()`] will be run internally using `project_2_df`.
+#' @param project_2_check_log Optional named list returned by [`check_npx()`]. If `NULL`, an
+#' attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `project_2_df`.
 #' (default: `NULL`)
 #'
 #' @return A "tibble" of NPX data in long format containing normalized NPX

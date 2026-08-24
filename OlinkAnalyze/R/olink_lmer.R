@@ -47,8 +47,9 @@
 #' @param variable Single character value or character array. Variables to test.
 #' If `length > 1`, the included variable names will be used in crossed
 #' analyses. Also takes ':' or '*' notation.
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`, an
+#' attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #' @param outcome Character. The dependent variable. Default: NPX.
 #' @param random Single character value or character array.
 #' @param covariates Single character value or character array. Default: `NULL`.
@@ -590,8 +591,9 @@ single_lmer <- function(data, formula_string) {
 #' @param df NPX data frame in long format with at least protein name (Assay),
 #' OlinkID, UniProt, 1-2 variables with at least 2 levels and subject
 #' identifier.
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`, an
+#' attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #' @param olinkid_list Character vector of OlinkID's on which to perform post
 #' hoc analysis. If not specified, all assays in df are used.
 #' @param variable Single character value or character array. Variables to test.

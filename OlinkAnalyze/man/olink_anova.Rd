@@ -23,8 +23,9 @@ OlinkID, UniProt, Panel and a factor with at least 3 levels.}
 test. If length > 1, the included variable names will be used in crossed
 analyses. Also takes ':' or '*' notation.}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL}, an
+attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df}.}
 
 \item{outcome}{Character. The dependent variable. Default: NPX.}
 

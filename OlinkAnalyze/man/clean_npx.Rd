@@ -25,8 +25,9 @@ clean_npx(
 \item{df}{A "tibble" or "ArrowObject"
 from \code{\link{read_npx}}.}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+an attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df}.}
 
 \item{remove_assay_na}{Logical. If \code{FALSE}, skips filtering assays with all
 quantified values \code{NA}. Defaults to \code{TRUE}.}

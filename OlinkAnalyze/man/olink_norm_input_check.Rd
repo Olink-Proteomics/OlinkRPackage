@@ -20,13 +20,15 @@ olink_norm_input_check(
 \arguments{
 \item{df1}{First dataset to be used in normalization (required).}
 
-\item{df1_check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df1}.}
+\item{df1_check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL}, an
+attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df1}.}
 
 \item{df2}{Second dataset to be used in normalization.}
 
-\item{df2_check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df2}.}
+\item{df2_check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL}, an
+attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df2}.}
 
 \item{overlapping_samples_df1}{Samples to be used for adjustment factor
 calculation in df1 (required).}

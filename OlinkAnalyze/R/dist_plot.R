@@ -6,8 +6,9 @@
 #'
 #' @param df NPX data frame in long format. Must have columns SampleID, NPX and
 #' Panel
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`, an
+#' attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #' @param color_g Character value indicating which column to use as fill color.
 #' (default: QC_Warning).
 #' @param ... Color option passed to specify color order.

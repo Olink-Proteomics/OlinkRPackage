@@ -25,8 +25,9 @@ columns representing limit of detection ("LOD", "PlateLOD" or "MaxLOD").}
 \item{test_results}{a data frame of statistical test results including the
 columns "Adjusted_pval" and "estimate".}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL}, an
+attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df}.}
 
 \item{method}{One of "GSEA" (default) or "ORA".}
 

@@ -13,8 +13,9 @@
 #' grouping variable. Needs to have exactly 2 levels.
 #' @param pair_id Character value indicating which column indicates the paired
 #' sample identifier.
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`, an
+#' attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #' @param ... Options to be passed to wilcox.test. See \code{?wilcox_test} for
 #' more information.
 #'

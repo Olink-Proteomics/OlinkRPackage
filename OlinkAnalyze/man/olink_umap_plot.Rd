@@ -39,8 +39,9 @@ also supported.}
 \item{y_val}{Integer indicating which UMAP component to plot along the y-axis
 (default 2)}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL}, an
+attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df}.}
 
 \item{config}{object of class umap.config, specifying the parameters for the
 UMAP algorithm (default umap::umap.defaults)}

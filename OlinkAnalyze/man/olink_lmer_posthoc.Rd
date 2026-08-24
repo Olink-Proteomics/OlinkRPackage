@@ -25,8 +25,9 @@ olink_lmer_posthoc(
 OlinkID, UniProt, 1-2 variables with at least 2 levels and subject
 identifier.}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL}, an
+attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df}.}
 
 \item{olinkid_list}{Character vector of OlinkID's on which to perform post
 hoc analysis. If not specified, all assays in df are used.}
