@@ -362,14 +362,15 @@ A named list with the following elements:
 The `clean_npx()` function cleans an NPX data frame by applying a series of
 filtering and conversion steps. It removes invalid or problematic assays and
 samples identified by `check_npx()`, and optionally converts column data types.
-Passing the output of `check_npx()` via the `check_log` argument avoids
-re-running the internal checks and improves performance.
+If no `check_log` is supplied, `clean_npx()` first uses an attached `check_log`
+from the input data and otherwise runs `check_npx()` internally.
 
 ### Function arguments
 
 -   `df`: NPX data frame in long format as returned by `read_npx()`.
--   `check_log`: Named list returned by `check_npx()`. If `NULL`, `check_npx()`
-    is run internally.
+-   `check_log`: Optional named list returned by `check_npx()`. If `NULL`, an
+    attached `check_log` is used when present; otherwise `check_npx()` is run
+    internally.
 -   `remove_assay_na`: Logical. Remove assays where all samples have NA values.
     Default: `TRUE`.
 -   `remove_invalid_oid`: Logical. Remove assays with invalid OlinkIDs. Default:
@@ -393,10 +394,9 @@ re-running the internal checks and improves performance.
 -   `verbose`: Logical. Print progress messages. Default: `FALSE`.
 
 ```{r, message = FALSE, eval = FALSE}
-# Clean the NPX data using the check_npx output
+# Clean the NPX data
 data_clean <- OlinkAnalyze::clean_npx(
-  df = data,
-  check_log = check_log
+  df = data
 )
 ```
 
@@ -404,20 +404,9 @@ data_clean <- OlinkAnalyze::clean_npx(
 
 A "tibble" (or "ArrowObject") in long format containing the cleaned NPX data,
 with invalid assays, control samples, QC-failing samples, and problematic
-entries removed according to the chosen arguments. Output matches that of the
-function `read_npx()`.
-
-**Note:** We recommend running `check_npx()` once again after cleaning the data
-to confirm that all issues have been resolved and that the data is ready for
-downstream analysis. A schematic illustration of the described workflow is
-provided ([Olink Analyze v5.0 example workflow](#usage)).
-
-```{r, message = FALSE, eval = FALSE}
-# Check NPX data quality and format
-check_log_clean <- OlinkAnalyze::check_npx(
-  df = data_clean
-)
-```
+entries removed according to the chosen arguments. The cleaned output includes
+an updated attached `check_log`, so it can be passed directly to downstream
+OlinkAnalyze functions without rerunning `check_npx()`.
 
 ## Randomize samples on plate (`olink_plate_randomizer()`)
 
