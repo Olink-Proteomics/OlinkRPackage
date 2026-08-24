@@ -430,6 +430,175 @@ rm_check_log <- function(df) {
 
 }
 
+#' Update the attached check log for an Olink dataset
+#'
+#' @author Klev Diamanti
+#'
+#' @description
+#' Refreshes the `check_log` attached to an `olink_class` tibble or ArrowObject.
+#' This is useful after manually modifying or cleaning an Olink dataset, where
+#' the attached check log may no longer describe the current data.
+#'
+#' The function can also be used to update only the column-name choices stored
+#' in the attached check log by supplying `preferred_names`, even when the data
+#' itself has not changed. The supplied names are validated by the same
+#' machinery used by [`check_npx()`].
+#'
+#' If `df` already carries a check log, the existing log is used to preserve
+#' current preferred column-name choices before the log is regenerated. If no
+#' attached check log is found, `check_log` is used when supplied; otherwise
+#' [`check_npx()`] is run on `df`. This means `update_check_log()` can also be
+#' used to attach a check log to a plain tibble or ArrowObject, returning an
+#' `olink_class` object for tibble input or an ArrowObject with
+#' `olink_check_log` metadata for Arrow input.
+#'
+#' @inheritParams .downstream_fun_args
+#' @inheritParams check_npx
+#'
+#' @return The input data in its original output format with an updated check
+#' log attached. Tibbles are returned as `olink_class` objects and ArrowObjects
+#' are returned with refreshed `olink_check_log` schema metadata.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'
+#' # get file
+#' npx_file <- system.file(
+#'   "extdata",
+#'   "npx_data1.xlsx",
+#'   package = "OlinkAnalyze"
+#' )
+#'
+#' # Example 1: manually modify the dataset and update the check log accordingly
+#'
+#' # read file
+#' npx_df <- OlinkAnalyze::read_npx(
+#'   filename = npx_file,
+#'   olink_platform = "Target 96"
+#' )
+#'
+#' # manually cleanup the data based on the warning messages from read_npx
+#' npx_df <- npx_df |>
+#'   # remove duplicated samples
+#'   dplyr::filter(
+#'     !grepl("^CONTROL", .data[["SampleID"]])
+#'   ) |>
+#'   # convert NPX and LOD columns to numeric
+#'   dplyr::mutate(
+#'     NPX = as.numeric(.data[["NPX"]]),
+#'     LOD = as.numeric(.data[["LOD"]])
+#'   )
+#' # same result achieved by using clean_npx
+#'
+#' # run update_check_log so that it describes the current status of the dataset
+#' npx_df <- OlinkAnalyze::update_check_log(
+#'   df = npx_df
+#' )
+#'
+#' # Example 2: change preferred column names to be used in the analyses
+#'
+#' # update preferred column names without otherwise modifying the dataset
+#' npx_df <- npx_df |>
+#'   dplyr::mutate(
+#'     PCNormalizedNPX = .data[["NPX"]]
+#'   )
+#'
+#' npx_df <- OlinkAnalyze::update_check_log(
+#'   df = npx_df,
+#'   preferred_names = c("quant" = "PCNormalizedNPX")
+#' )
+#'
+#' # Example 3: attach an existing check log to a plain tibble or ArrowObject
+#'
+#' # attach an existing check log to a plain tibble or ArrowObject
+#' npx_tbl <- OlinkAnalyze::rm_check_log(
+#'   df = npx_df
+#' )
+#' check_log <- OlinkAnalyze::check_npx(
+#'   df = npx_df,
+#'   preferred_names = c("quant" = "PCNormalizedNPX")
+#' )
+#'
+#' # attach an existing check log to a plain tibble
+#' npx_obj <- OlinkAnalyze::update_check_log(
+#'   df = npx_tbl,
+#'   check_log = check_log
+#' )
+#'
+#' # attach an existing check log to an ArrowObject
+#' npx_arrow <- npx_tbl |>
+#'   arrow::as_arrow_table() |>
+#'   OlinkAnalyze::update_check_log(
+#'     check_log = check_log
+#'   )
+#'
+#' # inspect ArrowObject has a check_log
+#' names(npx_arrow$metadata)
+#'
+#' }
+#'
+update_check_log <- function(df,
+                             check_log = NULL,
+                             preferred_names = NULL) {
+
+  check_is_dataset(x = df, error = TRUE)
+
+  # get current check_log
+  check_log <- withCallingHandlers({
+    get_check_npx(
+      df = df,
+      check_log = check_log,
+      preferred_names = preferred_names
+    )
+  }, warning = function(w) {
+    if (grepl(
+      x = w,
+      pattern = "No `olink_check_log` metadata found in the ArrowObject"
+    ))
+      invokeRestart("muffleWarning")
+  })
+
+  # get current preferred names from check_log
+  existing_preferred_names <- get_preferred_names(
+    df = df,
+    check_log = check_log
+  )
+
+  # append new preferred_names, if provided, to the existing preferred_names
+  # and remove duplicates, keeping the last occurrence of each name
+  # essentially preferred_names provided to update_check_log() will override any
+  # existing preferred_names in the check_log.
+  if (!is.null(preferred_names)) {
+    check_preferred_names(preferred_names = preferred_names)
+    existing_preferred_names <- c(existing_preferred_names, preferred_names)
+    existing_preferred_names <- existing_preferred_names[
+      !duplicated(names(existing_preferred_names), fromLast = TRUE)
+    ]
+  }
+
+  # if no preferred_names, set to NULL to avoid passing an empty vector
+  if (length(existing_preferred_names) == 0L) {
+    existing_preferred_names <- NULL
+  }
+
+  # get the format of the input data (tibble or ArrowObject) to retain that
+  # format after updating the check log
+  out_df <- get_read_npx_output(df = df)
+
+  # remove current check_log from the data object before attaching the new one
+  df <- rm_check_log(df = df)
+
+  df <- attach_check_log(
+    df = df,
+    out_df = out_df,
+    preferred_names = existing_preferred_names
+  )
+
+  return(df)
+}
+
 # Arrow metadata helpers ----
 
 #' Attach check log to an ArrowObject via schema metadata
