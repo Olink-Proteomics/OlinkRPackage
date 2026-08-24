@@ -39,9 +39,10 @@ convenient pipeline for your Olink NPX data analysis.
 > **Note:** Starting with OlinkAnalyze v5.0, detailed analysis workflow
 > vignettes have been moved to the new **OlinkAnalyzeVignettes** package, 
 > which is available on [CRAN](https://CRAN.R-project.org/package=OlinkAnalyzeVignettes).
-> This vignette provides an overview of the main
-> functions in OlinkAnalyze and introduces the new v5.0 preprocessing functions
-> `check_npx()` and `clean_npx()`.
+> This vignette provides an overview of the main functions in OlinkAnalyze,
+> including the v5.0 preprocessing workflow and the newer Olink data object
+> support where imported and processed NPX data can carry its own
+> `check_log`.
 
 # Installation
 
