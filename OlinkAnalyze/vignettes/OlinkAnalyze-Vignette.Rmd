@@ -1699,6 +1699,8 @@ npx_ht <- data_exploreht |>
     Project = "data1"
   )
 
+npx_ht <- update_check_log(df = npx_ht)
+
 npx_3072 <- data_explore3072 |>
   dplyr::filter(
     .data[["SampleType"]] == "SAMPLE"
@@ -1706,6 +1708,8 @@ npx_3072 <- data_explore3072 |>
   dplyr::mutate(
     Project = "data2"
   )
+
+npx_3072 <- update_check_log(df = npx_3072)
 
 overlapping_samples <- unique(
   intersect(
