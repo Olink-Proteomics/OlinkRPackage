@@ -381,6 +381,11 @@ before passing the result to another OlinkAnalyze function. When
 `check_log = NULL`, OlinkAnalyze first tries to use the attached `check_log`;
 if none is present, it runs `check_npx()` internally.
 
+If you manually edit an Olink dataset outside the OlinkAnalyze preprocessing
+functions, the attached `check_log` may no longer describe the current data.
+Use `update_check_log()` after manual edits to refresh and re-attach the
+`check_log` while retaining any preferred column-name choices.
+
 Several helper functions are available for working with attached check logs:
 
 -   `olink_extract_check_log()` retrieves the attached `check_log` from an
