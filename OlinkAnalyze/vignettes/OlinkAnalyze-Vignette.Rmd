@@ -310,12 +310,14 @@ data <- list.files(
 
 The `check_npx()` function performs various quality and format checks on NPX
 data. Running `check_npx()` directly is optional for most workflows: imported
-NPX data from `read_npx()`, as well as NPX data exported from `clean_npx()`, `olink_lod()` and the normalization functions (e.g. `olink_normalization()`, `olink_normalization_bridge()` and `olink_normalization_subset()`), already carries a `check_log`, and downstream Olink
-Analyze functions can use either an attached `check_log`, a user-supplied
-`check_log` argument, or an internally generated one. Calling `check_npx()`
-explicitly is still useful when you want to inspect the checks yourself, work
-with manually created or modified NPX data, or define custom column mappings
-through `preferred_names`.
+NPX data from `read_npx()`, as well as NPX data exported from `clean_npx()`,
+`olink_lod()` and the normalization functions (e.g. `olink_normalization()`,
+`olink_normalization_bridge()` and `olink_normalization_subset()`), already
+carries a `check_log`, and downstream OlinkAnalyze functions can use either an
+attached `check_log`, a user-supplied `check_log` argument, or an internally
+generated one. Calling `check_npx()` explicitly is still useful when you want to
+inspect the checks yourself, work with manually created or modified NPX data, or
+define custom column mappings through `preferred_names`.
 
 `check_npx()` also allows for alternative column names to be used in the
 downstream analysis, both standard and non-standard. If the user wishes to
@@ -409,7 +411,9 @@ check_log <- OlinkAnalyze::extract_check_log(
 
 # After manual edits, refresh the attached check_log
 data_updated <- data |>
-  dplyr::filter(!is.na(.data[["NPX"]])) |>
+  dplyr::filter(
+    !is.na(.data[["NPX"]])
+  ) |>
   OlinkAnalyze::update_check_log()
 
 # Remove the attached check_log and return a plain tibble or ArrowObject
@@ -476,7 +480,8 @@ with the option to keep the same individuals on the same plate. Olink® does not
 recommend to force balance based on other clinical variables.
 
 For more information on plate randomization, consult the 
-[Plate Randomization Vignette](https://CRAN.R-project.org/package=OlinkAnalyzeVignettes/vignettes/plate_randomizer.html) in the R package `OlinkAnalyzeVignettes`.
+[Plate Randomization Vignette](https://CRAN.R-project.org/package=OlinkAnalyzeVignettes/vignettes/plate_randomizer.html)
+in the R package `OlinkAnalyzeVignettes`.
 
 ## Select bridge samples (`olink_bridgeselector()`)
 
@@ -1125,7 +1130,8 @@ missingness \<10% for multi-plate projects, and for missingness \<5% for single
 plate projects.
 
 More information about `olink_pca()` can be found in the 
-[Outlier Exclusion Vignette](https://CRAN.R-project.org/package=OlinkAnalyzeVignettes/vignettes/outlier_exclusion.html) in the R package `OlinkAnalyzeVignettes`.
+[Outlier Exclusion Vignette](https://CRAN.R-project.org/package=OlinkAnalyzeVignettes/vignettes/outlier_exclusion.html)
+in the R package `OlinkAnalyzeVignettes`.
 
 ## Uniform Manifold Approximation and Projection for Dimension Reduction (UMAP) (`olink_umap_plot()`)
 
