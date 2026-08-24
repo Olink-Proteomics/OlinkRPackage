@@ -215,9 +215,10 @@ get_check_npx <- function(df,
   } else {
     cli::cli_inform(
       c(
-        "{.arg check_log} not provided. Running {.fn check_npx}.",
-        "i" = "It is recommended that the user runs {.fn check_npx} to get a
-        full picture of the results from the data validity check!"
+        "No attached or supplied {.arg check_log} found. Running
+        {.fn check_npx}.",
+        "i" = "Call {.fn check_npx} directly when you want to inspect the full
+        data validity check output."
       )
     )
     check_log <- check_npx(df = df, preferred_names = preferred_names)
