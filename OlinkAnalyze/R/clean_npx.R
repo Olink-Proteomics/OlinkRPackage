@@ -255,7 +255,7 @@ clean_npx <- function(df,
     cli::cli_h2("Completed {.fn clean_npx}. Returning clean dataset.")
   }
 
-  # Convert to requested output format, re-run check_npx, and attach check_log
+  # Convert to requested output format and attach an updated check_log
   df <- attach_check_log(
     df = df,
     out_df = out_df,
