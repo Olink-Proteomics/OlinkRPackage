@@ -28,8 +28,8 @@
 #'
 #' @param df data frame in long format with Sample Id, NPX and column
 #' of choice for colors.
-#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`, an
-#' attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`,
+#' an attached `check_log` is used when present; otherwise [`check_npx()`] will
 #' be run internally using `df`.
 #' @param color_g Character value indicating which column to use for
 #' colors (default QC_Warning). Continuous color scale for Olink(R)

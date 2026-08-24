@@ -63,8 +63,8 @@ returned for mean_return = TRUE and no adjustment is performed.}
 comparisons within an assay. Options include \code{tukey}, \code{sidak},
 \code{bonferroni} and \code{none}.}
 
-\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL}, an
-attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+an attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
 be run internally using \code{df}.}
 
 \item{verbose}{Boolean. Default: True. If information about removed samples,

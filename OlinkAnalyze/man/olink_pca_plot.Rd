@@ -29,8 +29,8 @@ olink_pca_plot(
 \item{df}{data frame in long format with Sample Id, NPX and column
 of choice for colors.}
 
-\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL}, an
-attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+an attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
 be run internally using \code{df}.}
 
 \item{color_g}{Character value indicating which column to use for

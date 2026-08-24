@@ -16,8 +16,8 @@
 #' Olink Analyze read_npx function.
 #' @param sample_missing_freq The threshold for sample wise missingness.
 #' @param n Number of bridge samples to be selected.
-#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`, an
-#' attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`,
+#' an attached `check_log` is used when present; otherwise [`check_npx()`] will
 #' be run internally using `df`.
 #'
 #' @return A "tibble" with sample IDs and mean NPX for a defined number of

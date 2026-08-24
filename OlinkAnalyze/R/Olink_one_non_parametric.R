@@ -22,8 +22,8 @@
 #'
 #' @param df NPX data frame in long format with at least protein name (Assay),
 #' OlinkID, UniProt, Panel and a factor with at least 3 levels.
-#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`, an
-#' attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`,
+#' an attached `check_log` is used when present; otherwise [`check_npx()`] will
 #' be run internally using `df`.
 #' @param variable Single character value.
 #' @param dependence Boolean. Default: FALSE. When the groups are independent,
@@ -356,8 +356,8 @@ olink_one_non_parametric <- function(df,
 #'
 #' @param df NPX data frame in long format with at least protein name (Assay),
 #' OlinkID, UniProt, Panel and a factor with at least 3 levels.
-#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`, an
-#' attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`,
+#' an attached `check_log` is used when present; otherwise [`check_npx()`] will
 #' be run internally using `df`.
 #' @param olinkid_list Character vector of OlinkID's on which to perform post
 #' hoc analysis. If not specified, all assays in df are used.

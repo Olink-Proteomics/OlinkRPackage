@@ -17,8 +17,8 @@ Olink Analyze read_npx function.}
 
 \item{n}{Number of bridge samples to be selected.}
 
-\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL}, an
-attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+an attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
 be run internally using \code{df}.}
 
 \item{...}{Additional arguments. Currently only accepts \code{sampleMissingFreq}

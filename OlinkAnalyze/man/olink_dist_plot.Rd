@@ -10,8 +10,8 @@ olink_dist_plot(df, check_log = NULL, color_g = "QC_Warning", ...)
 \item{df}{NPX data frame in long format. Must have columns SampleID, NPX and
 Panel}
 
-\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL}, an
-attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+an attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
 be run internally using \code{df}.}
 
 \item{color_g}{Character value indicating which column to use as fill color.

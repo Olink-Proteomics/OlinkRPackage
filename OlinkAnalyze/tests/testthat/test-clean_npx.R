@@ -2781,8 +2781,9 @@ test_that(
                 object = result <- clean_npx(
                   df = npx_data1
                 ),
-                regexp = "No attached or supplied.*check_log.*Running.*check_npx",
-                fixed = FALSE
+                regexp = paste("No attached or supplied `check_log` found.",
+                               "Running `check_npx()`."),
+                fixed = TRUE
               ),
               regexp = paste("Duplicate SampleIDs detected:",
                              "\"CONTROL_SAMPLE_AS 1\" and",
@@ -2837,8 +2838,9 @@ test_that(
                     df = npx_data1_arrow,
                     out_df = "arrow"
                   ),
-                  regexp = "No attached or supplied.*check_log.*Running.*check_npx",
-                  fixed = FALSE
+                  regexp = paste("No attached or supplied `check_log` found.",
+                                 "Running `check_npx()`."),
+                  fixed = TRUE
                 ),
                 regexp = paste("Duplicate SampleIDs detected:",
                                "\"CONTROL_SAMPLE_AS 1\" and",
