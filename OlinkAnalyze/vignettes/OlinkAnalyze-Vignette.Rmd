@@ -434,6 +434,9 @@ in the R package `OlinkAnalyzeVignettes`.
 The Olink® normalization function normalizes NPX values between two different
 datasets or one Olink® dataset to a set of reference medians.
 
+The returned normalized dataset includes an updated attached `check_log`, so
+`check_npx()` does not need to be rerun before downstream analysis.
+
 The function handles four different types of normalization:
 
 -   **Bridging normalization**: One of the data sets is adjusted to another
@@ -468,6 +471,9 @@ which can be downloaded from the Document Download Center at
 default LOD calculation method is based on the negative controls. If an NPX file
 is intensity normalized, both intensity normalized and PC normalized LODs are
 provided.
+
+The returned dataset includes an updated attached `check_log`, so `check_npx()`
+does not need to be rerun after LOD calculation.
 
 For more information on calculating LOD, consult the 
 [Calculating LOD from Olink® Explore data tutorial](https://CRAN.R-project.org/package=OlinkAnalyzeVignettes/vignettes/lod.html) 
