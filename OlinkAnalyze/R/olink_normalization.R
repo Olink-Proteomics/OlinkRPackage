@@ -416,7 +416,7 @@ olink_normalization <- function(df1,
 
   # attach check logs as attributes ----
 
-  # Convert to requested output format, re-run check_npx, and attach check_log
+  # Convert to requested output format and attach an updated check_log
   df_norm <- attach_check_log(
     df = df_norm,
     out_df = "tibble",
