@@ -125,13 +125,16 @@ install.packages("OlinkAnalyze")
 ```{r oa_v5_workflow, echo = FALSE, eval = TRUE, message = FALSE, out.width = "690px", fig.cap = fcap}
 knitr::include_graphics(
   path = normalizePath(
-    path = "../man/figures/OA_v5.0_flowchart.png"
+    path = "../man/figures/OA_v5.1_flowchart.png"
   ),
   error = FALSE
 )
-fcap <- paste("Schematic overview illustrating how the newly introduced",
-              "functions `check_npx()` and `clean_npx()` in Olink Analyze v5.0",
-              "can be used together in a typical Olink data analysis workflow.")
+fcap <- paste("Schematic overview of a typical Olink data analysis workflow in",
+              "Olink Analyze v5.1 and later. Data validation with",
+              "`check_npx()` is integrated into functions that return an NPX",
+              "dataset, such as `clean_npx()` and `olink_normalization()`,",
+              "simplifying the workflow before downstream QC and statistical",
+              "analysis.")
 ```
 
 ## Introduction to Olink NPX data format
