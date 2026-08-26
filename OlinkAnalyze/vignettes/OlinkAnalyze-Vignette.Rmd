@@ -379,7 +379,8 @@ attached:
 -   `read_npx()` / `read_NPX()`
 -   `clean_npx()`
 -   `olink_lod()`
--   `olink_normalization()`
+-   `olink_normalization()`, `olink_normalization_subset()`,
+    `olink_normalization_bridge()`, `olink_normalization_n()`
 
 This means you do not need to rerun `check_npx()` after using these functions
 before passing the result to another OlinkAnalyze function. When
