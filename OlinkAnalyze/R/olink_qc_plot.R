@@ -159,26 +159,20 @@ olink_qc_plot <- function(df,
 
   if ("qc_warning" %in% names(check_log$col_names)) {
     df_qr <- df |>
-      dplyr::group_by(
-        .data[[check_log$col_names$panel]],
-        .data[[check_log$col_names$sample_id]]
-      ) |>
-      dplyr::mutate(
-        !!check_log$col_names$qc_warning := dplyr::if_else(
-          all(toupper(.data[[check_log$col_names$qc_warning]]) == "PASS"),
-          "Pass",
-          "Warning"
+      olink_summarize_qc_warning(
+        qc_warning = check_log$col_names$qc_warning,
+        group = c(
+          check_log$col_names$panel,
+          check_log$col_names$sample_id
         )
-      )
-  } else {
-    df_qr <- df |>
-      dplyr::group_by(
-        .data[[check_log$col_names$panel]],
-        .data[[check_log$col_names$sample_id]]
       )
   }
 
   df_qr <- df_qr |>
+    dplyr::group_by(
+      .data[[check_log$col_names$panel]],
+      .data[[check_log$col_names$sample_id]]
+    ) |>
     dplyr::mutate(
       IQR = stats::IQR(
         x = .data[[check_log$col_names$quant]],

@@ -202,19 +202,24 @@ olink_bridge_selector <- function(df,
         dplyr::all_of(check_log_clean$col_names$sample_id)
       )
     ) |>
+    olink_summarize_qc_warning(
+      qc_warning = check_log_clean$col_names$qc_warning,
+      group = check_log_clean$col_names$sample_id,
+      output_col = "qc_warn"
+    ) |>
+    dplyr::group_by(
+      dplyr::across(
+        dplyr::all_of(check_log_clean$col_names$sample_id)
+      )
+    ) |>
     dplyr::mutate(
-      qc_warn = dplyr::if_else(
-        all(toupper(.data[[check_log_clean$col_names$qc_warning]]) == "PASS"),
-        "PASS",
-        "WARNING"
-      ),
       outliers = sum(.data[["Outlier"]], na.rm = TRUE),
       PercAssaysBelowLOD  = sum(is.na(.data[["quant_na"]])) / dplyr::n(),
       MeanNPX = mean(x = .data[["quant_na"]], na.rm = TRUE)
     ) |>
     dplyr::ungroup() |>
     dplyr::filter(
-      .data[["qc_warn"]] == "PASS" &
+      .data[["qc_warn"]] == "Pass" &
         .data[["outliers"]] == 0L &
         .data[["PercAssaysBelowLOD"]] < .env[["sample_missing_freq"]]
     ) |>
