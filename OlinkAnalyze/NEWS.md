@@ -4,6 +4,18 @@ editor_options:
   markdown: 
     wrap: 72
 ---
+# Olink Analyze 5.1.0
+
+## Minor Changes
+- improved QC warning flag summation (@klevdiamanti, #781)
+- new S3 object connecting NPX data with check log (#765, #785, #786)
+
+## Bug Fix
+- improved logic for determining if file is wide or long (@klevdiamanti, #773)
+- grammar fixed in error message when column is missing (@klevdiamanti, #780)
+- read_npx wide format data error message clarified (@klevdiamanti, #782)
+- refactoring of check_npx to use list-style subsetting (@klevdiamanti, #784)
+
 # Olink Analyze 5.0.2
 
 ## Bug Fix
