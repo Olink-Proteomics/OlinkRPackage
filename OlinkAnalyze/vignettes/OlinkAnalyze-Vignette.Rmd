@@ -39,9 +39,9 @@ convenient pipeline for your Olink NPX data analysis.
 > **Note:** Starting with OlinkAnalyze v5.0, detailed analysis workflow
 > vignettes have been moved to the new **OlinkAnalyzeVignettes** package, 
 > which is available on [CRAN](https://CRAN.R-project.org/package=OlinkAnalyzeVignettes).
-> This vignette provides an overview of the main functions in OlinkAnalyze,
+> This vignette provides an overview of the main functions in Olink Analyze,
 > including the v5.0 preprocessing workflow and the newer Olink data object
-> support where imported and processed NPX data can carry its own
+> support, where imported and processed NPX data can carry its own
 > `check_log`.
 
 # Installation
@@ -312,7 +312,13 @@ data <- list.files(
 ## Check NPX data quality (`check_npx()`)
 
 The `check_npx()` function performs various quality and format checks on NPX
-data. Running `check_npx()` directly is optional for most workflows: imported
+The `check_npx()` function performs various quality and format checks on NPX
+data.  Imported NPX data from `read_npx()`, as well as NPX data exported from `clean_npx()`,
+`olink_lod()` and the normalization functions (e.g. `olink_normalization()`,
+`olink_normalization_bridge()` and `olink_normalization_subset()`) include an attached `check_log` in the function output. When using one of these functions in a workflow, `check_npx()` does not need to be called directly. Downstream Olink Analyze functions can use an
+attached `check_log` or a user-supplied `check_log` argument. If neither is provided, the function will generate a `check_log` within the function. Calling `check_npx()` explicitly is still useful when you want to
+inspect the checks yourself, work with manually created or modified NPX data, or
+define custom column mappings through `preferred_names`.
 NPX data from `read_npx()`, as well as NPX data exported from `clean_npx()`,
 `olink_lod()` and the normalization functions (e.g. `olink_normalization()`,
 `olink_normalization_bridge()` and `olink_normalization_subset()`), already
@@ -368,7 +374,7 @@ A named list with the following elements:
 
 ## Olink objects and attached check logs
 
-OlinkAnalyze can store the output of `check_npx()` directly on the NPX data
+Olink Analyze can store the output of `check_npx()` with the NPX data
 object. For tibble output, the data is returned as an `olink_class` object; this
 inherits from tibble and stores the `check_log` as an attribute. For
 `ArrowObject` output, the same information is stored as Arrow schema metadata.
@@ -383,11 +389,11 @@ attached:
     `olink_normalization_bridge()`, `olink_normalization_n()`
 
 This means you do not need to rerun `check_npx()` after using these functions
-before passing the result to another OlinkAnalyze function. When
-`check_log = NULL`, OlinkAnalyze first tries to use the attached `check_log`;
+before passing the result to another Olink Analyze function. When
+`check_log = NULL`, Olink Analyze first tries to use the attached `check_log`;
 if none is present, it runs `check_npx()` internally.
 
-If you manually edit an Olink dataset outside the OlinkAnalyze preprocessing
+If an Olink dataset is edited outside the Olink Analyze preprocessing
 functions, the attached `check_log` may no longer describe the current data.
 Use `update_check_log()` after manual edits to refresh and re-attach the
 `check_log` while retaining any preferred column-name choices.
@@ -431,8 +437,8 @@ data_plain <- OlinkAnalyze::rm_check_log(
 The `clean_npx()` function cleans an NPX data frame by applying a series of
 filtering and conversion steps. It removes invalid or problematic assays and
 samples identified by `check_npx()`, and optionally converts column data types.
-If no `check_log` is supplied, `clean_npx()` first uses an attached `check_log`
-from the input data and otherwise runs `check_npx()` internally.
+If a `check_log` is not supplied, `clean_npx()` first checks for an attached `check_log`
+from the input data. If a `check_log` is not present, `check_npx()` is run internally.
 
 ### Function arguments
 
