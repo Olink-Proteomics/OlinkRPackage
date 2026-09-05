@@ -261,8 +261,8 @@ test_that(
               df = dt_edge_case,
               quiet = TRUE
             ),
-            regexp = "`check_log` not provided. Running `check_npx()`",
-            fixed = TRUE
+            regexp = "No attached or supplied.*check_log.*Running.*check_npx",
+            fixed = FALSE
           ),
           regexp = paste("8 assays exhibited assay QC warnings in column",
                          "`Assay_Warning` of the dataset")

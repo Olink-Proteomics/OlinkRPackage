@@ -476,8 +476,8 @@ test_that(
                 df = dt_edge_case_no_ctrl,
                 variable = "treatment2"
               ),
-              regexp = "`check_log` not provided. Running `check_npx()`.",
-              fixed = TRUE
+              regexp = "No attached or supplied.*check_log.*Running.*check_npx",
+              fixed = FALSE
             ),
             regexp = paste("8 assays exhibited assay QC warnings in column",
                            "`Assay_Warning` of the dataset")
@@ -882,8 +882,8 @@ test_that(
                 df = dt_edge_case_no_ctrl,
                 variable = "treatment2"
               ),
-              regexp = "`check_log` not provided. Running `check_npx()`.",
-              fixed = TRUE
+              regexp = "No attached or supplied.*check_log.*Running.*check_npx",
+              fixed = FALSE
             ),
             regexp = paste("8 assays exhibited assay QC warnings in column",
                            "`Assay_Warning` of the dataset")
@@ -921,8 +921,8 @@ test_that(
                 olinkid_list = ord_regs_res_treat_oid,
                 effect = "treatment2"
               ),
-              regexp = "`check_log` not provided. Running `check_npx()`.",
-              fixed = TRUE
+              regexp = "No attached or supplied.*check_log.*Running.*check_npx",
+              fixed = FALSE
             ),
             regexp = paste("8 assays exhibited assay QC warnings in column",
                            "`Assay_Warning` of the dataset")

@@ -84,9 +84,11 @@
 #' Required for reference median normalization.
 #' @param format Boolean that controls whether the normalized dataset will be
 #' formatted for input to downstream analysis.
-#' @param df1_check_log A named list returned by [`check_npx()`]. If `NULL`,
+#' @param df1_check_log Optional named list returned by [`check_npx()`]. If
+#' `NULL`, an attached `check_log` is used when present; otherwise
 #' [`check_npx()`] will be run internally using `df1`.
-#' @param df2_check_log A named list returned by [`check_npx()`]. If `NULL`,
+#' @param df2_check_log Optional named list returned by [`check_npx()`]. If
+#' `NULL`, an attached `check_log` is used when present; otherwise
 #' [`check_npx()`] will be run internally using `df2`.
 #'
 #' @return Tibble or ArrowObject with the normalized dataset.
@@ -414,7 +416,7 @@ olink_normalization <- function(df1,
 
   # attach check logs as attributes ----
 
-  # Convert to requested output format, re-run check_npx, and attach check_log
+  # Convert to requested output format and attach an updated check_log
   df_norm <- attach_check_log(
     df = df_norm,
     out_df = "tibble",

@@ -39,8 +39,9 @@ inferred from main effects.}
 \item{return.covariates}{Logical. Default: False. Returns F-test results for
 the covariates. Note: Adjusted p-values will be NA for the covariates.}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+an attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df}.}
 
 \item{verbose}{Logical. Default: True. If information about removed samples,
 factor conversion and final model formula is to be printed to the console.}

@@ -234,8 +234,8 @@ test_that(
             x_axis_variable = "Time",
             col_variable = "Treatment"
           ),
-          regexp = "`check_log` not provided. Running `check_npx()`.",
-          fixed = TRUE
+          regexp = "No attached or supplied.*check_log.*Running.*check_npx",
+          fixed = FALSE
         ),
         regexp = paste("Duplicate SampleIDs detected:",
                        "\"CONTROL_SAMPLE_AS 1\" and \"CONTROL_SAMPLE_AS 2\"")

@@ -9,8 +9,9 @@
 #'
 #' @param df NPX data frame in long format with at least protein name (Assay),
 #' OlinkID, UniProt, 1-2 variables with at least 2 levels.
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`,
+#' an attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #' @param olinkid_list Character vector indicating which proteins (by OlinkID)
 #' for which to create figures.
 #' @param number_of_proteins_per_plot Number plots to include in the list of

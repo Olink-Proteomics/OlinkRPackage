@@ -416,8 +416,9 @@ check_osi <- function(df,
 #'
 #' @param df A `r ansi_collapse_quot(x = get_df_output_print(), sep = "or")`
 #' from \code{\link{read_npx}}.
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`,
+#' an attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #'
 #' @keywords internal
 #'

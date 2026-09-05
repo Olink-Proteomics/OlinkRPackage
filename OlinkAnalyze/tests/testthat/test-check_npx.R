@@ -514,8 +514,8 @@ test_that(
       object = {
         result <- get_check_npx(df = df_tbl)
       },
-      regexp = "`check_log` not provided. Running `check_npx()`.",
-      fixed = TRUE
+      regexp = "No attached or supplied.*check_log.*Running.*check_npx",
+      fixed = FALSE
     )
 
     check_log_result <- check_npx(df = df_tbl) |>
@@ -539,8 +539,8 @@ test_that(
           preferred_names = c("sample_id" = "IamSampleName")
         )
       },
-      regexp = "`check_log` not provided. Running `check_npx()`.",
-      fixed = TRUE
+      regexp = "No attached or supplied.*check_log.*Running.*check_npx",
+      fixed = FALSE
     )
 
     check_log_result_v1 <- check_npx(
@@ -575,8 +575,8 @@ test_that(
                               "olink_id" = "IamOlinkIdentifier")
         )
       },
-      regexp = "`check_log` not provided. Running `check_npx()`.",
-      fixed = TRUE
+      regexp = "No attached or supplied.*check_log.*Running.*check_npx",
+      fixed = FALSE
     )
 
     check_log_result_v2 <- check_npx(

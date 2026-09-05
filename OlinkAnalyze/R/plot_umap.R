@@ -31,8 +31,9 @@
 #' (default 1)
 #' @param y_val Integer indicating which UMAP component to plot along the y-axis
 #' (default 2)
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`,
+#' an attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #' @param label_samples Logical. If TRUE, points are replaced with SampleID
 #' (default FALSE)
 #' @param config object of class umap.config, specifying the parameters for the

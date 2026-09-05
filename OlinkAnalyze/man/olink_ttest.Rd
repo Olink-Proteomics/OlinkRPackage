@@ -16,8 +16,9 @@ grouping variable. Needs to have exactly 2 levels.}
 \item{pair_id}{Character value indicating which column indicates the paired
 sample identifier.}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+an attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df}.}
 
 \item{...}{Options to be passed to t.test. See \code{?t.test} for more
 information.}

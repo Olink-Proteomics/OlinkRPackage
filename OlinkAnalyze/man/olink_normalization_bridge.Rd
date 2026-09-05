@@ -38,13 +38,15 @@ project to which the other project will be adjusted to (default: P1).}
 \item{format}{Boolean that controls whether the normalized dataset will be
 formatted for input to downstream analysis.}
 
-\item{project_1_check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If
-\code{NULL}, \code{\link[=check_npx]{check_npx()}} will be run internally using \code{project_1_df}.
-(default: \code{NULL})}
+\item{project_1_check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}.
+If \code{NULL}, an attached \code{check_log} is used when present; otherwise
+\code{\link[=check_npx]{check_npx()}} will be run internally using \code{project_1_df}. (default:
+\code{NULL})}
 
-\item{project_2_check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If
-\code{NULL}, \code{\link[=check_npx]{check_npx()}} will be run internally using \code{project_2_df}.
-(default: \code{NULL})}
+\item{project_2_check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}.
+If \code{NULL}, an attached \code{check_log} is used when present; otherwise
+\code{\link[=check_npx]{check_npx()}} will be run internally using \code{project_2_df}. (default:
+\code{NULL})}
 }
 \value{
 A "tibble" of NPX data in long format containing normalized NPX

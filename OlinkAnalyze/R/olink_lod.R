@@ -141,7 +141,7 @@ olink_lod <- function(data,
     )
   }
 
-  # Convert to requested output format, re-run check_npx, and attach check_log
+  # Convert to requested output format and attach an updated check_log
   data <- attach_check_log(
     df = data,
     out_df = out_df,

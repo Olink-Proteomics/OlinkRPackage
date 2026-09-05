@@ -5135,7 +5135,7 @@ test_that(
 
     # ensure that the check log is updated with the new column names
 
-    ht_3k_norm_chec_log <- olink_extract_check_log(df = ht_3k_norm)
+    ht_3k_norm_chec_log <- extract_check_log(df = ht_3k_norm)
 
     data_ht_check_log <- check_npx(df = data_ht) |>
       suppressMessages() |>

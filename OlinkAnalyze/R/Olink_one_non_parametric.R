@@ -22,8 +22,9 @@
 #'
 #' @param df NPX data frame in long format with at least protein name (Assay),
 #' OlinkID, UniProt, Panel and a factor with at least 3 levels.
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`,
+#' an attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #' @param variable Single character value.
 #' @param dependence Boolean. Default: FALSE. When the groups are independent,
 #' the kruskal-Wallis will run, when the groups are dependent, the Friedman
@@ -355,8 +356,9 @@ olink_one_non_parametric <- function(df,
 #'
 #' @param df NPX data frame in long format with at least protein name (Assay),
 #' OlinkID, UniProt, Panel and a factor with at least 3 levels.
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`,
+#' an attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #' @param olinkid_list Character vector of OlinkID's on which to perform post
 #' hoc analysis. If not specified, all assays in df are used.
 #' @param variable Single character value or character array.
