@@ -4,6 +4,22 @@ editor_options:
   markdown: 
     wrap: 72
 ---
+# Olink Analyze 5.1.0
+
+## Minor Changes
+
+- improved QC warning flag summation (@klevdiamanti, #781)
+- new `S3` object and `ArrowObject` connecting NPX data with check log allowing users to skip running `check_npx()` explicitly (@klevdiamanti, #765, #785, #786)
+
+## Bug Fix
+
+- improved logic for determining if file is wide or long (@klevdiamanti, #773)
+- grammar fixed in error message when column is missing (@klevdiamanti, #780)
+- read_npx wide format data error message clarified (@klevdiamanti, #782)
+- refactoring of check_npx to use list-style subsetting (@klevdiamanti, #784)
+- Update tests to accommodate updated precision of adjusted p-values in `rstatix v1.0.0` (@klevdiamanti, #774 )
+- Swap the legacy `.Dim` for the newer `dim` argument in the function `structure()` (@klevdiamanti, #783)
+
 # Olink Analyze 5.0.2
 
 ## Bug Fix
