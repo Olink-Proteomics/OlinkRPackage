@@ -19,6 +19,8 @@
       "r": "release",
       "events": ["pull_request"]
    },
+   {
+      "os": "ubuntu-26.04",
       "r": "devel",
       "events": ["pull_request"]
    },
