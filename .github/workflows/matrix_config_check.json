@@ -16,6 +16,9 @@
    },
    {
       "os": "ubuntu-24.04",
+      "r": "release",
+      "events": ["pull_request"]
+   },
       "r": "devel",
       "events": ["pull_request"]
    },
