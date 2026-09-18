@@ -17,8 +17,9 @@ Olink Analyze read_npx function.}
 
 \item{n}{Number of bridge samples to be selected.}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+an attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df}.}
 
 \item{...}{Additional arguments. Currently only accepts \code{sampleMissingFreq}
 for backward compatibility. Please use \code{sample_missing_freq} instead of
@@ -48,13 +49,10 @@ The function accepts NPX Excel files with data < LOD replaced.
 }
 \examples{
 \donttest{
-  check_log <- OlinkAnalyze::check_npx(df = npx_data1)
-
   bridge_samples <- OlinkAnalyze::olink_bridge_selector(
-    df = npx_data1,
+    df = OlinkAnalyze::npx_data1,
     sample_missing_freq = 0.1,
-    n = 20L,
-    check_log = check_log
+    n = 20L
   )
 }
 

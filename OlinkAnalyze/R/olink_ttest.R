@@ -14,8 +14,9 @@
 #' grouping variable. Needs to have exactly 2 levels.
 #' @param pair_id Character value indicating which column indicates the paired
 #' sample identifier.
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`,
+#' an attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #' @param ... Options to be passed to t.test. See \code{?t.test} for more
 #' information.
 #'
@@ -57,13 +58,11 @@
 #'       ignore.case = TRUE
 #'     )
 #'   )
-#'   check_log <- OlinkAnalyze::check_npx(df = npx_df)
 #'
 #'   ttest_results <- OlinkAnalyze::olink_ttest(
 #'     df = npx_df,
 #'     variable = "Treatment",
-#'     alternative = "two.sided",
-#'     check_log = check_log
+#'     alternative = "two.sided"
 #'   )
 #'
 #'   # Paired t-test
@@ -73,8 +72,7 @@
 #'     ) |>
 #'     OlinkAnalyze::olink_ttest(
 #'       variable = "Time",
-#'       pair_id = "Subject",
-#'       check_log = check_log
+#'       pair_id = "Subject"
 #'     )
 #' }
 #' }
@@ -190,7 +188,7 @@ olink_ttest <- function(df,
   }
 
   # Check data format
-  check_log <- run_check_npx(df = df, check_log = check_log)
+  check_log <- get_check_npx(df = df, check_log = check_log)
 
   nas_in_level <- df |>
     dplyr::filter(

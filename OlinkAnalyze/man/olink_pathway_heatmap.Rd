@@ -48,13 +48,10 @@ if (rlang::is_installed(pkg = c("msigdbr", "clusterProfiler"))) {
       )
     )
 
-  check_log <- check_npx(df = npx_df)
-
   ttest_results <- OlinkAnalyze::olink_ttest(
     df = npx_df,
     variable = "Treatment",
-    alternative = "two.sided",
-    check_log = check_log
+    alternative = "two.sided"
   )
 
   # Run olink_pathway_enrichment (see documentation)
@@ -62,15 +59,13 @@ if (rlang::is_installed(pkg = c("msigdbr", "clusterProfiler"))) {
   # GSEA
   gsea_results <- OlinkAnalyze::olink_pathway_enrichment(
     df = npx_df,
-    test_results = ttest_results,
-    check_log = check_log
+    test_results = ttest_results
   )
 
   # ORA
   ora_results <- OlinkAnalyze::olink_pathway_enrichment(
     df = npx_df,
     test_results = ttest_results,
-    check_log = check_log,
     method = "ORA"
   )
 

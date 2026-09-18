@@ -17,8 +17,9 @@ olink_one_non_parametric(
 \item{df}{NPX data frame in long format with at least protein name (Assay),
 OlinkID, UniProt, Panel and a factor with at least 3 levels.}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+an attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df}.}
 
 \item{variable}{Single character value.}
 
@@ -78,19 +79,15 @@ The threshold is determined by logic evaluation of Adjusted_pval < 0.05.
 \donttest{
 if (rlang::is_installed(pkg = c("broom", "rstatix"))) {
 
- check_log <- check_npx(df = npx_data1)
-
  # One-way Kruskal-Wallis Test
  kruskal_results <- OlinkAnalyze::olink_one_non_parametric(
-    df = npx_data1,
-    check_log = check_log,
+    df = OlinkAnalyze::npx_data1,
     variable = "Site"
   )
 
   # Friedman Test
   friedman_results <- OlinkAnalyze::olink_one_non_parametric(
-    df = npx_data1,
-    check_log = check_log,
+    df = OlinkAnalyze::npx_data1,
     variable = "Time",
     subject = "Subject",
     dependence = TRUE

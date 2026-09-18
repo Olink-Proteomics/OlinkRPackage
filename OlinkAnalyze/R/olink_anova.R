@@ -41,8 +41,9 @@
 #' @param variable Single character value or character array. Variable(s) to
 #' test. If length > 1, the included variable names will be used in crossed
 #' analyses. Also takes ':' or '*' notation.
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`,
+#' an attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #' @param outcome Character. The dependent variable. Default: NPX.
 #' @param covariates Single character value or character array. Default: NULL.
 #' Covariates to include. Takes ':' or '*' notation. Crossed analysis will not
@@ -91,16 +92,10 @@
 #'       )
 #'     )
 #'
-#'   # check data
-#'   npx_df_check_log <- OlinkAnalyze::check_npx(
-#'     df = npx_df
-#'   )
-#'
 #'   # One-way ANOVA, no covariates.
 #'   # Results in a model NPX~Time
 #'   anova_results <- OlinkAnalyze::olink_anova(
 #'     df = npx_df,
-#'     check_log = npx_df_check_log,
 #'     variable = "Time"
 #'   )
 #'
@@ -108,7 +103,6 @@
 #'   # Results in model NPX~Treatment*Time+Site.
 #'   anova_results <- OlinkAnalyze::olink_anova(
 #'     df = npx_df,
-#'     check_log = npx_df_check_log,
 #'     variable = c("Treatment:Time"),
 #'     covariates = "Site"
 #'   )
@@ -117,7 +111,6 @@
 #'   # Results in model NPX~Treatment+Site:Time+Site+Time.
 #'   anova_results <- OlinkAnalyze::olink_anova(
 #'     df = npx_df,
-#'     check_log = npx_df_check_log,
 #'     variable = "Treatment",
 #'     covariates = "Site:Time"
 #'   )
@@ -274,7 +267,7 @@ olink_anova <- function(df,
       }
 
       # Check data format
-      check_log <- run_check_npx(df = df, check_log = check_log)
+      check_log <- get_check_npx(df = df, check_log = check_log)
 
       # Convert character vars to factor
       converted.vars <- NULL # nolint: object_name_linter
@@ -386,13 +379,13 @@ olink_anova <- function(df,
 
       #Print verbose message
       if (verbose) {
-        if (!is.null(add.main.effects) & length(add.main.effects) > 0L) {
+        if (!is.null(add.main.effects) && length(add.main.effects) > 0L) {
           message(
             "Missing main effects added to the model formula: ",
             paste(add.main.effects, collapse = ", ")
           )
         }
-        if (!is.null(removed.sampleids) & length(removed.sampleids) > 0L) {
+        if (!is.null(removed.sampleids) && length(removed.sampleids) > 0L) {
           message(
             "Samples removed due to missing variable or covariate levels: ",
             paste(removed.sampleids, collapse = ", ")
@@ -417,7 +410,7 @@ olink_anova <- function(df,
         )
       }
 
-      if (!is.null(covariates) & any(grepl(":", covariates))) {
+      if (!is.null(covariates) && any(grepl(":", covariates))) {
         covariate_filter_string <- covariates[stringr::str_detect(covariates, ":")] # nolint: line_length_linter
         covariate_filter_string <- sub(
           pattern = "(.*)\\:(.*)$",
@@ -535,8 +528,9 @@ olink_anova <- function(df,
 #'
 #' @param df NPX data frame in long format with at least protein name (Assay),
 #' OlinkID, UniProt, Panel and a factor with at least 3 levels.
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`,
+#' an attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #' @param olinkid_list Character vector of OlinkID's on which to perform post
 #' hoc analysis. If not specified, all assays in df are used.
 #' @param variable Single character value or character array. Variable(s) to
@@ -598,16 +592,10 @@ olink_anova <- function(df,
 #'        )
 #'     )
 #'
-#'   # check data
-#'   npx_df_check_log <- OlinkAnalyze::check_npx(
-#'     df = npx_df
-#'   )
-#'
 #'   # Two-way ANOVA, one main effect (Site) covariate.
 #'   # Results in model NPX~Treatment*Time+Site.
 #'   anova_results <- OlinkAnalyze::olink_anova(
 #'     df = npx_df,
-#'     check_log = npx_df_check_log,
 #'     variable = c("Treatment:Time"),
 #'     covariates = "Site"
 #'   )
@@ -630,7 +618,6 @@ olink_anova <- function(df,
 #'   # Posthoc, all pairwise comparisons
 #'   anova_posthoc_results <- OlinkAnalyze::olink_anova_posthoc(
 #'     df = npx_df,
-#'     check_log = npx_df_check_log,
 #'     variable = c("Treatment:Time"),
 #'     covariates = "Site",
 #'     olinkid_list = significant_assays,
@@ -640,7 +627,6 @@ olink_anova <- function(df,
 #'   # Posthoc, treated vs untreated at each timepoint, adjusted for Site effect
 #'   anova_posthoc_results <- OlinkAnalyze::olink_anova_posthoc(
 #'     df = npx_df,
-#'     check_log = npx_df_check_log,
 #'     model_formula = "NPX~Treatment*Time+Site",
 #'     olinkid_list = significant_assays,
 #'     effect_formula = "pairwise~Treatment|Time"
@@ -857,7 +843,7 @@ olink_anova_posthoc <- function(df,
       }
 
       # Check data format
-      check_log <- run_check_npx(df = df, check_log = check_log)
+      check_log <- get_check_npx(df = df, check_log = check_log)
 
       # Convert character vars to factor
       converted.vars <- NULL # nolint: object_name_linter
@@ -888,13 +874,13 @@ olink_anova_posthoc <- function(df,
 
       # Print verbose message
       if (verbose) {
-        if (!is.null(add.main.effects) & length(add.main.effects) > 0L) {
+        if (!is.null(add.main.effects) && length(add.main.effects) > 0L) {
           message(
             "Missing main effects added to the model formula: ",
             paste(add.main.effects, collapse = ", ")
           )
         }
-        if (!is.null(removed.sampleids) & length(removed.sampleids) > 0L) {
+        if (!is.null(removed.sampleids) && length(removed.sampleids) > 0L) {
           message(
             "Samples removed due to missing variable or covariate levels: ",
             paste(removed.sampleids, collapse = ", ")

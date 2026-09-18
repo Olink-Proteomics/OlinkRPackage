@@ -23,8 +23,9 @@ olink_anova_posthoc(
 \item{df}{NPX data frame in long format with at least protein name (Assay),
 OlinkID, UniProt, Panel and a factor with at least 3 levels.}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+an attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df}.}
 
 \item{olinkid_list}{Character vector of OlinkID's on which to perform post
 hoc analysis. If not specified, all assays in df are used.}
@@ -110,16 +111,10 @@ if (rlang::is_installed(pkg = c("car", "emmeans"))) {
        )
     )
 
-  # check data
-  npx_df_check_log <- OlinkAnalyze::check_npx(
-    df = npx_df
-  )
-
   # Two-way ANOVA, one main effect (Site) covariate.
   # Results in model NPX~Treatment*Time+Site.
   anova_results <- OlinkAnalyze::olink_anova(
     df = npx_df,
-    check_log = npx_df_check_log,
     variable = c("Treatment:Time"),
     covariates = "Site"
   )
@@ -142,7 +137,6 @@ if (rlang::is_installed(pkg = c("car", "emmeans"))) {
   # Posthoc, all pairwise comparisons
   anova_posthoc_results <- OlinkAnalyze::olink_anova_posthoc(
     df = npx_df,
-    check_log = npx_df_check_log,
     variable = c("Treatment:Time"),
     covariates = "Site",
     olinkid_list = significant_assays,
@@ -152,7 +146,6 @@ if (rlang::is_installed(pkg = c("car", "emmeans"))) {
   # Posthoc, treated vs untreated at each timepoint, adjusted for Site effect
   anova_posthoc_results <- OlinkAnalyze::olink_anova_posthoc(
     df = npx_df,
-    check_log = npx_df_check_log,
     model_formula = "NPX~Treatment*Time+Site",
     olinkid_list = significant_assays,
     effect_formula = "pairwise~Treatment|Time"

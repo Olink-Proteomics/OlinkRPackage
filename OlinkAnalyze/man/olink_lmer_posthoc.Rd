@@ -25,8 +25,9 @@ olink_lmer_posthoc(
 OlinkID, UniProt, 1-2 variables with at least 2 levels and subject
 identifier.}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+an attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df}.}
 
 \item{olinkid_list}{Character vector of OlinkID's on which to perform post
 hoc analysis. If not specified, all assays in df are used.}
@@ -121,15 +122,9 @@ if (rlang::is_installed(pkg = c("lme4", "lmerTest", "emmeans", "broom"))) {
       )
     )
 
-  # check data
-  npx_df_check_log <- OlinkAnalyze::check_npx(
-    df = npx_df
-  )
-
   # Results in model NPX ~ Time * Treatment + (1 | Subject)
   lmer_results <- OlinkAnalyze::olink_lmer(
     df = npx_df,
-    check_log = npx_df_check_log,
     variable = c("Time", "Treatment"),
     random = c("Subject")
   )
@@ -146,7 +141,6 @@ if (rlang::is_installed(pkg = c("lme4", "lmerTest", "emmeans", "broom"))) {
   # Run lmer posthoc on significant proteins
   results_lmer_posthoc <- OlinkAnalyze::olink_lmer_posthoc(
     df = npx_df,
-    check_log = npx_df_check_log,
     olinkid_list = assay_list,
     variable = c("Time", "Treatment"),
     effect = "Time:Treatment",
@@ -157,7 +151,6 @@ if (rlang::is_installed(pkg = c("lme4", "lmerTest", "emmeans", "broom"))) {
   # Estimate treated vs untreated at each timepoint
   results_lmer_posthoc <- OlinkAnalyze::olink_lmer_posthoc(
     df = npx_df,
-    check_log = npx_df_check_log,
     olinkid_list = assay_list,
     model_formula = "NPX~Time*Treatment+(1|Subject)",
     effect_formula = "pairwise~Treatment|Time",

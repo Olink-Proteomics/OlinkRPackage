@@ -566,12 +566,15 @@ olink_normalization_n <- function(norm_schema) {
        project_i_npx_norm)
   }
 
-  normalized_npx <- dplyr::bind_rows(normalized_npx)
+  normalized_npx <- dplyr::bind_rows(normalized_npx) |>
+    attach_check_log(
+      out_df = "tibble"
+    )
 
   # update maxlod if present
   normalized_npx <- norm_internal_update_maxlod(
     df = normalized_npx,
-    cols = check_npx(df = normalized_npx) |>
+    cols = get_check_npx(df = normalized_npx) |>
       suppressMessages() |>
       suppressWarnings() |>
       (\(.) .$col_names)()
@@ -610,12 +613,14 @@ olink_normalization_n <- function(norm_schema) {
 #' project to which the other project will be adjusted to (default: P1).
 #' @param format Boolean that controls whether the normalized dataset will be
 #' formatted for input to downstream analysis.
-#' @param project_1_check_log A named list returned by [`check_npx()`]. If
-#' `NULL`, [`check_npx()`] will be run internally using `project_1_df`.
-#' (default: `NULL`)
-#' @param project_2_check_log A named list returned by [`check_npx()`]. If
-#' `NULL`, [`check_npx()`] will be run internally using `project_2_df`.
-#' (default: `NULL`)
+#' @param project_1_check_log Optional named list returned by [`check_npx()`].
+#' If `NULL`, an attached `check_log` is used when present; otherwise
+#' [`check_npx()`] will be run internally using `project_1_df`. (default:
+#' `NULL`)
+#' @param project_2_check_log Optional named list returned by [`check_npx()`].
+#' If `NULL`, an attached `check_log` is used when present; otherwise
+#' [`check_npx()`] will be run internally using `project_2_df`. (default:
+#' `NULL`)
 #'
 #' @return A "tibble" of NPX data in long format containing normalized NPX
 #' values, including adjustment factors and name of project.
@@ -656,10 +661,6 @@ olink_normalization_n <- function(norm_schema) {
 #' overlap_samples_list <- list("DF1" = overlap_samples,
 #'                              "DF2" = overlap_samples)
 #'
-#' # check npx
-#' df1_check_log <- OlinkAnalyze::check_npx(df = npx_df1)
-#' df2_check_log <- OlinkAnalyze::check_npx(df = npx_df2)
-#'
 #' # Normalize
 #' OlinkAnalyze::olink_normalization_bridge(
 #'   project_1_df = npx_df1,
@@ -667,9 +668,7 @@ olink_normalization_n <- function(norm_schema) {
 #'   bridge_samples = overlap_samples_list,
 #'   project_1_name = "P1",
 #'   project_2_name = "P2",
-#'   project_ref_name = "P1",
-#'   project_1_check_log = df1_check_log,
-#'   project_2_check_log = df2_check_log
+#'   project_ref_name = "P1"
 #' )
 #' }
 #'
@@ -718,7 +717,8 @@ olink_normalization_bridge <- function(project_1_df,
                                                 .data[["SampleID"]],
                                                 .data[["SampleID_df1"]])) |>
     dplyr::select(-dplyr::all_of("SampleID")) |>
-    dplyr::rename("SampleID" = "SampleID_df1")
+    dplyr::rename("SampleID" = "SampleID_df1") |>
+    dplyr::compute()
 
   # bridge normalize the two data frames
   norm_df <- olink_normalization(
@@ -788,12 +788,14 @@ olink_normalization_bridge <- function(project_1_df,
 #' project to which the other project will be adjusted to (default: P1).
 #' @param format Boolean that controls whether the normalized dataset will be
 #' formatted for input to downstream analysis.
-#' @param project_1_check_log A named list returned by [`check_npx()`]. If
-#' `NULL`, [`check_npx()`] will be run internally using `project_1_df`.
-#' (default: `NULL`)
-#' @param project_2_check_log A named list returned by [`check_npx()`]. If
-#' `NULL`, [`check_npx()`] will be run internally using `project_2_df`.
-#' (default: `NULL`)
+#' @param project_1_check_log Optional named list returned by [`check_npx()`].
+#' If `NULL`, an attached `check_log` is used when present; otherwise
+#' [`check_npx()`] will be run internally using `project_1_df`. (default:
+#' `NULL`)
+#' @param project_2_check_log Optional named list returned by [`check_npx()`].
+#' If `NULL`, an attached `check_log` is used when present; otherwise
+#' [`check_npx()`] will be run internally using `project_2_df`. (default:
+#' `NULL`)
 #'
 #' @return A "tibble" of NPX data in long format containing normalized NPX
 #' values, including adjustment factors and name of project.
@@ -879,10 +881,6 @@ olink_normalization_bridge <- function(project_1_df,
 #' subset_samples_list <- list("DF1" = df1_samples,
 #'                             "DF2" = df2_samples)
 #'
-#' # check npx
-#' df1_check_log <- OlinkAnalyze::check_npx(df = npx_df1)
-#' df2_check_log <- OlinkAnalyze::check_npx(df = npx_df2)
-#'
 #' # Normalize
 #' OlinkAnalyze::olink_normalization_subset(
 #'   project_1_df = npx_df1,
@@ -890,9 +888,7 @@ olink_normalization_bridge <- function(project_1_df,
 #'   reference_samples = subset_samples_list,
 #'   project_1_name = "P1",
 #'   project_2_name = "P2",
-#'   project_ref_name = "P1",
-#'   project_1_check_log = df1_check_log,
-#'   project_2_check_log = df2_check_log
+#'   project_ref_name = "P1"
 #' )
 #'
 #'
@@ -963,10 +959,6 @@ olink_normalization_bridge <- function(project_1_df,
 #' subset_samples_all_list <- list("DF1" = df1_samples_all,
 #'                                 "DF2" = df2_samples_all)
 #'
-#' # check npx
-#' df1_check_log <- OlinkAnalyze::check_npx(df = npx_df1)
-#' df2_check_log <- OlinkAnalyze::check_npx(df = npx_df2)
-#'
 #' # Normalize
 #' OlinkAnalyze::olink_normalization_subset(
 #'   project_1_df = npx_df1,
@@ -974,9 +966,7 @@ olink_normalization_bridge <- function(project_1_df,
 #'   reference_samples = subset_samples_all_list,
 #'   project_1_name = "P1",
 #'   project_2_name = "P2",
-#'   project_ref_name = "P1",
-#'   project_1_check_log = df1_check_log,
-#'   project_2_check_log = df2_check_log
+#'   project_ref_name = "P1"
 #' )
 #' }
 #'

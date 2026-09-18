@@ -16,8 +16,9 @@
 #' Olink Analyze read_npx function.
 #' @param sample_missing_freq The threshold for sample wise missingness.
 #' @param n Number of bridge samples to be selected.
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`,
+#' an attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #'
 #' @return A "tibble" with sample IDs and mean NPX for a defined number of
 #' bridging samples. Columns include:
@@ -35,13 +36,10 @@
 #'
 #' @examples
 #' \donttest{
-#'   check_log <- OlinkAnalyze::check_npx(df = npx_data1)
-#'
 #'   bridge_samples <- OlinkAnalyze::olink_bridge_selector(
-#'     df = npx_data1,
+#'     df = OlinkAnalyze::npx_data1,
 #'     sample_missing_freq = 0.1,
-#'     n = 20L,
-#'     check_log = check_log
+#'     n = 20L
 #'   )
 #' }
 #'
@@ -85,19 +83,16 @@ olink_bridge_selector <- function(df,
 
   # ---- STEP 1: Remove invalid OlinkIDs & control samples ---------------------
 
-  check_log <- run_check_npx(df = df, check_log = check_log)
-
   df_clean <- run_clean_npx(
     df = df,
-    check_log = check_log,
+    check_log = get_check_npx(df = df, check_log = check_log),
+    out_df = "tibble",
     remove_qc_warning = FALSE,
     remove_assay_warning = FALSE,
     verbose = FALSE
   )
 
-  check_log_clean <- run_check_npx(df = df_clean, check_log = NULL) |>
-    suppressMessages() |>
-    suppressWarnings()
+  check_log_clean <- get_check_npx(df = df_clean)
 
   if (!("sample_type" %in% names(check_log_clean$col_names))) {
     cli::cli_inform(
@@ -208,19 +203,24 @@ olink_bridge_selector <- function(df,
         dplyr::all_of(check_log_clean$col_names$sample_id)
       )
     ) |>
+    olink_summarize_qc_warning(
+      qc_warning = check_log_clean$col_names$qc_warning,
+      group = check_log_clean$col_names$sample_id,
+      output_col = "qc_warn"
+    ) |>
+    dplyr::group_by(
+      dplyr::across(
+        dplyr::all_of(check_log_clean$col_names$sample_id)
+      )
+    ) |>
     dplyr::mutate(
-      qc_warn = dplyr::if_else(
-        all(toupper(.data[[check_log_clean$col_names$qc_warning]]) == "PASS"),
-        "PASS",
-        "WARNING"
-      ),
       outliers = sum(.data[["Outlier"]], na.rm = TRUE),
       PercAssaysBelowLOD  = sum(is.na(.data[["quant_na"]])) / dplyr::n(),
       MeanNPX = mean(x = .data[["quant_na"]], na.rm = TRUE)
     ) |>
     dplyr::ungroup() |>
     dplyr::filter(
-      .data[["qc_warn"]] == "PASS" &
+      .data[["qc_warn"]] == "Pass" &
         .data[["outliers"]] == 0L &
         .data[["PercAssaysBelowLOD"]] < .env[["sample_missing_freq"]]
     ) |>

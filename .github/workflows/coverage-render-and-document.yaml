@@ -32,12 +32,14 @@ jobs:
         with:
           extra-packages: any::pak, any::remotes, any::stringr, any::covr, any::devtools, any::rmarkdown, any::roxygen2, local::.
           working-directory: OlinkAnalyze
-
+          
       - name: Test coverage badge
+        if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
         run: |
           Rscript -e 'source("test_coverage/update_readme_coverage_badge.R")'
 
       - name: Commit changes if README is updated
+        if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
         run: |
           git config --local user.name "$GITHUB_ACTOR"
           git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"

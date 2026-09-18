@@ -22,8 +22,9 @@ olink_qc_plot(
 \item{df}{NPX data frame in long format. Must have columns SampleID, NPX and
 Panel.}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+an attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df}.}
 
 \item{color_g}{Character value indicating which column to use as fill color
 (default QC_Warning). Continuous color scale for Olink(R) Sample Index (OSI)
@@ -70,14 +71,14 @@ if (rlang::is_installed(pkg = c("ggrepel"))) {
 
   # standard plot
   OlinkAnalyze::olink_qc_plot(
-    df = npx_data1,
+    df = OlinkAnalyze::npx_data1,
     color_g = "QC_Warning",
     label_outliers = TRUE
   )
 
   # Change the outlier threshold to +/-4SD
   OlinkAnalyze::olink_qc_plot(
-    df = npx_data1,
+    df = OlinkAnalyze::npx_data1,
     color_g = "QC_Warning",
     IQR_outlierDef = 4L,
     median_outlierDef = 4L,
@@ -86,7 +87,7 @@ if (rlang::is_installed(pkg = c("ggrepel"))) {
 
   # Identify the outliers
   qc <- OlinkAnalyze::olink_qc_plot(
-    df = npx_data1,
+    df = OlinkAnalyze::npx_data1,
     color_g = "QC_Warning",
     IQR_outlierDef = 4L,
     median_outlierDef = 4L,

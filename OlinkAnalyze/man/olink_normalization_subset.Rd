@@ -38,13 +38,15 @@ project to which the other project will be adjusted to (default: P1).}
 \item{format}{Boolean that controls whether the normalized dataset will be
 formatted for input to downstream analysis.}
 
-\item{project_1_check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If
-\code{NULL}, \code{\link[=check_npx]{check_npx()}} will be run internally using \code{project_1_df}.
-(default: \code{NULL})}
+\item{project_1_check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}.
+If \code{NULL}, an attached \code{check_log} is used when present; otherwise
+\code{\link[=check_npx]{check_npx()}} will be run internally using \code{project_1_df}. (default:
+\code{NULL})}
 
-\item{project_2_check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If
-\code{NULL}, \code{\link[=check_npx]{check_npx()}} will be run internally using \code{project_2_df}.
-(default: \code{NULL})}
+\item{project_2_check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}.
+If \code{NULL}, an attached \code{check_log} is used when present; otherwise
+\code{\link[=check_npx]{check_npx()}} will be run internally using \code{project_2_df}. (default:
+\code{NULL})}
 }
 \value{
 A "tibble" of NPX data in long format containing normalized NPX
@@ -145,10 +147,6 @@ df2_samples <- npx_df2 |>
 subset_samples_list <- list("DF1" = df1_samples,
                             "DF2" = df2_samples)
 
-# check npx
-df1_check_log <- OlinkAnalyze::check_npx(df = npx_df1)
-df2_check_log <- OlinkAnalyze::check_npx(df = npx_df2)
-
 # Normalize
 OlinkAnalyze::olink_normalization_subset(
   project_1_df = npx_df1,
@@ -156,9 +154,7 @@ OlinkAnalyze::olink_normalization_subset(
   reference_samples = subset_samples_list,
   project_1_name = "P1",
   project_2_name = "P2",
-  project_ref_name = "P1",
-  project_1_check_log = df1_check_log,
-  project_2_check_log = df2_check_log
+  project_ref_name = "P1"
 )
 
 
@@ -229,10 +225,6 @@ df2_samples_all <- npx_df2 |>
 subset_samples_all_list <- list("DF1" = df1_samples_all,
                                 "DF2" = df2_samples_all)
 
-# check npx
-df1_check_log <- OlinkAnalyze::check_npx(df = npx_df1)
-df2_check_log <- OlinkAnalyze::check_npx(df = npx_df2)
-
 # Normalize
 OlinkAnalyze::olink_normalization_subset(
   project_1_df = npx_df1,
@@ -240,9 +232,7 @@ OlinkAnalyze::olink_normalization_subset(
   reference_samples = subset_samples_all_list,
   project_1_name = "P1",
   project_2_name = "P2",
-  project_ref_name = "P1",
-  project_1_check_log = df1_check_log,
-  project_2_check_log = df2_check_log
+  project_ref_name = "P1"
 )
 }
 

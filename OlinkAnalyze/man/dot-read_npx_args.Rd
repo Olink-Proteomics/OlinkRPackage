@@ -8,6 +8,7 @@
   filename,
   file,
   out_df,
+  preferred_names,
   long_format,
   olink_platform,
   data_type,
@@ -26,6 +27,10 @@ Expecting extensions "xls" or "xlsx" for excel files, "csv" or "txt" for delim f
 \item{out_df}{The class of the output dataset. One of
 "tibble" or "arrow". Defaults to
 "tibble".}
+
+\item{preferred_names}{A named character vector where names are internal
+column names and values are column names to be selected from the input data
+frame. Read the \emph{description} of \code{\link[=check_npx]{check_npx()}}for further information.}
 
 \item{long_format}{Boolean marking format of input file. One of \code{TRUE} for
 long format and \code{FALSE} for wide format files. Defaults to \code{NULL} for

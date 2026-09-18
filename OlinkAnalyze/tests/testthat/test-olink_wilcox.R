@@ -8,6 +8,8 @@ test_that(
     skip_if_not_installed(pkg = "broom")
     skip_on_cran()
 
+    # tibble ----
+
     check_log <- check_npx(df = npx_data1) |>
       suppressMessages() |>
       suppressWarnings()
@@ -43,6 +45,52 @@ test_that(
           .data[["OlinkID"]]
         )
     )
+
+    # olink_class ----
+
+    expect_no_error(
+      object = expect_no_message(
+        object = expect_warning(
+          object = npx_data1_obj <- attach_check_log(
+            df = npx_data1,
+            out_df = "tibble"
+          ),
+          regexp = paste("Duplicate SampleIDs detected: \"CONTROL_SAMPLE_AS",
+                         "1\" and \"CONTROL_SAMPLE_AS 2\"")
+        )
+      )
+    )
+
+    # run olink_wilcox
+    expect_message(
+      object = expect_message(
+        object = expect_message(
+          object = wilcox_test_res_obj <- olink_wilcox(
+            df = npx_data1_obj,
+            variable = "Treatment"
+          ),
+          regexp = paste("Samples removed due to missing variable levels:",
+                         "CONTROL_SAMPLE_AS 1, CONTROL_SAMPLE_AS 2")
+        ),
+        regexp = "Variable converted from character to factor: Treatment"
+      ),
+      regexp = "Mann-Whitney U Test is performed on Treated - Untreated."
+    )
+
+    expect_equal(
+      object = wilcox_test_res_obj |>
+        dplyr::arrange(
+          .data[["Adjusted_pval"]],
+          .data[["estimate"]],
+          .data[["OlinkID"]]
+        ),
+      expected = reference_results$wilcox_test |>
+        dplyr::arrange(
+          .data[["Adjusted_pval"]],
+          .data[["estimate"]],
+          .data[["OlinkID"]]
+        )
+    )
   }
 )
 
@@ -55,6 +103,8 @@ test_that(
 
     skip_if_not_installed(pkg = "broom")
     skip_on_cran()
+
+    # tibble ---
 
     npx_df <- npx_data1 |>
       dplyr::filter(
@@ -81,6 +131,47 @@ test_that(
 
     expect_equal(
       object = paired_wilcox_test_res |>
+        dplyr::arrange(
+          .data[["Adjusted_pval"]],
+          .data[["estimate"]],
+          .data[["OlinkID"]]
+        ),
+      expected = reference_results$wilcox_test_paired |>
+        dplyr::arrange(
+          .data[["Adjusted_pval"]],
+          .data[["estimate"]],
+          .data[["OlinkID"]]
+        )
+    )
+
+    # olink_class ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = npx_df_obj <- attach_check_log(
+            df = npx_df,
+            out_df = "tibble"
+          )
+        )
+      )
+    )
+
+    # run olink_wilcox
+    expect_message(
+      object = expect_message(
+        object = paired_wilcox_test_res_obj <- olink_wilcox(
+          df = npx_df_obj,
+          variable = "Time",
+          pair_id = "Subject"
+        ),
+        regexp = "Variable converted from character to factor: Time"
+      ),
+      regexp = "Mann-Whitney U Test is performed on Baseline - Week.6."
+    )
+
+    expect_equal(
+      object = paired_wilcox_test_res_obj |>
         dplyr::arrange(
           .data[["Adjusted_pval"]],
           .data[["estimate"]],

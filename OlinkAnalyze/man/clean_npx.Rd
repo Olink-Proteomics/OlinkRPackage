@@ -25,8 +25,9 @@ clean_npx(
 \item{df}{A "tibble" or "ArrowObject"
 from \code{\link{read_npx}}.}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+an attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df}.}
 
 \item{remove_assay_na}{Logical. If \code{FALSE}, skips filtering assays with all
 quantified values \code{NA}. Defaults to \code{TRUE}.}
@@ -132,22 +133,21 @@ auto-detect internal control assays. \emph{Please ensure internal control assays
 }
 \examples{
 \dontrun{
-# run check_npx
-check_log <- check_npx(
-  df = npx_data1
-)
-
 # run clean_npx
-clean_npx(
-  df = npx_data1,
-  check_log = check_log
+OlinkAnalyze::clean_npx(
+  df = OlinkAnalyze::npx_data1
 )
 
 # run clean_npx with messages for all steps
-clean_npx(
-  df = npx_data1,
-  check_log = check_log,
+OlinkAnalyze::clean_npx(
+  df = OlinkAnalyze::npx_data1,
   verbose = TRUE
+)
+
+# run clean_npx but keep duplicated samples
+OlinkAnalyze::clean_npx(
+  df = OlinkAnalyze::npx_data1,
+  remove_dup_sample_id = FALSE
 )
 }
 

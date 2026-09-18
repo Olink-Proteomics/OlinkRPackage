@@ -25,8 +25,9 @@ columns representing limit of detection ("LOD", "PlateLOD" or "MaxLOD").}
 \item{test_results}{a data frame of statistical test results including the
 columns "Adjusted_pval" and "estimate".}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+an attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df}.}
 
 \item{method}{One of "GSEA" (default) or "ORA".}
 
@@ -142,27 +143,22 @@ if (rlang::is_installed(pkg = c("msigdbr", "clusterProfiler"))) {
       )
     )
 
-  check_log <- check_npx(df = npx_df)
-
   ttest_results <- OlinkAnalyze::olink_ttest(
     df = npx_df,
     variable = "Treatment",
-    alternative = "two.sided",
-    check_log = check_log
+    alternative = "two.sided"
   )
 
   # GSEA
   gsea_results <- OlinkAnalyze::olink_pathway_enrichment(
     df = npx_df,
-    test_results = ttest_results,
-    check_log = check_log
+    test_results = ttest_results
   )
 
   # ORA
   ora_results <- OlinkAnalyze::olink_pathway_enrichment(
     df = npx_df,
     test_results = ttest_results,
-    check_log = check_log,
     method = "ORA"
   )
 }

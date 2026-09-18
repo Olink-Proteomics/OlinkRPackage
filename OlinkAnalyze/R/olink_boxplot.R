@@ -20,8 +20,9 @@
 #' facet plot (default 6).
 #' @param verbose Boolean. If the plots are shown as well as returned in the
 #'  list (default is false).
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`...
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`,
+#' an attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #' @param ... coloroption passed to specify color order.
 #'
 #' @return A list of objects of class “ggplot” (the actual ggplot object is
@@ -32,18 +33,19 @@
 #'
 #' @examples
 #' \donttest{
-#'
 #' if (rlang::is_installed(pkg = c("broom", "car"))) {
-#'   npx_df <- npx_data1 |>
+#'   npx_df <- OlinkAnalyze::npx_data1 |>
 #'     dplyr::filter(
 #'       !grepl(pattern = "control|ctrl",
 #'              x = .data[["SampleID"]],
 #'              ignore.case = TRUE)
 #'     )
+#'
 #'   anova_results <- OlinkAnalyze::olink_anova(
 #'     df = npx_df,
 #'     variable = "Site"
 #'   )
+#'
 #'   significant_assays <- anova_results |>
 #'     dplyr::filter(
 #'       .data[["Threshold"]] == "Significant"
@@ -51,6 +53,7 @@
 #'     dplyr::pull(
 #'       .data[["OlinkID"]]
 #'     )
+#'
 #'   OlinkAnalyze::olink_boxplot(
 #'     df = npx_df,
 #'     variable = "Site",
@@ -103,21 +106,19 @@ olink_boxplot <- function(df,
     }
   }
   # ---- QC & CLEANING --------------------------------------------------------
-  check_log <- run_check_npx(df = df, check_log = check_log)
   df <- run_clean_npx(
     df = df,
-    check_log = check_log,
+    out_df = "tibble",
+    check_log = get_check_npx(df = df, check_log = check_log),
     remove_qc_warning = FALSE,
     remove_assay_warning = FALSE,
     verbose = FALSE
   )
-  check_log_clean <- run_check_npx(df = df, check_log = NULL) |>
-    suppressMessages() |>
-    suppressWarnings()
+  check_log_clean <- get_check_npx(df = df)
   if (!("sample_type" %in% names(check_log_clean$col_names))) {
     cli::cli_inform(
-      paste("No sample type column detected in input {.arg df}. Control",
-            "samples may not be filtered out.")
+      "No sample type column detected in input {.arg df}. Control samples may
+      not be filtered out."
     )
   }
   # ---- Early column trimming ------------------------------------------------

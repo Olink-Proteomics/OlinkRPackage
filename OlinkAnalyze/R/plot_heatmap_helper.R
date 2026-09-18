@@ -78,6 +78,8 @@ plot_heatmap_clean_df <- function(df, check_log, colnames) {
                       convert_nonunique_uniprot = TRUE,
                       out_df = "tibble",
                       verbose = FALSE)
+  check_log <- get_check_npx(df = df)
+
   #Remove assays with no variance
   df <- df |>
     dplyr::group_by(
@@ -107,6 +109,9 @@ plot_heatmap_clean_df <- function(df, check_log, colnames) {
       "oid" = check_log$col_names$olink_id,
       "assay" = check_log$col_names$assay
     )
+
+  df <- attach_check_log(df = df, out_df = "tibble")
+
   return(df)
 }
 
@@ -368,10 +373,10 @@ pheatmap_run <- function(pheatmap_args) {
   },
   error = function(e) {
     if (grepl("NA/NaN/Inf", e$message, fixed = TRUE)) {
-      cli::cli_abort(cli::cli_bullets(c("x" = "Error when clustering.",
-                                        "i" = paste("Try setting cluster of",
-                                                    "rows or columns to",
-                                                    "`FALSE`."))))
+      cli::cli_abort(cli::cli_bullets(c(
+        "x" = "Error when clustering.",
+        "i" = "Try setting cluster of rows or columns to {.val {FALSE}}."
+      )))
     } else {
       cli::cli_abort(e$message)
     }

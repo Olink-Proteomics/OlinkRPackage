@@ -59,8 +59,9 @@
 #' columns representing limit of detection ("LOD", "PlateLOD" or "MaxLOD").
 #' @param test_results a data frame of statistical test results including the
 #' columns "Adjusted_pval" and "estimate".
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`,
+#' an attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #' @param method One of "GSEA" (default) or "ORA".
 #' @param ontology One of "MSigDb" (default), "MSigDb_com", "KEGG", "GO", and
 #' "Reactome". "MSigDb" contains "C2" and "C5" gene sets which encompass "KEGG",
@@ -129,27 +130,22 @@
 #'       )
 #'     )
 #'
-#'   check_log <- check_npx(df = npx_df)
-#'
 #'   ttest_results <- OlinkAnalyze::olink_ttest(
 #'     df = npx_df,
 #'     variable = "Treatment",
-#'     alternative = "two.sided",
-#'     check_log = check_log
+#'     alternative = "two.sided"
 #'   )
 #'
 #'   # GSEA
 #'   gsea_results <- OlinkAnalyze::olink_pathway_enrichment(
 #'     df = npx_df,
-#'     test_results = ttest_results,
-#'     check_log = check_log
+#'     test_results = ttest_results
 #'   )
 #'
 #'   # ORA
 #'   ora_results <- OlinkAnalyze::olink_pathway_enrichment(
 #'     df = npx_df,
 #'     test_results = ttest_results,
-#'     check_log = check_log,
 #'     method = "ORA"
 #'   )
 #' }
@@ -188,19 +184,23 @@ olink_pathway_enrichment <- function(df,
   organism <- test_mode_results$organism
   test_mode <- test_mode_results$test_mode
 
-  check_log <- check_pe_inputs(df = df,
-                               check_log = check_log,
-                               test_results = test_results,
-                               method = method,
-                               ontology = ontology,
-                               organism = organism)
+  check_log <- get_check_npx(df = df, check_log = check_log)
+
+  check_pe_inputs(df = df,
+                  check_log = check_log,
+                  test_results = test_results,
+                  method = method,
+                  ontology = ontology,
+                  organism = organism)
 
   # prepare data ----
 
-  df <- data_prep(df = df,
-                  check_log = check_log,
-                  test_results = test_results)
-
+  lst_out <- data_prep(df = df,
+                       check_log = check_log,
+                       test_results = test_results)
+  df <- lst_out$df
+  check_log <- lst_out$check_log
+  rm(lst_out)
 
   test_results <- test_prep(df = df,
                             test_results = test_results,
@@ -270,8 +270,6 @@ check_pe_inputs <- function(df,
                             method,
                             ontology,
                             organism) {
-
-  check_log <- run_check_npx(df = df, check_log = check_log)
 
   # check required columns in test_results ----
 
@@ -366,13 +364,19 @@ check_pe_inputs <- function(df,
     )
   }
 
-  return(check_log)
+  return(invisible(NULL))
 }
 
 helper_non_overlap_assays <- function(df,
                                       test_results,
                                       check_log,
                                       which = "both") {
+  # convert to tibble if it's not already a tibble or olink_class
+  if (!any(c(check_is_tibble(x = df, error = FALSE),
+             check_is_olink_class(x = df, error = FALSE)))) {
+    df <- convert_read_npx_output(df = df, out_df = "tibble")
+  }
+
   no_overlap_in_df <- setdiff(
     x = unique(df[[check_log$col_names$olink_id]]),
     y = unique(test_results[["OlinkID"]])
@@ -397,11 +401,12 @@ helper_non_overlap_assays <- function(df,
 
 data_prep <- function(df,
                       test_results,
-                      check_log) {
+                      check_log = NULL) {
   # clean up data from invalid entries ----
 
   df <- run_clean_npx(df = df,
                       check_log = check_log,
+                      out_df = "tibble",
                       remove_assay_na = TRUE,
                       remove_invalid_oid = TRUE,
                       remove_dup_sample_id = FALSE,
@@ -412,6 +417,8 @@ data_prep <- function(df,
                       convert_df_cols = TRUE,
                       convert_nonunique_uniprot = FALSE,
                       verbose = FALSE)
+
+  check_log <- get_check_npx(df = df, check_log = check_log)
 
   # remove non-overlapping assays between df and test_results ----
 
@@ -472,7 +479,12 @@ data_prep <- function(df,
     )
   }
 
-  return(df)
+  return(
+    list(
+      df = df,
+      check_log = check_log
+    )
+  )
 }
 
 test_prep <- function(df,
@@ -544,8 +556,7 @@ select_ont <- function(ontology,
 
       msig_df <- arrow::open_dataset(
         sources = msig_fixture_path
-      ) |>
-        dplyr::collect()
+      )
 
     } else {
       msig_df <- msigdbr::msigdbr(
@@ -587,8 +598,7 @@ select_ont <- function(ontology,
 
       msig_df <- arrow::open_dataset(
         sources = msig_fixture_path
-      ) |>
-        dplyr::collect()
+      )
     } else {
       msig_df <- msigdbr::msigdbr(
         species = "Mus musculus",
@@ -652,7 +662,11 @@ select_ont <- function(ontology,
         dplyr::any_of(
           c("gs_name", "gene_symbol")
         )
-      )
+      ) |>
+      dplyr::collect()
+  } else {
+    msig_df <- msig_df |>
+      dplyr::collect()
   }
 
   return(msig_df)

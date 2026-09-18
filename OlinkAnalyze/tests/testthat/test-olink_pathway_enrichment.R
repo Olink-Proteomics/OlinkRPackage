@@ -76,7 +76,7 @@ test_that(
 
     expect_identical(
       object = dim(tt_gsea),
-      expected = c(6992L, 12L)
+      expected = c(573L, 12L)
     )
 
   }
@@ -169,7 +169,7 @@ test_that(
 
     expect_identical(
       object = dim(tt_gsea_na),
-      expected = c(4626L, 12L)
+      expected = c(62L, 12L)
     )
 
   }
@@ -219,7 +219,7 @@ test_that(
 
     expect_equal(
       object = dim(tt_gsea_reactome),
-      expected = c(320L, 12L)
+      expected = c(20L, 12L)
     )
   }
 )
@@ -268,7 +268,7 @@ test_that(
 
     expect_equal(
       object = dim(tt_gsea_msigdb_com),
-      expected = c(6862L, 12L)
+      expected = c(568L, 12L)
     )
   }
 )
@@ -286,42 +286,42 @@ test_that(
     skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_hs.parquet")))
     skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_mm.parquet")))
 
-    expect_message(
+    expect_warning(
       object = expect_message(
         object = expect_message(
           object = expect_message(
             object = expect_message(
-              object = tt_gsea_kegg <- olink_pathway_enrichment(
-                df = npx_data1 |>
-                  dplyr::filter(
-                    !grepl(pattern = "control",
-                           x = .data[["SampleID"]],
-                           ignore.case = TRUE)
-                  ),
-                check_log = check_log,
-                test_results = reference_results$t_test,
-                ontology = "TEST#KEGG",
-                method = "TEST#GSEA",
-                organism = "TEST#human"
+              object = expect_message(
+                object = tt_gsea_kegg <- olink_pathway_enrichment(
+                  df = npx_data1 |>
+                    dplyr::filter(
+                      !grepl(pattern = "control",
+                             x = .data[["SampleID"]],
+                             ignore.case = TRUE)
+                    ),
+                  check_log = check_log,
+                  test_results = reference_results$t_test,
+                  ontology = "TEST#KEGG",
+                  method = "TEST#GSEA",
+                  organism = "TEST#human"
+                ),
+                regexp = paste("Test mode activated: using fixed version of",
+                               "MSigDB for human")
               ),
-              regexp = paste("Test mode activated: using fixed version of",
-                             "MSigDB for human")
+              regexp = "Extracting KEGG Database from MSigDB..."
             ),
-            regexp = "Extracting KEGG Database from MSigDB..."
+            regexp = "KEGG is not approved for commercial use!"
           ),
-          regexp = "KEGG is not approved for commercial use!"
+          regexp = paste("138 assays are not found in the database. Please",
+                         "check the names for the following assays in",
+                         "`test_results` and `df`")
         ),
-        regexp = paste("138 assays are not found in the database. Please check",
-                       "the names for the following assays in `test_results`",
-                       "and `df`")
+        regexp = "Gene set enrichment analysis used by default"
       ),
-      regexp = "Gene set enrichment analysis used by default"
+      regexp = "No remaining pathways within the range 10-500 proteins!"
     )
 
-    expect_equal(
-      object = dim(tt_gsea_kegg),
-      expected = c(53L, 12L)
-    )
+    expect_null(object = tt_gsea_kegg)
   }
 )
 
@@ -369,7 +369,7 @@ test_that(
 
     expect_equal(
       object = dim(tt_gsea_go),
-      expected = c(2946L, 12L)
+      expected = c(356L, 12L)
     )
   }
 )
@@ -388,6 +388,19 @@ test_that(
 
     skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_hs.parquet")))
     skip_if_not(file.exists(test_path("data", "msidbr_v26.1.0_mm.parquet")))
+
+    # expected output ----
+
+    expected_dim <- c(345L, 12L)
+
+    # tibble ----
+
+    npx_data1_mod <- npx_data1 |>
+      dplyr::filter(
+        !grepl(pattern = "control",
+               x = .data[["SampleID"]],
+               ignore.case = TRUE)
+      )
 
     expect_message(
       object = expect_message(
@@ -420,7 +433,7 @@ test_that(
 
     expect_equal(
       object = dim(tt_ora),
-      expected = c(573L, 12L)
+      expected = c(345L, 12L)
     )
   }
 )
@@ -469,7 +482,7 @@ test_that(
 
     expect_equal(
       object = dim(tt_ora_reactome),
-      expected = c(20L, 12L)
+      expected = c(15L, 12L)
     )
   }
 )
@@ -572,7 +585,7 @@ test_that(
 
     expect_equal(
       object = dim(tt_ora_go),
-      expected = c(356L, 12L)
+      expected = c(212L, 12L)
     )
   }
 )
@@ -980,7 +993,7 @@ test_that(
     )
 
     expect_identical(
-      object = dim(data_prep_out),
+      object = dim(data_prep_out$df),
       expected = c(28236L, 18L)
     )
   }
@@ -1016,7 +1029,7 @@ test_that(
     )
 
     expect_identical(
-      object = dim(data_prep_out),
+      object = dim(data_prep_out$df),
       expected = c(27924L, 17L)
     )
   }

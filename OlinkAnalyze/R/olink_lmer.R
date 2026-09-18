@@ -47,8 +47,9 @@
 #' @param variable Single character value or character array. Variables to test.
 #' If `length > 1`, the included variable names will be used in crossed
 #' analyses. Also takes ':' or '*' notation.
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`,
+#' an attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #' @param outcome Character. The dependent variable. Default: NPX.
 #' @param random Single character value or character array.
 #' @param covariates Single character value or character array. Default: `NULL`.
@@ -99,15 +100,9 @@
 #'       )
 #'     )
 #'
-#'   # check data
-#'   npx_df_check_log <- OlinkAnalyze::check_npx(
-#'     df = npx_df
-#'   )
-#'
 #'   # Results in model NPX ~ Time * Treatment + (1 | Subject) + (1 | Site)
 #'   lmer_results <- OlinkAnalyze::olink_lmer(
 #'     df = npx_df,
-#'     check_log = npx_df_check_log,
 #'     variable = c("Time", "Treatment"),
 #'     random = c("Subject", "Site")
 #'   )
@@ -213,7 +208,7 @@ olink_lmer <- function(df,
   }
 
   # Check data format
-  check_log <- run_check_npx(df = df, check_log = check_log)
+  check_log <- get_check_npx(df = df, check_log = check_log)
 
   lmer_result <- withCallingHandlers(
     {
@@ -387,13 +382,13 @@ olink_lmer <- function(df,
 
       #Print verbose message
       if (verbose) {
-        if (!is.null(add_main_effects) & length(add_main_effects) > 0L) {
+        if (!is.null(add_main_effects) && length(add_main_effects) > 0L) {
           message(
             "Missing main effects added to the model formula: ",
             paste(add_main_effects, collapse = ", ")
           )
         }
-        if (!is.null(removed_sampleids) & length(removed_sampleids) > 0L) {
+        if (!is.null(removed_sampleids) && length(removed_sampleids) > 0L) {
           message(
             "Samples removed due to missing variable or covariate levels: ",
             paste(removed_sampleids, collapse = ", ")
@@ -418,7 +413,7 @@ olink_lmer <- function(df,
         )
       }
 
-      if (!is.null(covariates) & any(grepl(":", covariates))) {
+      if (!is.null(covariates) && any(grepl(":", covariates))) {
         covariate_filter_string <- covariates[stringr::str_detect(covariates, ":")] # nolint: line_length_linter
         covariate_filter_string <- sub(
           pattern = "(.*)\\:(.*)$",
@@ -596,8 +591,9 @@ single_lmer <- function(data, formula_string) {
 #' @param df NPX data frame in long format with at least protein name (Assay),
 #' OlinkID, UniProt, 1-2 variables with at least 2 levels and subject
 #' identifier.
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`,
+#' an attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #' @param olinkid_list Character vector of OlinkID's on which to perform post
 #' hoc analysis. If not specified, all assays in df are used.
 #' @param variable Single character value or character array. Variables to test.
@@ -661,15 +657,9 @@ single_lmer <- function(data, formula_string) {
 #'       )
 #'     )
 #'
-#'   # check data
-#'   npx_df_check_log <- OlinkAnalyze::check_npx(
-#'     df = npx_df
-#'   )
-#'
 #'   # Results in model NPX ~ Time * Treatment + (1 | Subject)
 #'   lmer_results <- OlinkAnalyze::olink_lmer(
 #'     df = npx_df,
-#'     check_log = npx_df_check_log,
 #'     variable = c("Time", "Treatment"),
 #'     random = c("Subject")
 #'   )
@@ -686,7 +676,6 @@ single_lmer <- function(data, formula_string) {
 #'   # Run lmer posthoc on significant proteins
 #'   results_lmer_posthoc <- OlinkAnalyze::olink_lmer_posthoc(
 #'     df = npx_df,
-#'     check_log = npx_df_check_log,
 #'     olinkid_list = assay_list,
 #'     variable = c("Time", "Treatment"),
 #'     effect = "Time:Treatment",
@@ -697,7 +686,6 @@ single_lmer <- function(data, formula_string) {
 #'   # Estimate treated vs untreated at each timepoint
 #'   results_lmer_posthoc <- OlinkAnalyze::olink_lmer_posthoc(
 #'     df = npx_df,
-#'     check_log = npx_df_check_log,
 #'     olinkid_list = assay_list,
 #'     model_formula = "NPX~Time*Treatment+(1|Subject)",
 #'     effect_formula = "pairwise~Treatment|Time",
@@ -846,7 +834,7 @@ olink_lmer_posthoc <- function(df,
   }
 
   # Check data format
-  check_log <- run_check_npx(df = df, check_log = check_log)
+  check_log <- get_check_npx(df = df, check_log = check_log)
 
   lmer_posthoc_result <- withCallingHandlers(
     {

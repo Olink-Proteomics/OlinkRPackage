@@ -249,3 +249,143 @@ test_that(
     vdiffr::expect_doppelganger(qc_plot2_name, qc_plot2)
   }
 )
+
+test_that(
+  "olink_qc_plot - works - olink_class and arrow",
+  {
+    skip_on_cran()
+    skip_if_not_installed("ggrepel")
+
+    # data ----
+
+    npx_data1_mod <- npx_data1 |>
+      dplyr::mutate(
+        SampleID = paste(.data[["SampleID"]], "_",
+                         .data[["Index"]], sep = "")
+      )
+
+    # tibble ----
+
+    check_npx_data1_mod <- check_npx(df = npx_data1_mod) |>
+      suppressMessages() |>
+      suppressWarnings()
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = qc_plot <- olink_qc_plot(
+            df = npx_data1_mod,
+            check_log = check_npx_data1_mod,
+            label_outliers = FALSE
+          )
+        )
+      )
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = qc_plot_v2 <- olink_qc_plot(
+            df = npx_data1_mod,
+            check_log = check_npx_data1_mod,
+            coloroption = c("teal", "pink"),
+            label_outliers = FALSE
+          )
+        )
+      )
+    )
+
+    # olink_class ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = npx_data1_mod_obj <- attach_check_log(
+            df = npx_data1_mod,
+            out_df = "tibble"
+          )
+        )
+      )
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = qc_plot_obj <- olink_qc_plot(
+            df = npx_data1_mod_obj,
+            label_outliers = FALSE
+          )
+        )
+      )
+    )
+
+    expect_equal_ggplot(
+      object = qc_plot_obj,
+      expected = qc_plot
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = qc_plot_obj_v2 <- olink_qc_plot(
+            df = npx_data1_mod_obj,
+            coloroption = c("teal", "pink"),
+            label_outliers = FALSE
+          )
+        )
+      )
+    )
+
+    expect_equal_ggplot(
+      object = qc_plot_obj_v2,
+      expected = qc_plot_v2
+    )
+
+    # arrow ----
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = npx_data1_mod_arrow <- attach_check_log(
+            df = npx_data1_mod,
+            out_df = "arrow"
+          )
+        )
+      )
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = qc_plot_arrow <- olink_qc_plot(
+            df = npx_data1_mod_arrow,
+            label_outliers = FALSE
+          )
+        )
+      )
+    )
+
+    expect_equal_ggplot(
+      object = qc_plot_arrow,
+      expected = qc_plot
+    )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = qc_plot_arrow_v2 <- olink_qc_plot(
+            df = npx_data1_mod_arrow,
+            coloroption = c("teal", "pink"),
+            label_outliers = FALSE
+          )
+        )
+      )
+    )
+
+    expect_equal_ggplot(
+      object = qc_plot_arrow_v2,
+      expected = qc_plot_v2
+    )
+
+  }
+)

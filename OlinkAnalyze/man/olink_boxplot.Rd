@@ -40,8 +40,9 @@ olink_anova_posthoc() function.}
 \item{ttest_results}{Data frame from ttest analysis using
 olink_ttest() function.}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}...}
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+an attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df}.}
 
 \item{...}{coloroption passed to specify color order.}
 }
@@ -56,18 +57,19 @@ of proteins (OlinkIDs) using ggplot2::ggplot and ggplot2::geom_boxplot.
 }
 \examples{
 \donttest{
-
 if (rlang::is_installed(pkg = c("broom", "car"))) {
-  npx_df <- npx_data1 |>
+  npx_df <- OlinkAnalyze::npx_data1 |>
     dplyr::filter(
       !grepl(pattern = "control|ctrl",
              x = .data[["SampleID"]],
              ignore.case = TRUE)
     )
+
   anova_results <- OlinkAnalyze::olink_anova(
     df = npx_df,
     variable = "Site"
   )
+
   significant_assays <- anova_results |>
     dplyr::filter(
       .data[["Threshold"]] == "Significant"
@@ -75,6 +77,7 @@ if (rlang::is_installed(pkg = c("broom", "car"))) {
     dplyr::pull(
       .data[["OlinkID"]]
     )
+
   OlinkAnalyze::olink_boxplot(
     df = npx_df,
     variable = "Site",

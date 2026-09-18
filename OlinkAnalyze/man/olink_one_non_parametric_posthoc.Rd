@@ -19,8 +19,9 @@ olink_one_non_parametric_posthoc(
 \item{df}{NPX data frame in long format with at least protein name (Assay),
 OlinkID, UniProt, Panel and a factor with at least 3 levels.}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+an attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df}.}
 
 \item{olinkid_list}{Character vector of OlinkID's on which to perform post
 hoc analysis. If not specified, all assays in df are used.}
@@ -66,19 +67,15 @@ The function handles both factor and numerical variables.
 \donttest{
 if (rlang::is_installed(pkg = c("FSA", "broom", "rstatix"))) {
 
-  check_log <- check_npx(df = npx_data1)
-
   # One-way Kruskal-Wallis Test
   kruskal_results <- OlinkAnalyze::olink_one_non_parametric(
-    df = npx_data1,
-    check_log = check_log,
+    df = OlinkAnalyze::npx_data1,
     variable = "Site"
   )
 
   # Friedman Test
   friedman_results <- OlinkAnalyze::olink_one_non_parametric(
-    df = npx_data1,
-    check_log = check_log,
+    df = OlinkAnalyze::npx_data1,
     variable = "Time",
     subject = "Subject",
     dependence = TRUE
@@ -86,8 +83,7 @@ if (rlang::is_installed(pkg = c("FSA", "broom", "rstatix"))) {
 
   # Posthoc test for the results from Friedman Test
   friedman_posthoc_results <- OlinkAnalyze::olink_one_non_parametric_posthoc(
-    df = npx_data1,
-    check_log = check_log,
+    df = OlinkAnalyze::npx_data1,
     variable = "Time",
     test = "friedman",
     olinkid_list = friedman_results |>

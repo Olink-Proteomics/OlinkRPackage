@@ -12,8 +12,8 @@
 #'
 #' Unique sample names are required.
 #'
-#' Imputation by the median is done for assays with missingness <10\%
-#' for multi-plate projects and <5\% for single plate projects.
+#' Imputation by the median is done for assays with missingness <10%
+#' for multi-plate projects and <5% for single plate projects.
 #'
 #' The plot is printed, and a list of ggplot objects is returned.
 #' If byPanel = TRUE, the data processing (imputation of missing
@@ -28,8 +28,9 @@
 #'
 #' @param df data frame in long format with Sample Id, NPX and column
 #' of choice for colors.
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`,
+#' an attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #' @param color_g Character value indicating which column to use for
 #' colors (default QC_Warning). Continuous color scale for Olink(R)
 #' Sample Index (OSI) columns OSITimeToCentrifugation,
@@ -81,19 +82,15 @@
 #'              ignore.case = TRUE)
 #'     )
 #'
-#'   check_log <- check_npx(npx_data)
-#'
 #'   # PCA using all the data
 #'   OlinkAnalyze::olink_pca_plot(
 #'     df = npx_data,
-#'     check_log = check_log,
 #'     color_g = "QC_Warning"
 #'   )
 #'
 #'   # PCA per panel
 #'   g <- OlinkAnalyze::olink_pca_plot(
 #'     df = npx_data,
-#'     check_log = check_log,
 #'     color_g = "QC_Warning",
 #'     byPanel = TRUE
 #'   )
@@ -102,7 +99,6 @@
 #'   # Label outliers
 #'   OlinkAnalyze::olink_pca_plot(
 #'     df = npx_data,
-#'     check_log = check_log,
 #'     color_g = "QC_Warning",
 #'     outlierDefX = 2L,
 #'     outlierDefY = 4L
@@ -110,7 +106,6 @@
 #'
 #'   OlinkAnalyze::olink_pca_plot(
 #'     df = npx_data,
-#'     check_log = check_log,
 #'     color_g = "QC_Warning",
 #'     outlierDefX = 2.5,
 #'     outlierDefY = 4L,
@@ -120,7 +115,6 @@
 #'   # Retrieve the outliers
 #'   g <- OlinkAnalyze::olink_pca_plot(
 #'     df = npx_data,
-#'     check_log = check_log,
 #'     color_g = "QC_Warning",
 #'     outlierDefX = 2.5,
 #'     outlierDefY = 4L,
@@ -161,23 +155,22 @@ olink_pca_plot <- function(df,
     if (length(ellipsis_variables) == 1L) {
       if (!(ellipsis_variables == "coloroption")) {
         cli::cli_abort(
-          "The ... option only takes the coloroption argument. ... currently
-          contains the variable {ellipsis_variables}."
+          "The ... option only takes the {.val {\"coloroption\"}} argument. ...
+          currently contains the variable {.val {ellipsis_variables}}."
         )
       }
     } else {
       cli::cli_abort(
-        "The ... option only takes the coloroption argument. ... currently
-        contains the variables {paste(ellipsis_variables, collapse = ', ')}."
+        "The ... option only takes the {.val {\"coloroption\"}} argument. ...
+        currently contains the variables {.val {ellipsis_variables}}."
       )
     }
   }
 
-  # Check if check_log is correct
-  check_log <- run_check_npx(df = df, check_log = check_log)
-
   # other checks
   check_is_dataset(x = df, error = TRUE)
+  # Check if check_log is correct
+  check_log <- get_check_npx(df = df, check_log = check_log)
   check_is_scalar_character(x = color_g, error = TRUE)
   check_is_scalar_boolean(x = label_samples, error = TRUE)
   check_is_scalar_boolean(x = drop_assays, error = TRUE)
@@ -191,10 +184,9 @@ olink_pca_plot <- function(df,
   # Stop if duplicate sample ID's detected
   if (length(check_log$sample_id_dups) > 0L) {
     cli::cli_abort(
-      "Duplicate SampleID(s) detected:
-      {paste(check_log$sample_id_dups, collapse = ', ')}.
-      Each sample ID must be unique. Please check your data and ensure that
-      each sample has a unique identifier."
+      "Duplicate SampleID(s) detected: {.val {check_log$sample_id_dups}}. Each
+      sample ID must be unique. Please check your data and ensure that each
+      sample has a unique identifier."
     )
   }
 
@@ -217,6 +209,8 @@ olink_pca_plot <- function(df,
     verbose = FALSE
   )
 
+  check_log <- get_check_npx(df = df)
+
   # OSI checks - ran only if OSI columns selected to color
   osi_cat_cols <- c("OSICategory")
   osi_cont_cols <- c(
@@ -229,7 +223,6 @@ olink_pca_plot <- function(df,
     # Check for invalid values and NA columns
     df <- check_osi(
       df = df,
-      check_log = check_log,
       osi_score = color_g
     )
   }
@@ -436,9 +429,6 @@ olink_pca_plot.internal <- function(df, # nolint: object_name_linter
                                     label_outliers,
                                     verbose = verbose,
                                     ...) {
-  # Check if check_log is correct
-  check_log <- run_check_npx(df = df, check_log = check_log)
-
   # Ensure one unique color value per SampleID (required by
   # npxProcessing_forDimRed)
   df <- df |>
@@ -469,8 +459,8 @@ olink_pca_plot.internal <- function(df, # nolint: object_name_linter
     if (length(dropped_loadings) > 0L) {
       if (verbose) {
         cli::cli_warn(
-          "The loading(s) {paste0(dropped_loadings, collapse = ', ')} from the
-          loadings_list contain NA and are dropped."
+          "The loading(s) {.val {dropped_loadings}} from the loadings_list
+          contain NA and are dropped."
         )
       }
 
@@ -487,8 +477,8 @@ olink_pca_plot.internal <- function(df, # nolint: object_name_linter
     if (length(dropped_loadings) > 0L) {
       if (verbose) {
         cli::cli_warn(
-          "The loading(s) {paste0(dropped_loadings, collapse = ', ')} from the
-          loadings_list are dropped due to high missingness."
+          "The loading(s) {.val {dropped_loadings}} from the loadings_list are
+          dropped due to high missingness."
         )
       }
 

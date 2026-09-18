@@ -39,8 +39,9 @@ also supported.}
 \item{y_val}{Integer indicating which UMAP component to plot along the y-axis
 (default 2)}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+an attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df}.}
 
 \item{config}{object of class umap.config, specifying the parameters for the
 UMAP algorithm (default umap::umap.defaults)}
@@ -109,21 +110,17 @@ if (rlang::is_installed(pkg = c("umap", "ggrepel", "ggpubr"))) {
       SampleID = paste(.data[["SampleID"]], "_", .data[["Index"]], sep = "")
     )
 
-  check_log <- check_npx(df = npx_data)
-
   # UMAP using all the data
   OlinkAnalyze::olink_umap_plot(
     df = npx_data,
-    color_g = "QC_Warning",
-    check_log = check_log
+    color_g = "QC_Warning"
   )
 
   # UMAP per panel
   g <- OlinkAnalyze::olink_umap_plot(
     df = npx_data,
     color_g = "QC_Warning",
-    byPanel = TRUE,
-    check_log = check_log
+    byPanel = TRUE
   )
   # Plot only the Inflammation panel
   g$Inflammation
@@ -133,8 +130,7 @@ if (rlang::is_installed(pkg = c("umap", "ggrepel", "ggpubr"))) {
     df = npx_data,
     color_g = "QC_Warning",
     outlierDefX = 2L,
-    outlierDefY = 4L,
-    check_log = check_log
+    outlierDefY = 4L
   )
 
   OlinkAnalyze::olink_umap_plot(
@@ -142,8 +138,7 @@ if (rlang::is_installed(pkg = c("umap", "ggrepel", "ggpubr"))) {
     color_g = "QC_Warning",
     outlierDefX = 3L,
     outlierDefY = 2L,
-    byPanel = TRUE,
-    check_log = check_log
+    byPanel = TRUE
   )
 
   # Retrieve outliers
@@ -152,8 +147,7 @@ if (rlang::is_installed(pkg = c("umap", "ggrepel", "ggpubr"))) {
     color_g = "QC_Warning",
     outlierDefX = 3L,
     outlierDefY = 2L,
-    byPanel = TRUE,
-    check_log = check_log
+    byPanel = TRUE
   )
   outliers <- lapply(p, function(x) x$data) |>
     dplyr::bind_rows() |>

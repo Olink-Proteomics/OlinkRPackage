@@ -23,8 +23,9 @@ OlinkID, UniProt, Panel and a factor with at least 3 levels.}
 test. If length > 1, the included variable names will be used in crossed
 analyses. Also takes ':' or '*' notation.}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+an attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df}.}
 
 \item{outcome}{Character. The dependent variable. Default: NPX.}
 
@@ -113,16 +114,10 @@ if (rlang::is_installed(pkg = c("broom", "car"))) {
       )
     )
 
-  # check data
-  npx_df_check_log <- OlinkAnalyze::check_npx(
-    df = npx_df
-  )
-
   # One-way ANOVA, no covariates.
   # Results in a model NPX~Time
   anova_results <- OlinkAnalyze::olink_anova(
     df = npx_df,
-    check_log = npx_df_check_log,
     variable = "Time"
   )
 
@@ -130,7 +125,6 @@ if (rlang::is_installed(pkg = c("broom", "car"))) {
   # Results in model NPX~Treatment*Time+Site.
   anova_results <- OlinkAnalyze::olink_anova(
     df = npx_df,
-    check_log = npx_df_check_log,
     variable = c("Treatment:Time"),
     covariates = "Site"
   )
@@ -139,7 +133,6 @@ if (rlang::is_installed(pkg = c("broom", "car"))) {
   # Results in model NPX~Treatment+Site:Time+Site+Time.
   anova_results <- OlinkAnalyze::olink_anova(
     df = npx_df,
-    check_log = npx_df_check_log,
     variable = "Treatment",
     covariates = "Site:Time"
   )

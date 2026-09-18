@@ -95,3 +95,47 @@ test_that(
     )
   }
 )
+
+test_that(
+  "olink_osi_dist_plot - works - olink_class",
+  {
+    skip_if_not_installed(pkg = "vdiffr")
+
+    osi_data <- get_example_data("example_osi_data.rds") |>
+      dplyr::filter(
+        !is.na(.data[["OSISummary"]])
+      )
+
+    expect_no_error(
+      object = expect_no_warning(
+        object = expect_no_message(
+          object = osi_data_obj <- attach_check_log(
+            df = osi_data,
+            out_df = "tibble"
+          )
+        )
+      )
+    )
+
+    # we can't use expect_equal_ggplot because df inherits olink_class and when
+    # the plot is generated, the olink_class is maintained in the plot data,
+    # which causes the test to fail as it does not match the ggplot object from
+    # the test using simple tibble osi_data. So instead we use vdiffr to check
+    # the plot output, which should be the same regardless of the class of the
+    # input data. This adds a snapshot test for the plot output when using
+    # olink_class data, which is important to ensure that the plot function
+    # works correctly with olink_class data and produces the expected visual
+    # output.
+
+    osi_dist_plot_name <- "osisummary-plot-olink-class"
+    check_snap_exist(test_dir_name = "osi_dist_plot",
+                     snap_name = osi_dist_plot_name)
+    vdiffr::expect_doppelganger(
+      title = "OSISummary Plot - olink class",
+      fig = olink_osi_dist_plot(
+        df = osi_data_obj,
+        osi_score = "OSISummary"
+      )
+    )
+  }
+)

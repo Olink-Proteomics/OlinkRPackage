@@ -31,8 +31,9 @@
 #' (default 1)
 #' @param y_val Integer indicating which UMAP component to plot along the y-axis
 #' (default 2)
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`,
+#' an attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #' @param label_samples Logical. If TRUE, points are replaced with SampleID
 #' (default FALSE)
 #' @param config object of class umap.config, specifying the parameters for the
@@ -70,21 +71,17 @@
 #'       SampleID = paste(.data[["SampleID"]], "_", .data[["Index"]], sep = "")
 #'     )
 #'
-#'   check_log <- check_npx(df = npx_data)
-#'
 #'   # UMAP using all the data
 #'   OlinkAnalyze::olink_umap_plot(
 #'     df = npx_data,
-#'     color_g = "QC_Warning",
-#'     check_log = check_log
+#'     color_g = "QC_Warning"
 #'   )
 #'
 #'   # UMAP per panel
 #'   g <- OlinkAnalyze::olink_umap_plot(
 #'     df = npx_data,
 #'     color_g = "QC_Warning",
-#'     byPanel = TRUE,
-#'     check_log = check_log
+#'     byPanel = TRUE
 #'   )
 #'   # Plot only the Inflammation panel
 #'   g$Inflammation
@@ -94,8 +91,7 @@
 #'     df = npx_data,
 #'     color_g = "QC_Warning",
 #'     outlierDefX = 2L,
-#'     outlierDefY = 4L,
-#'     check_log = check_log
+#'     outlierDefY = 4L
 #'   )
 #'
 #'   OlinkAnalyze::olink_umap_plot(
@@ -103,8 +99,7 @@
 #'     color_g = "QC_Warning",
 #'     outlierDefX = 3L,
 #'     outlierDefY = 2L,
-#'     byPanel = TRUE,
-#'     check_log = check_log
+#'     byPanel = TRUE
 #'   )
 #'
 #'   # Retrieve outliers
@@ -113,8 +108,7 @@
 #'     color_g = "QC_Warning",
 #'     outlierDefX = 3L,
 #'     outlierDefY = 2L,
-#'     byPanel = TRUE,
-#'     check_log = check_log
+#'     byPanel = TRUE
 #'   )
 #'   outliers <- lapply(p, function(x) x$data) |>
 #'     dplyr::bind_rows() |>
@@ -178,9 +172,6 @@ olink_umap_plot <- function(df,
     }
   }
 
-  # Check data format
-  check_log <- run_check_npx(df = df, check_log = check_log)
-
   # input checks
 
   check_is_dataset(x = df, error = TRUE)
@@ -191,7 +182,7 @@ olink_umap_plot <- function(df,
   # would be the user's decision.
   df <- run_clean_npx(
     df = df,
-    check_log = check_log,
+    check_log = get_check_npx(df = df, check_log = check_log),
     remove_assay_na = TRUE,
     remove_invalid_oid = TRUE,
     remove_dup_sample_id = FALSE,
@@ -203,6 +194,9 @@ olink_umap_plot <- function(df,
     out_df = "tibble",
     verbose = FALSE
   )
+
+  # get check log
+  check_log <- get_check_npx(df = df)
 
   # Check that the user didn't specify just one of outlierDefX and outlierDefY
   if (sum(c(is.numeric(outlierDefX), is.numeric(outlierDefY))) == 1L) {
@@ -233,7 +227,6 @@ olink_umap_plot <- function(df,
 
     # Check for invalid values and NA columns
     df <- check_osi(df = df,
-                    check_log = check_log,
                     osi_score = color_g)
   }
 

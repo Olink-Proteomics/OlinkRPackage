@@ -9,8 +9,9 @@
 #'
 #' @param df NPX data frame in long format with at least protein name (Assay),
 #' OlinkID, UniProt, 1-2 variables with at least 2 levels.
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`,
+#' an attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #' @param olinkid_list Character vector indicating which proteins (by OlinkID)
 #' for which to create figures.
 #' @param number_of_proteins_per_plot Number plots to include in the list of
@@ -51,15 +52,9 @@
 #'       )
 #'     )
 #'
-#'   # check data
-#'   npx_df_check_log <- OlinkAnalyze::check_npx(
-#'     df = npx_df
-#'   )
-#'
 #'   # Results in model NPX ~ Time * Treatment + (1 | Subject) + (1 | Site)
 #'   lmer_results <- OlinkAnalyze::olink_lmer(
 #'     df = npx_df,
-#'     check_log = npx_df_check_log,
 #'     variable = c("Time", "Treatment"),
 #'     random = c("Subject")
 #'   )
@@ -70,12 +65,13 @@
 #'     .data[["Threshold"]] == "Significant"
 #'     & .data[["term"]] == "Time:Treatment"
 #'   ) |>
-#'     dplyr::distinct(.data[["OlinkID"]]) |>
+#'     dplyr::distinct(
+#'       .data[["OlinkID"]]
+#'     ) |>
 #'     dplyr::pull()
 #'
 #'   lst_pointrange_plots <- OlinkAnalyze::olink_lmer_plot(
 #'     df = npx_df,
-#'     check_log = npx_df_check_log,
 #'     variable = c("Time", "Treatment"),
 #'     random = c("Subject"),
 #'     x_axis_variable = "Time",
@@ -170,7 +166,7 @@ olink_lmer_plot <- function(df,
 
   lm.means <- olink_lmer_posthoc( # nolint: object_name_linter
     df = df,
-    check_log = check_log,
+    check_log = get_check_npx(df = df, check_log = check_log),
     variable = variable,
     random = random,
     outcome = outcome,

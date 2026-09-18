@@ -61,4 +61,5 @@ OlinkAnalyze::olink_display_plate_layout(
   fill.color = "Site"
 )
 }
+
 }

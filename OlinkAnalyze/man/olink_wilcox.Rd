@@ -16,8 +16,9 @@ grouping variable. Needs to have exactly 2 levels.}
 \item{pair_id}{Character value indicating which column indicates the paired
 sample identifier.}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+an attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df}.}
 
 \item{...}{Options to be passed to wilcox.test. See \code{?wilcox_test} for
 more information.}
@@ -65,14 +66,12 @@ if (rlang::is_installed(pkg = c("broom"))) {
       ignore.case = TRUE
     )
   )
-  check_log <- OlinkAnalyze::check_npx(df = npx_df)
 
   # Mann-Whitney U Test
   wilcox_results <- OlinkAnalyze::olink_wilcox(
     df = npx_df,
     variable = "Treatment",
-    alternative = "two.sided",
-    check_log = check_log
+    alternative = "two.sided"
   )
 
   # Paired Mann-Whitney U Test
@@ -82,8 +81,7 @@ if (rlang::is_installed(pkg = c("broom"))) {
     ) |>
     OlinkAnalyze::olink_wilcox(
       variable = "Time",
-      pair_id = "Subject",
-      check_log = check_log
+      pair_id = "Subject"
     )
 }
 }

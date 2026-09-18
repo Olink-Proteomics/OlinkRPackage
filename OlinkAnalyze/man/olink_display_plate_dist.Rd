@@ -28,4 +28,5 @@ and ggplot2::geom_bar.
 \donttest{randomized.manifest <- olink_plate_randomizer(manifest)}
 \donttest{olink_display_plate_dist(data=randomized.manifest,
 fill.color="Site")}
+
 }

@@ -63,8 +63,9 @@ returned for mean_return = TRUE and no adjustment is performed.}
 comparisons within an assay. Options include \code{tukey}, \code{sidak},
 \code{bonferroni} and \code{none}.}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+an attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df}.}
 
 \item{verbose}{Boolean. Default: True. If information about removed samples,
 factor conversion and final model formula is to be printed to the console.}
@@ -109,7 +110,6 @@ if (rlang::is_installed(pkg = c("ordinal", "emmeans"))) {
       ignore.case = TRUE
     )
   )
-  check_log <- OlinkAnalyze::check_npx(df = npx_df)
 
   # Two-way Ordinal Regression with CLM.
   # Results in model NPX~Treatment+Time+Treatment:Time.
@@ -133,8 +133,7 @@ if (rlang::is_installed(pkg = c("ordinal", "emmeans"))) {
     df = npx_df,
     variable = c("Treatment:Time"),
     olinkid_list = significant_assays,
-    effect = "Time",
-    check_log = check_log
+    effect = "Time"
   )
 }
 }

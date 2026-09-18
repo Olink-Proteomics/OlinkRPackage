@@ -89,22 +89,21 @@
 #'
 #' @examples
 #' \dontrun{
-#' # run check_npx
-#' check_log <- check_npx(
-#'   df = npx_data1
-#' )
-#'
 #' # run clean_npx
-#' clean_npx(
-#'   df = npx_data1,
-#'   check_log = check_log
+#' OlinkAnalyze::clean_npx(
+#'   df = OlinkAnalyze::npx_data1
 #' )
 #'
 #' # run clean_npx with messages for all steps
-#' clean_npx(
-#'   df = npx_data1,
-#'   check_log = check_log,
+#' OlinkAnalyze::clean_npx(
+#'   df = OlinkAnalyze::npx_data1,
 #'   verbose = TRUE
+#' )
+#'
+#' # run clean_npx but keep duplicated samples
+#' OlinkAnalyze::clean_npx(
+#'   df = OlinkAnalyze::npx_data1,
+#'   remove_dup_sample_id = FALSE
 #' )
 #' }
 #'
@@ -126,7 +125,19 @@ clean_npx <- function(df,
   # Validate input dataset
   check_is_dataset(x = df, error = TRUE)
   check_is_scalar_boolean(x = verbose, error = TRUE)
-  check_log <- run_check_npx(df = df, check_log = check_log)
+
+  # obtain check_log: from df attribute, from argument, or by running check_npx
+  check_log <- get_check_npx(
+    df = df,
+    check_log = check_log,
+    preferred_names = NULL # no need to specify preferred names here
+  )
+
+  # get preferred column names to assign to output dataset
+  preferred_names <- get_preferred_names(
+    df = df,
+    check_log = check_log
+  )
 
   if (verbose) cli::cli_h2("Starting {.fn clean_npx} pipeline.")
 
@@ -212,7 +223,9 @@ clean_npx <- function(df,
   )
 
   # Correct non-unique Uniprot IDs
-  if (verbose) cli::cli_h3("Converting non-unique OlinkID - UniProt mapping.")
+  if (verbose) {
+    cli::cli_h3("Converting non-unique assay identifiers - UniProt mapping.")
+  }
   df <- clean_nonunique_uniprot(
     df = df,
     check_log = check_log,
@@ -242,12 +255,14 @@ clean_npx <- function(df,
     cli::cli_h2("Completed {.fn clean_npx}. Returning clean dataset.")
   }
 
-  return(
-    convert_read_npx_output(
-      df = df,
-      out_df = out_df
-    )
+  # Convert to requested output format and attach an updated check_log
+  df <- attach_check_log(
+    df = df,
+    out_df = out_df,
+    preferred_names = preferred_names
   )
+
+  return(df)
 }
 
 # Help Functions ----------------------------------------------------------
@@ -307,7 +322,12 @@ run_clean_npx <- function(df, ...) {
   n_before <- nrow(df)
 
   cleaned_df <- withCallingHandlers(
-    expr = do.call(clean_npx, c(list(df = df), dots, list(verbose = FALSE))),
+    expr = do.call(
+      what = clean_npx,
+      args = c(list(df = df),
+               dots,
+               list(verbose = FALSE))
+    ),
     message = function(m) invokeRestart("muffleMessage"),
     warning = function(w) invokeRestart("muffleWarning")
   )
@@ -319,7 +339,7 @@ run_clean_npx <- function(df, ...) {
     cli::cli_inform(
       c("{.val {n_removed}} entr{?y/ies} removed by {.fn clean_npx} from the
       input dataset {.arg df}. Run {.fn clean_npx} on your dataset with
-      {.arg verbose = TRUE} to inspect which rows were removed."),
+        {.arg verbose = TRUE} to inspect which rows were removed."),
       wrap = FALSE
     )
   }
@@ -1006,14 +1026,14 @@ clean_assay_warning <- function(df,
 #' @examples
 #' \dontrun{
 #' # use npx_data1 to check that clean_control_sample_id() works
-#' log <- OlinkAnalyze::check_npx(
+#' log <- OlinkAnalyze:::get_check_npx(
 #'   df = OlinkAnalyze::npx_data1
 #' ) |>
 #'   suppressWarnings() |>
 #'   suppressMessages()
 #'
 #' out <- OlinkAnalyze:::clean_control_sample_id(
-#'   df = npx_data1,
+#'   df =  OlinkAnalyze::npx_data1,
 #'   check_npx_log = log,
 #'   control_sample_id = c("CONTROL_SAMPLE_AS 1", "CONTROL_SAMPLE_AS 2")
 #' )
@@ -1160,10 +1180,18 @@ clean_col_class <- function(df,
       )
     )
 
-  col_class_msg <- paste0(
-    "* \"", check_log$col_class$col_name, "\": ",
-    "from \"", check_log$col_class$col_class, "\" converted to ",
-    "\"", check_log$col_class$expected_col_class, "\"."
+  col_class_msg <- vapply(
+    seq_len(nrow(check_log$col_class)),
+    function(i) {
+      cli::format_inline( # nolint: return_linter
+        paste0(
+          "* {.val {check_log$col_class$col_name[[i]]}}: from ",
+          "{.val {check_log$col_class$col_class[[i]]}} converted to ",
+          "{.val {check_log$col_class$expected_col_class[[i]]}}."
+        )
+      )
+    },
+    character(1L)
   )
 
   cli::cli_inform(
@@ -1250,7 +1278,7 @@ clean_nonunique_uniprot <- function(df,
           x = .data[[check_log$col_names$uniprot]],
           n = -1L
         ) |>
-          ansi_collapse_quot(),
+          (\(x) cli::format_inline("{.and {.val {x}}}"))(),
         .groups = "drop"
       )
 
@@ -1286,10 +1314,19 @@ clean_nonunique_uniprot <- function(df,
       c(
         "{nrow(oid_uniprot_map)} assay identifier{?s} map multiple UniProt
         identifiers. The first instance will be used for downstream analysis.",
-        paste0(
-          "* ", oid_uniprot_map$uniprot_extra, " will be replaced with ",
-          "\"", oid_uniprot_map$uniprot_keep, "\" for ",
-          "\"", oid_uniprot_map$OlinkID, "\"."
+        vapply(
+          seq_len(nrow(oid_uniprot_map)),
+          function(i) {
+            cli::format_inline( # nolint: return_linter
+              paste(
+                "* {oid_uniprot_map[[\"uniprot_extra\"]][[i]]} will be",
+                "replaced with",
+                "{.val {oid_uniprot_map[[\"uniprot_keep\"]][[i]]}} for",
+                "{.val {oid_uniprot_map[[check_log$col_names$olink_id]][[i]]}}."
+              )
+            )
+          },
+          character(1L)
         )
       )
     )

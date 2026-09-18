@@ -29,8 +29,9 @@ olink_pca_plot(
 \item{df}{data frame in long format with Sample Id, NPX and column
 of choice for colors.}
 
-\item{check_log}{A named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
-\code{\link[=check_npx]{check_npx()}} will be run internally using \code{df}.}
+\item{check_log}{Optional named list returned by \code{\link[=check_npx]{check_npx()}}. If \code{NULL},
+an attached \code{check_log} is used when present; otherwise \code{\link[=check_npx]{check_npx()}} will
+be run internally using \code{df}.}
 
 \item{color_g}{Character value indicating which column to use for
 colors (default QC_Warning). Continuous color scale for Olink(R)
@@ -98,8 +99,8 @@ corresponding assay.
 
 Unique sample names are required.
 
-Imputation by the median is done for assays with missingness <10\\%
-for multi-plate projects and <5\\% for single plate projects.
+Imputation by the median is done for assays with missingness <10\%
+for multi-plate projects and <5\% for single plate projects.
 
 The plot is printed, and a list of ggplot objects is returned.
 If byPanel = TRUE, the data processing (imputation of missing
@@ -122,19 +123,15 @@ if (rlang::is_installed(pkg = c("ggrepel", "ggpubr"))) {
              ignore.case = TRUE)
     )
 
-  check_log <- check_npx(npx_data)
-
   # PCA using all the data
   OlinkAnalyze::olink_pca_plot(
     df = npx_data,
-    check_log = check_log,
     color_g = "QC_Warning"
   )
 
   # PCA per panel
   g <- OlinkAnalyze::olink_pca_plot(
     df = npx_data,
-    check_log = check_log,
     color_g = "QC_Warning",
     byPanel = TRUE
   )
@@ -143,7 +140,6 @@ if (rlang::is_installed(pkg = c("ggrepel", "ggpubr"))) {
   # Label outliers
   OlinkAnalyze::olink_pca_plot(
     df = npx_data,
-    check_log = check_log,
     color_g = "QC_Warning",
     outlierDefX = 2L,
     outlierDefY = 4L
@@ -151,7 +147,6 @@ if (rlang::is_installed(pkg = c("ggrepel", "ggpubr"))) {
 
   OlinkAnalyze::olink_pca_plot(
     df = npx_data,
-    check_log = check_log,
     color_g = "QC_Warning",
     outlierDefX = 2.5,
     outlierDefY = 4L,
@@ -161,7 +156,6 @@ if (rlang::is_installed(pkg = c("ggrepel", "ggpubr"))) {
   # Retrieve the outliers
   g <- OlinkAnalyze::olink_pca_plot(
     df = npx_data,
-    check_log = check_log,
     color_g = "QC_Warning",
     outlierDefX = 2.5,
     outlierDefY = 4L,

@@ -19,20 +19,6 @@ If output is \code{FALSE} and \var{error} = \code{TRUE}, an error is thrown.
 \description{
 Common parameters for check functions.
 }
-\seealso{
-\code{\link{check_is_character}}
-\code{\link{check_is_integer}}
-\code{\link{check_is_numeric}}
-\code{\link{check_is_boolean}}
-\code{\link{check_is_scalar_character}}
-\code{\link{check_is_scalar_integer}}
-\code{\link{check_is_scalar_numeric}}
-\code{\link{check_is_scalar_boolean}}
-\code{\link{check_is_tibble}}
-\code{\link{check_is_dataset}}
-\code{\link{check_is_arrow_object}}
-\code{\link{check_is_list}}
-}
 \author{
 Klev Diamanti
 }

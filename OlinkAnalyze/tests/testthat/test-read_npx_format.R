@@ -1442,6 +1442,112 @@ test_that(
   }
 )
 
+## Special cases ----
+
+test_that(
+  "read_npx_format - wide - cell A2 is empty",
+  {
+    skip_if_not_installed("writexl")
+
+    ## current version ----
+
+    # get synthetic data, or skip if not available
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "NPX",
+      n_panels = 3L,
+      n_assays = 45L,
+      n_samples = 99L,
+      show_dev_int_ctrl = TRUE,
+      show_int_ctrl = TRUE,
+      version = 2L
+    )
+
+    ## excel  - data_type = NULL ----
+
+    withr::with_tempfile(
+      new = "excel_wide",
+      pattern = "test_wide",
+      fileext = ".xlsx",
+      code = {
+        df_rand$list_df_wide$df_wide <- df_rand$list_df_wide$df_wide |>
+          dplyr::mutate(
+            V1 = dplyr::if_else(
+              dplyr::row_number() == 2L, NA_character_, .data[["V1"]]
+            )
+          )
+
+        # write in csv
+        writexl::write_xlsx(x = df_rand$list_df_wide$df_wide,
+                            path = excel_wide,
+                            col_names = FALSE,
+                            format_headers = FALSE)
+
+        #check that file exists
+        expect_true(object = file.exists(excel_wide))
+
+        # check that read_npx_format works
+        expect_error(
+          object = df_out_v1 <- read_npx_format(
+            file = excel_wide,
+            out_df = "tibble",
+            long_format = NULL,
+            olink_platform = NULL,
+            data_type = NULL,
+            quiet = FALSE
+          ),
+          regexp = "Cell 'A2' of the input file.*format was likely empty"
+        )
+      }
+    )
+
+    ## excel  - data_type = "NPX" ----
+
+    withr::with_tempfile(
+      new = "excel_wide",
+      pattern = "test_wide",
+      fileext = ".xlsx",
+      code = {
+        df_rand$list_df_wide$df_wide <- df_rand$list_df_wide$df_wide |>
+          dplyr::mutate(
+            V1 = dplyr::if_else(
+              dplyr::row_number() == 2L, NA_character_, .data[["V1"]]
+            )
+          )
+
+        # write in csv
+        writexl::write_xlsx(x = df_rand$list_df_wide$df_wide,
+                            path = excel_wide,
+                            col_names = FALSE,
+                            format_headers = FALSE)
+
+        #check that file exists
+        expect_true(object = file.exists(excel_wide))
+
+        # check that read_npx_format works
+        expect_no_error(
+          object = expect_message(
+            object = expect_warning(
+              object = df_out_v1 <- read_npx_format(
+                file = excel_wide,
+                out_df = "tibble",
+                long_format = NULL,
+                olink_platform = NULL,
+                data_type = "NPX",
+                quiet = FALSE
+              ),
+              regexp = "Unable to recognize the quantification method from the"
+            ),
+            regexp = paste("Detected \"NPX\" data from \"Olink Target 48\" in",
+                           "wide format!")
+          )
+        )
+      }
+    )
+
+  }
+)
+
 # Test read_npx_format_read ----
 
 test_that(
@@ -1893,6 +1999,93 @@ test_that(
 )
 
 test_that(
+  "read_npx_format_get_format - works - wide - Cell 'A2' is NA",
+  {
+    # get synthetic data, or skip if not available
+    df_rand <- get_wide_synthetic_data(
+      olink_platform = "Target 48",
+      data_type = "NPX",
+      n_panels = 3L,
+      n_assays = 45L,
+      n_samples = 88L,
+      show_dev_int_ctrl = FALSE,
+      show_int_ctrl = TRUE,
+      version = 1L
+    )
+
+    withr::with_tempfile(
+      new = "excel_wide",
+      pattern = "test_excel_npx_wide",
+      fileext = ".xlsx",
+      code = {
+        # modify df wide
+        df <- df_rand$list_df_wide$df_wide |>
+          dplyr::slice_head(
+            n = 2L
+          ) |>
+          # creating special cases when cell A2 is NA
+          dplyr::mutate(
+            V1 = dplyr::if_else(dplyr::row_number() == 2L, NA, .data[["V1"]])
+          )
+
+        # write a dummy file
+        writeLines("foo", excel_wide)
+
+        #check that file exists
+        expect_true(object = file.exists(excel_wide))
+
+        # check that read_npx_format_get_format works with long_format = NULL
+        expect_no_condition(
+          object = df_npx_null <- read_npx_format_get_format(
+            df_top_n = df,
+            file = excel_wide,
+            long_format = NULL
+          )
+        )
+
+        # check that object exists
+        expect_true(object = exists("df_npx_null"))
+
+        # check that it contains the correct elements
+        expect_equal(
+          object = names(df_npx_null),
+          expected = c("is_long_format", "data_cells")
+        )
+
+        # check that it is the correct format
+        expect_equal(
+          object = df_npx_null$is_long_format,
+          expected = FALSE
+        )
+
+        # check that the output string is correct
+        expect_true(
+          object = is.na(df_npx_null$data_cells)
+        )
+
+        # check that read_npx_format_get_format works with long_format = FALSE
+        expect_no_condition(
+          object = df_npx_false <- read_npx_format_get_format(
+            df_top_n = df,
+            file = excel_wide,
+            long_format = FALSE
+          )
+        )
+
+        # check that object exists
+        expect_true(object = exists("df_npx_false"))
+
+        # check that the two runs of read_npx_format_get_format return the same
+        expect_identical(
+          object = df_npx_false,
+          expected = df_npx_null
+        )
+      }
+    )
+  }
+)
+
+test_that(
   "read_npx_format_get_format - works - long",
   {
     # get synthetic data, or skip if not available
@@ -2213,7 +2406,8 @@ test_that(
           dplyr::mutate(
             V1 = dplyr::if_else(.data[["V1"]] == "NPX",
                                 "Wrong_Name",
-                                .data[["V1"]])
+                                .data[["V1"]]),
+            V2 = dplyr::if_else(dplyr::row_number() == 1L, NA, .data[["V2"]])
           )
 
         # write a dummy file
@@ -2334,7 +2528,8 @@ test_that(
           dplyr::mutate(
             V1 = dplyr::if_else(.data[["V1"]] == "NPX",
                                 "Wrong_Name",
-                                .data[["V1"]])
+                                .data[["V1"]]),
+            V2 = dplyr::if_else(dplyr::row_number() == 1L, NA, .data[["V2"]])
           )
 
         # write a dummy file
@@ -2436,7 +2631,8 @@ test_that(
           dplyr::mutate(
             V1 = dplyr::if_else(.data[["V1"]] == "NPX",
                                 "Wrong_Name",
-                                .data[["V1"]])
+                                .data[["V1"]]),
+            V2 = dplyr::if_else(dplyr::row_number() == 1L, NA, .data[["V2"]])
           )
 
         # write a dummy file
@@ -3310,6 +3506,44 @@ test_that(
             data_cells = "NPX_Ct"
           ),
           regexp = "Too many occurrences of:"
+        )
+      }
+    )
+  }
+)
+
+test_that(
+  "read_npx_format_get_quant - error - empty cell A2 in wide file",
+  {
+    withr::with_tempfile(
+      new = "excel_wide",
+      pattern = "test_excel_wide",
+      fileext = ".xlsx",
+      code = {
+        # writing something to the file
+        writeLines("foo", excel_wide)
+
+        # check that file exists
+        expect_true(object = file.exists(excel_wide))
+
+        # check that read_npx_format_get_quant works for data_type = NULL
+        expect_error(
+          object = read_npx_format_get_quant(
+            file = excel_wide,
+            data_type = NULL,
+            data_cells = NA_character_
+          ),
+          regexp = "Cell 'A2' of the input file"
+        )
+
+        # check that read_npx_format_get_quant works for data_type = NULL
+        expect_error(
+          object = read_npx_format_get_quant(
+            file = excel_wide,
+            data_type = NULL,
+            data_cells = c(NA_character_, NA_real_, NA)
+          ),
+          regexp = "Cell 'A2' of the input file"
         )
       }
     )

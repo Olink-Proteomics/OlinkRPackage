@@ -93,7 +93,9 @@ test_that(
     # Load reference results - skipped if files are absent
     reference_results <- get_example_data(filename = "reference_results.rds")
 
-    # npx_data1 ----
+    # tibble ----
+
+    ## npx_data1 ----
 
     npx_df1 <- npx_data1 |>
       dplyr::filter(
@@ -125,7 +127,7 @@ test_that(
         dplyr::arrange(.data[["SampleID"]])
     )
 
-    # npx_data2 ----
+    ## npx_data2 ----
 
     npx_df2 <- npx_data2 |>
       dplyr::filter(
@@ -152,6 +154,98 @@ test_that(
 
     expect_identical(
       object = npx_df2_bridge_samples |>
+        dplyr::arrange(.data[["SampleID"]]),
+      expected = reference_results$bridge_samples_npx_data2 |>
+        dplyr::arrange(.data[["SampleID"]])
+    )
+
+    # olink_class ----
+
+    ## npx_data1 ----
+
+    npx_df1_obj <- attach_check_log(df = npx_df1, out_df = "tibble")
+
+    expect_message(
+      object = npx_df1_bridge_samples_obj <- olink_bridgeselector(
+        df = npx_df1_obj,
+        sampleMissingFreq = 0.1,
+        n = 8L
+      ),
+      regexp = paste("No sample type column detected in the input dataset",
+                     "`df`! Ensure that control samples have been filtered",
+                     "out!")
+    )
+
+    expect_identical(
+      object = npx_df1_bridge_samples_obj |>
+        dplyr::arrange(.data[["SampleID"]]),
+      expected = reference_results$bridge_samples_npx_data1 |>
+        dplyr::arrange(.data[["SampleID"]])
+    )
+
+    ## npx_data2 ----
+
+    npx_df2_obj <- attach_check_log(df = npx_df2, out_df = "tibble")
+
+    expect_message(
+      object = npx_df2_bridge_samples_obj <- olink_bridgeselector(
+        df = npx_df2_obj,
+        sampleMissingFreq = 0.2,
+        n = 16L
+      ),
+      regexp = paste("No sample type column detected in the input dataset",
+                     "`df`! Ensure that control samples have been filtered",
+                     "out!")
+    )
+
+    expect_identical(
+      object = npx_df2_bridge_samples_obj |>
+        dplyr::arrange(.data[["SampleID"]]),
+      expected = reference_results$bridge_samples_npx_data2 |>
+        dplyr::arrange(.data[["SampleID"]])
+    )
+
+    # arrow ----
+
+    ## npx_data1 ----
+
+    npx_df1_arrow <- attach_check_log(df = npx_df1, out_df = "arrow")
+
+    expect_message(
+      object = npx_df1_bridge_samples_arrow <- olink_bridgeselector(
+        df = npx_df1_arrow,
+        sampleMissingFreq = 0.1,
+        n = 8L
+      ),
+      regexp = paste("No sample type column detected in the input dataset",
+                     "`df`! Ensure that control samples have been filtered",
+                     "out!")
+    )
+
+    expect_identical(
+      object = npx_df1_bridge_samples_arrow |>
+        dplyr::arrange(.data[["SampleID"]]),
+      expected = reference_results$bridge_samples_npx_data1 |>
+        dplyr::arrange(.data[["SampleID"]])
+    )
+
+    ## npx_data2 ----
+
+    npx_df2_arrow <- attach_check_log(df = npx_df2, out_df = "arrow")
+
+    expect_message(
+      object = npx_df2_bridge_samples_arrow <- olink_bridgeselector(
+        df = npx_df2_arrow,
+        sampleMissingFreq = 0.2,
+        n = 16L
+      ),
+      regexp = paste("No sample type column detected in the input dataset",
+                     "`df`! Ensure that control samples have been filtered",
+                     "out!")
+    )
+
+    expect_identical(
+      object = npx_df2_bridge_samples_arrow |>
         dplyr::arrange(.data[["SampleID"]]),
       expected = reference_results$bridge_samples_npx_data2 |>
         dplyr::arrange(.data[["SampleID"]])

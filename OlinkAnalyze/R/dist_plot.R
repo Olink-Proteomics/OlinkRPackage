@@ -6,8 +6,9 @@
 #'
 #' @param df NPX data frame in long format. Must have columns SampleID, NPX and
 #' Panel
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`,
+#' an attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #' @param color_g Character value indicating which column to use as fill color.
 #' (default: QC_Warning).
 #' @param ... Color option passed to specify color order.
@@ -18,31 +19,22 @@
 #' @keywords NPX
 #'
 #' @export
+#'
 #' @examples
 #' \donttest{
-#'
-#' # Optional: check and clean dataset
-#' check_log <- OlinkAnalyze::check_npx(
-#'   df = npx_data1
-#' )
-#'
 #' cleaned_data <- OlinkAnalyze::clean_npx(
-#'   df = npx_data1,
-#'   check_log = check_log
+#'   df = OlinkAnalyze::npx_data1
 #' )
 #'
 #' OlinkAnalyze::olink_dist_plot(
-#'   df = npx_data1,
-#'   check_log = check_log,
+#'   df = OlinkAnalyze::npx_data1,
 #'   color_g = "QC_Warning"
 #' )
 #'
 #' OlinkAnalyze::olink_dist_plot(
 #'   df = cleaned_data,
-#'   check_log = check_log,
 #'   color_g = "QC_Warning"
 #' )
-#'
 #' }
 #'
 olink_dist_plot <- function(df,
@@ -81,16 +73,13 @@ olink_dist_plot <- function(df,
   # check if color column is present
   check_columns(df = df, col_list = list(color_g))
 
-  # Check if check_log is correct
-  check_log <- run_check_npx(df = df, check_log = check_log)
-
   # Remove invalid OlinkID, assays with all NA values, and convert non-unique
   # Uniprot IDs. Note that we do not remove samples with duplicate SampleID,
   # control samples or assays, or samples/assays with QC warnings, as this
   # would be the user's decision.
   df <- run_clean_npx(
     df = df,
-    check_log = check_log,
+    check_log = get_check_npx(df = df, check_log = check_log),
     remove_assay_na = TRUE,
     remove_invalid_oid = TRUE,
     remove_dup_sample_id = FALSE,
@@ -103,6 +92,8 @@ olink_dist_plot <- function(df,
     verbose = FALSE
   )
 
+  # re-get check_log after cleaning
+  check_log <- get_check_npx(df = df)
 
   reorder_within <- function(x, by, within, fun = mean, sep = "___", ...) {
     new_x <- paste(x, within, sep = sep)
@@ -124,31 +115,18 @@ olink_dist_plot <- function(df,
       )
     )
 
-  # If QC selected to plot
-  # If not all are Pass, the QC_Warning is set as warning for plotting purposes
+  # If QC selected to plot, summarize assay-level flags to one flag per sample
+  # and panel for plotting purposes.
   if (color_g %in% check_log$col_names$qc_warning) {
 
     df <- df |>
-      dplyr::group_by(
-        dplyr::pick(
-          dplyr::all_of(
-            c(
-              check_log$col_names$sample_id,
-              check_log$col_names$panel
-            )
-          )
+      olink_summarize_qc_warning(
+        qc_warning = check_log$col_names$qc_warning,
+        group = c(
+          check_log$col_names$sample_id,
+          check_log$col_names$panel
         )
-      ) |>
-      dplyr::mutate(
-        !!check_log$col_names$qc_warning := dplyr::if_else(
-          all(
-            toupper(.data[[check_log$col_names$qc_warning]]) == "PASS"
-          ),
-          "Pass",
-          "Warning"
-        )
-      ) |>
-      dplyr::ungroup()
+      )
 
   }
 

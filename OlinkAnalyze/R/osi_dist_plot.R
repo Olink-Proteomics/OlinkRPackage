@@ -33,14 +33,9 @@
 #'                                              na.rm = TRUE)
 #'   )
 #'
-#' check_log <- OlinkAnalyze::check_npx(
-#'   df = npx_df
-#' )
-#'
 #' # Generate figure
 #' OlinkAnalyze::olink_osi_dist_plot(
 #'   df = npx_df,
-#'   check_log = check_log,
 #'   osi_score = "OSISummary"
 #' )
 #'}
@@ -48,12 +43,11 @@
 olink_osi_dist_plot <- function(df,
                                 check_log = NULL,
                                 osi_score = NULL) {
-  check_log <- run_check_npx(df, check_log = check_log)
+  check_log <- get_check_npx(df = df, check_log = check_log)
 
   # General OSI checks
   df <- check_osi(
     df = df,
-    check_log = check_log,
     osi_score = osi_score
   )
 

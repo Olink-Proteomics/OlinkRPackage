@@ -42,8 +42,9 @@
 #' inferred from main effects.
 #' @param return.covariates Logical. Default: False. Returns F-test results for
 #' the covariates. Note: Adjusted p-values will be NA for the covariates.
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`,
+#' an attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #' @param verbose Logical. Default: True. If information about removed samples,
 #' factor conversion and final model formula is to be printed to the console.
 #'
@@ -75,7 +76,6 @@
 #'       ignore.case = TRUE
 #'     )
 #'   )
-#'   check_log <- OlinkAnalyze::check_npx(df = npx_df)
 #'
 #'   # Two-way Ordinal Regression with CLM.
 #'   # Results in model NPX~Treatment+Time+Treatment:Time.
@@ -159,7 +159,7 @@ olink_ordinal_regression <- function(df,
       }
 
       # check data format
-      check_log <- run_check_npx(df = df, check_log = check_log)
+      check_log <- get_check_npx(df = df, check_log = check_log)
       data_type <- check_log$col_names$quant
 
       # Convert outcome to factor
@@ -291,7 +291,7 @@ olink_ordinal_regression <- function(df,
                       formula_string))
       }
 
-      if (!is.null(covariates) & any(grepl(":", covariates))) {
+      if (!is.null(covariates) && any(grepl(":", covariates))) {
         covariate_filter_str <- covariates[grepl(pattern = ":", x = covariates)]
         covariate_filter_str <- sub(pattern = "(.*)\\:(.*)$",
                                     replacement = "\\2:\\1",
@@ -425,8 +425,9 @@ olink_ordinalRegression <- olink_ordinal_regression  # nolint: object_name_linte
 #' @param post_hoc_padjust_method P-value adjustment method to use for post-hoc
 #' comparisons within an assay. Options include \code{tukey}, \code{sidak},
 #' \code{bonferroni} and \code{none}.
-#' @param check_log A named list returned by [`check_npx()`]. If `NULL`,
-#' [`check_npx()`] will be run internally using `df`.
+#' @param check_log Optional named list returned by [`check_npx()`]. If `NULL`,
+#' an attached `check_log` is used when present; otherwise [`check_npx()`] will
+#' be run internally using `df`.
 #' @param verbose Boolean. Default: True. If information about removed samples,
 #' factor conversion and final model formula is to be printed to the console.
 #'
@@ -459,7 +460,6 @@ olink_ordinalRegression <- olink_ordinal_regression  # nolint: object_name_linte
 #'       ignore.case = TRUE
 #'     )
 #'   )
-#'   check_log <- OlinkAnalyze::check_npx(df = npx_df)
 #'
 #'   # Two-way Ordinal Regression with CLM.
 #'   # Results in model NPX~Treatment+Time+Treatment:Time.
@@ -483,8 +483,7 @@ olink_ordinalRegression <- olink_ordinal_regression  # nolint: object_name_linte
 #'     df = npx_df,
 #'     variable = c("Treatment:Time"),
 #'     olinkid_list = significant_assays,
-#'     effect = "Time",
-#'     check_log = check_log
+#'     effect = "Time"
 #'   )
 #' }
 #' }
@@ -536,7 +535,7 @@ olink_ordinal_regression_posthoc <- function(df, # nolint: object_length_linter
       }
 
       # check data format
-      check_log <- run_check_npx(df = df, check_log = check_log)
+      check_log <- get_check_npx(df = df, check_log = check_log)
       data_type <- check_log$col_names$quant
 
       # Allow for :/* notation in covariates
