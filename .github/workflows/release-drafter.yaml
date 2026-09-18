@@ -1,6 +1,11 @@
 name: Release Drafter
 
 on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/release-drafter.yml"
+      - ".github/workflows/release-drafter.yaml"
   push:
     branches:
       # Update the draft release whenever changes land on the release branch
@@ -21,6 +26,7 @@ jobs:
       - uses: release-drafter/release-drafter@v7
         with:
           config-name: release-drafter.yml # the default, loads '.github/release-drafter.yml'
+          dry-run: ${{ github.event_name != 'push' }}
         env:
           # Built in token provided by GitHub Actions
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
