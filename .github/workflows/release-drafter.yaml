@@ -3,6 +3,9 @@ name: Release Drafter
 on:
   workflow_dispatch:
   pull_request:
+    paths:
+      - ".github/release-drafter.yml"
+      - ".github/workflows/release-drafter.yaml"
   push:
     branches:
       # Update the draft release whenever changes land on the release branch
