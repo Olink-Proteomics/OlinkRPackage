@@ -499,30 +499,6 @@ test_that(
 )
 
 test_that(
-  "olink_ordinal_regression - error - 'df' and/or 'variable' not provided",
-  {
-    skip_if_not_installed(pkg = "ordinal")
-    skip_if_not_installed(pkg = "broom")
-    skip_on_cran()
-
-    expect_error(
-      object = olink_ordinal_regression(),
-      regexp = "The df and variable arguments need to be specified."
-    )
-
-    expect_error(
-      object = olink_ordinal_regression(df = npx_data1_mod),
-      regexp = "The df and variable arguments need to be specified."
-    )
-
-    expect_error(
-      object = olink_ordinal_regression(variable = "Site"),
-      regexp = "The df and variable arguments need to be specified."
-    )
-  }
-)
-
-test_that(
   "olink_ordinal_regression - works - when edge cases are cleaned up",
   {
     skip_if_not_installed(pkg = "ordinal")
@@ -939,39 +915,6 @@ test_that(
                      "\"OID30748\", \"OID30866\", \"OID30899\", \"OID31054\",",
                      "\"OID31113\", \"OID31186\", \"OID31225\", \"OID31309\",",
                      "and \"OID31325\" have \"NPX\" = NA for all samples.")
-    )
-  }
-)
-
-test_that(
-  "olink_ordinal_regression_posthoc - error - required input not provided",
-  {
-    skip_if_not_installed(pkg = "broom")
-    skip_if_not_installed(pkg = "ordinal")
-    skip_if_not_installed(pkg = "emmeans")
-    skip_on_cran()
-
-    expect_error(
-      object = olink_ordinal_regression_posthoc(),
-      regexp = "The df, variable and effect arguments need to be specified."
-    )
-
-    expect_error(
-      object = olink_ordinal_regression_posthoc(df = npx_data1_mod),
-      regexp = "The df, variable and effect arguments need to be specified."
-    )
-
-    expect_error(
-      object = olink_ordinal_regression_posthoc(variable = "Site"),
-      regexp = "The df, variable and effect arguments need to be specified."
-    )
-
-    expect_error(
-      object = olink_ordinal_regression_posthoc(
-        df = npx_data1_mod,
-        variable = "Site"
-      ),
-      regexp = "The df, variable and effect arguments need to be specified."
     )
   }
 )

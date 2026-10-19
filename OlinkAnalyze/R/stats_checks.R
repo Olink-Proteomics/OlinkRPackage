@@ -37,6 +37,10 @@ check_stats_formula <- function(model_formula) {
 parse_stats_effect_formula <- function(effect_formula,
                                        effect = NULL,
                                        effect_supplied = FALSE) {
+  if (inherits(effect_formula, "formula")) {
+    effect_formula <- deparse(effect_formula)
+  }
+
   if (length(effect_formula) != 1L) {
     cli::cli_abort(
       paste0(
@@ -49,9 +53,6 @@ parse_stats_effect_formula <- function(effect_formula,
 
   if (effect_supplied) {
     cli::cli_inform("effect_formula overriding effect argument.")
-  }
-  if (inherits(effect_formula, "formula")) {
-    effect_formula <- deparse(effect_formula)
   }
   if (grepl(pattern = "~", x = effect_formula)) {
     effect_formula <- strsplit(x = effect_formula, split = "~")[[1L]][2L]

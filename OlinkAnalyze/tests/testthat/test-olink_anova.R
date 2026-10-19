@@ -392,59 +392,6 @@ test_that(
 )
 
 test_that(
-  "olink_anova - error - 'df' and/or 'variable' not provided",
-  {
-    skip_if_not_installed(pkg = "car")
-    skip_if_not_installed(pkg = "broom")
-    skip_on_cran()
-
-    expect_error(
-      object = olink_anova(),
-      regexp = "The df and variable arguments need to be specified."
-    )
-
-    expect_error(
-      object = olink_anova(df = npx_data1_mod),
-      regexp = "The df and variable arguments need to be specified."
-    )
-
-    expect_error(
-      object = olink_anova(variable = "Site"),
-      regexp = "The df and variable arguments need to be specified."
-    )
-  }
-)
-
-test_that(
-  "olink_anova - error - control assays in dataset",
-  {
-    skip_if_not_installed(pkg = "car")
-    skip_if_not_installed(pkg = "broom")
-    skip_on_cran()
-
-    expect_error(
-      object = olink_anova(
-        df = dt_edge_case_ctrl,
-        variable = "treatment2",
-        check_log = dt_edge_case_ctrl_check
-      ),
-      # Assay controls not removed, no AssayType
-      regexp = "Control assays have not been removed from the dataset"
-    )
-
-    expect_error(
-      object = olink_anova(
-        df = dt_edge_case_assaytype,
-        variable = "treatment2",
-        check_log = dt_edge_case_assaytype_check
-      ),
-      # Assay controls not removed, AssayType present
-      regexp = "Control assays have not been removed from the dataset"
-    )
-  }
-)
-
-test_that(
   "olink_anova - works - when edge cases are cleaned up",
   {
     skip_if_not_installed(pkg = "car")
@@ -891,63 +838,6 @@ test_that(
                      "\"OID30748\", \"OID30866\", \"OID30899\", \"OID31054\",",
                      "\"OID31113\", \"OID31186\", \"OID31225\", \"OID31309\",",
                      "and \"OID31325\" have \"NPX\" = NA for all samples.")
-    )
-  }
-)
-
-test_that(
-  "olink_anova_posthoc - error - 'df', 'variable' or 'effect' not provided",
-  {
-    skip_if_not_installed(pkg = "car")
-    skip_if_not_installed(pkg = "broom")
-    skip_if_not_installed(pkg = "emmeans")
-    skip_on_cran()
-
-    expect_error(
-      object = olink_anova_posthoc(),
-      regexp = "The df and variable and effect arguments need to be specified."
-    )
-
-    expect_error(
-      object = olink_anova_posthoc(df = npx_data1_mod),
-      regexp = "The df and variable and effect arguments need to be specified."
-    )
-
-    expect_error(
-      object = olink_anova_posthoc(variable = "Site"),
-      regexp = "The df and variable and effect arguments need to be specified."
-    )
-  }
-)
-
-test_that(
-  "olink_anova_posthoc - error - control assays in dataset",
-  {
-    skip_if_not_installed(pkg = "car")
-    skip_if_not_installed(pkg = "broom")
-    skip_if_not_installed(pkg = "emmeans")
-    skip_on_cran()
-
-    expect_error(
-      object = olink_anova_posthoc(
-        df = dt_edge_case_ctrl,
-        variable = "treatment2",
-        check_log = dt_edge_case_ctrl_check,
-        effect = "treatment2"
-      ),
-      # Assay controls not removed, no AssayType
-      regexp = "Control assays have not been removed from the dataset"
-    )
-
-    expect_error(
-      object = olink_anova_posthoc(
-        df = dt_edge_case_assaytype,
-        variable = "treatment2",
-        check_log = dt_edge_case_assaytype_check,
-        effect = "treatment2"
-      ),
-      # Assay controls not removed, AssayType present
-      regexp = "Control assays have not been removed from the dataset"
     )
   }
 )

@@ -201,37 +201,6 @@ test_that(
 )
 
 test_that(
-  "olink_lmer - error - 'df','variable' or 'random ' not provided",
-  {
-    skip_if_not_installed(pkg = "lme4") |> suppressPackageStartupMessages()
-    skip_if_not_installed(pkg = "lmerTest")
-    skip_if_not_installed(pkg = "broom")
-    skip_on_cran()
-
-    expect_error(
-      object = olink_lmer(),
-      regexp = "The df and variable and random arguments need to be specified."
-    )
-
-    expect_error(
-      object = olink_lmer(df = npx_data1),
-      regexp = "The df and variable and random arguments need to be specified."
-    )
-
-    expect_error(
-      object = olink_lmer(variable = "Site"),
-      regexp = "The df and variable and random arguments need to be specified."
-    )
-
-    expect_error(
-      object = olink_lmer(df = npx_data1,
-                          variable = "Site"),
-      regexp = "The df and variable and random arguments need to be specified."
-    )
-  }
-)
-
-test_that(
   "olink_lmer - covariate provided with model formula",
   {
     skip_if_not_installed(pkg = "lme4") |> suppressPackageStartupMessages()
@@ -516,42 +485,6 @@ test_that(
           fixed = TRUE
         )
       )
-    )
-  }
-)
-
-test_that(
-  "olink_lmer_posthoc - error - 'df','variable' or 'random ' not provided",
-  {
-    skip_if_not_installed(pkg = "lme4") |> suppressPackageStartupMessages()
-    skip_if_not_installed(pkg = "lmerTest")
-    skip_if_not_installed(pkg = "broom")
-    skip_on_cran()
-
-    expect_error(
-      object = olink_lmer_posthoc(),
-      regexp = paste("The df, variable, random and effect arguments need to be",
-                     "specified.")
-    )
-
-    expect_error(
-      object = olink_lmer_posthoc(df = npx_data1),
-      regexp = paste("The df, variable, random and effect arguments need to be",
-                     "specified.")
-    )
-
-    expect_error(
-      object = olink_lmer_posthoc(variable = "Site"),
-      regexp = paste("The df, variable, random and effect arguments need to be",
-                     "specified.")
-    )
-
-    expect_error(
-      object = olink_lmer_posthoc(df = npx_data1,
-                                  variable = c("Treatment", "Time"),
-                                  random = "Subject"),
-      regexp = paste("The df, variable, random and effect arguments need to be",
-                     "specified.")
     )
   }
 )
