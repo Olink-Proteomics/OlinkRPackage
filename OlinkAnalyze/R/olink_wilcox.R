@@ -87,179 +87,31 @@ olink_wilcox <- function(df,
     call = rlang::caller_env()
   )
 
-  if (missing(df) || missing(variable)) {
-    stop("The df and variable arguments need to be specified.")
-  }
+  check_stats_required(
+    present = c(!missing(df), !missing(variable)),
+    message = "The df and variable arguments need to be specified."
+  )
 
   dot_lst <- rlang::list2(...) # nolint: object_usage_linter
+  pair_id_missing <- missing(pair_id)
+  checked <- prepare_two_group_stats(
+    df = df,
+    variable = variable,
+    pair_id = if (pair_id_missing) NULL else pair_id,
+    check_log = check_log,
+    test_name = "Mann-Whitney U Test"
+  )
+  df <- checked$df
+  var_levels <- checked$variable_levels # nolint: object_usage_linter
+  check_log <- checked$check_log
 
-  # Filtering on valid OlinkID
-  df <- df |>
-    dplyr::filter(
-      stringr::str_detect(
-        string = .data[["OlinkID"]],
-        pattern = "OID[0-9]{5}"
+  if (!pair_id_missing) {
+    cli::cli_inform(
+      paste0(
+        "Paired Mann-Whitney U Test is performed on ",
+        "{var_levels[1L]} - {var_levels[2L]}."
       )
     )
-
-  # Removing SampleID:s with no level for variable
-  removed.sampleids <- df |> # nolint: object_name_linter
-    dplyr::filter(
-      is.na(.data[[variable]])
-    ) |>
-    dplyr::pull(
-      .data[["SampleID"]]
-    ) |>
-    unique()
-  if (length(removed.sampleids) > 0L) {
-    message("Samples removed due to missing variable levels: ",
-            paste(removed.sampleids, collapse = ", "))
-  }
-  df <- df |>
-    dplyr::filter(
-      !is.na(.data[[variable]])
-    )
-
-  if (!missing(pair_id)) {
-    missing.pair <- df |> # nolint: object_name_linter
-      dplyr::filter(
-        is.na(.data[[pair_id]])
-      ) |>
-      dplyr::pull(
-        .data[["SampleID"]]
-      ) |>
-      unique()
-    if (length(missing.pair) > 0L) {
-      message("Samples removed due to missing pair ID: ",
-              paste(missing.pair, collapse = ", "))
-    }
-    df <- df |>
-      dplyr::filter(
-        !is.na(.data[[pair_id]])
-      )
-
-    removed.sampleids <- unique(c(removed.sampleids, missing.pair)) # nolint: object_name_linter
-  }
-
-  # Factor conversion
-  if (is.character(dplyr::pull(df, .data[[variable]]))) {
-    df <- df |>
-      dplyr::mutate(
-        !!variable := factor(x = .data[[variable]])
-      )
-    message(paste0("Variable converted from character to factor: ", variable))
-  } else if (!is.factor(dplyr::pull(df, .data[[variable]]))) {
-    stop(paste0("The grouping variable ", variable, "is neither factor nor ",
-                "character. Only character and factor variable types allowed."))
-  }
-
-  var_levels <- df |>
-    dplyr::pull(
-      .data[[variable]]
-    ) |>
-    levels()
-  number_of_levels <- length(var_levels)
-
-  # Checking number of levels
-  if (!(number_of_levels == 2L)) {
-    stop(paste0("The number of levels in the factor needs to be 2. Your ",
-                "factor has ", number_of_levels, " levels."))
-  }
-
-  # Every sample needs to have a unique level of the factor
-  n_samples_w_more_than_1_level <- df |>
-    dplyr::group_by(
-      .data[["SampleID"]]
-    ) |>
-    dplyr::summarise(
-      n_levels = dplyr::n_distinct(.data[[variable]], na.rm = TRUE),
-      .groups = "drop"
-    ) |>
-    dplyr::filter(
-      .data[["n_levels"]] > 1L
-    ) |>
-    nrow()
-  if (n_samples_w_more_than_1_level > 0L) {
-    stop(paste0("There are ", n_samples_w_more_than_1_level,
-                " samples that do not have a unique level for your variable.",
-                " Only one level per sample is allowed."))
-  }
-
-  # check data format
-  check_log <- get_check_npx(df = df, check_log = check_log)
-
-  nas_in_level <- df |>
-    dplyr::filter(
-      !(.data[["OlinkID"]] %in% check_log$assay_na)
-    ) |>
-    dplyr::group_by(
-      .data[["OlinkID"]], .data[[variable]]
-    ) |>
-    dplyr::summarise(
-      n = dplyr::n(),
-      n_na = sum(is.na(.data[["NPX"]])),
-      .groups = "drop"
-    ) |>
-    dplyr::filter(
-      .data[["n"]] == .data[["n_na"]]
-    ) |>
-    dplyr::pull(
-      .data[["OlinkID"]]
-    )
-  if (length(nas_in_level) > 0L) {
-    warning(paste0("The assays ", paste(nas_in_level, collapse = ", "),
-                   " have too few datapoints in one level of the factor.",
-                   " They will not be tested."),
-            call. = FALSE)
-  }
-
-  # Filtering out non-tested assays
-  df <- df |>
-    dplyr::filter(
-      !(.data[["OlinkID"]] %in% check_log$assay_na)
-      & !(.data[["OlinkID"]] %in% .env[["nas_in_level"]])
-    )
-
-  if (nrow(df) == 0L) {
-    stop(paste("No assays passing initial check. Mann-Whitney U Test will not",
-               "be performed."))
-  }
-
-  if (!missing(pair_id)) {
-
-    if (!(pair_id %in% colnames(df))) {
-      stop(paste0("Column ", pair_id, " not found."))
-    }
-
-    if (!check_is_tibble(x = df, error = FALSE)) {
-      message("Converting data frame to tibble.")
-      df <- dplyr::as_tibble(x = df)
-    }
-
-    # check that each "pair_id' has only 2 samples
-    ct_pairs <- df |>
-      dplyr::filter(
-        !is.na(.data[[variable]])
-      ) |>
-      dplyr::group_by(
-        .data[["OlinkID"]], .data[[pair_id]]
-      ) |>
-      dplyr::summarize(
-        n = dplyr::n(),
-        .groups = "drop"
-      )
-    if (!all(ct_pairs$n <= 2L)) {
-      stop(
-        paste0(
-          "Each pair identifier must identify no more than 2 unique samples.",
-          " Check pairs: ",
-          paste(unique(ct_pairs[[pair_id]][ct_pairs$n > 2L]), collapse = ", ")
-        )
-      )
-    }
-
-    message(paste0("Paired Mann-Whitney U Test is performed on ",
-                   var_levels[1L], " - ", var_levels[2L], "."))
 
     p.val <- df |> # nolint: object_name_linter
       dplyr::arrange(
@@ -298,21 +150,16 @@ olink_wilcox <- function(df,
         }
       ) |>
       dplyr::ungroup() |>
-      dplyr::mutate(
-        Adjusted_pval = stats::p.adjust(p = .data[["p.value"]],
-                                        method = "fdr"),
-        Threshold = dplyr::if_else(.data[["Adjusted_pval"]] < 0.05,
-                                   "Significant",
-                                   "Non-significant")
-      ) |>
+      add_stats_significance() |>
       dplyr::arrange(
         .data[["p.value"]]
       )
 
   } else {
 
-    message(paste0("Mann-Whitney U Test is performed on ",
-                   var_levels[1L], " - ", var_levels[2L], "."))
+    cli::cli_inform(
+      "Mann-Whitney U Test is performed on {var_levels[1L]} - {var_levels[2L]}."
+    )
 
     p.val <- df |> # nolint: object_name_linter
       dplyr::arrange(
@@ -341,13 +188,7 @@ olink_wilcox <- function(df,
       }
       ) |>
       dplyr::ungroup() |>
-      dplyr::mutate(
-        Adjusted_pval = stats::p.adjust(p = .data[["p.value"]],
-                                        method = "fdr"),
-        Threshold = dplyr::if_else(.data[["Adjusted_pval"]] < 0.05,
-                                   "Significant",
-                                   "Non-significant")
-      ) |>
+      add_stats_significance() |>
       dplyr::arrange(
         .data[["p.value"]]
       )

@@ -102,58 +102,25 @@ olink_lmer_plot <- function(df,
     call = rlang::caller_env()
   )
 
-  if (missing(df) || missing(variable)
-      || missing(x_axis_variable) || missing(random)) {
-    stop(paste("The df, variable, random and x_axis_variable arguments need to",
-               "be specified."))
-  }
-
-  if (!all(x_axis_variable %in% unique(unlist(strsplit(variable, "[\\*:]"))))) {
-    stop("The x axis variable must be included in the variable argument.")
-  }
-
-  if (!is.null(col_variable)) {
-    if (!all(col_variable %in% unique(unlist(strsplit(variable, "[\\*:]"))))) {
-      stop("The color variable must be included in the variable argument.")
-    }
-  }
-
-  #checking ellipsis
-  if (length(list(...)) > 0L) {
-    ellipsis_variables <- names(list(...))
-    if (length(ellipsis_variables) == 1L) {
-      if (!(ellipsis_variables == "coloroption")) {
-        stop(
-          paste0("The '...' option only takes the coloroption argument. ",
-                 "'...' currently contains the variable 'ellipsis_variables'.")
-        )
-      }
-    } else {
-      stop(
-        paste0("The '...' option only takes one argument. '...' currently ",
-               "contains the variables",
-               paste(ellipsis_variables, collapse = ", "), ".")
-      )
-    }
-  }
-
-  #Filtering on valid OlinkID
-  df <- df |>
-    dplyr::filter(
-      stringr::str_detect(
-        string = .data[["OlinkID"]],
-        pattern = "OID[0-9]{5}"
-      )
+  check_stats_required(
+    present = c(
+      !missing(df), !missing(variable), !missing(random),
+      !missing(x_axis_variable)
+    ),
+    message = paste(
+      "The df, variable, random and x_axis_variable arguments need to",
+      "be specified."
     )
+  )
+  check_lmer_plot_args(
+    variable = variable,
+    x_axis_variable = x_axis_variable,
+    col_variable = col_variable,
+    dots = rlang::list2(...)
+  )
 
-  if (is.null(olinkid_list) || length(olinkid_list) == 0L) {
-    olinkid_list <- df |>
-      dplyr::select(
-        dplyr::all_of("OlinkID")
-      ) |>
-      dplyr::distinct() |>
-      dplyr::pull()
-  }
+  df <- filter_stats_olink_ids(df)
+  olinkid_list <- resolve_stats_olink_ids(df, olinkid_list)
 
   # Setting up what needs to be plotted
   if (is.null(col_variable)) {

@@ -98,65 +98,34 @@ olink_ordinal_regression <- function(df,
     call = rlang::caller_env()
   )
 
-  if (missing(df) || missing(variable)) {
-    stop("The df and variable arguments need to be specified.")
-  }
+  check_stats_required(
+    present = c(!missing(df), !missing(variable)),
+    message = "The df and variable arguments need to be specified."
+  )
 
   ord_regr_results <- withCallingHandlers(
     {
-      # Filtering on valid OlinkID
-      df <- df |>
-        dplyr::filter(
-          stringr::str_detect(
-            string = .data[["OlinkID"]],
-            pattern = "OID[0-9]{5}"
-          )
-        )
+      df <- filter_stats_olink_ids(df)
 
-      # Allow for :/* notation in covariates
-      variable <- gsub(pattern = "\\*", replacement = ":", x = variable)
-      if (!is.null(covariates)) {
-        covariates <- gsub(pattern = "\\*", replacement = ":", x = covariates)
-      }
-
-      add.main.effects <- NULL # nolint: object_name_linter
-
-      if (any(grepl(pattern = ":", x = covariates))) {
-        tmp <- strsplit(x = covariates, split = ":") |> unlist()
-        add.main.effects <- c(add.main.effects, # nolint: object_name_linter
-                              setdiff(x = tmp, y = covariates))
-        covariates <- union(x = covariates, y = add.main.effects)
-      }
-      if (any(grepl(pattern = ":", x = variable))) {
-        tmp <- strsplit(x = variable, split = ":") |> unlist()
-        add.main.effects <- c(add.main.effects, # nolint: object_name_linter
-                              setdiff(x = tmp, y = variable))
-        variable <- union(x = variable,
-                          y = unlist(strsplit(x = variable, split = ":")))
-        variable <- variable[!grepl(pattern = ":", x = variable)]
-      }
-
-      # If variable is in both variable and covariate, keep it in variable or
-      # will get removed from final table
-      covariates <- setdiff(x = covariates, y = variable)
-      add.main.effects <- setdiff(x = add.main.effects, y = variable) # nolint: object_name_linter
+      model_terms <- prepare_stats_model_terms(
+        variable = variable,
+        covariates = covariates
+      )
+      variable <- model_terms$variable
+      covariates <- model_terms$covariates
+      add.main.effects <- model_terms$add_main_effects # nolint: object_name_linter
 
       # Variables to check
       variable_testers <- intersect(x = c(variable, covariates),
                                     y = names(df))
 
-      # Remove rows where variables or covariate is NA (cant include in analysis
-      # anyway)
-      removed.sampleids <- NULL # nolint: object_name_linter
-      for (i in variable_testers) {
-        removed.sampleids <- c(removed.sampleids, # nolint: object_name_linter
-                               df$SampleID[is.na(df[[i]])]) |>
-          unique()
-        df <- df |>
-          dplyr::filter(
-            !is.na(.data[[i]])
-          )
-      }
+      filtered_data <- filter_stats_missing(
+        df = df,
+        columns = variable_testers,
+        sample_id = "SampleID"
+      )
+      df <- filtered_data$df
+      removed.sampleids <- filtered_data$removed_sampleids # nolint: object_name_linter
 
       # check data format
       check_log <- get_check_npx(df = df, check_log = check_log)
@@ -168,139 +137,43 @@ olink_ordinal_regression <- function(df,
           !!data_type := factor(x = .data[[data_type]], ordered = TRUE)
         )
 
-      # Convert character vars to factor
-      converted.vars <- NULL # nolint: object_name_linter
-      num.vars <- NULL # nolint: object_name_linter
-      for (i in variable_testers) {
-        if (is.character(df[[i]])) {
-          df <- df |>
-            dplyr::mutate(
-              !!i := factor(x = .data[[i]])
-            )
-          converted.vars <- c(converted.vars, i) # nolint: object_name_linter
-        } else if (is.numeric(df[[i]])) {
-          num.vars <- c(num.vars, i) # nolint: object_name_linter
-        }
-      }
+      converted_data <- convert_stats_predictors(df, variable_testers)
+      df <- converted_data$df
+      converted.vars <- converted_data$converted_vars # nolint: object_name_linter
+      num.vars <- converted_data$numeric_vars # nolint: object_name_linter
+      fact.vars <- converted_data$factor_vars # nolint: object_name_linter
 
-      # Not testing assays that have all NA:s in one level
-      # Every sample needs to have a unique level of the factor
+      single_fixed_effects <- get_stats_fixed_effects(
+        df = df,
+        variable = variable,
+        covariates = covariates
+      )
+      nas_in_var <- check_stats_effect_data(
+        df = df,
+        effects = single_fixed_effects,
+        outcome = data_type,
+        check_log = check_log
+      )
 
-      nas_in_var <- character(0)
+      formula_string <- build_stats_formula(
+        outcome = data_type,
+        variable = variable,
+        covariates = covariates
+      )
 
-      if (!is.null(covariates)) {
-        factors_in_df <- names(df)[sapply(df, is.factor) == TRUE]
-        single_fixed_effects <- c(variable,
-                                  intersect(x = covariates, y = factors_in_df))
-      } else {
-        single_fixed_effects <- variable
-      }
-
-      for (effect in single_fixed_effects) {
-        current_nas <- df |>
-          dplyr::filter(
-            !(.data[["OlinkID"]] %in% check_log$assay_na)
-          ) |>
-          dplyr::group_by(
-            .data[["OlinkID"]], .data[[effect]]
-          ) |>
-          dplyr::summarise(
-            n = dplyr::n(),
-            n_na = sum(is.na(.data[[data_type]])),
-            .groups = "drop"
-          ) |>
-          dplyr::filter(
-            .data[["n"]] == .data[["n_na"]]
-          ) |>
-          dplyr::pull(
-            .data[["OlinkID"]]
-          ) |>
-          unique()
-        if (length(current_nas) > 0L) {
-          nas_in_var <- c(nas_in_var, current_nas)
-          warning(paste0("The assay(s) ", current_nas,
-                         " has only NA:s in atleast one level of ", effect,
-                         ". It will not be tested."),
-                  call. = FALSE)
-        }
-
-        # Every sample needs to have a unique level of the factor
-        n_samples_w_more_than_1_level <- df |>
-          dplyr::group_by(
-            .data[["SampleID"]]
-          ) |>
-          dplyr::summarise(
-            n_levels = dplyr::n_distinct(.data[[effect]], na.rm = TRUE),
-            .groups = "drop"
-          ) |>
-          dplyr::filter(
-            .data[["n_levels"]] > 1L
-          ) |>
-          nrow()
-        if (n_samples_w_more_than_1_level > 0L) {
-          stop(
-            paste0(
-              "There are ", n_samples_w_more_than_1_level,
-              " samples that do not have a unique level for the effect ",
-              effect, ". Only one level per sample is allowed."
-            )
-          )
-        }
-      }
-
-      if (!is.null(covariates)) {
-        formula_string <- paste0(data_type, "~",
-                                 paste(variable, collapse = "*"), "+",
-                                 paste(covariates, sep = "", collapse = "+"))
-      } else {
-        formula_string <- paste0(data_type, "~",
-                                 paste(variable, collapse = "*"))
-      }
-
-      # Get factors
-      fact.vars <- sapply(variable_testers, function(x) is.factor(df[[x]])) # nolint: object_name_linter
-      fact.vars <- names(fact.vars)[fact.vars] # nolint: object_name_linter
-
-      #Print verbose message
       if (verbose) {
-        if (!is.null(add.main.effects) && length(add.main.effects) > 0L) {
-          message(paste0(
-            "Missing main effects added to the model formula: ",
-            paste(add.main.effects, collapse = ", ")
-          ))
-        }
-        if (!is.null(removed.sampleids) && length(removed.sampleids) > 0L) {
-          message(paste0(
-            "Samples removed due to missing variable or covariate levels: ",
-            paste(removed.sampleids, collapse = ", ")
-          ))
-        }
-        if (!is.null(converted.vars)) {
-          message(paste0(
-            "Variables and covariates converted from character to factors: ",
-            paste(converted.vars, collapse = ", ")
-          ))
-        }
-        if (!is.null(num.vars)) {
-          message(paste0(
-            "Variables and covariates treated as numeric: ",
-            paste(num.vars, collapse = ", ")
-          ))
-        }
-        message(paste("Cumulative Link Model (CLM) fit to each assay:",
-                      formula_string))
+        inform_stats_model(
+          add_main_effects = add.main.effects,
+          removed_sampleids = removed.sampleids,
+          converted_vars = converted.vars,
+          numeric_vars = num.vars,
+          model_message = paste(
+            "Cumulative Link Model (CLM) fit to each assay:", formula_string
+          )
+        )
       }
 
-      if (!is.null(covariates) && any(grepl(":", covariates))) {
-        covariate_filter_str <- covariates[grepl(pattern = ":", x = covariates)]
-        covariate_filter_str <- sub(pattern = "(.*)\\:(.*)$",
-                                    replacement = "\\2:\\1",
-                                    x = covariate_filter_str)
-        covariate_filter_str <- c(covariates, covariate_filter_str)
-
-      } else {
-        covariate_filter_str <- covariates
-      }
+      covariate_filter_str <- get_stats_covariate_terms(covariates)
 
       p.val <- df |> # nolint: object_name_linter
         dplyr::filter(
@@ -337,13 +210,7 @@ olink_ordinal_regression <- function(df,
         dplyr::group_by(
           .data[["covariates"]]
         ) |>
-        dplyr::mutate(
-          Adjusted_pval = stats::p.adjust(p = .data[["p.value"]],
-                                          method = "fdr"),
-          Threshold = dplyr::if_else(.data[["Adjusted_pval"]] < 0.05,
-                                     "Significant",
-                                     "Non-significant")
-        ) |>
+        add_stats_significance() |>
         dplyr::ungroup() |>
         dplyr::mutate(
           dplyr::across(
@@ -371,13 +238,10 @@ olink_ordinal_regression <- function(df,
       return(p.val)
 
     }, warning = function(w) {
-      restart_if_spec_warn <- grepl(
-        x = w,
-        pattern = utils::glob2rx("*contains implicit NA, consider using*")
-      )
-      if (restart_if_spec_warn == TRUE) {
-        invokeRestart("muffleWarning")
-      }
+      return(muffle_stats_warning(
+        warning = w,
+        patterns = utils::glob2rx("*contains implicit NA, consider using*")
+      ))
     }
   )
 
@@ -505,83 +369,40 @@ olink_ordinal_regression_posthoc <- function(df, # nolint: object_length_linter
     call = rlang::caller_env()
   )
 
-  if (missing(df) || missing(variable) || missing(effect)) {
-    stop("The df, variable and effect arguments need to be specified.")
-  }
-
-  tmp <- strsplit(effect, ":") |> unlist() |> unique()
-  if (!all(tmp %in% unique(unlist(strsplit(variable, "[\\*:]"))))) {
-    stop("All effect terms must be included in the variable argument.")
-  }
+  check_stats_required(
+    present = c(!missing(df), !missing(variable), !missing(effect)),
+    message = "The df, variable and effect arguments need to be specified."
+  )
+  check_stats_effect_terms(effect = effect, variable = variable)
 
   ord_regr_posthoc_result <- withCallingHandlers(
     {
-      # Filtering on valid OlinkID
-      df <- df |>
-        dplyr::filter(
-          stringr::str_detect(
-            string = .data[["OlinkID"]],
-            pattern = "OID[0-9]{5}"
-          )
-        )
-
-      # if no list of OlinkID was provided, use all assays
-      if (is.null(olinkid_list) || length(olinkid_list) == 0L) {
-        olinkid_list <- df |>
-          dplyr::pull(
-            .data[["OlinkID"]]
-          ) |>
-          unique()
-      }
+      df <- filter_stats_olink_ids(df)
+      olinkid_list <- resolve_stats_olink_ids(df, olinkid_list)
 
       # check data format
       check_log <- get_check_npx(df = df, check_log = check_log)
       data_type <- check_log$col_names$quant
 
-      # Allow for :/* notation in covariates
-      variable <- gsub(pattern = "\\*", replacement = ":", x = variable)
-      if (!is.null(covariates)) {
-        covariates <- gsub(pattern = "\\*", replacement = ":", x = covariates)
-      }
-
-      add.main.effects <- NULL # nolint: object_name_linter
-
-      if (any(grepl(pattern = ":", x = covariates))) {
-        tmp <- strsplit(x = covariates, split = ":") |> unlist()
-        add.main.effects <- c(add.main.effects, # nolint: object_name_linter
-                              setdiff(x = tmp, y = covariates))
-        covariates <- union(x = covariates, y = add.main.effects)
-      }
-      if (any(grepl(pattern = ":", x = variable))) {
-        tmp <- strsplit(x = variable, split = ":") |> unlist()
-        add.main.effects <- c(add.main.effects, # nolint: object_name_linter
-                              setdiff(x = tmp, y = variable))
-        variable <- union(x = variable,
-                          y = unlist(strsplit(x = variable, split = ":")))
-        variable <- variable[!grepl(pattern = ":", x = variable)]
-      }
-
-      # If variable is in both variable and covariate, keep it in variable or
-      # will get removed from final table
-      covariates <- setdiff(x = covariates, y = variable)
-      add.main.effects <- setdiff(x = add.main.effects, y = variable) # nolint: object_name_linter
+      model_terms <- prepare_stats_model_terms(
+        variable = variable,
+        covariates = covariates
+      )
+      variable <- model_terms$variable
+      covariates <- model_terms$covariates
+      add.main.effects <- model_terms$add_main_effects # nolint: object_name_linter
 
       # Variables to check
       variable_testers <- intersect(x = c(variable, covariates),
                                     y = names(df))
 
-      # Remove rows where variables or covariate is NA (cant include in analysis
-      # anyway)
-      removed.sampleids <- NULL # nolint: object_name_linter
-      for (i in variable_testers) {
-        removed.sampleids <- c(removed.sampleids, # nolint: object_name_linter
-                               df$SampleID[is.na(df[[i]])]) |>
-          unique()
-        df <- df |>
-          dplyr::filter(
-            !is.na(.data[[i]])
-          )
-      }
+      filtered_data <- filter_stats_missing(
+        df = df,
+        columns = variable_testers,
+        sample_id = "SampleID"
+      )
+      df <- filtered_data$df
+      removed.sampleids <- filtered_data$removed_sampleids # nolint: object_name_linter
 
       # Convert outcome to factor
       df <- df |>
@@ -589,84 +410,42 @@ olink_ordinal_regression_posthoc <- function(df, # nolint: object_length_linter
           !!data_type := factor(x = .data[[data_type]], ordered = TRUE)
         )
 
-      # Convert character vars to factor
-      converted.vars <- NULL # nolint: object_name_linter
-      num.vars <- NULL # nolint: object_name_linter
-      for (i in variable_testers) {
-        if (is.character(df[[i]])) {
-          df <- df |>
-            dplyr::mutate(
-              !!i := factor(x = .data[[i]])
-            )
-          converted.vars <- c(converted.vars, i) # nolint: object_name_linter
-        } else if (is.numeric(df[[i]])) {
-          num.vars <- c(num.vars, i) # nolint: object_name_linter
-        }
-      }
+      converted_data <- convert_stats_predictors(df, variable_testers)
+      df <- converted_data$df
+      converted.vars <- converted_data$converted_vars # nolint: object_name_linter
+      num.vars <- converted_data$numeric_vars # nolint: object_name_linter
 
-      if (!is.null(covariates)) {
-        formula_string <- paste0(data_type, "~",
-                                 paste(variable, collapse = "*"), "+",
-                                 paste(covariates, sep = "", collapse = "+"))
-      } else {
-        formula_string <- paste0(data_type, "~",
-                                 paste(variable, collapse = "*"))
-      }
+      formula_string <- build_stats_formula(
+        outcome = data_type,
+        variable = variable,
+        covariates = covariates
+      )
 
-      #Print verbose message
       if (verbose) {
-        if (!is.null(add.main.effects) && length(add.main.effects) > 0L) {
-          message(paste0(
-            "Missing main effects added to the model formula: ",
-            paste(add.main.effects, collapse = ", ")
-          ))
-        }
-        if (!is.null(removed.sampleids) && length(removed.sampleids) > 0L) {
-          message(paste0(
-            "Samples removed due to missing variable or covariate levels: ",
-            paste(removed.sampleids, collapse = ", ")
-          ))
-        }
-        if (!is.null(converted.vars)) {
-          message(paste0(
-            "Variables and covariates converted from character to factors: ",
-            paste(converted.vars, collapse = ", ")
-          ))
-        }
-        if (!is.null(num.vars)) {
-          message(paste0(
-            "Variables and covariates treated as numeric: ",
-            paste(num.vars, collapse = ", ")
-          ))
-        }
-
-        if (any(variable %in% num.vars)) {
-          message(paste0(
-            "Numeric variables post-hoc performed using Mean and Mean + 1SD: ",
-            paste(num.vars[num.vars %in% variable], collapse = ", ")
-          ))
-        }
-        message(paste(
-          "Estimated marginal means for each assay computed from the",
-          "cumulative link model (CLM):", formula_string
-        ))
-      }
-
-      if (!missing(effect_formula)) {
-        e_form <- stats::as.formula(object = effect_formula) # nolint: object_usage_linter
-      } else {
-        e_form <- stats::as.formula(
-          object = paste0("pairwise~", paste(effect, collapse = "+")) # nolint: object_usage_linter
+        inform_stats_model(
+          add_main_effects = add.main.effects,
+          removed_sampleids = removed.sampleids,
+          converted_vars = converted.vars,
+          numeric_vars = num.vars,
+          variable = variable,
+          model_message = paste(
+            "Estimated marginal means for each assay computed from the",
+            "cumulative link model (CLM):", formula_string
+          ),
+          posthoc = TRUE
         )
       }
 
+      e_form <- build_stats_effect_formula( # nolint: object_usage_linter
+        effect = effect,
+        effect_formula = if (missing(effect_formula)) NULL else effect_formula
+      )
+
       ord_regr_posthoc_results <- df |>
-        dplyr::filter(
-          .data[["OlinkID"]] %in% .env[["olinkid_list"]]
-          & !(.data[["OlinkID"]] %in% check_log$assay_na)
-        ) |>
-        dplyr::mutate(
-          OlinkID = factor(x = .data[["OlinkID"]], levels = olinkid_list)
+        filter_stats_assays(
+          olinkid_list = olinkid_list,
+          assay_na = check_log$assay_na,
+          preserve_order = TRUE
         ) |>
         dplyr::group_by(
           .data[["Assay"]], .data[["OlinkID"]],
@@ -681,21 +460,11 @@ olink_ordinal_regression_posthoc <- function(df, # nolint: object_length_linter
             formula = stats::as.formula(object = formula_string),
             data = .x
           )
-          emmeans_result <- emmeans::emmeans(
-            object = model,
-            specs = e_form,
-            cov.reduce = function(x) {
-              round_num <- round(x = c(mean(x), mean(x) + stats::sd(x)),
-                                 digits = 4L)
-              return(round_num)
-            },
-            infer = c(TRUE, TRUE),
-            adjust = post_hoc_padjust_method
-          )
-          result_type <- ifelse(mean_return == TRUE, "emmeans", "contrasts")
-          data.frame(
-            emmeans_result[[result_type]],
-            stringsAsFactors = FALSE
+          run_stats_emmeans(
+            model = model,
+            effect = e_form,
+            mean_return = mean_return,
+            padjust_method = post_hoc_padjust_method
           )
         }) |>
         dplyr::ungroup() |>
@@ -708,11 +477,7 @@ olink_ordinal_regression_posthoc <- function(df, # nolint: object_length_linter
         dplyr::arrange(
           .data[["Adjusted_pval"]]
         ) |>
-        dplyr::mutate(
-          Threshold = dplyr::if_else(.data[["Adjusted_pval"]] < 0.05,
-                                     "Significant",
-                                     "Non-significant")
-        ) |>
+        add_stats_threshold() |>
         dplyr::select(
           dplyr::all_of(
             c("Assay", "OlinkID", "UniProt", "Panel", "term", "contrast",
@@ -723,13 +488,10 @@ olink_ordinal_regression_posthoc <- function(df, # nolint: object_length_linter
       return(ord_regr_posthoc_results)
 
     }, warning = function(w) {
-      restart_if_spec_warn <- grepl(
-        x = w,
-        pattern = utils::glob2rx("*contains implicit NA, consider using*")
-      )
-      if (restart_if_spec_warn == TRUE) {
-        invokeRestart("muffleWarning")
-      }
+      return(muffle_stats_warning(
+        warning = w,
+        patterns = utils::glob2rx("*contains implicit NA, consider using*")
+      ))
     }
   )
 

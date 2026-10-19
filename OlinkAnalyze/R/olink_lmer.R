@@ -127,21 +127,12 @@ olink_lmer <- function(df,
 
 
   if (!missing(model_formula)) {
-    if ("formula" %in% class(model_formula)) {
-      model_formula <- deparse(model_formula) # Convert to string if is formula
-    }
-    tryCatch(
-      stats::as.formula(object = model_formula),
-      # If cannot be coerced into formula, error
-      error = function(e) {
-        stop(paste0(model_formula, " is not a recognized formula."))
-      }
-    )
+    model_formula <- check_stats_formula(model_formula)
 
     # If variable or random were included, message that they will
     # not be used as model_formula is provided
     if (!missing(variable) || !missing(random)) {
-      message(
+      cli::cli_inform(
         paste("model_formula overriding variable and random",
               "arguments.")
       )
@@ -149,8 +140,6 @@ olink_lmer <- function(df,
 
     # Parse formula so checks on the variable, outcome and random objects can
     # continue as usual
-    model_formula <- gsub(pattern = " ", replacement = "", x = model_formula)
-
     # Random portion of formula
     splt_random <- stringr::str_extract(string = model_formula,
                                         pattern = "(?<=\\().*(?=\\))")
@@ -203,227 +192,80 @@ olink_lmer <- function(df,
 
   }
 
-  if (missing(df) || missing(variable) || missing(random)) {
-    stop("The df and variable and random arguments need to be specified.")
-  }
+  check_stats_required(
+    present = c(!missing(df), !missing(variable), !missing(random)),
+    message = "The df and variable and random arguments need to be specified."
+  )
 
   # Check data format
   check_log <- get_check_npx(df = df, check_log = check_log)
 
   lmer_result <- withCallingHandlers(
     {
-      # Filtering on valid OlinkID
-      if (length(check_log$oid_invalid > 0)) {
-        df <- df |>
-          dplyr::filter(
-            !(.data[[check_log$col_names$olink_id]] %in% check_log$oid_invalid)
-          )
-      }
+      df <- filter_stats_olink_ids(
+        df = df,
+        olink_id = check_log$col_names$olink_id,
+        invalid_ids = check_log$oid_invalid
+      )
 
-
-      # Allow for :/* notation in covariates
-      variable <- gsub(pattern = "\\*", replacement = ":", x = variable)
-      if (!is.null(covariates)) {
-        covariates <- gsub(pattern = "\\*", replacement = ":", x = covariates)
-      }
-
-      add_main_effects <- NULL
-      if (any(grepl(":", covariates))) {
-        tmp <- unlist(strsplit(covariates, ":"))
-        add_main_effects <- c(add_main_effects, setdiff(tmp, covariates))
-        covariates <- union(covariates, add_main_effects)
-      }
-      if (any(grepl(":", variable))) {
-        tmp <- unlist(strsplit(variable, ":"))
-        add_main_effects <- c(add_main_effects, setdiff(tmp, variable))
-        variable <- union(variable, unlist(strsplit(variable, ":")))
-        variable <- variable[!grepl(":", variable)]
-      }
-      # If variable is in both variable and covariate, keep it in variable or
-      # will get removed from final table
-      covariates <- setdiff(x = covariates, y = variable)
-      add_main_effects <- setdiff(x = add_main_effects, y = variable)
+      model_terms <- prepare_stats_model_terms(
+        variable = variable,
+        covariates = covariates
+      )
+      variable <- model_terms$variable
+      covariates <- model_terms$covariates
+      add_main_effects <- model_terms$add_main_effects
 
       # Variables to be checked
       variable_testers <- intersect(x = c(variable, covariates, random),
                                     y = names(df))
 
-      # Remove rows where variables or covariate is NA (can't include in
-      # analysis anyway)
-      removed_sampleids <- NULL
-      for (i in variable_testers) {
-        sampleids_na <- df |>
-          dplyr::filter(is.na(.data[[i]])) |>
-          dplyr::distinct(.data[[check_log$col_names$sample_id]]) |>
-          dplyr::pull()
+      filtered_data <- filter_stats_missing(
+        df = df,
+        columns = variable_testers,
+        sample_id = check_log$col_names$sample_id
+      )
+      df <- filtered_data$df
+      removed_sampleids <- filtered_data$removed_sampleids
 
-        removed_sampleids <- c(removed_sampleids,
-                               sampleids_na) |>
-          unique()
-        df <- df[!is.na(df[[i]]), ]
-      }
+      converted_data <- convert_stats_predictors(df, variable_testers)
+      df <- converted_data$df
+      converted_vars <- converted_data$converted_vars
+      num_vars <- converted_data$numeric_vars
 
-      # Convert character vars to factor
-      converted_vars <- NULL
-      num_vars <- NULL
-      for (i in variable_testers) {
-        if (is.character(df[[i]])) {
-          df[[i]] <- factor(df[[i]])
-          converted_vars <- c(converted_vars, i)
-        } else if (is.numeric(df[[i]])) {
-          num_vars <- c(num_vars, i)
-        }
-      }
+      single_fixed_effects <- get_stats_fixed_effects(
+        df = df,
+        variable = variable,
+        covariates = covariates
+      )
+      nas_in_var <- check_stats_effect_data(
+        df = df,
+        effects = single_fixed_effects,
+        outcome = outcome,
+        check_log = check_log
+      )
 
-      # Not testing assays that have all NA:s in one level
-      # Every sample needs to have a unique level of the factor
+      formula_string <- build_stats_formula(
+        outcome = outcome,
+        variable = variable,
+        covariates = covariates,
+        random = random,
+        model_formula = if (missing(model_formula)) NULL else model_formula
+      )
 
-      nas_in_var <- character(0L)
-
-      if (!is.null(covariates)) {
-        factors_in_df <- names(df)[sapply(df, is.factor)]
-        single_fixed_effects <- c(variable,
-                                  intersect(x = covariates,
-                                            y = factors_in_df))
-      } else {
-        single_fixed_effects <- variable
-      }
-
-      for (effect in single_fixed_effects) {
-
-        current_nas <- df |>
-          dplyr::filter( # Exclude assays that have all NA:s
-            !(.data[[check_log$col_names$olink_id]] %in% check_log$assay_na)
-          ) |>
-          dplyr::group_by(
-            dplyr::across(
-              dplyr::all_of(
-                c(check_log$col_names$olink_id, effect)
-              )
-            )
-          ) |>
-          dplyr::summarise(
-            n = dplyr::n(),
-            n_na = sum(is.na(.data[[outcome]])),
-            .groups = "drop"
-          ) |>
-          dplyr::filter(
-            .data[["n"]] == .data[["n_na"]]
-          ) |>
-          dplyr::distinct(
-            .data[[check_log$col_names$olink_id]]
-          ) |>
-          dplyr::pull(
-            .data[[check_log$col_names$olink_id]]
-          )
-
-        if (length(current_nas) > 0L) {
-
-          nas_in_var <- c(nas_in_var, current_nas)
-
-          warning(
-            paste0(
-              "The assay(s) ", current_nas,
-              " has only NA:s in atleast one level of ", effect,
-              ". It will not be tested."
-            ),
-            call. = FALSE
-          )
-        }
-
-        n_samples_w_more_than_1_level <- df |>
-          dplyr::group_by(
-            dplyr::across(
-              dplyr::all_of(
-                c(check_log$col_names$sample_id)
-              )
-            )
-          ) |>
-          dplyr::summarise(
-            n_levels = dplyr::n_distinct(.data[[effect]], na.rm = TRUE),
-            .groups = "drop"
-          ) |>
-          dplyr::filter(
-            .data[["n_levels"]] > 1L
-          ) |>
-          nrow()
-
-        if (n_samples_w_more_than_1_level > 0L) {
-          stop(
-            paste0(
-              "There are ", n_samples_w_more_than_1_level,
-              " samples that do not have a unique level for the effect ",
-              effect, ". Only one level per sample is allowed."
-            )
-          )
-        }
-      }
-
-      if (missing(model_formula)) {
-        if (!is.null(covariates)) {
-          formula_string <- paste0(
-            outcome, "~", paste(variable, collapse = "*"), "+",
-            paste(covariates, sep = "", collapse = "+"), "+",
-            paste(paste0("(1|", random, ")"), collapse = "+")
-          )
-        } else {
-          formula_string <- paste0(
-            outcome, "~", paste(variable, collapse = "*"), "+",
-            paste(paste0("(1|", random, ")"), collapse = "+")
-          )
-        }
-      } else if (!missing(model_formula)) {
-        formula_string <- model_formula
-      }
-
-      #Get factors
-      fact_vars <- sapply(variable_testers, function(x) is.factor(df[[x]]))
-      fact_vars <- names(fact_vars)[fact_vars]
-
-      #Print verbose message
       if (verbose) {
-        if (!is.null(add_main_effects) && length(add_main_effects) > 0L) {
-          message(
-            "Missing main effects added to the model formula: ",
-            paste(add_main_effects, collapse = ", ")
+        inform_stats_model(
+          add_main_effects = add_main_effects,
+          removed_sampleids = removed_sampleids,
+          converted_vars = converted_vars,
+          numeric_vars = num_vars,
+          model_message = paste0(
+            "Linear mixed effects model fit to each assay:", formula_string
           )
-        }
-        if (!is.null(removed_sampleids) && length(removed_sampleids) > 0L) {
-          message(
-            "Samples removed due to missing variable or covariate levels: ",
-            paste(removed_sampleids, collapse = ", ")
-          )
-        }
-        if (!is.null(converted_vars)) {
-          message(
-            paste0(
-              "Variables and covariates converted from character to factors: ",
-              paste(converted_vars, collapse = ", ")
-            )
-          )
-        }
-        if (!is.null(num_vars)) {
-          message(
-            paste0("Variables and covariates treated as numeric: ",
-                   paste(num_vars, collapse = ", "))
-          )
-        }
-        message(
-          paste("Linear mixed effects model fit to each assay:"), formula_string
         )
       }
 
-      if (!is.null(covariates) && any(grepl(":", covariates))) {
-        covariate_filter_string <- covariates[stringr::str_detect(covariates, ":")] # nolint: line_length_linter
-        covariate_filter_string <- sub(
-          pattern = "(.*)\\:(.*)$",
-          replacement = "\\2:\\1",
-          x = covariate_filter_string
-        )
-        covariate_filter_string <- c(covariates, covariate_filter_string)
-      } else {
-        covariate_filter_string <- covariates
-      }
+      covariate_filter_string <- get_stats_covariate_terms(covariates)
 
       ##make LMM
       lmer_model <- df |>
@@ -463,17 +305,7 @@ olink_lmer <- function(df,
         dplyr::group_by(
           .data[["covariates"]]
         ) |>
-        dplyr::mutate(
-          Adjusted_pval = stats::p.adjust(
-            p = .data[["p.value"]],
-            method = "fdr"
-          ),
-          Threshold = dplyr::if_else(
-            .data[["Adjusted_pval"]] < 0.05,
-            "Significant",
-            "Non-significant"
-          )
-        ) |>
+        add_stats_significance() |>
         dplyr::mutate(
           dplyr::across(
             dplyr::all_of(
@@ -505,18 +337,13 @@ olink_lmer <- function(df,
 
     },
     warning = function(w) {
-      restart_if_spec_warn <- grepl(
-        x = w,
-        pattern = "not\\s+recognized\\s+or\\s+transformed"
-      ) |
-        grepl(
-          x = w,
-          pattern = utils::glob2rx("*contains implicit NA, consider using*")
+      return(muffle_stats_warning(
+        warning = w,
+        patterns = c(
+          "not\\s+recognized\\s+or\\s+transformed",
+          utils::glob2rx("*contains implicit NA, consider using*")
         )
-
-      if (restart_if_spec_warn == TRUE) {
-        invokeRestart("muffleWarning")
-      }
+      ))
     }
   )
 
@@ -561,7 +388,9 @@ single_lmer <- function(data, formula_string) {
   if (inherits(out_model, "lmerModLmerTest")) {
     return(out_model)
   } else {
-    stop("Convergence issue not caught by single_lmer")
+    cli::cli_abort( # nolint: return_linter
+      "Convergence issue not caught by {.fn single_lmer}."
+    )
   }
 }
 
@@ -715,21 +544,12 @@ olink_lmer_posthoc <- function(df,
   )
 
   if (!missing(model_formula)) {
-    if ("formula" %in% class(model_formula)) {
-      model_formula <- deparse(model_formula) # Convert to string if is formula
-    }
-    tryCatch(
-      stats::as.formula(object = model_formula),
-      # If cannot be coerced into formula, error
-      error = function(e) {
-        stop(paste0(model_formula, " is not a recognized formula."))
-      }
-    )
+    model_formula <- check_stats_formula(model_formula)
 
     # If variable or random were included, throw a message that they will
     # not be used as model_formula is provided
     if (!missing(variable) || !missing(random)) {
-      message(
+      cli::cli_inform(
         paste("model_formula overriding variable and",
               "random arguments.")
       )
@@ -737,8 +557,6 @@ olink_lmer_posthoc <- function(df,
 
     # Parse formula so checks on the  variable and outcome objects can continue
     # as usual
-    model_formula <- gsub(pattern = " ", replacement = "", x = model_formula)
-
     # Random portion of formula
     splt_random <- stringr::str_extract(string = model_formula,
                                         pattern = "(?<=\\().*(?=\\))")
@@ -788,202 +606,95 @@ olink_lmer_posthoc <- function(df,
   }
 
   if (!missing(effect_formula)) {
-    if (length(effect_formula) == 1L) {
-      # Parse effect formula so the check on the effect object can continue as
-      # usual
-      if (!missing(effect)) {
-        message("effect_formula overriding effect argument.")
-      }
-      if ("formula" %in% class(effect_formula)) {
-        effect_formula <- deparse(effect_formula)
-      }
-      splt_effect <- effect_formula
-      if (grepl(pattern = "~", x = splt_effect)) {
-        # Pull out variables from right hand side of formula.
-        # e.g. pairwise~A+B|C = "A+B|C"
-        splt_effect <- strsplit(x = splt_effect, split = "~")[[1L]][2L]
-      }
-      if (grepl(pattern = "\\||+|\\*", x = splt_effect)) {
-        # Split rhs of formula into vector of variables.
-        # e.g. "A+B|C"=c("A","B","C")
-        splt_effect <- strsplit(x = splt_effect, split = "\\||\\+|\\*")[[1L]]
-      }
-      effect <- splt_effect
-    } else {
-      stop(
-        paste0(
-          "Unrecognized effect formula. Should be a character string of length",
-          "1. If listing in the form c('A','B'), use the effects argument."
-        )
-      )
-    }
+    effect <- parse_stats_effect_formula(
+      effect_formula = effect_formula,
+      effect = if (missing(effect)) NULL else effect,
+      effect_supplied = !missing(effect)
+    )
   }
 
-  if (missing(df) || missing(variable) || missing(effect) || missing(random)) {
-    stop("The df, variable, random and effect arguments need to be specified.")
-  }
-
-  tmp_efect <- strsplit(x = effect, split = ":") |>
-    unlist() |>
-    unique()
-  tmp_variable <- strsplit(x = variable, split = "[\\*:]") |>
-    unlist() |>
-    unique()
-  if (!all(tmp_efect %in% tmp_variable)) {
-    stop("All effect terms must be included in the variable argument.")
-  }
+  check_stats_required(
+    present = c(
+      !missing(df), !missing(variable), !missing(random), !missing(effect)
+    ),
+    message = paste(
+      "The df, variable, random and effect arguments need to be specified."
+    )
+  )
+  check_stats_effect_terms(effect = effect, variable = variable)
 
   # Check data format
   check_log <- get_check_npx(df = df, check_log = check_log)
 
   lmer_posthoc_result <- withCallingHandlers(
     {
-      #Filtering on valid OlinkID
-      if (length(check_log$oid_invalid > 0)) {
-        df <- df |>
-          dplyr::filter(
-            !(.data[[check_log$col_names$olink_id]] %in% check_log$oid_invalid)
-          )
-      }
+      df <- filter_stats_olink_ids(
+        df = df,
+        olink_id = check_log$col_names$olink_id,
+        invalid_ids = check_log$oid_invalid
+      )
+      olinkid_list <- resolve_stats_olink_ids(
+        df = df,
+        olinkid_list = olinkid_list,
+        olink_id = check_log$col_names$olink_id
+      )
 
-      if (is.null(olinkid_list) || length(olinkid_list) == 0L) {
-        olinkid_list <- df |>
-          dplyr::select(
-            dplyr::all_of(check_log$col_names$olink_id)
-          ) |>
-          dplyr::distinct() |>
-          dplyr::pull()
-      }
-
-      #Allow for :/* notation in covariates
-      variable <- gsub(pattern = "\\*", replacement = ":", x = variable)
-      if (!is.null(covariates)) {
-        covariates <- gsub(pattern = "\\*", replacement = ":", x = covariates)
-      }
-
-      add_main_effects <- NULL
-      if (any(grepl(pattern = ":", x = covariates))) {
-        tmp <- strsplit(x = covariates, split = ":") |> unlist()
-        add_main_effects <- c(add_main_effects,
-                              setdiff(x = tmp, y = covariates))
-        covariates <- union(x = covariates, y = add_main_effects)
-      }
-
-      if (any(grepl(pattern = ":", x = variable))) {
-        tmp <- strsplit(x = variable, split = ":") |> unlist()
-        add_main_effects <- c(add_main_effects, setdiff(x = tmp, y = variable))
-        variable <- union(x = variable,
-                          y = unlist(strsplit(x = variable, split = ":")))
-        variable <- variable[!grepl(pattern = ":", x = variable)]
-      }
-
-      # If variable is in both variable and covariate, keep it in variable or
-      # will get removed from final table
-      covariates <- setdiff(x = covariates, y = variable)
-      add_main_effects <- setdiff(x = add_main_effects, y = variable)
+      model_terms <- prepare_stats_model_terms(
+        variable = variable,
+        covariates = covariates
+      )
+      variable <- model_terms$variable
+      covariates <- model_terms$covariates
+      add_main_effects <- model_terms$add_main_effects
 
       variable_testers <- intersect(x = c(variable, covariates), y = names(df))
-      # Remove rows where variables or covariate is NA (cant include in analysis
-      # anyway)
-      removed_sampleids <- NULL
-      for (i in variable_testers) {
-        sampleids_na <- df |>
-          dplyr::filter(is.na(.data[[i]])) |>
-          dplyr::distinct(.data[[check_log$col_names$sample_id]]) |>
-          dplyr::pull()
+      filtered_data <- filter_stats_missing(
+        df = df,
+        columns = variable_testers,
+        sample_id = check_log$col_names$sample_id
+      )
+      df <- filtered_data$df
+      removed_sampleids <- filtered_data$removed_sampleids
 
-        removed_sampleids <- c(removed_sampleids,
-                               sampleids_na) |>
-          unique()
-        df <- df[!is.na(df[[i]]), ]
-      }
+      converted_data <- convert_stats_predictors(df, variable_testers)
+      df <- converted_data$df
+      converted_vars <- converted_data$converted_vars
+      num_vars <- converted_data$numeric_vars
 
-      # Convert character vars to factor
-      converted_vars <- NULL
-      num_vars <- NULL
-      for (i in variable_testers) {
-        if (is.character(df[[i]])) {
-          df[[i]] <- factor(df[[i]])
-          converted_vars <- c(converted_vars, i)
-        } else if (is.numeric(df[[i]])) {
-          num_vars <- c(num_vars, i)
-        }
-      }
+      formula_string <- build_stats_formula(
+        outcome = outcome,
+        variable = variable,
+        covariates = covariates,
+        random = random,
+        model_formula = if (missing(model_formula)) NULL else model_formula
+      )
+      e_form <- build_stats_effect_formula( # nolint: object_usage_linter
+        effect = effect,
+        effect_formula = if (missing(effect_formula)) NULL else effect_formula,
+        as_formula = FALSE
+      )
 
-      if (missing(model_formula)) {
-        if (!is.null(covariates)) {
-          formula_string <- paste0(
-            outcome, "~", paste(variable, collapse = "*"), "+",
-            paste(covariates, sep = "", collapse = "+"), "+",
-            paste(paste0("(1|", random, ")"), collapse = "+")
-          )
-        } else {
-          formula_string <- paste0(
-            outcome, "~", paste(variable, collapse = "*"), "+",
-            paste(paste0("(1|", random, ")"), collapse = "+")
-          )
-        }
-      } else if (!missing(model_formula)) {
-        formula_string <- model_formula
-      }
-
-      if (!missing(effect_formula)) {
-        e_form <- effect_formula # nolint: object_usage_linter
-      } else if (missing(effect_formula)) {
-        e_form <- paste0("pairwise~", paste(effect, collapse = "+")) # nolint: object_usage_linter
-      }
-
-      #Print verbose message
       if (verbose) {
-        if (!is.null(add_main_effects) & length(add_main_effects) > 0L) {
-          message(
-            "Missing main effects added to the model formula: ",
-            paste(add_main_effects, collapse = ", ")
-          )
-        }
-        if (!is.null(removed_sampleids) & length(removed_sampleids) > 0L) {
-          message(
-            "Samples removed due to missing variable or covariate levels: ",
-            paste(removed_sampleids, collapse = ", ")
-          )
-        }
-        if (!is.null(converted_vars)) {
-          message(
-            paste0(
-              "Variables and covariates converted from character to factors: ",
-              paste(converted_vars, collapse = ", ")
-            )
-          )
-        }
-        if (!is.null(num_vars)) {
-          message(
-            paste0("Variables and covariates treated as numeric: ",
-                   paste(num_vars, collapse = ", "))
-          )
-        }
-        if (any(variable %in% num_vars)) {
-          message(
-            paste0(
-              "Numeric variables post-hoc performed using",
-              " Mean and Mean + 1SD: ",
-              paste(num_vars[num_vars %in% variable], collapse = ", ")
-            )
-          )
-        }
-        message(
-          paste("Means estimated for each assay from linear mixed effects",
-                "model:", formula_string)
+        inform_stats_model(
+          add_main_effects = add_main_effects,
+          removed_sampleids = removed_sampleids,
+          converted_vars = converted_vars,
+          numeric_vars = num_vars,
+          variable = variable,
+          model_message = paste(
+            "Means estimated for each assay from linear mixed effects model:",
+            formula_string
+          ),
+          posthoc = TRUE
         )
       }
 
 
       output_df <- df |>
-        dplyr::filter(
-          .data[[check_log$col_names$olink_id]] %in% .env[["olinkid_list"]]
-        ) |>
-        # Exclude assays that have all NA:s
-        dplyr::filter(
-          !(.data[[check_log$col_names$olink_id]] %in% check_log$assay_na)
+        filter_stats_assays(
+          olinkid_list = olinkid_list,
+          assay_na = check_log$assay_na,
+          olink_id = check_log$col_names$olink_id
         ) |>
         dplyr::group_by(
           dplyr::across(
@@ -1029,13 +740,10 @@ olink_lmer_posthoc <- function(df,
       return(output_df)
     },
     warning = function(w) {
-      restart_if_spec_warn <- grepl(
-        x = w,
-        pattern = utils::glob2rx("*contains implicit NA, consider using*")
-      )
-      if (restart_if_spec_warn == TRUE) {
-        invokeRestart("muffleWarning")
-      }
+      return(muffle_stats_warning(
+        warning = w,
+        patterns = utils::glob2rx("*contains implicit NA, consider using*")
+      ))
     }
   )
 
@@ -1066,27 +774,23 @@ single_posthoc <- function(data,
                            padjust_method = "tukey") {
 
   if (!is.character(effect)) {
-    stop("effect must be a character string.")
+    cli::cli_abort("{.arg effect} must be a character string.")
   }
 
-  the_model <- emmeans::emmeans(
-    object = single_lmer(
+  posthoc_result <- run_stats_emmeans(
+    model = single_lmer(
       data = data,
       formula_string = formula_string
     ),
-    # effect must be string to be converted to as.formula
-    specs = stats::as.formula(effect),
-    cov.reduce = function(x) {
-      round(x = c(mean(x), mean(x) + stats::sd(x)), digits = 4L) # nolint: return_linter
-    },
-    lmer.df = "satterthwaite",
-    infer = c(TRUE, TRUE),
-    adjust = padjust_method
+    effect = stats::as.formula(effect),
+    mean_return = mean_return,
+    padjust_method = padjust_method,
+    lmer_df = "satterthwaite"
   )
 
   if (mean_return) {
     return(
-      the_model$emmeans |>
+      posthoc_result |>
         dplyr::as_tibble() |>
         dplyr::rename(
           "conf.low" = "lower.CL",
@@ -1099,20 +803,14 @@ single_posthoc <- function(data,
         )
     )
   } else {
-    out_df <- the_model$contrasts |>
+    out_df <- posthoc_result |>
       dplyr::as_tibble() |>
       dplyr::rename(
         "Adjusted_pval" = "p.value",
         "conf.low" = "lower.CL",
         "conf.high" = "upper.CL"
       ) |>
-      dplyr::mutate(
-        Threshold = dplyr::if_else(
-          .data[["Adjusted_pval"]] < 0.05,
-          "Significant",
-          "Non-significant"
-        )
-      ) |>
+      add_stats_threshold() |>
       dplyr::select(
         -dplyr::all_of(
           c("SE", "df", "t.ratio")

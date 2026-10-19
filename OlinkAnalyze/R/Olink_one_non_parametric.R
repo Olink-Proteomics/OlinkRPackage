@@ -87,34 +87,32 @@ olink_one_non_parametric <- function(df,
     call = rlang::caller_env()
   )
 
-  if (missing(df) || missing(variable)) {
-    cli::cli_abort("{.arg df} and {.arg variable} must be specified.")
-  }
+  check_stats_required(
+    present = c(!missing(df), !missing(variable)),
+    message = "{.arg df} and {.arg variable} must be specified."
+  )
 
   # Check data format
   check_log <- get_check_npx(df = df, check_log = check_log)
 
   withCallingHandlers( # nolint: return_linter
     {
-      # Filtering on valid OlinkID
-      df <- suppressMessages(
-        clean_invalid_oid(df = df, check_log = check_log)
+      df <- filter_stats_olink_ids(
+        df = df,
+        olink_id = check_log$col_names$olink_id,
+        invalid_ids = check_log$oid_invalid
       )
 
       # Variables to check
       variable_testers <- intersect(c(variable), names(df))
 
-      ## Remove rows where variables is NA (cant include in analysis anyway)
-      removed.sampleids <- NULL # nolint: object_name_linter
-
-      for (i in variable_testers) {
-        removed.sampleids <- unique( # nolint: object_name_linter
-          c(removed.sampleids, df[["SampleID"]][is.na(df[[i]])])
-        )
-        df <- df[!is.na(df[[i]]), ]
-      }
-
-      df <- df[!is.na(df[[variable_testers]]), ]
+      filtered_data <- filter_stats_missing(
+        df = df,
+        columns = variable_testers,
+        sample_id = "SampleID"
+      )
+      df <- filtered_data$df
+      removed.sampleids <- filtered_data$removed_sampleids # nolint: object_name_linter
 
       # Temporary fix to avoid issues with rlang::ensym downstream
       data_type <- check_log$col_names$quant
@@ -124,69 +122,27 @@ olink_one_non_parametric <- function(df,
         clean_nonunique_uniprot(df = df, check_log = check_log)
       )
 
-      ## Convert character vars to factor
-      converted.vars <- NULL # nolint: object_name_linter
-      num.vars <- NULL # nolint: object_name_linter
-      for (i in variable_testers) {
-        if (is.character(df[[i]])) {
-          df[[i]] <- factor(df[[i]])
-          converted.vars <- c(converted.vars, i) # nolint: object_name_linter
-        } else if (is.numeric(df[[i]])) {
-          num.vars <- c(num.vars, i) # nolint: object_name_linter
-        }
-      }
+      converted_data <- convert_stats_predictors(df, variable_testers)
+      df <- converted_data$df
+      converted.vars <- converted_data$converted_vars # nolint: object_name_linter
+      num.vars <- converted_data$numeric_vars # nolint: object_name_linter
+      fact.vars <- converted_data$factor_vars # nolint: object_name_linter
 
       # Not testing assays that have all NA:s in one level
       # Every sample needs to have a unique level of the factor
 
-      nas_in_var <- character(0L)
-
       single_fixed_effects <- variable
+      nas_in_var <- check_stats_effect_data(
+        df = df,
+        effects = single_fixed_effects,
+        outcome = data_type,
+        check_log = check_log
+      )
 
-      for (effect in single_fixed_effects) {
-        current_nas <- df |>
-          dplyr::filter(!(.data[["OlinkID"]] %in% check_log$assay_na)) |>
-          dplyr::group_by(.data[["OlinkID"]], .data[[effect]]) |>
-          dplyr::summarise(
-            n = dplyr::n(),
-            n_na = sum(is.na(.data[[data_type]])),
-            .groups = "drop"
-          ) |>
-          dplyr::filter(.data[["n"]] == .data[["n_na"]]) |>
-          dplyr::distinct(.data[["OlinkID"]]) |>
-          dplyr::pull(.data[["OlinkID"]])
-
-        if (length(current_nas) > 0L) {
-          nas_in_var <- c(nas_in_var, current_nas)
-          cli::cli_warn(
-            "The assay(s) {.val {current_nas}} have only NA values in at least
-            one level of {.var {effect}} and will not be tested."
-          )
-        }
-
-        number_of_samples_w_more_than_one_level <- df |> # nolint: object_length_linter
-          dplyr::group_by(.data[["SampleID"]]) |>
-          dplyr::summarise(
-            n_levels = dplyr::n_distinct(.data[[effect]], na.rm = TRUE),
-            .groups = "drop"
-          ) |>
-          dplyr::filter(.data[["n_levels"]] > 1L) |>
-          nrow()
-
-        if (number_of_samples_w_more_than_one_level > 0L) {
-          cli::cli_abort(
-            "There are {number_of_samples_w_more_than_one_level} samples that
-            do not have a unique level for the effect {.var {effect}}. Only one
-            level per sample is allowed."
-          )
-        }
-      }
-
-      formula_string <- paste0(data_type, "~", paste(variable, collapse = "*"))
-
-      # Get factors
-      fact.vars <- sapply(variable_testers, function(x) is.factor(df[[x]])) # nolint: object_name_linter
-      fact.vars <- names(fact.vars)[fact.vars] # nolint: object_name_linter
+      formula_string <- build_stats_formula(
+        outcome = data_type,
+        variable = variable
+      )
 
       # Print verbose message
       if (verbose) {
@@ -276,12 +232,7 @@ olink_one_non_parametric <- function(df,
             )
           }) |>
           dplyr::ungroup() |>
-          dplyr::mutate(
-            Adjusted_pval = stats::p.adjust(p = .data[["p"]], method = "BH")
-          ) |>
-          dplyr::mutate(Threshold = ifelse(
-            .data[["Adjusted_pval"]] < 0.05, "Significant", "Non-significant"
-          )) |>
+          add_stats_significance(p_column = "p", method = "BH") |>
           dplyr::ungroup() |>
           dplyr::arrange(.data[["Adjusted_pval"]]) |>
           dplyr::select(-dplyr::all_of(c("n", ".y."))) |>
@@ -316,13 +267,7 @@ olink_one_non_parametric <- function(df,
               )
             }) |>
             dplyr::ungroup() |>
-            dplyr::mutate(
-              Adjusted_pval = stats::p.adjust(p = .data[["p.value"]],
-                                              method = "BH")
-            ) |>
-            dplyr::mutate(Threshold = ifelse(
-              .data[["Adjusted_pval"]] < 0.05, "Significant", "Non-significant"
-            )) |>
+            add_stats_significance(method = "BH") |>
             dplyr::ungroup() |>
             dplyr::arrange(.data[["Adjusted_pval"]])
         } |> # nolint: brace_linter
@@ -335,12 +280,10 @@ olink_one_non_parametric <- function(df,
       }
     },
     warning = function(w) {
-      if (grepl(
-        x = w,
-        pattern = utils::glob2rx("*contains implicit NA, consider using*")
-      )) {
-        invokeRestart("muffleWarning")
-      }
+      return(muffle_stats_warning(
+        warning = w,
+        patterns = utils::glob2rx("*contains implicit NA, consider using*")
+      ))
     }
   )
 }
@@ -435,11 +378,10 @@ olink_one_non_parametric_posthoc <- function(df, # nolint: object_length_linter
     call = rlang::caller_env()
   )
 
-  if (missing(df) || missing(variable)) {
-    cli::cli_abort(
-      "{.arg df} and {.arg variable} must be specified."
-    )
-  }
+  check_stats_required(
+    present = c(!missing(df), !missing(variable)),
+    message = "{.arg df} and {.arg variable} must be specified."
+  )
   if (!(test %in% c("friedman", "kruskal"))) {
     cli::cli_abort(
       "{.arg test} must be either {.val friedman} or {.val kruskal}."
@@ -455,17 +397,12 @@ olink_one_non_parametric_posthoc <- function(df, # nolint: object_length_linter
 
   withCallingHandlers( # nolint: return_linter
     {
-      # Filtering on valid OlinkID
-      df <- suppressMessages(
-        clean_invalid_oid(df = df, check_log = check_log)
+      df <- filter_stats_olink_ids(
+        df = df,
+        olink_id = check_log$col_names$olink_id,
+        invalid_ids = check_log$oid_invalid
       )
-
-      if (is.null(olinkid_list)) {
-        olinkid_list <- df |>
-          dplyr::select(dplyr::all_of("OlinkID")) |>
-          dplyr::distinct() |>
-          dplyr::pull()
-      }
+      olinkid_list <- resolve_stats_olink_ids(df, olinkid_list)
 
       # Temporary fix to avoid issues with rlang::ensym downstream
       data_type <- check_log$col_names$quant
@@ -477,29 +414,24 @@ olink_one_non_parametric_posthoc <- function(df, # nolint: object_length_linter
 
       # Variables to check
       variable_testers <- intersect(c(variable), names(df))
-      ## Remove rows where variables or covariate is NA (can't include in
-      ## analysis anyway)
-      removed.sampleids <- NULL # nolint: object_name_linter
+      filtered_data <- filter_stats_missing(
+        df = df,
+        columns = variable_testers,
+        sample_id = "SampleID"
+      )
+      df <- filtered_data$df
+      removed.sampleids <- filtered_data$removed_sampleids # nolint: object_name_linter
 
-      for (i in variable_testers) {
-        removed.sampleids <- unique( # nolint: object_name_linter
-          c(removed.sampleids, df$SampleID[is.na(df[[i]])])
-        )
-        df <- df[!is.na(df[[i]]), ]
-      }
+      converted_data <- convert_stats_predictors(df, variable_testers)
+      df <- converted_data$df
+      converted.vars <- converted_data$converted_vars # nolint: object_name_linter
+      num.vars <- converted_data$numeric_vars # nolint: object_name_linter
+      fact.vars <- converted_data$factor_vars # nolint: object_name_linter
 
-      ## Convert character vars to factor
-      converted.vars <- NULL # nolint: object_name_linter
-      num.vars <- NULL # nolint: object_name_linter
-
-      if (is.character(df[[variable_testers]])) {
-        df[[variable_testers]] <- factor(df[[variable_testers]])
-        converted.vars <- c(converted.vars, variable_testers) # nolint: object_name_linter
-      } else if (is.numeric(df[[variable_testers]])) {
-        num.vars <- c(num.vars, variable_testers) # nolint: object_name_linter
-      }
-
-      formula_string <- paste0(data_type, "~", paste(variable, collapse = "*")) # nolint: object_usage_linter
+      formula_string <- build_stats_formula( # nolint: object_usage_linter
+        outcome = data_type,
+        variable = variable
+      )
 
       # Print verbose message
       if (verbose) {
@@ -531,59 +463,13 @@ olink_one_non_parametric_posthoc <- function(df, # nolint: object_length_linter
         # Not testing assays that have all NA:s in one level
         # Every sample needs to have a unique level of the factor
 
-        nas_in_var <- character(0L)
-
         single_fixed_effects <- variable
-
-        for (effect in single_fixed_effects) {
-          current_nas <- df |>
-            dplyr::filter(!(.data[["OlinkID"]] %in% check_log$assay_na)) |>
-            dplyr::group_by(.data[["OlinkID"]], .data[[effect]]) |>
-            dplyr::summarise(
-              n = dplyr::n(),
-              n_na = sum(is.na(.data[[data_type]])),
-              .groups = "drop"
-            ) |>
-            dplyr::filter(.data[["n"]] == .data[["n_na"]]) |>
-            dplyr::distinct(.data[["OlinkID"]]) |>
-            dplyr::pull(.data[["OlinkID"]])
-
-          if (length(current_nas) > 0L) {
-            nas_in_var <- c(nas_in_var, current_nas)
-            cli::cli_warn(
-              "The assay(s) {.val {current_nas}} have only NA values in at
-              least one level of {.var {effect}} and will not be tested."
-            )
-          }
-
-          number_of_samples_w_more_than_one_level <- df |> # nolint: object_length_linter
-            dplyr::group_by(.data[["SampleID"]]) |>
-            dplyr::summarise(
-              n_levels = dplyr::n_distinct(
-                .data[[effect]],
-                na.rm = TRUE
-              ),
-              .groups = "drop"
-            ) |>
-            dplyr::filter(.data[["n_levels"]] > 1L) |>
-            nrow()
-
-          if (number_of_samples_w_more_than_one_level > 0L) {
-            cli::cli_abort(
-              "There are {number_of_samples_w_more_than_one_level} samples
-              that do not have a unique level for the effect {.var {effect}}.
-              Only one level per sample is allowed."
-            )
-          }
-        }
-
-        formula_string <- paste0(
-          data_type, "~", paste(variable, collapse = "*")
+        nas_in_var <- check_stats_effect_data(
+          df = df,
+          effects = single_fixed_effects,
+          outcome = data_type,
+          check_log = check_log
         )
-
-        # Get factors
-        fact.vars <- sapply(variable_testers, function(x) is.factor(df[[x]])) # nolint: object_name_linter
-        fact.vars <- names(fact.vars)[fact.vars] # nolint: object_name_linter
 
         # add repeat measurement groups
         df_nas_remove <- df |>
@@ -625,10 +511,10 @@ olink_one_non_parametric_posthoc <- function(df, # nolint: object_length_linter
         p.hoc_val <- df_nas_remove |> # nolint: object_name_linter
           dplyr::left_join(subject_remove, by = c("Assay", subject)) |>
           dplyr::filter(.data[["Friedman_remove"]] == "no") |>
-          dplyr::filter(.data[["OlinkID"]] %in% .env[["olinkid_list"]]) |>
-          dplyr::filter(!(.data[["OlinkID"]] %in% check_log$assay_na)) |>
-          dplyr::mutate(
-            OlinkID = factor(.data[["OlinkID"]], levels = olinkid_list)
+          filter_stats_assays(
+            olinkid_list = olinkid_list,
+            assay_na = check_log$assay_na,
+            preserve_order = TRUE
           ) |>
           dplyr::arrange(
             .data[["Assay"]],
@@ -656,9 +542,7 @@ olink_one_non_parametric_posthoc <- function(df, # nolint: object_length_linter
           }) |>
           dplyr::ungroup() |>
           dplyr::mutate("variable" = variable) |>
-          dplyr::mutate(Threshold = dplyr::if_else(
-            .data[["p.adj"]] < 0.05, "Significant", "Non-significant"
-          )) |>
+          add_stats_threshold(p_column = "p.adj") |>
           dplyr::rename("term" = "variable") |>
           dplyr::mutate(
             contrast = paste(.data[["group1"]], .data[["group2"]], sep = " - ")
@@ -675,10 +559,10 @@ olink_one_non_parametric_posthoc <- function(df, # nolint: object_length_linter
           were performed"
         )
         p.hoc_val <- df |> # nolint: object_name_linter
-          dplyr::filter(.data[["OlinkID"]] %in% .env[["olinkid_list"]]) |>
-          dplyr::filter(!(.data[["OlinkID"]] %in% check_log$assay_na)) |>
-          dplyr::mutate(
-            OlinkID = factor(.data[["OlinkID"]], levels = olinkid_list)
+          filter_stats_assays(
+            olinkid_list = olinkid_list,
+            assay_na = check_log$assay_na,
+            preserve_order = TRUE
           ) |>
           dplyr::group_by(
             .data[["Assay"]],
@@ -695,9 +579,7 @@ olink_one_non_parametric_posthoc <- function(df, # nolint: object_length_linter
           }) |>
           dplyr::ungroup() |>
           dplyr::mutate(variable = .env[["variable"]]) |>
-          dplyr::mutate(Threshold = dplyr::if_else(
-            .data[["P.adj"]] < 0.05, "Significant", "Non-significant"
-          )) |>
+          add_stats_threshold(p_column = "P.adj") |>
           dplyr::rename("term" = "variable") |>
           dplyr::rename("contrast" = "Comparison") |>
           dplyr::arrange(.data[["P.adj"]]) |>
@@ -712,13 +594,10 @@ olink_one_non_parametric_posthoc <- function(df, # nolint: object_length_linter
       return(p.hoc_val) # nolint: object_name_linter
     },
     warning = function(w) {
-      if (grepl(
-        x = w,
-        pattern = utils::glob2rx("*contains implicit NA, consider using*")
-      )
-      ) {
-        invokeRestart("muffleWarning")
-      }
+      return(muffle_stats_warning(
+        warning = w,
+        patterns = utils::glob2rx("*contains implicit NA, consider using*")
+      ))
     }
   )
 }
