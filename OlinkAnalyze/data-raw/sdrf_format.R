@@ -1,560 +1,514 @@
-## code to prepare internal dataset `sdrf_column_dict` goes here
+## code to prepare internal datasets from SDRF YAML templates
 ## based on https://r-pkgs.org/data.html#sec-data-sysdata
 ##
-## Column specification for SDRF affinity-proteomics template
-## Source: https://sdrf.quantms.org/templates/affinity-proteomics.html
-## Inheritance: base → sample-metadata → affinity-proteomics
+## Reads local templates under data-raw/sdrf/:
+##   - base.yaml                 (v1.1.0; root)
+##   - sample-metadata.yaml      (v1.0.0; extends base@>=1.1.0)
+##   - affinity-proteomics.yaml  (v1.0.0; extends sample-metadata@>=1.0.0)
 ##
-## Notes:
-## - Official SDRF headers are the first entry in each col_names vector.
-## - col_miss = FALSE means the column is required by the template.
-## - comment[panel name] is recommended, but MUST be provided when
-##   comment[platform] is a platform family that cannot uniquely imply
-##   the panel (e.g. "Olink Target 96"). That conditional rule is not
-##   encoded in col_miss and should be handled in validation later.
-## - This is a draft design artifact; not yet wired into sysdata.R.
+## Builds:
+##   - sdrf_base_template / sdrf_sample_metadata_template / sdrf_affinity_template
+##   - sdrf_column_dict: merged columns for affinity-proteomics
+##     (base → sample-metadata → affinity; child overrides same-name columns)
+##
+## Requires the yaml package at data-raw build time.
+## Draft: not yet wired into sysdata.R.
 
-sdrf_column_dict <- dplyr::tibble(
-  # internal keys used for alternative column names
-  col_key = c(
-    # required (base)
-    "source_name",
-    "assay_name",
-    "technology_type",
-    "technical_replicate",
-    "data_file",
-    # required (sample-metadata)
-    "organism",
-    "organism_part",
-    "biological_replicate",
-    # required (affinity-proteomics)
-    "sample_type",
-    "platform",
-    # recommended (base)
-    "sdrf_version",
-    # recommended (sample-metadata)
-    "cell_type",
-    "disease",
-    # recommended (affinity-proteomics)
-    "panel_name",
-    "sample_matrix",
-    # optional (base)
-    "sdrf_template",
-    "sdrf_annotation_tool",
-    "sdrf_validation_hash",
-    # optional (sample-metadata)
-    "tissue_supergroup",
-    "pooled_sample",
-    "material_type",
-    "tissue_mass",
-    "biosample_accession",
-    "sampling_time",
-    "treatment",
-    "synthetic_peptide",
-    "spiked_compound",
-    "enrichment_process",
-    # optional (affinity-proteomics)
-    "instrument",
-    "quantification_unit",
-    "plate",
-    "normalization_method",
-    "dilution",
-    "lot_number"
-  ),
-  # list of alternative column names matching the keys
-  # first name = official SDRF affinity-proteomics header
-  col_names = list(
-    "source_name" = c(
-      "source name",
-      "source_name",
-      "SourceName"
-    ),
-    "assay_name" = c(
-      "assay name",
-      "assay_name",
-      "AssayName"
-    ),
-    "technology_type" = c(
-      "technology type",
-      "technology_type",
-      "TechnologyType"
-    ),
-    "technical_replicate" = c(
-      "comment[technical replicate]",
-      "comment[technical_replicate]",
-      "technical_replicate"
-    ),
-    "data_file" = c(
-      "comment[data file]",
-      "comment[data_file]",
-      "data_file"
-    ),
-    "organism" = c(
-      "characteristics[organism]",
-      "organism"
-    ),
-    "organism_part" = c(
-      "characteristics[organism part]",
-      "characteristics[organism_part]",
-      "organism_part"
-    ),
-    "biological_replicate" = c(
-      "characteristics[biological replicate]",
-      "characteristics[biological_replicate]",
-      "biological_replicate"
-    ),
-    "sample_type" = c(
-      "characteristics[sample type]",
-      "characteristics[sample_type]",
-      "sample_type",
-      "Sample_Type",
-      "SampleType"
-    ),
-    "platform" = c(
-      "comment[platform]",
-      "platform"
-    ),
-    "sdrf_version" = c(
-      "comment[sdrf version]",
-      "comment[sdrf_version]",
-      "sdrf_version"
-    ),
-    "cell_type" = c(
-      "characteristics[cell type]",
-      "characteristics[cell_type]",
-      "cell_type"
-    ),
-    "disease" = c(
-      "characteristics[disease]",
-      "disease"
-    ),
-    "panel_name" = c(
-      "comment[panel name]",
-      "comment[panel_name]",
-      "panel_name",
-      "Panel"
-    ),
-    "sample_matrix" = c(
-      "characteristics[sample matrix]",
-      "characteristics[sample_matrix]",
-      "sample_matrix"
-    ),
-    "sdrf_template" = c(
-      "comment[sdrf template]",
-      "comment[sdrf_template]",
-      "sdrf_template"
-    ),
-    "sdrf_annotation_tool" = c(
-      "comment[sdrf annotation tool]",
-      "comment[sdrf_annotation_tool]",
-      "sdrf_annotation_tool"
-    ),
-    "sdrf_validation_hash" = c(
-      "comment[sdrf validation hash]",
-      "comment[sdrf_validation_hash]",
-      "sdrf_validation_hash"
-    ),
-    "tissue_supergroup" = c(
-      "characteristics[tissue supergroup]",
-      "characteristics[tissue_supergroup]",
-      "tissue_supergroup"
-    ),
-    "pooled_sample" = c(
-      "characteristics[pooled sample]",
-      "characteristics[pooled_sample]",
-      "pooled_sample"
-    ),
-    "material_type" = c(
-      "characteristics[material type]",
-      "characteristics[material_type]",
-      "material_type"
-    ),
-    "tissue_mass" = c(
-      "characteristics[tissue mass]",
-      "characteristics[tissue_mass]",
-      "tissue_mass"
-    ),
-    "biosample_accession" = c(
-      "characteristics[biosample accession number]",
-      "characteristics[biosample_accession_number]",
-      "biosample_accession"
-    ),
-    "sampling_time" = c(
-      "characteristics[sampling time]",
-      "characteristics[sampling_time]",
-      "sampling_time"
-    ),
-    "treatment" = c(
-      "characteristics[treatment]",
-      "treatment"
-    ),
-    "synthetic_peptide" = c(
-      "characteristics[synthetic peptide]",
-      "characteristics[synthetic_peptide]",
-      "synthetic_peptide"
-    ),
-    "spiked_compound" = c(
-      "characteristics[spiked compound]",
-      "characteristics[spiked_compound]",
-      "spiked_compound"
-    ),
-    "enrichment_process" = c(
-      "characteristics[enrichment process]",
-      "characteristics[enrichment_process]",
-      "enrichment_process"
-    ),
-    "instrument" = c(
-      "comment[instrument]",
-      "instrument"
-    ),
-    "quantification_unit" = c(
-      "comment[quantification unit]",
-      "comment[quantification_unit]",
-      "quantification_unit"
-    ),
-    "plate" = c(
-      "comment[plate]",
-      "plate",
-      "PlateID"
-    ),
-    "normalization_method" = c(
-      "comment[normalization method]",
-      "comment[normalization_method]",
-      "normalization_method",
-      "Normalization"
-    ),
-    "dilution" = c(
-      "comment[dilution]",
-      "dilution"
-    ),
-    "lot_number" = c(
-      "comment[lot number]",
-      "comment[lot_number]",
-      "lot_number"
-    )
-  ),
-  # requirement level from the affinity-proteomics template
-  col_requirement = c(
-    "required",     # source_name
-    "required",     # assay_name
-    "required",     # technology_type
-    "required",     # technical_replicate
-    "required",     # data_file
-    "required",     # organism
-    "required",     # organism_part
-    "required",     # biological_replicate
-    "required",     # sample_type
-    "required",     # platform
-    "recommended",  # sdrf_version
-    "recommended",  # cell_type
-    "recommended",  # disease
-    "recommended",  # panel_name
-    "recommended",  # sample_matrix
-    "optional",     # sdrf_template
-    "optional",     # sdrf_annotation_tool
-    "optional",     # sdrf_validation_hash
-    "optional",     # tissue_supergroup
-    "optional",     # pooled_sample
-    "optional",     # material_type
-    "optional",     # tissue_mass
-    "optional",     # biosample_accession
-    "optional",     # sampling_time
-    "optional",     # treatment
-    "optional",     # synthetic_peptide
-    "optional",     # spiked_compound
-    "optional",     # enrichment_process
-    "optional",     # instrument
-    "optional",     # quantification_unit
-    "optional",     # plate
-    "optional",     # normalization_method
-    "optional",     # dilution
-    "optional"      # lot_number
-  ),
-  # which template layer defines the column
-  col_source = c(
-    "base",                  # source_name
-    "base",                  # assay_name
-    "base",                  # technology_type
-    "base",                  # technical_replicate
-    "base",                  # data_file
-    "sample-metadata",       # organism
-    "sample-metadata",       # organism_part
-    "sample-metadata",       # biological_replicate
-    "affinity-proteomics",   # sample_type
-    "affinity-proteomics",   # platform
-    "base",                  # sdrf_version
-    "sample-metadata",       # cell_type
-    "sample-metadata",       # disease
-    "affinity-proteomics",   # panel_name
-    "affinity-proteomics",   # sample_matrix
-    "base",                  # sdrf_template
-    "base",                  # sdrf_annotation_tool
-    "base",                  # sdrf_validation_hash
-    "sample-metadata",       # tissue_supergroup
-    "sample-metadata",       # pooled_sample
-    "sample-metadata",       # material_type
-    "sample-metadata",       # tissue_mass
-    "sample-metadata",       # biosample_accession
-    "sample-metadata",       # sampling_time
-    "sample-metadata",       # treatment
-    "sample-metadata",       # synthetic_peptide
-    "sample-metadata",       # spiked_compound
-    "sample-metadata",       # enrichment_process
-    "affinity-proteomics",   # instrument
-    "affinity-proteomics",   # quantification_unit
-    "affinity-proteomics",   # plate
-    "affinity-proteomics",   # normalization_method
-    "affinity-proteomics",   # dilution
-    "affinity-proteomics"    # lot_number
-  ),
-  # boolean: TRUE if column is allowed to be absent
-  # (recommended + optional → TRUE; required → FALSE)
-  col_miss = c(
-    FALSE, # source_name
-    FALSE, # assay_name
-    FALSE, # technology_type
-    FALSE, # technical_replicate
-    FALSE, # data_file
-    FALSE, # organism
-    FALSE, # organism_part
-    FALSE, # biological_replicate
-    FALSE, # sample_type
-    FALSE, # platform
-    TRUE,  # sdrf_version
-    TRUE,  # cell_type
-    TRUE,  # disease
-    TRUE,  # panel_name (conditionally required; see file header note)
-    TRUE,  # sample_matrix
-    TRUE,  # sdrf_template
-    TRUE,  # sdrf_annotation_tool
-    TRUE,  # sdrf_validation_hash
-    TRUE,  # tissue_supergroup
-    TRUE,  # pooled_sample
-    TRUE,  # material_type
-    TRUE,  # tissue_mass
-    TRUE,  # biosample_accession
-    TRUE,  # sampling_time
-    TRUE,  # treatment
-    TRUE,  # synthetic_peptide
-    TRUE,  # spiked_compound
-    TRUE,  # enrichment_process
-    TRUE,  # instrument
-    TRUE,  # quantification_unit
-    TRUE,  # plate
-    TRUE,  # normalization_method
-    TRUE,  # dilution
-    TRUE   # lot_number
-  ),
-  # boolean: TRUE if multiple same-key columns are allowed (SDRF multi-cardinality)
-  col_multi = c(
-    FALSE, # source_name
-    FALSE, # assay_name
-    FALSE, # technology_type
-    FALSE, # technical_replicate
-    FALSE, # data_file
-    FALSE, # organism
-    TRUE,  # organism_part
-    FALSE, # biological_replicate
-    FALSE, # sample_type
-    FALSE, # platform
-    FALSE, # sdrf_version
-    TRUE,  # cell_type
-    FALSE, # disease
-    FALSE, # panel_name
-    FALSE, # sample_matrix
-    TRUE,  # sdrf_template
-    FALSE, # sdrf_annotation_tool
-    FALSE, # sdrf_validation_hash
-    FALSE, # tissue_supergroup
-    FALSE, # pooled_sample
-    FALSE, # material_type
-    FALSE, # tissue_mass
-    FALSE, # biosample_accession
-    FALSE, # sampling_time
-    FALSE, # treatment
-    FALSE, # synthetic_peptide
-    TRUE,  # spiked_compound
-    FALSE, # enrichment_process
-    FALSE, # instrument
-    FALSE, # quantification_unit
-    FALSE, # plate
-    FALSE, # normalization_method
-    FALSE, # dilution
-    FALSE  # lot_number
-  ),
-  # expected R class after reading (character for ontology / free text)
-  col_class = c(
-    "character", # source_name
-    "character", # assay_name
-    "character", # technology_type
-    "integer",   # technical_replicate
-    "character", # data_file
-    "character", # organism
-    "character", # organism_part
-    "character", # biological_replicate (integer as string, or "pooled")
-    "character", # sample_type
-    "character", # platform
-    "character", # sdrf_version
-    "character", # cell_type
-    "character", # disease
-    "character", # panel_name
-    "character", # sample_matrix
-    "character", # sdrf_template
-    "character", # sdrf_annotation_tool
-    "character", # sdrf_validation_hash
-    "character", # tissue_supergroup
-    "character", # pooled_sample
-    "character", # material_type
-    "character", # tissue_mass
-    "character", # biosample_accession
-    "character", # sampling_time
-    "character", # treatment
-    "character", # synthetic_peptide
-    "character", # spiked_compound
-    "character", # enrichment_process
-    "character", # instrument
-    "character", # quantification_unit
-    "character", # plate
-    "character", # normalization_method
-    "character", # dilution
-    "character"  # lot_number
-  ),
-  # whether to enforce col_class in checks (draft; can tighten later)
-  col_class_check = c(
-    FALSE, # source_name
-    FALSE, # assay_name
-    FALSE, # technology_type
-    TRUE,  # technical_replicate
-    FALSE, # data_file
-    FALSE, # organism
-    FALSE, # organism_part
-    FALSE, # biological_replicate
-    FALSE, # sample_type
-    FALSE, # platform
-    FALSE, # sdrf_version
-    FALSE, # cell_type
-    FALSE, # disease
-    FALSE, # panel_name
-    FALSE, # sample_matrix
-    FALSE, # sdrf_template
-    FALSE, # sdrf_annotation_tool
-    FALSE, # sdrf_validation_hash
-    FALSE, # tissue_supergroup
-    FALSE, # pooled_sample
-    FALSE, # material_type
-    FALSE, # tissue_mass
-    FALSE, # biosample_accession
-    FALSE, # sampling_time
-    FALSE, # treatment
-    FALSE, # synthetic_peptide
-    FALSE, # spiked_compound
-    FALSE, # enrichment_process
-    FALSE, # instrument
-    FALSE, # quantification_unit
-    FALSE, # plate
-    FALSE, # normalization_method
-    FALSE, # dilution
-    FALSE  # lot_number
-  ),
-  # example values from the affinity-proteomics template (documentation aid)
-  col_examples = list(
-    "source_name" = character(),
-    "assay_name" = character(),
-    "technology_type" = c(
-      "protein expression profiling by antibody array",
-      "protein expression profiling by aptamer array"
-    ),
-    "technical_replicate" = c("1", "2"),
-    "data_file" = character(),
-    "organism" = c(
-      "homo sapiens",
-      "mus musculus",
-      "rattus norvegicus"
-    ),
-    "organism_part" = c("liver", "brain", "heart", "blood"),
-    "biological_replicate" = c("1", "2", "pooled"),
-    "sample_type" = c(
-      "study sample",
-      "negative control",
-      "positive control",
-      "calibrator",
-      "plate control",
-      "quality control sample",
-      "buffer control",
-      "reference"
-    ),
-    "platform" = c(
-      "Olink Explore HT",
-      "Olink Target 96",
-      "SomaScan Assay 11K",
-      "NULISAseq"
-    ),
-    "sdrf_version" = c("v1.1.0", "v2.0.0-dev"),
-    "cell_type" = c("hepatocyte", "neuron", "fibroblast", "T cell"),
-    "disease" = c("normal", "breast cancer", "infection"),
-    "panel_name" = c(
-      "Target 96 Inflammation",
-      "Explore 1536",
-      "SomaScan 7K",
-      "NULISAseq Inflammation Panel 250"
-    ),
-    "sample_matrix" = c(
-      "serum",
-      "plasma",
-      "cerebrospinal fluid",
-      "urine",
-      "saliva"
-    ),
-    "sdrf_template" = c(
-      "NT=affinity-proteomics;VV=v1.1.0",
-      "affinity-proteomics v1.1.0"
-    ),
-    "sdrf_annotation_tool" = c(
-      "NT=OlinkAnalyze;VV=v5.1.0",
-      "manual curation"
-    ),
-    "sdrf_validation_hash" = character(),
-    "tissue_supergroup" = c("heart", "liver", "brain"),
-    "pooled_sample" = c("not pooled", "pooled", "SN=sample1;SN=sample2"),
-    "material_type" = c(
-      "tissue",
-      "cell",
-      "cell line",
-      "organism part",
-      "whole organism",
-      "synthetic"
-    ),
-    "tissue_mass" = c("50 mg", "1 g", "500 ug"),
-    "biosample_accession" = c("SAMN12345678", "SAMEA12345678"),
-    "sampling_time" = c("0 hour", "24 hour", "7 day"),
-    "treatment" = c("untreated", "LPS stimulation"),
-    "synthetic_peptide" = c("synthetic", "not synthetic"),
-    "spiked_compound" = c("CT=peptide;PS=PEPTIDESEQ;QY=10 fmol"),
-    "enrichment_process" = character(),
-    "instrument" = c(
-      "Illumina NovaSeq X",
-      "Alamar ARGO HT System"
-    ),
-    "quantification_unit" = c("NPX", "RFU", "NPQ"),
-    "plate" = c("1", "2"),
-    "normalization_method" = c(
-      "plate control normalized",
-      "bridge normalized",
-      "median normalization",
-      "not normalized"
-    ),
-    "dilution" = c("0.005%", "0.5%", "20%", "40%", "1:200"),
-    "lot_number" = c("SS-2023-001", "lot_12345")
+# helpers ----
+
+#' Resolve path to an SDRF template YAML under data-raw/sdrf/
+#'
+#' @param file File name, e.g. "affinity-proteomics.yaml"
+#' @return Absolute path to an existing file
+#' @noRd
+sdrf_yaml_path <- function(file) {
+  candidates <- c(
+    file.path("data-raw", "sdrf", file),
+    file.path("sdrf", file),
+    system.file("data-raw", "sdrf", file,
+                package = "OlinkAnalyze",
+                mustWork = FALSE)
   )
+  hit <- candidates[file.exists(candidates)][1L]
+  if (is.na(hit) || !nzchar(hit)) {
+    stop(
+      "Cannot find SDRF YAML '", file, "'. Tried:\n  - ",
+      paste(candidates, collapse = "\n  - "),
+      call. = FALSE
+    )
+  }
+  normalizePath(hit, winslash = "/", mustWork = TRUE)
+}
+
+#' Parse an extends string such as "sample-metadata@>=1.0.0"
+#'
+#' @param extends Character scalar or NULL
+#' @return NULL or list(name, op, version) where op is e.g. ">="
+#' @noRd
+sdrf_parse_extends <- function(extends) {
+  if (is.null(extends) || !nzchar(extends)) {
+    return(NULL)
+  }
+  extends <- as.character(extends)
+  # name@opVERSION  e.g. sample-metadata@>=1.0.0
+  m <- regexec(
+    pattern = "^([A-Za-z0-9_-]+)@([<>!=]+)([0-9]+(?:\\.[0-9]+){0,3})$",
+    text = extends
+  )
+  parts <- regmatches(extends, m)[[1L]]
+  if (length(parts) != 4L) {
+    stop("Cannot parse extends value: '", extends, "'.", call. = FALSE)
+  }
+  list(
+    name = parts[[2L]],
+    op = parts[[3L]],
+    version = parts[[4L]]
+  )
+}
+
+#' Check a template version against an extends constraint
+#'
+#' @param version Template version string, e.g. "1.0.0"
+#' @param op Comparison operator, e.g. ">="
+#' @param required Required version string, e.g. "1.0.0"
+#' @return Logical
+#' @noRd
+sdrf_version_satisfies <- function(version, op, required) {
+  v <- numeric_version(version)
+  r <- numeric_version(required)
+  switch(
+    EXPR = op,
+    ">=" = v >= r,
+    ">"  = v > r,
+    "<=" = v <= r,
+    "<"  = v < r,
+    "==" = v == r,
+    "="  = v == r,
+    stop("Unsupported version operator: '", op, "'.", call. = FALSE)
+  )
+}
+
+#' Map official SDRF header to an internal snake_case key
+#'
+#' @param name Character scalar, official SDRF column header
+#' @return Character scalar key
+#' @noRd
+sdrf_name_to_key <- function(name) {
+  stopifnot(is.character(name), length(name) == 1L)
+  key <- name
+  if (grepl(pattern = "\\[.+\\]", x = name)) {
+    key <- sub(
+      pattern = "^[^\\[]+\\[(.+)\\]$",
+      replacement = "\\1",
+      x = name
+    )
+  }
+  key <- tolower(key)
+  key <- gsub(pattern = "[^a-z0-9]+", replacement = "_", x = key)
+  key <- gsub(pattern = "^_|_$", replacement = "", x = key)
+  key
+}
+
+#' Extract example values nested under column validators
+#'
+#' @param validators List of validator entries from YAML (or NULL)
+#' @return Character vector of examples (possibly empty)
+#' @noRd
+sdrf_validator_examples <- function(validators) {
+  if (is.null(validators) || length(validators) == 0L) {
+    return(character())
+  }
+  ex <- lapply(
+    X = validators,
+    FUN = function(v) {
+      params <- v[["params"]]
+      if (is.null(params)) {
+        return(character())
+      }
+      out <- params[["examples"]]
+      if (is.null(out)) {
+        return(character())
+      }
+      as.character(unlist(out, use.names = FALSE))
+    }
+  )
+  unique(unlist(ex, use.names = FALSE))
+}
+
+#' Whether a column is multi-cardinality
+#'
+#' @param col Parsed column list entry
+#' @return Logical scalar
+#' @noRd
+sdrf_col_is_multi <- function(col) {
+  card <- col[["cardinality"]]
+  if (!is.null(card) && identical(as.character(card), "multiple")) {
+    return(TRUE)
+  }
+  validators <- col[["validators"]]
+  if (is.null(validators) || length(validators) == 0L) {
+    return(FALSE)
+  }
+  names_v <- vapply(
+    X = validators,
+    FUN = function(v) {
+      nm <- v[["validator_name"]]
+      if (is.null(nm)) NA_character_ else as.character(nm)
+    },
+    FUN.VALUE = character(1L)
+  )
+  # single_cardinality_validator means NOT multi
+  if (any(names_v == "single_cardinality_validator", na.rm = TRUE)) {
+    return(FALSE)
+  }
+  FALSE
+}
+
+#' Build column_name_dict-like tibble from one SDRF template YAML
+#'
+#' @param yaml Parsed YAML list from yaml::read_yaml()
+#' @return A tibble
+#' @noRd
+sdrf_columns_from_yaml <- function(yaml) {
+  cols <- yaml[["columns"]]
+  if (is.null(cols) || length(cols) == 0L) {
+    stop(
+      "SDRF YAML '", yaml[["name"]], "' has no 'columns' entries.",
+      call. = FALSE
+    )
+  }
+
+  template_name <- yaml[["name"]]
+  if (is.null(template_name)) {
+    template_name <- NA_character_
+  }
+
+  col_name <- vapply(
+    X = cols,
+    FUN = function(cl) as.character(cl[["name"]]),
+    FUN.VALUE = character(1L)
+  )
+  col_key <- vapply(X = col_name, FUN = sdrf_name_to_key, FUN.VALUE = character(1L))
+
+  if (anyDuplicated(col_key)) {
+    stop(
+      "Duplicate col_key values in '", template_name, "': ",
+      paste(unique(col_key[duplicated(col_key)]), collapse = ", "),
+      call. = FALSE
+    )
+  }
+
+  col_requirement <- vapply(
+    X = cols,
+    FUN = function(cl) {
+      req <- cl[["requirement"]]
+      if (is.null(req)) NA_character_ else as.character(req)
+    },
+    FUN.VALUE = character(1L)
+  )
+
+  col_description <- vapply(
+    X = cols,
+    FUN = function(cl) {
+      desc <- cl[["description"]]
+      if (is.null(desc)) NA_character_ else as.character(desc)
+    },
+    FUN.VALUE = character(1L)
+  )
+
+  ontology_accession <- vapply(
+    X = cols,
+    FUN = function(cl) {
+      acc <- cl[["ontology_accession"]]
+      if (is.null(acc)) NA_character_ else as.character(acc)
+    },
+    FUN.VALUE = character(1L)
+  )
+
+  col_default <- vapply(
+    X = cols,
+    FUN = function(cl) {
+      d <- cl[["default"]]
+      if (is.null(d)) NA_character_ else as.character(d)
+    },
+    FUN.VALUE = character(1L)
+  )
+
+  allow_not_applicable <- vapply(
+    X = cols,
+    FUN = function(cl) {
+      x <- cl[["allow_not_applicable"]]
+      if (is.null(x)) NA else as.logical(x)
+    },
+    FUN.VALUE = logical(1L)
+  )
+
+  allow_not_available <- vapply(
+    X = cols,
+    FUN = function(cl) {
+      x <- cl[["allow_not_available"]]
+      if (is.null(x)) NA else as.logical(x)
+    },
+    FUN.VALUE = logical(1L)
+  )
+
+  col_names <- lapply(
+    X = seq_along(cols),
+    FUN = function(i) {
+      unique(c(col_name[[i]], col_key[[i]]))
+    }
+  )
+  names(col_names) <- col_key
+
+  col_examples <- lapply(
+    X = cols,
+    FUN = function(cl) sdrf_validator_examples(cl[["validators"]])
+  )
+  names(col_examples) <- col_key
+
+  validators <- lapply(
+    X = cols,
+    FUN = function(cl) {
+      v <- cl[["validators"]]
+      if (is.null(v)) list() else v
+    }
+  )
+  names(validators) <- col_key
+
+  col_multi <- vapply(X = cols, FUN = sdrf_col_is_multi, FUN.VALUE = logical(1L))
+
+  dplyr::tibble(
+    col_key = col_key,
+    col_names = col_names,
+    col_requirement = col_requirement,
+    col_source = rep(x = as.character(template_name), times = length(cols)),
+    col_miss = col_requirement != "required",
+    col_multi = col_multi,
+    col_description = col_description,
+    ontology_accession = ontology_accession,
+    col_default = col_default,
+    allow_not_applicable = allow_not_applicable,
+    allow_not_available = allow_not_available,
+    col_class = rep(x = "character", times = length(cols)),
+    col_class_check = rep(x = FALSE, times = length(cols)),
+    col_examples = col_examples,
+    validators = validators
+  )
+}
+
+#' Build template-level metadata list from parsed SDRF YAML
+#'
+#' @param yaml Parsed YAML list
+#' @param path Path to the YAML file
+#' @return Named list
+#' @noRd
+sdrf_template_from_yaml <- function(yaml, path) {
+  list(
+    name = yaml[["name"]],
+    version = yaml[["version"]],
+    description = yaml[["description"]],
+    documentation = yaml[["documentation"]],
+    extends = yaml[["extends"]],
+    usable_alone = yaml[["usable_alone"]],
+    layer = yaml[["layer"]],
+    mutually_exclusive_with = {
+      mex <- yaml[["mutually_exclusive_with"]]
+      if (is.null(mex)) character() else as.character(unlist(mex, use.names = FALSE))
+    },
+    validators = yaml[["validators"]],
+    contributors = {
+      ctb <- yaml[["contributors"]]
+      if (is.null(ctb)) character() else as.character(unlist(ctb, use.names = FALSE))
+    },
+    url = paste0(
+      "https://sdrf.quantms.org/templates/",
+      yaml[["name"]],
+      ".html"
+    ),
+    yaml_path = path
+  )
+}
+
+#' Load one local SDRF YAML by template name
+#'
+#' @param name Template name without extension, e.g. "sample-metadata"
+#' @return list(yaml, path, template, columns)
+#' @noRd
+sdrf_load_template <- function(name) {
+  path <- sdrf_yaml_path(paste0(name, ".yaml"))
+  yaml <- yaml::read_yaml(path)
+  if (is.null(yaml[["name"]]) || !identical(as.character(yaml[["name"]]), name)) {
+    stop(
+      "YAML file '", path, "' has name '", yaml[["name"]],
+      "' but was loaded as '", name, "'.",
+      call. = FALSE
+    )
+  }
+  if (is.null(yaml[["version"]])) {
+    stop("YAML '", name, "' is missing a 'version' field.", call. = FALSE)
+  }
+  list(
+    name = name,
+    path = path,
+    yaml = yaml,
+    template = sdrf_template_from_yaml(yaml = yaml, path = path),
+    columns = sdrf_columns_from_yaml(yaml)
+  )
+}
+
+#' Merge parent then child column tibbles; child wins on duplicate col_key
+#'
+#' @param parent_cols Tibble from parent template (or NULL)
+#' @param child_cols Tibble from child template
+#' @return Tibble
+#' @noRd
+sdrf_merge_columns <- function(parent_cols, child_cols) {
+  if (is.null(parent_cols) || nrow(parent_cols) == 0L) {
+    return(child_cols)
+  }
+  overlap <- intersect(parent_cols$col_key, child_cols$col_key)
+  if (length(overlap) > 0L) {
+    parent_cols <- parent_cols[!parent_cols$col_key %in% overlap, , drop = FALSE]
+  }
+  dplyr::bind_rows(parent_cols, child_cols)
+}
+
+#' Resolve extends for a loaded template against locally available templates
+#'
+#' Only follows parents that exist under data-raw/sdrf/. Missing parents
+#' (e.g. base) are recorded as unresolved warnings.
+#'
+#' @param child Loaded template list from sdrf_load_template()
+#' @param available Named list of loaded templates
+#' @return list(columns, chain, unresolved)
+#' @noRd
+sdrf_resolve_extends <- function(child, available) {
+  chain <- child$name
+  unresolved <- character()
+  columns <- child$columns
+
+  extends_raw <- child$yaml[["extends"]]
+  parent_spec <- sdrf_parse_extends(extends_raw)
+
+  while (!is.null(parent_spec)) {
+    parent_name <- parent_spec$name
+    if (!parent_name %in% names(available)) {
+      unresolved <- c(
+        unresolved,
+        paste0(
+          parent_name, "@", parent_spec$op, parent_spec$version,
+          " (required by ", chain[[length(chain)]], "; YAML not present locally)"
+        )
+      )
+      break
+    }
+
+    parent <- available[[parent_name]]
+    if (!sdrf_version_satisfies(
+      version = parent$yaml[["version"]],
+      op = parent_spec$op,
+      required = parent_spec$version
+    )) {
+      stop(
+        "Template '", child$name, "' requires ",
+        parent_name, "@", parent_spec$op, parent_spec$version,
+        " but local '", parent_name, "' is version ",
+        parent$yaml[["version"]], ".",
+        call. = FALSE
+      )
+    }
+
+    chain <- c(parent_name, chain)
+    columns <- sdrf_merge_columns(parent$columns, columns)
+
+    parent_spec <- sdrf_parse_extends(parent$yaml[["extends"]])
+  }
+
+  list(
+    columns = columns,
+    chain = chain,
+    unresolved = unresolved
+  )
+}
+
+# read local SDRF YAMLs ----
+
+if (!requireNamespace("yaml", quietly = TRUE)) {
+  stop(
+    "Package 'yaml' is required to build SDRF format objects from ",
+    "data-raw/sdrf/*.yaml. Install it with install.packages(\"yaml\").",
+    call. = FALSE
+  )
+}
+
+## Load all templates present under data-raw/sdrf/
+sdrf_base <- sdrf_load_template("base")
+sdrf_sample_metadata <- sdrf_load_template("sample-metadata")
+sdrf_affinity <- sdrf_load_template("affinity-proteomics")
+
+sdrf_available <- list(
+  "base" = sdrf_base,
+  "sample-metadata" = sdrf_sample_metadata,
+  "affinity-proteomics" = sdrf_affinity
 )
 
-## Template-level metadata (not per-column)
-sdrf_affinity_template <- list(
-  name = "affinity-proteomics",
-  url = "https://sdrf.quantms.org/templates/affinity-proteomics.html",
-  inheritance = c("base", "sample-metadata", "affinity-proteomics"),
-  mutually_exclusive_with = c("ms-proteomics", "ms-metabolomics"),
-  # Olink-relevant defaults for future validation / export helpers
-  technology_type_olink = "protein expression profiling by antibody array",
-  quantification_unit_olink = "NPX"
+## Template metadata (cite local versions)
+sdrf_base_template <- sdrf_base$template
+sdrf_sample_metadata_template <- sdrf_sample_metadata$template
+sdrf_affinity_template <- sdrf_affinity$template
+sdrf_affinity_template$technology_type_olink <-
+  "protein expression profiling by antibody array"
+sdrf_affinity_template$quantification_unit_olink <- "NPX"
+
+## Resolve affinity → sample-metadata@>=1.0.0 → base@>=1.1.0
+sdrf_affinity_resolved <- sdrf_resolve_extends(
+  child = sdrf_affinity,
+  available = sdrf_available
+)
+
+sdrf_affinity_template$resolved_chain <- sdrf_affinity_resolved$chain
+sdrf_affinity_template$unresolved_extends <- sdrf_affinity_resolved$unresolved
+sdrf_affinity_template$local_dependencies <- lapply(
+  X = sdrf_available,
+  FUN = function(tpl) {
+    list(
+      version = tpl$template$version,
+      yaml_path = tpl$path,
+      extends = tpl$template$extends
+    )
+  }
+)
+
+if (length(sdrf_affinity_resolved$unresolved) > 0L) {
+  warning(
+    "SDRF inheritance incomplete; missing local YAML(s):\n  - ",
+    paste(sdrf_affinity_resolved$unresolved, collapse = "\n  - "),
+    call. = FALSE
+  )
+}
+
+## Merged column dict for the usable affinity-proteomics template
+sdrf_column_dict <- sdrf_affinity_resolved$columns
+
+## Layer-only dicts (useful for debugging / future)
+sdrf_base_column_dict <- sdrf_base$columns
+sdrf_sample_metadata_column_dict <- sdrf_sample_metadata$columns
+
+rm(
+  sdrf_yaml_path,
+  sdrf_parse_extends,
+  sdrf_version_satisfies,
+  sdrf_name_to_key,
+  sdrf_validator_examples,
+  sdrf_col_is_multi,
+  sdrf_columns_from_yaml,
+  sdrf_template_from_yaml,
+  sdrf_load_template,
+  sdrf_merge_columns,
+  sdrf_resolve_extends,
+  sdrf_base,
+  sdrf_sample_metadata,
+  sdrf_affinity,
+  sdrf_available,
+  sdrf_affinity_resolved
 )
