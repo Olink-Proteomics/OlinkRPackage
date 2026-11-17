@@ -13,23 +13,24 @@ One sentence: what should a user be able to do with this in v0?
 
 ## Steps
 
-- Write the contract first (½–1 day, no code)
+1. Write the contract first (½–1 day, no code)
 Decide: input format (TSV/CSV?), required columns, how it joins NPX (SampleID?), and what the first user-facing function should do (read? validate? annotate NPX?). One short design note beats jumping into R/.
 
-- Learn the local patterns by reading 2–3 files
+2. Learn the local patterns by reading 2–3 files
 Mirror how this package already does I/O + checks:
 
 - R/read_npx.R (+ a read_npx_*.R) — file → parse → return tibble
-R/check_*.R — validation + cli::cli_abort
-Matching tests/testthat/test-*.R
-Build the smallest vertical slice
-Suggested first PR shape:
+- R/check_*.R — validation + cli::cli_abort
+- Matching tests/testthat/test-*.R
 
+3. Build the smallest vertical slice
+Suggested first PR shape:
 - check_*() for required columns / types
-read_*() that reads a file and runs those checks
-1 fixture under inst/extdata/ or tests/testthat/
-tests for happy path + 1–2 clear failures
-Only then join to NPX / export / richer metadata features.
+- read_*() that reads a file and runs those checks
+- 1 fixture under inst/extdata/ or tests/testthat/
+- tests for happy path + 1–2 clear failures
+
+4. Only then join to NPX / export / richer metadata features.
 
 
 ## Background / naming
