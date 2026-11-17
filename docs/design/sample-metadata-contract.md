@@ -11,6 +11,27 @@ One sentence: what should a user be able to do with this in v0?
 
 > _e.g. Read a sample metadata file, validate required fields, and return a tidy tibble ready to join to NPX on SampleID._
 
+## Steps
+
+- Write the contract first (½–1 day, no code)
+Decide: input format (TSV/CSV?), required columns, how it joins NPX (SampleID?), and what the first user-facing function should do (read? validate? annotate NPX?). One short design note beats jumping into R/.
+
+- Learn the local patterns by reading 2–3 files
+Mirror how this package already does I/O + checks:
+
+- R/read_npx.R (+ a read_npx_*.R) — file → parse → return tibble
+R/check_*.R — validation + cli::cli_abort
+Matching tests/testthat/test-*.R
+Build the smallest vertical slice
+Suggested first PR shape:
+
+- check_*() for required columns / types
+read_*() that reads a file and runs those checks
+1 fixture under inst/extdata/ or tests/testthat/
+tests for happy path + 1–2 clear failures
+Only then join to NPX / export / richer metadata features.
+
+
 ## Background / naming
 
 In OlinkAnalyze today, `manifest` / `olink_plate_randomizer()` means a **plate-layout sample map** (`SampleID`, `SubjectID`, `Visit`, `Site`). That stays as-is.
