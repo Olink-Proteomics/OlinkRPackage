@@ -12,7 +12,7 @@
 ##     (base → sample-metadata → affinity; child overrides same-name columns)
 ##
 ## Requires the yaml package at data-raw build time.
-## Draft: not yet wired into sysdata.R.
+## Wired into sysdata.R (rebuild R/sysdata.rda after YAML changes).
 
 # helpers ----
 

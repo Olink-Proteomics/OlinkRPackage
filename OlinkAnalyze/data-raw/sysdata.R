@@ -61,6 +61,16 @@ column_name_dict_file <- system.file("data-raw",
 source(column_name_dict_file)
 rm(column_name_dict_file)
 
+# sdrf_format.R ----
+# Requires yaml at data-raw build time; reads data-raw/sdrf/*.yaml
+
+sdrf_format_file <- system.file("data-raw",
+                                "sdrf_format.R",
+                                package = "OlinkAnalyze",
+                                mustWork = TRUE)
+source(sdrf_format_file)
+rm(sdrf_format_file)
+
 # normalization ----
 
 ## mapping.R ----
@@ -120,6 +130,12 @@ usethis::use_data(accepted_olink_platforms,
                   read_npx_df_output,
                   olink_wide_bottom_matrix,
                   column_name_dict,
+                  sdrf_column_dict,
+                  sdrf_affinity_template,
+                  sdrf_base_template,
+                  sdrf_sample_metadata_template,
+                  sdrf_base_column_dict,
+                  sdrf_sample_metadata_column_dict,
                   olink_sample_types,
                   olink_assay_types,
                   check_npx_lst_names,
@@ -149,6 +165,12 @@ rm(accepted_olink_platforms,
    read_npx_df_output,
    olink_wide_bottom_matrix,
    column_name_dict,
+   sdrf_column_dict,
+   sdrf_affinity_template,
+   sdrf_base_template,
+   sdrf_sample_metadata_template,
+   sdrf_base_column_dict,
+   sdrf_sample_metadata_column_dict,
    olink_sample_types,
    olink_assay_types,
    check_npx_lst_names,
