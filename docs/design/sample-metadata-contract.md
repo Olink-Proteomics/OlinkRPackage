@@ -11,7 +11,7 @@ One sentence: what should a user be able to do with this in v0?
 
 > _e.g. Read a sample metadata file, validate required fields, and return a tidy tibble ready to join to NPX on SampleID._
 
-## Steps
+## Steps (sugested)
 
 1. Write the contract first (½–1 day, no code)
 Decide: input format (TSV/CSV?), required columns, how it joins NPX (SampleID?), and what the first user-facing function should do (read? validate? annotate NPX?). One short design note beats jumping into R/.
