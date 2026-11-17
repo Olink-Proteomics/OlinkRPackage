@@ -1,0 +1,182 @@
+name: base
+description: Base SDRF template with infrastructure columns (identifiers, data files, versioning) inherited by all proteomics templates. This is a construction artifact and cannot be used directly.
+documentation: |
+  The base template provides the foundational columns inherited by every SDRF file.
+  It is never used directly — all other templates inherit from it through sample-metadata.
+
+  Key conventions:
+  - `source name` must be unique per biological sample across the entire SDRF file.
+  - `assay name` must be unique per data acquisition run.
+  - `comment[data file]` must exactly match the filename deposited in the data repository.
+  - `comment[technical replicate]` starts at 1 for each biological sample.
+  - `comment[sdrf template]` records which templates were combined, using format
+    `NT=template_name;VV=vX.Y.Z` or `template_name vX.Y.Z`.
+
+  Validation rules enforced at this level:
+  - No trailing whitespace in any cell.
+  - No empty cells allowed.
+  - The combination of source name + assay name must be unique (no duplicate rows).
+  - Column order must follow the template definition order.
+contributors:
+  - Yasset Perez-Riverol (yperez@ebi.ac.uk) - EMBL-EBI
+  - Deepti Jaiswal Kundu (jaiswal@ebi.ac.uk) - EMBL-EBI
+  - Nithu Sara John (nithu@ebi.ac.uk) - EMBL-EBI
+  - Nandana Madhusoodanan (nandana@ebi.ac.uk) - EMBL-EBI
+  - Asier Larrea (alarre@ebi.ac.uk) - EMBL-EBI
+  - Toan Phung (TPhung001@dundee.ac.uk) - University of Dundee
+  - Timo Sachsenberg (timo.sachsenberg@uni-tuebingen.de) - University of Tübingen
+version: 1.1.0
+usable_alone: false
+validators:
+  - validator_name: trailing_whitespace_validator
+    params: {}
+  - validator_name: column_name_validator
+    params: {}
+  - validator_name: column_order
+    params: {}
+  - validator_name: empty_cells
+    params: {}
+  - validator_name: combination_of_columns_no_duplicate_validator
+    params:
+      column_name:
+        - source name
+        - assay name
+      column_name_warning:
+        - source name
+        - assay name
+columns:
+  - name: source name
+    ontology_accession: PRIDE:0000623
+    description: Unique identifier for the biological sample
+    requirement: required
+    allow_not_applicable: false
+    allow_not_available: false
+
+  - name: characteristics[sample type]
+    ontology_accession: PRIDE:0000895
+    description: Role of the sample in the assay. Distinguishes study samples from controls and reference materials for assay interpretation and quality control.
+    requirement: recommended
+    # The column exists to mark the rows that are NOT ordinary samples. If a row is not
+    # identified as a control, reference, calibrator or blank, then it is a study sample --
+    # that is a known value, not a missing one, so neither reserved word is accepted here.
+    # Writers use this default rather than recording the role as unknown.
+    default: study sample
+    allow_not_applicable: false
+    allow_not_available: false
+    validators:
+      - validator_name: ontology
+        params:
+          ontologies:
+            - pride
+          parent_term: PRIDE:0000895
+          error_level: error
+          description: Sample type should be a child of PRIDE:0000895 (sample type)
+          examples:
+            - study sample
+            - negative control sample
+            - positive control sample
+            - calibration sample
+            - blank sample
+            - quality control sample
+
+  - name: assay name
+    ontology_accession: NCIT:C178857
+    description: Unique identifier for the data acquisition run
+    requirement: required
+    allow_not_applicable: false
+    allow_not_available: false
+
+  - name: technology type
+    ontology_accession: PRIDE:0000663
+    description: Type of technology used
+    requirement: required
+    allow_not_applicable: false
+    allow_not_available: false
+    validators:
+      - validator_name: single_cardinality_validator
+        params: {}
+      - validator_name: values
+        params:
+          values:
+            - proteomic profiling by mass spectrometry
+            - protein expression profiling by antibody array
+            - protein expression profiling by aptamer array
+
+  - name: comment[technical replicate]
+    ontology_accession: MS:1001808
+    description: Identifier for the technical replicate (integer starting from 1)
+    requirement: required
+    type: integer
+    allow_not_applicable: false
+    allow_not_available: false
+
+  - name: comment[data file]
+    ontology_accession: MS:1003083
+    description: Name of the raw data file
+    requirement: required
+    allow_not_applicable: false
+    allow_not_available: false
+
+  - name: comment[sdrf version]
+    ontology_accession: PRIDE:0000839
+    description: Version of the SDRF-Proteomics specification used to annotate this file
+    requirement: recommended
+    allow_not_applicable: false
+    allow_not_available: false
+    validators:
+      - validator_name: semver
+        params:
+          prefix: "v"
+          allow_prerelease: true
+          error_level: error
+          description: SDRF specification version
+          examples:
+            - v1.1.0
+            - v2.0.0-dev
+
+  - name: comment[sdrf template]
+    ontology_accession: PRIDE:0000832
+    description: Template name and version used for annotation. Two formats are supported - key=value format (NT=template_name;VV=vX.Y.Z) or simple format (template_name vX.Y.Z). Multiple templates can be specified using multiple columns.
+    requirement: optional
+    cardinality: multiple
+    allow_not_applicable: false
+    allow_not_available: true
+    validators:
+      - validator_name: pattern
+        params:
+          pattern: ^(NT=[\w-]+;VV=v\d+\.\d+\.\d+(-[\w.]+)?|[\w-]+ v\d+\.\d+\.\d+(-[\w.]+)?)$
+          description: Template can be specified as 'NT=name;VV=vX.Y.Z' or 'name vX.Y.Z'
+          examples:
+            - NT=human;VV=v1.1.0
+            - human v1.1.0
+            - NT=ms-proteomics;VV=v1.1.0
+            - ms-proteomics v1.1.0
+
+  - name: comment[sdrf annotation tool]
+    ontology_accession: PRIDE:0000840
+    description: Software tool or method used to generate or annotate the SDRF file. Two formats are supported - key=value format (NT=tool_name;VV=vX.Y.Z) or simple format (tool_name vX.Y.Z).
+    requirement: optional
+    allow_not_applicable: false
+    allow_not_available: true
+    validators:
+      - validator_name: pattern
+        params:
+          pattern: ^(NT=[\w-]+;VV=v[\d.]+[\w.-]*|[\w-]+ v[\d.]+[\w.-]*|manual curation)$
+          description: Annotation tool can be specified as 'NT=name;VV=vX.Y.Z' or 'name vX.Y.Z' or 'manual curation'
+          examples:
+            - NT=lesSDRF;VV=v0.1.0
+            - lesSDRF v0.1.0
+            - NT=sdrf-pipelines;VV=v1.0.0
+            - sdrf-pipelines v1.0.0
+            - manual curation
+
+  - name: comment[sdrf validation hash]
+    description: Hash value for SDRF validation integrity checking
+    requirement: optional
+    allow_not_applicable: true
+    allow_not_available: true
+    validators:
+      - validator_name: pattern
+        params:
+          pattern: ^.+$
+          description: Validation hash string
