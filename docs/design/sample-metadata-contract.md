@@ -39,6 +39,10 @@ In OlinkAnalyze today, `manifest` / `olink_plate_randomizer()` means a **plate-l
 
 This work is about **sample / study metadata** (possibly SDRF-oriented). Prefer new names such as `read_sdrf` / `check_sdrf` (final names TBD) so we do not overload `manifest`.
 
+## Resources
+- https://pypi.org/project/sdrf-pipelines/0.0.30/
+- https://github.com/PRIDE-Archive/pyprideap
+
 ## Input
 
 | Item | Decision (fill in) |
