@@ -21,19 +21,40 @@
 #' are those with \code{col_requirement == "required"} in
 #' \var{sdrf_column_dict}.
 #'
-#' This function is under development; the body currently prepares column-name
-#' lookups and then stops.
+#' This is a first working draft: it writes the **required** affinity-proteomics
+#' columns (plus a few recommended fields when available) with Olink-oriented
+#' defaults. Ontology-perfect annotations are not guaranteed; use
+#' [olink_sdrf_validate()] to check the result.
 #'
 #' @param npx Tibble/data frame in long format such as produced by
 #' [read_npx()]. Must contain a sample identifier column matching one of the
 #' names registered under \code{sample_id} in \var{column_name_dict}.
-#' @param sample_metadata Tibble/data frame of sample-level metadata (one row
-#' per sample). Must be joinable to \code{npx} on the sample identifier.
+#' @param sample_metadata Optional tibble/data frame of sample-level metadata
+#' (one row per sample), joinable to \code{npx} on the sample identifier.
+#' If \code{NULL}, one row per distinct sample in \code{npx} is used.
 #' @param file Optional path to write the SDRF table (TSV). If \code{NULL},
 #' only the tibble is returned.
+#' @param data_file Value for \code{comment[data file]} (recycled). Default
+#' \code{"npx_data.tsv"}.
+#' @param platform Value for \code{comment[platform]}. Default
+#' \code{"Olink Target 96"}.
+#' @param organism Value for \code{characteristics[organism]}. Default
+#' \code{"homo sapiens"}.
+#' @param organism_part Value for \code{characteristics[organism part]}.
+#' Default \code{"blood"}.
+#' @param validate Logical. If \code{TRUE} (default) and \code{file} is set,
+#' run [olink_sdrf_validate()] on the written file via `sdrf-pipelines`.
+#' Ignored when \code{file} is \code{NULL}.
+#' @param validate_error Logical passed to [olink_sdrf_validate()] as
+#' \code{error}. Default \code{FALSE} so a failed validation still returns
+#' the SDRF tibble (check \code{attr(x, "sdrf_validation")}).
+#' @param skip_ontology Logical passed to [olink_sdrf_validate()].
+#' Default \code{TRUE}.
 #'
-#' @return A tibble whose column names are official SDRF headers from
-#' \var{sdrf_column_dict} (affinity-proteomics, including inherited columns).
+#' @return A tibble whose column names are official SDRF headers (required
+#' columns always present; selected recommended columns when mappable).
+#' When \code{validate = TRUE} and a file was written, the validation list from
+#' [olink_sdrf_validate()] is attached as attribute \code{sdrf_validation}.
 #'
 #' @seealso
 #' \code{column_name_dict}, \code{sdrf_column_dict},
@@ -43,31 +64,34 @@
 #'
 #' @examples
 #' \dontrun{
-#'   npx <- OlinkAnalyze::npx_data1
-#'   # sample_metadata: user-provided table with SampleID + study variables
-#'   # sdrf <- olink_sdrf(npx = npx, sample_metadata = sample_metadata)
+#'   meta <- dplyr::distinct(
+#'     OlinkAnalyze::npx_data1,
+#'     SampleID, Subject, Treatment, Site, Time, Project
+#'   )
+#'   sdrf <- olink_sdrf(
+#'     npx = OlinkAnalyze::npx_data1,
+#'     sample_metadata = meta,
+#'     file = "smoke_olink.sdrf.tsv"
+#'   )
+#'   attr(sdrf, "sdrf_validation")$ok
 #' }
 #'
 olink_sdrf <- function(npx,
-                       sample_metadata,
-                       file = NULL) {
+                       sample_metadata = NULL,
+                       file = NULL,
+                       data_file = "npx_data.tsv",
+                       platform = "Olink Target 96",
+                       organism = "homo sapiens",
+                       organism_part = "blood",
+                       validate = TRUE,
+                       validate_error = FALSE,
+                       skip_ontology = TRUE) {
 
   # ---- Column dictionaries (internal sysdata) --------------------------------
-  # NPX: data-raw/column_name_dict.R
-  # SDRF: data-raw/sdrf_format.R ← data-raw/sdrf/{base,sample-metadata,
-  #       affinity-proteomics}.yaml
+  npx_sample_id_names <- get_alt_colnames(col_key = "sample_id")
+  npx_plate_id_names <- get_alt_colnames(col_key = "plate_id")
+  npx_panel_names <- get_alt_colnames(col_key = "panel")
 
-  ## NPX aliases used when mapping / joining into SDRF
-  npx_cols <- list(
-    sample_id = get_alt_colnames(col_key = "sample_id"),
-    sample_type = get_alt_colnames(col_key = "sample_type"),
-    plate_id = get_alt_colnames(col_key = "plate_id"),
-    panel = get_alt_colnames(col_key = "panel"),
-    quant = get_alt_colnames(col_key = "quant"),
-    normalization = get_alt_colnames(col_key = "normalization")
-  )
-
-  ## Official SDRF headers (first entry in each col_names vector)
   sdrf_official_names <- vapply(
     X = sdrf_column_dict[["col_names"]],
     FUN = function(nm) as.character(nm[[1L]]),
@@ -76,34 +100,192 @@ olink_sdrf <- function(npx,
   )
   names(sdrf_official_names) <- sdrf_column_dict[["col_key"]]
 
-  sdrf_cols <- list(
-    all = sdrf_official_names,
-    required = sdrf_official_names[
-      sdrf_column_dict[["col_requirement"]] == "required"
-    ],
-    recommended = sdrf_official_names[
-      sdrf_column_dict[["col_requirement"]] == "recommended"
-    ],
-    optional = sdrf_official_names[
-      sdrf_column_dict[["col_requirement"]] == "optional"
-    ]
-  )
+  # ---- resolve SampleID column in npx ----------------------------------------
+  check_is_tibble_or_df <- function(x, arg) {
+    if (!inherits(x, c("data.frame", "tbl_df", "tbl"))) {
+      cli::cli_abort("{.arg {arg}} must be a data.frame or tibble.")
+    }
+  }
+  check_is_tibble_or_df(npx, "npx")
+  if (!is.null(sample_metadata)) {
+    check_is_tibble_or_df(sample_metadata, "sample_metadata")
+  }
+  check_is_scalar_character(x = data_file, error = TRUE)
+  check_is_scalar_character(x = platform, error = TRUE)
+  check_is_scalar_character(x = organism, error = TRUE)
+  check_is_scalar_character(x = organism_part, error = TRUE)
+  check_is_scalar_boolean(x = validate, error = TRUE)
+  check_is_scalar_boolean(x = validate_error, error = TRUE)
+  check_is_scalar_boolean(x = skip_ontology, error = TRUE)
+  if (!is.null(file)) {
+    check_is_scalar_character(x = file, error = TRUE)
+  }
 
-  cli::cli_abort(
-    c(
-      "{.fn olink_sdrf} is not implemented yet.",
-      "i" = "NPX SampleID aliases: {.val {npx_cols$sample_id}}.",
-      "i" = paste(
-        "SDRF required columns ({length(sdrf_cols$required)}):",
-        "{.val {unname(sdrf_cols$required)}}."
-      ),
-      "i" = paste(
-        "Inputs received: {.arg npx} ({.cls {class(npx)[1]}}),",
-        "{.arg sample_metadata} ({.cls {class(sample_metadata)[1]}}),",
-        "{.arg file} = {.val {file}}."
+  npx_sid <- intersect(npx_sample_id_names, colnames(npx))
+  if (length(npx_sid) == 0L) {
+    cli::cli_abort(
+      c(
+        "x" = "No sample ID column found in {.arg npx}.",
+        "i" = "Expected one of {.val {npx_sample_id_names}}."
       )
     )
+  }
+  npx_sid <- npx_sid[[1L]]
+
+  samples <- npx |>
+    dplyr::distinct(.data[[npx_sid]]) |>
+    dplyr::rename(SampleID = !!rlang::sym(npx_sid))
+
+  # optional plate / panel from NPX (one value per sample; first if multiple)
+  plate_col <- intersect(npx_plate_id_names, colnames(npx))
+  panel_col <- intersect(npx_panel_names, colnames(npx))
+  extras <- npx |>
+    dplyr::group_by(.data[[npx_sid]]) |>
+    dplyr::summarise(
+      .plate = if (length(plate_col) > 0L) {
+        as.character(dplyr::first(.data[[plate_col[[1L]]]]))
+      } else {
+        NA_character_
+      },
+      .panel = if (length(panel_col) > 0L) {
+        as.character(dplyr::first(.data[[panel_col[[1L]]]]))
+      } else {
+        NA_character_
+      },
+      .groups = "drop"
+    ) |>
+    dplyr::rename(SampleID = !!rlang::sym(npx_sid))
+
+  samples <- samples |>
+    dplyr::left_join(extras, by = "SampleID")
+
+  # ---- join sample metadata --------------------------------------------------
+  if (!is.null(sample_metadata)) {
+    meta_sid <- intersect(npx_sample_id_names, colnames(sample_metadata))
+    if (length(meta_sid) == 0L) {
+      cli::cli_abort(
+        c(
+          "x" = "No sample ID column found in {.arg sample_metadata}.",
+          "i" = "Expected one of {.val {npx_sample_id_names}}."
+        )
+      )
+    }
+    meta_sid <- meta_sid[[1L]]
+    meta <- sample_metadata |>
+      dplyr::mutate(SampleID = as.character(.data[[meta_sid]])) |>
+      dplyr::distinct(.data[["SampleID"]], .keep_all = TRUE)
+
+    n_overlap <- length(intersect(samples$SampleID, meta$SampleID))
+    if (n_overlap == 0L) {
+      cli::cli_warn(
+        c(
+          "!" = paste(
+            "No overlapping SampleID between {.arg npx} and",
+            "{.arg sample_metadata}; metadata columns will be ignored."
+          )
+        )
+      )
+    } else {
+      samples <- samples |>
+        dplyr::left_join(meta, by = "SampleID", suffix = c("", "_meta"))
+    }
+  }
+
+  # ---- map to required (+ light recommended) SDRF columns --------------------
+  tech <- sdrf_affinity_template[["technology_type_olink"]]
+  if (is.null(tech) || !nzchar(tech)) {
+    tech <- "protein expression profiling by antibody array"
+  }
+  quant_unit <- sdrf_affinity_template[["quantification_unit_olink"]]
+  if (is.null(quant_unit) || !nzchar(quant_unit)) {
+    quant_unit <- "NPX"
+  }
+  tmpl_ver <- sdrf_affinity_template[["version"]]
+  if (is.null(tmpl_ver) || !nzchar(tmpl_ver)) {
+    tmpl_ver <- "1.0.0"
+  }
+
+  is_control <- grepl(
+    pattern = "CONTROL|control|CTRL|ctrl",
+    x = samples$SampleID
   )
+
+  # Column order matters for sdrf-pipelines: all characteristics[*] before
+  # "assay name", then technology / comment columns.
+  sdrf <- tibble::tibble(
+    `source name` = samples$SampleID,
+    `characteristics[sample type]` = dplyr::if_else(
+      is_control,
+      "plate control",
+      "study sample"
+    ),
+    `characteristics[organism]` = organism,
+    `characteristics[organism part]` = organism_part,
+    `characteristics[biological replicate]` = 1L,
+    `assay name` = samples$SampleID,
+    `technology type` = tech,
+    `comment[technical replicate]` = 1L,
+    `comment[data file]` = data_file,
+    `comment[platform]` = platform,
+    `comment[panel name]` = samples$.panel,
+    `comment[plate]` = samples$.plate,
+    `comment[quantification unit]` = quant_unit,
+    `comment[sdrf version]` = paste0("v", tmpl_ver),
+    `comment[sdrf template]` = paste("affinity-proteomics", paste0("v", tmpl_ver))
+  )
+
+  # drop all-NA recommended extras
+  for (col in c("comment[panel name]", "comment[plate]")) {
+    if (all(is.na(sdrf[[col]]))) {
+      sdrf[[col]] <- NULL
+    }
+  }
+
+  # silence unused binding (kept for future richer mapping)
+  force(sdrf_official_names)
+
+  if (!is.null(file)) {
+    utils::write.table(
+      x = sdrf,
+      file = file,
+      sep = "\t",
+      quote = FALSE,
+      row.names = FALSE,
+      col.names = TRUE,
+      na = "not available"
+    )
+    cli::cli_alert_success(
+      "Wrote SDRF ({nrow(sdrf)} row{?s}) to {.file {file}}."
+    )
+
+    # ---- validate the same written file ------------------------------------
+    if (isTRUE(validate)) {
+      cli::cli_alert_info(
+        "Validating written SDRF with {.fn olink_sdrf_validate} ..."
+      )
+      validation <- olink_sdrf_validate(
+        sdrf_file = file,
+        template = "affinity-proteomics",
+        skip_ontology = skip_ontology,
+        error = validate_error
+      )
+      attr(sdrf, "sdrf_validation") <- validation
+      if (!isTRUE(validation$ok)) {
+        cli::cli_warn(
+          c(
+            "!" = "SDRF validation did not pass for {.file {file}}.",
+            "i" = "See {.code attr(sdrf, \"sdrf_validation\")} for details."
+          )
+        )
+      }
+    }
+  } else if (isTRUE(validate)) {
+    cli::cli_alert_info(
+      "Skipping validation: {.arg file} is NULL (nothing written to disk)."
+    )
+  }
+
+  sdrf
 }
 
 #' Validate an SDRF file with sdrf-pipelines
