@@ -18,7 +18,8 @@ olink_sdrf_validate(
 \item{sdrf_file}{Path to an SDRF TSV file (typically \verb{*.sdrf.tsv}).}
 
 \item{template}{SDRF template name passed to \code{--template}. Default
-\code{"affinity-proteomics"} (Olink / SomaScan / NULISA).}
+\code{"affinity-proteomics"} (used for Olink PEA exports), matching
+\code{data-raw/sdrf/affinity-proteomics.yaml}.}
 
 \item{skip_ontology}{Logical. If \code{TRUE} (default), pass
 \code{--skip-ontology} for structural validation without OLS ontology
@@ -36,14 +37,18 @@ is \code{FALSE}).}
 If \code{NULL}, resolved via \code{\link[=Sys.which]{Sys.which()}}.}
 
 \item{error}{Logical. If \code{TRUE} (default), abort when validation
-fails or \code{parse_sdrf} is missing. If \code{FALSE}, return the result
-list with \code{ok = FALSE}.}
+fails or \code{parse_sdrf} is missing. If \code{FALSE} and \code{parse_sdrf}
+is missing, emit a warning that validation was skipped and return
+the result list with \code{ok = FALSE} and \code{skipped = TRUE}.}
 }
 \value{
 A named list with:
 \itemize{
 \item{\code{ok}:} Logical; \code{TRUE} if exit status is 0
 \item{\code{status}:} Integer exit status from \code{parse_sdrf}
+(\code{NA_integer_} when skipped)
+\item{\code{skipped}:} Logical; \code{TRUE} when validation was
+skipped because \code{parse_sdrf} / sdrf-pipelines was not found
 \item{\code{command}:} Character vector of the invoked command
 \item{\code{stdout}:} Captured standard output lines
 \item{\code{stderr}:} Captured standard error lines (may be empty)
@@ -55,12 +60,19 @@ A named list with:
 Soft-dependency wrapper around the
 \href{https://github.com/bigbio/sdrf-pipelines}{sdrf-pipelines}
 CLI (\verb{parse_sdrf validate-sdrf}). Use this to check that an SDRF TSV
-produced by \code{\link[=olink_sdrf]{olink_sdrf()}} (or elsewhere) matches the official
-affinity-proteomics template.
+produced by \code{\link[=olink_sdrf]{olink_sdrf()}} / \code{\link[=generate_sdrf]{generate_sdrf()}} (or elsewhere) matches
+the official affinity-proteomics template
+(\code{data-raw/sdrf/affinity-proteomics.yaml}).
 
 Requires Python with \code{sdrf-pipelines} installed and \code{parse_sdrf} on
 \code{PATH}, for example:
 \preformatted{pip install "sdrf-pipelines[ontology]"}
+
+For Olink files, validation typically covers headers such as
+\code{characteristics[sample type]} (\code{study sample},
+\code{plate control}), \code{comment[platform]}
+(\code{Olink Target 96}, \code{Olink Explore HT}), and
+\code{comment[panel name]} (e.g. Inflammation).
 }
 \examples{
 \dontrun{
@@ -74,7 +86,7 @@ Requires Python with \code{sdrf-pipelines} installed and \code{parse_sdrf} on
 
 }
 \seealso{
-\code{\link[=olink_sdrf]{olink_sdrf()}},
+\code{\link[=olink_sdrf]{olink_sdrf()}}, \code{\link[=generate_sdrf]{generate_sdrf()}},
 \href{https://github.com/bigbio/sdrf-pipelines}{sdrf-pipelines on GitHub},
 \href{https://sdrf.quantms.org/tools.html}{SDRF tools}
 }

@@ -17,14 +17,33 @@
 #'
 #' @details
 #' SDRF inheritance resolved for this package is
-#' \code{base → sample-metadata → affinity-proteomics}. Required SDRF headers
-#' are those with \code{col_requirement == "required"} in
-#' \var{sdrf_column_dict}.
+#' \code{base → sample-metadata → affinity-proteomics}
+#' (`data-raw/sdrf/*.yaml`). Required SDRF headers are those with
+#' \code{col_requirement == "required"} in \var{sdrf_column_dict}.
 #'
 #' This is a first working draft: it writes the **required** affinity-proteomics
 #' columns (plus a few recommended fields when available) with Olink-oriented
 #' defaults. Ontology-perfect annotations are not guaranteed; use
 #' [olink_sdrf_validate()] to check the result.
+#'
+#' Columns typically written (official SDRF headers; Olink-oriented examples):
+#' \tabular{lll}{
+#'   Header \tab Requirement \tab Olink example values \cr
+#'   \code{source name} / \code{assay name} \tab required \tab SampleID from NPX \cr
+#'   \code{characteristics[sample type]} \tab required \tab
+#'     study sample; plate control \cr
+#'   \code{characteristics[organism]} \tab required \tab homo sapiens \cr
+#'   \code{characteristics[organism part]} \tab required \tab blood \cr
+#'   \code{characteristics[biological replicate]} \tab required \tab 1; 2 \cr
+#'   \code{comment[platform]} \tab required \tab
+#'     Olink Target 96; Olink Explore HT; Olink Explore 3072 \cr
+#'   \code{comment[panel name]} \tab recommended \tab
+#'     Inflammation; Cardiometabolic; Explore 1536 \cr
+#'   \code{comment[quantification unit]} \tab optional \tab NPX \cr
+#'   \code{comment[data file]} \tab required \tab path/name of NPX export
+#' }
+#' Control-like SampleIDs matching \code{CONTROL|CTRL} (any case) are labeled
+#' \code{plate control}; others default to \code{study sample}.
 #'
 #' @param npx Tibble/data frame in long format such as produced by
 #' [read_npx()]. Must contain a sample identifier column matching one of the
@@ -36,12 +55,13 @@
 #' only the tibble is returned.
 #' @param data_file Value for \code{comment[data file]} (recycled). Default
 #' \code{"npx_data.tsv"}.
-#' @param platform Value for \code{comment[platform]}. Default
-#' \code{"Olink Target 96"}.
+#' @param platform Value for \code{comment[platform]}. Olink examples:
+#' \code{"Olink Target 96"}, \code{"Olink Explore HT"},
+#' \code{"Olink Explore 3072"}. Default \code{"Olink Target 96"}.
 #' @param organism Value for \code{characteristics[organism]}. Default
-#' \code{"homo sapiens"}.
+#' \code{"homo sapiens"} (typical for Olink clinical studies).
 #' @param organism_part Value for \code{characteristics[organism part]}.
-#' Default \code{"blood"}.
+#' Default \code{"blood"} (common Olink sample type; override for e.g. CSF).
 #' @param validate Logical. If \code{TRUE} (default) and \code{file} is set,
 #' run [olink_sdrf_validate()] on the written file via `sdrf-pipelines`.
 #' Ignored when \code{file} is \code{NULL}.
@@ -58,7 +78,8 @@
 #'
 #' @seealso
 #' \code{column_name_dict}, \code{sdrf_column_dict},
-#' [olink_sdrf_validate()], [read_npx()], [olink_plate_randomizer()]
+#' [generate_sdrf()], [olink_sdrf_validate()], [read_npx()],
+#' [olink_plate_randomizer()]
 #'
 #' @export
 #'
@@ -71,8 +92,13 @@
 #'   sdrf <- olink_sdrf(
 #'     npx = OlinkAnalyze::npx_data1,
 #'     sample_metadata = meta,
+#'     platform = "Olink Target 96",
+#'     organism = "homo sapiens",
+#'     organism_part = "blood",
 #'     file = "smoke_olink.sdrf.tsv"
 #'   )
+#'   # SDRF headers follow affinity-proteomics.yaml, e.g.:
+#'   # characteristics[sample type], comment[platform], comment[panel name]
 #'   attr(sdrf, "sdrf_validation")$ok
 #' }
 #'
@@ -210,28 +236,41 @@ olink_sdrf <- function(npx,
     x = samples$SampleID
   )
 
+  extra_chars <- sdrf_characteristics_from_metadata(
+    metadata = samples,
+    skip_cols = c("SampleID", ".panel", ".plate")
+  )
+
   # Column order matters for sdrf-pipelines: all characteristics[*] before
   # "assay name", then technology / comment columns.
-  sdrf <- tibble::tibble(
-    `source name` = samples$SampleID,
-    `characteristics[sample type]` = dplyr::if_else(
-      is_control,
-      "plate control",
-      "study sample"
+  sdrf <- dplyr::bind_cols(
+    tibble::tibble(
+      `source name` = samples$SampleID,
+      `characteristics[sample type]` = dplyr::if_else(
+        is_control,
+        "plate control",
+        "study sample"
+      ),
+      `characteristics[organism]` = organism,
+      `characteristics[organism part]` = organism_part,
+      `characteristics[biological replicate]` = 1L
     ),
-    `characteristics[organism]` = organism,
-    `characteristics[organism part]` = organism_part,
-    `characteristics[biological replicate]` = 1L,
-    `assay name` = samples$SampleID,
-    `technology type` = tech,
-    `comment[technical replicate]` = 1L,
-    `comment[data file]` = data_file,
-    `comment[platform]` = platform,
-    `comment[panel name]` = samples$.panel,
-    `comment[plate]` = samples$.plate,
-    `comment[quantification unit]` = quant_unit,
-    `comment[sdrf version]` = paste0("v", tmpl_ver),
-    `comment[sdrf template]` = paste("affinity-proteomics", paste0("v", tmpl_ver))
+    extra_chars,
+    tibble::tibble(
+      `assay name` = samples$SampleID,
+      `technology type` = tech,
+      `comment[technical replicate]` = 1L,
+      `comment[data file]` = data_file,
+      `comment[platform]` = platform,
+      `comment[panel name]` = samples$.panel,
+      `comment[plate]` = samples$.plate,
+      `comment[quantification unit]` = quant_unit,
+      `comment[sdrf version]` = paste0("v", tmpl_ver),
+      `comment[sdrf template]` = paste(
+        "affinity-proteomics",
+        paste0("v", tmpl_ver)
+      )
+    )
   )
 
   # drop all-NA recommended extras
@@ -259,16 +298,24 @@ olink_sdrf <- function(npx,
 #' Soft-dependency wrapper around the
 #' [sdrf-pipelines](https://github.com/bigbio/sdrf-pipelines)
 #' CLI (`parse_sdrf validate-sdrf`). Use this to check that an SDRF TSV
-#' produced by [olink_sdrf()] (or elsewhere) matches the official
-#' affinity-proteomics template.
+#' produced by [olink_sdrf()] / [generate_sdrf()] (or elsewhere) matches
+#' the official affinity-proteomics template
+#' (`data-raw/sdrf/affinity-proteomics.yaml`).
 #'
 #' Requires Python with `sdrf-pipelines` installed and `parse_sdrf` on
 #' `PATH`, for example:
 #' \preformatted{pip install "sdrf-pipelines[ontology]"}
 #'
+#' For Olink files, validation typically covers headers such as
+#' \code{characteristics[sample type]} (\code{study sample},
+#' \code{plate control}), \code{comment[platform]}
+#' (\code{Olink Target 96}, \code{Olink Explore HT}), and
+#' \code{comment[panel name]} (e.g. Inflammation).
+#'
 #' @param sdrf_file Path to an SDRF TSV file (typically `*.sdrf.tsv`).
 #' @param template SDRF template name passed to `--template`. Default
-#'   \code{"affinity-proteomics"} (Olink / SomaScan / NULISA).
+#'   \code{"affinity-proteomics"} (used for Olink PEA exports), matching
+#'   `data-raw/sdrf/affinity-proteomics.yaml`.
 #' @param skip_ontology Logical. If \code{TRUE} (default), pass
 #'   `--skip-ontology` for structural validation without OLS ontology
 #'   lookups. Set \code{FALSE} when ontology extras are installed and
@@ -300,7 +347,7 @@ olink_sdrf <- function(npx,
 #' }
 #'
 #' @seealso
-#' [olink_sdrf()],
+#' [olink_sdrf()], [generate_sdrf()],
 #' [sdrf-pipelines on GitHub](https://github.com/bigbio/sdrf-pipelines),
 #' [SDRF tools](https://sdrf.quantms.org/tools.html)
 #'
@@ -485,29 +532,50 @@ find_parse_sdrf <- function(parse_sdrf = NULL, error = TRUE) {
 #' @description
 #' Builds an SDRF-Proteomics **affinity-proteomics** table from a sample
 #' metadata data frame / tibble (for example the package \code{manifest}
-#' dataset), without requiring NPX assay data.
+#' dataset), without requiring NPX assay data. Output headers follow
+#' `data-raw/sdrf/affinity-proteomics.yaml` (merged with base /
+#' sample-metadata).
 #'
 #' Defaults assume **human blood** samples run on an Olink platform. Choose the
 #' platform with \code{platform} (see [get_all_olink_platforms()]) and optionally
 #' set \code{panel_name} (constant or a column in \code{metadata}).
 #'
+#' @details
+#' Same core affinity columns as [olink_sdrf()]. Olink-oriented examples:
+#' \itemize{
+#'   \item \code{characteristics[sample type]}:
+#'     study sample; plate control
+#'   \item \code{comment[platform]}:
+#'     Olink Target 96; Olink Explore HT; Olink Explore 3072
+#'   \item \code{comment[panel name]}:
+#'     Inflammation; Cardiometabolic; Explore 1536
+#'   \item \code{characteristics[organism]} / \code{[organism part]}:
+#'     homo sapiens / blood (defaults)
+#'   \item \code{comment[quantification unit]}: NPX
+#' }
+#' Pass \code{sample_id} when the metadata ID column is not named
+#' \code{SampleID}. Any other metadata columns (e.g. \code{Visit}, \code{Site},
+#' \code{SubjectID}) are added as \code{characteristics[<column>]}.
+#'
 #' @param metadata Data frame / tibble with one row per sample. Must contain a
-#' sample identifier column (default \code{SampleID}).
-#' @param sample_id Name of the sample ID column in \code{metadata}.
-#' Default \code{"SampleID"}.
+#' sample identifier column (see \code{sample_id}). Remaining columns become
+#' \code{characteristics[...]} fields.
+#' @param sample_id Name of the sample ID column in \code{metadata} used for
+#' \code{source name} / \code{assay name}. Default \code{"SampleID"}.
 #' @param file Optional path to write the SDRF TSV. If \code{NULL}, only the
 #' tibble is returned.
-#' @param organism Value for \code{characteristics[organism]}.
-#' Default \code{"homo sapiens"}.
+#' @param organism Value for \code{characteristics[organism]}. Default
+#' \code{"homo sapiens"}.
 #' @param organism_part Value for \code{characteristics[organism part]}.
 #' Default \code{"blood"}.
-#' @param platform Olink platform. Accepts package platform names from
-#' [get_all_olink_platforms()] (e.g. \code{"Target 96"}, \code{"Explore HT"})
-#' or full names (e.g. \code{"Olink Target 96"}). Default \code{"Target 96"}.
-#' @param panel_name Optional panel / menu label for
-#' \code{comment[panel name]}. Either a single string (recycled) or the name of
-#' a column in \code{metadata}. Examples: \code{"Cardiometabolic"},
-#' \code{"Inflammation"}.
+#' @param platform Olink platform for \code{comment[platform]}. Accepts names
+#' from [get_all_olink_platforms()] (e.g. \code{"Target 96"},
+#' \code{"Explore HT"}) or full names (e.g. \code{"Olink Target 96"},
+#' \code{"Olink Explore HT"}). Default \code{"Target 96"}.
+#' @param panel_name Optional value for \code{comment[panel name]}. Either a
+#' single string (recycled) or the name of a column in \code{metadata}.
+#' Olink examples: \code{"Inflammation"}, \code{"Cardiometabolic"},
+#' \code{"Explore 1536"}.
 #' @param data_file Value for \code{comment[data file]} (recycled).
 #' Default \code{"npx_data.tsv"}.
 #' @param validate,validate_error,skip_ontology See [olink_sdrf()].
@@ -523,8 +591,11 @@ find_parse_sdrf <- function(parse_sdrf = NULL, error = TRUE) {
 #' \dontrun{
 #'   sdrf <- generate_sdrf(
 #'     metadata = manifest,
+#'     sample_id = "SampleID",
 #'     platform = "Target 96",
 #'     panel_name = "Inflammation",
+#'     organism = "homo sapiens",
+#'     organism_part = "blood",
 #'     file = "manifest_olink.sdrf.tsv"
 #'   )
 #' }
@@ -610,27 +681,43 @@ generate_sdrf <- function(metadata,
     bio_rep <- as.integer(factor(samples[[subj_col[[1L]]]]))
   }
 
-  sdrf <- tibble::tibble(
-    `source name` = samples$SampleID,
-    `characteristics[sample type]` = dplyr::if_else(
-      is_control,
-      "plate control",
-      "study sample"
+  skip_meta_cols <- c("SampleID", sample_id)
+  if (!is.null(panel_name) && panel_name %in% colnames(samples)) {
+    skip_meta_cols <- c(skip_meta_cols, panel_name)
+  }
+  extra_chars <- sdrf_characteristics_from_metadata(
+    metadata = samples,
+    skip_cols = skip_meta_cols
+  )
+
+  # Column order: required characteristics, then metadata characteristics,
+  # then assay name / technology / comments (sdrf-pipelines rule).
+  sdrf <- dplyr::bind_cols(
+    tibble::tibble(
+      `source name` = samples$SampleID,
+      `characteristics[sample type]` = dplyr::if_else(
+        is_control,
+        "plate control",
+        "study sample"
+      ),
+      `characteristics[organism]` = organism,
+      `characteristics[organism part]` = organism_part,
+      `characteristics[biological replicate]` = bio_rep
     ),
-    `characteristics[organism]` = organism,
-    `characteristics[organism part]` = organism_part,
-    `characteristics[biological replicate]` = bio_rep,
-    `assay name` = samples$SampleID,
-    `technology type` = tech,
-    `comment[technical replicate]` = 1L,
-    `comment[data file]` = data_file,
-    `comment[platform]` = platform_sdrf,
-    `comment[panel name]` = panel_values,
-    `comment[quantification unit]` = quant_unit,
-    `comment[sdrf version]` = paste0("v", tmpl_ver),
-    `comment[sdrf template]` = paste(
-      "affinity-proteomics",
-      paste0("v", tmpl_ver)
+    extra_chars,
+    tibble::tibble(
+      `assay name` = samples$SampleID,
+      `technology type` = tech,
+      `comment[technical replicate]` = 1L,
+      `comment[data file]` = data_file,
+      `comment[platform]` = platform_sdrf,
+      `comment[panel name]` = panel_values,
+      `comment[quantification unit]` = quant_unit,
+      `comment[sdrf version]` = paste0("v", tmpl_ver),
+      `comment[sdrf template]` = paste(
+        "affinity-proteomics",
+        paste0("v", tmpl_ver)
+      )
     )
   )
 
@@ -693,6 +780,53 @@ resolve_olink_sdrf_panel_name <- function(panel_name, metadata, n) {
     return(as.character(metadata[[panel_name]]))
   }
   rep(panel_name, n)
+}
+
+#' Map leftover metadata columns to characteristics[col] SDRF headers
+#'
+#' @param metadata Sample-level data frame
+#' @param skip_cols Column names already consumed (e.g. SampleID, panel col)
+#' @return Tibble of characteristics columns (0 columns if none)
+#' @keywords internal
+#' @noRd
+#'
+sdrf_characteristics_from_metadata <- function(metadata, skip_cols = character()) {
+  extra <- setdiff(colnames(metadata), unique(c(skip_cols, "SampleID")))
+  # drop internal helper columns
+  extra <- extra[!startsWith(extra, ".")]
+  if (length(extra) == 0L) {
+    return(tibble::tibble(.rows = nrow(metadata)))
+  }
+
+  out <- metadata[, extra, drop = FALSE]
+  out[] <- lapply(
+    X = out,
+    FUN = function(x) {
+      ifelse(is.na(x), NA_character_, as.character(x))
+    }
+  )
+
+  already_sdrf <- grepl(
+    pattern = "^(characteristics|comment|factor value)\\[.+\\]$",
+    x = names(out)
+  )
+  names(out)[!already_sdrf] <- paste0(
+    "characteristics[",
+    names(out)[!already_sdrf],
+    "]"
+  )
+
+  # avoid colliding with required headers we always write
+  reserved <- c(
+    "characteristics[sample type]",
+    "characteristics[organism]",
+    "characteristics[organism part]",
+    "characteristics[biological replicate]"
+  )
+  keep <- !names(out) %in% reserved
+  out <- out[, keep, drop = FALSE]
+
+  tibble::as_tibble(out)
 }
 
 #' Write SDRF tibble and optionally validate

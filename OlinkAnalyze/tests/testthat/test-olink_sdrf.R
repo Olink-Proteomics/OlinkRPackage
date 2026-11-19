@@ -33,9 +33,18 @@ test_that(
     expect_equal(unique(sdrf[["characteristics[organism part]"]]), "blood")
     expect_equal(unique(sdrf[["comment[platform]"]]), "Olink Target 96")
     expect_equal(unique(sdrf[["comment[panel name]"]]), "Inflammation")
+    # leftover manifest columns become characteristics[*]
+    expect_true(all(
+      c(
+        "characteristics[SubjectID]",
+        "characteristics[Visit]",
+        "characteristics[Site]"
+      ) %in% colnames(sdrf)
+    ))
+    expect_false("characteristics[SampleID]" %in% colnames(sdrf))
     # characteristics before assay name (sdrf-pipelines column-order rule)
     expect_lt(
-      match("characteristics[organism]", colnames(sdrf)),
+      match("characteristics[Visit]", colnames(sdrf)),
       match("assay name", colnames(sdrf))
     )
   }

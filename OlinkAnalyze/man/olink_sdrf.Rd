@@ -32,14 +32,15 @@ only the tibble is returned.}
 \item{data_file}{Value for \code{comment[data file]} (recycled). Default
 \code{"npx_data.tsv"}.}
 
-\item{platform}{Value for \code{comment[platform]}. Default
-\code{"Olink Target 96"}.}
+\item{platform}{Value for \code{comment[platform]}. Olink examples:
+\code{"Olink Target 96"}, \code{"Olink Explore HT"},
+\code{"Olink Explore 3072"}. Default \code{"Olink Target 96"}.}
 
 \item{organism}{Value for \code{characteristics[organism]}. Default
-\code{"homo sapiens"}.}
+\code{"homo sapiens"} (typical for Olink clinical studies).}
 
 \item{organism_part}{Value for \code{characteristics[organism part]}.
-Default \code{"blood"}.}
+Default \code{"blood"} (common Olink sample type; override for e.g. CSF).}
 
 \item{validate}{Logical. If \code{TRUE} (default) and \code{file} is set,
 run \code{\link[=olink_sdrf_validate]{olink_sdrf_validate()}} on the written file via \code{sdrf-pipelines}.
@@ -75,14 +76,33 @@ The join key between NPX and sample metadata is the NPX sample identifier
 }
 \details{
 SDRF inheritance resolved for this package is
-\code{base → sample-metadata → affinity-proteomics}. Required SDRF headers
-are those with \code{col_requirement == "required"} in
-\var{sdrf_column_dict}.
+\code{base → sample-metadata → affinity-proteomics}
+(\verb{data-raw/sdrf/*.yaml}). Required SDRF headers are those with
+\code{col_requirement == "required"} in \var{sdrf_column_dict}.
 
 This is a first working draft: it writes the \strong{required} affinity-proteomics
 columns (plus a few recommended fields when available) with Olink-oriented
 defaults. Ontology-perfect annotations are not guaranteed; use
 \code{\link[=olink_sdrf_validate]{olink_sdrf_validate()}} to check the result.
+
+Columns typically written (official SDRF headers; Olink-oriented examples):
+\tabular{lll}{
+Header \tab Requirement \tab Olink example values \cr
+\code{source name} / \code{assay name} \tab required \tab SampleID from NPX \cr
+\code{characteristics[sample type]} \tab required \tab
+study sample; plate control \cr
+\code{characteristics[organism]} \tab required \tab homo sapiens \cr
+\code{characteristics[organism part]} \tab required \tab blood \cr
+\code{characteristics[biological replicate]} \tab required \tab 1; 2 \cr
+\code{comment[platform]} \tab required \tab
+Olink Target 96; Olink Explore HT; Olink Explore 3072 \cr
+\code{comment[panel name]} \tab recommended \tab
+Inflammation; Cardiometabolic; Explore 1536 \cr
+\code{comment[quantification unit]} \tab optional \tab NPX \cr
+\code{comment[data file]} \tab required \tab path/name of NPX export
+}
+Control-like SampleIDs matching \code{CONTROL|CTRL} (any case) are labeled
+\code{plate control}; others default to \code{study sample}.
 }
 \examples{
 \dontrun{
@@ -93,13 +113,19 @@ defaults. Ontology-perfect annotations are not guaranteed; use
   sdrf <- olink_sdrf(
     npx = OlinkAnalyze::npx_data1,
     sample_metadata = meta,
+    platform = "Olink Target 96",
+    organism = "homo sapiens",
+    organism_part = "blood",
     file = "smoke_olink.sdrf.tsv"
   )
+  # SDRF headers follow affinity-proteomics.yaml, e.g.:
+  # characteristics[sample type], comment[platform], comment[panel name]
   attr(sdrf, "sdrf_validation")$ok
 }
 
 }
 \seealso{
 \code{column_name_dict}, \code{sdrf_column_dict},
-\code{\link[=olink_sdrf_validate]{olink_sdrf_validate()}}, \code{\link[=read_npx]{read_npx()}}, \code{\link[=olink_plate_randomizer]{olink_plate_randomizer()}}
+\code{\link[=generate_sdrf]{generate_sdrf()}}, \code{\link[=olink_sdrf_validate]{olink_sdrf_validate()}}, \code{\link[=read_npx]{read_npx()}},
+\code{\link[=olink_plate_randomizer]{olink_plate_randomizer()}}
 }
