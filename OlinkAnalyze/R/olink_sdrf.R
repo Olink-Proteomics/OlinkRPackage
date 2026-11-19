@@ -281,13 +281,17 @@ olink_sdrf <- function(npx,
 #' @param parse_sdrf Optional path/name of the `parse_sdrf` executable.
 #'   If \code{NULL}, resolved via [Sys.which()].
 #' @param error Logical. If \code{TRUE} (default), abort when validation
-#'   fails or `parse_sdrf` is missing. If \code{FALSE}, return the result
-#'   list with \code{ok = FALSE}.
+#'   fails or `parse_sdrf` is missing. If \code{FALSE} and `parse_sdrf`
+#'   is missing, emit a warning that validation was skipped and return
+#'   the result list with \code{ok = FALSE} and \code{skipped = TRUE}.
 #'
 #' @return A named list with:
 #' \itemize{
 #'   \item{\code{ok}:} Logical; \code{TRUE} if exit status is 0
 #'   \item{\code{status}:} Integer exit status from `parse_sdrf`
+#'     (\code{NA_integer_} when skipped)
+#'   \item{\code{skipped}:} Logical; \code{TRUE} when validation was
+#'     skipped because `parse_sdrf` / sdrf-pipelines was not found
 #'   \item{\code{command}:} Character vector of the invoked command
 #'   \item{\code{stdout}:} Captured standard output lines
 #'   \item{\code{stderr}:} Captured standard error lines (may be empty)
@@ -336,16 +340,25 @@ olink_sdrf_validate <- function(sdrf_file,
   # ---- locate parse_sdrf -----------------------------------------------------
   exe <- find_parse_sdrf(parse_sdrf = parse_sdrf, error = error)
   if (is.null(exe)) {
+    msg <- paste(
+      "parse_sdrf not found on PATH.",
+      "Install with: pip install \"sdrf-pipelines[ontology]\""
+    )
+    cli::cli_warn(
+      c(
+        "!" = "SDRF validation skipped: {.cmd parse_sdrf} (from sdrf-pipelines) is not installed or not on {.envvar PATH}.",
+        "i" = "Install with: {.code pip install \"sdrf-pipelines[ontology]\"}",
+        "i" = "Or pass {.arg parse_sdrf} with the full path to the executable."
+      )
+    )
     return(
       list(
         ok = FALSE,
         status = NA_integer_,
+        skipped = TRUE,
         command = character(),
         stdout = character(),
-        stderr = paste(
-          "parse_sdrf not found on PATH.",
-          "Install with: pip install \"sdrf-pipelines[ontology]\""
-        ),
+        stderr = msg,
         sdrf_file = sdrf_file,
         template = template
       )
@@ -389,6 +402,7 @@ olink_sdrf_validate <- function(sdrf_file,
   result <- list(
     ok = identical(status, 0L),
     status = status,
+    skipped = FALSE,
     command = command,
     stdout = as.character(output),
     stderr = character(),
@@ -720,7 +734,7 @@ sdrf_write_and_validate <- function(sdrf,
         error = validate_error
       )
       attr(sdrf, "sdrf_validation") <- validation
-      if (!isTRUE(validation$ok)) {
+      if (!isTRUE(validation$ok) && !isTRUE(validation$skipped)) {
         cli::cli_warn(
           c(
             "!" = "SDRF validation did not pass for {.file {file}}.",
