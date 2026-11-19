@@ -244,48 +244,13 @@ olink_sdrf <- function(npx,
   # silence unused binding (kept for future richer mapping)
   force(sdrf_official_names)
 
-  if (!is.null(file)) {
-    utils::write.table(
-      x = sdrf,
-      file = file,
-      sep = "\t",
-      quote = FALSE,
-      row.names = FALSE,
-      col.names = TRUE,
-      na = "not available"
-    )
-    cli::cli_alert_success(
-      "Wrote SDRF ({nrow(sdrf)} row{?s}) to {.file {file}}."
-    )
-
-    # ---- validate the same written file ------------------------------------
-    if (isTRUE(validate)) {
-      cli::cli_alert_info(
-        "Validating written SDRF with {.fn olink_sdrf_validate} ..."
-      )
-      validation <- olink_sdrf_validate(
-        sdrf_file = file,
-        template = "affinity-proteomics",
-        skip_ontology = skip_ontology,
-        error = validate_error
-      )
-      attr(sdrf, "sdrf_validation") <- validation
-      if (!isTRUE(validation$ok)) {
-        cli::cli_warn(
-          c(
-            "!" = "SDRF validation did not pass for {.file {file}}.",
-            "i" = "See {.code attr(sdrf, \"sdrf_validation\")} for details."
-          )
-        )
-      }
-    }
-  } else if (isTRUE(validate)) {
-    cli::cli_alert_info(
-      "Skipping validation: {.arg file} is NULL (nothing written to disk)."
-    )
-  }
-
-  sdrf
+  sdrf_write_and_validate(
+    sdrf = sdrf,
+    file = file,
+    validate = validate,
+    validate_error = validate_error,
+    skip_ontology = skip_ontology
+  )
 }
 
 #' Validate an SDRF file with sdrf-pipelines
@@ -500,3 +465,276 @@ find_parse_sdrf <- function(parse_sdrf = NULL, error = TRUE) {
 
   exe
 }
+
+#' Generate an Olink affinity-proteomics SDRF from a metadata table
+#'
+#' @description
+#' Builds an SDRF-Proteomics **affinity-proteomics** table from a sample
+#' metadata data frame / tibble (for example the package \code{manifest}
+#' dataset), without requiring NPX assay data.
+#'
+#' Defaults assume **human blood** samples run on an Olink platform. Choose the
+#' platform with \code{platform} (see [get_all_olink_platforms()]) and optionally
+#' set \code{panel_name} (constant or a column in \code{metadata}).
+#'
+#' @param metadata Data frame / tibble with one row per sample. Must contain a
+#' sample identifier column (default \code{SampleID}).
+#' @param sample_id Name of the sample ID column in \code{metadata}.
+#' Default \code{"SampleID"}.
+#' @param file Optional path to write the SDRF TSV. If \code{NULL}, only the
+#' tibble is returned.
+#' @param organism Value for \code{characteristics[organism]}.
+#' Default \code{"homo sapiens"}.
+#' @param organism_part Value for \code{characteristics[organism part]}.
+#' Default \code{"blood"}.
+#' @param platform Olink platform. Accepts package platform names from
+#' [get_all_olink_platforms()] (e.g. \code{"Target 96"}, \code{"Explore HT"})
+#' or full names (e.g. \code{"Olink Target 96"}). Default \code{"Target 96"}.
+#' @param panel_name Optional panel / menu label for
+#' \code{comment[panel name]}. Either a single string (recycled) or the name of
+#' a column in \code{metadata}. Examples: \code{"Cardiometabolic"},
+#' \code{"Inflammation"}.
+#' @param data_file Value for \code{comment[data file]} (recycled).
+#' Default \code{"npx_data.tsv"}.
+#' @param validate,validate_error,skip_ontology See [olink_sdrf()].
+#'
+#' @return A tibble of SDRF columns. If \code{validate = TRUE} and \code{file}
+#' is set, validation output is attached as \code{attr(x, "sdrf_validation")}.
+#'
+#' @seealso [olink_sdrf()], [olink_sdrf_validate()], [get_all_olink_platforms()]
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#'   sdrf <- generate_sdrf(
+#'     metadata = manifest,
+#'     platform = "Target 96",
+#'     panel_name = "Inflammation",
+#'     file = "manifest_olink.sdrf.tsv"
+#'   )
+#' }
+#'
+generate_sdrf <- function(metadata,
+                          sample_id = "SampleID",
+                          file = NULL,
+                          organism = "homo sapiens",
+                          organism_part = "blood",
+                          platform = "Target 96",
+                          panel_name = NULL,
+                          data_file = "npx_data.tsv",
+                          validate = TRUE,
+                          validate_error = FALSE,
+                          skip_ontology = TRUE) {
+
+  if (!inherits(metadata, c("data.frame", "tbl_df", "tbl"))) {
+    cli::cli_abort("{.arg metadata} must be a data.frame or tibble.")
+  }
+  check_is_scalar_character(x = sample_id, error = TRUE)
+  check_is_scalar_character(x = organism, error = TRUE)
+  check_is_scalar_character(x = organism_part, error = TRUE)
+  check_is_scalar_character(x = platform, error = TRUE)
+  check_is_scalar_character(x = data_file, error = TRUE)
+  check_is_scalar_boolean(x = validate, error = TRUE)
+  check_is_scalar_boolean(x = validate_error, error = TRUE)
+  check_is_scalar_boolean(x = skip_ontology, error = TRUE)
+  if (!is.null(file)) {
+    check_is_scalar_character(x = file, error = TRUE)
+  }
+  if (!sample_id %in% colnames(metadata)) {
+    cli::cli_abort(
+      c(
+        "x" = "Column {.val {sample_id}} not found in {.arg metadata}.",
+        "i" = "Available columns: {.val {colnames(metadata)}}."
+      )
+    )
+  }
+
+  samples <- metadata |>
+    dplyr::mutate(
+      SampleID = as.character(.data[[sample_id]])
+    ) |>
+    dplyr::filter(!is.na(.data[["SampleID"]]), .data[["SampleID"]] != "") |>
+    dplyr::distinct(.data[["SampleID"]], .keep_all = TRUE)
+
+  if (nrow(samples) == 0L) {
+    cli::cli_abort("No non-missing sample IDs found in {.arg metadata}.")
+  }
+
+  platform_sdrf <- resolve_olink_sdrf_platform(platform = platform)
+  panel_values <- resolve_olink_sdrf_panel_name(
+    panel_name = panel_name,
+    metadata = samples,
+    n = nrow(samples)
+  )
+
+  tech <- sdrf_affinity_template[["technology_type_olink"]]
+  if (is.null(tech) || !nzchar(tech)) {
+    tech <- "protein expression profiling by antibody array"
+  }
+  quant_unit <- sdrf_affinity_template[["quantification_unit_olink"]]
+  if (is.null(quant_unit) || !nzchar(quant_unit)) {
+    quant_unit <- "NPX"
+  }
+  tmpl_ver <- sdrf_affinity_template[["version"]]
+  if (is.null(tmpl_ver) || !nzchar(tmpl_ver)) {
+    tmpl_ver <- "1.0.0"
+  }
+
+  is_control <- grepl(
+    pattern = "CONTROL|control|CTRL|ctrl",
+    x = samples$SampleID
+  )
+
+  # biological replicate: prefer SubjectID / Subject if present, else 1
+  bio_rep <- rep(1L, nrow(samples))
+  subj_col <- intersect(
+    c("SubjectID", "Subject", "subject_id"),
+    colnames(samples)
+  )
+  if (length(subj_col) > 0L) {
+    bio_rep <- as.integer(factor(samples[[subj_col[[1L]]]]))
+  }
+
+  sdrf <- tibble::tibble(
+    `source name` = samples$SampleID,
+    `characteristics[sample type]` = dplyr::if_else(
+      is_control,
+      "plate control",
+      "study sample"
+    ),
+    `characteristics[organism]` = organism,
+    `characteristics[organism part]` = organism_part,
+    `characteristics[biological replicate]` = bio_rep,
+    `assay name` = samples$SampleID,
+    `technology type` = tech,
+    `comment[technical replicate]` = 1L,
+    `comment[data file]` = data_file,
+    `comment[platform]` = platform_sdrf,
+    `comment[panel name]` = panel_values,
+    `comment[quantification unit]` = quant_unit,
+    `comment[sdrf version]` = paste0("v", tmpl_ver),
+    `comment[sdrf template]` = paste(
+      "affinity-proteomics",
+      paste0("v", tmpl_ver)
+    )
+  )
+
+  if (all(is.na(sdrf[["comment[panel name]"]]))) {
+    sdrf[["comment[panel name]"]] <- NULL
+  }
+
+  sdrf_write_and_validate(
+    sdrf = sdrf,
+    file = file,
+    validate = validate,
+    validate_error = validate_error,
+    skip_ontology = skip_ontology
+  )
+}
+
+#' Map a package / SDRF Olink platform name to comment[platform]
+#'
+#' @param platform Character scalar
+#' @return Full SDRF-style platform string, e.g. "Olink Target 96"
+#' @keywords internal
+#' @noRd
+#'
+resolve_olink_sdrf_platform <- function(platform) {
+  plats <- accepted_olink_platforms
+  allowed_short <- plats[["name"]]
+  allowed_full <- plats[["full_name"]]
+
+  if (platform %in% allowed_full) {
+    return(platform)
+  }
+  if (platform %in% allowed_short) {
+    return(allowed_full[[match(platform, allowed_short)]])
+  }
+  # allow "Olink ExploreHT" style typos? no — be strict
+  cli::cli_abort(
+    c(
+      "x" = "Unknown Olink {.arg platform}: {.val {platform}}.",
+      "i" = "Use one of {.val {allowed_short}}",
+      "i" = "or full names {.val {allowed_full}}."
+    )
+  )
+}
+
+#' Resolve comment[panel name] from a constant or metadata column
+#'
+#' @param panel_name NULL, scalar string, or column name
+#' @param metadata Sample table
+#' @param n Number of rows expected
+#' @return Character vector of length n (may be all NA)
+#' @keywords internal
+#' @noRd
+#'
+resolve_olink_sdrf_panel_name <- function(panel_name, metadata, n) {
+  if (is.null(panel_name)) {
+    return(rep(NA_character_, n))
+  }
+  check_is_scalar_character(x = panel_name, error = TRUE)
+  if (panel_name %in% colnames(metadata)) {
+    return(as.character(metadata[[panel_name]]))
+  }
+  rep(panel_name, n)
+}
+
+#' Write SDRF tibble and optionally validate
+#'
+#' @param sdrf Tibble
+#' @param file Path or NULL
+#' @param validate,validate_error,skip_ontology Logical
+#' @return \code{sdrf}, possibly with \code{sdrf_validation} attribute
+#' @keywords internal
+#' @noRd
+#'
+sdrf_write_and_validate <- function(sdrf,
+                                    file = NULL,
+                                    validate = TRUE,
+                                    validate_error = FALSE,
+                                    skip_ontology = TRUE) {
+  if (!is.null(file)) {
+    utils::write.table(
+      x = sdrf,
+      file = file,
+      sep = "\t",
+      quote = FALSE,
+      row.names = FALSE,
+      col.names = TRUE,
+      na = "not available"
+    )
+    cli::cli_alert_success(
+      "Wrote SDRF ({nrow(sdrf)} row{?s}) to {.file {file}}."
+    )
+
+    if (isTRUE(validate)) {
+      cli::cli_alert_info(
+        "Validating written SDRF with {.fn olink_sdrf_validate} ..."
+      )
+      validation <- olink_sdrf_validate(
+        sdrf_file = file,
+        template = "affinity-proteomics",
+        skip_ontology = skip_ontology,
+        error = validate_error
+      )
+      attr(sdrf, "sdrf_validation") <- validation
+      if (!isTRUE(validation$ok)) {
+        cli::cli_warn(
+          c(
+            "!" = "SDRF validation did not pass for {.file {file}}.",
+            "i" = "See {.code attr(sdrf, \"sdrf_validation\")} for details."
+          )
+        )
+      }
+    }
+  } else if (isTRUE(validate)) {
+    cli::cli_alert_info(
+      "Skipping validation: {.arg file} is NULL (nothing written to disk)."
+    )
+  }
+
+  sdrf
+}
+
