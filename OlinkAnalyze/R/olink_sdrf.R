@@ -633,7 +633,7 @@ generate_sdrf <- function(metadata,
   )
 }
 
-#' Map a package / SDRF Olink platform name to comment[platform]
+#' Map a package / SDRF Olink platform name to comment platform field
 #'
 #' @param platform Character scalar
 #' @return Full SDRF-style platform string, e.g. "Olink Target 96"
@@ -661,7 +661,7 @@ resolve_olink_sdrf_platform <- function(platform) {
   )
 }
 
-#' Resolve comment[panel name] from a constant or metadata column
+#' Resolve comment panel name from a constant or metadata column
 #'
 #' @param panel_name NULL, scalar string, or column name
 #' @param metadata Sample table
