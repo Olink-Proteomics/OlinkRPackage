@@ -181,10 +181,46 @@ test_that(
 test_that(
   "find_parse_sdrf - works - soft miss returns NULL",
   {
-    skip_if(
-      nzchar(Sys.which("parse_sdrf")),
-      message = "parse_sdrf is installed; soft-miss path not exercised"
+    expect_null(
+      find_parse_sdrf(
+        parse_sdrf = "definitely-not-a-real-parse-sdrf-binary",
+        error = FALSE
+      )
     )
-    expect_null(find_parse_sdrf(parse_sdrf = NULL, error = FALSE))
+  }
+)
+
+test_that(
+  "olink_sdrf_validate - warns - skips when parse_sdrf missing",
+  {
+    withr::with_tempfile(
+      "sdrf_file",
+      fileext = ".sdrf.tsv",
+      code = {
+        utils::write.table(
+          data.frame(
+            `source name` = "s1",
+            `assay name` = "a1",
+            check.names = FALSE
+          ),
+          file = sdrf_file,
+          sep = "\t",
+          quote = FALSE,
+          row.names = FALSE
+        )
+
+        expect_warning(
+          res <- olink_sdrf_validate(
+            sdrf_file = sdrf_file,
+            parse_sdrf = "definitely-not-a-real-parse-sdrf-binary",
+            error = FALSE
+          ),
+          regexp = "validation skipped"
+        )
+        expect_false(res$ok)
+        expect_true(res$skipped)
+        expect_true(is.na(res$status))
+      }
+    )
   }
 )
