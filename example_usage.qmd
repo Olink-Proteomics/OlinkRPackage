@@ -1,0 +1,274 @@
+---
+title: "OlinkAnalyze SDRF — example usage"
+subtitle: "Create and validate affinity-proteomics SDRF tables for Olink studies"
+author: "OlinkAnalyze"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    code-fold: false
+    theme: cosmo
+execute:
+  warning: false
+  message: true
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+---
+
+## Overview
+
+[SDRF](https://github.com/bigbio/proteomics-metadata-standard) (Sample and Data
+Relationship Format) describes samples, assays, and data files for proteomics
+deposition. OlinkAnalyze supports the **affinity-proteomics** template with
+three related functions:
+
+| Function | Role |
+|----------|------|
+| `olink_sdrf()` | Build SDRF from long-format **NPX** (+ optional sample metadata) |
+| `generate_sdrf()` | Build SDRF from a **sample metadata** table only (e.g. `manifest`) |
+| `olink_sdrf_validate()` | Soft-dependency check via Python `sdrf-pipelines` (`parse_sdrf`) |
+
+Column expectations come from the package YAML under
+`OlinkAnalyze/data-raw/sdrf/` (`base` → `sample-metadata` →
+`affinity-proteomics`), stored internally as `sdrf_column_dict`.
+
+This document mirrors the smoke script `example_sdrf.R`, with more explanation
+of each step. Run it from the **repository root** (the folder that contains
+`OlinkAnalyze/`).
+
+::: {.callout-note}
+## Optional validation
+
+Writing an SDRF file does **not** require Python. Validation
+(`validate = TRUE`) calls `olink_sdrf_validate()`, which needs
+`parse_sdrf` on `PATH`:
+
+```bash
+pip install "sdrf-pipelines[ontology]"
+```
+
+If it is missing and `validate_error = FALSE`, validation is **skipped** with
+a warning (`skipped = TRUE` in the result list).
+:::
+
+```{r}
+#| label: setup
+pkg_dir <- "OlinkAnalyze"
+if (!dir.exists(pkg_dir)) {
+  stop("Open / render this document from the repo root (folder with OlinkAnalyze/).")
+}
+devtools::load_all(pkg_dir, quiet = TRUE)
+```
+
+## A. `olink_sdrf()` — from NPX and sample metadata
+
+### When to use it
+
+Use `olink_sdrf()` when you already have long-format NPX (e.g. from
+`read_npx()` or package data `npx_data1`). It:
+
+1. Resolves the sample ID column via `column_name_dict` aliases  
+2. Optionally joins `sample_metadata` on that ID  
+3. Writes required affinity-proteomics headers (sample type, organism, platform, …)  
+4. Maps leftover metadata columns to `characteristics[<name>]`  
+5. Labels SampleIDs matching `CONTROL|CTRL` as `plate control`
+
+::: {.callout-important}
+## `manifest` vs `npx_data1`
+
+Package datasets `manifest` and `npx_data1` do **not** share SampleIDs. For this
+example we build `sample_metadata` from columns already on `npx_data1`.
+:::
+
+```{r}
+#| label: olink-sdrf-prepare
+npx <- OlinkAnalyze::npx_data1
+
+sample_metadata <- npx |>
+  dplyr::distinct(
+    SampleID,
+    Subject,
+    Treatment,
+    Site,
+    Time,
+    Project
+  )
+
+list(
+  npx_rows = nrow(npx),
+  unique_samples = dplyr::n_distinct(npx$SampleID),
+  metadata_rows = nrow(sample_metadata),
+  overlap_with_manifest = length(
+    intersect(unique(npx$SampleID), unique(OlinkAnalyze::manifest$SampleID))
+  )
+)
+```
+
+### Call
+
+Important arguments:
+
+- `npx` — long NPX table  
+- `sample_metadata` — one row per sample (optional)  
+- `platform` — e.g. `"Olink Target 96"`, `"Olink Explore HT"`  
+- `organism` / `organism_part` — defaults `"homo sapiens"` / `"blood"`  
+- `file` — path to write `*.sdrf.tsv` (required for on-disk validation)  
+- `validate` — run `olink_sdrf_validate()` after write  
+
+```{r}
+#| label: olink-sdrf-run
+out_npx <- file.path(getwd(), "smoke_olink.sdrf.tsv")
+
+sdrf_npx <- olink_sdrf(
+  npx = npx,
+  sample_metadata = sample_metadata,
+  file = out_npx,
+  data_file = "npx_data1.tsv",
+  platform = "Olink Target 96",
+  organism = "homo sapiens",
+  organism_part = "blood",
+  validate = TRUE,
+  validate_error = FALSE,
+  skip_ontology = TRUE
+)
+
+utils::head(sdrf_npx, 3L)
+```
+
+```{r}
+#| label: olink-sdrf-validation
+validation_npx <- attr(sdrf_npx, "sdrf_validation")
+if (is.null(validation_npx)) {
+  message("No validation attribute (parse_sdrf missing, or validate = FALSE).")
+} else {
+  validation_npx[c("ok", "status", "skipped", "template", "sdrf_file")]
+}
+```
+
+## B. `generate_sdrf()` — from metadata only
+
+### When to use it
+
+Use `generate_sdrf()` when you have a **sample plate map / study metadata**
+table but no NPX yet (or you only need sample-level SDRF). The package
+`manifest` dataset is a good example: `SubjectID`, `Visit`, `SampleID`, `Site`.
+
+It:
+
+1. Requires a sample ID column (`sample_id = "SampleID"` by default)  
+2. Sets Olink platform via `get_all_olink_platforms()` short or full names  
+3. Optionally sets `comment[panel name]` from a constant or a metadata column  
+4. Turns **all other** metadata columns into `characteristics[<column>]`  
+5. Uses `SubjectID` / `Subject` for `characteristics[biological replicate]` when present  
+
+```{r}
+#| label: platforms
+get_all_olink_platforms()
+```
+
+```{r}
+#| label: manifest-preview
+manifest <- OlinkAnalyze::manifest
+utils::head(manifest, 5L)
+```
+
+### Call (Target 96)
+
+```{r}
+#| label: generate-sdrf-target96
+out_manifest <- file.path(getwd(), "smoke_manifest.sdrf.tsv")
+
+sdrf_manifest <- generate_sdrf(
+  metadata = manifest,
+  sample_id = "SampleID",
+  platform = "Target 96",
+  panel_name = "Inflammation",
+  organism = "homo sapiens",
+  organism_part = "blood",
+  file = out_manifest,
+  data_file = "manifest_study.tsv",
+  validate = TRUE,
+  validate_error = FALSE,
+  skip_ontology = TRUE
+)
+
+colnames(sdrf_manifest)
+utils::head(sdrf_manifest, 3L)
+```
+
+Leftover `manifest` columns appear as characteristics, for example
+`characteristics[SubjectID]`, `characteristics[Visit]`, and
+`characteristics[Site]`.
+
+```{r}
+#| label: generate-sdrf-validation
+validation_manifest <- attr(sdrf_manifest, "sdrf_validation")
+if (is.null(validation_manifest)) {
+  message("No validation attribute.")
+} else {
+  validation_manifest[c("ok", "status", "skipped", "template")]
+}
+```
+
+### Same metadata, Explore HT panel
+
+`platform` accepts short names from `get_all_olink_platforms()` or full names
+such as `"Olink Explore HT"`.
+
+```{r}
+#| label: generate-sdrf-explore-ht
+out_ht <- file.path(getwd(), "smoke_manifest_explore_ht.sdrf.tsv")
+
+sdrf_ht <- generate_sdrf(
+  metadata = manifest,
+  platform = "Explore HT",
+  panel_name = "Explore 1536",
+  file = out_ht,
+  validate = TRUE,
+  validate_error = FALSE
+)
+
+unique(sdrf_ht[["comment[platform]"]])
+unique(sdrf_ht[["comment[panel name]"]])
+isTRUE(attr(sdrf_ht, "sdrf_validation")$ok)
+```
+
+## C. `olink_sdrf_validate()` — check a written file
+
+You can validate any SDRF TSV independently (not only files just written by
+the create helpers):
+
+```{r}
+#| label: validate-standalone
+if (!nzchar(Sys.which("parse_sdrf"))) {
+  message("parse_sdrf not on PATH — skipping standalone validate demo.")
+} else {
+  res <- olink_sdrf_validate(
+    sdrf_file = out_manifest,
+    template = "affinity-proteomics",
+    skip_ontology = TRUE,
+    error = FALSE
+  )
+  print(res[c("ok", "status", "skipped", "template")])
+}
+```
+
+If `parse_sdrf` is missing, `olink_sdrf_validate(..., error = FALSE)` warns that
+validation was skipped and returns `skipped = TRUE`.
+
+## Outputs
+
+This document writes (gitignored) smoke files under the repo root:
+
+- `smoke_olink.sdrf.tsv` — from `olink_sdrf()`  
+- `smoke_manifest.sdrf.tsv` — from `generate_sdrf()` (Target 96)  
+- `smoke_manifest_explore_ht.sdrf.tsv` — from `generate_sdrf()` (Explore HT)  
+
+## See also
+
+- Design note: `docs/design/sample-metadata-contract.md`  
+- YAML templates: `OlinkAnalyze/data-raw/sdrf/`  
+- Unit tests: `OlinkAnalyze/tests/testthat/test-olink_sdrf.R`  
+- Smoke script: `example_sdrf.R`  
