@@ -1,0 +1,315 @@
+---
+title: "DIA-NN → MSstats protein → NPX"
+subtitle: "End-to-end demo with MSstatsConvert tinytest DIANN fixtures and `MSstatstoNPX()`"
+author: "OlinkAnalyze"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    code-fold: false
+    theme: cosmo
+execute:
+  warning: false
+  message: true
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+---
+
+## Goal
+
+This notebook shows how to:
+
+1. Read the **DIA-NN** example report shipped with
+   [MSstatsConvert](https://github.com/Vitek-Lab/MSstatsConvert)
+   (`inst/tinytest/raw_data/DIANN` on the `devel` branch)
+2. Convert it to MSstats input with `DIANNtoMSstatsFormat()`
+3. Summarise to **protein-level** intensities with `dataProcess()`
+4. Reformat that protein table to **NPX-style** long data with
+   OlinkAnalyze `MSstatstoNPX()`
+
+```{mermaid}
+flowchart LR
+  A[DIA-NN report + annotation] --> B[DIANNtoMSstatsFormat]
+  B --> C[dataProcess ProteinLevelData]
+  C --> D[MSstatstoNPX]
+  D --> E[OlinkAnalyze NPX tibble]
+```
+
+::: {.callout-note}
+## Dependencies
+
+- **Bioconductor:** `MSstats`, `MSstatsConvert` (install with
+  `BiocManager::install(c("MSstats", "MSstatsConvert"))`)
+- **OlinkAnalyze:** this repo — load with `devtools::load_all("OlinkAnalyze")`
+- Render from the **repository root**
+:::
+
+## Setup
+
+```{r}
+#| label: setup
+pkg_dir <- "OlinkAnalyze"
+if (!dir.exists(pkg_dir)) {
+  stop("Render / knit from the repo root (folder that contains OlinkAnalyze/).")
+}
+
+# Prefer personal library + optional local MSstats renv tree used in development
+user_lib <- file.path(
+  Sys.getenv("HOME"),
+  "R",
+  paste0(R.version$platform, "-library"),
+  paste(R.version$major, strsplit(R.version$minor, ".", fixed = TRUE)[[1L]][[1L]], sep = ".")
+)
+ms_renv_lib <- file.path(
+  Sys.getenv("HOME"),
+  ".cache/R/renv/library/test_MSstats-b57ec874/linux-ubuntu-noble/R-4.6/x86_64-pc-linux-gnu"
+)
+extra_libs <- c(user_lib, ms_renv_lib)
+extra_libs <- extra_libs[dir.exists(extra_libs)]
+if (length(extra_libs) > 0L) {
+  .libPaths(unique(c(extra_libs, .libPaths())))
+}
+
+needed <- c("MSstats", "MSstatsConvert", "data.table")
+missing_pkgs <- needed[!vapply(needed, requireNamespace, logical(1), quietly = TRUE)]
+if (length(missing_pkgs) > 0L) {
+  stop(
+    "Install missing packages first: ",
+    paste(missing_pkgs, collapse = ", "),
+    "\nExample: BiocManager::install(c(\"MSstats\", \"MSstatsConvert\"))",
+    "\nCurrent .libPaths():\n  ", paste(.libPaths(), collapse = "\n  ")
+  )
+}
+
+suppressPackageStartupMessages({
+  library(MSstats)
+  library(MSstatsConvert)
+  library(data.table)
+  library(dplyr)
+})
+
+if (requireNamespace("pkgload", quietly = TRUE)) {
+  pkgload::load_all(pkg_dir, quiet = TRUE)
+} else if (requireNamespace("devtools", quietly = TRUE)) {
+  devtools::load_all(pkg_dir, quiet = TRUE)
+} else {
+  stop("Install pkgload or devtools to load the local OlinkAnalyze package.")
+}
+```
+
+## Locate DIA-NN tinytest data
+
+Prefer the copy installed with `MSstatsConvert`. If that is unavailable
+(older CRAN builds may omit `tinytest/`), fall back to a local cache path
+or download from the GitHub `devel` tree.
+
+Source on GitHub:
+[MSstatsConvert/tree/devel/inst/tinytest/raw_data/DIANN](https://github.com/Vitek-Lab/MSstatsConvert/tree/devel/inst/tinytest/raw_data/DIANN)
+
+```{r}
+#| label: locate-diann-data
+diann_dir <- system.file(
+  "tinytest", "raw_data", "DIANN",
+  package = "MSstatsConvert"
+)
+
+if (!nzchar(diann_dir) || !dir.exists(diann_dir)) {
+  # Optional local fallback used during development
+  fallback <- path.expand(
+    "~/.cache/R/renv/library/test_MSstats-b57ec874/linux-ubuntu-noble/R-4.6/x86_64-pc-linux-gnu/MSstatsConvert/tinytest/raw_data/DIANN"
+  )
+  if (dir.exists(fallback)) {
+    diann_dir <- fallback
+    message("Using local fallback DIANN tinytest directory.")
+  } else {
+    stop(
+      "Could not find MSstatsConvert DIANN tinytest data.\n",
+      "Install a build that includes inst/tinytest/, or clone:\n",
+      "  https://github.com/Vitek-Lab/MSstatsConvert/tree/devel"
+    )
+  }
+}
+
+diann_report_path <- file.path(diann_dir, "diann_input.tsv")
+annotation_path <- file.path(diann_dir, "annotation.csv")
+
+stopifnot(file.exists(diann_report_path), file.exists(annotation_path))
+list(
+  diann_dir = diann_dir,
+  report = basename(diann_report_path),
+  annotation = basename(annotation_path)
+)
+```
+
+### Peek at inputs
+
+```{r}
+#| label: peek-inputs
+diann_report <- data.table::fread(diann_report_path)
+annotation <- data.table::fread(annotation_path)
+
+list(
+  report_dim = dim(diann_report),
+  report_cols = names(diann_report)[seq_len(min(8L, ncol(diann_report)))],
+  annotation = annotation
+)
+```
+
+The annotation maps each `Run` to a `Condition` and `BioReplicate` (here:
+`0.1fmol` vs `0.25fmol`).
+
+## Convert DIA-NN → MSstats format
+
+`DIANNtoMSstatsFormat()` produces the feature-level table MSstats expects
+(ProteinName, peptide/feature columns, Intensity, Condition, …).
+
+```{r}
+#| label: diann-to-msstats
+msstats_input <- DIANNtoMSstatsFormat(
+  input = diann_report,
+  annotation = annotation,
+  MBR = FALSE,
+  use_log_file = FALSE
+)
+
+dim(msstats_input)
+utils::head(msstats_input, 3L)
+```
+
+## Summarise to protein level
+
+`dataProcess()` aggregates features to protein-level log-intensities
+(`ProteinLevelData`), which is the table `MSstatstoNPX()` expects.
+
+```{r}
+#| label: data-process
+processed <- dataProcess(
+  msstats_input,
+  use_log_file = FALSE
+)
+
+protein_level <- processed$ProteinLevelData
+dim(protein_level)
+utils::head(protein_level, 3L)
+```
+
+Key columns for the next step:
+
+| MSstats column | Role in NPX conversion |
+|----------------|------------------------|
+| `Protein` | → `UniProt` / `Assay` (+ synthetic `OlinkID`) |
+| `LogIntensities` | → `NPX` |
+| `originalRUN` | → `SampleID` |
+| `GROUP` | → `Condition` / `PlateID` |
+| `SUBJECT` | → `Subject` |
+| `more50missing` | contributes to `QC_Warning` |
+
+## Convert protein level → NPX with `MSstatstoNPX()`
+
+```{r}
+#| label: msstats-to-npx
+npx <- MSstatstoNPX(
+  data = protein_level,
+  panel = "MSstats/DIANN protein",
+  check = TRUE,
+  clean = FALSE
+)
+
+dim(npx)
+colnames(npx)
+utils::head(npx, 5L)
+```
+
+```{r}
+#| label: npx-summary
+dplyr::count(npx, SampleID, Condition)
+dplyr::count(npx, QC_Warning)
+```
+
+Optional: persist for downstream scripts.
+
+```{r}
+#| label: write-npx
+out_dir <- "results"
+dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
+out_csv <- file.path(out_dir, "diann_msstats_protein_npx.csv")
+utils::write.csv(npx, out_csv, row.names = FALSE)
+out_csv
+```
+
+## Quick OlinkAnalyze look
+
+Drop non-finite NPX before plotting / testing. With two conditions in the
+tinytest annotation, a simple t-test is possible.
+
+```{r}
+#| label: olink-dist
+#| fig-width: 8
+#| fig-height: 4.5
+npx_plot <- dplyr::filter(npx, is.finite(NPX))
+
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  olink_dist_plot(npx_plot, color_g = "Condition")
+}
+```
+
+```{r}
+#| label: olink-ttest
+npx_ttest <- npx_plot |>
+  dplyr::filter(!is.na(.data[["Condition"]])) |>
+  dplyr::mutate(Condition = factor(.data[["Condition"]]))
+
+n_cond <- nlevels(npx_ttest$Condition)
+if (n_cond == 2L) {
+  # Keep proteins measured in both conditions with >=2 samples each
+  keep_oids <- npx_ttest |>
+    dplyr::count(.data[["OlinkID"]], .data[["Condition"]]) |>
+    dplyr::group_by(.data[["OlinkID"]]) |>
+    dplyr::summarise(
+      n_cond = dplyr::n(),
+      min_n = min(.data[["n"]]),
+      .groups = "drop"
+    ) |>
+    dplyr::filter(.data[["n_cond"]] == 2L, .data[["min_n"]] >= 2L) |>
+    dplyr::pull(.data[["OlinkID"]])
+
+  if (length(keep_oids) == 0L) {
+    message(
+      "Tinytest DIANN set is too sparse for olink_ttest() ",
+      "(need >=2 samples per Condition for some proteins)."
+    )
+  } else {
+    npx_ttest <- dplyr::filter(npx_ttest, .data[["OlinkID"]] %in% keep_oids)
+    ttest_results <- tryCatch(
+      olink_ttest(npx_ttest, variable = "Condition"),
+      error = function(e) {
+        message("olink_ttest() skipped: ", conditionMessage(e))
+        NULL
+      }
+    )
+    if (!is.null(ttest_results)) {
+      utils::head(dplyr::arrange(ttest_results, .data[["Adjusted_pval"]]), 10L)
+    }
+  }
+} else {
+  message(
+    "Need exactly 2 Condition levels for olink_ttest(); found ",
+    n_cond, ": ",
+    paste(levels(npx_ttest$Condition), collapse = ", ")
+  )
+}
+```
+
+## Summary
+
+| Step | Function | Output |
+|------|----------|--------|
+| Read DIANN tinytest | `fread(diann_input.tsv)` + `annotation.csv` | DIA-NN report |
+| Feature-level MSstats | `DIANNtoMSstatsFormat()` | 11-column MSstats table |
+| Protein summarisation | `dataProcess()` | `ProteinLevelData` |
+| NPX-style long table | `MSstatstoNPX()` | OlinkAnalyze-ready tibble |
+
+Synthetic `OlinkID`s (`OID#####`) are assigned per protein so helpers that
+expect an Olink ID column can run. They are **not** real Olink assay IDs.
