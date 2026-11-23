@@ -61,8 +61,8 @@ MSstatstoNPX <- function(data,
   check_is_scalar_boolean(x = check, error = TRUE)
   check_is_scalar_boolean(x = clean, error = TRUE)
 
-  protein_tbl <- _msstats_read_protein_level(data = data)
-  protein_tbl <- _msstats_harmonize_protein_level(df = protein_tbl)
+  protein_tbl <- msstats_read_protein_level(data = data)
+  protein_tbl <- msstats_harmonize_protein_level(df = protein_tbl)
 
   protein_ids <- protein_tbl |>
     dplyr::distinct(.data[["protein"]]) |>
@@ -147,7 +147,7 @@ MSstatstoNPX <- function(data,
 #' @keywords internal
 #' @noRd
 #'
-_msstats_read_protein_level <- function(data) {
+msstats_read_protein_level <- function(data) {
   if (is.character(data)) {
     check_is_scalar_character(x = data, error = TRUE)
     if (!file.exists(data)) {
@@ -194,8 +194,8 @@ _msstats_read_protein_level <- function(data) {
 #' @keywords internal
 #' @noRd
 #'
-_msstats_harmonize_protein_level <- function(df) {
-  names(df) <- _msstats_clean_colnames(names(df))
+msstats_harmonize_protein_level <- function(df) {
+  names(df) <- msstats_clean_colnames(names(df))
 
   required_cols <- c("protein", "log_intensities")
   missing <- setdiff(required_cols, names(df))
@@ -254,7 +254,7 @@ _msstats_harmonize_protein_level <- function(df) {
 #' @keywords internal
 #' @noRd
 #'
-_msstats_clean_colnames <- function(nms) {
+msstats_clean_colnames <- function(nms) {
   nms <- as.character(nms)
   # Insert underscores at camelCase / digit boundaries (janitor-like)
   nms <- gsub(
