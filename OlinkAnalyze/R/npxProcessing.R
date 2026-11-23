@@ -95,44 +95,26 @@ npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
       .data[[check_log$col_names$sample_id]]
     )
 
-  # wide format
-  df_wide <- df_temp |>
-    dplyr::select(
-      dplyr::all_of(
-        c(check_log$col_names$sample_id,
-          check_log$col_names$olink_id,
-          check_log$col_names$quant)
-      )
-    ) |>
-    dplyr::filter(
-      !is.na(.data[[check_log$col_names$quant]])
-    ) |>
-    tidyr::pivot_wider(
-      names_from = dplyr::all_of(check_log$col_names$olink_id),
-      values_from = dplyr::all_of(check_log$col_names$quant),
-      names_sort = TRUE
-    )
-
-  #### If drop_assays == T, drop assays with any missing values ####
+  # Widen and optionally remove assays with any missing measurements.
+  shaped <- shape_long_to_wide(
+    df = df_temp,
+    sample_col = check_log$col_names$sample_id,
+    assay_col = check_log$col_names$olink_id,
+    value_col = check_log$col_names$quant,
+    drop_missing_values = TRUE,
+    drop_assays = drop_assays,
+    names_sort = TRUE,
+    return_details = TRUE
+  )
+  df_wide <- shaped$data
   if (drop_assays) {
-    dropped_assays.na <- colnames(df_wide[, -c(1)])[apply( # nolint: object_name_linter
-      df_wide[, -c(1)],
-      2,
-      anyNA
-    )]
-
-    df_wide <- df_wide |>
-      dplyr::select(
-        -dplyr::all_of(dropped_assays.na)
-      )
-
+    dropped_assays.na <- shaped$dropped_assays # nolint: object_name_linter
     if (verbose) {
       cli::cli_warn(
         "{length(dropped_assays.na)} assay{?s} contain NA and
         {?is/are} dropped."
       )
     }
-
     if (ncol(df_wide) < 4) {
       cli::cli_abort(
         "Too many assays were removed. Set `drop_assays = FALSE` to use
@@ -143,18 +125,23 @@ npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
     dropped_assays.na <- NULL # nolint: object_name_linter
   }
 
-  #### If drop_samples == T, drop samples with any missing values ####
+  # Remove samples after the assay check so errors and warnings retain order.
   if (drop_samples) {
-    dropped_samples <- apply(df_wide[, -c(1)], 1, anyNA)
-    df_wide <- df_wide[!dropped_samples, ]
-
+    n_samples_before <- nrow(df_wide)
+    shaped <- shape_filter_wide(
+      df = df_wide,
+      row_col = check_log$col_names$sample_id,
+      orientation = "assays_in_columns",
+      drop_samples = TRUE
+    )
+    df_wide <- shaped$data
     if (verbose) {
+      # Preserve the existing warning count, which used the logical mask length.
       cli::cli_warn(
-        "{length(dropped_samples)} sample{?s} contain NA and
+        "{n_samples_before} sample{?s} contain NA and
         {?is/are} dropped."
       )
     }
-
     if (nrow(df_wide) < 2) {
       cli::cli_abort(
         "Too many samples were removed. Set `drop_assays = FALSE` to use
@@ -163,27 +150,20 @@ npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
     }
   }
 
-  #### Drop assays with too many missing values ####
-  # Missingness per assay
-  percent_missingness <- colSums(is.na(df_wide[, -c(1)])) / nrow(df_wide)
-
-  # assays with missingness > 10% are dropped from the PCA
+  # The cutoff is selected after sample removal and before imputation.
   PERCENT_CUTOFF <- 0.1 # nolint: object_name_linter
-
-  # If there are fewer samples than one plate (88), the PERCENT_CUTOFF is 0.05
   if (nrow(df_wide) <= 88) {
     PERCENT_CUTOFF <- 0.05 # nolint: object_name_linter
   }
-
-  if (any(percent_missingness > PERCENT_CUTOFF)) {
-    removed_assays_index <- which(percent_missingness > PERCENT_CUTOFF)
-    percent_missingness <- percent_missingness[-removed_assays_index]
-
-    removed_assays_index <- removed_assays_index + 1
-    dropped_assays.missingness <- colnames(df_wide)[removed_assays_index] # nolint: object_name_linter
-
-    df_wide <- df_wide[, -removed_assays_index]
-
+  shaped <- shape_filter_wide(
+    df = df_wide,
+    row_col = check_log$col_names$sample_id,
+    orientation = "assays_in_columns",
+    assay_missingness_cutoff = PERCENT_CUTOFF
+  )
+  df_wide <- shaped$data
+  if (length(shaped$dropped_assays_missingness) > 0L) {
+    dropped_assays.missingness <- shaped$dropped_assays_missingness # nolint: object_name_linter
     if (verbose) {
       cli::cli_warn(
         "{length(dropped_assays.missingness)} assay{?s} were dropped due
@@ -193,6 +173,7 @@ npxProcessing_forDimRed <- function(df, # nolint: object_name_linter
   } else {
     dropped_assays.missingness <- NULL # nolint: object_name_linter
   }
+  percent_missingness <- colSums(is.na(df_wide[, -c(1)])) / nrow(df_wide)
 
   #### Impute remaining missing values by the assay median ####
   if (any(percent_missingness <= PERCENT_CUTOFF & percent_missingness > 0)) {

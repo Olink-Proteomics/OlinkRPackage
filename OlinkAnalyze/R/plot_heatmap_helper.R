@@ -125,16 +125,13 @@ plot_heatmap_clean_df <- function(df, check_log, colnames) {
 plot_heatmap_df_to_wide <- function(df,
                                     check_log,
                                     colnames) {
-  df_wide <- df |>
-    tidyr::pivot_wider(
-      id_cols = dplyr::all_of(check_log$col_names$sample_id),
-      names_from = dplyr::all_of(colnames),
-      values_from =
-        dplyr::all_of(check_log$col_names$quant)
-    ) |>
-    tibble::column_to_rownames(
-      check_log$col_names$sample_id
-    )
+  df_wide <- shape_long_to_wide(
+    df = df,
+    sample_col = check_log$col_names$sample_id,
+    assay_col = colnames,
+    value_col = check_log$col_names$quant
+  ) |>
+    tibble::column_to_rownames(check_log$col_names$sample_id)
   return(df_wide)
 }
 
