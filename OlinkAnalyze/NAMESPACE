@@ -3,6 +3,7 @@
 S3method(dplyr::dplyr_reconstruct,olink_class)
 S3method(pillar::tbl_sum,olink_class)
 S3method(tibble::as_tibble,olink_class)
+export(MSstatstoNPX)
 export(check_npx)
 export(clean_npx)
 export(extract_check_log)
