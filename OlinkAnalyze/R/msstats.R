@@ -44,25 +44,25 @@
 #' @examples
 #' \dontrun{
 #'   # From dataProcess()$ProteinLevelData
-#'   npx <- MSstatstoNPX(processed_data$ProteinLevelData)
+#'   npx <- msstats_to_npx(processed_data$ProteinLevelData)
 #'
 #'   # From a CSV written by MSstats
-#'   npx <- MSstatstoNPX("processed_data_protein_level.csv", check = TRUE)
+#'   npx <- msstats_to_npx("processed_data_protein_level.csv", check = TRUE)
 #' }
 #'
-MSstatstoNPX <- function(data,
-                         panel = "MSstats/DIANN protein",
-                         panel_version = "none",
-                         check = FALSE,
-                         clean = FALSE) {
+msstats_to_npx <- function(data,
+                           panel = "MSstats/DIANN protein",
+                           panel_version = "none",
+                           check = FALSE,
+                           clean = FALSE) {
 
   check_is_scalar_character(x = panel, error = TRUE)
   check_is_scalar_character(x = panel_version, error = TRUE)
   check_is_scalar_boolean(x = check, error = TRUE)
   check_is_scalar_boolean(x = clean, error = TRUE)
 
-  protein_tbl <- msstats_read_protein_level(data = data)
-  protein_tbl <- msstats_harmonize_protein_level(df = protein_tbl)
+  protein_tbl <- msstats_read_protein(data = data)
+  protein_tbl <- msstats_harmonize_protein(df = protein_tbl)
 
   protein_ids <- protein_tbl |>
     dplyr::distinct(.data[["protein"]]) |>
@@ -137,7 +137,7 @@ MSstatstoNPX <- function(data,
       )
   }
 
-  npx_tbl
+  return(npx_tbl)
 }
 
 #' Read MSstats protein-level table from data frame or file path
@@ -147,7 +147,7 @@ MSstatstoNPX <- function(data,
 #' @keywords internal
 #' @noRd
 #'
-msstats_read_protein_level <- function(data) {
+msstats_read_protein <- function(data) {
   if (is.character(data)) {
     check_is_scalar_character(x = data, error = TRUE)
     if (!file.exists(data)) {
@@ -184,7 +184,7 @@ msstats_read_protein_level <- function(data) {
     )
   }
 
-  tibble::as_tibble(data)
+  return(tibble::as_tibble(data))
 }
 
 #' Harmonize MSstats protein-level column names and required fields
@@ -194,7 +194,7 @@ msstats_read_protein_level <- function(data) {
 #' @keywords internal
 #' @noRd
 #'
-msstats_harmonize_protein_level <- function(df) {
+msstats_harmonize_protein <- function(df) {
   names(df) <- msstats_clean_colnames(names(df))
 
   required_cols <- c("protein", "log_intensities")
@@ -239,12 +239,14 @@ msstats_harmonize_protein_level <- function(df) {
       dplyr::mutate(subject = NA_character_)
   }
 
-  df |>
-    dplyr::mutate(
-      protein = as.character(.data[["protein"]]),
-      log_intensities = as.numeric(.data[["log_intensities"]]),
-      original_run = as.character(.data[["original_run"]])
-    )
+  return(
+    df |>
+      dplyr::mutate(
+        protein = as.character(.data[["protein"]]),
+        log_intensities = as.numeric(.data[["log_intensities"]]),
+        original_run = as.character(.data[["original_run"]])
+      )
+  )
 }
 
 #' Snake-case column names (janitor::clean_names-like, no extra dependency)
@@ -271,5 +273,5 @@ msstats_clean_colnames <- function(nms) {
   nms <- gsub(pattern = "[^a-z0-9]+", replacement = "_", x = nms)
   nms <- gsub(pattern = "^_|_$", replacement = "", x = nms)
   nms <- gsub(pattern = "_+", replacement = "_", x = nms)
-  make.unique(nms, sep = "_")
+  return(make.unique(nms, sep = "_"))
 }

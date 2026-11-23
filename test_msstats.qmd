@@ -1,6 +1,6 @@
 ---
 title: "DIA-NN → MSstats protein → NPX"
-subtitle: "End-to-end demo with MSstatsConvert tinytest DIANN fixtures and `MSstatstoNPX()`"
+subtitle: "End-to-end demo with MSstatsConvert tinytest DIANN fixtures and `msstats_to_npx()`"
 author: "OlinkAnalyze"
 format:
   html:
@@ -27,13 +27,13 @@ This notebook shows how to:
 2. Convert it to MSstats input with `DIANNtoMSstatsFormat()`
 3. Summarise to **protein-level** intensities with `dataProcess()`
 4. Reformat that protein table to **NPX-style** long data with
-   OlinkAnalyze `MSstatstoNPX()`
+   OlinkAnalyze `msstats_to_npx()`
 
 ```{mermaid}
 flowchart LR
   A[DIA-NN report + annotation] --> B[DIANNtoMSstatsFormat]
   B --> C[dataProcess ProteinLevelData]
-  C --> D[MSstatstoNPX]
+  C --> D[msstats_to_npx]
   D --> E[OlinkAnalyze NPX tibble]
 ```
 
@@ -181,7 +181,7 @@ utils::head(msstats_input, 3L)
 ## Summarise to protein level
 
 `dataProcess()` aggregates features to protein-level log-intensities
-(`ProteinLevelData`), which is the table `MSstatstoNPX()` expects.
+(`ProteinLevelData`), which is the table `msstats_to_npx()` expects.
 
 ```{r}
 #| label: data-process
@@ -206,11 +206,11 @@ Key columns for the next step:
 | `SUBJECT` | → `Subject` |
 | `more50missing` | contributes to `QC_Warning` |
 
-## Convert protein level → NPX with `MSstatstoNPX()`
+## Convert protein level → NPX with `msstats_to_npx()`
 
 ```{r}
 #| label: msstats-to-npx
-npx <- MSstatstoNPX(
+npx <- msstats_to_npx(
   data = protein_level,
   panel = "MSstats/DIANN protein",
   check = TRUE,
@@ -309,7 +309,7 @@ if (n_cond == 2L) {
 | Read DIANN tinytest | `fread(diann_input.tsv)` + `annotation.csv` | DIA-NN report |
 | Feature-level MSstats | `DIANNtoMSstatsFormat()` | 11-column MSstats table |
 | Protein summarisation | `dataProcess()` | `ProteinLevelData` |
-| NPX-style long table | `MSstatstoNPX()` | OlinkAnalyze-ready tibble |
+| NPX-style long table | `msstats_to_npx()` | OlinkAnalyze-ready tibble |
 
 Synthetic `OlinkID`s (`OID#####`) are assigned per protein so helpers that
 expect an Olink ID column can run. They are **not** real Olink assay IDs.
