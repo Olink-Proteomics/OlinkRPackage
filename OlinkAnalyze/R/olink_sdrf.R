@@ -29,7 +29,8 @@
 #' Columns typically written (official SDRF headers; Olink-oriented examples):
 #' \tabular{lll}{
 #'   Header \tab Requirement \tab Olink example values \cr
-#'   \code{source name} / \code{assay name} \tab required \tab SampleID from NPX \cr
+#'   \code{source name} / \code{assay name} \tab required \tab
+#'     SampleID from NPX \cr
 #'   \code{characteristics[sample type]} \tab required \tab
 #'     study sample; plate control \cr
 #'   \code{characteristics[organism]} \tab required \tab homo sapiens \cr
@@ -131,6 +132,7 @@ olink_sdrf <- function(npx,
     if (!inherits(x, c("data.frame", "tbl_df", "tbl"))) {
       cli::cli_abort("{.arg {arg}} must be a data.frame or tibble.")
     }
+    return(invisible(NULL))
   }
   check_is_tibble_or_df(npx, "npx")
   if (!is.null(sample_metadata)) {
@@ -236,7 +238,7 @@ olink_sdrf <- function(npx,
     x = samples$SampleID
   )
 
-  extra_chars <- sdrf_characteristics_from_metadata(
+  extra_chars <- sdrf_chars_from_meta(
     metadata = samples,
     skip_cols = c("SampleID", ".panel", ".plate")
   )
@@ -283,12 +285,14 @@ olink_sdrf <- function(npx,
   # silence unused binding (kept for future richer mapping)
   force(sdrf_official_names)
 
-  sdrf_write_and_validate(
-    sdrf = sdrf,
-    file = file,
-    validate = validate,
-    validate_error = validate_error,
-    skip_ontology = skip_ontology
+  return(
+    sdrf_write_and_validate(
+      sdrf = sdrf,
+      file = file,
+      validate = validate,
+      validate_error = validate_error,
+      skip_ontology = skip_ontology
+    )
   )
 }
 
@@ -393,7 +397,11 @@ olink_sdrf_validate <- function(sdrf_file,
     )
     cli::cli_warn(
       c(
-        "!" = "SDRF validation skipped: {.cmd parse_sdrf} (from sdrf-pipelines) is not installed or not on {.envvar PATH}.",
+        "!" = paste(
+          "SDRF validation skipped: {.cmd parse_sdrf}",
+          "(from sdrf-pipelines) is not installed or not on",
+          "{.envvar PATH}."
+        ),
         "i" = "Install with: {.code pip install \"sdrf-pipelines[ontology]\"}",
         "i" = "Or pass {.arg parse_sdrf} with the full path to the executable."
       )
@@ -471,11 +479,14 @@ olink_sdrf_validate <- function(sdrf_file,
 
   if (result$ok) {
     cli::cli_alert_success(
-      "SDRF validation passed for {.file {sdrf_file}} (template {.val {template}})."
+      paste(
+        "SDRF validation passed for {.file {sdrf_file}}",
+        "(template {.val {template}})."
+      )
     )
   }
 
-  result
+  return(result)
 }
 
 #' Locate the parse_sdrf executable from sdrf-pipelines
@@ -517,14 +528,17 @@ find_parse_sdrf <- function(parse_sdrf = NULL, error = TRUE) {
           "x" = "{.cmd parse_sdrf} not found on {.envvar PATH}.",
           "i" = "Install sdrf-pipelines, then retry:",
           " " = "{.code pip install \"sdrf-pipelines[ontology]\"}",
-          "i" = "Or pass {.arg parse_sdrf} with the full path to the executable."
+          "i" = paste(
+            "Or pass {.arg parse_sdrf} with the full path",
+            "to the executable."
+          )
         )
       )
     }
     return(NULL)
   }
 
-  exe
+  return(exe)
 }
 
 #' Generate an Olink affinity-proteomics SDRF from a metadata table
@@ -536,9 +550,9 @@ find_parse_sdrf <- function(parse_sdrf = NULL, error = TRUE) {
 #' `data-raw/sdrf/affinity-proteomics.yaml` (merged with base /
 #' sample-metadata).
 #'
-#' Defaults assume **human blood** samples run on an Olink platform. Choose the
-#' platform with \code{platform} (see [get_all_olink_platforms()]) and optionally
-#' set \code{panel_name} (constant or a column in \code{metadata}).
+#' Defaults assume **human blood** samples run on an Olink platform. Choose
+#' the platform with \code{platform} (see [get_all_olink_platforms()]) and
+#' optionally set \code{panel_name} (constant or a column in \code{metadata}).
 #'
 #' @details
 #' Same core affinity columns as [olink_sdrf()]. Olink-oriented examples:
@@ -685,7 +699,7 @@ generate_sdrf <- function(metadata,
   if (!is.null(panel_name) && panel_name %in% colnames(samples)) {
     skip_meta_cols <- c(skip_meta_cols, panel_name)
   }
-  extra_chars <- sdrf_characteristics_from_metadata(
+  extra_chars <- sdrf_chars_from_meta(
     metadata = samples,
     skip_cols = skip_meta_cols
   )
@@ -725,12 +739,14 @@ generate_sdrf <- function(metadata,
     sdrf[["comment[panel name]"]] <- NULL
   }
 
-  sdrf_write_and_validate(
-    sdrf = sdrf,
-    file = file,
-    validate = validate,
-    validate_error = validate_error,
-    skip_ontology = skip_ontology
+  return(
+    sdrf_write_and_validate(
+      sdrf = sdrf,
+      file = file,
+      validate = validate,
+      validate_error = validate_error,
+      skip_ontology = skip_ontology
+    )
   )
 }
 
@@ -760,6 +776,7 @@ resolve_olink_sdrf_platform <- function(platform) {
       "i" = "or full names {.val {allowed_full}}."
     )
   )
+  return(invisible(NULL))
 }
 
 #' Resolve comment panel name from a constant or metadata column
@@ -779,7 +796,7 @@ resolve_olink_sdrf_panel_name <- function(panel_name, metadata, n) {
   if (panel_name %in% colnames(metadata)) {
     return(as.character(metadata[[panel_name]]))
   }
-  rep(panel_name, n)
+  return(rep(panel_name, n))
 }
 
 #' Map leftover metadata columns to characteristics[col] SDRF headers
@@ -790,7 +807,7 @@ resolve_olink_sdrf_panel_name <- function(panel_name, metadata, n) {
 #' @keywords internal
 #' @noRd
 #'
-sdrf_characteristics_from_metadata <- function(metadata, skip_cols = character()) {
+sdrf_chars_from_meta <- function(metadata, skip_cols = character()) {
   extra <- setdiff(colnames(metadata), unique(c(skip_cols, "SampleID")))
   # drop internal helper columns
   extra <- extra[!startsWith(extra, ".")]
@@ -802,7 +819,7 @@ sdrf_characteristics_from_metadata <- function(metadata, skip_cols = character()
   out[] <- lapply(
     X = out,
     FUN = function(x) {
-      ifelse(is.na(x), NA_character_, as.character(x))
+      return(ifelse(is.na(x), NA_character_, as.character(x)))
     }
   )
 
@@ -826,7 +843,7 @@ sdrf_characteristics_from_metadata <- function(metadata, skip_cols = character()
   keep <- !names(out) %in% reserved
   out <- out[, keep, drop = FALSE]
 
-  tibble::as_tibble(out)
+  return(tibble::as_tibble(out))
 }
 
 #' Write SDRF tibble and optionally validate
@@ -883,6 +900,5 @@ sdrf_write_and_validate <- function(sdrf,
     )
   }
 
-  sdrf
+  return(sdrf)
 }
-

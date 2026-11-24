@@ -6,10 +6,9 @@
 ##   - sample-metadata.yaml      (v1.0.0; extends base@>=1.1.0)
 ##   - affinity-proteomics.yaml  (v1.0.0; extends sample-metadata@>=1.0.0)
 ##
-## Builds:
-##   - sdrf_base_template / sdrf_sample_metadata_template / sdrf_affinity_template
-##   - sdrf_column_dict: merged columns for affinity-proteomics
-##     (base → sample-metadata → affinity; child overrides same-name columns)
+## Builds template metadata objects and a merged column dictionary for
+## affinity-proteomics (base then sample-metadata then affinity; child
+## overrides columns with the same name).
 ##
 ## Requires the yaml package at data-raw build time.
 ## Wired into sysdata.R (rebuild R/sysdata.rda after YAML changes).
@@ -37,7 +36,7 @@ sdrf_yaml_path <- function(file) {
       call. = FALSE
     )
   }
-  normalizePath(hit, winslash = "/", mustWork = TRUE)
+  return(normalizePath(hit, winslash = "/", mustWork = TRUE))
 }
 
 #' Parse an extends string such as "sample-metadata@>=1.0.0"
@@ -59,10 +58,12 @@ sdrf_parse_extends <- function(extends) {
   if (length(parts) != 4L) {
     stop("Cannot parse extends value: '", extends, "'.", call. = FALSE)
   }
-  list(
-    name = parts[[2L]],
-    op = parts[[3L]],
-    version = parts[[4L]]
+  return(
+    list(
+      name = parts[[2L]],
+      op = parts[[3L]],
+      version = parts[[4L]]
+    )
   )
 }
 
@@ -76,15 +77,17 @@ sdrf_parse_extends <- function(extends) {
 sdrf_version_satisfies <- function(version, op, required) {
   v <- numeric_version(version)
   r <- numeric_version(required)
-  switch(
-    EXPR = op,
-    ">=" = v >= r,
-    ">"  = v > r,
-    "<=" = v <= r,
-    "<"  = v < r,
-    "==" = v == r,
-    "="  = v == r,
-    stop("Unsupported version operator: '", op, "'.", call. = FALSE)
+  return(
+    switch(
+      EXPR = op,
+      ">=" = v >= r,
+      ">"  = v > r,
+      "<=" = v <= r,
+      "<"  = v < r,
+      "==" = v == r,
+      "="  = v == r,
+      stop("Unsupported version operator: '", op, "'.", call. = FALSE)
+    )
   )
 }
 
@@ -106,7 +109,7 @@ sdrf_name_to_key <- function(name) {
   key <- tolower(key)
   key <- gsub(pattern = "[^a-z0-9]+", replacement = "_", x = key)
   key <- gsub(pattern = "^_|_$", replacement = "", x = key)
-  key
+  return(key)
 }
 
 #' Extract example values nested under column validators
@@ -129,10 +132,10 @@ sdrf_validator_examples <- function(validators) {
       if (is.null(out)) {
         return(character())
       }
-      as.character(unlist(out, use.names = FALSE))
+      return(as.character(unlist(out, use.names = FALSE)))
     }
   )
-  unique(unlist(ex, use.names = FALSE))
+  return(unique(unlist(ex, use.names = FALSE)))
 }
 
 #' Whether a column is multi-cardinality
@@ -153,7 +156,7 @@ sdrf_col_is_multi <- function(col) {
     X = validators,
     FUN = function(v) {
       nm <- v[["validator_name"]]
-      if (is.null(nm)) NA_character_ else as.character(nm)
+      return(if (is.null(nm)) NA_character_ else as.character(nm))
     },
     FUN.VALUE = character(1L)
   )
@@ -161,7 +164,7 @@ sdrf_col_is_multi <- function(col) {
   if (any(names_v == "single_cardinality_validator", na.rm = TRUE)) {
     return(FALSE)
   }
-  FALSE
+  return(FALSE)
 }
 
 #' Build column_name_dict-like tibble from one SDRF template YAML
@@ -185,10 +188,16 @@ sdrf_columns_from_yaml <- function(yaml) {
 
   col_name <- vapply(
     X = cols,
-    FUN = function(cl) as.character(cl[["name"]]),
+    FUN = function(cl) {
+      return(as.character(cl[["name"]]))
+    },
     FUN.VALUE = character(1L)
   )
-  col_key <- vapply(X = col_name, FUN = sdrf_name_to_key, FUN.VALUE = character(1L))
+  col_key <- vapply(
+    X = col_name,
+    FUN = sdrf_name_to_key,
+    FUN.VALUE = character(1L)
+  )
 
   if (anyDuplicated(col_key)) {
     stop(
@@ -202,7 +211,7 @@ sdrf_columns_from_yaml <- function(yaml) {
     X = cols,
     FUN = function(cl) {
       req <- cl[["requirement"]]
-      if (is.null(req)) NA_character_ else as.character(req)
+      return(if (is.null(req)) NA_character_ else as.character(req))
     },
     FUN.VALUE = character(1L)
   )
@@ -211,7 +220,7 @@ sdrf_columns_from_yaml <- function(yaml) {
     X = cols,
     FUN = function(cl) {
       desc <- cl[["description"]]
-      if (is.null(desc)) NA_character_ else as.character(desc)
+      return(if (is.null(desc)) NA_character_ else as.character(desc))
     },
     FUN.VALUE = character(1L)
   )
@@ -220,7 +229,7 @@ sdrf_columns_from_yaml <- function(yaml) {
     X = cols,
     FUN = function(cl) {
       acc <- cl[["ontology_accession"]]
-      if (is.null(acc)) NA_character_ else as.character(acc)
+      return(if (is.null(acc)) NA_character_ else as.character(acc))
     },
     FUN.VALUE = character(1L)
   )
@@ -229,7 +238,7 @@ sdrf_columns_from_yaml <- function(yaml) {
     X = cols,
     FUN = function(cl) {
       d <- cl[["default"]]
-      if (is.null(d)) NA_character_ else as.character(d)
+      return(if (is.null(d)) NA_character_ else as.character(d))
     },
     FUN.VALUE = character(1L)
   )
@@ -238,7 +247,7 @@ sdrf_columns_from_yaml <- function(yaml) {
     X = cols,
     FUN = function(cl) {
       x <- cl[["allow_not_applicable"]]
-      if (is.null(x)) NA else as.logical(x)
+      return(if (is.null(x)) NA else as.logical(x))
     },
     FUN.VALUE = logical(1L)
   )
@@ -247,7 +256,7 @@ sdrf_columns_from_yaml <- function(yaml) {
     X = cols,
     FUN = function(cl) {
       x <- cl[["allow_not_available"]]
-      if (is.null(x)) NA else as.logical(x)
+      return(if (is.null(x)) NA else as.logical(x))
     },
     FUN.VALUE = logical(1L)
   )
@@ -255,14 +264,16 @@ sdrf_columns_from_yaml <- function(yaml) {
   col_names <- lapply(
     X = seq_along(cols),
     FUN = function(i) {
-      unique(c(col_name[[i]], col_key[[i]]))
+      return(unique(c(col_name[[i]], col_key[[i]])))
     }
   )
   names(col_names) <- col_key
 
   col_examples <- lapply(
     X = cols,
-    FUN = function(cl) sdrf_validator_examples(cl[["validators"]])
+    FUN = function(cl) {
+      return(sdrf_validator_examples(cl[["validators"]]))
+    }
   )
   names(col_examples) <- col_key
 
@@ -270,29 +281,38 @@ sdrf_columns_from_yaml <- function(yaml) {
     X = cols,
     FUN = function(cl) {
       v <- cl[["validators"]]
-      if (is.null(v)) list() else v
+      return(if (is.null(v)) list() else v)
     }
   )
   names(validators) <- col_key
 
-  col_multi <- vapply(X = cols, FUN = sdrf_col_is_multi, FUN.VALUE = logical(1L))
+  col_multi <- vapply(
+    X = cols,
+    FUN = sdrf_col_is_multi,
+    FUN.VALUE = logical(1L)
+  )
 
-  dplyr::tibble(
-    col_key = col_key,
-    col_names = col_names,
-    col_requirement = col_requirement,
-    col_source = rep(x = as.character(template_name), times = length(cols)),
-    col_miss = col_requirement != "required",
-    col_multi = col_multi,
-    col_description = col_description,
-    ontology_accession = ontology_accession,
-    col_default = col_default,
-    allow_not_applicable = allow_not_applicable,
-    allow_not_available = allow_not_available,
-    col_class = rep(x = "character", times = length(cols)),
-    col_class_check = rep(x = FALSE, times = length(cols)),
-    col_examples = col_examples,
-    validators = validators
+  return(
+    dplyr::tibble(
+      col_key = col_key,
+      col_names = col_names,
+      col_requirement = col_requirement,
+      col_source = rep(
+        x = as.character(template_name),
+        times = length(cols)
+      ),
+      col_miss = col_requirement != "required",
+      col_multi = col_multi,
+      col_description = col_description,
+      ontology_accession = ontology_accession,
+      col_default = col_default,
+      allow_not_applicable = allow_not_applicable,
+      allow_not_available = allow_not_available,
+      col_class = rep(x = "character", times = length(cols)),
+      col_class_check = rep(x = FALSE, times = length(cols)),
+      col_examples = col_examples,
+      validators = validators
+    )
   )
 }
 
@@ -303,29 +323,39 @@ sdrf_columns_from_yaml <- function(yaml) {
 #' @return Named list
 #' @noRd
 sdrf_template_from_yaml <- function(yaml, path) {
-  list(
-    name = yaml[["name"]],
-    version = yaml[["version"]],
-    description = yaml[["description"]],
-    documentation = yaml[["documentation"]],
-    extends = yaml[["extends"]],
-    usable_alone = yaml[["usable_alone"]],
-    layer = yaml[["layer"]],
-    mutually_exclusive_with = {
-      mex <- yaml[["mutually_exclusive_with"]]
-      if (is.null(mex)) character() else as.character(unlist(mex, use.names = FALSE))
-    },
-    validators = yaml[["validators"]],
-    contributors = {
-      ctb <- yaml[["contributors"]]
-      if (is.null(ctb)) character() else as.character(unlist(ctb, use.names = FALSE))
-    },
-    url = paste0(
-      "https://sdrf.quantms.org/templates/",
-      yaml[["name"]],
-      ".html"
-    ),
-    yaml_path = path
+  return(
+    list(
+      name = yaml[["name"]],
+      version = yaml[["version"]],
+      description = yaml[["description"]],
+      documentation = yaml[["documentation"]],
+      extends = yaml[["extends"]],
+      usable_alone = yaml[["usable_alone"]],
+      layer = yaml[["layer"]],
+      mutually_exclusive_with = {
+        mex <- yaml[["mutually_exclusive_with"]]
+        if (is.null(mex)) {
+          character()
+        } else {
+          as.character(unlist(mex, use.names = FALSE))
+        }
+      },
+      validators = yaml[["validators"]],
+      contributors = {
+        ctb <- yaml[["contributors"]]
+        if (is.null(ctb)) {
+          character()
+        } else {
+          as.character(unlist(ctb, use.names = FALSE))
+        }
+      },
+      url = paste0(
+        "https://sdrf.quantms.org/templates/",
+        yaml[["name"]],
+        ".html"
+      ),
+      yaml_path = path
+    )
   )
 }
 
@@ -337,7 +367,8 @@ sdrf_template_from_yaml <- function(yaml, path) {
 sdrf_load_template <- function(name) {
   path <- sdrf_yaml_path(paste0(name, ".yaml"))
   yaml <- yaml::read_yaml(path)
-  if (is.null(yaml[["name"]]) || !identical(as.character(yaml[["name"]]), name)) {
+  yaml_name <- as.character(yaml[["name"]])
+  if (is.null(yaml[["name"]]) || !identical(yaml_name, name)) {
     stop(
       "YAML file '", path, "' has name '", yaml[["name"]],
       "' but was loaded as '", name, "'.",
@@ -347,12 +378,14 @@ sdrf_load_template <- function(name) {
   if (is.null(yaml[["version"]])) {
     stop("YAML '", name, "' is missing a 'version' field.", call. = FALSE)
   }
-  list(
-    name = name,
-    path = path,
-    yaml = yaml,
-    template = sdrf_template_from_yaml(yaml = yaml, path = path),
-    columns = sdrf_columns_from_yaml(yaml)
+  return(
+    list(
+      name = name,
+      path = path,
+      yaml = yaml,
+      template = sdrf_template_from_yaml(yaml = yaml, path = path),
+      columns = sdrf_columns_from_yaml(yaml)
+    )
   )
 }
 
@@ -368,9 +401,10 @@ sdrf_merge_columns <- function(parent_cols, child_cols) {
   }
   overlap <- intersect(parent_cols$col_key, child_cols$col_key)
   if (length(overlap) > 0L) {
-    parent_cols <- parent_cols[!parent_cols$col_key %in% overlap, , drop = FALSE]
+    keep <- !parent_cols$col_key %in% overlap
+    parent_cols <- parent_cols[keep, , drop = FALSE]
   }
-  dplyr::bind_rows(parent_cols, child_cols)
+  return(dplyr::bind_rows(parent_cols, child_cols))
 }
 
 #' Resolve extends for a loaded template against locally available templates
@@ -397,7 +431,8 @@ sdrf_resolve_extends <- function(child, available) {
         unresolved,
         paste0(
           parent_name, "@", parent_spec$op, parent_spec$version,
-          " (required by ", chain[[length(chain)]], "; YAML not present locally)"
+          " (required by ", chain[[length(chain)]],
+          "; YAML not present locally)"
         )
       )
       break
@@ -424,10 +459,12 @@ sdrf_resolve_extends <- function(child, available) {
     parent_spec <- sdrf_parse_extends(parent$yaml[["extends"]])
   }
 
-  list(
-    columns = columns,
-    chain = chain,
-    unresolved = unresolved
+  return(
+    list(
+      columns = columns,
+      chain = chain,
+      unresolved = unresolved
+    )
   )
 }
 
@@ -467,14 +504,17 @@ sdrf_affinity_resolved <- sdrf_resolve_extends(
 )
 
 sdrf_affinity_template$resolved_chain <- sdrf_affinity_resolved$chain
-sdrf_affinity_template$unresolved_extends <- sdrf_affinity_resolved$unresolved
+sdrf_affinity_template$unresolved_extends <-
+  sdrf_affinity_resolved$unresolved
 sdrf_affinity_template$local_dependencies <- lapply(
   X = sdrf_available,
   FUN = function(tpl) {
-    list(
-      version = tpl$template$version,
-      yaml_path = tpl$path,
-      extends = tpl$template$extends
+    return(
+      list(
+        version = tpl$template$version,
+        yaml_path = tpl$path,
+        extends = tpl$template$extends
+      )
     )
   }
 )
@@ -492,7 +532,7 @@ sdrf_column_dict <- sdrf_affinity_resolved$columns
 
 ## Layer-only dicts (useful for debugging / future)
 sdrf_base_column_dict <- sdrf_base$columns
-sdrf_sample_metadata_column_dict <- sdrf_sample_metadata$columns
+sdrf_sample_meta_cols <- sdrf_sample_metadata$columns
 
 rm(
   sdrf_yaml_path,
