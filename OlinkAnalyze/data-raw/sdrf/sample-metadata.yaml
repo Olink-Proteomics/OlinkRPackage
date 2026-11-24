@@ -1,0 +1,357 @@
+name: sample-metadata
+description: SDRF template with shared sample metadata columns (organism, tissue, disease). This is an internal construction layer inherited by technology and organism templates - not used directly.
+documentation: |
+  The sample-metadata template is the shared biological layer inherited by all technology
+  and organism templates. It defines the core sample identity and biology columns.
+
+  Key columns and guidance:
+  - `characteristics[organism]`: Use NCBI Taxonomy names in lowercase (e.g., `homo sapiens`).
+  - `characteristics[organism part]`: Use UBERON or BTO terms. Supports multiple cardinality
+    for mixed-tissue samples (add multiple columns with the same header). This is the main
+    normalized anatomy field used for integration across studies.
+  - `characteristics[tissue supergroup]`: Optional broader anatomical bucket (for example
+    `heart`, `liver`, `brain`, or a higher-level system such as `gastrointestinal tract`)
+    used alongside `characteristics[organism part]` when higher-level grouping is useful.
+  - `characteristics[disease]`: Use `normal` (PATO:0000461) for healthy/control samples.
+    Organism templates (human, vertebrates, etc.) override this to required.
+  - `characteristics[biological replicate]`: Integer starting from 1. Use `pooled` for
+    pooled reference samples only.
+  - `characteristics[sample type]`: Classifies the sample's role in the experiment.
+    Use `study sample` for biological samples under investigation. Control wells use
+    PRIDE control terms (e.g. negative control, positive control, calibrator, plate control,
+    quality control sample). Multiplexed or plate-normalization roles include reference,
+    bridge, carrier, pooled, and empty.
+  - `characteristics[biosample accession number]`: Link to BioSample record (SAMN/SAMEA/SAMD).
+contributors:
+  - Yasset Perez-Riverol (yperez@ebi.ac.uk) - EMBL-EBI
+  - Deepti Jaiswal Kundu (jaiswal@ebi.ac.uk) - EMBL-EBI
+  - Nithu Sara John (nithu@ebi.ac.uk) - EMBL-EBI
+  - Nandana Madhusoodanan (nandana@ebi.ac.uk) - EMBL-EBI
+  - Asier Larrea (alarre@ebi.ac.uk) - EMBL-EBI
+  - Toan Phung (TPhung001@dundee.ac.uk) - University of Dundee
+  - Timo Sachsenberg (timo.sachsenberg@uni-tuebingen.de) - University of Tübingen
+version: 1.0.0
+extends: base@>=1.1.0
+usable_alone: false
+layer: null
+
+columns:
+  - name: characteristics[organism]
+    ontology_accession: COB:0000022
+    description: Species of the sample using NCBI Taxonomy
+    requirement: required
+    allow_not_applicable: true
+    allow_not_available: false
+    validators:
+      - validator_name: ontology
+        params:
+          ontologies:
+            - ncbitaxon
+          error_level: error
+          description: The organism should be a valid NCBI Taxonomy term
+          examples:
+            - homo sapiens
+            - mus musculus
+            - rattus norvegicus
+            - saccharomyces cerevisiae
+
+  - name: characteristics[organism part]
+    ontology_accession: EFO:0000635
+    description: Main normalized anatomical term for the sample
+    requirement: required
+    cardinality: multiple
+    allow_not_applicable: true
+    allow_not_available: true
+    validators:
+      - validator_name: ontology
+        params:
+          ontologies:
+            - uberon
+            - bto
+          error_level: warning
+          description: The organism part should be a valid UBERON or BTO term
+          examples:
+            - liver
+            - brain
+            - heart
+            - blood
+
+  - name: characteristics[tissue supergroup]
+    description: Broader anatomical grouping or system-level bucket for the sample, used alongside the organism part for higher-level grouping
+    requirement: optional
+    allow_not_applicable: true
+    allow_not_available: true
+    validators:
+      - validator_name: ontology
+        params:
+          ontologies:
+            - uberon
+            - bto
+          error_level: warning
+          description: Tissue supergroup should be a valid UBERON or BTO anatomy term such as heart, liver, brain, or gastrointestinal tract when possible
+          examples:
+            - heart
+            - liver
+            - brain
+            - gastrointestinal tract
+
+  - name: characteristics[cell type]
+    ontology_accession: EFO:0000324
+    description: Cell type of the sample
+    requirement: recommended
+    cardinality: multiple
+    allow_not_applicable: true
+    allow_not_available: true
+    validators:
+      - validator_name: ontology
+        params:
+          ontologies:
+            - cl
+            - bto
+            - clo
+          error_level: warning
+          description: The cell type should be a valid Cell Ontology (CL), BRENDA Tissue Ontology (BTO), or Cell Line Ontology (CLO) term
+          examples:
+            - hepatocyte
+            - neuron
+            - fibroblast
+            - T cell
+
+  - name: characteristics[biological replicate]
+    ontology_accession: MS:1001809
+    description: Identifier for the biological replicate (integer starting from 1, or 'pooled' for pooled samples)
+    requirement: required
+    allow_not_applicable: false
+    allow_not_available: false
+    allow_pooled: true
+    validators:
+      - validator_name: pattern
+        params:
+          pattern: ^\d+$|^pooled$
+          description: Biological replicate should be an integer or 'pooled' for pooled reference samples
+          examples:
+            - 1
+            - 2
+            - pooled
+
+  - name: characteristics[pooled sample]
+    ontology_accession: NCIT:C165587
+    description: Whether the sample is a pooled sample combining material from multiple biological sources. Use 'not pooled' for individual samples, 'pooled' when sources are unknown, or 'SN=sample1;SN=sample2' to list source names.
+    requirement: optional
+    allow_not_applicable: true
+    allow_not_available: true
+    validators:
+      - validator_name: values
+        params:
+          values:
+            - not pooled
+            - pooled
+          error_level: warning
+      - validator_name: pattern
+        params:
+          pattern: "^(not pooled|pooled|SN=.+(;SN=.+)*)$"
+          error_level: warning
+          description: Use 'not pooled', 'pooled', or list sample IDs with SN= prefix
+          examples:
+            - SN=sample1;SN=sample2
+
+  - name: characteristics[sample type]
+    ontology_accession: PRIDE:0000895
+    description: Classification of the sample role in the experiment. Distinguishes study samples under investigation from controls, references, and other roles in multiplexed or plate-based experiments.
+    requirement: optional
+    allow_not_applicable: true
+    allow_not_available: true
+    validators:
+      - validator_name: ontology
+        params:
+          ontologies:
+            - pride
+          parent_term: PRIDE:0000895
+          error_level: error
+          description: Sample type should be a child of PRIDE:0000895 (sample type)
+          examples:
+            - study sample
+            - single cell
+            - environmental sample
+            - reference
+            - bridge
+            - carrier
+            - pooled
+            - empty
+            - negative control
+            - positive control
+            - bulk control
+            - buffer control
+            - plate control
+            - quality control sample
+            - calibrator
+            - standard
+
+  - name: characteristics[disease]
+    ontology_accession: MONDO:0000001
+    description: Disease state of the sample
+    requirement: recommended
+    allow_not_applicable: true
+    allow_not_available: true
+    validators:
+      - validator_name: ontology
+        params:
+          ontologies:
+            - mondo
+            - efo
+            - doid
+            - ncit
+            - pato
+          error_level: warning
+          description: The disease should be a valid MONDO, EFO, DOID, NCIT, or PATO ontology term. Use 'normal' (PATO:0000461) for healthy samples.
+          examples:
+            - normal
+            - breast cancer
+            - infection
+            - metabolic disease
+
+  - name: characteristics[material type]
+    ontology_accession: PRIDE:0000837
+    description: Type of biological material being analyzed
+    requirement: optional
+    allow_not_applicable: true
+    allow_not_available: true
+    validators:
+      - validator_name: values
+        params:
+          values:
+            - tissue
+            - cell
+            - cell line
+            - organism part
+            - whole organism
+            - synthetic
+          error_level: warning
+          description: Material type
+
+  - name: characteristics[tissue mass]
+    ontology_accession: OBA:2045411
+    description: Mass of tissue used for extraction
+    requirement: optional
+    allow_not_applicable: true
+    allow_not_available: true
+    validators:
+      - validator_name: number_with_unit
+        params:
+          units: [mg, g, ug]
+          error_level: warning
+          description: Tissue mass with unit
+          examples:
+            - 50 mg
+            - 1 g
+            - 500 ug
+
+  - name: characteristics[biosample accession number]
+    ontology_accession: NCIT:C175889
+    description: BioSample accession number for the sample (e.g., SAMN or SAMEA identifiers)
+    requirement: optional
+    allow_not_applicable: true
+    allow_not_available: true
+    validators:
+      - validator_name: accession
+        params:
+          format: biosample
+          error_level: error
+          description: BioSample accession
+          examples:
+            - SAMN12345678
+            - SAMEA12345678
+            - SAMD1234567
+
+  - name: characteristics[sampling time]
+    ontology_accession: EFO:0000689
+    description: Time at which the sample was collected (for longitudinal or time-course studies)
+    requirement: optional
+    allow_not_applicable: true
+    allow_not_available: true
+    validators:
+      - validator_name: number_with_unit
+        params:
+          units: [hour, day, minute, week, month, year]
+          error_level: warning
+          description: Sampling time with unit
+          examples:
+            - 0 hour
+            - 24 hour
+            - 7 day
+            - 3 month
+
+  - name: characteristics[treatment]
+    ontology_accession: EFO:0000727
+    description: Treatment or perturbation applied to the sample (drug, stimulus, environmental stress)
+    requirement: optional
+    allow_not_applicable: true
+    allow_not_available: true
+    validators:
+      - validator_name: ontology
+        params:
+          ontologies:
+            - ncit
+            - efo
+          error_level: warning
+          description: Treatment should be a valid ontology term. Use 'untreated' for controls.
+          examples:
+            - untreated
+            - LPS stimulation
+            - doxorubicin treatment
+            - drought stress
+            - salt stress
+
+  - name: characteristics[synthetic peptide]
+    ontology_accession: PRIDE:0000495
+    description: Whether the sample is a synthetic peptide library or biological material
+    requirement: optional
+    allow_not_applicable: true
+    allow_not_available: false
+    validators:
+      - validator_name: values
+        params:
+          values:
+            - synthetic
+            - not synthetic
+          error_level: error
+          description: Synthetic peptide status
+
+  - name: characteristics[spiked compound]
+    ontology_accession: PRIDE:0000496
+    description: Spiked-in compound details using key-value format (CT=compound type, QY=quantity, PS=peptide sequence, AC=UniProt accession, CN=compound name, CV=vendor)
+    requirement: optional
+    cardinality: multiple
+    allow_not_applicable: true
+    allow_not_available: true
+    validators:
+      - validator_name: pattern
+        params:
+          pattern: ^CT=.+(;(QY|PS|AC|CN|CV|SP)=.+)*$
+          description: Key-value format for spiked compound details (CT=type, SP=species, QY=quantity, PS=sequence, AC=accession, CN=name, CV=vendor)
+          examples:
+            - CT=peptide;PS=PEPTIDESEQ;QY=10 fmol
+            - CT=protein;AC=A9WZ33;QY=20 nmol
+            - CT=protein;SP=Homo sapiens;QY=1 pmol;AC=P37840
+            - CT=mixture;CN=iRT mixture;CV=Biognosys;QY=1 pmol
+
+  - name: characteristics[enrichment process]
+    ontology_accession: EFO:0009090
+    description: Enrichment strategy applied to the sample (e.g., phosphopeptide enrichment, crosslinked peptide enrichment, glycopeptide enrichment)
+    requirement: optional
+    allow_not_applicable: true
+    allow_not_available: true
+    validators:
+      - validator_name: ontology
+        params:
+          ontologies:
+            - pride
+            - efo
+          parent_term: EFO:0009090
+          error_level: warning
+          description: Enrichment type should be a child term of EFO:0009090 (enrichment process)
+          examples:
+            - enrichment of cross-linked peptides
+            - enrichment of phosphorylated protein
+            - enrichment of glycopeptides
+            - enrichment of ubiquitinated proteins
